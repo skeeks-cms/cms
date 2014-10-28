@@ -14,4 +14,6 @@ namespace skeeks\cms;
  * @package skeeks\cms
  */
 abstract class Module extends \yii\base\Module
-{}
+{
+    //TODO:: расширить базовый модуль skeeks cms
+}
