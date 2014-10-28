@@ -1,0 +1,19 @@
+html {
+    background-image: url(http://demopavothemes.com/pav_food_store/catalog/view/theme/pav_foodstore/image/pattern/pattern16.png);
+}
+
+.sx-auth-block {
+    width: 480px;
+    margin-left: -240px;
+    padding-bottom: 20px;
+    margin-top: -200px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border: 3px solid #c9c9c9;
+    background: white;
+    -webkit-box-shadow: 1px 24px 39px 68px rgba(255, 255, 255, 0.5);
+    box-shadow: 1px 1px 13px 10px rgba(190, 190, 190, 0.54);
+    display: none;
+    border-radius: 14px;
+}

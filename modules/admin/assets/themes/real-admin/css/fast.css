@@ -1,0 +1,108 @@
+/* Change standart bootstrap */
+.navbar .navbar-nav > .active > a
+{
+    background-color: #F0F0F0;
+}
+
+#header .navbar {
+    background-image: url(../images/bg/19.png);
+    border-bottom: 2px solid #BEBEBE;
+    -webkit-box-shadow: 1px 24px 39px 68px rgba(255, 255, 255, 0.5);
+    box-shadow: 1px 1px 22px 4px rgba(247, 247, 247, 0.54);
+    /* border-radius: 14px; */
+    width: 100%;
+}
+
+    .navbar-brand {
+        //background: url("http://skeeks.com/static/templates/main/images/logo.png") repeat-x;
+        height: 38px;
+        left: 15px;
+        width: 40px;
+    }
+
+    #header .navbar .navbar-collapse{
+        background: none;
+    }
+
+
+body {
+    //background-image: url(../images/bg/4.png);
+    background: url(http://st.gdefon.com/wallpapers_original/wallpapers/500279_mashia_yekskavator_ogromna_kovsh_pesok_gusenicy_d_2560x1440_www.GdeFon.ru.jpg?sx-original) center fixed;
+}
+
+#heading, #sidebar, .panel {
+    //box-shadow: 1px 1px 22px 4px rgba(247, 247, 247, 0.54);
+    box-shadow: 1px 1px 31px 4px rgba(138, 113, 179, 0.54);
+}
+
+
+    /*
+     * footer
+     */
+.sx-admin-footer {
+    background-image: url(../images/bg/19.png);
+    padding: 7px;
+    position: fixed;
+    bottom: 0px;
+    border-top: 2px solid #BEBEBE;
+    -webkit-box-shadow: 1px 24px 39px 68px rgba(255, 255, 255, 0.5);
+    box-shadow: 1px 1px 22px 4px rgba(247, 247, 247, 0.54);
+    width: 100%;
+}
+
+    .sx-admin-footer .copyright {
+        text-align: center;
+    }
+
+.crumb {
+    margin-bottom: 20px;
+}
+
+
+
+
+    /*Виджеты админки*/
+
+.sx-widget-block {}
+    .sx-widget-block .sx-no-icon {}
+        .sx-widget-block .sx-no-icon h4
+            {
+                padding: 11px 0 11px 10px;
+            }
+        .sx-widget-block .sx-navbar
+        {
+            margin-bottom: 0px;
+            border-radius: 0px;
+            border-bottom: 0px;
+            border-left: 0px;
+            border-right: 0px;
+        }
+
+            .sx-widget-block .sx-navbar .container
+            {
+                margin-right: 0px;
+                margin-left: 0px;
+                padding-left: 0px;
+            }
+
+            .sx-widget-block .sx-navbar ul li
+            {
+                margin-bottom: 0px;
+            }
+
+
+.sx-admin-windowCloseButton {
+    display: none;
+}
+
+
+.sx-form-group-admin-editor {
+    background: url(../images/bg/19.png);
+    padding: 10px;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    left: 0px;
+    border-top: 1px solid #E7E7E7;
+    box-shadow: 1px 1px 31px 4px rgba(138, 113, 179, 0.54);
+}
