@@ -10,22 +10,22 @@
  * @date 20.10.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\modules\subscribe\behaviors;
+namespace skeeks\cms\models\behaviors;
 
-use skeeks\cms\modules\subscribe\models\Subscribe;
+use skeeks\cms\models\Comment;
 use yii\db\BaseActiveRecord;
 use \yii\base\Behavior;
 
 /**
  * Class HasComments
- * @package common\models\behaviors
+ * @package skeeks\cms\models\behaviors
  */
-class HasSubscribes extends Behavior
+class HasComments extends Behavior
 {
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteSubscribes",
+            BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteComments",
         ];
     }
 
@@ -36,9 +36,9 @@ class HasSubscribes extends Behavior
      *
      * @throws \Exception
      */
-    public function deleteSubscribes()
+    public function deleteComments()
     {
-        if ($comments = Subscribe::find($this->owner->getRef()->toArray())->all())
+        if ($comments = Comment::find($this->owner->getRef()->toArray())->all())
         {
             foreach ($comments as $comment)
             {

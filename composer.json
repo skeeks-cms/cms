@@ -1,8 +1,9 @@
 {
     "name": "skeeks/yii2-cms",
     "description": "Yii2 cms extension",
+    "keywords": ["framework", "cms", "skeeks", "sx", "app", "yii2", "extension"],
+    "homepage": "http://www.skeeks.com/",
     "type": "yii2-extension",
-    "keywords": ["yii2","extension","skeeks","cms","sx"],
     "license": "BSD-3-Clause",
     "support": {
         "issues": "http://www.skeeks.com/",
@@ -17,7 +18,29 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "skeeks/yii2-sx": "*"
+        "yiisoft/yii2-bootstrap": "*",
+        "yiisoft/yii2-swiftmailer": "*",
+        "skeeks/yii2-sx": "*",
+        "skeeks/yii2-widget-simpleajaxuploader": "*",
+        "skeeks/yii2-widget-ckeditor": "*",
+        "miloschuman/yii2-highcharts-widget": "dev-master",
+        "nex/yii2-chosen": "*"
+    },
+    "require-dev": {
+        "yiisoft/yii2-codeception": "*",
+        "yiisoft/yii2-debug": "*",
+        "yiisoft/yii2-gii": "*",
+        "yiisoft/yii2-faker": "*"
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "process-timeout": 1800
+    },
+    "extra": {
+        "asset-installer-paths": {
+            "npm-asset-library": "vendor/npm",
+            "bower-asset-library": "vendor/bower"
+        }
     },
     "autoload": {
         "psr-4": {

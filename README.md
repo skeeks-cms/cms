@@ -21,6 +21,11 @@ or add
 
 to the require section of your `composer.json` file.
 
+Install migrations 
+
+```
+php yii migrate --migrationPath=@skeeks/cms/migrations
+```
 
 Usage
 -----

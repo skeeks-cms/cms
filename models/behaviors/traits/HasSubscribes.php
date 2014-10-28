@@ -9,13 +9,14 @@
  * @since 1.0.0
  */
 
-namespace \skeeks\cms\modules\subscribe\behaviors\traits;
+namespace skeeks\cms\models\behaviors\traits;
 
-use \skeeks\cms\modules\subscribe\models\Subscribe;
+use \skeeks\cms\models\Subscribe;
 use \skeeks\cms\modules\user\models\User;
 
 /**
  * Class HasSubscribes
+ * @package skeeks\cms\models\behaviors\traits
  */
 trait HasSubscribes
 {

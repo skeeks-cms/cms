@@ -8,7 +8,7 @@
  * @date 20.10.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\behaviors;
+namespace skeeks\cms\models\behaviors;
 
 use yii\db\BaseActiveRecord;
 use \yii\base\Behavior;
@@ -16,7 +16,7 @@ use yii\base\Event;
 
 /**
  * Class Implode
- * @package skeeks\sx\behaviors
+ * @package skeeks\cms\models\behaviors
  */
 class Implode extends Behavior
 {

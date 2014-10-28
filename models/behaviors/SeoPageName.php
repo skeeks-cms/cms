@@ -9,7 +9,7 @@
  * @since 1.0.0
  */
 
-namespace skeeks\cms\behaviors;
+namespace skeeks\cms\models\behaviors;
 
 use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
 
@@ -19,7 +19,7 @@ use yii\base\Event;
 
 /**
  * Class SeoPageName
- * @package skeeks\cms\behaviors
+ * @package skeeks\cms\models\behaviors
  */
 class SeoPageName extends AttributeBehavior
 {
