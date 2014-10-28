@@ -1,0 +1,27 @@
+{
+    "name": "skeeks/yii2-cms",
+    "description": "Yii2 cms extension",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","skeeks","cms","sx"],
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "http://www.skeeks.com/",
+        "wiki": "http://cms.skeeks.com/wiki/",
+        "source": "http://git.skeeks.com/skeeks/yii2-cms"
+    },
+    "authors": [
+        {
+            "name": "Semenov Alexander",
+            "email": "semenov@skeeks.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*",
+        "skeeks/sx": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "skeeks\\cms\\": ""
+        }
+    }
+}
