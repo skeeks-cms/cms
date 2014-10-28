@@ -17,7 +17,7 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "skeeks/sx": "*"
+        "skeeks/yii2-sx": "*"
     },
     "autoload": {
         "psr-4": {
