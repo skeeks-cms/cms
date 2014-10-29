@@ -100,153 +100,56 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
-            <div class="sidebar-menu" id="sx-admin-menu-">
-                <div class="sx-head">
-                    <i class="icon icon-arrow-up" style=""></i>
-                    Основное
+            <? if ($items = App::getDescriptor()->getAdminItems()) : ?>
+                <div class="sidebar-menu" id="sx-admin-menu-">
+                    <div class="sx-head">
+                        <i class="icon icon-arrow-up" style=""></i>
+                        <?= App::getDescriptor()->name; ?>
+                    </div>
+
+                    <ul class="nav nav-sidebar">
+                        <? foreach ($items as $itemData) : ?>
+                            <li>
+                                <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["route"]) ?>" title="#">
+                                    <span class="sx-icon"></span>
+                                    <span class="txt"><?= $itemData["label"]; ?></span>
+                                </a>
+                            </li>
+                        <? endforeach; ?>
+                    </ul>
                 </div>
+            <? endif; ?>
 
-                <ul class="nav nav-sidebar">
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("user") ?>" title="#">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Управление пользователями</span>
-                        </a>
-                    </li>
+            <? if ($modules = App::getModules()) : ?>
+                <?
+                /**
+                 * @var \skeeks\cms\Module $module
+                 */
+                 ?>
 
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("user-authclient") ?>" title="#">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Социальные профили</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                <? foreach ($modules as $key => $module) : ?>
+                    <? if ($items = $module->getDescriptor()->getAdminItems()) : ?>
+                    <div class="sidebar-menu" id="sx-admin-menu-">
+                        <div class="sx-head">
+                            <i class="icon icon-arrow-up" style=""></i>
+                            <?= $module->getDescriptor()->name; ?>
+                        </div>
 
+                        <ul class="nav nav-sidebar">
+                            <? foreach ($items as $itemData) : ?>
+                                <li>
+                                    <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["route"]) ?>" title="#">
+                                        <span class="sx-icon"></span>
+                                        <span class="txt"><?= $itemData["label"]; ?></span>
+                                    </a>
+                                </li>
+                            <? endforeach; ?>
+                        </ul>
+                    </div>
+                    <? endif; ?>
+                <? endforeach; ?>
 
-            <div class="sidebar-menu" id="sx-admin-menu-">
-                <div class="sx-head">
-                    <i class="icon icon-arrow-up" style=""></i>
-                    Игровой портал
-                </div>
-
-                <ul class="nav nav-sidebar">
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("game") ?>">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Игры</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("game-genre") ?>">
-                            <span class="sx-icon">
-                            </span>
-                            <span class="txt">Игровые жанры</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("game-platform") ?>">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Игровые платформы</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("game-company") ?>">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Компании</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </div>
-
-
-            <div class="sidebar-menu" id="sx-admin-menu-">
-                <div class="sx-head">
-                    <i class="icon icon-arrow-up" style=""></i>
-                    Публикации
-                </div>
-
-                <ul class="nav nav-sidebar">
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("publication") ?>">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Публикации</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-
-            <div class="sidebar-menu" id="sx-admin-menu-">
-                <div class="sx-head">
-                    <i class="icon icon-arrow-up" style=""></i>
-                    Комментарии
-                </div>
-
-                <ul class="nav nav-sidebar">
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("comment") ?>">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Комментарии</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="sidebar-menu" id="sx-admin-menu-">
-                <div class="sx-head">
-                    <i class="icon icon-arrow-up" style=""></i>
-                    Файлы
-                </div>
-
-                <ul class="nav nav-sidebar">
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("storage-file") ?>">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Управление файлами</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="sidebar-menu" id="sx-admin-menu-">
-                <div class="sx-head">
-                    <i class="icon icon-arrow-up" style=""></i>
-                    Для разработчика
-                </div>
-
-                <ul class="nav nav-sidebar">
-                    <li>
-                        <a href="<?= Yii::$app->urlManager->createUrl("developer/gii") ?>">
-                            <span class="sx-icon">
-                                
-                            </span>
-                            <span class="txt">Генератор кода Yii</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
+            <? endif; ?>
         </div>
     </div>
 </div>

@@ -10,12 +10,41 @@
  */
 namespace skeeks\cms\modules\admin\controllers;
 
-use \yii\base\Controller;
+use skeeks\cms\App;
+use yii\base\Controller;
+use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
+ *
+ * Это самый базовый контроллер админки, завкрывает все дейсвтия авторизацией
+ *
+ *
  * Class Admin
+ * @package skeeks\cms\modules\admin\controllers
  */
 abstract class Admin extends Controller
 {
+    public function behaviors()
+    {
+        return
+        [
+            'access' =>
+            [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
+    public function init()
+    {
+        parent::init();
+        $this->layout = App::moduleAdmin()->layout;
+    }
 }

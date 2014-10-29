@@ -68,7 +68,7 @@ abstract class Module extends \yii\base\Module
 
                 "items" =>
                 [
-                    "user" =>
+                    /*"user" =>
                         [
                             "label"     => "Управление пользователями",
                             "route"     => "cms/test-admin",
@@ -80,7 +80,7 @@ abstract class Module extends \yii\base\Module
                             "label"     => "Управление группами",
                             "route"     => "cms/user-group-admin",
                             "priority"  => 5,
-                        ]
+                        ]*/
                 ]
             ]
         ];

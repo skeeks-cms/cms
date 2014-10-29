@@ -57,7 +57,13 @@ class UrlRule
 
         unset($params["namespace"]);
 
-        return $this->adminPrefix . "/" . $route . "?" . http_build_query($params);
+        $url = $this->adminPrefix . "/" . $route;
+        if (!empty($params) && ($query = http_build_query($params)) !== '')
+        {
+            $url .= '?' . $query;
+        }
+
+        return $url;
     }
 
     /**

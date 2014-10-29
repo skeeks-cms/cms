@@ -39,13 +39,13 @@ class CmsModule extends Module
                 [
                     [
                         "label"     => "Управление пользователями",
-                        "route"     => "cms/admin-user",
+                        "route"     => ["cms/admin-user"],
                         "priority"  => 10,
                     ],
 
                     [
                         "label"     => "Управление группами",
-                        "route"     => "cms/admin-user-group",
+                        "route"     => ["cms/admin-user-group"],
                         "priority"  => 5,
                     ]
                 ]

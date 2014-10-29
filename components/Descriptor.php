@@ -65,6 +65,9 @@ class Descriptor
 
     public $admin       =
     [
+        "enabled"       => true,
+        "name"          => "",
+
         "items"         =>
         [
             /*"user" =>
