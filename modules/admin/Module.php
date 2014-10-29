@@ -39,7 +39,7 @@ class Module extends CmsModule
     {
         return array_merge(parent::_descriptor(), [
             "name"          => "Админка cms",
-            "description"   => "Модуль входит в состав модуля cms",
+            "description"   => "Модуль входит в состав модуля cms, содержит все необходимые элементы для админки",
         ]);
     }
 

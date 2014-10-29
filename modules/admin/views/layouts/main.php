@@ -175,12 +175,14 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
                     ]) ?>
                 </h2>
                 <div class="panel-actions">
+
                 </div>
 
             </div><!-- End .panel-heading -->
 
             <div class="panel-body">
                 <div class="panel-content-before">
+                    <?= $this->params['actions'] ?>
                     <?/*= Alert::widget() */?>
                 </div>
                 <div class="panel-content">
