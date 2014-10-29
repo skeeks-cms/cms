@@ -8,7 +8,7 @@
  * @date 28.10.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\modules\user\models;
+namespace skeeks\cms\models\forms;
 
 use yii\base\InvalidParamException;
 use yii\base\Model;

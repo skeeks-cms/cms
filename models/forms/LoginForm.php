@@ -9,7 +9,7 @@
  * @since 1.0.0
  */
 
-namespace skeeks\cms\modules\user\models;
+namespace skeeks\cms\models\forms;
 
 use Yii;
 use yii\base\Model;

@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
+use skeeks\cms\App;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -294,7 +295,8 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
 <footer class="sx-admin-footer">
     <div class="row">
         <div class="col-sm-5">
-            &copy; SkeekS <?= date('Y') ?> - сайт разработчика cms: <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
+            <?= App::moduleCms()->getDescriptor()->getCopyright(); ?>
+             | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
         </div><!--/.col-->
         <div class="col-sm-7 text-right">
 

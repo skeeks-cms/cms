@@ -42,12 +42,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $gender
  *
  * @property Comment[] $comments
- * @property Game[] $games
- * @property GameCompany[] $gameCompanies
- * @property GameGenre[] $gameGenres
- * @property GamePlatform[] $gamePlatforms
  * @property Publication[] $publications
- * @property StorageAlbum[] $storageAlbums
  * @property StorageFile[] $storageFiles
  * @property Subscribe[] $subscribes
  * @property StorageFile $imageCover
@@ -192,37 +187,7 @@ class User
         return $this->hasMany(Comment::className(), ['created_by' => 'id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGames()
-    {
-        return $this->hasMany(Game::className(), ['updated_by' => 'id']);
-    }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGameCompanies()
-    {
-        return $this->hasMany(GameCompany::className(), ['updated_by' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGameGenres()
-    {
-        return $this->hasMany(GameGenre::className(), ['updated_by' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGamePlatforms()
-    {
-        return $this->hasMany(GamePlatform::className(), ['updated_by' => 'id']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -232,13 +197,7 @@ class User
         return $this->hasMany(Publication::className(), ['created_by' => 'id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStorageAlbums()
-    {
-        return $this->hasMany(StorageAlbum::className(), ['updated_by' => 'id']);
-    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -248,13 +207,6 @@ class User
         return $this->hasMany(StorageFile::className(), ['created_by' => 'id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStorageFileAlbumMaps()
-    {
-        return $this->hasMany(StorageFileAlbumMap::className(), ['updated_by' => 'id']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery

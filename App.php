@@ -9,7 +9,6 @@
  * @since 1.0.0
  */
 namespace skeeks\cms;
-
 use skeeks\sx\models\IdentityMap;
 /**
  * Class App
@@ -43,10 +42,8 @@ class App
         return static::getInstance();
     }
 
-
     protected function __construct()
     {}
-
 
     /**
      * @var IdentityMap
@@ -67,7 +64,7 @@ class App
 
 
     /**
-     * @return \yii\web\User|\common\models\User|null
+     * @return \yii\web\User|\common\models\User|models\User|null
      */
     static public function getUser()
     {
@@ -89,7 +86,7 @@ class App
 
 
     /**
-     * @return mixed|\yii\web\User
+     * @return \yii\web\User
      */
     static public function auth()
     {
@@ -97,12 +94,83 @@ class App
     }
 
     /**
-     * @return \common\models\User|\yii\web\User
+     * @return \common\models\User|\yii\web\User|models\User
      */
     static public function user()
     {
         return static::getUser();
     }
+
+
+
+        /**
+         * Удобный и быстрый доступ к модулям
+         */
+
+    /**
+     * @return null|\skeeks\cms\modules\admin\Module
+     */
+    static public function moduleAdmin()
+    {
+        return \Yii::$app->getModule("admin");
+    }
+
+    /**
+     * @return null|\skeeks\cms\CmsModule
+     */
+    static public function moduleCms()
+    {
+        return \Yii::$app->getModule("cms");
+    }
+
+    /**
+     *
+     * Вернутся модули только которые instanceof skeeks\cms\Module
+     * При этом происходит загрузка всех зарегистрированных модулей приложения, это не очень оптимально.
+     * Используется для админки, только если срабатывает роут админки, в сайтовой части данной неоптимальности нет.
+     *
+     * @return array
+     */
+    static public function getModules()
+    {
+        $result = [];
+        $allModules = array_keys(\Yii::$app->getModules());
+        if ($allModules)
+        {
+            foreach ($allModules as $key)
+            {
+                $moduleObject = \Yii::$app->getModule($key);
+
+                if ($moduleObject instanceof Module)
+                {
+                    $result[$key] = $moduleObject;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @var components\Descriptor
+     */
+    protected static $_descriptor = null;
+
+    /**
+     * @return components\Descriptor
+     */
+    static public function getDescriptor()
+    {
+        if (self::$_descriptor === null)
+        {
+             self::$_descriptor = new components\Descriptor((array) \Yii::$app->params["descriptor"]);
+        }
+
+        return self::$_descriptor;
+    }
+
+
 
     /**
      * @param $template

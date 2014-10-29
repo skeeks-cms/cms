@@ -41,9 +41,10 @@ class m141019_100557_create_publication_table extends Migration
             'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
-            'seo_page_name'         => Schema::TYPE_STRING. '(64) NOT NULL', //обложка
+            'linked_to_model'       => Schema::TYPE_STRING. '(255) NOT NULL', //Коммент обязательно должен быть к кому то привязан
+            'linked_to_value'       => Schema::TYPE_STRING. '(255) NOT NULL', //Коммент обязательно должен быть к кому то привязан
 
-            'game_id'               => Schema::TYPE_INTEGER . ' NULL',
+            'seo_page_name'         => Schema::TYPE_STRING. '(64) NOT NULL', //обложка
 
             'count_comment'         => Schema::TYPE_INTEGER . ' NULL', //Количество комментариев
 
@@ -69,12 +70,13 @@ class m141019_100557_create_publication_table extends Migration
         $this->execute("ALTER TABLE {{%publication}} ADD INDEX(name);");
         $this->execute("ALTER TABLE {{%publication}} ADD UNIQUE(seo_page_name);");
 
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(game_id);");
-
         $this->execute("ALTER TABLE {{%publication}} ADD INDEX(count_comment);");
         $this->execute("ALTER TABLE {{%publication}} ADD INDEX(count_subscribe);");
         $this->execute("ALTER TABLE {{%publication}} ADD INDEX(count_vote);");
         $this->execute("ALTER TABLE {{%publication}} ADD INDEX(result_vote);");
+
+        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(linked_to_model);");
+        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(linked_to_value);");
 
         $this->execute("ALTER TABLE {{%publication}} ADD INDEX(status);");
         $this->execute("ALTER TABLE {{%publication}} ADD INDEX(status_adult);");
@@ -91,16 +93,10 @@ class m141019_100557_create_publication_table extends Migration
             'publication_updated_by', "{{%publication}}",
             'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
-
-        $this->addForeignKey(
-            'publication_game_id', "{{%publication}}",
-            'game_id', '{{%game}}', 'id', 'CASCADE', 'CASCADE'
-        );
     }
 
     public function down()
     {
-        $this->dropForeignKey("publication_game_id", "{{%publication}}");
         $this->dropForeignKey("publication_created_by", "{{%publication}}");
         $this->dropForeignKey("publication_updated_by", "{{%publication}}");
 

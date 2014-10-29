@@ -172,13 +172,13 @@ class Publication extends ActiveRecord
         ];
     }
 
-    /**
+    /*
      * @return \yii\db\ActiveQuery
      */
-    public function getGame()
+    /**public function getGame()
     {
         return $this->hasOne(Game::className(), ['id' => 'game_id']);
-    }
+    }*/
 
 
     /**
