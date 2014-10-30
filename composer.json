@@ -20,19 +20,16 @@
         "yiisoft/yii2": "*",
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
+        "yiisoft/yii2-codeception": "*",
+        "yiisoft/yii2-debug": "*",
+        "yiisoft/yii2-gii": "*",
+        "yiisoft/yii2-faker": "*",
         "skeeks/yii2-sx": "*",
         "skeeks/yii2-widget-simpleajaxuploader": "*",
         "skeeks/yii2-widget-ckeditor": "*",
         "skeeks/yii2-widget-chosen": "*",
         "miloschuman/yii2-highcharts-widget": "dev-master"
     },
-    "require-dev": {
-        "yiisoft/yii2-codeception": "*",
-        "yiisoft/yii2-debug": "*",
-        "yiisoft/yii2-gii": "*",
-        "yiisoft/yii2-faker": "*"
-    },
-    "minimum-stability": "dev",
     "config": {
         "process-timeout": 1800
     },
