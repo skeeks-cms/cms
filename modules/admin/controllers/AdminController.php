@@ -14,8 +14,12 @@
 namespace skeeks\cms\modules\admin\controllers;
 
 use skeeks\cms\App;
+use skeeks\cms\Controller;
+use skeeks\cms\modules\admin\components\UrlRule;
+use skeeks\cms\modules\admin\widgets\ControllerActions;
 use yii\base\ActionEvent;
-use yii\web\Controller;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Inflector;
 use yii\filters\AccessControl;
 
 /**
@@ -25,11 +29,16 @@ use yii\filters\AccessControl;
 abstract class AdminController extends Controller
 {
     /**
+     * @var string
+     */
+    protected $_defaultAction = "index";
+    /**
      * @var string понятное название контроллера, будет добавлено в хлебные крошки и title страницы
      */
     protected $_label = null;
 
     /**
+     * Описанные действия будут отображаться в виде дополнительного меню
      * @var array
      */
     protected $_actions =
@@ -69,17 +78,101 @@ abstract class AdminController extends Controller
 
         $this->layout = App::moduleAdmin()->layout;
 
-        $this->on(self::EVENT_BEFORE_ACTION, [$this, "_renderActions"]);
+        $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
     }
 
-    protected function _renderActions(ActionEvent $e)
-    {
-        $this->getView()->params["actions"] = "rendered";
-        /*print_r($this->view->params["actions"]);die;
-        print_r($e->action->id);die;
-        print_r($this->_actions);die;*/
-    }
-
+    /**
+     * Проверка целостности данных для работы контроллера
+     */
     protected function _ensure()
     {}
+
+    /**
+     * @param ActionEvent $e
+     */
+    protected function _beforeAction(ActionEvent $e)
+    {
+        $this->_renderActions($e);
+        $this->_renderBreadcrumbs($e);
+        $this->_renderMetadata($e);
+    }
+
+    /**
+     *
+     * Рендер действий текущего контроллера
+     * Сразу запускаем нужный виджет и формируем готовый html
+     * @param ActionEvent $e
+     *
+     * @return $this
+     */
+    protected function _renderActions(ActionEvent $e)
+    {
+        $this->getView()->params["actions"] = ControllerActions::begin([
+            "actions"       => $this->_actions,
+            "currentAction" => $e->action->id,
+            "controller"    => $this,
+        ])->run();
+
+        return $this;
+    }
+
+    /**
+     * Формируем данные для хлебных крошек.
+     * Эти данные в layout - е будут передаваться в нужный виджет.
+     * @param ActionEvent $e
+     *
+     * @return $this
+     */
+    protected function _renderBreadcrumbs(ActionEvent $e)
+    {
+        $actionTitle = Inflector::humanize($e->action->id);
+
+        if (isset($this->_actions[$e->action->id]))
+        {
+            $data = $this->_actions[$e->action->id];
+            $actionTitle = ArrayHelper::getValue($data, "label");
+        }
+
+        if ($this->_label)
+        {
+            $this->getView()->params['breadcrumbs'][] = ['label' => $this->_label, 'url' => [
+                'index',
+                UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
+            ]];
+        }
+
+        if ($this->_defaultAction != $e->action->id)
+        {
+            $this->getView()->params['breadcrumbs'][] = $actionTitle;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ActionEvent $e
+     * @return $this
+     */
+    protected function _renderMetadata(ActionEvent $e)
+    {
+        $actionTitle = Inflector::humanize($e->action->id);
+
+        if (isset($this->_actions[$e->action->id]))
+        {
+            $data = $this->_actions[$e->action->id];
+            $actionTitle = ArrayHelper::getValue($data, "label", "Label");
+        }
+
+        if ($this->_defaultAction != $e->action->id)
+        {
+            $this->getView()->title = $actionTitle . " / " . $this->_label;
+        } else
+        {
+            $this->getView()->title = $this->_label;
+        }
+
+
+        return $this;
+    }
+
 }

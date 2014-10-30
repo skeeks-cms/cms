@@ -18,6 +18,9 @@ use \yii\base\InvalidConfigException;
 class UrlRule
     extends \yii\web\UrlRule
 {
+    const ADMIN_PARAM_NAME  = "namespace";
+    const ADMIN_PARAM_VALUE = "admin";
+
     /**
      * Месторасположения админки
      * @var string
@@ -45,17 +48,17 @@ class UrlRule
      */
     public function createUrl($manager, $route, $params)
     {
-        if (!isset($params["namespace"]))
+        if (!isset($params[self::ADMIN_PARAM_NAME]))
         {
             return false;
         }
 
-        if ($params["namespace"] != "admin")
+        if ($params[self::ADMIN_PARAM_NAME] != self::ADMIN_PARAM_VALUE)
         {
             return false;
         }
 
-        unset($params["namespace"]);
+        unset($params[self::ADMIN_PARAM_NAME]);
 
         $url = $this->adminPrefix . "/" . $route;
         if (!empty($params) && ($query = http_build_query($params)) !== '')
@@ -85,7 +88,7 @@ class UrlRule
                 $route = "admin/index";
             }
 
-            $params["namespace"] = "admin";
+            $params[self::ADMIN_PARAM_NAME] = self::ADMIN_PARAM_VALUE;
             return [$route, $params];
             //return ["cms/admin-user", $params];
         }

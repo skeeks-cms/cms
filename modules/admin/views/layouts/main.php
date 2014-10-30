@@ -171,6 +171,10 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
             <div class="panel-heading sx-no-icon">
                 <h2>
                     <?= Breadcrumbs::widget([
+                        'homeLink' => ['label' => \Yii::t("yii", "Home"), 'url' => [
+                            'admin/index',
+                            'namespace' => 'admin'
+                        ]],
                         'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
                     ]) ?>
                 </h2>

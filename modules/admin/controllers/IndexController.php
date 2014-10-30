@@ -11,10 +11,17 @@
 namespace skeeks\cms\modules\admin\controllers;
 
 /**
- * Class Admin
+ * Class IndexController
+ * @package skeeks\cms\modules\admin\controllers
  */
-class IndexController extends Admin
+class IndexController extends AdminController
 {
+    public function init()
+    {
+        $this->_label = "Админка";
+
+        parent::init();
+    }
     public function actionIndex()
     {
         return $this->render("index");
