@@ -17,4 +17,5 @@ namespace skeeks\cms\grid;
 class DescriptionShortColumn extends LongTextColumnData
 {
     public $attribute = "description_short";
+
 }
