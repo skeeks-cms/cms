@@ -1,6 +1,6 @@
 {
-    "name": "skeeks/yii2-cms",
-    "description": "Yii2 cms extension",
+    "name": "skeeks/cms",
+    "description": "SkeekS cms",
     "keywords": ["framework", "cms", "skeeks", "sx", "app", "yii2", "extension"],
     "homepage": "http://www.skeeks.com/",
     "type": "yii2-extension",
