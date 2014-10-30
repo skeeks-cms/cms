@@ -1,6 +1,5 @@
-Skeeks cms на базе yii2 фреймворка
+Skeeks cms
 ====================
-Yii2 cms extension
 
 Installation
 ------------
@@ -9,13 +8,13 @@ Installation
 1) The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
 ```
-php composer.phar require --prefer-dist skeeks/yii2-cms "*"
+php composer.phar require --prefer-dist skeeks/cms "*"
 ```
 
 or add
 
 ```
-"skeeks/yii2-cms": "*"
+"skeeks/cms": "*"
 ```
 
 to the require section of your `composer.json` file.
