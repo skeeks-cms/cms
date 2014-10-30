@@ -33,7 +33,8 @@ Usage
 Once the extension is installed, simply use it in your code by  :
 
 ```php
-<?= \skeeks\cms\Module ?>```
+<?= \skeeks\cms\Module ?>
+```
 
 
 
