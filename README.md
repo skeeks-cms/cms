@@ -1,13 +1,12 @@
-Yii2 cms extension
+Skeeks cms на базе yii2 фреймворка
 ====================
 Yii2 cms extension
 
 Installation
 ------------
+Процесс установки достаточно стандартный:
 
-This extension is used by other modules and components cms, it is a basic need for the expansion of the cms in general.
-
-Contains useful behaviors and helpers to work with yii framework
+1) The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
 ```
 php composer.phar require --prefer-dist skeeks/yii2-cms "*"
@@ -21,7 +20,7 @@ or add
 
 to the require section of your `composer.json` file.
 
-Install migrations 
+2) Install migrations 
 
 ```
 php yii migrate --migrationPath=@skeeks/cms/migrations
