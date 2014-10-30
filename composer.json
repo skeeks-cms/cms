@@ -39,6 +39,7 @@
             "bower-asset-library": "vendor/bower"
         }
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "skeeks\\cms\\": ""
