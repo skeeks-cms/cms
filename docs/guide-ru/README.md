@@ -7,7 +7,7 @@
 --------
 
 * [О SkeekS cms](intro-skeeks-cms.md)
-
+* [Дополнительные сведения для разработчиков](additional-info-for-developers.md)
 
 Первое знакомство
 -----------------
