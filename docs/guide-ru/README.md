@@ -12,12 +12,8 @@
 Первое знакомство
 -----------------
 
-* [Установка Yii](start-installation.md)
-* [Запуск приложения](start-workflow.md)
-* [Говорим «привет»](start-hello.md)
-* [Работа с формами](start-forms.md)
-* [Работа с базами данных](start-databases.md)
-* [Генерация кода при помощи Gii](start-gii.md)
+* [Установка Skeeks cms](start-installation.md)
+* [Запуск сайта](start-workflow.md)
 * [Что дальше?](start-looking-ahead.md)
 
 
@@ -36,6 +32,8 @@
 * **TBD** [Модули](structure-modules.md)
 * [Ресурсы](structure-assets.md)
 * **TBD** [Расширения](structure-extensions.md)
+
+
 
 > [![skeeks!](https://gravatar.com/userimage/74431132/13d04d83218593564422770b616e5622.jpg)](http://www.skeeks.com)  
 <i>Web development has never been so fun!</i>  
