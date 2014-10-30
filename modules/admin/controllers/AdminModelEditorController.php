@@ -228,16 +228,8 @@ class AdminModelEditorController extends AdminController
 
         if ($this->_actionIsTypeModel($dataCurrentAction))
         {
-            foreach ($this->_actions as $code => $data)
-            {
-                if (!$this->_actionIsTypeModel($data))
-                {
-                    unset($this->_actions[$code]);
-                }
-            }
 
             $this->getView()->params["actions"] = ControllerModelActions::begin([
-                "actions"       => $this->_actions,
                 "currentAction" => $e->action->id,
                 "controller"    => $this,
                 "model"         => $this->getCurrentModel(),
@@ -245,22 +237,49 @@ class AdminModelEditorController extends AdminController
 
         } else
         {
-            //Строим просто действия контроллера, для этого уберем лишние типы действий
-            foreach ($this->_actions as $code => $data)
-            {
-                if ($this->_actionIsTypeModel($data))
-                {
-                    unset($this->_actions[$code]);
-                }
-            }
-
             parent::_renderActions($e);
         }
 
-
-
         return $this;
     }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        $result = [];
+
+        foreach ($this->_actions as $code => $data)
+        {
+            if (!$this->_actionIsTypeModel($data))
+            {
+                $result[$code] = $data;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Действия для управления моделью
+     * @return array
+     */
+    public function getModelActions()
+    {
+        $result = [];
+
+        foreach ($this->_actions as $code => $data)
+        {
+            if ($this->_actionIsTypeModel($data))
+            {
+                $result[$code] = $data;
+            }
+        }
+
+        return $result;
+    }
+
 
 
     /**
@@ -371,8 +390,9 @@ class AdminModelEditorController extends AdminController
         $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'searchModel'   => $searchModel,
+            'dataProvider'  => $dataProvider,
+            'controller'    => $this,
         ]);
     }
 

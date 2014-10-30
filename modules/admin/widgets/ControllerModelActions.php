@@ -26,6 +26,10 @@ class ControllerModelActions
     extends ControllerActions
 {
     /**
+     * @var AdminModelEditorController
+     */
+    public $controller = null;
+    /**
      * @var ActiveRecord объет модели
      */
     public $model = null;
@@ -58,14 +62,26 @@ class ControllerModelActions
      */
     public function run()
     {
-        if (!$this->actions)
+        $actions = $this->controller->getModelActions();
+
+        if (!$actions)
         {
             return "";
         }
 
+        $result = $this->renderListLi();
+        return Html::tag("ul", implode($result), $this->ulOptions);
+    }
+
+    /**
+     * @return array
+     */
+    public function renderListLi()
+    {
+        $actions = $this->controller->getModelActions();
         $result = [];
 
-        foreach ($this->actions as $code => $data)
+        foreach ($actions as $code => $data)
         {
             $label = ArrayHelper::getValue($data, "label");
 
@@ -78,6 +94,6 @@ class ControllerModelActions
             );
         }
 
-        return Html::tag("ul", implode($result), ["class" => "nav nav-pills sx-nav"]);
+        return $result;
     }
 }

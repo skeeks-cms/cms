@@ -108,7 +108,6 @@ abstract class AdminController extends Controller
     protected function _renderActions(ActionEvent $e)
     {
         $this->getView()->params["actions"] = ControllerActions::begin([
-            "actions"       => $this->_actions,
             "currentAction" => $e->action->id,
             "controller"    => $this,
         ])->run();
@@ -175,4 +174,12 @@ abstract class AdminController extends Controller
         return $this;
     }
 
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->_actions;
+    }
 }

@@ -26,13 +26,14 @@ class ControllerActions
     extends Widget
 {
     /**
-     * @var array все возможные действия из конфига
-     */
-    public $actions         = [];
-    /**
      * @var string id текущего действия
      */
     public $currentAction   = null;
+
+
+    public $ulOptions = [
+        "class" => "nav nav-pills sx-nav"
+    ];
 
     /**
      * @var AdminController объект контроллера
@@ -63,20 +64,32 @@ class ControllerActions
         }
     }
 
+
     /**
      * TODO: учитывать приоритет
      * @return string
      */
     public function run()
     {
-        if (!$this->actions)
+        $actions = $this->controller->getActions();
+        if (!$actions)
         {
             return "";
         }
 
+        $result = $this->renderListLi();
+        return Html::tag("ul", implode($result), $this->ulOptions);
+    }
+
+    /**
+     * @return array
+     */
+    public function renderListLi()
+    {
+        $actions = $this->controller->getActions();
         $result = [];
 
-        foreach ($this->actions as $code => $data)
+        foreach ($actions as $code => $data)
         {
             $label          = ArrayHelper::getValue($data, "label");
 
@@ -89,6 +102,6 @@ class ControllerActions
             );
         }
 
-        return Html::tag("ul", implode($result), ["class" => "nav nav-pills sx-nav"]);
+        return $result;
     }
 }
