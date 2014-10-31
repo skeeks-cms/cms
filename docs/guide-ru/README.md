@@ -16,22 +16,18 @@
 * [Запуск сайта](start-workflow.md)
 * [Что дальше?](start-looking-ahead.md)
 
+Базовые классы
+---------------
+SkeekS cms содержит полезные базовые классы, которые дополняют классы Yii фреймворка.
+* [Базовый контроллер](cms-base-controller.md)
+* [Базовые модели](structure-overview.md)
+* [Grid columns helpers](structure-overview.md)
 
-Структура приложения
---------------------
-
-* [Обзор](structure-overview.md)
-* [Входные скрипты](structure-entry-scripts.md)
-* [Приложения](structure-applications.md)
-* [Компоненты приложения](structure-application-components.md)
-* [Контроллеры](structure-controllers.md)
-* [Представления](structure-views.md)
-* [Модели](structure-models.md)
-* **TBD** [Фильтры](structure-filters.md)
-* **TBD** [Виджеты](structure-widgets.md)
-* **TBD** [Модули](structure-modules.md)
-* [Ресурсы](structure-assets.md)
-* **TBD** [Расширения](structure-extensions.md)
+Модул admin
+-----------
+Данный модель содержит все необходимые компоненты, хелперы для работы с административной панелью сайта
+* [Базовые контроллеры](structure-overview.md)
+* [Grid columns helpers](structure-overview.md)
 
 
 
