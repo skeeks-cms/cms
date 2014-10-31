@@ -11,7 +11,7 @@
 
 namespace skeeks\cms\modules\admin\widgets;
 
-use skeeks\cms\db\ActiveRecord;
+use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use yii\base\InvalidConfigException;

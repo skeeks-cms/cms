@@ -16,10 +16,9 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\controllers;
-use skeeks\cms\db\ActiveRecord;
+use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
 use skeeks\cms\modules\admin\components\UrlRule;
-use skeeks\cms\modules\admin\widgets\ControllerEntityEditorActions;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;

@@ -15,8 +15,13 @@ namespace skeeks\cms;
  */
 class CmsModule extends Module
 {
-
     public $controllerNamespace = 'skeeks\cms\controllers';
+
+    public function init()
+    {
+        parent::init();
+    }
+
 
     /**
      * Используем свой layout

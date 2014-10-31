@@ -27,7 +27,8 @@ class SeoPageName extends AttributeBehavior
      * @var string the attribute that will receive timestamp value
      * Set this property to false if you do not want to record the creation time.
      */
-    public $generatedAttribute = 'seo_page_name';
+    public $generatedAttribute  = 'seo_page_name';
+    public $fromAttribute       = 'name';
 
     /**
      * @var
@@ -59,7 +60,7 @@ class SeoPageName extends AttributeBehavior
         if ($this->value === null)
         {
             $filter = new FilterSeoPageName();
-            return $filter->filter($this->owner->name);
+            return $filter->filter($this->owner->{$this->fromAttribute});
         } else
         {
             return call_user_func($this->value, $event);
