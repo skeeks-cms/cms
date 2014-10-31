@@ -54,6 +54,17 @@ abstract class AdminController extends Controller
         ],*/
     ];
 
+    /**
+     * @param string $code
+     * @param array $data
+     * @return $this
+     */
+    public function _registerAction($code, array $data = [])
+    {
+        $this->_actions[$code] = $data;
+        return $this;
+    }
+
     public function behaviors()
     {
         return

@@ -26,40 +26,5 @@ class HasVotes extends HasLinkedModels
 
     public $canBeLinkedModels = ['skeeks\cms\models\Vote'];
     public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные голоса.";
-    /*const MODE_RESTRICT     = "restrict";
-    const MODE_CASCADE      = "cascade";
-    const MODE_SET_NULL     = "setnull";
 
-    public $mode = "restrict";
-
-    public function events()
-    {
-        return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteVotes",
-        ];
-    }
-
-    /**
-     *
-     * Находим все комментарии и удаляем поочереди, потому как при удалении коммента может что то еще срабатыать.
-     * Дабы сгенерировать событие
-     *
-     * @throws \Exception
-     */
-    /*public function deleteVotes()
-    {
-        if ($models = Vote::find($this->owner->getRef()->toArray())->all())
-        {
-            if ($this->mode == self::MODE_RESTRICT)
-            {
-                throw new Exception("Невозможно удалить запись, для начала необходимо удалить все голоса.");
-            }
-
-
-            foreach ($models as $model)
-            {
-                $model->delete();
-            }
-        }
-    }*/
 }

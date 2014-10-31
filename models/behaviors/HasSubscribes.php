@@ -25,28 +25,4 @@ class HasSubscribes extends HasLinkedModels
     public $canBeLinkedModels       = ['skeeks\cms\models\Subscribe'];
     public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные подписки на эту запись.";
 
-    /*public function events()
-    {
-        return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteSubscribes",
-        ];
-    }*/
-
-    /**
-     *
-     * Находим все комментарии и удаляем поочереди, потому как при удалении коммента может что то еще срабатыать.
-     * Дабы сгенерировать событие
-     *
-     * @throws \Exception
-     */
-    /*public function deleteSubscribes()
-    {
-        if ($comments = Subscribe::find($this->owner->getRef()->toArray())->all())
-        {
-            foreach ($comments as $comment)
-            {
-                $comment->delete();
-            }
-        }
-    }*/
 }

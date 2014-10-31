@@ -15,13 +15,16 @@ namespace skeeks\cms;
  */
 class CmsModule extends Module
 {
+    public $noImage         = "http://vk.com/images/deactivated_100.gif";
+    public $adminEmail      = "semenov@skeeks.com";
+    public $supportEmail    = "support@skeeks.com";
+
     public $controllerNamespace = 'skeeks\cms\controllers';
 
     public function init()
     {
         parent::init();
     }
-
 
     /**
      * Используем свой layout

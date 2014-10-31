@@ -400,9 +400,10 @@ class AdminModelEditorController extends AdminController
      */
     public function actionView()
     {
-        return $this->render('view', [
+        return $this->output(\skeeks\cms\modules\admin\widgets\DetailView::widget([
             'model' => $this->getCurrentModel(),
-        ]);
+
+        ]));
     }
 
     /**

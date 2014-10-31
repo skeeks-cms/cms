@@ -24,29 +24,4 @@ class HasComments extends HasLinkedModels
 {
     public $canBeLinkedModels       = ['skeeks\cms\models\Comment'];
     public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные комментарии";
-
-    /*public function events()
-    {
-        return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteComments",
-        ];
-    }
-
-    /**
-     *
-     * Находим все комментарии и удаляем поочереди, потому как при удалении коммента может что то еще срабатыать.
-     * Дабы сгенерировать событие
-     *
-     * @throws \Exception
-     */
-    /*public function deleteComments()
-    {
-        if ($comments = Comment::find($this->owner->getRef()->toArray())->all())
-        {
-            foreach ($comments as $comment)
-            {
-                $comment->delete();
-            }
-        }
-    }*/
 }
