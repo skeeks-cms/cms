@@ -26,7 +26,7 @@ SkeekS cms содержит полезные базовые классы, кот
 Модул admin
 -----------
 Данный модель содержит все необходимые компоненты, хелперы для работы с административной панелью сайта
-* [Базовые контроллеры](structure-overview.md)
+* [Базовые контроллеры](cms-admin-base-controller.md)
 * [Grid columns helpers](structure-overview.md)
 
 
