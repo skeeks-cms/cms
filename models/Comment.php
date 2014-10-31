@@ -10,14 +10,13 @@
  */
 namespace skeeks\cms\models;
 
+use skeeks\cms\base\models\Core;
+use skeeks\cms\models\behaviors\CanBeLinkedTo;
 use skeeks\sx\models\Ref;
 use Yii;
 
 use yii\base\Event;
-use yii\behaviors\TimestampBehavior;
-use yii\behaviors\BlameableBehavior;
 
-use skeeks\cms\db\ActiveRecord;
 /**
  * This is the model class for table "{{%comment}}".
  *
@@ -35,7 +34,7 @@ use skeeks\cms\db\ActiveRecord;
  * @property User $updatedBy
  * @property User $createdBy
  */
-class Comment extends ActiveRecord
+class Comment extends Core
 {
     use behaviors\traits\HasSubscribes;
     use behaviors\traits\HasVotes;
@@ -74,16 +73,14 @@ class Comment extends ActiveRecord
 
 
 
-
-
     /**
-     * @inheritdoc
+     * @return array
      */
     public function behaviors()
     {
-        return [
-            BlameableBehavior::className(),
-            TimestampBehavior::className(),
+        return array_merge(parent::behaviors(), [
+            CanBeLinkedTo::className(),
+
             behaviors\HasVotes::className(),
 
             [
@@ -93,55 +90,35 @@ class Comment extends ActiveRecord
                      "images", "files"
                 ]
             ],
-        ];
+        ]);
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
     public function rules()
     {
-        return [
+        return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'count_subscribe', 'count_vote'], 'integer'],
             [['content'], 'string'],
             [['linked_to_model', 'linked_to_value'], 'required'],
             [['linked_to_model', 'linked_to_value'], 'string', 'max' => 255]
-        ];
+        ]);
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
     public function attributeLabels()
     {
-        return [
+        return array_merge(parent::attributeLabels(), [
             'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
             'content' => Yii::t('app', 'Content'),
             'linked_to_model' => Yii::t('app', 'Linked To Model'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
             'count_subscribe' => Yii::t('app', 'Count Subscribe'),
             'count_vote' => Yii::t('app', 'Count Vote'),
             'count_vote_up' => Yii::t('app', 'Count Vote Up'),
-        ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
+        ]);
     }
 }

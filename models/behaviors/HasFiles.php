@@ -43,8 +43,11 @@ use \yii\base\Behavior;
  * Class HasComments
  * @package common\models\behaviors
  */
-class HasFiles extends Behavior
+class HasFiles extends HasLinkedModels
 {
+    public $canBeLinkedModels       = ['skeeks\cms\models\StorageFile'];
+    public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные файлы";
+
     const MAX_SIZE_TOTAL        = "maxSizeTotal";
     const MAX_SIZE              = "maxSize";
     const ALLOWED_EXTENSIONS    = "allowedExtensions";
@@ -53,12 +56,12 @@ class HasFiles extends Behavior
 
     public $fields = [];
 
-    public function events()
+    /*public function events()
     {
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "beforeDelete",
         ];
-    }
+    }*/
 
     /**
      *
@@ -67,7 +70,7 @@ class HasFiles extends Behavior
      *
      * @throws \Exception
      */
-    public function beforeDelete()
+    /*public function beforeDelete()
     {
         if ($models = StorageFile::find($this->owner->getRef()->toArray())->all())
         {
@@ -79,7 +82,7 @@ class HasFiles extends Behavior
                 }
             }
         }
-    }
+    }*/
 
 
     /**

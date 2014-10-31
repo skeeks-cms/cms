@@ -1,7 +1,7 @@
 <?php
 
 namespace skeeks\cms\models;
-use skeeks\cms\db\ActiveRecord;
+use skeeks\cms\base\db\ActiveRecord;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;

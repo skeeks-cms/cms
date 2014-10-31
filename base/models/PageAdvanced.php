@@ -161,6 +161,13 @@ abstract class PageAdvanced extends Page
     }
 
 
+    /**
+     * @return array
+     */
+    public function getImages()
+    {
+        return (array) $this->images;
+    }
 
     /**
      * @return string

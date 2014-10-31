@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms;
+use skeeks\cms\models\User;
 use skeeks\sx\models\IdentityMap;
 /**
  * Class App
@@ -101,6 +102,29 @@ class App
         return static::getUser();
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     * @throws Exception
+     */
+    static public function findUser()
+    {
+        /**
+         * @var $userClassName User
+         */
+        $userClassName = \Yii::$app->user->identityClass;
+
+        if (!class_exists($userClassName))
+        {
+            throw new Exception("Не правильно сконфигурирован компонент user, класс пользователя не найден");
+        }
+
+        if (!is_subclass_of($userClassName, User::className()))
+        {
+            throw new Exception("Пользовательский класс должен быть наследован от базового skeeks cms класса: " . User::className());
+        }
+
+        return $userClassName::find();
+    }
 
 
         /**

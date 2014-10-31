@@ -20,14 +20,17 @@ use \yii\base\Behavior;
  * Class HasSubscribes
  * @package skeeks\cms\models\behaviors
  */
-class HasSubscribes extends Behavior
+class HasSubscribes extends HasLinkedModels
 {
-    public function events()
+    public $canBeLinkedModels       = ['skeeks\cms\models\Subscribe'];
+    public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные подписки на эту запись.";
+
+    /*public function events()
     {
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteSubscribes",
         ];
-    }
+    }*/
 
     /**
      *
@@ -36,7 +39,7 @@ class HasSubscribes extends Behavior
      *
      * @throws \Exception
      */
-    public function deleteSubscribes()
+    /*public function deleteSubscribes()
     {
         if ($comments = Subscribe::find($this->owner->getRef()->toArray())->all())
         {
@@ -45,5 +48,5 @@ class HasSubscribes extends Behavior
                 $comment->delete();
             }
         }
-    }
+    }*/
 }

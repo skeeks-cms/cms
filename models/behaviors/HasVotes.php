@@ -12,6 +12,7 @@
  */
 namespace skeeks\cms\models\behaviors;
 
+use skeeks\cms\Exception;
 use \skeeks\cms\models\Vote;
 use yii\db\BaseActiveRecord;
 use \yii\base\Behavior;
@@ -20,8 +21,17 @@ use \yii\base\Behavior;
  * Class HasVotes
  * @package skeeks\cms\models\behaviors
  */
-class HasVotes extends Behavior
+class HasVotes extends HasLinkedModels
 {
+
+    public $canBeLinkedModels = ['skeeks\cms\models\Vote'];
+    public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные голоса.";
+    /*const MODE_RESTRICT     = "restrict";
+    const MODE_CASCADE      = "cascade";
+    const MODE_SET_NULL     = "setnull";
+
+    public $mode = "restrict";
+
     public function events()
     {
         return [
@@ -36,14 +46,20 @@ class HasVotes extends Behavior
      *
      * @throws \Exception
      */
-    public function deleteVotes()
+    /*public function deleteVotes()
     {
         if ($models = Vote::find($this->owner->getRef()->toArray())->all())
         {
+            if ($this->mode == self::MODE_RESTRICT)
+            {
+                throw new Exception("Невозможно удалить запись, для начала необходимо удалить все голоса.");
+            }
+
+
             foreach ($models as $model)
             {
                 $model->delete();
             }
         }
-    }
+    }*/
 }

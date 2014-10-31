@@ -20,9 +20,12 @@ use \yii\base\Behavior;
  * Class HasComments
  * @package skeeks\cms\models\behaviors
  */
-class HasComments extends Behavior
+class HasComments extends HasLinkedModels
 {
-    public function events()
+    public $canBeLinkedModels       = ['skeeks\cms\models\Comment'];
+    public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные комментарии";
+
+    /*public function events()
     {
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteComments",
@@ -36,7 +39,7 @@ class HasComments extends Behavior
      *
      * @throws \Exception
      */
-    public function deleteComments()
+    /*public function deleteComments()
     {
         if ($comments = Comment::find($this->owner->getRef()->toArray())->all())
         {
@@ -45,5 +48,5 @@ class HasComments extends Behavior
                 $comment->delete();
             }
         }
-    }
+    }*/
 }

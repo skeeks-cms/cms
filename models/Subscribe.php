@@ -11,28 +11,21 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\base\models\Core;
+use skeeks\cms\models\behaviors\CanBeLinkedTo;
 use skeeks\sx\models\Ref;
 use yii\base\Event;
-use skeeks\cms\db\ActiveRecord;
 use Yii;
 
-use yii\behaviors\TimestampBehavior;
-use yii\behaviors\BlameableBehavior;
 
 /**
  * This is the model class for table "{{%subscribe}}".
  *
  * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $linked_to
- *
- * @property User $updatedBy
- * @property User $createdBy
+ * @property string $linked_to_model
+ * @property string $linked_to_value
  */
-class Subscribe extends ActiveRecord
+class Subscribe extends Core
 {
     public function init()
     {
@@ -66,57 +59,36 @@ class Subscribe extends ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
     public function behaviors()
     {
-        return [
-            BlameableBehavior::className(),
-            TimestampBehavior::className(),
-        ];
+        return array_merge(parent::behaviors(), [
+            CanBeLinkedTo::className()
+        ]);
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
     public function rules()
     {
-        return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+        return array_merge(parent::rules(), [
             [['linked_to_model', 'linked_to_value'], 'required'],
             [['linked_to_model', 'linked_to_value'], 'string', 'max' => 255]
-        ];
+        ]);
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
     public function attributeLabels()
     {
-        return [
+        return array_merge(parent::attributeLabels(), [
             'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
+            'value' => Yii::t('app', 'Value'),
             'linked_to_model' => Yii::t('app', 'Linked To Model'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
-        ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
+        ]);
     }
 }

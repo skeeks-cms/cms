@@ -11,7 +11,7 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\db\ActiveRecord;
+use skeeks\cms\base\db\ActiveRecord;
 
 use Yii;
 use yii\base\NotSupportedException;
@@ -271,7 +271,7 @@ class User
 
     public function getPageUrl()
     {
-        return \Yii::$app->urlManager->createUrl(["user/view", "username" => $this->username]);
+        return \Yii::$app->urlManager->createUrl(["cms/user/view", "username" => $this->username]);
     }
 
 
