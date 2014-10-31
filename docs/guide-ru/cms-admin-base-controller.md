@@ -39,8 +39,8 @@ use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 
 /**
- * Class AdminGameController
- * @package skeeks\cms\modules\game\controllers
+ * Class AdminUserController
+ * @package skeeks\cms\controllers
  */
 class AdminUserController extends AdminModelEditorController
 {
