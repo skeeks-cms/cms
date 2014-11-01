@@ -77,7 +77,11 @@ TODO: необходимо доработать этот момент, чтоб�
 /var/www/sites/test.ru/common/config/main.php - настройки подключения к базе всех приложений
 
 ~~~
-$config = \yii\helpers\ArrayHelper::merge($configSkeeksCms, [
+
+$vendorPath         = dirname(dirname(__DIR__)) . '/vendor';
+$configSkeeksCms    = include $vendorPath . '/skeeks/cms/config/main.php';
+
+return \yii\helpers\ArrayHelper::merge($configSkeeksCms, [
 //......
 'components'    =>
     [
@@ -96,6 +100,7 @@ $config = \yii\helpers\ArrayHelper::merge($configSkeeksCms, [
         //......
     ]
 //......
+]);
 ~~~
 
 3) Инициализация
