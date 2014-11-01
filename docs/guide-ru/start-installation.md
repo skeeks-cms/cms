@@ -127,4 +127,8 @@ $application = new yii\web\Application($config);
 $application->run();
 ~~~
 
+Админка сайта будет находиться по адресу: site.ru/~sx (адрес админки можно сконфигурировать каким угодно)
+Root доступ для управления:
+user: root
+password: skeeks
 
