@@ -1,4 +1,4 @@
-Полное руководство по SkeekS cms
+Полное руководство по ms
 =============================
 
 2014 © SkeekS cms
@@ -6,14 +6,14 @@
 Введение
 --------
 
-* [О SkeekS cms](intro-skeeks-cms.md)
+* [О cms](intro-skeeks-cms.md)
 * [Дополнительные сведения для разработчиков](additional-info-for-developers.md)
 
 Первое знакомство
 -----------------
 
-* [Установка Skeeks cms](start-installation.md)
-* [Запуск сайта](start-workflow.md)
+* [Установка проекта](start-installation.md)
+* [Конфигурирование и запуск проекта](start-workflow.md)
 * [Что дальше?](start-looking-ahead.md)
 
 Базовые классы
