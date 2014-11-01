@@ -1,24 +1,35 @@
-
-
-INSTALLATION
+Установка, кофигурирование и запуск проекта
+===========================================
+В данном разделе описан только процесс установки проекта, следующим шагом необходимо сконфигурировать проект, это описано в разделе TODO:
+ 
+1) Установка
 ------------
+Мы предлагаем несколько вариантов установки проекта
 
-### Install via Composer
+### Установка через Composer
 
-If you do not have [Composer](http://getcomposer.org/), you may install it by following the instructions
-at [getcomposer.org](http://getcomposer.org/doc/00-intro.md#installation-nix).
+Если у вас еще нет [Composer](http://getcomposer.org/), вы можете установить его, следуя инструкциям 
+на [getcomposer.org](http://getcomposer.org/doc/00-intro.md#installation-nix).
 
-You can then install the application using the following command:
+Вы можете установить приложение с помощью следующих команд (необходим доступ по ssh):
 
-Go to project dir and do example /var/www/sites/test.ru/public
 ~~~
+# перейти в папку своего проекта
+cd /var/www/sites/test.ru/
+
+# установка composer (если уже установлен пропускаем этот шаг) 
 curl -sS https://getcomposer.org/installer | php
-php composer.phar install
+
+# устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
+php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
+
+# устанавливаем шаблон приложения skeeks-cms
+php composer.phar create-project skeeks/cms-app
 ~~~
-or
-~~~
-php composer.phar create-project skeeks/yii2-app
-~~~
+
+
+
+
 
 After in /frontend/web/ dir will be generated file index.php
 
