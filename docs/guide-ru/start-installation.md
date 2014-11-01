@@ -2,8 +2,11 @@
 ===========================================
 В данном разделе описан только процесс установки базового проекта, без дополнительных модулей, а также стандартное конфигурирование.
  1) [Установка файлов (скачивание проекта)](#1)
+ 
  2) [Инициализация](#2)
+ 
  3) [Установка миграций](#3)
+ 
  
 1) Установка файлов (скачивание проекта)
 ----------------------------------------
@@ -63,14 +66,40 @@ php composer.phar install
 TODO: необходимо доработать этот момент, чтобы можно было запускать через браузер все это дело.
 
 
-2) Инициализация
+2) Базовое конфигурирование проекта
+-----------------------------------
+Необходимо прописать настройки подключения к базе данных:
+/var/www/sites/test.ru/common/config/main.php - настройки подключения к базе всех приложений
+
+3) Инициализация
 -----------------
+~~~
+# перейти в папку своего проекта
+cd /var/www/sites/test.ru/
 
-3) Установка миграций
+# выполнить команду
+php init
+~~~
+
+4) Установка миграций
 ---------------------
+~~~
+# перейти в папку своего проекта
+cd /var/www/sites/test.ru/
+
+# установка миграций cms (миграции модуля админ находятся тут же)
+php yii migrate --migrationPath=@skeeks/cms/migrations
+
+# установка миграций проекта (по умолчанию их не будет, cms с собой принесет все что нужно)
+php yii migrate
+~~~
 
 
-After in /frontend/web/ dir will be generated file index.php
+
+5) Итог
+-------
+
+После всех проделанных действий в дирриктории /frontend/web/ будет сгенерирован файлик index.php:
 
 ~~~
 <?php
@@ -94,27 +123,11 @@ $application->run();
 ~~~
 
 
-Next step install migrations 
+Apache + Nginx settings
+-----------------------
+Подробное конфигурирование пока не даем. Но важно понимать, что схема должны быть следующей
 
-~~~
-php yii migrate
-php yii migrate --migrationPath=common/modules/game/migrations
-~~~
+- for application 1 `/var/www/sites/test.ru/frontend/web/` and using the URL `http://test.ru/`
+- for application 2 `/var/www/sites/test.ru/backend/web/` and using the URL `http://application2.test.ru/`
 
-GETTING STARTED
----------------
-
-After you install the application, you have to conduct the following steps to initialize
-the installed application. You only need to do these once for all.
-
-1. Run command `init` to initialize the application with a specific environment.
-2. Create a new database and adjust the `components['db']` configuration in `common/config/main-local.php` accordingly.
-3. Apply migrations with console command `yii migrate`. This will create tables needed for the application to work.
-4. Set document roots of your Web server:
-
-- for frontend `/path/to/yii-application/frontend/web/` and using the URL `http://frontend/`
-- for backend `/path/to/yii-application/backend/web/` and using the URL `http://backend/`
-
-To login into the application, you need to first sign up, with any of your email address, username and password.
-Then, you can login into the application with same email address and password at any time.
 
