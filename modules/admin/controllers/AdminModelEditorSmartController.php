@@ -1,6 +1,6 @@
 <?php
 /**
- * AdminModelEditorAdvancedController
+ * AdminModelEditorSmartController
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
@@ -18,47 +18,97 @@ use skeeks\cms\models\behaviors\HasMetaData;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
 
+use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
+use skeeks\cms\modules\admin\controllers\helpers\rules\ModelHasBehaviors;
 use yii\base\ActionEvent;
 use yii\base\Behavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminModelEditorAdvancedController
  * @package skeeks\cms\modules\admin\controllers
  */
-abstract class AdminModelEditorAdvancedController extends AdminModelEditorController
+abstract class AdminModelEditorSmartController extends AdminModelEditorController
 {
-    public function init()
+
+    /**
+     * @return array
+     */
+    public function behaviors()
     {
-        parent::init();
+        return ArrayHelper::merge(parent::behaviors(), [
 
-        $this
+            self::BEHAVIOR_ACTION_MANAGER =>
+            [
+                "actions" =>
+                [
+                    'files' =>
+                    [
+                        "label"     => "Файлы",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasFiles::className()
+                            ]
+                        ]
+                    ],
 
-            ->_addAction("files", [
-                "label"     => "Файлами",
-                "behaviors" => HasFiles::className()
-            ])
 
-            ->_addAction("comments", [
-                "label"     => "Комментарии",
-                "behaviors" => HasComments::className()
-            ])
+                    'comments' =>
+                    [
+                        "label"     => "Комментарии",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasComments::className()
+                            ]
+                        ]
+                    ],
 
-            ->_addAction("votes", [
-                "label"     => "Голоса",
-                "behaviors" => HasVotes::className()
-            ])
+                    'votes' =>
+                    [
+                        "label"     => "Голоса",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasVotes::className()
+                            ]
+                        ]
+                    ],
 
-            ->_addAction("subscribes", [
-                "label"     => "Подписки",
-                "behaviors" => HasSubscribes::className()
-            ])
 
-            ->_addAction("meta-data", [
-                "label"     => "Мета данные",
-                "behaviors" => HasMetaData::className(),
-            ])
-        ;
+                    'subscribes' =>
+                    [
+                        "label"     => "Голоса",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasSubscribes::className()
+                            ]
+                        ]
+                    ],
+
+
+                    'meta-data' =>
+                    [
+                        "label"     => "Мета данные",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasMetaData::className()
+                            ]
+                        ]
+                    ],
+                ]
+            ]
+        ]);
     }
+
 
 
     /**

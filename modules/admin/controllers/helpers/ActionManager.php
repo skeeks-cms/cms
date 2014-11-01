@@ -8,34 +8,125 @@
  * @date 01.11.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\modules\admin\descriptors;
+namespace skeeks\cms\modules\admin\controllers\helpers;
+use skeeks\cms\Exception;
+use skeeks\cms\modules\admin\controllers\AdminController;
+use yii\base\Behavior;
 use yii\base\Component;
 
 /**
  * Class Action
  * @package skeeks\cms\modules\admin\descriptors
  */
-class ActionManager extends Component
+class ActionManager extends Behavior
 {
-    public $actions    = [];
+    public $actions         = [];
 
     /**
-     * @param Action $action
-     * @return $this
+     * @throws Exception
      */
-    public function registerAction(Action $action)
+    public function init()
     {
-        $this->actions[$action->code] = $action;
-        return $this;
+        parent::init();
+    }
+
+    /**
+     * @param Component $owner
+     */
+    public function attach($owner)
+    {
+        if (!$owner instanceof AdminController)
+        {
+            throw new Exception("Данный менеджер предназначен для работы с контроллерами дочерними от: " . AdminController::className());
+        }
+
+        parent::attach($owner);
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function getAllowActions()
+    {
+        $baseData = [
+            "controller" => $this->owner
+        ];
+
+        $result = [];
+
+        if ($this->actions)
+        {
+            foreach ($this->actions as $code => $actionData)
+            {
+                $result[$code] = $actionData;
+
+                if (isset($actionData["rules"]))
+                {
+                    if (is_string($actionData["rules"]))
+                    {
+                        $rules = [$actionData["rules"]];
+                    } else if (is_array($actionData["rules"]))
+                    {
+                        $rules = $actionData["rules"];
+                    } else
+                    {
+                        throw new Exception("rules должны быть array|string");
+                    }
+
+                    foreach ($rules as $ruleData)
+                    {
+                        if (is_string($ruleData))
+                        {
+                            $test = $ruleData;
+                            $ruleData = [];
+                            $ruleData["class"] = $test;
+                        }
+
+                        //TODO: не хватает проверок, кучи, добавить
+                        if (is_array($ruleData))
+                        {
+                            $class  = $ruleData["class"];
+                            unset($ruleData["class"]);
+                            $params = $ruleData;
+                            $ruleObject = new $class(array_merge($params, $baseData));
+                        } else
+                        {
+                            throw new Exception("rules должны быть array|string");
+                        }
+
+                        /**
+                         * @var ActionRule $ruleObject
+                         */
+                        if (!$ruleObject->isAllow())
+                        {
+                            unset($result[$code]);
+                        }
+                    }
+
+
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
      * @param $code
-     * @return Action|bool
+     * @return array|bool
      */
-    public function getAction($code)
+    public function getActionData($code)
     {
-        if (isset($this->actions))
+        if (isset($this->actions[$code]))
         {
             return $this->actions[$code];
         }
@@ -52,16 +143,19 @@ class ActionManager extends Component
         return isset($this->actions[$code]);
     }
 
-
     /**
-     * @param string $code
-     * @param array $data
-     * @return $this
+     * @param $code
+     * @return bool|Action
      */
-    public function createAction($code, array $data = [])
+    public function getAction($code)
     {
-        $this->registerAction(Action::create($code, $data));
-        return $this;
+        if ($data = $this->getActionData($code))
+        {
+            return new Action($data);
+        }
+
+        return false;
     }
+
 
 }

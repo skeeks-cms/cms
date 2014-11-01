@@ -19,6 +19,9 @@ namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
 use skeeks\cms\modules\admin\components\UrlRule;
+use skeeks\cms\modules\admin\controllers\helpers\Action;
+use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
+use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;
@@ -33,13 +36,10 @@ use yii\web\NotFoundHttpException;
  */
 class AdminModelEditorController extends AdminController
 {
-    //Действие показывается только если передана модель
-    const ACTION_TYPE_MODEL = "model";
-
     /**
      * @var string
      */
-    protected $_defaultModelAction = "view";
+    protected $_defaultActionModel = "view";
     protected $_modelShowAttribute = "id";
 
     /**
@@ -54,35 +54,68 @@ class AdminModelEditorController extends AdminController
      */
     protected $_modelSearchClassName = null;
 
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+
+            self::BEHAVIOR_ACTION_MANAGER =>
+            [
+                "actions" =>
+                [
+                    "index" =>
+                    [
+                        "label" => "Список",
+                    ],
+
+                    "create" =>
+                    [
+                        "label" => "Добавить",
+                    ],
+
+                    "view" =>
+                    [
+                        "label" => "Смотреть",
+                        "icon"  => "glyphicon glyphicon-eye-open",
+                        "rules"         => HasModel::className()
+                    ],
+
+                    "update" =>
+                    [
+                        "label" => "Редактировать",
+                        "icon"  => "glyphicon glyphicon-pencil",
+                        "rules"         => HasModel::className()
+                    ],
+
+                    "delete" =>
+                    [
+                        "label"         => "Удалить",
+                        "icon"          => "glyphicon glyphicon-trash",
+                        "method"        => "post",
+                        "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+                        "priority"      => 9999,
+                        "rules"         => HasModel::className()
+                    ]
+                ]
+            ]
+        ]);
+    }
     /**
      * @throws InvalidConfigException
      */
     public function init()
     {
         parent::init();
-
-        $this
-            ->_addAction("index", ["label" => "Список"])
-            ->_addAction("create", ["label" => "Добавить"])
-
-            ->_addAction("view", [
-                "label" => "Смотреть",
-                "icon"  => "glyphicon glyphicon-eye-open"
-            ])
-
-            ->_addAction("update", [
-                "label" => "Редактировать",
-                "icon"  => "glyphicon glyphicon-pencil"
-            ])
-
-            ->_addAction("delete", [
-                "label"         => "Удалить",
-                "icon"          => "glyphicon glyphicon-trash",
-                "method"        => "post",
-                "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
-                "priority"      => 9999
-            ])
-        ;
     }
 
     /**
@@ -124,21 +157,6 @@ class AdminModelEditorController extends AdminController
     }
 
 
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(),
-        [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
-        ]);
-    }
 
     /**
      * Finds the Game model based on its primary key value.
@@ -195,73 +213,6 @@ class AdminModelEditorController extends AdminController
 
         return $this->_currentModel;
     }
-    /**
-     * Рендер действий текущего контроллера
-     * Сразу запускаем нужный виджет и формируем готовый html
-     * @param ActionEvent $e
-     *
-     * @return $this
-     */
-    protected function _renderActions(ActionEvent $e)
-    {
-        $dataCurrentAction = [];
-        if (isset($this->_actions[$e->action->id]))
-        {
-            $dataCurrentAction = $this->_actions[$e->action->id];
-        }
-
-        if ($this->_actionIsTypeModel($dataCurrentAction))
-        {
-            $this->getView()->params["actions"] = ControllerModelActions::begin([
-                "currentAction" => $e->action->id,
-                "controller"    => $this,
-                "model"         => $this->getCurrentModel(),
-            ])->run();
-
-        } else
-        {
-            parent::_renderActions($e);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getActions()
-    {
-        $result = [];
-
-        foreach ($this->_actions as $code => $data)
-        {
-            if (!$this->_actionIsTypeModel($data))
-            {
-                $result[$code] = $data;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Действия для управления моделью
-     * @return array
-     */
-    public function getModelActions()
-    {
-        $result = [];
-
-        foreach ($this->_actions as $code => $data)
-        {
-            if ($this->_actionIsTypeModel($data))
-            {
-                $result[$code] = $data;
-            }
-        }
-
-        return $result;
-    }
 
 
 
@@ -274,25 +225,18 @@ class AdminModelEditorController extends AdminController
      */
     protected function _renderBreadcrumbs(ActionEvent $e)
     {
-        $actionTitle = Inflector::humanize($e->action->id);
-
-        if (!isset($this->_actions[$e->action->id]))
-        {
-            return parent::_renderBreadcrumbs($e);
-        }
-        $data           = $this->_actions[$e->action->id];
-        if (!$this->_actionIsTypeModel($data))
+        //Если текущее действие не описано, делаем как нужно по умолчанию
+        if (!$currentAction = $this->_getActionFromEvent($e));
         {
             return parent::_renderBreadcrumbs($e);
         }
 
-
-
-        if (isset($this->_actions[$e->action->id]))
+        //Если текущее действие не ActionModel, делаем как нужно по умолчанию
+        if (!$currentAction instanceof ActionModel)
         {
-            $data = $this->_actions[$e->action->id];
-            $actionTitle = ArrayHelper::getValue($data, "label");
+            return parent::_renderBreadcrumbs($e);
         }
+
 
         if ($this->_label)
         {
@@ -324,21 +268,21 @@ class AdminModelEditorController extends AdminController
      */
     protected function _renderMetadata(ActionEvent $e)
     {
-        $result = [];
-        $actionTitle = Inflector::humanize($e->action->id);
-
-        if (!isset($this->_actions[$e->action->id]))
+        //Если текущее действие не описано, делаем как нужно по умолчанию
+        if (!$currentAction = $this->_getActionFromEvent($e));
         {
             return parent::_renderMetadata($e);
         }
 
-        $data           = $this->_actions[$e->action->id];
-        if (!$this->_actionIsTypeModel($data))
+        //Если текущее действие не ActionModel, делаем как нужно по умолчанию
+        if (!$currentAction instanceof ActionModel)
         {
             return parent::_renderMetadata($e);
         }
 
-        $actionTitle    = ArrayHelper::getValue($data, "label", "Label");
+
+
+        $actionTitle    = $currentAction->label;
 
         $result[] = $actionTitle;
         $result[] = $this->getCurrentModel()->getAttribute($this->_modelShowAttribute);
@@ -348,16 +292,14 @@ class AdminModelEditorController extends AdminController
         return $this;
     }
 
-    /**
-     * Тип действия модель или общее?
-     * @param array $dataAction
-     * @return bool
-     */
-    protected function _actionIsTypeModel(array $dataAction)
-    {
-        $type = ArrayHelper::getValue($dataAction, "type");
-        return $type == self::ACTION_TYPE_MODEL;
-    }
+
+
+
+
+
+
+
+
 
 
     /**

@@ -14,6 +14,8 @@ namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\controllers\helpers\Action;
+use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -62,8 +64,8 @@ class ControllerModelActions
      */
     public function run()
     {
-        $actions = $this->controller->getModelActions();
-
+        $am = $this->controller->actionManager();
+        $actions = $am->getActions();
         if (!$actions)
         {
             return "";
@@ -78,19 +80,30 @@ class ControllerModelActions
      */
     public function renderListLi()
     {
-        $actions = $this->controller->getModelActions();
+        $am = $this->controller->actionManager();
+        $actions = $am->getActions();
+
         $result = [];
 
-        foreach ($actions as $code => $data)
-        {
-            $label = ArrayHelper::getValue($data, "label");
+        /**
+         * @var ActionModel $action
+         */
 
-            $linkOptions["data-method"]         = ArrayHelper::getValue($data, "data-method");
-            $linkOptions["data-confirm"]        = ArrayHelper::getValue($data, "data-confirm");
+        foreach ($actions as $code => $action)
+        {
+            if (!$action instanceof ActionModel)
+            {
+                continue;
+            }
+
+            $label = $action->label;
+
+            $linkOptions["data-method"]         = $action->method;
+            $linkOptions["data-confirm"]        = $action->confirm;
 
             $result[] = Html::tag("li",
                 Html::a($label, [$code, "id" => $this->model->getPrimaryKey(), UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE], $linkOptions),
-                ["class" => $this->currentAction == $code ? "active" : ""]
+                ["class" => $this->currentActionCode == $code ? "active" : ""]
             );
         }
 

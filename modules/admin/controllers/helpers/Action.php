@@ -8,7 +8,7 @@
  * @date 01.11.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\modules\admin\descriptors;
+namespace skeeks\cms\modules\admin\controllers\helpers;
 
 use yii\base\Component;
 
@@ -27,6 +27,8 @@ class Action extends Component
     public $method      = null;
     public $confirm     = null;
 
+    public $rules       = [];
+
     /**
      * @param string $code
      * @param array $data
@@ -38,4 +40,15 @@ class Action extends Component
             "code" => $code
         ]));
     }
+
+    /**
+     * Добавить правило
+     * @param $rule
+     */
+    public function appendRule($rule)
+    {
+        $this->rules = array_merge($this->rules, $rule);
+    }
+
+
 }

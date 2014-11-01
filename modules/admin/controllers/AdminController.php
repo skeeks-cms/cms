@@ -16,8 +16,8 @@ namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\App;
 use skeeks\cms\Controller;
 use skeeks\cms\modules\admin\components\UrlRule;
-use skeeks\cms\modules\admin\descriptors\Action;
-use skeeks\cms\modules\admin\descriptors\ActionManager;
+use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
+use skeeks\cms\modules\admin\controllers\helpers\Test;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use yii\base\ActionEvent;
 use yii\helpers\ArrayHelper;
@@ -30,28 +30,22 @@ use yii\filters\AccessControl;
  */
 abstract class AdminController extends Controller
 {
-    /**
-     * @var string
-     */
-    protected $_defaultAction = "index";
+    const BEHAVIOR_ACTION_MANAGER = "actionManager";
     /**
      * @var string понятное название контроллера, будет добавлено в хлебные крошки и title страницы
      */
     protected $_label = null;
 
-
-
-    /**
-     * Описанные действия будут отображаться в виде дополнительного меню
-     * @var ActionManager
-     */
-    protected $_actionManager = null;
-
-
     public function behaviors()
     {
         return
         [
+            self::BEHAVIOR_ACTION_MANAGER =>
+            [
+                'class'     => ActionManager::className(),
+                'actions'   => [],
+            ],
+
             'access' =>
             [
                 'class' => AccessControl::className(),
@@ -68,11 +62,11 @@ abstract class AdminController extends Controller
     public function init()
     {
         parent::init();
-        $this->_actionManager = new ActionManager();
         $this->_ensure();
         $this->layout = App::moduleAdmin()->layout;
         $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
     }
+
 
     /**
      * Проверка целостности данных для работы контроллера
@@ -82,22 +76,31 @@ abstract class AdminController extends Controller
 
 
     /**
-     * @param string $code
-     * @param array $data
-     * @return $this
-     */
-    protected function _addAction($code, array $data = [])
-    {
-        $this->_actionManager->createAction($code, $data);
-        return $this;
-    }
-
-    /**
      * @return ActionManager
      */
     public function actionManager()
     {
-        return $this->_actionManager;
+        return $this->getBehavior(self::BEHAVIOR_ACTION_MANAGER);
+    }
+
+
+    /**
+     *
+     * Вытащить объект текущего действия из события
+     *
+     * @param ActionEvent $e
+     * @return bool|helpers\Action
+     */
+    protected function _getActionFromEvent(ActionEvent $e)
+    {
+        $currentAction = false;
+
+        if ($this->actionManager()->hasAction($e->action->id))
+        {
+            $currentAction = $this->actionManager()->getAction($e->action->id);
+        }
+
+        return $currentAction;
     }
 
 
@@ -122,12 +125,13 @@ abstract class AdminController extends Controller
     protected function _renderActions(ActionEvent $e)
     {
         $this->getView()->params["actions"] = ControllerActions::begin([
-            "currentAction" => $e->action->id,
-            "controller"    => $this,
+            "currentActionCode"     => $e->action->id,
+            "controller"            => $this,
         ])->run();
 
         return $this;
     }
+
 
     /**
      * Формируем данные для хлебных крошек.
@@ -140,10 +144,9 @@ abstract class AdminController extends Controller
     {
         $actionTitle = Inflector::humanize($e->action->id);
 
-        if (isset($this->_actions[$e->action->id]))
+        if ($currentAction = $this->_getActionFromEvent($e))
         {
-            $data = $this->_actions[$e->action->id];
-            $actionTitle = ArrayHelper::getValue($data, "label");
+            $actionTitle = $currentAction->label;
         }
 
         if ($this->_label)
@@ -154,7 +157,7 @@ abstract class AdminController extends Controller
             ]];
         }
 
-        if ($this->_defaultAction != $e->action->id)
+        if ($this->defaultAction != $e->action->id)
         {
             $this->getView()->params['breadcrumbs'][] = $actionTitle;
         }
@@ -163,20 +166,21 @@ abstract class AdminController extends Controller
     }
 
     /**
+     *
+     * Строим метаданные на странице
+     *
      * @param ActionEvent $e
      * @return $this
      */
     protected function _renderMetadata(ActionEvent $e)
     {
         $actionTitle = Inflector::humanize($e->action->id);
-
-        if (isset($this->_actions[$e->action->id]))
+        if ($currentAction = $this->_getActionFromEvent($e))
         {
-            $data = $this->_actions[$e->action->id];
-            $actionTitle = ArrayHelper::getValue($data, "label", "Label");
+            $actionTitle = $currentAction->label;
         }
 
-        if ($this->_defaultAction != $e->action->id)
+        if ($this->defaultAction != $e->action->id)
         {
             $this->getView()->title = $actionTitle . " / " . $this->_label;
         } else
@@ -184,7 +188,11 @@ abstract class AdminController extends Controller
             $this->getView()->title = $this->_label;
         }
 
-
         return $this;
     }
+
+
+
+
+
 }

@@ -13,6 +13,8 @@ namespace skeeks\cms\modules\admin\widgets;
 
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
+use skeeks\cms\modules\admin\controllers\helpers\Action;
+use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
@@ -28,7 +30,7 @@ class ControllerActions
     /**
      * @var string id текущего действия
      */
-    public $currentAction   = null;
+    public $currentActionCode   = null;
 
 
     public $ulOptions = [
@@ -71,8 +73,8 @@ class ControllerActions
      */
     public function run()
     {
-        $actions = $this->controller->getActions();
-        if (!$actions)
+        $actionManager = $this->controller->actionManager();
+        if (!$actionManager->getAllowActions())
         {
             return "";
         }
@@ -86,19 +88,25 @@ class ControllerActions
      */
     public function renderListLi()
     {
-        $actions = $this->controller->getActions();
+        $actionManager = $this->controller->actionManager();
+
+        $actions = $actionManager->getAllowActions();
         $result = [];
 
-        foreach ($actions as $code => $data)
+        /**
+         * @var Action $action
+         */
+        foreach ($actions as $code => $actionData)
         {
-            $label          = ArrayHelper::getValue($data, "label");
+            $action         = $actionManager->getAction($code);
+            $label          = $action->label;
 
-            $linkOptions["data-method"]         = ArrayHelper::getValue($data, "data-method");
-            $linkOptions["data-confirm"]        = ArrayHelper::getValue($data, "data-method");
+            $linkOptions["data-method"]         = $action->method;
+            $linkOptions["data-confirm"]        = $action->confirm;
 
             $result[] = Html::tag("li",
                 Html::a($label, [$code, UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE], $linkOptions),
-                ["class" => $this->currentAction == $code ? "active" : ""]
+                ["class" => $this->currentActionCode == $code ? "active" : ""]
             );
         }
 

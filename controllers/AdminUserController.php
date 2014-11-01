@@ -10,7 +10,9 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\modules\admin\controllers\AdminModelEditorAdvancedController;
+use skeeks\cms\modules\admin\controllers\AdminController;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -19,16 +21,19 @@ use skeeks\cms\models\searchs\User as UserSearch;
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
-class AdminUserController extends AdminModelEditorAdvancedController
+class AdminUserController extends AdminModelEditorSmartController
 {
     public function init()
     {
         $this->_label                   = "Управление пользователями";
+
         $this->_modelShowAttribute      = "username";
 
         $this->_modelClassName          = User::className();
         $this->_modelSearchClassName    = UserSearch::className();
 
         parent::init();
+
     }
+
 }
