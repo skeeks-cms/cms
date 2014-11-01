@@ -1,38 +1,9 @@
-Skeeks cms
-====================
+Skeeks cms 1.0
+==============
 
-Installation
-------------
-Процесс установки достаточно стандартный:
+Полное руководство и описание проекта, доступно по ссылкам:
+[На русском языке](http://git.skeeks.com/skeeks/cms/blob/master/docs/guide-ru/README.md)
 
-1) The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
-
-```
-php composer.phar require --prefer-dist skeeks/cms "*"
-```
-
-or add
-
-```
-"skeeks/cms": "*"
-```
-
-to the require section of your `composer.json` file.
-
-2) Install migrations 
-
-```
-php yii migrate --migrationPath=@skeeks/cms/migrations
-```
-
-Usage
------
-
-Once the extension is installed, simply use it in your code by  :
-
-```php
-<?= \skeeks\cms\Module ?>
-```
 
 
 
