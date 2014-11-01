@@ -8,9 +8,6 @@
 
 ### Установка через Composer
 
-Если у вас еще нет [Composer](http://getcomposer.org/), вы можете установить его, следуя инструкциям 
-на [getcomposer.org](http://getcomposer.org/doc/00-intro.md#installation-nix).
-
 Вы можете установить приложение с помощью следующих команд (необходим доступ по ssh):
 
 ~~~
@@ -27,7 +24,30 @@ php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
 php composer.phar create-project skeeks/cms-app
 ~~~
 
+### Установка через git
 
+~~~
+# если git не установлен выполнить команду
+sudo apt-get install git
+
+# перейти в папку своего проекта
+cd /var/www/sites/test.ru/
+
+# установка composer (если уже установлен пропускаем этот шаг) 
+curl -sS https://getcomposer.org/installer | php
+
+# устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
+php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
+
+# клонирование проекта из git репозитория
+git clone http://git.skeeks.com/skeeks/cms-app.git
+
+# переключаемся на релизную ветку (стабилная версия проекта)
+git checkout origin/release
+
+# запускаем установку cms и всех необходимых зависимостей
+php composer.phar install
+~~~
 
 
 
