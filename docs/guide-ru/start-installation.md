@@ -76,6 +76,28 @@ TODO: необходимо доработать этот момент, чтоб�
 Необходимо прописать настройки подключения к базе данных:
 /var/www/sites/test.ru/common/config/main.php - настройки подключения к базе всех приложений
 
+~~~
+$config = \yii\helpers\ArrayHelper::merge($configSkeeksCms, [
+//......
+'components'    =>
+    [
+        //......
+
+        'db' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'mysql:host=host;dbname=DbName',
+            'username' => 'user',
+            'password' => 'pwd',
+            'charset' => 'utf8',
+            'enableSchemaCache' => true,
+            'schemaCacheDuration' => 3600,
+        ],
+        
+        //......
+    ]
+//......
+~~~
+
 3) Инициализация
 -----------------
 ~~~
