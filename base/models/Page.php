@@ -15,14 +15,12 @@
  */
 namespace skeeks\cms\base\models;
 
+use skeeks\cms\models\behaviors\HasMetaData;
 use skeeks\cms\models\behaviors\SeoPageName;
 use Yii;
 
 /**
  * @property string $name
- * @property string $meta_title
- * @property string $meta_description
- * @property string $meta_keywords
  * @property string $seo_page_name
  *
  * Class Publication
@@ -30,6 +28,7 @@ use Yii;
  */
 abstract class Page extends Core
 {
+    use \skeeks\cms\models\behaviors\traits\HasMetaData;
     /**
      * @var string
      */
@@ -41,7 +40,8 @@ abstract class Page extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            SeoPageName::className()
+            SeoPageName::className(),
+            HasMetaData::className()
         ]);
     }
 

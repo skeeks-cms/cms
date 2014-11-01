@@ -61,43 +61,28 @@ class AdminModelEditorController extends AdminController
     {
         parent::init();
 
-        $this->_actions =
-        [
-            "index" =>
-            [
-                "label" => "Список",
-            ],
+        $this
+            ->_addAction("index", ["label" => "Список"])
+            ->_addAction("create", ["label" => "Добавить"])
 
-            "create" =>
-            [
-                "label" => "Добавить",
-            ],
-
-
-            "view" =>
-            [
-                "type"  => self::ACTION_TYPE_MODEL,
+            ->_addAction("view", [
                 "label" => "Смотреть",
-                "icon"  => "glyphicon glyphicon-eye-open",
-            ],
+                "icon"  => "glyphicon glyphicon-eye-open"
+            ])
 
-            "update" =>
-            [
-                "type"  => self::ACTION_TYPE_MODEL,
+            ->_addAction("update", [
                 "label" => "Редактировать",
-                "icon"  => "glyphicon glyphicon-pencil",
-            ],
+                "icon"  => "glyphicon glyphicon-pencil"
+            ])
 
-            "delete" =>
-            [
-                "type"          => self::ACTION_TYPE_MODEL,
+            ->_addAction("delete", [
                 "label"         => "Удалить",
                 "icon"          => "glyphicon glyphicon-trash",
-                "data-method"   => "post",
-                'data-confirm'  => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+                "method"        => "post",
+                "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
                 "priority"      => 9999
-            ]
-        ];
+            ])
+        ;
     }
 
     /**
@@ -227,7 +212,6 @@ class AdminModelEditorController extends AdminController
 
         if ($this->_actionIsTypeModel($dataCurrentAction))
         {
-
             $this->getView()->params["actions"] = ControllerModelActions::begin([
                 "currentAction" => $e->action->id,
                 "controller"    => $this,
@@ -369,13 +353,11 @@ class AdminModelEditorController extends AdminController
      * @param array $dataAction
      * @return bool
      */
-    private function _actionIsTypeModel(array $dataAction)
+    protected function _actionIsTypeModel(array $dataAction)
     {
         $type = ArrayHelper::getValue($dataAction, "type");
         return $type == self::ACTION_TYPE_MODEL;
     }
-
-
 
 
     /**

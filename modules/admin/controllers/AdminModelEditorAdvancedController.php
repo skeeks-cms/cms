@@ -9,38 +9,135 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\controllers;
+
+use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\Exception;
+use skeeks\cms\models\behaviors\HasComments;
+use skeeks\cms\models\behaviors\HasFiles;
+use skeeks\cms\models\behaviors\HasMetaData;
+use skeeks\cms\models\behaviors\HasSubscribes;
+use skeeks\cms\models\behaviors\HasVotes;
+
+use yii\base\ActionEvent;
+use yii\base\Behavior;
+
 /**
  * Class AdminModelEditorAdvancedController
  * @package skeeks\cms\modules\admin\controllers
  */
 abstract class AdminModelEditorAdvancedController extends AdminModelEditorController
 {
-    /**
-     *
-     */
     public function init()
     {
         parent::init();
 
         $this
-            ->_registerAction("files", [
-                "label" => "Управление файлами",
-                "type" => self::ACTION_TYPE_MODEL
+
+            ->_addAction("files", [
+                "label"     => "Файлами",
+                "behaviors" => HasFiles::className()
+            ])
+
+            ->_addAction("comments", [
+                "label"     => "Комментарии",
+                "behaviors" => HasComments::className()
+            ])
+
+            ->_addAction("votes", [
+                "label"     => "Голоса",
+                "behaviors" => HasVotes::className()
+            ])
+
+            ->_addAction("subscribes", [
+                "label"     => "Подписки",
+                "behaviors" => HasSubscribes::className()
+            ])
+
+            ->_addAction("meta-data", [
+                "label"     => "Мета данные",
+                "behaviors" => HasMetaData::className(),
             ])
         ;
     }
 
+
     /**
-     * Действия для управления моделью
-     * @return array
+     * @param $dataAction
+     * @throws Exception
      */
-    public function getModelActions()
+    protected function _actionIsAllow($dataAction)
     {
-        $result = [];
+        //Если нужно учитывать наличие поведения у сущьности
+        if (!isset($dataAction["behaviors"]))
+        {
+            return true;
+        }
 
-        $result = parent::getModelActions();
+        $model = $this->getCurrentModel();
+        $behaviorsNeed = $dataAction["behaviors"];
 
-        return $result;
+        if (is_array($behaviorsNeed))
+        {
+            return $this->_checkBehaviorsForModel($model, $behaviorsNeed);
+
+        } else if (is_string($behaviorsNeed))
+        {
+            return $this->_checkBehaviorsForModel($model, [$behaviorsNeed]);
+        } else
+        {
+            throw new Exception();
+        }
+
+    }
+    /**
+     *
+     * TODO: нужно выносить часто нужно знать
+     *
+     * Проверка наличия поведений у модели
+     * Если хотя бы одного нету будет false
+     *
+     * TODO: думаю нужно делать по типу механимзма валидаций skeeks\sx\Validator
+     *
+     * @param ActiveRecord $model
+     * @param array $behaviors
+     * @return bool
+     */
+    protected function _checkBehaviorsForModel(ActiveRecord $model, array $behaviors = [])
+    {
+
+        foreach ($behaviors as $behaviorNeed)
+        {
+            if (!$this->_checkBehaviorForModel($model, $behaviorNeed))
+            {
+                return false;
+            }
+        }
+
+
+        return true;
+    }
+
+
+    /**
+     * TODO: нужно выносить часто нужно знать
+     *
+     * Проверка есть ли у модели поведение
+     *
+     * @param ActiveRecord $model
+     * @param Behavior $behaviorNeed
+     * @return bool
+     */
+    protected function _checkBehaviorForModel(ActiveRecord $model, $behaviorNeed)
+    {
+        foreach ($model->getBehaviors() as $behavior)
+        {
+            if ($behavior instanceof $behaviorNeed)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

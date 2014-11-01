@@ -10,7 +10,7 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorAdvancedController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -19,7 +19,7 @@ use skeeks\cms\models\searchs\User as UserSearch;
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
-class AdminUserController extends AdminModelEditorController
+class AdminUserController extends AdminModelEditorAdvancedController
 {
     public function init()
     {

@@ -16,6 +16,8 @@ namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\App;
 use skeeks\cms\Controller;
 use skeeks\cms\modules\admin\components\UrlRule;
+use skeeks\cms\modules\admin\descriptors\Action;
+use skeeks\cms\modules\admin\descriptors\ActionManager;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use yii\base\ActionEvent;
 use yii\helpers\ArrayHelper;
@@ -37,33 +39,14 @@ abstract class AdminController extends Controller
      */
     protected $_label = null;
 
+
+
     /**
      * Описанные действия будут отображаться в виде дополнительного меню
-     * @var array
+     * @var ActionManager
      */
-    protected $_actions =
-    [
-        /*"index" =>
-        [
-            "label" => "Список",
-        ],
+    protected $_actionManager = null;
 
-        "create" =>
-        [
-            "label" => "Добавить",
-        ],*/
-    ];
-
-    /**
-     * @param string $code
-     * @param array $data
-     * @return $this
-     */
-    public function _registerAction($code, array $data = [])
-    {
-        $this->_actions[$code] = $data;
-        return $this;
-    }
 
     public function behaviors()
     {
@@ -85,10 +68,9 @@ abstract class AdminController extends Controller
     public function init()
     {
         parent::init();
+        $this->_actionManager = new ActionManager();
         $this->_ensure();
-
         $this->layout = App::moduleAdmin()->layout;
-
         $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
     }
 
@@ -97,6 +79,27 @@ abstract class AdminController extends Controller
      */
     protected function _ensure()
     {}
+
+
+    /**
+     * @param string $code
+     * @param array $data
+     * @return $this
+     */
+    protected function _addAction($code, array $data = [])
+    {
+        $this->_actionManager->createAction($code, $data);
+        return $this;
+    }
+
+    /**
+     * @return ActionManager
+     */
+    public function actionManager()
+    {
+        return $this->_actionManager;
+    }
+
 
     /**
      * @param ActionEvent $e
@@ -183,14 +186,5 @@ abstract class AdminController extends Controller
 
 
         return $this;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getActions()
-    {
-        return $this->_actions;
     }
 }
