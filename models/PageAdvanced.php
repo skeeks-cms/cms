@@ -19,7 +19,7 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\base\models;
+namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasFiles;

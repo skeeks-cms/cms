@@ -16,6 +16,7 @@ use skeeks\cms\Exception;
 use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMetaData;
+use skeeks\cms\models\behaviors\HasSeoPageUrl;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
 
@@ -85,12 +86,24 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'subscribes' =>
                     [
-                        "label"     => "Голоса",
+                        "label"     => "Подписки",
                         "rules"     =>
                         [
                             [
                                 "class"     => HasModelBehaviors::className(),
                                 "behaviors" => HasSubscribes::className()
+                            ]
+                        ]
+                    ],
+
+                    'seo-page-url' =>
+                    [
+                        "label"     => "Адрес на сайте",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasSeoPageUrl::className()
                             ]
                         ]
                     ],
@@ -133,10 +146,38 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     }
 
 
+    public function actionComments()
+    {
+        return $this->output("Еще не реализовано");
+    }
+
+    public function actionVotes()
+    {
+        return $this->output("Еще не реализовано");
+    }
+
+    public function actionSubscribes()
+    {
+        return $this->output("Еще не реализовано");
+    }
+
+    public function actionSeoPageUrl()
+    {
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        {
+            return $this->redirect(['seo-page-url', 'id' => $model->id]);
+        } else
+        {
+            return $this->output(App::moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
+
     /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return string|\yii\web\Response
      */
     public function actionMetaData()
     {

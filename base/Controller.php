@@ -5,16 +5,16 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
- * @date 30.10.2014
+ * @date 03.11.2014
  * @since 1.0.0
  */
 
-namespace skeeks\cms;
+namespace skeeks\cms\base;
 use yii\web\Controller as YiiWebController;
 
 /**
  * Class Controller
- * @package skeeks\cms
+ * @package skeeks\cms\base
  */
 class Controller extends YiiWebController
 {

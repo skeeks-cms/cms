@@ -11,7 +11,6 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\models\PageAdvanced;
 use Yii;
 
 /**

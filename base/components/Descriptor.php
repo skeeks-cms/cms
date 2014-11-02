@@ -8,7 +8,7 @@
  * @date 29.10.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\components;
+namespace skeeks\cms\base\components;
 
 use \skeeks\sx\Entity;
 use \skeeks\sx\Version;
@@ -16,7 +16,7 @@ use \yii\base\Component;
 
 /**
  * Class Descriptor
- * @package skeeks\cms\components
+ * @package skeeks\cms\base\components
  */
 class Descriptor
     extends Component

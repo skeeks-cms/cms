@@ -11,7 +11,6 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\models\Core;
 use skeeks\cms\models\behaviors\CanBeLinkedTo;
 use skeeks\sx\models\Ref;
 use yii\base\Event;

@@ -10,9 +10,8 @@
  */
 namespace skeeks\cms\modules\admin;
 
-use skeeks\cms\Module as CmsModule;
+use skeeks\cms\base\Module as CmsModule;
 use skeeks\cms\App;
-use yii\helpers\Inflector;
 /**
  * Class Module
  * @package skeeks\modules\cms\user

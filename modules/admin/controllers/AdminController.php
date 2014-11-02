@@ -14,7 +14,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 
 use skeeks\cms\App;
-use skeeks\cms\Controller;
+use skeeks\cms\base\Controller;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\widgets\ControllerActions;

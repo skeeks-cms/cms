@@ -13,9 +13,10 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\base\models;
+namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\HasMetaData;
+use skeeks\cms\models\behaviors\HasSeoPageUrl;
 use skeeks\cms\models\behaviors\SeoPageName;
 use Yii;
 
@@ -29,10 +30,12 @@ use Yii;
 abstract class Page extends Core
 {
     use \skeeks\cms\models\behaviors\traits\HasMetaData;
+    use \skeeks\cms\models\behaviors\traits\HasPageUrl;
+
     /**
      * @var string
      */
-    protected $_viewPage = "module/controller/view";
+    public $viewPageTemplate = "module/controller/view";
 
     /**
      * @inheritdoc
@@ -41,7 +44,11 @@ abstract class Page extends Core
     {
         return array_merge(parent::behaviors(), [
             SeoPageName::className(),
-            HasMetaData::className()
+            HasMetaData::className(),
+            [
+                "class"             => HasSeoPageUrl::className(),
+                "viewPageTemplate"  => $this->viewPageTemplate
+            ]
         ]);
     }
 
@@ -71,20 +78,5 @@ abstract class Page extends Core
             [['meta_description', 'meta_keywords'], 'string'],
         ]);
     }
-    /**
-     * @return string
-     */
-    public function createPageUrl()
-    {
-        return \Yii::$app->urlManager->createUrl([$this->_viewPage, "seo_page_name" => $this->seo_page_name]);
-    }
 
-    /**
-     * TODO: old function
-     * @return string
-     */
-    public function getPageUrl()
-    {
-        return $this->createPageUrl();
-    }
 }

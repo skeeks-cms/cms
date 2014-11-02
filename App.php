@@ -9,6 +9,8 @@
  * @since 1.0.0
  */
 namespace skeeks\cms;
+use skeeks\cms\base\components\Descriptor;
+use skeeks\cms\base\Module;
 use skeeks\cms\models\User;
 use skeeks\sx\models\IdentityMap;
 /**
@@ -177,18 +179,18 @@ class App
 
 
     /**
-     * @var components\Descriptor
+     * @var Descriptor
      */
     protected static $_descriptor = null;
 
     /**
-     * @return components\Descriptor
+     * @return Descriptor
      */
     static public function getDescriptor()
     {
         if (self::$_descriptor === null)
         {
-             self::$_descriptor = new components\Descriptor((array) \Yii::$app->params["descriptor"]);
+             self::$_descriptor = new Descriptor((array) \Yii::$app->params["descriptor"]);
         }
 
         return self::$_descriptor;

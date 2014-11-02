@@ -8,7 +8,7 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\base\models;
+namespace skeeks\cms\models;
 
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\User;
