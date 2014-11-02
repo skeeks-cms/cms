@@ -14,6 +14,7 @@ namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
+use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
@@ -74,23 +75,23 @@ class ControllerActions
     public function run()
     {
         $actionManager = $this->controller->actionManager();
-        if (!$actionManager->getAllowActions())
+        if (!$actions = $actionManager->getAllowActions())
         {
             return "";
         }
 
-        $result = $this->renderListLi();
+        $result = $this->renderListLi($actions, $actionManager);
         return Html::tag("ul", implode($result), $this->ulOptions);
     }
 
     /**
+     * @param array $actions
+     * @param ActionManager $actionManager
      * @return array
      */
-    public function renderListLi()
+    public function renderListLi($actions = [], ActionManager $actionManager)
     {
         $actionManager = $this->controller->actionManager();
-
-        $actions = $actionManager->getAllowActions();
         $result = [];
 
         /**
@@ -105,7 +106,7 @@ class ControllerActions
             $linkOptions["data-confirm"]        = $action->confirm;
 
             $result[] = Html::tag("li",
-                Html::a($label, [$code, UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE], $linkOptions),
+                Html::a($label, $action->getUrlData(), $linkOptions),
                 ["class" => $this->currentActionCode == $code ? "active" : ""]
             );
         }

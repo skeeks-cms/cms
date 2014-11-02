@@ -22,6 +22,7 @@ use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
+use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;
@@ -39,8 +40,8 @@ class AdminModelEditorController extends AdminController
     /**
      * @var string
      */
-    protected $_defaultActionModel = "view";
-    protected $_modelShowAttribute = "id";
+    public $defaultActionModel      = "view";
+    protected $_modelShowAttribute  = "id";
 
     /**
      * обязателено указывать!
@@ -75,25 +76,30 @@ class AdminModelEditorController extends AdminController
                 [
                     "index" =>
                     [
-                        "label" => "Список",
+                        "label"         => "Список",
+                        "rules"         => NoModel::className()
                     ],
 
                     "create" =>
                     [
-                        "label" => "Добавить",
+                        "label"         => "Добавить",
+                        "rules"         => NoModel::className()
                     ],
+
+
+
 
                     "view" =>
                     [
-                        "label" => "Смотреть",
-                        "icon"  => "glyphicon glyphicon-eye-open",
+                        "label"         => "Смотреть",
+                        "icon"          => "glyphicon glyphicon-eye-open",
                         "rules"         => HasModel::className()
                     ],
 
                     "update" =>
                     [
-                        "label" => "Редактировать",
-                        "icon"  => "glyphicon glyphicon-pencil",
+                        "label"         => "Редактировать",
+                        "icon"          => "glyphicon glyphicon-pencil",
                         "rules"         => HasModel::className()
                     ],
 
@@ -188,19 +194,24 @@ class AdminModelEditorController extends AdminController
         $id = \Yii::$app->request->getQueryParam("id");
         if (!$id)
         {
-            throw new Exception("Текущая модель не может быть загружена");
+            //throw new Exception("Текущая модель не может быть загружена");
+            $this->_currentModel = false;
+            return $this;
         }
         $this->_currentModel = $this->_findModel($id);
 
         if (!$this->_currentModel->primaryKey)
         {
-            throw new Exception("У модели нет первичного ключа, не сможем с ней работать");
+            //throw new Exception("У модели нет первичного ключа, не сможем с ней работать");
+            $this->_currentModel = false;
+            return $this;
         }
 
         return $this;
     }
 
     /**
+     * TODO: use $this->getModel();
      * @return ActiveRecord
      * @throws Exception
      */
@@ -214,6 +225,33 @@ class AdminModelEditorController extends AdminController
         return $this->_currentModel;
     }
 
+    /**
+     * @return ActiveRecord
+     */
+    public function getModel()
+    {
+        return $this->getCurrentModel();
+    }
+
+    /**
+     * @param ActiveRecord $model
+     * @return $this
+     */
+    public function setModel(ActiveRecord $model)
+    {
+        $this->_currentModel = $model;
+        return $this;
+    }
+    /**
+     * TODO: use $this->getModel();
+     * @param ActiveRecord $model
+     * @return $this
+     */
+    public function setCurrentModel(ActiveRecord $model)
+    {
+        $this->_currentModel = $model;
+        return $this;
+    }
 
 
     /**
@@ -225,18 +263,11 @@ class AdminModelEditorController extends AdminController
      */
     protected function _renderBreadcrumbs(ActionEvent $e)
     {
-        //Если текущее действие не описано, делаем как нужно по умолчанию
-        if (!$currentAction = $this->_getActionFromEvent($e));
+        $currentAction = $this->_getActionFromEvent($e);
+        if (!$currentAction instanceof Action || !$this->getCurrentModel())
         {
             return parent::_renderBreadcrumbs($e);
         }
-
-        //Если текущее действие не ActionModel, делаем как нужно по умолчанию
-        if (!$currentAction instanceof ActionModel)
-        {
-            return parent::_renderBreadcrumbs($e);
-        }
-
 
         if ($this->_label)
         {
@@ -247,15 +278,15 @@ class AdminModelEditorController extends AdminController
         }
 
         $this->getView()->params['breadcrumbs'][] = ['label' => $this->getCurrentModel()->getAttribute($this->_modelShowAttribute), 'url' => [
-            $this->_defaultModelAction,
+            $this->defaultActionModel,
             "id" => $this->getCurrentModel()->getPrimaryKey(),
             UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
         ]];
 
 
-        if ($this->_defaultAction != $e->action->id)
+        if ($this->defaultAction != $e->action->id)
         {
-            $this->getView()->params['breadcrumbs'][] = $actionTitle;
+            $this->getView()->params['breadcrumbs'][] = $currentAction->label;
         }
 
         return $this;
@@ -269,18 +300,11 @@ class AdminModelEditorController extends AdminController
     protected function _renderMetadata(ActionEvent $e)
     {
         //Если текущее действие не описано, делаем как нужно по умолчанию
-        if (!$currentAction = $this->_getActionFromEvent($e));
+        $currentAction = $this->_getActionFromEvent($e);
+        if (!$currentAction instanceof Action || !$this->getCurrentModel())
         {
             return parent::_renderMetadata($e);
         }
-
-        //Если текущее действие не ActionModel, делаем как нужно по умолчанию
-        if (!$currentAction instanceof ActionModel)
-        {
-            return parent::_renderMetadata($e);
-        }
-
-
 
         $actionTitle    = $currentAction->label;
 
@@ -291,10 +315,6 @@ class AdminModelEditorController extends AdminController
         $this->getView()->title = implode(" / ", $result);
         return $this;
     }
-
-
-
-
 
 
 

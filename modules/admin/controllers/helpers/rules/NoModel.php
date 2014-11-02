@@ -1,6 +1,6 @@
 <?php
 /**
- * Действие будет работать только когда у контроллера определена модель
+ * Дейсвтие не связано с моделью
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\controllers\helpers\rules;
+use skeeks\cms\Exception;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\ActionRule;
 
@@ -16,7 +17,7 @@ use skeeks\cms\modules\admin\controllers\helpers\ActionRule;
  * Class HasModel
  * @package skeeks\cms\modules\admin\controllers\helpers\rules
  */
-class HasModel extends ActionRule
+class NoModel extends ActionRule
 {
     /**
      * @var AdminModelEditorController
@@ -33,7 +34,6 @@ class HasModel extends ActionRule
      */
     public function isAllow()
     {
-
         if (!parent::isAllow())
         {
             return false;
@@ -46,9 +46,9 @@ class HasModel extends ActionRule
 
         if ($model = $this->controller->getCurrentModel())
         {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 }

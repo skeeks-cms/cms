@@ -17,7 +17,6 @@ use skeeks\cms\App;
 use skeeks\cms\Controller;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
-use skeeks\cms\modules\admin\controllers\helpers\Test;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use yii\base\ActionEvent;
 use yii\helpers\ArrayHelper;

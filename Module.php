@@ -103,4 +103,15 @@ abstract class Module extends \yii\base\Module
 
         return $this->_descriptor;
     }
+
+    /**
+     * @param string $filePath helpers/test.php
+     * @param array $data
+     * @param null $context
+     * @return string
+     */
+    public function renderFile($filePath, $data = [], $context = null)
+    {
+        return \Yii::$app->view->renderFile($this->getViewPath() . "/" . $filePath, $data, $context);
+    }
 }

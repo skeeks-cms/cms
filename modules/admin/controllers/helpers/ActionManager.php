@@ -151,6 +151,8 @@ class ActionManager extends Behavior
     {
         if ($data = $this->getActionData($code))
         {
+            $data["code"] = $code;
+            $data["controller"] = $this->owner;
             return new Action($data);
         }
 
