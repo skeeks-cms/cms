@@ -33,16 +33,49 @@ class Module extends base\Module
     public $adminMenuItems  =
     [
         [
-            "label"     => "Управление пользователями",
-            "url"       => ["cms/admin-user"],
-            "priority"  => 10,
+            "label"     => "Сайты",
+            "url"       => ["cms/admin-user-group"],
         ],
 
         [
-            "label"     => "Управление группами",
+            "label"     => "Дерево страниц",
             "url"       => ["cms/admin-user-group"],
-            "priority"  => 5,
-        ]
+        ],
+
+        [
+            "label"     => "Инфоблоки",
+            "url"       => ["cms/admin-user-group"],
+        ],
+
+        [
+            "label"     => "Управление пользователями",
+            "url"       => ["cms/admin-user"],
+        ],
+
+        [
+            "label"     => "Управление группами пользователей",
+            "url"       => ["cms/admin-user-group"],
+        ],
+
+        [
+            "label"     => "Публикации",
+            "url"       => ["cms/admin-user-group"],
+        ],
+
+        [
+            "label"     => "Комментарии",
+            "url"       => ["cms/admin-user-group"],
+        ],
+
+        [
+            "label"     => "Голоса",
+            "url"       => ["cms/admin-user-group"],
+        ],
+
+        [
+            "label"     => "Подписки",
+            "url"       => ["cms/admin-user-group"],
+        ],
     ];
 
 
