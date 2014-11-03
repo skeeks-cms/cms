@@ -29,7 +29,7 @@
 
 SkeekS cms содержит полезные базовые классы, которые дополняют классы Yii фреймворка.
 
-* Базовые классы cms
+* [Базовые классы cms](base-classes-cms.md)
 * Grid columns helpers
 
 
