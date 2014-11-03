@@ -19,20 +19,20 @@ class HasSeoPageUrl extends HasPageUrl
     /**
      * @var string
      */
-    public $viewPageTemplate    = "module/controller/view";
-    public $pkName              = "seo_page_name";
+    public $viewPageTemplate                    = "module/controller/view";
+    public $seoPageNameAttribute                = "seo_page_name";
 
     /**
      * @return string
      */
     public function createUrl()
     {
-        return \Yii::$app->urlManager->createUrl([$this->viewPageTemplate, $this->pkName => $this->owner->{$this->pkName}]);
+        return \Yii::$app->urlManager->createUrl([$this->viewPageTemplate, $this->seoPageNameAttribute => $this->owner->{$this->pkName}]);
     }
 
     public function createAbsoluteUrl()
     {
-        return \Yii::$app->urlManager->createAbsoluteUrl([$this->viewPageTemplate, $this->pkName => $this->owner->{$this->pkName}]);
+        return \Yii::$app->urlManager->createAbsoluteUrl([$this->viewPageTemplate, $this->seoPageNameAttribute => $this->owner->{$this->seoPageNameAttribute}]);
     }
 
     /**
@@ -42,4 +42,6 @@ class HasSeoPageUrl extends HasPageUrl
     {
         return $this->createUrl();
     }
+
+
 }

@@ -1,0 +1,25 @@
+.sx-file-manager
+{
+    display: table;
+}
+.sx-file-manager:after
+{
+    clear: both;
+}
+
+    .sx-file-manager ul li
+    {
+        list-style: none;
+        float: left;
+        margin: 3px;
+    }
+
+        .sx-file-manager ul li img
+        {
+            border: 2px solid silver;
+        }
+
+            .sx-file-manager ul li img:hover
+            {
+                border: 2px solid deepskyblue;
+            }

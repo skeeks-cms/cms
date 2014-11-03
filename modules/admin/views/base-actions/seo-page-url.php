@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm;
 <?php $form = ActiveForm::begin(); ?>
 <hr />
 
-<?= $form->field($model, 'seo_page_name')->textInput(['maxlength' => 64]) ?>
+<?= $form->field($model, $model->seoPageNameAttribute)->textInput(['maxlength' => 64]) ?>
 
 <div class="form-group">
     <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-primary']) ?>

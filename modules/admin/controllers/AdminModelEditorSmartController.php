@@ -132,17 +132,24 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
      */
     public function actionFiles()
     {
-        $model = $this->getCurrentModel();
+        $allowFields = [];
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        if ($behaviors = $this->getModel()->getBehaviors())
         {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else
-        {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            foreach ($behaviors as $behavior)
+            {
+                if ($behavior instanceof HasFiles)
+                {
+                    $allowFields = array_merge($allowFields, array_keys($behavior->fields));
+                }
+            }
+
         }
+
+        return $this->output(App::moduleAdmin()->renderFile("base-actions/files.php", [
+            "model"         => $this->getModel(),
+            "allowFields"   => $allowFields
+        ]));
     }
 
 

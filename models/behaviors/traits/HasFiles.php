@@ -29,11 +29,11 @@ trait HasFiles
     }
 
     /**
-     * Добавить файл последним
+     * @param StorageFile $file
      * @param $fieldName
      * @return $this
      */
-    protected function _appendFile(\common\models\StorageFile $file, $fieldName)
+    protected function _appendFile(StorageFile $file, $fieldName)
     {
         $files              = $this->getFiles($fieldName);
         $files[]            = $file->src;
@@ -54,7 +54,7 @@ trait HasFiles
      * @param $fieldName
      * @return $this
      */
-    public function appendFile(\common\models\StorageFile $file, $fieldName)
+    public function appendFile(StorageFile $file, $fieldName)
     {
         //Вяжем файл к этой сущьности
         $file->setAttributes($this->getRef()->toArray(), false);

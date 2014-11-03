@@ -15,6 +15,7 @@ namespace skeeks\cms\models\behaviors\traits;
  * @method string createUrl()
  * @method string createAbsoluteUrl()
  * @method string getPageUrl()
+ * @property string seoPageNameAttribute
  *
  * Class HasPageUrl
  * @package skeeks\cms\models\behaviors\traits
