@@ -73,7 +73,7 @@ $config =
         ],
 
         'cms' => [
-            'class' => \skeeks\cms\Module::className()
+            'class'     => \skeeks\cms\Module::className(),
         ],
     ],
 ];

@@ -100,26 +100,6 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
-            <? if ($items = App::getDescriptor()->getAdminItems()) : ?>
-                <div class="sidebar-menu" id="sx-admin-menu-">
-                    <div class="sx-head">
-                        <i class="icon icon-arrow-up" style=""></i>
-                        <?= App::getDescriptor()->name; ?>
-                    </div>
-
-                    <ul class="nav nav-sidebar">
-                        <? foreach ($items as $itemData) : ?>
-                            <li>
-                                <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["route"]) ?>" title="#">
-                                    <span class="sx-icon"></span>
-                                    <span class="txt"><?= $itemData["label"]; ?></span>
-                                </a>
-                            </li>
-                        <? endforeach; ?>
-                    </ul>
-                </div>
-            <? endif; ?>
-
             <? if ($modules = App::getModules()) : ?>
                 <?
                 /**
@@ -128,17 +108,17 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
                  ?>
 
                 <? foreach ($modules as $key => $module) : ?>
-                    <? if ($items = $module->getDescriptor()->getAdminItems()) : ?>
+                    <? if ($module->adminMenuEnabled && $module->adminMenuItems) : ?>
                     <div class="sidebar-menu" id="sx-admin-menu-">
                         <div class="sx-head">
                             <i class="icon icon-arrow-up" style=""></i>
-                            <?= $module->getDescriptor()->name; ?>
+                            <?= $module->adminMenuName ? $module->adminMenuName : $module->getName(); ?>
                         </div>
 
                         <ul class="nav nav-sidebar">
-                            <? foreach ($items as $itemData) : ?>
+                            <? foreach ($module->adminMenuItems as $itemData) : ?>
                                 <li>
-                                    <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["route"]) ?>" title="#">
+                                    <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#">
                                         <span class="sx-icon"></span>
                                         <span class="txt"><?= $itemData["label"]; ?></span>
                                     </a>

@@ -27,7 +27,7 @@ class HasSeoPageUrl extends HasPageUrl
      */
     public function createUrl()
     {
-        return \Yii::$app->urlManager->createUrl([$this->viewPageTemplate, $this->seoPageNameAttribute => $this->owner->{$this->pkName}]);
+        return \Yii::$app->urlManager->createUrl([$this->viewPageTemplate, $this->seoPageNameAttribute => $this->owner->{$this->seoPageNameAttribute}]);
     }
 
     public function createAbsoluteUrl()

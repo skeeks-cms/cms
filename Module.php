@@ -21,10 +21,30 @@ class Module extends base\Module
 
     public $controllerNamespace = 'skeeks\cms\controllers';
 
-    public function init()
-    {
-        parent::init();
-    }
+
+    /**
+     * @var string
+     */
+    public $adminMenuName   = "Основное меню";
+
+    /**
+     * @var array настройки админки
+     */
+    public $adminMenuItems  =
+    [
+        [
+            "label"     => "Управление пользователями",
+            "url"       => ["cms/admin-user"],
+            "priority"  => 10,
+        ],
+
+        [
+            "label"     => "Управление группами",
+            "url"       => ["cms/admin-user-group"],
+            "priority"  => 5,
+        ]
+    ];
+
 
     /**
      * Используем свой layout
@@ -40,24 +60,6 @@ class Module extends base\Module
         return array_merge(parent::_descriptor(), [
             "name"          => "Cms module",
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
-
-            "admin" =>
-            [
-                "items" =>
-                [
-                    [
-                        "label"     => "Управление пользователями",
-                        "route"     => ["cms/admin-user"],
-                        "priority"  => 10,
-                    ],
-
-                    [
-                        "label"     => "Управление группами",
-                        "route"     => ["cms/admin-user-group"],
-                        "priority"  => 5,
-                    ]
-                ]
-            ]
         ]);
     }
 }

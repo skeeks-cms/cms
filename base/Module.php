@@ -18,6 +18,34 @@ use skeeks\cms\base\components\Descriptor;
 abstract class Module extends \yii\base\Module
 {
     /**
+     * @var string название модуля
+     */
+    public $name = "";
+
+    /**
+     *  [
+            "label"     => "Управление пользователями",
+            "url"       => "cms/test-admin",
+            "priority"  => 10,
+        ],
+
+        [
+            "label"     => "Управление группами",
+            "url"       => "cms/user-group-admin",
+            "priority"  => 5,
+        ]
+     *
+     * @var array пункуты меню админки
+     */
+    public $adminMenuItems      = [];
+    /**
+     * @var string название модуля в меню админки, опционально
+     */
+    public $adminMenuName       = "";
+    public $adminMenuEnabled    = true;
+
+
+    /**
      * @return array
      */
     protected function _descriptor()
@@ -64,27 +92,6 @@ abstract class Module extends \yii\base\Module
                     "phones"    => ["+7 (495) 722-28-73"]
                 ],
             ],
-
-            "admin" =>
-            [
-
-                "items" =>
-                [
-                    /*"user" =>
-                        [
-                            "label"     => "Управление пользователями",
-                            "route"     => "cms/test-admin",
-                            "priority"  => 10,
-                        ],
-
-                    "user-group" =>
-                        [
-                            "label"     => "Управление группами",
-                            "route"     => "cms/user-group-admin",
-                            "priority"  => 5,
-                        ]*/
-                ]
-            ]
         ];
     }
 
@@ -106,7 +113,22 @@ abstract class Module extends \yii\base\Module
         return $this->_descriptor;
     }
 
+
     /**
+     * Название модуля
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name ? $this->name : $this->getDescriptor()->name;
+    }
+
+
+    /**
+     *
+     * Берет файл относительно views модуля и рендерит его
+     *
      * @param string $filePath helpers/test.php
      * @param array $data
      * @param null $context

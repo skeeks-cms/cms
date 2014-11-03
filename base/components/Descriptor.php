@@ -134,17 +134,4 @@ class Descriptor
     }
 
 
-
-    /**
-     * @return array
-     */
-    public function getAdminItems()
-    {
-        if (isset($this->admin["items"]))
-        {
-            return (array) $this->admin["items"];
-        }
-
-        return [];
-    }
 }
