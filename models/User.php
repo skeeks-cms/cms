@@ -13,6 +13,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\db\ActiveRecord;
 
+use skeeks\cms\models\behaviors\HasRef;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -74,7 +75,12 @@ class User
      */
     public function behaviors()
     {
-        return [
+        return array_merge(parent::behaviors(), [
+            HasRef::className() =>
+            [
+                'class'             => HasRef::className(),
+                'savedClassName'    => self::className()
+            ],
             TimestampBehavior::className(),
             HasSubscribes::className(),
 
@@ -125,7 +131,7 @@ class User
                     ],
                 ]
             ],
-        ];
+        ]);
     }
 
     /**

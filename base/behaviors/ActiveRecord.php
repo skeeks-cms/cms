@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\base\behaviors;
 
+
 use skeeks\cms\Exception;
 use yii\base\Behavior;
 
@@ -20,12 +21,12 @@ use yii\base\Behavior;
 class ActiveRecord extends Behavior
 {
     /**
-     * @var \skeeks\cms\Controller the owner of this behavior
+     * @var \skeeks\cms\base\db\ActiveRecord the owner of this behavior
      */
     public $owner;
 
     /**
-     * @param \skeeks\cms\Controller $owner
+     * @param \skeeks\cms\base\db\ActiveRecord $owner
      * @throws Exception
      */
     public function attach($owner)

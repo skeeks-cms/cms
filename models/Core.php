@@ -33,10 +33,10 @@ abstract class Core extends ActiveRecord
      */
     public function behaviors()
     {
-        return [
+        return array_merge(parent::behaviors(), [
             BlameableBehavior::className(),
             TimestampBehavior::className(),
-        ];
+        ]);
     }
 
 
