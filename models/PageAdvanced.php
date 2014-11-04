@@ -22,11 +22,13 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\HasComments;
+use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
 use skeeks\cms\models\behaviors\Implode;
 
+use skeeks\cms\models\behaviors\traits\HasDescriptionsTrait;
 use skeeks\cms\models\behaviors\traits\HasFiles as THasFiles;
 use skeeks\cms\models\behaviors\traits\HasSubscribes as THasSubscribes;
 use skeeks\cms\models\behaviors\traits\HasVotes as THasVotes;
@@ -35,8 +37,6 @@ use skeeks\cms\models\behaviors\traits\HasComments as THasComments;
 use Yii;
 
 /**
- * @property string $description_short
- * @property string $description_full
  * @property string $image
  * @property string $image_cover
  * @property string $images
@@ -63,6 +63,7 @@ abstract class PageAdvanced extends Page
     use THasSubscribes;
     use THasVotes;
     use THasFiles;
+    use HasDescriptionsTrait;
 
     /**
      * @inheritdoc
@@ -74,6 +75,7 @@ abstract class PageAdvanced extends Page
             HasComments::className(),
             HasSubscribes::className(),
             HasVotes::className(),
+            HasDescriptionsBehavior::className(),
 
             [
                 "class"  => Implode::className(),

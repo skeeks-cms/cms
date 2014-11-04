@@ -19,6 +19,7 @@ $config =
     'components' => [
 
         'user' => [
+            'class'         => \yii\web\User::className(),
             'identityClass' => 'skeeks\cms\models\User',
             'enableAutoLogin' => true,
         ],

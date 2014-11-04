@@ -14,6 +14,7 @@ use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
 use skeeks\cms\models\behaviors\HasComments;
+use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMetaData;
 use skeeks\cms\models\behaviors\HasSeoPageUrl;
@@ -46,6 +47,18 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             [
                 "actions" =>
                 [
+                    'descriptions' =>
+                    [
+                        "label"     => "Описание",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasDescriptionsBehavior::className()
+                            ]
+                        ]
+                    ],
+
                     'files' =>
                     [
                         "label"     => "Файлы",
@@ -120,6 +133,8 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             ]
                         ]
                     ],
+
+
                 ]
             ]
         ]);
@@ -196,6 +211,24 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         } else
         {
             return $this->output(App::moduleAdmin()->renderFile("base-actions/meta-data.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionDescriptions()
+    {
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        {
+            return $this->redirect(['descriptions', 'id' => $model->id]);
+        } else
+        {
+            return $this->output(App::moduleAdmin()->renderFile("base-actions/descriptions.php", [
                 "model" => $this->getModel()
             ]));
         }

@@ -368,7 +368,7 @@ class AdminModelEditorController extends AdminController
             return $this->redirect(['view', 'id' => $model->id]);
         } else
         {
-            return $this->render('create', [
+            return $this->render('_form', [
                 'model' => $model,
             ]);
         }
@@ -387,7 +387,7 @@ class AdminModelEditorController extends AdminController
         {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
-            return $this->render('update', [
+            return $this->render('_form', [
                 'model' => $model,
             ]);
         }

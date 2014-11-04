@@ -39,7 +39,7 @@ class Module extends base\Module
 
         [
             "label"     => "Дерево страниц",
-            "url"       => ["cms/admin-user-group"],
+            "url"       => ["cms/admin-tree"],
         ],
 
         [
