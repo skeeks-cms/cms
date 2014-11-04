@@ -24,6 +24,10 @@ $config =
             'enableAutoLogin' => true,
         ],
 
+        'errorHandler' => [
+            'errorAction' => 'cms/error/error',
+        ],
+
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],

@@ -12,6 +12,8 @@ namespace skeeks\cms\modules\admin;
 
 use skeeks\cms\base\Module as CmsModule;
 use skeeks\cms\App;
+use skeeks\cms\modules\admin\components\UrlRule;
+
 /**
  * Class Module
  * @package skeeks\modules\cms\user
@@ -97,4 +99,22 @@ class Module extends CmsModule
         return \Yii::$app->urlManager->createUrl($data);
     }
 
+    /**
+     * @return bool
+     */
+    public function requestIsAdmin()
+    {
+        $request = \Yii::$app->request;
+        $urlRuleAdmin = new UrlRule();
+        $pathInfo       = $request->getPathInfo();
+        $params         = $request->getQueryParams();
+        $firstPrefix    = substr($pathInfo, 0, strlen($urlRuleAdmin->adminPrefix));
+
+        if ($firstPrefix == $urlRuleAdmin->adminPrefix)
+        {
+            return true;
+        }
+
+        return false;
+    }
 }
