@@ -24,7 +24,7 @@ use \yii\base\Behavior;
 class HasVotes extends HasLinkedModels
 {
 
-    public $canBeLinkedModels = ['skeeks\cms\models\Vote'];
+    public $canBeLinkedModels       = ['skeeks\cms\models\Vote'];
     public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные голоса.";
 
 }
