@@ -18,6 +18,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
+use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
@@ -333,16 +334,12 @@ class AdminModelEditorController extends AdminController
 
         if (!$modelSeacrhClass)
         {
-            $modelSeacrhClass = $this->_modelClassName;
-
-            $query = $modelSeacrhClass::find();
-            $dataProvider = new ActiveDataProvider([
-                'query' => $query,
-            ]);
+            $search = new Search($this->_modelClassName);
+            $dataProvider = $search->search(\Yii::$app->request->queryParams);
+            $searchModel = $search->getLoadedModel();
         } else
         {
             $searchModel = new $modelSeacrhClass();
-
             $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
         }
 

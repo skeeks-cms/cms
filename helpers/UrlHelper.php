@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\helpers;
 
+use skeeks\cms\App;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\sx\traits\Entity;
 use skeeks\sx\traits\InstanceObject;
@@ -52,7 +53,13 @@ class UrlHelper
      */
     static public function constructCurrent()
     {
-        return new static("/", \Yii::$app->request->getQueryParams());
+        $url = new static("/", \Yii::$app->request->getQueryParams());
+        if (App::moduleAdmin()->requestIsAdmin())
+        {
+            $url->enableAdmin();
+        }
+
+        return $url;
     }
 
     /**
@@ -149,6 +156,14 @@ class UrlHelper
         return $this->getSystem("ref", "");
     }
 
+
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return (bool) $this->get(UrlRule::ADMIN_PARAM_NAME);
+    }
 
     /**
      * @return $this

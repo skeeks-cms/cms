@@ -18,6 +18,7 @@ use yii\web\AssetBundle;
  */
 class AdminAsset extends AssetBundle
 {
+
     public $sourcePath = '@skeeks/cms/modules/admin/assets';
 
     public $css = [
