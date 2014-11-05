@@ -45,6 +45,11 @@ SkeekS cms содержит полезные базовые классы, кот
 * [Descriptor cms компонента](base-descriptor-cms.md)
 * Grid columns helpers
 
+Cms работа с URL
+----------------
+
+* [Работа с URL фреймворк](runtime-url-handling.md)
+* [Работа с URL cms](runtime-url-handling-cms.md)
 
 Модуль admin и его составляющие (классы и хелперы)
 --------------------------------------------------
