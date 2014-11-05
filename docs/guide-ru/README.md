@@ -62,7 +62,7 @@ Cms работа с URL
 
 Cms Модуль
 ----------
-* [Модуль Yii](cms-module-yii.md)
+* [Модуль фреймворка](cms-module-yii.md)
 * [Модуль cms](cms-module-about.md)
 * Правила написания модулей для cms
 
