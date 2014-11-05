@@ -12,6 +12,7 @@ namespace skeeks\cms\modules\admin\controllers;
 
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\controllers\AdminSubscribeController;
 use skeeks\cms\Exception;
 use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
@@ -21,11 +22,17 @@ use skeeks\cms\models\behaviors\HasSeoPageUrl;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
 
+use skeeks\cms\models\Comment;
+use skeeks\cms\models\Search;
+use skeeks\cms\models\Subscribe;
+use skeeks\cms\models\Vote;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
 use skeeks\cms\modules\admin\controllers\helpers\rules\ModelHasBehaviors;
 use yii\base\ActionEvent;
 use yii\base\Behavior;
+use yii\base\Component;
 use yii\base\View;
+use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -170,17 +177,53 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
     public function actionComments()
     {
-        return $this->output("Еще не реализовано");
+        $search = new Search(Comment::className());
+        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+        $searchModel    = $search->getLoadedModel();
+
+        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+
+        $controller = App::moduleCms()->createControllerByID("admin-comment");
+
+        return $this->output(App::moduleCms()->renderFile("admin-comment/index.php", [
+            'searchModel'   => $searchModel,
+            'dataProvider'  => $dataProvider,
+            'controller'    => $controller,
+        ]));
     }
 
     public function actionVotes()
     {
-        return $this->output("Еще не реализовано");
+        $search = new Search(Vote::className());
+        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+        $searchModel    = $search->getLoadedModel();
+
+        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+
+        $controller = App::moduleCms()->createControllerByID("admin-vote");
+
+        return $this->output(App::moduleCms()->renderFile("admin-vote/index.php", [
+            'searchModel'   => $searchModel,
+            'dataProvider'  => $dataProvider,
+            'controller'    => $controller,
+        ]));
     }
 
     public function actionSubscribes()
     {
-        return $this->output("Еще не реализовано");
+        $search = new Search(Subscribe::className());
+        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+        $searchModel    = $search->getLoadedModel();
+
+        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+
+        $controller = App::moduleCms()->createControllerByID("admin-subscribe");
+
+        return $this->output(App::moduleCms()->renderFile("admin-subscribe/index.php", [
+            'searchModel'   => $searchModel,
+            'dataProvider'  => $dataProvider,
+            'controller'    => $controller,
+        ]));
     }
 
     public function actionSeoPageUrl()

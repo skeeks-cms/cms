@@ -27,7 +27,7 @@ class m141104_100557_create_cms_tree_table extends Migration
             'created_at'            => Schema::TYPE_INTEGER . ' NULL',
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
-            'name'                  => Schema::TYPE_STRING. '(255) NULL',
+            'name'                  => Schema::TYPE_STRING. '(255) NOT NULL',
 
             'description_short'     => Schema::TYPE_TEXT,
             'description_full'      => Schema::TYPE_TEXT,

@@ -33,7 +33,6 @@ class AdminPublicationController extends AdminModelEditorSmartController
         $this->_modelShowAttribute      = "id";
 
         $this->_modelClassName          = Publication::className();
-        $this->_modelSearchClassName    = PublicationSearch::className();
 
         parent::init();
 
