@@ -19,7 +19,7 @@ use Yii;
  */
 class Publication extends PageAdvanced
 {
-    protected $_viewPage = "cms/publication/view";
+    public $viewPageTemplate = "cms/publication/view";
 
     /**
      * @inheritdoc

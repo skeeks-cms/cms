@@ -26,6 +26,7 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
@@ -328,9 +329,23 @@ class AdminModelEditorController extends AdminController
      */
     public function actionIndex()
     {
-        $modelSeacrhClass = $this->_modelSearchClassName;
-        $searchModel = new $modelSeacrhClass();
-        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+        if (!$modelSeacrhClass)
+        {
+            $modelSeacrhClass = $this->_modelClassName;
+
+            $query = $modelSeacrhClass::find();
+            $dataProvider = new ActiveDataProvider([
+                'query' => $query,
+            ]);
+        } else
+        {
+            $modelSeacrhClass = $this->_modelSearchClassName;
+            $searchModel = new $modelSeacrhClass();
+
+            $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+        }
+
+
 
         return $this->render('index', [
             'searchModel'   => $searchModel,

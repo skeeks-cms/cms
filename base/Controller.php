@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\base;
+use skeeks\cms\App;
 use yii\web\Controller as YiiWebController;
 
 /**
@@ -18,6 +19,15 @@ use yii\web\Controller as YiiWebController;
  */
 class Controller extends YiiWebController
 {
+    public function init()
+    {
+        parent::init();
+
+        $this->view->registerMetaTag([
+            "name"      => "generator",
+            "content"   => App::moduleCms()->getDescriptor()->toString()
+        ]);
+    }
     /**
      *
      * Если не хочется рендерить шаблон текущего действия, можно воспользоваться этой функцией.

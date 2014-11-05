@@ -5,6 +5,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use skeeks\cms\App;
+use skeeks\cms\helpers\UrlHelper;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -22,6 +23,8 @@ $sidebarHidden = App::getAuth()->getIsGuest();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <!-- <?= App::moduleCms()->getDescriptor()->getCopyright(); ?> -->
+    <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
     <?php $this->head() ?>
 </head>
 <body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?>">
@@ -55,11 +58,11 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                 <li class="dropdown-menu-header text-center">
                     <strong><?= Yii::$app->user->identity->username ?></strong>
                 </li>
-                <li><a href="<?= Yii::$app->urlManager->createUrl("profile") ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
+                <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
                 <li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>
                 <li class="divider"></li>
                 <li>
-                    <?= Html::a('<i class="fa fa-lock"></i> Выход', \skeeks\cms\helpers\UrlHelper::construct("admin/auth/logout")->setCurrentRef(), ["data-method" => "post"])?>
+                    <?= Html::a('<i class="fa fa-lock"></i> Выход', UrlHelper::construct("admin/auth/logout")->setCurrentRef(), ["data-method" => "post"])?>
                 </li>
             </ul>
         </li>

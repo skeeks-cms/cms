@@ -59,22 +59,22 @@ class Module extends base\Module
 
         [
             "label"     => "Публикации",
-            "url"       => ["cms/admin-user-group"],
+            "url"       => ["cms/admin-publication/index"],
         ],
 
         [
             "label"     => "Комментарии",
-            "url"       => ["cms/admin-user-group"],
+            "url"       => ["cms/admin-comment/index"],
         ],
 
         [
             "label"     => "Голоса",
-            "url"       => ["cms/admin-user-group"],
+            "url"       => ["cms/admin-vote/index"],
         ],
 
         [
             "label"     => "Подписки",
-            "url"       => ["cms/admin-user-group"],
+            "url"       => ["cms/admin-subscribe/index"],
         ],
     ];
 
@@ -91,7 +91,7 @@ class Module extends base\Module
     protected function _descriptor()
     {
         return array_merge(parent::_descriptor(), [
-            "name"          => "Cms module",
+            "name"          => "SkeekS cms",
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
         ]);
     }
