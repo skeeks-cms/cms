@@ -60,3 +60,15 @@ $url->setRef(\Yii::$app->request->getUrl()); //Установить в реф п
 $url->setCurrentRef();
 
 ```
+
+ - Вытащить служебные параметры из запроса.
+ 
+ ```php
+ 
+$url = UrlHelper::getCurrent(); //Из объекта \Yii::$app->request собирается объект UrlHelper
+$url->getSystem(); //получение массива служебных параметров
+$url->getSystem("ref", "значение по умолчанию, если нет параметра ref"); //проучение одного служебного параметра
+$url->getRef() //Функция заготовка
+
+
+ ```
