@@ -44,3 +44,19 @@ die;
 //Будет напечатано: /module/controller/action?param1=value1&param2=value2&param3=value3&param4=value4&param5=valu5
 
 ```
+
+ - Системные опции
+ Так же cms предоставляет ряд системных опций. Для упрощения работы. Например если мы хотим отправить пользователя на какое либо действие, и сообщить url возврата, можно сделать так.
+
+```php
+
+$url = UrlHelper::construct("module/controller/action");
+$url->setRef("/backUrl/");
+print_r((string) $url);
+//echo: /module/controller/action?_sx%5Bref%5D=%2FbackUrl%2F
+
+$url->setRef(\Yii::$app->request->getUrl()); //Установить в реф параметр текущий адрес
+//или проще так
+$url->setCurrentRef();
+
+```
