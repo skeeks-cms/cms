@@ -8,20 +8,20 @@ SkeekS CMS предоставляет удобный \skeeks\cms\helpers\UrlHelp
 
 Как это работает?
 Примеры:
+------------
 
  - ссылка на контроллер controller модуля module действие action
- -------------------
+ 
 
-```
+```php
 use \skeeks\cms\helpers\UrlHelper;
 
 UrlHelper::construct("module/controller/action")->createUrl();
-
 ```
 
  - ссылка на контроллер controller модуля module действие action с дополнительными параметрами
- -------------------
-```
+ 
+```php
 use \skeeks\cms\helpers\UrlHelper;
 
 $url = UrlHelper::construct("module/controller/action");
