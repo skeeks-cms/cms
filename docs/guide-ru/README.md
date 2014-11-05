@@ -57,7 +57,8 @@ SkeekS cms содержит полезные базовые классы, кот
 
 Cms Модуль
 ----------
-* [Что такое модуль cms?](cms-module-about.md)
+* [Модуль Yii](cms-module-yii.md)
+* [Модуль cms](cms-module-about.md)
 * Правила написания модулей для cms
 
 Cms Widget
