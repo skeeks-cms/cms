@@ -142,7 +142,7 @@ class App
     }
 
     /**
-     * @return null|\skeeks\cms\CmsModule
+     * @return null|\skeeks\cms\Module
      */
     static public function moduleCms()
     {

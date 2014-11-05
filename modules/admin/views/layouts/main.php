@@ -11,7 +11,7 @@ use skeeks\cms\App;
 
 AdminAsset::register($this);
 
-$sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidden", false);
+$sidebarHidden = App::getAuth()->getIsGuest();
 
 ?>
 <?php $this->beginPage() ?>
@@ -28,7 +28,7 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
 <?php $this->beginBody() ?>
 <div class="navbar" role="navigation">
     <div class="navbar-header">
-        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>SkeekS Cms</span>', Yii::$app->homeUrl, ["class" => "navbar-brand"]); ?>
+        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>Cms</span>', App::moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
     </div>
 
     <? if (!$sidebarHidden): ?>
@@ -59,7 +59,7 @@ $sidebarHidden = \yii\helpers\ArrayHelper::getValue($this->params, "sidebar-hidd
                 <li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>
                 <li class="divider"></li>
                 <li>
-                    <?= Html::a('<i class="fa fa-lock"></i> Выход', Yii::$app->urlManager->createUrl("site/logout"), ["data-method" => "post"])?>
+                    <?= Html::a('<i class="fa fa-lock"></i> Выход', \skeeks\cms\helpers\UrlHelper::construct("admin/auth/logout")->setCurrentRef(), ["data-method" => "post"])?>
                 </li>
             </ul>
         </li>

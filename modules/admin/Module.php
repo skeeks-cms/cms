@@ -12,6 +12,7 @@ namespace skeeks\cms\modules\admin;
 
 use skeeks\cms\base\Module as CmsModule;
 use skeeks\cms\App;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
 
 /**
@@ -95,7 +96,7 @@ class Module extends CmsModule
      */
     public function createUrl(array $data)
     {
-        $data["namespace"] = "admin";
+        $data[UrlRule::ADMIN_PARAM_NAME] = UrlRule::ADMIN_PARAM_VALUE;
         return \Yii::$app->urlManager->createUrl($data);
     }
 

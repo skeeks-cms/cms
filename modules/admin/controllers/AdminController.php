@@ -17,11 +17,11 @@ use skeeks\cms\App;
 use skeeks\cms\base\Controller;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
+use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use yii\base\ActionEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
-use yii\filters\AccessControl;
 
 /**
  * Class AdminController

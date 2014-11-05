@@ -42,6 +42,9 @@ abstract class Module extends \yii\base\Module
      * @var string название модуля в меню админки, опционально
      */
     public $adminMenuName       = "";
+    /**
+     * @var bool включить/отключить отображение блока меню в админке
+     */
     public $adminMenuEnabled    = true;
 
 

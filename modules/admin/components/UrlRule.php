@@ -83,7 +83,7 @@ class UrlRule
         if ($firstPrefix == $this->adminPrefix)
         {
             $route = str_replace($this->adminPrefix, "", $pathInfo);
-            if (!$route)
+            if (!$route || $route == "/")
             {
                 $route = "admin/index";
             }
