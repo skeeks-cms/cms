@@ -329,6 +329,8 @@ class AdminModelEditorController extends AdminController
      */
     public function actionIndex()
     {
+        $modelSeacrhClass = $this->_modelSearchClassName;
+
         if (!$modelSeacrhClass)
         {
             $modelSeacrhClass = $this->_modelClassName;
@@ -339,7 +341,6 @@ class AdminModelEditorController extends AdminController
             ]);
         } else
         {
-            $modelSeacrhClass = $this->_modelSearchClassName;
             $searchModel = new $modelSeacrhClass();
 
             $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);

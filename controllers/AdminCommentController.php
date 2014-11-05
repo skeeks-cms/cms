@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Comment;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;

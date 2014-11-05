@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\helpers\UrlHelper;
 use Yii;
 
 /**

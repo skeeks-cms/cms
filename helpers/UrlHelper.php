@@ -69,7 +69,7 @@ class UrlHelper
      * @param array $data
      * @return static
      */
-    static public function construct($route, $data = [])
+    static public function construct($route = "", $data = [])
     {
         return new static($route, $data);
     }
@@ -78,7 +78,7 @@ class UrlHelper
      * @param $route
      * @param array $data
      */
-    public function __construct($route, $data = [])
+    public function __construct($route = "", $data = [])
     {
         $this->_route   = (string) $route;
         $this->_data    = (array) $data;

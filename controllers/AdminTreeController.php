@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
@@ -18,6 +19,7 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\helpers\Html;
 
 /**
  * Class AdminUserController
@@ -38,6 +40,17 @@ class AdminTreeController extends AdminModelEditorSmartController
 
     public function actionIndex()
     {
-        return $this->output("tree");
+        $models = Tree::find()->where(["level" => 0])->all();
+
+        $ul = Html::ul($models, [
+            "item" => function($model)
+            {
+                return Html::tag("li",
+                    Html::a($model->name, UrlHelper::construct("cms/admin-tree/index")->set("pid", $model->id))
+                );
+            }
+        ]);
+
+        return $this->output($ul);
     }
 }
