@@ -70,5 +70,12 @@ $url->getSystem(); //получение массива служебных пар
 $url->getSystem("ref", "значение по умолчанию, если нет параметра ref"); //проучение одного служебного параметра
 $url->getRef() //Функция заготовка
 
-
  ```
+ 
+  - Адрес на действие админки
+  
+```php
+
+UrlHelper::construct("module/controller/action")->enableAdmin();
+
+```
