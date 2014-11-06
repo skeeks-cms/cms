@@ -17,7 +17,7 @@ use yii\db\ActiveQuery;
 
 /**
  * Class Publication
- * @method ActiveQuery roots()
+ * @method ActiveQuery findRoots()
  *
  * @package skeeks\cms\models
  */

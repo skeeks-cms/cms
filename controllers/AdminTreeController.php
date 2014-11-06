@@ -39,8 +39,14 @@ class AdminTreeController extends AdminModelEditorSmartController
 
     public function actionIndex()
     {
+        $parent = Tree::find()->where(["id" => 1])->one();
+        $target = Tree::find()->where(["id" => 4])->one();
+
+        $parent->processAddNode($target);
+        die;
+
         $tree = new Tree();
-        $models = $tree->roots()->all();
+        $models = $tree->findRoots()->all();
 
         $ul = Html::ul($models, [
             "item" => function($model)
