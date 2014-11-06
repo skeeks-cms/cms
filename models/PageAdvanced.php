@@ -26,7 +26,6 @@ use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
-use skeeks\cms\models\behaviors\Implode;
 
 use skeeks\cms\models\behaviors\traits\HasDescriptionsTrait;
 use skeeks\cms\models\behaviors\traits\HasFiles as THasFiles;

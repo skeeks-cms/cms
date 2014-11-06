@@ -48,13 +48,11 @@ use yii\base\Event;
  * @property User $updatedBy
  * @property User $createdBy
  */
-class StorageFile extends ActiveRecord
+class StorageFile extends Core
 {
     use behaviors\traits\HasComments;
     use behaviors\traits\HasSubscribes;
     use behaviors\traits\HasVotes;
-
-
 
     /**
      * @inheritdoc
@@ -69,7 +67,7 @@ class StorageFile extends ActiveRecord
      */
     public function rules()
     {
-        return [
+        return array_merge(parent::rules(), [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             [['src'], 'required'],
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'status', 'image_height', 'image_width', 'count_comment', 'count_subscribe', 'count_vote', 'result_vote'], 'integer'],
@@ -79,7 +77,7 @@ class StorageFile extends ActiveRecord
             [['name_to_save'], 'string', 'max' => 32],
             [['src'], 'unique'],
             [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => 'The combination of Cluster ID and Cluster Src has already been taken.']
-        ];
+        ]);
     }
 
     /**
@@ -87,7 +85,7 @@ class StorageFile extends ActiveRecord
      */
     public function attributeLabels()
     {
-        return [
+        return array_merge(parent::attributeLabels(), [
             'id' => Yii::t('app', 'ID'),
             'src' => Yii::t('app', 'Src'),
             'cluster_id' => Yii::t('app', 'Cluster ID'),
@@ -120,30 +118,8 @@ class StorageFile extends ActiveRecord
             'users_votes_down' => Yii::t('app', 'Users Votes Down'),
             'linked_to_model' => Yii::t('app', 'Linked To Model'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
-        ];
+        ]);
     }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
-    }
-
-
-
-
-
-
 
 
     //['status', 'default', 'value' => self::STATUS_ACTIVE],
@@ -160,13 +136,11 @@ class StorageFile extends ActiveRecord
      */
     public function behaviors()
     {
-        return [
-            BlameableBehavior::className(),
-            TimestampBehavior::className(),
+        return array_merge(parent::behaviors(), [
             behaviors\HasComments::className(),
             behaviors\HasSubscribes::className(),
             behaviors\HasVotes::className(),
-        ];
+        ]);
     }
 
 

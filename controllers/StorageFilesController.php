@@ -13,6 +13,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\Exception;
+use skeeks\cms\models\helpers\ModelRef;
 use skeeks\sx\models\Ref;
 use Yii;
 use skeeks\cms\models\StorageFile;
@@ -77,7 +78,7 @@ class StorageFilesController extends Controller
 
         if ($request->get("linked_to_model") && $request->get("linked_to_value") && $request->get("field") && $request->get("src"))
         {
-            $ref = new Ref(Yii::$app->getRequest()->get("linked_to_model"), Yii::$app->getRequest()->get("linked_to_value"));
+            $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
 
             /**
              * @var Game $model
@@ -105,8 +106,8 @@ class StorageFilesController extends Controller
         $request = Yii::$app->getRequest();
         if ($request->get("linked_to_model") && $request->get("linked_to_value") && $request->get("field"))
         {
-            $ref = new Ref(Yii::$app->getRequest()->get("linked_to_model"), Yii::$app->getRequest()->get("linked_to_value"));
 
+            $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
             /**
              * @var \common\models\Game $model
              */
@@ -135,7 +136,7 @@ class StorageFilesController extends Controller
 
                 $storageFile = Yii::$app->storage->upload($file, array_merge(
                     [
-                        "name"          => $model->name,
+                        "name"          => isset($model->name) ? $model->name : "",
                         "original_name" => $originalName
                     ]
                 ));

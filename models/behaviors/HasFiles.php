@@ -118,4 +118,87 @@ class HasFiles extends HasLinkedModels
     {
         return $this->hasField($fieldName) ? (array) $this->fields[$fieldName] : [];
     }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Файлы привязанные к полю
+     * @param $fieldName
+     * @return array of src
+     */
+    public function getFiles($fieldName)
+    {
+        return (array) $this->owner->{$fieldName};
+    }
+
+    /**
+     * @param StorageFile $file
+     * @param $fieldName
+     * @return $this
+     */
+    protected function _appendFile(StorageFile $file, $fieldName)
+    {
+        $files              = $this->getFiles($fieldName);
+        $files[]            = $file->src;
+        $this->owner->setAttribute($fieldName, array_unique($files));
+
+        $this->owner->save();
+        return $this;
+    }
+
+    /**
+     *
+     * Вставка файла в нужное поле
+     *
+     * Привязывается файл к этой сущьности
+     * Вставляется src в поле сущьности
+     *
+     * @param StorageFile $file
+     * @param $fieldName
+     * @return $this
+     */
+    public function appendFile(StorageFile $file, $fieldName)
+    {
+        //Вяжем файл к этой сущьности
+        $file->setAttributes($this->owner->getRef()->toArray(), false);
+        $file->save();
+        $this->_appendFile($file, $fieldName);
+
+        return $this;
+    }
+
+    /**
+     * @param $fieldName
+     * @param $src
+     * @return $this
+     */
+    public function detachFile($fieldName, $src)
+    {
+        $files  = $this->getFiles($fieldName);
+
+        $result = [];
+        if ($files)
+        {
+            foreach ($files as $fileSrc)
+            {
+                if ($fileSrc != $src)
+                {
+                    $result[] = $fileSrc;
+                }
+            }
+
+            $this->owner->setAttribute($fieldName, $result);
+            $this->owner->save();
+        }
+
+        return $this;
+    }
+
 }

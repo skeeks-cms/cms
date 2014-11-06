@@ -38,12 +38,6 @@ class UserGroup extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            HasRef::className() =>
-            [
-                'class'             => HasRef::className(),
-                'savedClassName'    => self::className()
-            ],
-
             [
                 "class"  => behaviors\HasFiles::className(),
                 "fields" =>
@@ -91,23 +85,14 @@ class UserGroup extends Core
      */
     public function rules()
     {
-        return [
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+        return array_merge(parent::rules(), [
+            ['groupname', 'string', 'min' => 3, 'max' => 12],
 
-            ['role', 'default', 'value' => self::ROLE_USER],
-            ['role', 'in', 'range' => [self::ROLE_USER]],
-
-            ['username', 'string', 'min' => 3, 'max' => 12],
-
-            [['username', 'auth_key', 'password_hash', 'email'], 'required'],
-            [['role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['info', 'gender'], 'string'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
-            [['auth_key'], 'string', 'max' => 32],
-            [['username'], 'unique'],
-            [['image_cover', 'image'], 'default', 'value' => NULL],
-        ];
+            [['groupname'], 'required'],
+            [['description', 'groupname'], 'string'],
+            [['groupname'], 'unique'],
+            [["images", "files", "image_cover", "image"], 'safe'],
+        ]);
     }
 
 
@@ -116,25 +101,15 @@ class UserGroup extends Core
      */
     public function attributeLabels()
     {
-        return [
+        return  array_merge(parent::attributeLabels(), [
             'id' => Yii::t('app', 'ID'),
-            'username' => Yii::t('app', 'Username'),
-            'auth_key' => Yii::t('app', 'Auth Key'),
-            'password_hash' => Yii::t('app', 'Password Hash'),
-            'password_reset_token' => Yii::t('app', 'Password Reset Token'),
-            'email' => Yii::t('app', 'Email'),
-            'role' => Yii::t('app', 'Role'),
-            'status' => Yii::t('app', 'Status'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'city' => Yii::t('app', 'City'),
-            'address' => Yii::t('app', 'Address'),
-            'info' => Yii::t('app', 'Info'),
+            'groupname' => Yii::t('app', 'Groupname'),
+            'description' => Yii::t('app', 'Description'),
             'image' => Yii::t('app', 'Image'),
             'image_cover' => Yii::t('app', 'Image Cover'),
-            'gender' => Yii::t('app', 'Gender'),
-        ];
+            'images' => Yii::t('app', 'Images'),
+            'files' => Yii::t('app', 'Files'),
+        ]);
     }
 
 }

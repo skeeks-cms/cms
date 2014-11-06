@@ -29,6 +29,12 @@ class UserColumnData extends DataColumn
         $userId = (int) $model->{$this->attribute};
         $user = User::findOne($userId);
 
-        return $user->getDisplayName();
+        if ($user)
+        {
+            return $user->getDisplayName();
+        } else
+        {
+            return "";
+        }
     }
 }

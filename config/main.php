@@ -89,6 +89,18 @@ $config =
                     'label'             => 'Комментарий',
                 ],
 
+                'user' =>
+                [
+                    'class'             => 'skeeks\cms\models\User',
+                    'label'             => 'Пользователь',
+                ],
+
+                'userGroup' =>
+                [
+                    'class'             => 'skeeks\cms\models\UserGroup',
+                    'label'             => 'Группа пользователя',
+                ],
+
                 [
                     'class' => 'skeeks\cms\models\Vote',
                     'label' => 'Голос'

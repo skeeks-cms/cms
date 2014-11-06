@@ -95,13 +95,23 @@ class m141106_100557_create_user_group_table extends Migration
             "description"           => "Пользователь",
             "status"                => 10,
         ]);
+
+
+        $this->execute("ALTER TABLE {{%user}} ADD `group_id` INT(11) NULL;");
+
+        $this->addForeignKey(
+            'user_user_group_updated_by', "{{%user}}",
+            'group_id', '{{%user_group}}', 'id', 'RESTRICT', 'RESTRICT'
+        );
     }
 
     public function down()
     {
+        $this->dropForeignKey("user_user_group_updated_by", "{{%user}}");
         $this->dropForeignKey("user_group_created_by", "{{%user_group}}");
         $this->dropForeignKey("user_group_updated_by", "{{%user_group}}");
 
+        $this->dropColumn('{{%user}}', 'group_id');
         $this->dropTable('{{%user_group}}');
     }
 }
