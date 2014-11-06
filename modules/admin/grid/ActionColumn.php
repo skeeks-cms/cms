@@ -13,6 +13,7 @@ namespace skeeks\cms\modules\admin\grid;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
+use skeeks\cms\modules\admin\widgets\DropdownControllerActions;
 use yii\base\InvalidConfigException;
 use yii\grid\DataColumn;
 
@@ -55,16 +56,8 @@ class ActionColumn extends DataColumn
         $controller = clone $this->controller;
         $controller->setModel($model);
 
-        return "<div class='dropdown'>
-            <button type=\"button\" class='btn btn-xs' data-toggle=\"dropdown\">
-               <span class=\"caret\"></span>
-            </button>" .
-            ControllerActions::begin([
-                "controller"    => $controller,
-                "ulOptions"     => [
-                    "class" => "dropdown-menu"
-                ],
-            ])->run()
-        . "</div>";
+        return DropdownControllerActions::begin([
+                    "controller"    => $controller,
+                ])->run();
     }
 }

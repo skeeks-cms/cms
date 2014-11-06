@@ -11,11 +11,14 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\widgets\ControllerActions;
+use skeeks\cms\modules\admin\widgets\DropdownControllerActions;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -39,11 +42,11 @@ class AdminTreeController extends AdminModelEditorSmartController
 
     public function actionIndex()
     {
-        $parent = Tree::find()->where(["id" => 1])->one();
+        /*$parent = Tree::find()->where(["id" => 1])->one();
         $target = Tree::find()->where(["id" => 4])->one();
 
         $parent->processAddNode($target);
-        die;
+        die;*/
 
         $tree = new Tree();
         $models = $tree->findRoots()->all();
@@ -51,8 +54,14 @@ class AdminTreeController extends AdminModelEditorSmartController
         $ul = Html::ul($models, [
             "item" => function($model)
             {
+                $controller = App::moduleCms()->createControllerByID("admin-tree");
+                $controller->setModel($model);
+
                 return Html::tag("li",
-                    Html::a($model->name, UrlHelper::construct("cms/admin-tree/index")->set("pid", $model->id))
+                    Html::a($model->name, UrlHelper::construct("cms/admin-tree/index")->set("pid", $model->id)) .
+                    DropdownControllerActions::begin([
+                        "controller"    => $controller,
+                    ])->run()
                 );
             }
         ]);
