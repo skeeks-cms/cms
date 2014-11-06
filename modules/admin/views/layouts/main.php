@@ -59,7 +59,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                     <strong><?= Yii::$app->user->identity->username ?></strong>
                 </li>
                 <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
-                <li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>
+                <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
                 <li class="divider"></li>
                 <li>
                     <?= Html::a('<i class="fa fa-lock"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
@@ -197,6 +197,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
 </footer>
 
     <?php $this->endBody() ?>
+
 </body>
 </html>
 <?php $this->endPage() ?>

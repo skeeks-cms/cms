@@ -73,8 +73,8 @@ $config =
             [
                 'publication' =>
                 [
-                    'class'             => 'skeeks\cms\models\Publication',
-                    'label'             => 'Публикация',
+                    'class'                 => 'skeeks\cms\models\Publication',
+                    'label'                 => 'Публикация',
                 ],
 
                 'tree' =>

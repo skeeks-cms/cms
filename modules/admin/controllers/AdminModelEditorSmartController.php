@@ -106,7 +106,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'subscribes' =>
                     [
-                        "label"     => "Подписки",
+                        "label"     => "Подписаны",
                         "rules"     =>
                         [
                             [

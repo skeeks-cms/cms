@@ -20,6 +20,8 @@ use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Json;
+use yii\helpers\Url;
 
 /**
  * Class ControllerActions
@@ -105,9 +107,14 @@ class ControllerActions
             $linkOptions["data-method"]         = $action->method;
             $linkOptions["data-confirm"]        = $action->confirm;
 
+            $actionData = array_merge($actionData, ["url" => Url::to($action->getUrlData())]);
+            $actionDataJson = Json::encode($actionData);
             $result[] = Html::tag("li",
                 Html::a($label, $action->getUrlData(), $linkOptions),
-                ["class" => $this->currentActionCode == $code ? "active" : ""]
+                [
+                    "class" => $this->currentActionCode == $code ? "active" : "",
+                    "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).open(); return false;"
+                ]
             );
         }
 

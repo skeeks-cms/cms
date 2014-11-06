@@ -125,7 +125,6 @@
         _init: function()
         {
             this._navigation            = new sx.classes.app.MainNav(this.get("navigation"));
-
         },
 
         _onWindowReady: function()

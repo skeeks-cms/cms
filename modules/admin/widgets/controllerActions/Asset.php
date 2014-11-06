@@ -9,30 +9,25 @@
  * @since 1.0.0
  */
 
-namespace skeeks\cms\modules\admin\assets;
+namespace skeeks\cms\modules\admin\widgets\controllerActions;
 use yii\web\AssetBundle;
 
 /**
  * Class AppAsset
  * @package skeeks\cms\modules\admin
  */
-class AdminAsset extends AssetBundle
+class Asset extends AssetBundle
 {
 
-    public $sourcePath = '@skeeks/cms/modules/admin/assets';
+    public $sourcePath = '@skeeks/cms/modules/admin/assets/widgets/controllerActions';
 
     public $css = [
-        'css/app.css',
     ];
     public $js = [
-        'js/app.js',
+        'js/widget.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapPluginAsset',
-
         '\skeeks\sx\assets\Custom',
-        '\skeeks\cms\modules\admin\assets\JqueryScrollbarAsset',
-        '\skeeks\cms\modules\admin\assets\ThemeRealAdminAsset',
     ];
 }

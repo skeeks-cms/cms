@@ -138,7 +138,7 @@ class User
 
             [['username', 'auth_key', 'password_hash', 'email'], 'required'],
             [['role', 'status', 'created_at', 'updated_at', 'group_id'], 'integer'],
-            [['info', 'gender'], 'string'],
+            [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
