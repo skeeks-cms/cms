@@ -76,21 +76,9 @@ class User
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            HasRef::className() =>
-            [
-                'class'             => HasRef::className(),
-                'savedClassName'    => self::className()
-            ],
+
             TimestampBehavior::className(),
             HasSubscribes::className(),
-
-            [
-                "class"  => behaviors\Implode::className(),
-                "fields" =>  [
-                    "users_subscribers",
-                    "image_cover", "image", "images", "files"
-                ]
-            ],
 
             [
                 "class"  => behaviors\HasFiles::className(),

@@ -12,45 +12,25 @@
 namespace skeeks\cms\models\behaviors;
 use skeeks\cms\base\behaviors\ActiveRecord;
 use skeeks\cms\Exception;
-use skeeks\sx\models\Ref;
+use skeeks\cms\models\helpers\ModelRef;
 
 
 /**
  * Class HasLinkedModels
  * @package skeeks\cms\models\behaviors
  */
-class HasRef extends ActiveRecord
+class HasModelRef extends ActiveRecord
 {
-
-    public $savedClassName = null;
-
-    public function init()
-    {
-        parent::init();
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getSavedClassName()
-    {
-        if ($this->savedClassName === null)
-        {
-            return $this->owner->className();
-        }
-
-        return $this->savedClassName;
-    }
     /**
      * Объект ссылка
-     * @return Ref
+     * @return ModelRef
      * @throws Exception
      */
     public function getRef()
     {
         if ($this->owner->primaryKey)
         {
-            return new Ref($this->getSavedClassName(), $this->owner->primaryKey);
+            return ModelRef::createFromModel($this->owner);
         }
 
         throw new Exception("Can't get a ref of the entity that is not saved yet.");

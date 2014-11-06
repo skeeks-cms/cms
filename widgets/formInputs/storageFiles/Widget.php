@@ -89,7 +89,7 @@ class Widget extends InputWidget
             foreach ($valueArray as $src)
             {
                 $backendDeleteUrl = Yii::$app->urlManager->createUrl(["cms/storage-files/detach-file",
-                    "linked_to_model"   => $this->model->getRef()->getClassName(),
+                    "linked_to_model"   => $this->model->getRef()->getCode(),
                     "linked_to_value"   => $this->model->getRef()->getValue(),
                     "field"             => $this->attribute,
                     "src"               => $src
@@ -179,7 +179,7 @@ JS
     private function _getSourceSimpleUploadOptions()
     {
         $backendSimpleUpload = Yii::$app->urlManager->createUrl(["cms/storage-files/upload",
-            "linked_to_model"   => $this->model->getRef()->getClassName(),
+            "linked_to_model"   => $this->model->getRef()->getCode(),
             "linked_to_value"   => $this->model->getRef()->getValue(),
             "field"             => $this->attribute
         ]);

@@ -63,6 +63,42 @@ $config =
             'rules' => [
                 ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'],
             ]
+        ],
+
+        'registeredModels' =>
+        [
+            'class' => 'skeeks\cms\components\RegisteredModels',
+            //Модели к которым можно крепить другие, то есть эти модели имеют ссылку на себя объект Ref
+            'models' =>
+            [
+                'publication' =>
+                [
+                    'class'             => 'skeeks\cms\models\Publication',
+                    'label'             => 'Публикация',
+                ],
+
+                'tree' =>
+                [
+                    'class'             => 'skeeks\cms\models\Tree',
+                    'label'             => 'Страница',
+                ],
+
+                'comment' =>
+                [
+                    'class'             => 'skeeks\cms\models\Comment',
+                    'label'             => 'Комментарий',
+                ],
+
+                [
+                    'class' => 'skeeks\cms\models\Vote',
+                    'label' => 'Голос'
+                ],
+
+                [
+                    'class' => 'skeeks\cms\models\Subscribe',
+                    'label' => 'Подписка'
+                ],
+            ],
         ]
     ],
 

@@ -11,7 +11,8 @@
 
 namespace skeeks\cms\base\db;
 
-use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\behaviors\HasModelRef;
+//use skeeks\cms\models\behaviors\HasRef;
 use skeeks\sx\models\Ref;
 use \yii\db\ActiveRecord as YiiActiveRecord;
 
@@ -19,25 +20,8 @@ use \yii\db\ActiveRecord as YiiActiveRecord;
 /**
  * Class ActiveRecord
  *
- * @method Ref getRef();
- * @method bool hasRef();
- *
  * @package skeeks\cms\db
  */
 class ActiveRecord
     extends YiiActiveRecord
-{
-    //У этого объекта есть ссылка
-    //use HasRef;
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            HasRef::className() => HasRef::className()
-        ];
-    }
-
-}
+{}

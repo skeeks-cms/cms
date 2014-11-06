@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 <div class="comment-input">
                     <div class="tawrap">
-                        <?= Html::input("hidden", "linked_to_model", $model->getRef()->getClassName()); ?>
+                        <?= Html::input("hidden", "linked_to_model", $model->getRef()->getCode()); ?>
                         <?= Html::input("hidden", "linked_to_value", $model->getRef()->getValue()); ?>
                         <textarea name="content" placeholder="Что у вас нового?"></textarea>
                     </div>

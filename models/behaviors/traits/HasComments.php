@@ -18,39 +18,5 @@ use skeeks\cms\models\Comment;
  */
 trait HasComments
 {
-    /**
-     * @param $content
-     * @return bool|Comment
-     * @throws \skeeks\sx\Exception
-     */
-    public function addComment($content)
-    {
-        $comment = new Comment(array_merge(
-            $this->getRef()->toArray(),
-            [
-                "content"           => $content,
-            ]
-        ));
-        $comment = $comment->save(false);
-        return $comment;
-    }
 
-    /**
-     * @return $this
-     */
-    public function calculateCountComments()
-    {
-        $this->setAttribute("count_comment", count($this->findComments()->all()));
-        $this->save();
-        return $this;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     * @throws \skeeks\sx\Exception
-     */
-    public function findComments()
-    {
-        return Comment::find()->where($this->getRef()->toArray());
-    }
 }

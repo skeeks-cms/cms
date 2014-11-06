@@ -10,7 +10,8 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\models\behaviors\CanBeLinkedTo;
+use skeeks\cms\models\behaviors\CanBeLinkedToModel;
+use skeeks\cms\models\helpers\ModelRef;
 use Yii;
 
 use skeeks\sx\models\Ref;
@@ -25,27 +26,6 @@ use yii\base\Event;
  */
 class Vote extends Core
 {
-    public function init()
-    {
-        parent::init();
-
-        $this->on(self::EVENT_AFTER_INSERT, [$this, "_reCalculateModel"]);
-        $this->on(self::EVENT_AFTER_DELETE, [$this, "_reCalculateModel"]);
-    }
-
-    /**
-     * После добавления подписки нун
-     * @param Event $e
-     * @return $this
-     */
-    protected function _reCalculateModel(Event $e)
-    {
-        $ref = new Ref($e->sender->linked_to_model, $e->sender->linked_to_value);
-        $model = $ref->findModel();
-        $model->calculateVotes();
-        return $this;
-    }
-
     /**
      * @inheritdoc
      */
@@ -54,14 +34,13 @@ class Vote extends Core
         return '{{%vote}}';
     }
 
-
     /**
      * @return array
      */
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            CanBeLinkedTo::className()
+            CanBeLinkedToModel::className()
         ]);
     }
 

@@ -56,33 +56,20 @@ class HasFiles extends HasLinkedModels
 
     public $fields = [];
 
-    /*public function events()
-    {
-        return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "beforeDelete",
-        ];
-    }*/
 
-    /**
-     *
-     * Находим все комментарии и удаляем поочереди, потому как при удалении коммента может что то еще срабатыать.
-     * Дабы сгенерировать событие
-     *
-     * @throws \Exception
-     */
-    /*public function beforeDelete()
+
+    public function attach($owner)
     {
-        if ($models = StorageFile::find($this->owner->getRef()->toArray())->all())
-        {
-            foreach ($models as $model)
-            {
-                if (!$model->delete())
-                {
-                    throw new \yii\base\Exception("Не удалось удалить файл, процесс удаления остановлен");
-                }
-            }
-        }
-    }*/
+        $owner->attachBehavior("implode_files", [
+            "class"  => Implode::className(),
+            "fields" =>  [
+                "image_cover", "image", "images", "files"
+            ]
+        ]);
+
+        parent::attach($owner);
+    }
+
 
 
     /**

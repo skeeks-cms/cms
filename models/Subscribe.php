@@ -11,7 +11,7 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\models\behaviors\CanBeLinkedTo;
+use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\sx\models\Ref;
 use yii\base\Event;
 use Yii;
@@ -26,29 +26,6 @@ use Yii;
  */
 class Subscribe extends Core
 {
-    public function init()
-    {
-        parent::init();
-
-        $this->on(self::EVENT_AFTER_INSERT, [$this, "_reCalculateModel"]);
-        $this->on(self::EVENT_AFTER_DELETE, [$this, "_reCalculateModel"]);
-    }
-
-    /**
-     * После добавления подписки нун
-     * @param Event $e
-     * @return $this
-     */
-    protected function _reCalculateModel(Event $e)
-    {
-        $ref = new Ref($e->sender->linked_to_model, $e->sender->linked_to_value);
-        $model = $ref->findModel();
-        $model->calculateCountSubscribes();
-        return $this;
-    }
-
-
-
     /**
      * @inheritdoc
      */
@@ -63,7 +40,7 @@ class Subscribe extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            CanBeLinkedTo::className()
+            CanBeLinkedToModel::className()
         ]);
     }
 

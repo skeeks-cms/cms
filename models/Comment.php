@@ -10,7 +10,7 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\models\behaviors\CanBeLinkedTo;
+use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\sx\models\Ref;
 use Yii;
 
@@ -46,31 +46,6 @@ class Comment extends Core
         return '{{%comment}}';
     }
 
-    public function init()
-    {
-        parent::init();
-
-        $this->on(self::EVENT_AFTER_INSERT, [$this, "_reCalculateModel"]);
-        $this->on(self::EVENT_AFTER_DELETE, [$this, "_reCalculateModel"]);
-    }
-
-    /**
-     * После вставки комментария, необходимо найти, того к кому он добавился и обновить у него счетчик
-     * @param Event $e
-     * @return $this
-     */
-    protected function _reCalculateModel(Event $e)
-    {
-        $ref = new Ref($e->sender->linked_to_model, $e->sender->linked_to_value);
-        $model = $ref->findModel();
-        $model->calculateCountComments();
-        return $this;
-    }
-
-
-
-
-
 
     /**
      * @return array
@@ -78,17 +53,8 @@ class Comment extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            CanBeLinkedTo::className(),
-
+            CanBeLinkedToModel::className(),
             behaviors\HasVotes::className(),
-
-            [
-                "class"  => behaviors\Implode::className(),
-                "fields" =>  [
-                    "users_subscribers", "users_votes_up", "users_votes_down",
-                     "images", "files"
-                ]
-            ],
         ]);
     }
 

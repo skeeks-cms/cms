@@ -76,15 +76,6 @@ abstract class PageAdvanced extends Page
             HasSubscribes::className(),
             HasVotes::className(),
             HasDescriptionsBehavior::className(),
-
-            [
-                "class"  => Implode::className(),
-                "fields" =>  [
-                    "users_subscribers", "users_votes_up", "users_votes_down",
-                    "image_cover", "image", "images", "files"
-                ]
-            ],
-
             [
                 "class"  => HasFiles::className(),
                 "fields" =>

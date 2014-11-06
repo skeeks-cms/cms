@@ -20,7 +20,7 @@ use yii\db\BaseActiveRecord;
  * Class HasLinkedModels
  * @package skeeks\cms\models\behaviors
  */
-class HasLinkedModels extends Behavior
+class HasLinkedModels extends \skeeks\cms\base\behaviors\ActiveRecord
 {
     const MODE_RESTRICT     = "restrict";
     const MODE_CASCADE      = "cascade";
@@ -36,6 +36,15 @@ class HasLinkedModels extends Behavior
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteLinkedModels",
         ];
+    }
+
+    public function attach($owner)
+    {
+        $owner->attachBehavior(HasModelRef::className(), [
+            "class"  => HasModelRef::className(),
+        ]);
+
+        parent::attach($owner);
     }
 
     /**
