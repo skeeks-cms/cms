@@ -20,6 +20,7 @@ use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * Class AdminUserController
@@ -30,9 +31,7 @@ class AdminTreeController extends AdminModelEditorSmartController
     public function init()
     {
         $this->_label                   = "Дерево страниц";
-
         $this->_modelShowAttribute      = "name";
-
         $this->_modelClassName          = Tree::className();
 
         parent::init();
@@ -40,7 +39,8 @@ class AdminTreeController extends AdminModelEditorSmartController
 
     public function actionIndex()
     {
-        $models = Tree::find()->where(["level" => 0])->all();
+        $tree = new Tree();
+        $models = $tree->roots()->all();
 
         $ul = Html::ul($models, [
             "item" => function($model)

@@ -13,9 +13,12 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * Class Publication
+ * @method ActiveQuery roots()
+ *
  * @package skeeks\cms\models
  */
 class Tree extends PageAdvanced

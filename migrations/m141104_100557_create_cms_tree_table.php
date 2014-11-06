@@ -61,6 +61,7 @@ class m141104_100557_create_cms_tree_table extends Migration
             'pids'                  => Schema::TYPE_STRING . '(255) NULL',
             'level'                 => Schema::TYPE_INTEGER . ' DEFAULT 0',
             'dir'                   => Schema::TYPE_TEXT . ' NULL',
+            'has_children'          => Schema::TYPE_SMALLINT . '(1) DEFAULT 0',
 
             'main_root'              => Schema::TYPE_SMALLINT . ' NULL',
             'priority'               => Schema::TYPE_INTEGER . '  NOT NULL DEFAULT 0',
@@ -88,6 +89,7 @@ class m141104_100557_create_cms_tree_table extends Migration
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(pids);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(level);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(priority);");
+        $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(has_children);");
 
         $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(level, seo_page_name);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(main_root);");
