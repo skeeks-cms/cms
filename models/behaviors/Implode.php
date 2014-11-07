@@ -51,7 +51,10 @@ class Implode extends Behavior
         {
             if ($this->owner->{$fielName})
             {
-                $this->owner->{$fielName} = implode($this->delimetr, $this->owner->{$fielName});
+                if (is_array($this->owner->{$fielName}))
+                {
+                    $this->owner->{$fielName} = implode($this->delimetr, $this->owner->{$fielName});
+                }
             } else
             {
                 $this->owner->{$fielName} = "";
@@ -69,7 +72,10 @@ class Implode extends Behavior
         {
             if ($this->owner->{$fielName})
             {
-                $this->owner->{$fielName} = explode($this->delimetr, $this->owner->{$fielName});
+                if (is_string($this->owner->{$fielName}))
+                {
+                    $this->owner->{$fielName} = explode($this->delimetr, $this->owner->{$fielName});
+                }
             }
             else
             {

@@ -11,13 +11,18 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 
 /**
  * Class Publication
- * @method ActiveQuery findRoots()
+ * @method ActiveRecord         findRoots()
+ * @method ActiveRecord         findChildrens()
+ * @method Tree                 findParent()
+ * @method ActiveRecord         processAddNode(ActiveRecord $target)
  *
  * @package skeeks\cms\models
  */
@@ -25,13 +30,18 @@ class Tree extends PageAdvanced
 {
     public function behaviors()
     {
-        //$behaviors = parent::behaviors();
+        $behaviors = parent::behaviors();
+        $result = [];
+        foreach ($behaviors as $key => $behavior)
+        {
+            if ($behavior != SeoPageName::className())
+            {
+                $result[$key] = $behavior;
+            }
+        }
 
-        //SeoPageName::className()
-
-        return array_merge(parent::behaviors(), [
-            TreeBehavior::className()
-        ]);
+        $result[] = TreeBehavior::className();
+        return $result;
     }
     /**
      * @inheritdoc

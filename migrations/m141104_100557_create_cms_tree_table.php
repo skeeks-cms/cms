@@ -97,6 +97,12 @@ class m141104_100557_create_cms_tree_table extends Migration
         $this->execute("ALTER TABLE {{%cms_tree}} COMMENT = 'Страницы дерево';");
 
 
+
+        $this->addForeignKey(
+            'cms_tree_pid_cms_tree', "{{%cms_tree}}",
+            'pid', '{{%cms_tree}}', 'id', 'RESTRICT', 'RESTRICT'
+        );
+
         $this->addForeignKey(
             'cms_tree_created_by', "{{%cms_tree}}",
             'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
@@ -110,6 +116,7 @@ class m141104_100557_create_cms_tree_table extends Migration
 
     public function down()
     {
+        $this->dropForeignKey("cms_tree_pid_cms_tree", "{{%cms_tree}}");
         $this->dropForeignKey("cms_tree_created_by", "{{%cms_tree}}");
         $this->dropForeignKey("cms_tree_updated_by", "{{%cms_tree}}");
 

@@ -17,11 +17,22 @@ use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\modules\admin\widgets\DropdownControllerActions;
+use skeeks\cms\validators\db\IsSame;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\sx\validate\Validate;
+use skeeks\sx\validators\ChainAnd;
+use skeeks\sx\validators\ChainOr;
+use skeeks\sx\validators\is\IsArray;
+use skeeks\sx\validators\is\IsString;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\behaviors\AttributeBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -40,32 +51,110 @@ class AdminTreeController extends AdminModelEditorSmartController
         parent::init();
     }
 
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+
+            self::BEHAVIOR_ACTION_MANAGER =>
+            [
+                "actions" =>
+                [
+                    'new-children' =>
+                    [
+                        "label" => "Создать подраздел",
+                        "rules" =>
+                        [
+                            [
+                                "class" => HasModel::className()
+                            ]
+                        ]
+                    ],
+                ]
+            ]
+        ]);
+    }
+
+    public function actionNewChildren()
+    {
+        /**
+         * @var Tree $parent
+         */
+        $parent = $this->getCurrentModel();
+
+        if (\Yii::$app->request->isPost)
+        {
+            $childTree = new Tree();
+            $childTree->load(\Yii::$app->request->post());
+
+            $parent->processAddNode($childTree);
+
+            $this->redirect(Url::to(["view", "id" => $childTree->primaryKey]));
+        }
+        else
+        {
+            return $this->render('_form', [
+                'model' => new Tree(),
+            ]);
+        }
+    }
+
     public function actionIndex()
     {
-        /*$parent = Tree::find()->where(["id" => 1])->one();
-        $target = Tree::find()->where(["id" => 4])->one();
-
-        $parent->processAddNode($target);
-        die;*/
-
         $tree = new Tree();
-        $models = $tree->findRoots()->all();
 
+        $active = [];
+        if ($pid = \Yii::$app->request->getQueryParam("pid"))
+        {
+            $selected = Tree::find()->where(["id" => $pid])->one();
+            if ($selected)
+            {
+
+                $active = $selected->hasParent() ? $selected->findParents()->all() : [];
+
+                $active[] = $selected;
+            }
+        }
+
+        $models = $tree->findRoots()->all();
+        $this->_activeTmp = $active;
+
+        return $this->output($this->renderNodes($models));
+    }
+
+    protected $_activeTmp = [];
+    public function renderNodes($models)
+    {
         $ul = Html::ul($models, [
             "item" => function($model)
             {
                 $controller = App::moduleCms()->createControllerByID("admin-tree");
                 $controller->setModel($model);
 
+                $child = "";
+                foreach ($this->_activeTmp as $active)
+                {
+                    if (Validate::validate(new IsSame($active), $model)->isValid() && $model->hasChildrens())
+                    {
+                        $child = $this->renderNodes($model->findChildrens()->all());
+                    }
+                }
+
                 return Html::tag("li",
+                    ($model->hasChildrens() ? " + " : "") .
                     Html::a($model->name, UrlHelper::construct("cms/admin-tree/index")->set("pid", $model->id)) .
                     DropdownControllerActions::begin([
                         "controller"    => $controller,
-                    ])->run()
+                    ])->run() . $child
                 );
+
+
             }
         ]);
 
-        return $this->output($ul);
+        return $ul;
     }
 }

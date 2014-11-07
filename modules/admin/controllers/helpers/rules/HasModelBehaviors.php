@@ -10,6 +10,9 @@
  */
 namespace skeeks\cms\modules\admin\controllers\helpers\rules;
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\cms\validators\HasBehaviorsAnd;
+use skeeks\sx\validate\Validate;
 
 /**
  * Class Action
@@ -35,73 +38,8 @@ class HasModelBehaviors extends HasModel
         }
 
         $model = $this->controller->getModel();
-
         $behaviors = $this->behaviors;
 
-        if (is_string($this->behaviors))
-        {
-            $behaviors = [$this->behaviors];
-        }
-
-        if (!$this->_hasBehaviorsForModel($model, $behaviors))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-
-
-
-    /**
-     *
-     * TODO: нужно выносить часто нужно знать
-     *
-     * Проверка наличия поведений у модели
-     * Если хотя бы одного нету будет false
-     *
-     * TODO: думаю нужно делать по типу механимзма валидаций skeeks\sx\Validator
-     *
-     * @param ActiveRecord $model
-     * @param array $behaviors
-     * @return bool
-     */
-    protected function _hasBehaviorsForModel(ActiveRecord $model, array $behaviors = [])
-    {
-
-        foreach ($behaviors as $behaviorNeed)
-        {
-            if (!$this->_hasBehaviorForModel($model, $behaviorNeed))
-            {
-                return false;
-            }
-        }
-
-
-        return true;
-    }
-
-
-    /**
-     * TODO: нужно выносить часто нужно знать
-     *
-     * Проверка есть ли у модели поведение
-     *
-     * @param ActiveRecord $model
-     * @param Behavior $behaviorNeed
-     * @return bool
-     */
-    protected function _hasBehaviorForModel(ActiveRecord $model, $behaviorNeed)
-    {
-        foreach ($model->getBehaviors() as $behavior)
-        {
-            if ($behavior instanceof $behaviorNeed)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return Validate::validate(new HasBehaviorsAnd($behaviors), $model)->isValid();
     }
 }

@@ -24,9 +24,6 @@ $config =
             'enableAutoLogin' => true,
         ],
 
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
-        ],
 
         'storage' => [
             'class' => 'skeeks\cms\components\Storage',

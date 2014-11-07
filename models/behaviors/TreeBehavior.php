@@ -14,7 +14,20 @@ use skeeks\cms\base\behaviors\ActiveRecord as ActiveRecordBehavior;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
 use skeeks\cms\models\Tree;
+use skeeks\cms\validators\db\IsNewRecord;
+use skeeks\cms\validators\db\NotNewRecord;
+use skeeks\cms\validators\db\NotSame;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\cms\validators\model\TreeSeoPageName;
+use skeeks\cms\validators\NewRecord;
+use skeeks\sx\filters\string\SeoPageName;
+use skeeks\sx\validate\Validate;
+use skeeks\sx\validators\ChainAnd;
+use yii\base\Event;
+use yii\base\ModelEvent;
 use yii\db\ActiveQuery;
+use yii\db\BaseActiveRecord;
+use yii\helpers\Json;
 use yii\validators\Validator;
 
 /**
@@ -28,50 +41,117 @@ class TreeBehavior extends ActiveRecordBehavior
     public $levelAttrName       = "level";
     public $dirAttrName         = "dir";
     public $pageAttrName        = "seo_page_name";
+    public $nameAttrName        = "name";
     public $hasChildrenAttrName = "has_children";
 
+    public $delimetr = "/";
 
+
+    /**
+     * @param ActiveRecord $owner
+     * @throws Exception
+     */
     public function attach($owner)
     {
         $owner->attachBehavior("implode_tree",  [
             "class"  => Implode::className(),
-            "delimetr" => "/",
+            "delimetr" => $this->delimetr,
             "fields" =>  ["pids"]
         ]);
 
         parent::attach($owner);
     }
 
+
+    /**
+     * @return array
+     */
     public function events()
-	{
-		return [
-			/*ActiveRecord::EVENT_INIT => 'afterConstruct',
-			ActiveRecord::EVENT_AFTER_FIND => 'afterFind',
-			ActiveRecord::EVENT_BEFORE_INSERT => 'beforeSave',
-			ActiveRecord::EVENT_BEFORE_UPDATE => 'beforeSave',
-			ActiveRecord::EVENT_BEFORE_DELETE => 'beforeDelete',*/
-		];
-	}
+    {
+        return array_merge(parent::events(), [
+            BaseActiveRecord::EVENT_BEFORE_INSERT          => "beforeInsertNode",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE          => "beforeInsertNode",
+        ]);
+    }
+
+    public function beforeInsertNode(ModelEvent $event)
+    {
+        //Если не заполнено название, нужно сгенерить
+        if (!$this->getName())
+        {
+            $this->generateName();
+        }
+    }
 
 
     /**
-	 * Named scope. Gets descendants for node.
-	 * @param int $depth the depth.
-	 * @return CActiveRecord the owner.
-	 */
+     *
+     * Автоматическая генерация PageName по названию
+     *
+     * @return ActiveRecord
+     */
+    public function generatePageName()
+    {
+        if ($this->isRoot())
+        {
+            $this->owner->setAttribute($this->pageAttrName, null);
+        } else
+        {
+            $filter     = new SeoPageName();
+            $newName    = $filter->filter($this->getName());
+
+            if (Validate::validate(new TreeSeoPageName($this->owner), $newName)->isInvalid())
+            {
+                $newName    = $filter->filter($newName . "-" . substr(md5(uniqid() . time()), 0, 4));
+
+                if (!Validate::validate(new TreeSeoPageName($this->owner), $newName)->isValid())
+                {
+                    $this->generateName();
+                }
+            }
+
+            $this->owner->setAttribute($this->pageAttrName, $newName);
+        }
+
+        return $this->owner;
+    }
+    /**
+     *
+     * Автоматическая генерация названия раздела
+     *
+     * @return ActiveRecord
+     */
+    public function generateName()
+    {
+        $lastTree = $this->owner->find()->orderBy(["id" => SORT_DESC])->one();
+        $this->owner->setAttribute($this->nameAttrName, "pk-" . $lastTree->primaryKey);
+
+        return $this->owner;
+    }
+
+    /**
+     *
+     * Проверка ноды
+     *
+     * @param ActiveRecord $node
+     * @throws \skeeks\sx\validate\Exception
+     */
+    protected function _ensureNode(ActiveRecord $node)
+    {
+        Validate::ensure(new HasBehavior(self::className()), $node);
+    }
+
+    /**
+     * @param null $depth
+     */
 	public function descendants($depth = null)
-	{
-	}
+	{}
 
     /**
-	 * Named scope. Gets ancestors for node.
-	 * @param int $depth the depth.
-	 * @return CActiveRecord the owner.
-	 */
+     * @param null $depth
+     */
 	public function ancestors($depth=null)
-	{
-
-	}
+	{}
 
     /**
      * Найти непосредственных детей ноды
@@ -81,181 +161,6 @@ class TreeBehavior extends ActiveRecordBehavior
 	{
 		return $this->owner->find()->where([$this->pidAttrName => $this->owner->primaryKey])->orderBy(["priority" => SORT_DESC]);
 	}
-
-
-
-    protected function _createNode(Tree $target)
-    {
-        $target->setAttribute($this->levelAttrName, ($this->getLevel() + 1));
-        $target->setAttribute($this->pidAttrName, $this->owner->primaryKey);
-    }
-    
-    public function processAddNode(Tree $target)
-    {
-        //TODO:: больше проверок
-        if ($this->owner->isNewRecord)
-        {
-            throw new Exception('Прежде чем добавлять в эту ноду что либо, нужно сохранить ее');
-        }
-
-        if ($this->owner->primaryKey == $target->primaryKey)
-        {
-            throw new Exception('Нельзя добавить раздел в раздел');
-        }
-
-        //Если раздел который мы пытаемся добавить новый, то у него нет детей и он
-        if ($target->isNewRecord)
-        {
-
-        }
-        $target->setAttribute($this->levelAttrName, ($this->getLevel() + 1));
-        $target->setAttribute($this->pidAttrName, $this->owner->primaryKey);
-
-         if ($target->getPage())
-        {
-            /*$result = \Cx_Validate::validate(new \Cx_Validator_Chain_And([
-                new Cx_Validator_TreePage(),
-                new Cx_Validator_TreePageName($treeChild)
-            ]), $treeChild->getPage());*/
-
-            /*if (!$result->isValid())
-            {
-                $treeChild->set("page", NULL);
-            }*/
-        }
-
-        $target->save();
-
-
-        if ($target->getPage())
-        {
-            $target->processNormalize();
-        } else
-        {
-            $target->processGeneratePageName();
-        }
-    }
-
-
-    public function processNormalize()
-    {
-        return $this
-            ->processNormalizePids()
-            ->processNormalizeDirs()
-            ->processNormalizeCountChildrens()
-        ;
-    }
-
-
-    /**
-     *
-     * Качественное обновление поля dir
-     *
-     * @return $this
-     */
-    public function processNormalizeDirs()
-    {
-        $newDir = [];
-        if ($models = $this->findParents()->all())
-        {
-            foreach ($models as $model)
-            {
-                //Если разделе не текущий то добавляем его в путь
-                if ($model->primaryKey != $this->owner->primaryKey && !$model->isRoot())
-                {
-                    $newDir[] = $model->getPage();
-                }
-            }
-        }
-
-        $newDir[] = $this->getPage();
-        $this->owner->setAttribute($this->dirAttrName, implode("/", $newDir));
-        $this->owner->save();
-
-        //Берем детей на один уровень ниже
-        $childModels = $this->findChildrens()->all();
-
-        if ($childModels)
-        {
-            foreach ($childModels as $childModel)
-            {
-                $childModel->processNormalizeDirs();
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     *
-     * Процесс обновления pids у всех детей в дереве ниже.
-     *
-     * @return $this
-     */
-    public function processNormalizePids()
-    {
-        if ($this->owner->isNewRecord)
-        {
-            return $this;
-        }
-
-        $parent = $this->findParent();
-
-        if ($parent)
-        {
-            $newPids    = $parent->getPids();
-            $newPids[]  = $parent->primaryKey;
-
-            $this->owner->setAttribute($this->pidsAttrName, array_unique($newPids));
-            $this->owner->setAttribute($this->levelAttrName, $parent->getLevel() + 1);
-
-            $this->owner->save();
-        } else
-        {
-            $this->owner->setAttribute($this->pidsAttrName, []);
-            $this->owner->setAttribute($this->levelAttrName, 0);
-        }
-
-
-        //Берем детей на один уровень ниже
-        $childModels = $this->findChildrens()->all();
-
-        if ($childModels)
-        {
-            foreach ($childModels as $childModel)
-            {
-                $childModel->processNormalizePids();
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Подсчитать количество всех дочерних разделов и сохранить
-     * @return $this
-     */
-    public function processNormalizeCountChildrens()
-    {
-        if ($this->owner->isNewRecord)
-        {
-            return $this;
-        }
-
-        //Берем детей на один уровень ниже
-        $childModels = $this->findChildrens()->all();
-
-        if ($childModels)
-        {
-            $this->owner->setAttribute($this->hasChildrenAttrName, 1);
-            foreach ($childModels as $childModel)
-            {
-                $childModel->processNormalizeCountChildrens();
-            }
-        }
-
-        return $this;
-    }
 
     /**
      *
@@ -274,22 +179,17 @@ class TreeBehavior extends ActiveRecordBehavior
      */
 	public function findParent()
 	{
-        if ($this->owner->isNewRecord)
+        if (!$this->hasParent())
         {
             return false;
         }
 
-        if (!$this->hasParent() || $this->isRoot())
-        {
-            return false;
-        }
-
-		return $this->owner->find()->where([$this->pidAttrName => $this->getPid()])->one();
+		return $this->owner->find()->where([$this->owner->primaryKey()[0] => $this->getPid()])->one();
 	}
 
 
     /**
-     * @return array|bool|null|ActiveRecord
+     * @return array|bool|null|ActiveQuery
      */
     public function findParents()
     {
@@ -315,6 +215,177 @@ class TreeBehavior extends ActiveRecordBehavior
         return $find;
     }
 
+
+
+    /**
+     *
+     * Установка атрибутов если родителем этой ноды будет новый, читаем родителя, и обновляем необходимые данные у себя
+     *
+     * @param ActiveRecord $parent
+     * @return ActiveRecord
+     * @throws \skeeks\sx\validate\Exception
+     */
+    public function setAttributesForFutureParent(ActiveRecord $parent)
+    {
+        $this->_ensureNode($parent);
+        //Родитель должен быть уже сохранен
+        Validate::ensure(new ChainAnd([
+            new NotNewRecord(),
+            new NotSame($this->owner)
+        ]), $parent);
+
+        $newPids     = $parent->getPids();
+        $newPids[]   = $parent->primaryKey;
+
+        $this->owner->setAttribute($this->levelAttrName,     ($parent->getLevel() + 1));
+        $this->owner->setAttribute($this->pidAttrName,       $parent->primaryKey);
+        $this->owner->setAttribute($this->pidsAttrName,      $newPids);
+
+
+        if (!$this->getName())
+        {
+            $this->generateName();
+        }
+
+        if (!$this->getSeoPageName())
+        {
+            //Просто генерируем pageName
+            $this->generatePageName();
+        }
+
+        if ($parent->{$this->dirAttrName})
+        {
+            $this->owner->setAttribute($this->dirAttrName,       $parent->{$this->dirAttrName} . $this->delimetr . $this->getSeoPageName());
+        } else
+        {
+            $this->owner->setAttribute($this->dirAttrName,       $this->getSeoPageName());
+        }
+
+        return $this->owner;
+    }
+
+    /**
+     *
+     * Создание дочерней ноды
+     *
+     * @param ActiveRecord $target
+     * @return ActiveRecord
+     * @throws Exception
+     * @throws \skeeks\sx\validate\Exception
+     */
+    public function processCreateNode(ActiveRecord $target)
+    {
+        $this->_ensureNode($target);
+        //Текущая сущьность должна быть уже сохранена
+        Validate::ensure(new NotNewRecord(), $this->owner);
+        //Новая сущьность должна быть еще не сохранена
+        Validate::ensure(new IsNewRecord(), $target);
+
+        //Установка атрибутов будущему ребенку
+        $target->setAttributesForFutureParent($this->owner);
+        if (!$target->save(false))
+        {
+            throw new Exception("Не удалось создать дочерний элемент: " . Json::encode($target->attributes));
+        }
+
+        $this->owner->setAttribute($this->hasChildrenAttrName, 1);
+        $this->owner->save();
+
+        return $target;
+    }
+
+
+    /**
+     *
+     * Процесс вставки ноды одна в другую. Можно вставлять как уже сохраненную модель с дочерними элементами, так и еще не сохраненную.
+     *
+     * @param ActiveRecord $target
+     * @return ActiveRecord
+     * @throws Exception
+     * @throws \skeeks\sx\validate\Exception
+     */
+    public function processAddNode(ActiveRecord $target)
+    {
+        $this->_ensureNode($target);
+        //Текущая сущьность должна быть уже сохранена, и не равна $target
+        Validate::ensure(new ChainAnd([
+            new NotNewRecord(),
+            new NotSame($target)
+        ]), $this->owner);
+
+        //Если раздел который мы пытаемся добавить новый, то у него нет детей и он
+        if ($target->isNewRecord)
+        {
+            $this->processCreateNode($target);
+            return $this->owner;
+        }
+        else
+        {
+            $target->setAttributesForFutureParent($this->owner);
+            if (!$target->save(false))
+            {
+                throw new Exception("Не удалось переместить: " . Json::encode($target->attributes));
+            }
+
+            $this->processNormalize();
+        }
+
+        return $this->owner;
+    }
+
+
+    /**
+     * Обновление всего дерева ниже, и самого элемента.
+     * Если найти всех рутов дерева и запустить этот метод, то дерево починиться в случае поломки
+     * правильно переустановятся все dir, pids и т.д.
+     * @return ActiveRecord
+     */
+    public function processNormalize()
+    {
+        //Если это новая несохраненная сущьность, ничего делать не надо
+        if (Validate::validate(new IsNewRecord(), $this->owner)->isValid())
+        {
+            return $this;
+        }
+
+        if (!$this->hasParent())
+        {
+            $this->owner->setAttribute($this->dirAttrName, null);
+            $this->owner->setAttribute($this->dirAttrName, null);
+            $this->owner->save();
+        }
+        else
+        {
+            $parent = $this->findParent();
+            $this->setAttributesForFutureParent($parent);
+            $this->owner->save();
+        }
+
+
+        //Берем детей на один уровень ниже
+        $childModels = $this->findChildrens()->all();
+        if ($childModels)
+        {
+            $this->owner->setAttribute($this->hasChildrenAttrName, 1);
+            $this->owner->save();
+
+            foreach ($childModels as $childModel)
+            {
+                $childModel->processNormalize();
+            }
+        } else
+        {
+            $this->owner->setAttribute($this->hasChildrenAttrName, 0);
+            $this->owner->save();
+        }
+
+        return $this->owner;
+    }
+
+
+
+
+
     /**
      * У текущего раздела есть ли родительский элемент
      * @return bool
@@ -322,6 +393,15 @@ class TreeBehavior extends ActiveRecordBehavior
     public function hasParent()
     {
         return (bool) $this->getPid();
+    }
+
+    /**
+     * У текущего раздела есть ли родительский элемент
+     * @return bool
+     */
+    public function hasChildrens()
+    {
+        return (bool) $this->owner->{$this->hasChildrenAttrName};
     }
 
     /**
@@ -336,7 +416,15 @@ class TreeBehavior extends ActiveRecordBehavior
     /**
      * @return string
      */
-    public function getPage()
+    public function getName()
+    {
+        return (string) $this->owner->{$this->nameAttrName};
+    }
+
+    /**
+     * @return string
+     */
+    public function getSeoPageName()
     {
         return (string) $this->owner->{$this->pageAttrName};
     }
