@@ -25,6 +25,10 @@ class Tree extends PageAdvanced
 {
     public function behaviors()
     {
+        //$behaviors = parent::behaviors();
+
+        //SeoPageName::className()
+
         return array_merge(parent::behaviors(), [
             TreeBehavior::className()
         ]);

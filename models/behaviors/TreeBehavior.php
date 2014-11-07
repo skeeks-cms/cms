@@ -84,6 +84,11 @@ class TreeBehavior extends ActiveRecordBehavior
 
 
 
+    protected function _createNode(Tree $target)
+    {
+        $target->setAttribute($this->levelAttrName, ($this->getLevel() + 1));
+        $target->setAttribute($this->pidAttrName, $this->owner->primaryKey);
+    }
     
     public function processAddNode(Tree $target)
     {
@@ -98,6 +103,11 @@ class TreeBehavior extends ActiveRecordBehavior
             throw new Exception('Нельзя добавить раздел в раздел');
         }
 
+        //Если раздел который мы пытаемся добавить новый, то у него нет детей и он
+        if ($target->isNewRecord)
+        {
+
+        }
         $target->setAttribute($this->levelAttrName, ($this->getLevel() + 1));
         $target->setAttribute($this->pidAttrName, $this->owner->primaryKey);
 
