@@ -18,10 +18,13 @@
         {
             this._window = new sx.classes.Window(this.get('url'), this.get('newWindowName'));
             this._window.setCenterOptions().disableResize().disableLocation();
+            console.log(localStorage.getItem('test1'));
+
 
             this._window.bind('close', function()
             {
                 window.location.reload();
+
             });
 
 
