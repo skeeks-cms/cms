@@ -41,7 +41,7 @@ class DropdownControllerActions
     public function run()
     {
         return "<div class='dropdown'>
-            <button type=\"button\" class='btn btn-xs' data-toggle=\"dropdown\">
+            <button type=\"button\" class='btn btn-xs btn-default' data-toggle=\"dropdown\">
                <span class=\"caret\"></span>
             </button>" .
             parent::run()

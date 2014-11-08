@@ -105,56 +105,12 @@ class AdminTreeController extends AdminModelEditorSmartController
     public function actionIndex()
     {
         $tree = new Tree();
-
-        $active = [];
-        if ($pid = \Yii::$app->request->getQueryParam("pid"))
-        {
-            $selected = Tree::find()->where(["id" => $pid])->one();
-            if ($selected)
-            {
-
-                $active = $selected->hasParent() ? $selected->findParents()->all() : [];
-
-                $active[] = $selected;
-            }
-        }
-
         $models = $tree->findRoots()->all();
-        $this->_activeTmp = $active;
 
-        return $this->output($this->renderNodes($models));
-    }
-
-    protected $_activeTmp = [];
-    public function renderNodes($models)
-    {
-        $ul = Html::ul($models, [
-            "item" => function($model)
-            {
-                $controller = App::moduleCms()->createControllerByID("admin-tree");
-                $controller->setModel($model);
-
-                $child = "";
-                foreach ($this->_activeTmp as $active)
-                {
-                    if (Validate::validate(new IsSame($active), $model)->isValid() && $model->hasChildrens())
-                    {
-                        $child = $this->renderNodes($model->findChildrens()->all());
-                    }
-                }
-
-                return Html::tag("li",
-                    ($model->hasChildrens() ? " + " : "") .
-                    Html::a($model->name, UrlHelper::construct("cms/admin-tree/index")->set("pid", $model->id)) .
-                    DropdownControllerActions::begin([
-                        "controller"    => $controller,
-                    ])->run() . $child
-                );
-
-
-            }
+        $widget = \skeeks\cms\modules\admin\widgets\Tree::begin([
+            "models" => $models
         ]);
-
-        return $ul;
+        return $this->output($widget->run());
     }
+
 }
