@@ -19,7 +19,7 @@ use yii\web\AssetBundle;
 class Asset extends AssetBundle
 {
 
-    public $sourcePath = '@skeeks/cms/modules/admin/assets/widgets/controllerActions';
+    public $sourcePath = '@skeeks/cms/modules/admin/widgets/controllerActions';
 
     public $css = [
     ];

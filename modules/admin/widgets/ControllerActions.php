@@ -16,6 +16,7 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
+use skeeks\cms\modules\admin\widgets\controllerActions\Asset;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
@@ -83,6 +84,8 @@ class ControllerActions
         }
 
         $result = $this->renderListLi($actions, $actionManager);
+
+        Asset::register($this->getView());
         return Html::tag("ul", implode($result), $this->ulOptions);
     }
 
@@ -107,13 +110,18 @@ class ControllerActions
             $linkOptions["data-method"]         = $action->method;
             $linkOptions["data-confirm"]        = $action->confirm;
 
-            $actionData = array_merge($actionData, ["url" => Url::to($action->getUrlData())]);
+            $actionData = array_merge($actionData, [
+                "url"               => Url::to($action->getUrlData()),
+                "isOpenNewWindow"   => $action->isOpenNewWindow(),
+                "newWindowName"     => $action->getNewWindowName()
+            ]);
+
             $actionDataJson = Json::encode($actionData);
             $result[] = Html::tag("li",
                 Html::a($label, $action->getUrlData(), $linkOptions),
                 [
                     "class" => $this->currentActionCode == $code ? "active" : "",
-                    "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).open(); return false;"
+                    "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;"
                 ]
             );
         }

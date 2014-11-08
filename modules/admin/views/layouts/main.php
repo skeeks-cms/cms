@@ -173,6 +173,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                     <?/*= Alert::widget() */?>
                 </div>
                 <div class="panel-content">
+                    <?= \skeeks\cms\widgets\Alert::widget(); ?>
                     <?= $content ?>
                 </div><!-- End .panel-body -->
             </div><!-- End .panel-body -->

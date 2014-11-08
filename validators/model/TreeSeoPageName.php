@@ -42,16 +42,18 @@ class TreeSeoPageName
     {
         if ($this->_model->isRoot())
         {
+            /*$find   = $this->_model->findRoots()->where([$this->_model->pageAttrName => $seoPageName])->one();*/
             return $this->_ok();
-        }
-
-        $parent = $this->_model->findParent();
-        if (!$parent)
+        } else
         {
-            return $this->_ok();
-        }
+            $parent = $this->_model->findParent();
+            if (!$parent)
+            {
+                return $this->_ok();
+            }
 
-        $find   = $parent->findChildrens()->where([$this->_model->pageAttrName => $seoPageName])->one();
+            $find   = $parent->findChildrens()->where([$this->_model->pageAttrName => $seoPageName])->one();
+        }
 
         if ($find)
         {

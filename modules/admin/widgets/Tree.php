@@ -78,6 +78,15 @@ class Tree
     public function run()
     {
         $openedModels = [];
+
+        if (\Yii::$app->request->getQueryParam('setting-open-all'))
+        {
+            \skeeks\cms\models\Tree::find()->where([]);
+
+            return \Yii::$app->response->redirect(UrlHelper::construct("cms/admin-tree/index"));
+        }
+
+
         if ($opened = \Yii::$app->request->getQueryParam($this->openedRequestName))
         {
             $openedModels = \skeeks\cms\models\Tree::find()->where(["id" => $opened])->all();
@@ -86,7 +95,19 @@ class Tree
         $this->_openedTmp = $openedModels;
 
         $this->registerAssets();
-        return Html::tag("div", $this->renderNodes($this->models), $this->containerOptions);
+        return Html::tag('div',
+
+            Html::tag("div",
+                Html::tag("div", $this->renderNodes($this->models), $this->containerOptions)
+            , ['class' => "sx-container-tree col-md-6"]) .
+
+            Html::tag("div",
+                Html::a("Открыть все разделы", UrlHelper::construct("cms/admin-tree/index")->set('setting-open-all', 'true'), ['class' => 'btn btn-primary btn-sm']) .
+                Html::a("Закрыть все разделы", UrlHelper::construct("cms/admin-tree/index"), ['class' => 'btn btn-primary btn-sm'])
+            , ['class' => "sx-container-controlls col-md-2"])
+
+            ,['class' => 'row-fluid']
+        );
     }
 
 

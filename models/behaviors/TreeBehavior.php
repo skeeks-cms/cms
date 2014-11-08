@@ -81,6 +81,11 @@ class TreeBehavior extends ActiveRecordBehavior
         {
             $this->generateName();
         }
+
+        if (!$this->getSeoPageName())
+        {
+            $this->generatePageName();
+        }
     }
 
 

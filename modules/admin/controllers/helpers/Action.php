@@ -56,6 +56,41 @@ class Action extends Component
         $this->rules = array_merge($this->rules, $rule);
     }
 
+
+
+    /**
+     * @return bool
+     */
+    public function isOpenNewWindow()
+    {
+        if ($this->controller instanceof AdminModelEditorController)
+        {
+            if ($model = $this->controller->getModel())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNewWindowName()
+    {
+        if ($this->controller instanceof AdminModelEditorController)
+        {
+            if ($model = $this->controller->getModel())
+            {
+                return $this->controller->id . $model->id;
+            }
+        }
+
+        return $this->controller->id . $this->code;
+    }
+
+
     /**
      * @return array
      */

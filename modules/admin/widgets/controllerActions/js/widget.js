@@ -16,19 +16,48 @@
 
         _init: function()
         {
+            this._window = new sx.classes.Window(this.get('url'), this.get('newWindowName'));
+            this._window.setCenterOptions().disableResize().disableLocation();
 
+            this._window.bind('close', function()
+            {
+                window.location.reload();
+            });
+
+
+            this._window.bind('error', function(e, data)
+            {
+                alert(data.message);
+            });
         },
 
-        open: function()
+        /**
+         * @returns {sx.classes.app.controllerAction}
+         */
+        go: function()
         {
+            if (this.get('isOpenNewWindow') && window.name != this.get('newWindowName'))
+            {
+                this._window.open().focus();
+                return this;
+            }
 
+            location.href = this.get('url');
         },
 
         _onDomReady: function()
         {},
 
         _onWindowReady: function()
-        {}
+        {},
+
+        /**
+         * @returns {sx.classes.Window|*}
+         */
+        getWindow: function()
+        {
+            return this._window;
+        }
     });
 
 })(sx, sx.$, sx._);

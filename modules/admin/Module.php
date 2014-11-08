@@ -34,6 +34,33 @@ class Module extends CmsModule
         parent::init();
     }
 
+
+    /**
+     * @var string
+     */
+    public $adminMenuName   = "Для разработчика";
+
+    /**
+     * @var array настройки админки
+     */
+    public $adminMenuItems  =
+    [
+        [
+            "label"     => "Генератор кода",
+            "url"       => ["admin/gii"],
+        ],
+
+        [
+            "label"     => "Удаление и чистка",
+            "url"       => ["admin/clear"],
+        ],
+        [
+            "label"     => "Работа с базой данных",
+            "url"       => ["admin/db"],
+        ],
+    ];
+
+
     /**
      * @return array
      */

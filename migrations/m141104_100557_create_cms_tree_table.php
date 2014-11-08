@@ -41,7 +41,7 @@ class m141104_100557_create_cms_tree_table extends Migration
             'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
-            'seo_page_name'         => Schema::TYPE_STRING. '(64) NOT NULL', //обложка
+            'seo_page_name'         => Schema::TYPE_STRING. '(64) NULL', //обложка
 
             'count_comment'         => Schema::TYPE_INTEGER . ' NULL', //Количество комментариев
 
