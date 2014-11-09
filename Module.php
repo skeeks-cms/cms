@@ -44,7 +44,7 @@ class Module extends base\Module
 
         [
             "label"     => "Инфоблоки",
-            "url"       => ["cms/admin-user-group"],
+            "url"       => ["cms/admin-infoblock"],
         ],
 
         [

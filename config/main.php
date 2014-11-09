@@ -58,7 +58,11 @@ $config =
             'showScriptName' => false,
             'suffix' => '',
             'rules' => [
-                ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'],
+                ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //админка
+
+                '<_c:(publication|user)>'               => 'cms/<_c>/index',
+                '<_c:(publication)>/<seo_page_name>'    => 'cms/<_c>/view',
+                '<_c:(user)>/<username>'                => 'cms/<_c>/view',
             ]
         ],
 
@@ -98,16 +102,54 @@ $config =
                     'label'             => 'Группа пользователя',
                 ],
 
+                'vote'      =>
                 [
                     'class' => 'skeeks\cms\models\Vote',
                     'label' => 'Голос'
                 ],
 
+                'subscribe'   =>
                 [
                     'class' => 'skeeks\cms\models\Subscribe',
                     'label' => 'Подписка'
                 ],
             ],
+        ],
+
+        'registeredWidgets' =>
+        [
+            'class' => 'skeeks\cms\components\RegisteredWidgets',
+
+            'widgets' =>
+            [
+                'skeeks\cms\widgets\text\Text' =>
+                [
+                    'label'         => 'Текст',
+                    'description'   => 'Виджет просто выводит текст',
+                    'templates'     =>
+                    [
+                        'default' =>
+                        [
+                            'label' => 'Шаблон по умолчанию'
+                        ]
+                    ],
+                    'enabled'       => true
+                ],
+
+                'skeeks\cms\widgets\infoblocks\Infoblocks' =>
+                [
+                    'label'         => 'Список инфоблоков',
+                    'description'   => 'Виджет который содержит в себе другие инфоблоки',
+                    'templates'     =>
+                    [
+                        'default' =>
+                        [
+                            'label' => 'Шаблон по умолчанию'
+                        ]
+                    ],
+                    'enabled'       => true
+                ]
+            ]
         ]
     ],
 
