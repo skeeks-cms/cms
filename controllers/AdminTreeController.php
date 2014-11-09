@@ -35,6 +35,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\web\Cookie;
 
 /**
  * Class AdminUserController

@@ -71,6 +71,22 @@ class Tree
     protected $_activeTmp = [];
     protected $_openedTmp = [];
     protected $_countTmp = 0;
+
+    /**
+     * @return array
+     */
+    protected function _getOpenIds()
+    {
+        if ($fromRequest = (array) \Yii::$app->request->getQueryParam($this->openedRequestName))
+        {
+            $opened = array_unique($fromRequest);
+        } else
+        {
+            $opened = array_unique(\Yii::$app->getSession()->get('cms-tree-opened', []));
+        }
+
+        return $opened;
+    }
     /**
      * TODO: учитывать приоритет
      * @return string
@@ -82,13 +98,12 @@ class Tree
         if (\Yii::$app->request->getQueryParam('setting-open-all'))
         {
             \skeeks\cms\models\Tree::find()->where([]);
-
             return \Yii::$app->response->redirect(UrlHelper::construct("cms/admin-tree/index"));
         }
 
-
-        if ($opened = \Yii::$app->request->getQueryParam($this->openedRequestName))
+        if ($opened = $this->_getOpenIds())
         {
+            \Yii::$app->getSession()->set('cms-tree-opened', $opened);
             $openedModels = \skeeks\cms\models\Tree::find()->where(["id" => $opened])->all();
         }
 
@@ -115,8 +130,8 @@ class Tree
     {
         $options["item"] = function($model)
         {
-            $isOpen = false;
-            $isActive = false;
+            $isOpen     = false;
+            $isActive   = false;
 
             $controller = App::moduleCms()->createControllerByID("admin-tree");
             $controller->setModel($model);
@@ -143,8 +158,7 @@ class Tree
             $currentLink = "";
             if ($model->hasChildrens())
             {
-                ;
-                $openedIds = (array) \Yii::$app->request->getQueryParam($this->openedRequestName);
+                $openedIds = $this->_getOpenIds();
 
                 if ($isOpen)
                 {
