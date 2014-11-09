@@ -156,15 +156,16 @@ $config =
 
     'modules' => [
 
-        'admin' => [
+        'admin' =>
+        [
             'class' => \skeeks\cms\modules\admin\Module::className()
         ],
 
-        'cms' => [
+        'cms' =>
+        [
             'class'     => \skeeks\cms\Module::className(),
         ],
     ],
 ];
-
 
 return $config;
