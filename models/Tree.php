@@ -13,21 +13,19 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\behaviors\SeoPageName;
+use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 
 /**
- * Class Publication
- * @method ActiveRecord         findRoots()
- * @method ActiveRecord         findChildrens()
- * @method Tree                 findParent()
- * @method ActiveRecord         processAddNode(ActiveRecord $target)
- *
+ * Class Tree
  * @package skeeks\cms\models
  */
 class Tree extends PageAdvanced
 {
+    use TreeBehaviorTrait;
+
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -51,4 +49,38 @@ class Tree extends PageAdvanced
         return '{{%cms_tree}}';
     }
 
+    /**
+     * @return string
+     */
+    public function createUrl()
+    {
+        if ($this->getDir())
+        {
+            return  DIRECTORY_SEPARATOR . $this->getDir();
+        } else
+        {
+            return  DIRECTORY_SEPARATOR;
+        }
+    }
+
+    public function createAbsoluteUrl()
+    {
+        if ($this->getDir())
+        {
+            return  DIRECTORY_SEPARATOR . $this->getDir();
+        } else
+        {
+            return  DIRECTORY_SEPARATOR;
+        }
+    }
+
+
+    /**
+     * Нода по умолчанию, задается для всех сайтов проекта.
+     * @return static
+     */
+    static public function findDefaultRoot()
+    {
+        return self::find()->where(['main_root' => 1])->one();
+    }
 }

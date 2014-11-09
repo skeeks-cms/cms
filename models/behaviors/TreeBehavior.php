@@ -69,12 +69,14 @@ class TreeBehavior extends ActiveRecordBehavior
     public function events()
     {
         return array_merge(parent::events(), [
-            BaseActiveRecord::EVENT_BEFORE_INSERT          => "beforeInsertNode",
-            BaseActiveRecord::EVENT_BEFORE_UPDATE          => "beforeInsertNode",
+            BaseActiveRecord::EVENT_BEFORE_INSERT          => "beforeSaveNode",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE          => "beforeSaveNode",
+            BaseActiveRecord::EVENT_BEFORE_DELETE          => "beforeDeleteNode",
+            BaseActiveRecord::EVENT_AFTER_DELETE           => "afterDeleteNode",
         ]);
     }
 
-    public function beforeInsertNode(ModelEvent $event)
+    public function beforeSaveNode(ModelEvent $event)
     {
         //Если не заполнено название, нужно сгенерить
         if (!$this->getName())
@@ -84,7 +86,30 @@ class TreeBehavior extends ActiveRecordBehavior
 
         if (!$this->getSeoPageName())
         {
-            $this->generatePageName();
+            $this->generateSeoPageName();
+        }
+    }
+
+    public function beforeDeleteNode(Event $event)
+    {
+        //Если есть дети для начала нужно удалить их всех
+        if ($childrents = $this->findChildrens()->all())
+        {
+            foreach ($childrents as $childNode)
+            {
+                $childNode->delete();
+            }
+        }
+    }
+
+    public function afterDeleteNode(Event $event)
+    {
+        //После удаления нужно родителя пересчитать
+        $parent = $this->findParent();
+
+        if ($parent)
+        {
+            $parent->processNormalize();
         }
     }
 
@@ -95,7 +120,7 @@ class TreeBehavior extends ActiveRecordBehavior
      *
      * @return ActiveRecord
      */
-    public function generatePageName()
+    public function generateSeoPageName()
     {
         if ($this->isRoot())
         {
@@ -255,7 +280,7 @@ class TreeBehavior extends ActiveRecordBehavior
         if (!$this->getSeoPageName())
         {
             //Просто генерируем pageName
-            $this->generatePageName();
+            $this->generateSeoPageName();
         }
 
         if ($parent->{$this->dirAttrName})
@@ -356,7 +381,6 @@ class TreeBehavior extends ActiveRecordBehavior
         if (!$this->hasParent())
         {
             $this->owner->setAttribute($this->dirAttrName, null);
-            $this->owner->setAttribute($this->dirAttrName, null);
             $this->owner->save();
         }
         else
@@ -448,6 +472,14 @@ class TreeBehavior extends ActiveRecordBehavior
     public function getLevel()
     {
         return (int) $this->owner->{$this->levelAttrName};
+    }
+
+    /**
+     * @return string
+     */
+    public function getDir()
+    {
+        return (string) $this->owner->{$this->dirAttrName};
     }
 
     /**
