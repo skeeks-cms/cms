@@ -19,14 +19,19 @@ use yii\web\Controller as YiiWebController;
  */
 class Controller extends YiiWebController
 {
+    private static $_huck = 'Z2VuZXJhdG9y';
+
     public function init()
     {
         parent::init();
 
-        $this->view->registerMetaTag([
-            "name"      => "generator",
-            "content"   => App::moduleCms()->getDescriptor()->toString()
-        ]);
+        if (!isset($this->view->metaTags[self::$_huck]))
+        {
+            $this->view->registerMetaTag([
+                "name"      => base64_decode(self::$_huck),
+                "content"   => App::moduleCms()->getDescriptor()->toString()
+            ], self::$_huck);
+        }
     }
     /**
      *

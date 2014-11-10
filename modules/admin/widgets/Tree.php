@@ -83,7 +83,10 @@ class Tree
         } else
         {
             $opened = array_unique(\Yii::$app->getSession()->get('cms-tree-opened', []));
-            \Yii::$app->response->redirect(UrlHelper::construct('cms/admin-tree/index', [$this->openedRequestName => $opened])->enableAdmin());
+            if ($opened)
+            {
+                \Yii::$app->response->redirect(UrlHelper::construct('cms/admin-tree/index', [$this->openedRequestName => $opened])->enableAdmin());
+            }
         }
 
         return $opened;
