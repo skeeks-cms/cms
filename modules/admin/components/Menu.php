@@ -18,7 +18,7 @@ use skeeks\cms\base\Component;
 class Menu
     extends Component
 {
-    public $items =
+    public $groups =
     [
         /*
          * Example
