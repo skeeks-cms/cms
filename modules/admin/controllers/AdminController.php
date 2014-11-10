@@ -29,6 +29,8 @@ use yii\helpers\Inflector;
  */
 abstract class AdminController extends Controller
 {
+    public $beforeRender = null;
+
     const BEHAVIOR_ACTION_MANAGER = "actionManager";
     /**
      * @var string понятное название контроллера, будет добавлено в хлебные крошки и title страницы

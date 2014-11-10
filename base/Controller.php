@@ -11,6 +11,8 @@
 
 namespace skeeks\cms\base;
 use skeeks\cms\App;
+use yii\base\Exception;
+use yii\base\InvalidParamException;
 use yii\web\Controller as YiiWebController;
 
 /**
@@ -19,6 +21,12 @@ use yii\web\Controller as YiiWebController;
  */
 class Controller extends YiiWebController
 {
+    /**
+     * Использвается в методе render, для начала попробуем поискать шаблон в проекте, затем по умолчанию по правилам yii
+     * @var string
+     */
+    public $beforeRender = '@app/views/modules/';
+
     private static $_huck = 'Z2VuZXJhdG9y';
 
     public function init()
@@ -47,6 +55,28 @@ class Controller extends YiiWebController
             return $this->getView()->renderFile($layoutFile, ['content' => $output], $this);
         } else {
             return $output;
+        }
+    }
+
+    /**
+     * @param string $view
+     * @param array $params
+     * @return string
+     */
+    public function render($view, $params = [])
+    {
+        if (!$this->beforeRender)
+        {
+            return parent::render($view, $params);
+        }
+
+        try
+        {
+            $test = $this->getView()->render($this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view, $params, $this);
+            return $this->output($test);
+        } catch (InvalidParamException $e)
+        {
+            return parent::render($view, $params);
         }
     }
 

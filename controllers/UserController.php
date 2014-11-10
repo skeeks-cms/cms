@@ -10,9 +10,9 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\base\Controller;
 use skeeks\cms\models\User;
 use Yii;
-use yii\web\Controller;
 use skeeks\cms\models\searchs\User as UserSearch;
 use \skeeks\cms\App;
 
