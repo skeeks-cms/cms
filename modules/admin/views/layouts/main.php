@@ -29,9 +29,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
 </head>
 <body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?>">
 
-<?= \skeeks\cms\widgets\Infoblock::widget([
-    'code' => 'text',
-])?>
+
 
 <?php $this->beginBody() ?>
 <div class="navbar" role="navigation">
