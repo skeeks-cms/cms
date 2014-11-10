@@ -17,6 +17,8 @@ use skeeks\cms\models\behaviors\HasRef;
 use Yii;
 
 /**
+ * @property $config
+ *
  * Class Publication
  * @package skeeks\cms\models
  */

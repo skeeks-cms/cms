@@ -14,6 +14,8 @@ use skeeks\cms\App;
 use skeeks\cms\models\Infoblock;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\UserGroup;
+use skeeks\cms\models\WidgetConfig;
+use skeeks\cms\models\WidgetSettings;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
@@ -52,7 +54,7 @@ class AdminInfoblockController extends AdminModelEditorSmartController
             [
                 "actions" =>
                 [
-                    'settings' =>
+                    'config' =>
                     [
                         "label" => "Настройки",
                         "rules" =>
@@ -89,10 +91,34 @@ class AdminInfoblockController extends AdminModelEditorSmartController
         ]);
     }
 
-    public function actionSettings()
+    public function actionTemplate()
     {
+
+    }
+
+    public function actionConfig()
+    {
+        $widgetConfig = new WidgetConfig([
+            'widget'    => $this->getCurrentModel()->getWidgetClassName(),
+            'config'    => $this->getCurrentModel()->getWidgetConfig()
+        ]);
+
+        if (\Yii::$app->request->isPost)
+        {
+            if ($data = \Yii::$app->request->post('WidgetConfig'))
+            {
+                $this->getCurrentModel()->setAttribute('config', $data);
+                $this->getCurrentModel()->save(false);
+
+                $widgetConfig = new WidgetConfig([
+                    'widget'    => $this->getCurrentModel()->getWidgetClassName(),
+                    'config'    => $this->getCurrentModel()->getWidgetConfig()
+                ]);
+            }
+        }
+
         return $this->output($this->getCurrentModel()->getRegisterdWidgetModel()->renderForm([
-            'model' => $this->getCurrentModel()
+            'model' => $widgetConfig
         ]));
     }
 }
