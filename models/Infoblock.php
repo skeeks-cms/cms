@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasRef;
 use Yii;
@@ -35,6 +36,10 @@ class Infoblock extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
+            [
+                "class"  => behaviors\Serialize::className(),
+                'fields' => ['config', 'rules']
+            ],
             [
                 "class"  => behaviors\HasFiles::className(),
                 "fields" =>
@@ -114,4 +119,89 @@ class Infoblock extends Core
         ]);
     }
 
+
+    /**
+     * @param $id
+     * @return static
+     */
+    static public function findById($id)
+    {
+        return static::find()->where(['id' => (int) $id])->one();
+    }
+
+    /**
+     * @param $code
+     * @return static
+     */
+    static public function findByCode($code)
+    {
+        return static::find()->where(['code' => (string) $code])->one();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllow()
+    {
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWidgetClassName()
+    {
+        return (string) $this->widget;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWidgetConfig()
+    {
+        return (array) $this->config;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWidgetRules()
+    {
+        return (array) $this->rules;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWidgetTemplate()
+    {
+        return (string) $this->template;
+    }
+
+
+    /**
+     * @param array $config
+     * @return string
+     */
+    public function run($config = [])
+    {
+        $result = "";
+        if (!$this->isAllow() || !$model = $this->getRegisterdWidgetModel())
+        {
+            return $result;
+        }
+
+        $config = array_merge($this->getWidgetConfig(), $config);
+        $widget = $model->createWidget($config);
+
+        return $widget->run();
+    }
+
+    /**
+     * @return Model
+     */
+    public function getRegisterdWidgetModel()
+    {
+        return \Yii::$app->registeredWidgets->getModel($this->getWidgetClassName());
+    }
 }

@@ -28,6 +28,11 @@ $sidebarHidden = App::getAuth()->getIsGuest();
     <?php $this->head() ?>
 </head>
 <body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?>">
+
+<?= \skeeks\cms\widgets\Infoblock::widget([
+    'code' => 'text',
+])?>
+
 <?php $this->beginBody() ?>
 <div class="navbar" role="navigation">
     <div class="navbar-header">
@@ -43,10 +48,15 @@ $sidebarHidden = App::getAuth()->getIsGuest();
 
     <? endif; ?>
 
-    <!--<ul class="nav navbar-nav visible-md visible-lg">
+    <ul class="nav navbar-nav visible-md visible-lg">
         <li>&nbsp;</li>
-        <li><button onclick="return false;" class="btn btn-default">Перейти на сайт</button></li>
-    </ul>-->
+        <li>
+            <?= Html::button('Перейти на сайт', [
+                'class' => 'btn btn-default',
+                'onclick' => 'sx.helpers.Url.redirect("' . \yii\helpers\Url::home() . '"); return false;'
+            ])?>
+        </li>
+    </ul>
 
     <ul class="nav navbar-nav navbar-right visible-md visible-lg">
         <li><span class="timer"><i class="icon-clock"></i> <span id="clock"><!-- JavaScript clock will be displayed here, if you want to remove clock delete parent <li> --></span></span></li>

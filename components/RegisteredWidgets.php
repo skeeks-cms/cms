@@ -12,6 +12,7 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Component;
@@ -24,6 +25,27 @@ use yii\web\UploadedFile;
  */
 class RegisteredWidgets extends Component
 {
+
+    /**
+     *
+     *
+     * 'skeeks\cms\widgets\infoblocks\Infoblocks' =>
+    [
+        'label'         => 'Список инфоблоков',
+        'description'   => 'Виджет который содержит в себе другие инфоблоки',
+        'templates'     =>
+        [
+            'default' =>
+            [
+                'label' => 'Шаблон по умолчанию'
+            ]
+        ],
+        'enabled'       => true
+    ]
+     *
+     *
+     * @var array
+     */
     public $widgets           = [];
 
     public function init()
@@ -31,60 +53,62 @@ class RegisteredWidgets extends Component
         parent::init();
     }
 
+    protected $_models = null;
+
     /**
-     *
-     * Получить реальное название класса модели по ее коду
-     *
-     * @param $code
-     * @return bool|string
+     * @return Model[]
      */
-    public function getClassNameByCode($code)
+    public function getModels()
     {
-        $modelData = ArrayHelper::getValue($this->models, $code);
-
-        if (!$modelData)
+        if ($this->_models === null)
         {
-            return false;
+            $this->_models = [];
+
+            if ($this->widgets)
+            {
+                foreach ($this->widgets as $class => $data)
+                {
+                    $data['class'] = $class;
+                    $this->_models[$class] = new Model($data);
+                }
+            }
         }
 
-        if (is_array($modelData))
-        {
-            return ArrayHelper::getValue($modelData, "class", false);
-        } else if (is_string($modelData))
-        {
-            return $modelData;
-        }
-
-        return false;
+        return $this->_models;
     }
 
     /**
-     *
-     * Получить уникальный код по названию модели
-     *
-     * @param ActiveRecord $model
-     * @return string
+     * @return Model[]
      */
-    public function getCodeByModel(ActiveRecord $model)
+    public function getEnabledModels()
     {
-        foreach ($this->models as $code => $modelData)
-        {
-            if (is_array($modelData))
-            {
-                $className = ArrayHelper::getValue($modelData, "class", false);
-            } else if (is_string($modelData))
-            {
-                $className = $modelData;
-            } else
-            {
-                continue;
-            }
+        $result = [];
 
-            if ($model->className() == $className)
+        if ($this->getModels())
+        {
+            foreach ($this->getModels() as $model)
             {
-                return (string) $code;
+                if ($model->enabled)
+                {
+                    $result[$model->class] = $model;
+                }
             }
         }
+
+        return $result;
     }
 
+    /**
+     * @param $classNameWiget
+     * @return Model|null
+     */
+    public function getModel($classNameWiget)
+    {
+        if ($models = $this->getModels())
+        {
+            return ArrayHelper::getValue($models, (string) $classNameWiget, null);
+        }
+
+        return null;
+    }
 }

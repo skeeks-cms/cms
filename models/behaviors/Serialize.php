@@ -1,11 +1,11 @@
 <?php
 /**
- * implode / explode before after save
+ * Serialize
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
- * @date 20.10.2014
+ * @date 10.11.2014
  * @since 1.0.0
  */
 namespace skeeks\cms\models\behaviors;
@@ -15,10 +15,10 @@ use \yii\base\Behavior;
 use yii\base\Event;
 
 /**
- * Class Implode
+ * Class Serialize
  * @package skeeks\cms\models\behaviors
  */
-class Implode extends Behavior
+class Serialize extends Behavior
 {
     /**
      * @var array
@@ -26,28 +26,23 @@ class Implode extends Behavior
     public $fields      = [];
 
     /**
-     * @var string
-     */
-    public $delimetr    = ',';
-
-    /**
      * @return array
      */
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_INSERT   => "implodeFields",
-            BaseActiveRecord::EVENT_BEFORE_UPDATE   => "implodeFields",
-            BaseActiveRecord::EVENT_AFTER_FIND      => "explodeFields",
-            BaseActiveRecord::EVENT_AFTER_UPDATE    => "explodeFields",
-            BaseActiveRecord::EVENT_AFTER_INSERT    => "explodeFields",
+            BaseActiveRecord::EVENT_BEFORE_INSERT   => "serializeFields",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE   => "serializeFields",
+            BaseActiveRecord::EVENT_AFTER_FIND      => "unserializeFields",
+            BaseActiveRecord::EVENT_AFTER_UPDATE    => "unserializeFields",
+            BaseActiveRecord::EVENT_AFTER_INSERT    => "unserializeFields",
         ];
     }
 
     /**
      * @param Event $event
      */
-    public function implodeFields($event)
+    public function serializeFields($event)
     {
         foreach ($this->fields as $fielName)
         {
@@ -55,7 +50,7 @@ class Implode extends Behavior
             {
                 if (is_array($this->owner->{$fielName}))
                 {
-                    $this->owner->{$fielName} = implode($this->delimetr, $this->owner->{$fielName});
+                    $this->owner->{$fielName} = serialize($this->owner->{$fielName});
                 }
             } else
             {
@@ -68,7 +63,7 @@ class Implode extends Behavior
     /**
      * @param Event $event
      */
-    public function explodeFields($event)
+    public function unserializeFields($event)
     {
         foreach ($this->fields as $fielName)
         {
@@ -76,7 +71,7 @@ class Implode extends Behavior
             {
                 if (is_string($this->owner->{$fielName}))
                 {
-                    $this->owner->{$fielName} = explode($this->delimetr, $this->owner->{$fielName});
+                    $this->owner->{$fielName} = unserialize($this->owner->{$fielName});
                 }
             }
             else
@@ -85,6 +80,4 @@ class Implode extends Behavior
             }
         }
     }
-
-
 }

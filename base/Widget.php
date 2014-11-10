@@ -15,4 +15,16 @@ namespace skeeks\cms\base;
  * @package skeeks\cms\base
  */
 class Widget extends \yii\base\Widget
-{}
+{
+    public function init()
+    {
+        parent::init();
+        $this->_ensure();
+    }
+
+    /**
+     * Проверка целостности настроек виджета
+     */
+    protected function _ensure()
+    {}
+}

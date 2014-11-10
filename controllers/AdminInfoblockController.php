@@ -25,6 +25,9 @@ use skeeks\cms\models\searchs\User as UserSearch;
 use yii\helpers\ArrayHelper;
 
 /**
+ *
+ * @method Infoblock getCurrentModel()
+ *
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
@@ -88,6 +91,8 @@ class AdminInfoblockController extends AdminModelEditorSmartController
 
     public function actionSettings()
     {
-        return $this->output(Text::begin(['text' => 'teasdxt'])->render('default'));
+        return $this->output($this->getCurrentModel()->getRegisterdWidgetModel()->renderForm([
+            'model' => $this->getCurrentModel()
+        ]));
     }
 }
