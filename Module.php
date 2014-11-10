@@ -21,64 +21,6 @@ class Module extends base\Module
 
     public $controllerNamespace = 'skeeks\cms\controllers';
 
-
-    /**
-     * @var string
-     */
-    public $adminMenuName   = "Основное меню";
-
-    /**
-     * @var array настройки админки
-     */
-    public $adminMenuItems  =
-    [
-        [
-            "label"     => "Сайты",
-            "url"       => ["cms/admin-user-group"],
-        ],
-
-        [
-            "label"     => "Дерево страниц",
-            "url"       => ["cms/admin-tree"],
-        ],
-
-        [
-            "label"     => "Инфоблоки",
-            "url"       => ["cms/admin-infoblock"],
-        ],
-
-        [
-            "label"     => "Управление пользователями",
-            "url"       => ["cms/admin-user"],
-        ],
-
-        [
-            "label"     => "Управление группами пользователей",
-            "url"       => ["cms/admin-user-group"],
-        ],
-
-        [
-            "label"     => "Публикации",
-            "url"       => ["cms/admin-publication/index"],
-        ],
-
-        [
-            "label"     => "Комментарии",
-            "url"       => ["cms/admin-comment/index"],
-        ],
-
-        [
-            "label"     => "Голоса",
-            "url"       => ["cms/admin-vote/index"],
-        ],
-
-        [
-            "label"     => "Подписки",
-            "url"       => ["cms/admin-subscribe/index"],
-        ],
-    ];
-
-
     /**
      * Используем свой layout
      * @var string
