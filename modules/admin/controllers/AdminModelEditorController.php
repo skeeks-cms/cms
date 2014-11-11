@@ -396,10 +396,18 @@ class AdminModelEditorController extends AdminController
     {
         $model = $this->getCurrentModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
             return $this->redirect(['view', 'id' => $model->id]);
-        } else {
+        } else
+        {
+
+            if (\Yii::$app->request->isPost)
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
+
             return $this->render('_form', [
                 'model' => $model,
             ]);
@@ -413,7 +421,13 @@ class AdminModelEditorController extends AdminController
      */
     public function actionDelete()
     {
-        $this->getCurrentModel()->delete();
+        if ($this->getCurrentModel()->delete())
+        {
+            \Yii::$app->getSession()->setFlash('success', 'Запись успешно удалена');
+        } else
+        {
+            \Yii::$app->getSession()->setFlash('error', 'Не получилось удалить запись');
+        }
         return $this->redirect(['index']);
     }
 

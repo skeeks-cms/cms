@@ -10,12 +10,17 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
+use skeeks\cms\widgets\ActiveForm;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminUserController
@@ -36,4 +41,60 @@ class AdminUserController extends AdminModelEditorSmartController
 
     }
 
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+
+            self::BEHAVIOR_ACTION_MANAGER =>
+            [
+                "actions" =>
+                [
+                    'change-password' =>
+                    [
+                        "label" => "Изменение пароля",
+                        "rules" =>
+                        [
+                            [
+                                "class" => HasModel::className()
+                            ]
+                        ]
+                    ],
+                ]
+            ]
+        ]);
+    }
+
+
+    /**
+     * Updates an existing Game model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionChangePassword()
+    {
+        $model = $this->getCurrentModel();
+
+        $modelForm = new PasswordChangeForm([
+            'user' => $model
+        ]);
+
+        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
+        {
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            return $this->redirect(['change-password', 'id' => $model->id]);
+        } else
+        {
+            if (\Yii::$app->request->isPost)
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
+            }
+
+            return $this->render('_form-change-password', [
+                'model' => $modelForm,
+            ]);
+        }
+    }
 }

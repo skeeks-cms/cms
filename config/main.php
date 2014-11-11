@@ -238,6 +238,42 @@ $config =
                     ]
                 ],
             ]
+        ],
+
+        'treeTypes' =>
+        [
+            'class' => \skeeks\cms\components\TreeTypes::className(),
+
+            'components' =>
+            [
+                'news' =>
+                [
+                    'label' => 'Новостной раздел'
+                ],
+
+                'article' =>
+                [
+                    'label' => 'Раздел статей'
+                ]
+            ]
+        ],
+
+        'publicationTypes' =>
+        [
+            'class' => \skeeks\cms\components\PublicationTypes::className(),
+
+            'components' =>
+            [
+                'news' =>
+                [
+                    'label' => 'Новость'
+                ],
+
+                'article' =>
+                [
+                    'label' => 'Статья'
+                ]
+            ]
         ]
     ],
 
@@ -251,7 +287,7 @@ $config =
 
         'cms' =>
         [
-            'class'     => \skeeks\cms\Module::className(),
+            'class'             => \skeeks\cms\Module::className(),
         ],
     ],
 ];
