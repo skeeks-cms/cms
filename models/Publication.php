@@ -50,7 +50,8 @@ class Publication extends PageAdvanced
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'type' => Yii::t('app', 'Publication type'),
+            'type'      => Yii::t('app', 'Publication type'),
+            'tree_ids'  => Yii::t('app', 'Разделы'),
         ]);
     }
 
@@ -61,6 +62,7 @@ class Publication extends PageAdvanced
     {
         return array_merge(parent::rules(), [
             [['type'], 'string'],
+            [['tree_ids'], 'safe'],
         ]);
     }
 

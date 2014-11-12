@@ -24,6 +24,14 @@ use skeeks\cms\models\Tree;
     ]);
 ?>
 
+
+<?= $form->field($model, 'tree_ids')->widget(
+    \skeeks\widget\chosen\Chosen::className(),
+    [
+
+    ]);
+?>
+
 <div class="form-group">
     <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
 </div>

@@ -20,6 +20,18 @@ class CanBeLinkedToTree extends ActiveRecord
 {
     public $treeIdsFieldName = 'tree_ids';
 
+    public function attach($owner)
+    {
+        $owner->attachBehavior("implode_tree_ids", [
+            "class"  => Implode::className(),
+            "fields" =>  [
+                "tree_ids"
+            ]
+        ]);
+
+        parent::attach($owner);
+    }
+
     /**
      *
      * Найти модель к которой привязана текущая модель.
