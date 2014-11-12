@@ -59,6 +59,23 @@ class RegisteredModels extends Component
     }
 
     /**
+     * @param $code
+     * @return array
+     */
+    public function getModelDataByCode($code)
+    {
+        $modelData = (array) ArrayHelper::getValue($this->models, $code);
+
+        if (!$modelData)
+        {
+            return [];
+        }
+
+        return $modelData;
+    }
+
+
+    /**
      *
      * Получить уникальный код по названию модели
      *

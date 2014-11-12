@@ -29,6 +29,8 @@ use yii\grid\GridView;
 
         "content",
 
+        ['class' => \skeeks\cms\grid\LinkedToType::className()],
+        ['class' => \skeeks\cms\grid\LinkedToModel::className()],
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
         ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 

@@ -63,6 +63,11 @@ $config =
                 '<_c:(publication|user)>'               => 'cms/<_c>/index',
                 '<_c:(publication)>/<seo_page_name>'    => 'cms/<_c>/view',
                 '<_c:(user)>/<username>'                => 'cms/<_c>/view',
+
+                '<_a:(login|logout)>'                   => 'cms/auth/<_a>',
+
+                'skeeks-cms'                            => 'cms/cms/index',
+                'skeeks-cms/<action>'                   => 'cms/cms/<action>',
             ]
         ],
 
@@ -75,43 +80,43 @@ $config =
                 'publication' =>
                 [
                     'class'                 => 'skeeks\cms\models\Publication',
-                    'label'                 => 'Публикация',
+                    'name'                 => 'Публикация',
                 ],
 
                 'tree' =>
                 [
                     'class'             => 'skeeks\cms\models\Tree',
-                    'label'             => 'Страница',
+                    'name'             => 'Страница',
                 ],
 
                 'comment' =>
                 [
                     'class'             => 'skeeks\cms\models\Comment',
-                    'label'             => 'Комментарий',
+                    'name'             => 'Комментарий',
                 ],
 
                 'user' =>
                 [
                     'class'             => 'skeeks\cms\models\User',
-                    'label'             => 'Пользователь',
+                    'name'             => 'Пользователь',
                 ],
 
                 'userGroup' =>
                 [
                     'class'             => 'skeeks\cms\models\UserGroup',
-                    'label'             => 'Группа пользователя',
+                    'name'             => 'Группа пользователя',
                 ],
 
                 'vote'      =>
                 [
                     'class' => 'skeeks\cms\models\Vote',
-                    'label' => 'Голос'
+                    'name' => 'Голос'
                 ],
 
                 'subscribe'   =>
                 [
                     'class' => 'skeeks\cms\models\Subscribe',
-                    'label' => 'Подписка'
+                    'name' => 'Подписка'
                 ],
             ],
         ],
