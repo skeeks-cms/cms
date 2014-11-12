@@ -12,6 +12,8 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\CanBeLinkedToModel;
+use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use Yii;
 
 /**
@@ -30,6 +32,17 @@ class Publication extends PageAdvanced
         return '{{%publication}}';
     }
 
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            CanBeLinkedToModel::className(),
+            CanBeLinkedToTree::className()
+        ]);
+    }
 
     /**
      * @inheritdoc

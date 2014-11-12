@@ -21,8 +21,10 @@ use skeeks\cms\models\behaviors\HasMetaData;
 use skeeks\cms\models\behaviors\HasSeoPageUrl;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
+use skeeks\cms\models\behaviors\HasPublications;
 
 use skeeks\cms\models\Comment;
+use skeeks\cms\models\Publication;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Subscribe;
 use skeeks\cms\models\Vote;
@@ -116,6 +118,18 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                         ]
                     ],
 
+                    'publications' =>
+                    [
+                        "label"     => "Публикации",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasPublications::className()
+                            ]
+                        ]
+                    ],
+
                     'seo-page-url' =>
                     [
                         "label"     => "Адрес на сайте",
@@ -203,6 +217,23 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         $controller = App::moduleCms()->createControllerByID("admin-vote");
 
         return $this->output(App::moduleCms()->renderFile("admin-vote/index.php", [
+            'searchModel'   => $searchModel,
+            'dataProvider'  => $dataProvider,
+            'controller'    => $controller,
+        ]));
+    }
+
+    public function actionPublications()
+    {
+        $search = new Search(Publication::className());
+        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+        $searchModel    = $search->getLoadedModel();
+
+        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+
+        $controller = App::moduleCms()->createControllerByID("admin-publication");
+
+        return $this->output(App::moduleCms()->renderFile("admin-publication/index.php", [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,
