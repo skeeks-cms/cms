@@ -19,7 +19,9 @@ use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
 /**
- * @method TreeType[] getComponents()
+ * @method TreeType[]   getComponents()
+ * @method TreeType     getComponent($id)
+ *
  * Class CollectionComponents
  * @package skeeks\cms\components
  */

@@ -49,6 +49,27 @@ class Tree extends PageAdvanced
         return '{{%cms_tree}}';
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'type' => Yii::t('app', 'Tree type'),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['type'], 'string'],
+        ]);
+    }
+
     /**
      * @return string
      */

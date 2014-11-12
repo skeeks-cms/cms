@@ -30,4 +30,25 @@ class Publication extends PageAdvanced
         return '{{%publication}}';
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'type' => Yii::t('app', 'Publication type'),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['type'], 'string'],
+        ]);
+    }
+
 }

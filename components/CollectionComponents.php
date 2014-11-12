@@ -45,13 +45,27 @@ abstract class CollectionComponents extends Component
 
             if ($this->components)
             {
-                foreach ($this->components as $code => $data)
+                foreach ($this->components as $id => $data)
                 {
-                    $this->_components[$code] = new $class($data);
+                    if (ArrayHelper::getValue($data, 'enabled', true) === true)
+                    {
+                        $data['id'] = $id;
+                        $this->_components[$id] = new $class($data);
+                    }
                 }
             }
         }
 
         return $this->_components;
+    }
+
+    /**
+     * @param string $id
+     * @return Component|null
+     */
+    public function getComponent($id)
+    {
+        $components = $this->getComponents();
+        return ArrayHelper::getValue($components, $id);
     }
 }

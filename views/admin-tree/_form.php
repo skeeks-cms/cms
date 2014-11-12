@@ -14,6 +14,16 @@ use skeeks\cms\models\Tree;
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
+<?= $form->field($model, 'type')->widget(
+    \skeeks\widget\chosen\Chosen::className(), [
+            'items' => \yii\helpers\ArrayHelper::map(
+                 \Yii::$app->treeTypes->getComponents(),
+                 "id",
+                 "name"
+             ),
+    ]);
+?>
+
 <div class="form-group">
     <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
 </div>

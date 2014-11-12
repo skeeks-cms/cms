@@ -119,125 +119,14 @@ $config =
         'registeredWidgets' =>
         [
             'class' => 'skeeks\cms\components\RegisteredWidgets',
+            'widgets' => include_once 'widgets.php'
 
-            'widgets' =>
-            [
-                'skeeks\cms\widgets\text\Text' =>
-                [
-                    'label'         => 'Текст',
-                    'description'   => 'Виджет просто выводит текст',
-                    'templates'     =>
-                    [
-                        'default' =>
-                        [
-                            'label' => 'Шаблон по умолчанию'
-                        ]
-                    ],
-                    'enabled'       => true
-                ],
-
-                'skeeks\cms\widgets\infoblocks\Infoblocks' =>
-                [
-                    'label'         => 'Список инфоблоков',
-                    'description'   => 'Виджет который содержит в себе другие инфоблоки',
-                    'templates'     =>
-                    [
-                        'default' =>
-                        [
-                            'label' => 'Шаблон по умолчанию'
-                        ]
-                    ],
-                    'enabled'       => true
-                ]
-            ]
         ],
 
         'adminMenu' =>
         [
             'class' => \skeeks\cms\modules\admin\components\Menu::className(),
-
-            'groups' =>
-            [
-                'cms' =>
-                [
-                    'label'     => 'Основное',
-
-                    'items' =>
-                    [
-
-                        [
-                            "label"     => "Сайты",
-                            "url"       => ["cms/admin-user-group"],
-                        ],
-
-                        [
-                            "label"     => "Дерево страниц",
-                            "url"       => ["cms/admin-tree"],
-                        ],
-
-                        [
-                            "label"     => "Инфоблоки",
-                            "url"       => ["cms/admin-infoblock"],
-                        ],
-
-                        [
-                            "label"     => "Управление пользователями",
-                            "url"       => ["cms/admin-user"],
-                        ],
-
-                        [
-                            "label"     => "Управление группами пользователей",
-                            "url"       => ["cms/admin-user-group"],
-                        ],
-
-                        [
-                            "label"     => "Публикации",
-                            "url"       => ["cms/admin-publication/index"],
-                        ],
-
-                        [
-                            "label"     => "Комментарии",
-                            "url"       => ["cms/admin-comment/index"],
-                        ],
-
-                        [
-                            "label"     => "Голоса",
-                            "url"       => ["cms/admin-vote/index"],
-                        ],
-
-                        [
-                            "label"     => "Подписки",
-                            "url"       => ["cms/admin-subscribe/index"],
-                        ],
-                    ]
-                ],
-
-                'dev' =>
-                [
-                    'label'     => 'Для разработчика',
-                    'priority'  => 0,
-                    'enabled'   => true,
-
-                    'items' =>
-                    [
-                        [
-                            "label"     => "Генератор кода",
-                            "url"       => ["admin/gii"],
-                            'enabled'   => true,
-                            'priority'  => 0,
-                        ],
-
-                        [
-                            "label"     => "Удаление и чистка",
-                            "url"       => ["admin/clear"],
-                        ],
-                        [
-                            "label"     => "Работа с базой данных",
-                            "url"       => ["admin/db"],
-                        ],
-                    ]
-                ],
-            ]
+            'groups' => include_once 'admin-menu.php'
         ],
 
         'treeTypes' =>
@@ -248,12 +137,12 @@ $config =
             [
                 'news' =>
                 [
-                    'label' => 'Новостной раздел'
+                    'name' => 'Новостной раздел'
                 ],
 
                 'article' =>
                 [
-                    'label' => 'Раздел статей'
+                    'name'      => 'Раздел статей',
                 ]
             ]
         ],
@@ -266,12 +155,18 @@ $config =
             [
                 'news' =>
                 [
-                    'label' => 'Новость'
+                    'name' => 'Новость'
                 ],
 
                 'article' =>
                 [
-                    'label' => 'Статья'
+                    'name'      => 'Статья',
+                ],
+
+                'demo' =>
+                [
+                    'name'      => 'Демо нода',
+                    'enabled'   => false
                 ]
             ]
         ]
