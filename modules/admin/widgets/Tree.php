@@ -202,11 +202,15 @@ class Tree
             }
 
 
-
+            $controllElement = Html::checkbox('tree_id', false, ['value' => $model->id, 'style' => 'float: left; margin-left: 5px; margin-right: 5px;']);
+            $urlOptionsOpen = array_unique($newOptionsOpen);
+            $params = \Yii::$app->request->getQueryParams();
+            $params[$this->openedRequestName] = $urlOptionsOpen;
 
             return Html::tag("li",
                         Html::tag("div",
                             $openCloseLink .
+                            $controllElement .
                             Html::tag("div",
                                 Html::a($model->name, $currentLink),
                                 [
@@ -238,6 +242,37 @@ class Tree
     public function registerAssets()
     {
         Asset::register($this->getView());
+        $this->getView()->registerJs(<<<JS
+        (function(sx, $, _)
+        {
+            sx.createNamespace('classes.app', sx);
+
+            sx.classes.app.Tree = sx.classes.Component.extend({
+
+                _init: function()
+                {
+                    console.log(sx.Window.openerWidget());
+                    if (sx.Window.openerWidget())
+                    {
+                        this._parentWidget = sx.Window.openerWidget();
+
+                        this._parentWidget.trigger('selectedNodes', {'test': 'test'});
+                    }
+                },
+
+                _onDomReady: function()
+                {},
+
+                _onWindowReady: function()
+                {}
+            });
+
+            sx.app.Tree = new sx.classes.app.Tree();
+
+        })(sx, sx.$, sx._);
+JS
+    );
+
         $this->getView()->registerCss(<<<CSS
 
 .sx-tree

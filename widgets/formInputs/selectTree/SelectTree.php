@@ -11,6 +11,7 @@
 namespace skeeks\cms\widgets\formInputs\selectTree;
 
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\Tree;
 use yii\helpers\Html;
@@ -22,7 +23,7 @@ use Yii;
  * Class Widget
  * @package skeeks\cms\widgets\formInputs\selectTree
  */
-class Widget extends InputWidget
+class SelectTree extends InputWidget
 {
     /**
      * @var array the options for the Bootstrap File Input plugin. Default options have exporting enabled.
@@ -56,14 +57,20 @@ class Widget extends InputWidget
             $valueArray     = Html::getAttributeValue($this->model, $this->attribute);
             $trees          = Tree::find()->where(['id' => $valueArray])->all();
 
+            $id = "sx-id-" . Yii::$app->security->generateRandomString(6);
+            return $this->render('widget', [
+                'widget'            => $this,
+                'id'                => $id,
+                'clientOptions'     => Json::encode(
+                    [
+                        'src'   => UrlHelper::construct('/cms/admin-tree')->enableAdmin()->toString(),
+                        'name'  => $id
+                    ]
+                )
 
+            ]);
 
-            $this->getView()->registerJs(<<<JS
-
-JS
-);
-
-            $this->registerClientScript();
+            //$this->registerClientScript();
 
         } catch (Exception $e)
         {

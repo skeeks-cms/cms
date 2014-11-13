@@ -121,6 +121,7 @@ $config =
             ],
         ],
 
+        //Зарегистрированные виджеты
         'registeredWidgets' =>
         [
             'class' => 'skeeks\cms\components\RegisteredWidgets',
@@ -128,12 +129,14 @@ $config =
 
         ],
 
+        //Админское меню
         'adminMenu' =>
         [
             'class' => \skeeks\cms\modules\admin\components\Menu::className(),
             'groups' => include_once 'admin-menu.php'
         ],
 
+        //Типы разделов
         'treeTypes' =>
         [
             'class' => \skeeks\cms\components\TreeTypes::className(),
@@ -142,7 +145,7 @@ $config =
             [
                 'news' =>
                 [
-                    'name' => 'Новостной раздел'
+                    'name'      => 'Новостной раздел'
                 ],
 
                 'article' =>
@@ -152,6 +155,7 @@ $config =
             ]
         ],
 
+        //Типы публикаций
         'publicationTypes' =>
         [
             'class' => \skeeks\cms\components\PublicationTypes::className(),
@@ -173,6 +177,25 @@ $config =
                     'name'      => 'Демо нода',
                     'enabled'   => false
                 ]
+            ]
+        ],
+
+        'registeredSites' =>
+        [
+            'class' => \skeeks\cms\components\RegisteredSites::className(),
+
+            'components' =>
+            [
+                'yii2.cms.skeeks.com' =>
+                [
+                    'name'              => 'Тестовый сайт',
+                    'description'       => 'Тестовый сайт',
+                    'aliases'           =>
+                        [
+                            'demo.yii2.cms.skeeks.com'
+                        ]
+                ],
+
             ]
         ]
     ],

@@ -26,7 +26,7 @@ use skeeks\cms\models\Tree;
 
 
 <?= $form->field($model, 'tree_ids')->widget(
-    \skeeks\widget\chosen\Chosen::className(),
+    \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
     [
 
     ]);
