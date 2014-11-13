@@ -14,6 +14,7 @@ use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\Tree;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\widgets\InputWidget;
@@ -31,6 +32,8 @@ class SelectTree extends InputWidget
      * @see http://plugins.krajee.com/file-input#options
      */
     public $clientOptions = [];
+
+    public $mode = 'multi';
 
 
     /**
@@ -57,14 +60,26 @@ class SelectTree extends InputWidget
             $valueArray     = Html::getAttributeValue($this->model, $this->attribute);
             $trees          = Tree::find()->where(['id' => $valueArray])->all();
 
+            $select = Html::activeListBox($this->model, $this->attribute, [], [
+                'multiple' => true,
+                'class' => 'sx-controll-element',
+                'style' => 'display: none;'
+            ]);
+
+
             $id = "sx-id-" . Yii::$app->security->generateRandomString(6);
             return $this->render('widget', [
                 'widget'            => $this,
                 'id'                => $id,
+                'select'            => $select,
                 'clientOptions'     => Json::encode(
                     [
-                        'src'   => UrlHelper::construct('/cms/admin-tree')->enableAdmin()->toString(),
-                        'name'  => $id
+                        'src'       => UrlHelper::construct('/cms/admin-tree')
+                            ->set('mode', $this->mode)
+                            ->set('s', $valueArray)
+                            ->enableAdmin()->toString(),
+                        'name'      => $id,
+                        'selected'  => $trees
                     ]
                 )
 

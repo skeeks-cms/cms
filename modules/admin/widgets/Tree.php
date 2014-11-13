@@ -50,8 +50,9 @@ class Tree
     /**
      * @var string
      */
-    public $activeRequestName      = "a";
-    public $openedRequestName      = "o";
+    public $selectedRequestName         = "s";
+    public $openedRequestName           = "o";
+    public $mode                        = "mode";
 
     public function init()
     {
@@ -68,7 +69,7 @@ class Tree
     {}
 
 
-    protected $_activeTmp = [];
+    protected $_selectedTmp = [];
     protected $_openedTmp = [];
     protected $_countTmp = 0;
 
@@ -85,12 +86,39 @@ class Tree
             $opened = array_unique(\Yii::$app->getSession()->get('cms-tree-opened', []));
             if ($opened)
             {
-                \Yii::$app->response->redirect(UrlHelper::construct('cms/admin-tree/index', [$this->openedRequestName => $opened])->enableAdmin());
+                \Yii::$app->response->redirect(UrlHelper::construct('cms/admin-tree/index', array_merge(\Yii::$app->request->getQueryParams(), [$this->openedRequestName => $opened]))->enableAdmin());
             }
         }
 
         return $opened;
     }
+
+    /**
+     * @return array
+     */
+    protected function _getSelectedIds()
+    {
+        if ($fromRequest = (array) \Yii::$app->request->getQueryParam($this->selectedRequestName))
+        {
+            return array_unique($fromRequest);
+        }
+
+        return [];
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getMode()
+    {
+        if ($mode = \Yii::$app->request->getQueryParam($this->mode))
+        {
+            return (string) $mode;
+        }
+
+        return '';
+    }
+
     /**
      * TODO: учитывать приоритет
      * @return string
@@ -121,8 +149,9 @@ class Tree
             , ['class' => "sx-container-tree col-md-6"]) .
 
             Html::tag("div",
-                Html::a("Открыть все разделы", UrlHelper::construct("cms/admin-tree/index")->set('setting-open-all', 'true'), ['class' => 'btn btn-primary btn-sm']) .
-                Html::a("Закрыть все разделы", UrlHelper::construct("cms/admin-tree/index"), ['class' => 'btn btn-primary btn-sm'])
+                Html::a("Добавить отмеченное", '#', ['class' => 'btn btn-primary btn-sm sx-controll-btn-select'])
+                /*Html::a("Открыть все разделы", UrlHelper::construct("cms/admin-tree/index")->set('setting-open-all', 'true'), ['class' => 'btn btn-primary btn-sm']) .
+                Html::a("Закрыть все разделы", UrlHelper::construct("cms/admin-tree/index"), ['class' => 'btn btn-primary btn-sm'])*/
             , ['class' => "sx-container-controlls col-md-2"])
 
             ,['class' => 'row-fluid']
@@ -202,10 +231,62 @@ class Tree
             }
 
 
-            $controllElement = Html::checkbox('tree_id', false, ['value' => $model->id, 'style' => 'float: left; margin-left: 5px; margin-right: 5px;']);
-            $urlOptionsOpen = array_unique($newOptionsOpen);
-            $params = \Yii::$app->request->getQueryParams();
-            $params[$this->openedRequestName] = $urlOptionsOpen;
+            if ($this->_getMode() == 'multi')
+            {
+                $params = \Yii::$app->request->getQueryParams();
+                $isSelected = in_array($model->id, $this->_getSelectedIds()) ? true : false;
+                if ($isSelected)
+                {
+                    $result = [];
+                    foreach ($this->_getSelectedIds() as $id)
+                    {
+                        if ($id != $model->id)
+                        {
+                            $result[] = $id;
+                        }
+                    }
+                    $params[$this->selectedRequestName] = $result;
+                } else
+                {
+                    $params[$this->selectedRequestName] = array_unique(array_merge($this->_getSelectedIds(), [$model->id]));
+                }
+
+                $link = UrlHelper::construct("cms/admin-tree/index")->setData($params);
+
+
+                $controllElement = Html::checkbox('tree_id', $isSelected, [
+                    'value'     => $model->id,
+                    'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                    'onclick'   => 'location.href="' . $link . '"'
+                ]);
+
+            } else if ($this->_getMode() == 'single')
+            {
+                $params = \Yii::$app->request->getQueryParams();
+                $isSelected = in_array($model->id, $this->_getSelectedIds()) ? true : false;
+                if ($isSelected)
+                {
+                    $params[$this->selectedRequestName] = [];
+                } else
+                {
+                    $params[$this->selectedRequestName] = [$model->id];
+                }
+
+                $link = UrlHelper::construct("cms/admin-tree/index")->setData($params);
+
+                $controllElement = Html::radio('tree_id', $isSelected, [
+                    'value'     => $model->id,
+                    'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                    'onclick'   => 'location.href="' . $link . '"'
+                ]);
+
+            }
+
+
+
+
+
+
 
             return Html::tag("li",
                         Html::tag("div",
@@ -241,9 +322,12 @@ class Tree
 
     public function registerAssets()
     {
+        $models     = \skeeks\cms\models\Tree::find()->where(["id" => $this->_getSelectedIds()])->all();
+        $options    = Json::encode(['selected' => $models]);
+
         Asset::register($this->getView());
         $this->getView()->registerJs(<<<JS
-        (function(sx, $, _)
+        (function(window, sx, $, _)
         {
             sx.createNamespace('classes.app', sx);
 
@@ -251,25 +335,36 @@ class Tree
 
                 _init: function()
                 {
-                    console.log(sx.Window.openerWidget());
+                    var self = this;
                     if (sx.Window.openerWidget())
                     {
                         this._parentWidget = sx.Window.openerWidget();
 
-                        this._parentWidget.trigger('selectedNodes', {'test': 'test'});
+
                     }
                 },
 
                 _onDomReady: function()
-                {},
+                {
+                    var self = this;
+                    $('.sx-controll-btn-select').on('click', function()
+                    {
+                        self._parentWidget.trigger('selected', {
+                            'selected': self.get('selected')
+                        });
+
+                        window.close();
+                        return false;
+                    });
+                },
 
                 _onWindowReady: function()
                 {}
             });
 
-            sx.app.Tree = new sx.classes.app.Tree();
+            sx.app.Tree = new sx.classes.app.Tree({$options});
 
-        })(sx, sx.$, sx._);
+        })(window, sx, sx.$, sx._);
 JS
     );
 

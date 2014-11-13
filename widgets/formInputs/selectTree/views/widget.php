@@ -17,7 +17,9 @@
 
 <div id="<?= $id; ?>">
     <div class="sx-selected">
-
+        <?= $select; ?>
+        <ul>
+        </ul>
     </div>
     <div class="sx-controlls">
         <a href="#" class="btn btn-xs btn-default sx-controll-window-create">Выбрать разделы</a>
@@ -40,8 +42,9 @@
         _onDomReady: function()
         {
             var self = this;
-            this._containerSelected     = $('.sx-selected',                 this.getWrapper());
+            this._containerSelected     = $('.sx-selected ul',              this.getWrapper());
             this._containerControlls    = $('.sx-controlls',                this.getWrapper());
+            this._controllElement       = $('.sx-controll-element',         this.getWrapper());
             this._btnCreateWindow       = $('.sx-controll-window-create',   this.getWrapper());
 
             this._windowTree = null;
@@ -51,6 +54,11 @@
                 self.getWindow().open();
                 return false;
             });
+
+            if (this.get('selected'))
+            {
+                this.addTrees(this.get('selected'));
+            }
         },
 
         /**
@@ -59,17 +67,36 @@
         */
         getWindow: function()
         {
+            var self = this;
+
             if (this._windowTree === null)
             {
                 this._windowTree = new sx.classes.Window(this.get('src'), this.get('name')).setCenterOptions();
 
-                this._windowTree.bind('selectedNodes', function(e, data)
+                this._windowTree.bind('selected', function(e, data)
                 {
-                    console.log(data);
+                    self.addTrees(data.selected);
                 });
             }
 
             return this._windowTree;
+        },
+
+        addTrees: function(data)
+        {
+            var self = this;
+
+            self._controllElement.empty();
+            self._containerSelected.empty();
+
+            _.each(data, function(value, key)
+            {
+                self._controllElement.append('<option value="' + value.id + '" selected="selected">name</option>')
+                self._containerSelected.append(
+                    $('<li>')
+                        .append(value.name)
+                );
+            })
         },
 
         _onWindowReady: function()
