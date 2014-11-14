@@ -17,12 +17,6 @@ return
 
         'items' =>
         [
-
-            [
-                "label"     => "Сайты",
-                "url"       => ["cms/admin-user-group"],
-            ],
-
             [
                 "label"     => "Дерево разделов",
                 "url"       => ["cms/admin-tree"],

@@ -295,7 +295,7 @@ class Tree
                             Html::tag("div",
                                 Html::a($model->name, $currentLink),
                                 [
-                                    "class" => "sx-label-node"
+                                    "class" => "sx-label-node level-" . $model->level
                                 ]
                             ) .
                             Html::tag("div",

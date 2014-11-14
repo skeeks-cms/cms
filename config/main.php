@@ -186,28 +186,18 @@ $config =
 
             'components' =>
             [
-                'yii2.cms.skeeks.com' =>
+                /*'yii2.cms.skeeks.com' =>
                 [
                     'name'              => 'Тестовый сайт',
                     'description'       => 'Тестовый сайт',
                     'aliases'           =>
                         [
-                            'demo.yii2.cms.skeeks.com'
+                            'demo.yii2.cms.skeeks.com',
+                            'demo1.yii2.cms.skeeks.com'
                         ],
-                    'lang' => 'ru'
-                ],
-
-                'yii2.cms.skeeks.com/en' =>
-                [
-                    'name'              => 'Тестовый сайт',
-                    'description'       => 'Тестовый сайт',
-                    'aliases'           =>
-                        [
-                            'demo.yii2.cms.skeeks.com'
-                        ],
-                    'lang' => 'en'
-                ],
-
+                    'lang' => 'ru',
+                    'root' => 1
+                ],*/
             ]
         ]
     ],
