@@ -193,7 +193,19 @@ $config =
                     'aliases'           =>
                         [
                             'demo.yii2.cms.skeeks.com'
-                        ]
+                        ],
+                    'lang' => 'ru'
+                ],
+
+                'yii2.cms.skeeks.com/en' =>
+                [
+                    'name'              => 'Тестовый сайт',
+                    'description'       => 'Тестовый сайт',
+                    'aliases'           =>
+                        [
+                            'demo.yii2.cms.skeeks.com'
+                        ],
+                    'lang' => 'en'
                 ],
 
             ]
