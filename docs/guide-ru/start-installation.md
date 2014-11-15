@@ -33,6 +33,9 @@ php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
 
 # устанавливаем шаблон приложения skeeks-cms
 php composer.phar create-project skeeks/cms-app
+
+# Если делали под другим пользователем
+chown -R www-data:www-data ../
 ~~~
 
 ### - Установка с использованием Git репозитория
@@ -58,6 +61,9 @@ php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
 
 # запускаем установку cms и всех необходимых зависимостей
 php composer.phar install
+
+# Если делали под другим пользователем
+chown -R www-data:www-data ../
 ~~~
 
 ### - Установка используя FTP (пока невозможно)
