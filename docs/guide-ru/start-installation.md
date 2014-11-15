@@ -25,8 +25,8 @@
 # перейти в папку своего проекта
 cd /var/www/sites/test.ru/
 
-# установка composer (если уже установлен пропускаем этот шаг) 
-curl -sS https://getcomposer.org/installer | php
+# установка composer (если уже установлен пропускаем этот шаг). Так же следует учесть чтобы в пхп был включен модуль phar 
+php -r "readfile('https://getcomposer.org/installer');" | php
 
 # устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
 php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
@@ -44,17 +44,17 @@ sudo apt-get install git
 # перейти в папку своего проекта
 cd /var/www/sites/test.ru/
 
-# установка composer (если уже установлен пропускаем этот шаг) 
-curl -sS https://getcomposer.org/installer | php
-
-# устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
-php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
-
 # клонирование проекта из git репозитория
 git clone http://git.skeeks.com/skeeks/cms-app.git
 
 # переключаемся на релизную ветку (стабилная версия проекта)
-git checkout origin/release
+git checkout origin/master
+
+# установка composer (если уже установлен пропускаем этот шаг). Так же следует учесть чтобы в пхп был включен модуль phar 
+php -r "readfile('https://getcomposer.org/installer');" | php
+
+# устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
+php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
 
 # запускаем установку cms и всех необходимых зависимостей
 php composer.phar install
