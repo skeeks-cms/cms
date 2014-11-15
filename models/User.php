@@ -22,7 +22,7 @@ use yii\web\IdentityInterface;
 use skeeks\cms\models\behaviors\HasSubscribes;
 
 /**
- * This is the model class for table "{{%user}}".
+ * This is the model class for table "{{%cms_user}}".
  *
  * @property integer $id
  * @property string $username
@@ -67,7 +67,7 @@ class User
      */
     public static function tableName()
     {
-        return '{{%user}}';
+        return '{{%cms_user}}';
     }
 
     /**

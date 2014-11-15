@@ -7,7 +7,7 @@ class m141019_162726_create_vote_table extends Migration
 {
     public function up()
     {
-        $tableExist = $this->db->getTableSchema("{{%vote}}", true);
+        $tableExist = $this->db->getTableSchema("{{%cms_vote}}", true);
         if ($tableExist)
         {
             return true;
@@ -18,7 +18,7 @@ class m141019_162726_create_vote_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable("{{%vote}}", [
+        $this->createTable("{{%cms_vote}}", [
             'id'                    => Schema::TYPE_PK,
 
             'created_by'            => Schema::TYPE_INTEGER . ' NULL',
@@ -34,38 +34,38 @@ class m141019_162726_create_vote_table extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%vote}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%vote}} ADD INDEX(created_by);");
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD INDEX(updated_by);");
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD INDEX(created_by);");
 
-        $this->execute("ALTER TABLE {{%vote}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%vote}} ADD INDEX(updated_at);");
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD INDEX(created_at);");
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD INDEX(updated_at);");
 
-        $this->execute("ALTER TABLE {{%vote}} ADD INDEX(value);");
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD INDEX(value);");
 
-        $this->execute("ALTER TABLE {{%vote}} ADD INDEX(linked_to_model);");
-        $this->execute("ALTER TABLE {{%vote}} ADD INDEX(linked_to_value);");
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD INDEX(linked_to_model);");
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD INDEX(linked_to_value);");
 
-        $this->execute("ALTER TABLE {{%vote}} ADD UNIQUE(linked_to_model, linked_to_value, created_by);"); //на одну сущьность пользователь может подписаться 1 раз
+        $this->execute("ALTER TABLE {{%cms_vote}} ADD UNIQUE(linked_to_model, linked_to_value, created_by);"); //на одну сущьность пользователь может подписаться 1 раз
 
 
-        $this->execute("ALTER TABLE {{%vote}} COMMENT = 'Голос, плюс минус';");
+        $this->execute("ALTER TABLE {{%cms_vote}} COMMENT = 'Голос, плюс минус';");
 
         $this->addForeignKey(
-            'vote_created_by', "{{%vote}}",
-            'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'vote_created_by', "{{%cms_vote}}",
+            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(
-            'vote_updated_by', "{{%vote}}",
-            'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'vote_updated_by', "{{%cms_vote}}",
+            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
     }
 
     public function down()
     {
-        $this->dropForeignKey("vote_created_by", "{{%vote}}");
-        $this->dropForeignKey("vote_updated_by", "{{%vote}}");
+        $this->dropForeignKey("vote_created_by", "{{%cms_vote}}");
+        $this->dropForeignKey("vote_updated_by", "{{%cms_vote}}");
 
-        $this->dropTable("{{%vote}}");
+        $this->dropTable("{{%cms_vote}}");
     }
 }

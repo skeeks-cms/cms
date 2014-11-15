@@ -10,7 +10,7 @@ use yii\behaviors\BlameableBehavior;
 use skeeks\sx\models\Ref;
 use yii\base\Event;
 /**
- * This is the model class for table "{{%storage_file}}".
+ * This is the model class for table "{{%cms_storage_file}}".
  *
  * @property integer $id
  * @property string $src
@@ -59,7 +59,7 @@ class StorageFile extends Core
      */
     public static function tableName()
     {
-        return '{{%storage_file}}';
+        return '{{%cms_storage_file}}';
     }
 
     /**

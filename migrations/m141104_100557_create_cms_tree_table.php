@@ -105,12 +105,12 @@ class m141104_100557_create_cms_tree_table extends Migration
 
         $this->addForeignKey(
             'cms_tree_created_by', "{{%cms_tree}}",
-            'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(
             'cms_tree_updated_by', "{{%cms_tree}}",
-            'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
     }
 

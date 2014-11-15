@@ -7,7 +7,7 @@ class m141019_162718_create_comment_table extends Migration
 {
     public function up()
     {
-        $tableExist = $this->db->getTableSchema("{{%comment}}", true);
+        $tableExist = $this->db->getTableSchema("{{%cms_comment}}", true);
         if ($tableExist)
         {
             return true;
@@ -18,7 +18,7 @@ class m141019_162718_create_comment_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable("{{%comment}}", [
+        $this->createTable("{{%cms_comment}}", [
             'id'                    => Schema::TYPE_PK,
 
             'created_by'            => Schema::TYPE_INTEGER . ' NULL',
@@ -48,41 +48,41 @@ class m141019_162718_create_comment_table extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(created_by);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(updated_by);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(created_by);");
 
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(updated_at);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(created_at);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(updated_at);");
 
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(linked_to_model);");
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(linked_to_value);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(linked_to_model);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(linked_to_value);");
 
 
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(count_subscribe);");
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(count_vote);");
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(result_vote);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(count_subscribe);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(count_vote);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(result_vote);");
 
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(status);");
-        $this->execute("ALTER TABLE {{%comment}} ADD INDEX(status_adult);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(status);");
+        $this->execute("ALTER TABLE {{%cms_comment}} ADD INDEX(status_adult);");
 
-        $this->execute("ALTER TABLE {{%comment}} COMMENT = 'Комментарий к игре';");
+        $this->execute("ALTER TABLE {{%cms_comment}} COMMENT = 'Комментарий к игре';");
 
         $this->addForeignKey(
-            'comment_created_by', "{{%comment}}",
-            'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'comment_created_by', "{{%cms_comment}}",
+            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(
-            'comment_updated_by', "{{%comment}}",
-            'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'comment_updated_by', "{{%cms_comment}}",
+            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
     }
 
     public function down()
     {
-        $this->dropForeignKey("comment_created_by", "{{%comment}}");
-        $this->dropForeignKey("comment_updated_by", "{{%comment}}");
+        $this->dropForeignKey("comment_created_by", "{{%cms_comment}}");
+        $this->dropForeignKey("comment_updated_by", "{{%cms_comment}}");
 
-        $this->dropTable("{{%comment}}");
+        $this->dropTable("{{%cms_comment}}");
     }
 }

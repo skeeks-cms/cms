@@ -24,7 +24,7 @@ class UserAuthclient extends ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%user_authclient}}';
+        return '{{%cms_user_authclient}}';
     }
 
     /**

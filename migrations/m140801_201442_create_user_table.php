@@ -18,7 +18,7 @@ class m140801_201442_create_user_table extends Migration
 {
     public function up()
     {
-        $tableExist = $this->db->getTableSchema("{{%user}}", true);
+        $tableExist = $this->db->getTableSchema("{{%cms_user}}", true);
         if ($tableExist)
         {
             return true;
@@ -31,7 +31,7 @@ class m140801_201442_create_user_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable('{{%user}}', [
+        $this->createTable('{{%cms_user}}', [
             'id'                    => Schema::TYPE_PK,
             'username'              => Schema::TYPE_STRING . ' NOT NULL',
             'auth_key'              => Schema::TYPE_STRING . '(32) NOT NULL',
@@ -69,50 +69,32 @@ class m140801_201442_create_user_table extends Migration
             'users_votes_down'      => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые проголосовали -
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(updated_at);");
-        $this->execute("ALTER TABLE {{%user}} ADD UNIQUE(username);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(email);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(password_hash);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(password_reset_token);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(name);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(city);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(address);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(created_at);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(updated_at);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD UNIQUE(username);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(email);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(password_hash);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(password_reset_token);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(name);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(city);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(address);");
 
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(count_comment);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(count_comment);");
 
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(count_vote);");
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(result_vote);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(count_vote);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(result_vote);");
 
-        $this->execute("ALTER TABLE {{%user}} ADD INDEX(count_subscribe);");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD INDEX(count_subscribe);");
 
-        $this->execute("ALTER TABLE {{%user}} ADD `gender` ENUM(\"men\",\"women\") NOT NULL DEFAULT 'men' ;");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD `gender` ENUM(\"men\",\"women\") NOT NULL DEFAULT 'men' ;");
 
-        $this->execute("ALTER TABLE {{%user}} COMMENT = 'Пользователь';");
+        $this->execute("ALTER TABLE {{%cms_user}} COMMENT = 'Пользователь';");
 
-        $this->insert('{{%user}}', [
-            "username"              => "admin",
-            "name"                  => "Семенов Александр",
-            "city"                  => "Зеленоград",
-            "address"               => "Зеленоград, ул. Каменка, 2004-25",
-            "auth_key"              => "otv60YW-nV6-8GRI4La3vYNhu_-dmp_n",
-            "password_hash"         => '$2y$13$tEMlbu9DvkU3RDCg.sZwM.JNScy.HJXFqG.Ew.n5fwcdAPxHsFdla',
-            "password_reset_token"  => 'wn49wJLj9OMVjgj8bBzBjND4nFixyJgt_1413297645',
-            "email"                 => 'admin@skeeks.com',
-            "role"                  => 10,
-            "status"                => 10,
-        ]);
 
-        /**
-         * @var \skeeks\cms\models\User $user
-         */
-        /*$user = \skeeks\cms\models\User::find()->where(['username' => 'admin'])->one();
-        $user->setPassword('skeeks');
-        $user->save(false);*/
     }
 
     public function down()
     {
-        $this->dropTable('{{%user}}');
+        $this->dropTable('{{%cms_user}}');
     }
 }

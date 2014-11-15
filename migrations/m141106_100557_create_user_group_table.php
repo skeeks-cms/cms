@@ -18,7 +18,7 @@ class m141106_100557_create_user_group_table extends Migration
 {
     public function up()
     {
-        $tableExist = $this->db->getTableSchema("{{%user_group}}", true);
+        $tableExist = $this->db->getTableSchema("{{%cms_user_group}}", true);
         if ($tableExist)
         {
             return true;
@@ -30,7 +30,7 @@ class m141106_100557_create_user_group_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable('{{%user_group}}', [
+        $this->createTable('{{%cms_user_group}}', [
             'id'                    => Schema::TYPE_PK,
 
             'created_by'            => Schema::TYPE_INTEGER . ' NULL',
@@ -51,67 +51,82 @@ class m141106_100557_create_user_group_table extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%user_group}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%user_group}} ADD INDEX(updated_at);");
-        $this->execute("ALTER TABLE {{%user_group}} ADD INDEX(created_by);");
-        $this->execute("ALTER TABLE {{%user_group}} ADD INDEX(updated_by);");
+        $this->execute("ALTER TABLE {{%cms_user_group}} ADD INDEX(created_at);");
+        $this->execute("ALTER TABLE {{%cms_user_group}} ADD INDEX(updated_at);");
+        $this->execute("ALTER TABLE {{%cms_user_group}} ADD INDEX(created_by);");
+        $this->execute("ALTER TABLE {{%cms_user_group}} ADD INDEX(updated_by);");
 
-        $this->execute("ALTER TABLE {{%user_group}} ADD UNIQUE(groupname);");
+        $this->execute("ALTER TABLE {{%cms_user_group}} ADD UNIQUE(groupname);");
 
-        $this->execute("ALTER TABLE {{%user_group}} COMMENT = 'Группа пользователя';");
+        $this->execute("ALTER TABLE {{%cms_user_group}} COMMENT = 'Группа пользователя';");
 
         $this->addForeignKey(
-            'user_group_created_by', "{{%user_group}}",
-            'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'user_group_created_by', "{{%cms_user_group}}",
+            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(
-            'user_group_updated_by', "{{%user_group}}",
-            'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'user_group_updated_by', "{{%cms_user_group}}",
+            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
 
 
-        $this->insert('{{%user_group}}', [
+        $this->insert('{{%cms_user_group}}', [
             "groupname"             => "root",
             "description"           => "Суперпользователи",
             "status"                => 10,
         ]);
 
-        $this->insert('{{%user_group}}', [
+        $this->insert('{{%cms_user_group}}', [
             "groupname"             => "admin",
             "description"           => "Администраторы",
             "status"                => 10,
         ]);
 
-        $this->insert('{{%user_group}}', [
+        $this->insert('{{%cms_user_group}}', [
             "groupname"             => "manager",
             "description"           => "Менеджер",
             "status"                => 10,
         ]);
 
-        $this->insert('{{%user_group}}', [
+        $this->insert('{{%cms_user_group}}', [
             "groupname"             => "user",
             "description"           => "Пользователь",
             "status"                => 10,
         ]);
 
 
-        $this->execute("ALTER TABLE {{%user}} ADD `group_id` INT(11) NULL;");
+        $this->execute("ALTER TABLE {{%cms_user}} ADD `group_id` INT(11) NULL;");
 
         $this->addForeignKey(
-            'user_user_group_updated_by', "{{%user}}",
-            'group_id', '{{%user_group}}', 'id', 'RESTRICT', 'RESTRICT'
+            'user_user_group_updated_by', "{{%cms_user}}",
+            'group_id', '{{%cms_user_group}}', 'id', 'RESTRICT', 'RESTRICT'
         );
+
+
+        $this->insert('{{%cms_user}}', [
+            "username"              => "admin",
+            "name"                  => "Семенов Александр",
+            "city"                  => "Зеленоград",
+            "address"               => "Зеленоград, ул. Каменка, 2004-25",
+            "auth_key"              => "otv60YW-nV6-8GRI4La3vYNhu_-dmp_n",
+            "password_hash"         => '$2y$13$tEMlbu9DvkU3RDCg.sZwM.JNScy.HJXFqG.Ew.n5fwcdAPxHsFdla',
+            "password_reset_token"  => 'wn49wJLj9OMVjgj8bBzBjND4nFixyJgt_1413297645',
+            "email"                 => 'admin@skeeks.com',
+            "role"                  => 10,
+            "status"                => 10,
+            "group_id"              => 1,
+        ]);
     }
 
     public function down()
     {
-        $this->dropForeignKey("user_user_group_updated_by", "{{%user}}");
-        $this->dropForeignKey("user_group_created_by", "{{%user_group}}");
-        $this->dropForeignKey("user_group_updated_by", "{{%user_group}}");
+        $this->dropForeignKey("user_user_group_updated_by", "{{%cms_user}}");
+        $this->dropForeignKey("user_group_created_by", "{{%cms_user_group}}");
+        $this->dropForeignKey("user_group_updated_by", "{{%cms_user_group}}");
 
-        $this->dropColumn('{{%user}}', 'group_id');
-        $this->dropTable('{{%user_group}}');
+        $this->dropColumn('{{%cms_user}}', 'group_id');
+        $this->dropTable('{{%cms_user_group}}');
     }
 }

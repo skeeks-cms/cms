@@ -29,7 +29,7 @@ class Publication extends PageAdvanced
      */
     public static function tableName()
     {
-        return '{{%publication}}';
+        return '{{%cms_publication}}';
     }
 
 

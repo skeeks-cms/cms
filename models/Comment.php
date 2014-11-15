@@ -17,7 +17,7 @@ use Yii;
 use yii\base\Event;
 
 /**
- * This is the model class for table "{{%comment}}".
+ * This is the model class for table "{{%cms_comment}}".
  *
  * @property integer $id
  * @property integer $created_by
@@ -43,7 +43,7 @@ class Comment extends Core
      */
     public static function tableName()
     {
-        return '{{%comment}}';
+        return '{{%cms_comment}}';
     }
 
 

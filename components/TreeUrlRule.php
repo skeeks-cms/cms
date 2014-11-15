@@ -10,8 +10,11 @@
  */
 namespace skeeks\cms\components;
 use skeeks\cms\App;
+use skeeks\cms\filters\NormalizeDir;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
+use yii\helpers\Url;
+
 /**
  * Class Storage
  * @package skeeks\cms\components
@@ -19,6 +22,14 @@ use \yii\base\InvalidConfigException;
 class TreeUrlRule
     extends \yii\web\UrlRule
 {
+    /**
+     *
+     * Добавлять слэш на конце или нет
+     *
+     * @var bool
+     */
+    public $useLastDelimetr = true;
+
     public function init()
     {
         if ($this->name === null)
@@ -50,17 +61,36 @@ class TreeUrlRule
         $params             = $request->getQueryParams();
         $treeNode           = null;
 
-        //Проверить для начала зарегистрирован ли текущий сайт в базе данных, если да то нужно главнй раздел взять для него, если нет тогда по умолчанию для всех сайтов.
-        $mainRoot = Tree::findDefaultRoot();
+        if (!$pathInfo)
+        {
+            return $this->_go();
+        }
+
+        $pathInfoNormal = $this->_normalizeDir($pathInfo);
+        if ($pathInfo != $pathInfoNormal)
+        {
+            \Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal);
+        }
+
+        return $this->_go($pathInfoNormal);
+    }
+
+    protected function _go($normalizeDir = null)
+    {
+        $mainRoot = Tree::findCurrentRoot();
         if (!$mainRoot)
         {
             return false;
         }
 
-        if ($mainRoot->isRoot())
+        if ($this->useLastDelimetr)
         {
-            $treeNode           = Tree::find()->where([$mainRoot->dirAttrName => $pathInfo])->one();
+            $normalizeDir = substr($normalizeDir, 0, (strlen($normalizeDir) - 1));
         }
+
+        $treeNode           = Tree::find()->where([
+            $mainRoot->dirAttrName => $normalizeDir,
+        ])->one();
 
         if ($treeNode)
         {
@@ -69,6 +99,19 @@ class TreeUrlRule
         } else
         {
             return false;
+        }
+    }
+    protected function _normalizeDir($pathInfo)
+    {
+        $filter             = new NormalizeDir();
+        $pathInfoNormal     = $filter->filter($pathInfo);
+
+        if ($this->useLastDelimetr)
+        {
+            return $pathInfoNormal . DIRECTORY_SEPARATOR;
+        } else
+        {
+            return $pathInfoNormal;
         }
     }
 }

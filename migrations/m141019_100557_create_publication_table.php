@@ -7,7 +7,7 @@ class m141019_100557_create_publication_table extends Migration
 {
     public function up()
     {
-        $tableExist = $this->db->getTableSchema("{{%publication}}", true);
+        $tableExist = $this->db->getTableSchema("{{%cms_publication}}", true);
         if ($tableExist)
         {
             return true;
@@ -18,7 +18,7 @@ class m141019_100557_create_publication_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable("{{%publication}}", [
+        $this->createTable("{{%cms_publication}}", [
             'id'                    => Schema::TYPE_PK,
 
             'created_by'            => Schema::TYPE_INTEGER . ' NULL',
@@ -61,45 +61,45 @@ class m141019_100557_create_publication_table extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(created_by);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(updated_by);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(created_by);");
 
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(updated_at);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(created_at);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(updated_at);");
 
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(name);");
-        $this->execute("ALTER TABLE {{%publication}} ADD UNIQUE(seo_page_name);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(name);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD UNIQUE(seo_page_name);");
 
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(count_comment);");
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(count_subscribe);");
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(count_vote);");
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(result_vote);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(count_comment);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(count_subscribe);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(count_vote);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(result_vote);");
 
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(linked_to_model);");
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(linked_to_value);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(linked_to_model);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(linked_to_value);");
 
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(status);");
-        $this->execute("ALTER TABLE {{%publication}} ADD INDEX(status_adult);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(status);");
+        $this->execute("ALTER TABLE {{%cms_publication}} ADD INDEX(status_adult);");
 
-        $this->execute("ALTER TABLE {{%publication}} COMMENT = 'Публикация';");
+        $this->execute("ALTER TABLE {{%cms_publication}} COMMENT = 'Публикация';");
 
 
         $this->addForeignKey(
-            'publication_created_by', "{{%publication}}",
-            'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'publication_created_by', "{{%cms_publication}}",
+            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(
-            'publication_updated_by', "{{%publication}}",
-            'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'publication_updated_by', "{{%cms_publication}}",
+            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
     }
 
     public function down()
     {
-        $this->dropForeignKey("publication_created_by", "{{%publication}}");
-        $this->dropForeignKey("publication_updated_by", "{{%publication}}");
+        $this->dropForeignKey("publication_created_by", "{{%cms_publication}}");
+        $this->dropForeignKey("publication_updated_by", "{{%cms_publication}}");
 
-        $this->dropTable("{{%publication}}");
+        $this->dropTable("{{%cms_publication}}");
     }
 }

@@ -28,7 +28,7 @@ class UserGroup extends Core
      */
     public static function tableName()
     {
-        return '{{%user_group}}';
+        return '{{%cms_user_group}}';
     }
 
 

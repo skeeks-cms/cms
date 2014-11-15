@@ -13,6 +13,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
@@ -66,7 +67,7 @@ class AdminTreeController extends AdminModelEditorSmartController
                 [
                     'new-children' =>
                     [
-                        "label" => "Создать подраздел",
+                        "label" => "Управление подразделами",
                         "rules" =>
                         [
                             [
@@ -93,12 +94,25 @@ class AdminTreeController extends AdminModelEditorSmartController
 
             $parent->processAddNode($childTree);
 
-            $this->redirect(Url::to(["view", "id" => $childTree->primaryKey]));
+            $this->redirect(Url::to(["new-children", "id" => $parent->primaryKey]));
         }
         else
         {
-            return $this->render('_form', [
-                'model' => new Tree(),
+            $tree   = new Tree();
+            $search = new Search(Tree::className());
+            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+            $searchModel    = $search->getLoadedModel();
+
+            $dataProvider->query->andWhere([$tree->pidAttrName => $parent->primaryKey]);
+
+            $controller = App::moduleCms()->createControllerByID("admin-tree");
+
+            return $this->render('new-children', [
+                'model'         => new Tree(),
+
+                'searchModel'   => $searchModel,
+                'dataProvider'  => $dataProvider,
+                'controller'    => $controller,
             ]);
         }
     }
@@ -114,4 +128,30 @@ class AdminTreeController extends AdminModelEditorSmartController
         return $this->output($widget->run());
     }
 
+
+    /**
+     * Lists all Game models.
+     * @return mixed
+     */
+    public function actionList()
+    {
+        $modelSeacrhClass = $this->_modelSearchClassName;
+
+        if (!$modelSeacrhClass)
+        {
+            $search = new Search($this->_modelClassName);
+            $dataProvider = $search->search(\Yii::$app->request->queryParams);
+            $searchModel = $search->getLoadedModel();
+        } else
+        {
+            $searchModel = new $modelSeacrhClass();
+            $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+        }
+
+        return $this->render('list', [
+            'searchModel'   => $searchModel,
+            'dataProvider'  => $dataProvider,
+            'controller'    => $this,
+        ]);
+    }
 }

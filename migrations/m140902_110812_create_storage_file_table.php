@@ -7,7 +7,7 @@ class m140902_110812_create_storage_file_table extends Migration
 {
     public function up()
     {
-        $tableExist = $this->db->getTableSchema("{{%storage_file}}", true);
+        $tableExist = $this->db->getTableSchema("{{%cms_storage_file}}", true);
         if ($tableExist)
         {
             return true;
@@ -18,7 +18,7 @@ class m140902_110812_create_storage_file_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable("{{%storage_file}}", [
+        $this->createTable("{{%cms_storage_file}}", [
             'id'                    => Schema::TYPE_PK,
 
             'src'                   => Schema::TYPE_STRING. '(255) NOT NULL',
@@ -73,58 +73,58 @@ class m140902_110812_create_storage_file_table extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD UNIQUE(src);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD UNIQUE(src);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD UNIQUE(cluster_id, cluster_file);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD UNIQUE(cluster_id, cluster_file);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(cluster_id);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(cluster_file);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(cluster_id);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(cluster_file);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(created_by);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(updated_by);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(created_by);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(updated_at);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(created_at);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(updated_at);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(size);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(extension);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(status);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(status_adult);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(name_to_save);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(size);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(extension);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(status);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(status_adult);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(name_to_save);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(name);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(type);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(mime_type);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(name);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(type);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(mime_type);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(image_height);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(image_width);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(image_height);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(image_width);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(count_comment);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(count_subscribe);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(count_vote);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(result_vote);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(count_comment);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(count_subscribe);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(count_vote);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(result_vote);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(linked_to_model);");
-        $this->execute("ALTER TABLE {{%storage_file}} ADD INDEX(linked_to_value);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(linked_to_model);");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} ADD INDEX(linked_to_value);");
 
-        $this->execute("ALTER TABLE {{%storage_file}} COMMENT = 'Файл';");
+        $this->execute("ALTER TABLE {{%cms_storage_file}} COMMENT = 'Файл';");
 
         $this->addForeignKey(
-            'storage_file_created_by', "{{%storage_file}}",
-            'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'storage_file_created_by', "{{%cms_storage_file}}",
+            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(
-            'storage_file_updated_by', "{{%storage_file}}",
-            'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'storage_file_updated_by', "{{%cms_storage_file}}",
+            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
     }
 
     public function down()
     {
-        $this->dropForeignKey("storage_file_created_by", "{{%storage_file}}");
-        $this->dropForeignKey("storage_file_updated_by", "{{%storage_file}}");
+        $this->dropForeignKey("storage_file_created_by", "{{%cms_storage_file}}");
+        $this->dropForeignKey("storage_file_updated_by", "{{%cms_storage_file}}");
 
-        $this->dropTable("{{%storage_file}}");
+        $this->dropTable("{{%cms_storage_file}}");
     }
 }

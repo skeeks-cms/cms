@@ -73,12 +73,12 @@ class m141109_100557_create_cms_infoblock_table extends Migration
 
         $this->addForeignKey(
             'cms_infoblock_created_by', "{{%cms_infoblock}}",
-            'created_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(
             'cms_infoblock_updated_by', "{{%cms_infoblock}}",
-            'updated_by', '{{%user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
     }
 

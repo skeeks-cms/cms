@@ -18,7 +18,7 @@ use Yii;
 
 
 /**
- * This is the model class for table "{{%subscribe}}".
+ * This is the model class for table "{{%cms_subscribe}}".
  *
  * @property integer $id
  * @property string $linked_to_model
@@ -31,7 +31,7 @@ class Subscribe extends Core
      */
     public static function tableName()
     {
-        return '{{%subscribe}}';
+        return '{{%cms_subscribe}}';
     }
 
     /**

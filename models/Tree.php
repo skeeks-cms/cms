@@ -104,4 +104,12 @@ class Tree extends PageAdvanced
     {
         return self::find()->where(['main_root' => 1])->one();
     }
+
+    /**
+     * @return Tree
+     */
+    static public function findCurrentRoot()
+    {
+        return self::findDefaultRoot();
+    }
 }

@@ -20,7 +20,7 @@ class m140814_223103_create_user_authclient_table extends Migration
 {
     public function up()
     {
-        $tableExist = $this->db->getTableSchema("{{%user_authclient}}", true);
+        $tableExist = $this->db->getTableSchema("{{%cms_user_authclient}}", true);
         if ($tableExist)
         {
             return true;
@@ -32,7 +32,7 @@ class m140814_223103_create_user_authclient_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable("{{%user_authclient}}", [
+        $this->createTable("{{%cms_user_authclient}}", [
             'id'                    => Schema::TYPE_PK,
             'user_id'               => Schema::TYPE_INTEGER . ' NOT NULL',
             'provider'              => Schema::TYPE_STRING. '(50)',
@@ -42,22 +42,22 @@ class m140814_223103_create_user_authclient_table extends Migration
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%user_authclient}} ADD INDEX(user_id);");
-        $this->execute("ALTER TABLE {{%user_authclient}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%user_authclient}} ADD INDEX(updated_at);");
-        $this->execute("ALTER TABLE {{%user_authclient}} ADD INDEX(provider);");
-        $this->execute("ALTER TABLE {{%user_authclient}} ADD INDEX(provider_identifier);");
+        $this->execute("ALTER TABLE {{%cms_user_authclient}} ADD INDEX(user_id);");
+        $this->execute("ALTER TABLE {{%cms_user_authclient}} ADD INDEX(created_at);");
+        $this->execute("ALTER TABLE {{%cms_user_authclient}} ADD INDEX(updated_at);");
+        $this->execute("ALTER TABLE {{%cms_user_authclient}} ADD INDEX(provider);");
+        $this->execute("ALTER TABLE {{%cms_user_authclient}} ADD INDEX(provider_identifier);");
 
         $this->addForeignKey(
-            'fk_user_id', "{{%user_authclient}}",
-            'user_id', '{{%user}}', 'id', 'CASCADE', 'CASCADE'
+            'fk_user_id', "{{%cms_user_authclient}}",
+            'user_id', '{{%cms_user}}', 'id', 'CASCADE', 'CASCADE'
         );
 
     }
 
     public function down()
     {
-        $this->dropForeignKey("fk_user_id", "{{%user_authclient}}");
-        $this->dropTable("{{%user_authclient}}");
+        $this->dropForeignKey("fk_user_id", "{{%cms_user_authclient}}");
+        $this->dropTable("{{%cms_user_authclient}}");
     }
 }

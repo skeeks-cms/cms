@@ -17,7 +17,7 @@ use Yii;
 use skeeks\sx\models\Ref;
 use yii\base\Event;
 /**
- * This is the model class for table "{{%vote}}".
+ * This is the model class for table "{{%cms_vote}}".
  *
  * @property integer $id
  * @property integer $value
@@ -31,7 +31,7 @@ class Vote extends Core
      */
     public static function tableName()
     {
-        return '{{%vote}}';
+        return '{{%cms_vote}}';
     }
 
     /**
