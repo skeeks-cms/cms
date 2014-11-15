@@ -91,17 +91,24 @@ class m140801_201442_create_user_table extends Migration
         $this->execute("ALTER TABLE {{%user}} COMMENT = 'Пользователь';");
 
         $this->insert('{{%user}}', [
-            "username"              => "semenov",
+            "username"              => "admin",
             "name"                  => "Семенов Александр",
             "city"                  => "Зеленоград",
             "address"               => "Зеленоград, ул. Каменка, 2004-25",
             "auth_key"              => "otv60YW-nV6-8GRI4La3vYNhu_-dmp_n",
-            "password_hash"         => '$2y$13$uQTuHAVweWENBA08dpsb7Ov2p0sj4t1c9AV8S1OkXszwBQB/gBToS',
+            "password_hash"         => '$2y$13$tEMlbu9DvkU3RDCg.sZwM.JNScy.HJXFqG.Ew.n5fwcdAPxHsFdla',
             "password_reset_token"  => 'wn49wJLj9OMVjgj8bBzBjND4nFixyJgt_1413297645',
-            "email"                 => 'semenov@skeeks.com',
+            "email"                 => 'admin@skeeks.com',
             "role"                  => 10,
             "status"                => 10,
         ]);
+
+        /**
+         * @var \skeeks\cms\models\User $user
+         */
+        /*$user = \skeeks\cms\models\User::find()->where(['username' => 'admin'])->one();
+        $user->setPassword('skeeks');
+        $user->save(false);*/
     }
 
     public function down()

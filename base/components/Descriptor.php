@@ -133,5 +133,12 @@ class Descriptor
         return (string) "@ " . \Yii::$app->getFormatter()->asDate($this->startDevelopmentDate, "y") . "-" . \Yii::$app->getFormatter()->asDate(time(), "y") .  "; " . $this->toString();
     }
 
+    /**
+     * @return string
+     */
+    public function getPovered()
+    {
+        return 'Разработка <a href="http://www.skeeks.com/" rel="external">SkeekS cms</a>';
+    }
 
 }
