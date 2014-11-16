@@ -20,21 +20,25 @@ return
             [
                 "label"     => "Дерево разделов",
                 "url"       => ["cms/admin-tree"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
             ],
 
             [
                 "label"     => "Инфоблоки",
                 "url"       => ["cms/admin-infoblock"],
+
             ],
 
             [
                 "label"     => "Управление пользователями",
                 "url"       => ["cms/admin-user"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users.png']
             ],
 
             [
                 "label"     => "Управление группами пользователей",
                 "url"       => ["cms/admin-user-group"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png']
             ],
 
             [

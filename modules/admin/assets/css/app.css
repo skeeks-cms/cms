@@ -191,6 +191,7 @@ body.sidebar-hidden footer.sx-admin-footer
 {
     background: none;
     padding-bottom: 40px;
+    padding-left: 10px;
     z-index: 1;
     width: 270px;
 }
@@ -210,7 +211,7 @@ body.sidebar-hidden footer.sx-admin-footer
 
     .sx-sidebar .sidebar-menu
     {
-        width: 250px;
+        width: 240px;
         border: 1px solid #20a8d8;
         margin-bottom: 0px;
         margin-top: 20px;
@@ -287,8 +288,13 @@ body.sidebar-hidden footer.sx-admin-footer
 
                 .sidebar ul.nav.nav-sidebar li a .sx-icon img
                 {
-                    width: 20px;
+                    width: 16px;
                     margin-left: 7px;
+                }
+
+                .sidebar ul.nav.nav-sidebar li a .txt
+                {
+                    font-size: 11px;
                 }
 
 
