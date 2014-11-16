@@ -380,9 +380,15 @@ class AdminModelEditorController extends AdminController
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
-            return $this->redirect(['view', 'id' => $model->id]);
+            \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
+            return $this->redirect(['index']);
         } else
         {
+            if (\Yii::$app->request->isPost)
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
+
             return $this->render('_form', [
                 'model' => $model,
             ]);

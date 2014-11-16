@@ -137,6 +137,48 @@ class StaticBlock extends Core
         return static::find()->where(['code' => (string) $code])->one();
     }
 
+
+
+
+
+
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setDefaultValue($value)
+    {
+        $values = $this->getValues();
+        $values[self::DEFAULT_VALUE_SECTION] = $value;
+        $this->setAttribute('value', $values);
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @param null $sections
+     * @return $this
+     */
+    public function setValue($value, $sections = null)
+    {
+        $values = $this->getValues();
+        if (!$sections)
+        {
+            return $this->setDefaultValue($value);
+        }
+
+        if (is_string($sections))
+        {
+            $values = $this->getValues();
+            $values[$sections] = $value;
+            $this->setAttribute('value', $values);
+            return $this;
+        }
+
+        return $this;
+    }
+
     /**
      * @return array
      */

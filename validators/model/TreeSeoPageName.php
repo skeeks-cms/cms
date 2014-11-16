@@ -52,7 +52,10 @@ class TreeSeoPageName
                 return $this->_ok();
             }
 
-            $find   = $parent->findChildrens()->where([$this->_model->pageAttrName => $seoPageName])->one();
+            $find   = $parent->findChildrens()->where([
+                $this->_model->pageAttrName => $seoPageName,
+                $this->_model->pidAttrName => $this->_model->getPid()
+            ])->one();
         }
 
         if ($find)

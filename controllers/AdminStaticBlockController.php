@@ -61,4 +61,69 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
         ]);
     }
 
+    /**
+     * Creates a new Game model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        /**
+         * @var $model \skeeks\cms\base\db\ActiveRecord
+         */
+        $modelClass = $this->_modelClassName;
+        $model      = new $modelClass();
+
+
+        if ($model->load(\Yii::$app->request->post()))
+        {
+            $value = $model->value;
+            $model->value = [];
+
+            $model->setValue($value);
+            $model->save(false);
+
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else
+        {
+            if (\Yii::$app->request->isPost)
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
+
+            return $this->render('_form', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Updates an existing Game model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionUpdate()
+    {
+        $model = $this->getCurrentModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        {
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            return $this->redirect(['update', 'id' => $model->id]);
+        } else
+        {
+
+            if (\Yii::$app->request->isPost)
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
+
+            $model->value = $model->getDefaultValue();
+
+            return $this->render('_form', [
+                'model' => $model,
+            ]);
+        }
+    }
 }
