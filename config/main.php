@@ -29,6 +29,7 @@ $config =
             'class' => 'skeeks\cms\components\Storage',
             'clusters' =>
             [
+                'local' =>
                 [
                     'class'                 => 'skeeks\cms\components\storage\ClusterLocal',
                     "id"                    => "local",
