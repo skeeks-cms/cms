@@ -179,27 +179,6 @@ $config =
                 ]
             ]
         ],
-
-        'registeredSites' =>
-        [
-            'class' => \skeeks\cms\components\RegisteredSites::className(),
-
-            'components' =>
-            [
-                /*'yii2.cms.skeeks.com' =>
-                [
-                    'name'              => 'Тестовый сайт',
-                    'description'       => 'Тестовый сайт',
-                    'aliases'           =>
-                        [
-                            'demo.yii2.cms.skeeks.com',
-                            'demo1.yii2.cms.skeeks.com'
-                        ],
-                    'lang' => 'ru',
-                    'root' => 1
-                ],*/
-            ]
-        ]
     ],
 
 

@@ -27,9 +27,11 @@ class Action extends Component
     public $label   = "";
 
     public $priority    = null;
-    public $icon        = null;
     public $method      = null;
     public $confirm     = null;
+
+    public $icon     = null;
+    public $img      = null;
 
     public $rules       = [];
 
@@ -107,6 +109,7 @@ class Action extends Component
 
         return $url;
     }
+
 
 
 }

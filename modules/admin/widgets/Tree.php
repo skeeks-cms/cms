@@ -286,6 +286,18 @@ class Tree
 
 
 
+            $additionalName = '';
+            if ($model->main_root)
+            {
+                $additionalName = 'по умолчанию';
+            } else if ($model->level == 0)
+            {
+                $models = \skeeks\cms\models\Site::getAllKeyTreeId();
+                if (isset($models[$model->id]))
+                {
+                    $additionalName = $models[$model->id]->getName();
+                }
+            }
 
 
             return Html::tag("li",
@@ -293,7 +305,7 @@ class Tree
                             $openCloseLink .
                             $controllElement .
                             Html::tag("div",
-                                Html::a($model->name, $currentLink),
+                                Html::a($model->name . ($additionalName ? ' (' . $additionalName . ')': ''), $currentLink),
                                 [
                                     "class" => "sx-label-node level-" . $model->level
                                 ]

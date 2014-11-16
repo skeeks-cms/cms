@@ -39,7 +39,7 @@ class m141116_100557_create_teable_static_block extends Migration
             'created_at'            => Schema::TYPE_INTEGER . ' NULL',
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
-            'code'                  => Schema::TYPE_STRING . '(32) NULL',
+            'code'                  => Schema::TYPE_STRING . '(32) NOT NULL',
             'description'           => Schema::TYPE_TEXT . ' NULL',
             'value'                 => Schema::TYPE_TEXT . ' NULL',
 

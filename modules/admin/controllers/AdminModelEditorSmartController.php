@@ -59,6 +59,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     'descriptions' =>
                     [
                         "label"     => "Описание",
+                        "icon"     => "glyphicon glyphicon-paperclip",
                         "rules"     =>
                         [
                             [
@@ -71,6 +72,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     'files' =>
                     [
                         "label"     => "Файлы",
+                        "icon"     => "glyphicon glyphicon-folder-open",
                         "rules"     =>
                         [
                             [
@@ -84,6 +86,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     'comments' =>
                     [
                         "label"     => "Комментарии",
+                        'icon'      => 'glyphicon glyphicon-comment',
                         "rules"     =>
                         [
                             [
@@ -96,6 +99,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     'votes' =>
                     [
                         "label"     => "Голоса",
+                        'icon'      => 'glyphicon glyphicon-thumbs-up',
                         "rules"     =>
                         [
                             [

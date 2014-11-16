@@ -112,6 +112,7 @@ class m141104_100557_create_cms_tree_table extends Migration
             'cms_tree_updated_by', "{{%cms_tree}}",
             'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
         );
+
     }
 
     public function down()

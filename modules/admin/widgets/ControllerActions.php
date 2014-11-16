@@ -116,9 +116,16 @@ class ControllerActions
                 "newWindowName"     => $action->getNewWindowName()
             ]);
 
+            $icon = '';
+            if ($action->icon)
+            {
+                $icon = Html::tag('span', '', ['class' => $action->icon]);
+            }
+
             $actionDataJson = Json::encode($actionData);
             $result[] = Html::tag("li",
-                Html::a($label, $action->getUrlData(), $linkOptions),
+                Html::a($icon . '  ' . $label, $action->getUrlData(), $linkOptions)
+                ,
                 [
                     "class" => $this->currentActionCode == $code ? "active" : "",
                     "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;"

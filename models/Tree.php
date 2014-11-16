@@ -94,6 +94,11 @@ class Tree extends PageAdvanced
             return  DIRECTORY_SEPARATOR;
         }
     }
+    
+    public function getBaseUrl()
+    {
+
+    }
 
 
     /**

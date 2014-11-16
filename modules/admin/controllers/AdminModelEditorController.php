@@ -79,12 +79,14 @@ class AdminModelEditorController extends AdminController
                     "index" =>
                     [
                         "label"         => "Список",
+                        "icon"         => "glyphicon glyphicon-th-list",
                         "rules"         => NoModel::className()
                     ],
 
                     "create" =>
                     [
                         "label"         => "Добавить",
+                        "icon"          => "glyphicon glyphicon-plus",
                         "rules"         => NoModel::className()
                     ],
 
