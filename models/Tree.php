@@ -12,6 +12,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
@@ -42,6 +43,7 @@ class Tree extends PageAdvanced
         }
 
         $result[] = TreeBehavior::className();
+        $result[HasPageOptions::className()] = HasPageOptions::className();
         return $result;
     }
     /**
@@ -61,6 +63,7 @@ class Tree extends PageAdvanced
         return array_merge(parent::attributeLabels(), [
             'type' => Yii::t('app', 'Tree type'),
             'pid_main' => Yii::t('app', 'Pid main'),
+            'page_options' => Yii::t('app', 'Page Options'),
         ]);
     }
 
@@ -72,6 +75,7 @@ class Tree extends PageAdvanced
         return array_merge(parent::rules(), [
             [['type'], 'string'],
             [['pid_main'], 'integer'],
+            [['page_options'], 'safe'],
         ]);
     }
 

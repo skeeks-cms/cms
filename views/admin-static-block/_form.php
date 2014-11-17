@@ -45,8 +45,8 @@ JS
 <form id="select-site">
     <?=
         \skeeks\widget\chosen\Chosen::widget([
-            'name' => 'section',
-            'value' => \Yii::$app->request->get('section'),
+            'name' => 'site',
+            'value' => \Yii::$app->request->get('site'),
             'items' =>
                 \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\Site::getAll(),
@@ -55,6 +55,20 @@ JS
              ),
         ]);
     ?>
+
+    <?=
+        \skeeks\widget\chosen\Chosen::widget([
+            'name' => 'lang',
+            'value' => \Yii::$app->request->get('lang'),
+            'items' =>
+                \yii\helpers\ArrayHelper::map(
+                 \Yii::$app->langs->getComponents(),
+                 "id",
+                 "name"
+             ),
+        ]);
+    ?>
+
     <input type="hidden" name="id" value="<?= $model->id; ?>" />
 </form>
 <hr />

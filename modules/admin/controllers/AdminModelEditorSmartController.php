@@ -18,6 +18,7 @@ use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMetaData;
+use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\HasSeoPageUrl;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
@@ -159,6 +160,18 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                         ]
                     ],
 
+                    'page-options' =>
+                    [
+                        "label"     => "Дополнительные свойства",
+                        'icon'      => 'glyphicon glyphicon-plus-sign',
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasPageOptions::className()
+                            ]
+                        ]
+                    ],
 
                 ]
             ]
@@ -271,6 +284,21 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         } else
         {
             return $this->output(App::moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
+
+    public function actionPageOptions()
+    {
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        {
+            return $this->redirect(['page-options', 'id' => $model->id]);
+        } else
+        {
+            return $this->output(App::moduleAdmin()->renderFile("base-actions/page-options.php", [
                 "model" => $this->getModel()
             ]));
         }

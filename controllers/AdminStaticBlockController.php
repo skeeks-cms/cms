@@ -80,7 +80,7 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
             $value = $model->value;
             $model->value = [];
 
-            $model->setValue($value, \Yii::$app->request->get('section'));
+            $model->setValue($value, \Yii::$app->request->get('site'));
             $model->save(false);
 
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
@@ -116,7 +116,7 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
             $valueNew = $model->value;
             $model->value = $valueOld;
 
-            $model->setValue($valueNew, \Yii::$app->request->get('section'));
+            $model->setValue($valueNew, \Yii::$app->request->get('site'));
             $model->save(false);
 
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
@@ -130,7 +130,7 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
 
-            $model->value = $model->getValue(\Yii::$app->request->get('section'));
+            $model->value = $model->getValue(\Yii::$app->request->get('site'));
 
             return $this->render('_form', [
                 'model' => $model,
