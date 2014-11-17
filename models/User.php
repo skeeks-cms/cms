@@ -80,6 +80,7 @@ class User
             TimestampBehavior::className(),
             HasSubscribes::className(),
 
+            behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
                 "fields" =>

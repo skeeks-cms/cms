@@ -45,6 +45,8 @@ class StaticBlock extends Core
                 "class"  => behaviors\Serialize::className(),
                 'fields' => ['value']
             ],
+
+            behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
                 "fields" =>

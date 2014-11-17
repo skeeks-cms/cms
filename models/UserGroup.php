@@ -38,6 +38,7 @@ class UserGroup extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
+            behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
                 "fields" =>

@@ -75,6 +75,7 @@ abstract class PageAdvanced extends Page
             HasSubscribes::className(),
             HasVotes::className(),
             HasDescriptionsBehavior::className(),
+            behaviors\HasFiles::className() =>
             [
                 "class"  => HasFiles::className(),
                 "fields" =>

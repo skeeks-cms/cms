@@ -42,6 +42,8 @@ class Infoblock extends Core
                 "class"  => behaviors\Serialize::className(),
                 'fields' => ['config', 'rules']
             ],
+
+            behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
                 "fields" =>
