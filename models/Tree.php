@@ -60,6 +60,7 @@ class Tree extends PageAdvanced
     {
         return array_merge(parent::attributeLabels(), [
             'type' => Yii::t('app', 'Tree type'),
+            'pid_main' => Yii::t('app', 'Pid main'),
         ]);
     }
 
@@ -70,6 +71,7 @@ class Tree extends PageAdvanced
     {
         return array_merge(parent::rules(), [
             [['type'], 'string'],
+            [['pid_main'], 'integer'],
         ]);
     }
 
@@ -100,10 +102,10 @@ class Tree extends PageAdvanced
         {
             if ($this->getDir())
             {
-                return  DIRECTORY_SEPARATOR . $this->getDir();
+                return  \Yii::$app->request->getHostInfo() . DIRECTORY_SEPARATOR . $this->getDir();
             } else
             {
-                return  DIRECTORY_SEPARATOR;
+                return  \Yii::$app->request->getHostInfo();
             }
 
         }

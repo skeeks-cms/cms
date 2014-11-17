@@ -83,7 +83,7 @@ $config =
                 'publication' =>
                 [
                     'class'                 => 'skeeks\cms\models\Publication',
-                    'name'                 => 'Публикация',
+                    'name'                  => 'Публикация',
                 ],
 
                 'tree' =>
@@ -207,6 +207,50 @@ $config =
                     'name'      => 'Демо нода',
                     'enabled'   => false
                 ]
+            ]
+        ],
+
+        //Опции страницы
+        'pageOptions' =>
+        [
+            'class' => '\skeeks\cms\components\PageOptions',
+
+            'components' =>
+            [
+                'meta_title' =>
+                [
+                    'name' => 'Мета title'
+                ],
+
+                'meta_keywords' =>
+                [
+                    'name' => 'Мета keywords'
+                ],
+
+                'meta_description' =>
+                [
+                    'name' => 'Мета description'
+                ],
+            ]
+        ],
+
+
+        //Опции страницы
+        'langs' =>
+        [
+            'class' => '\skeeks\cms\components\Langs',
+
+            'components' =>
+            [
+                'ru' =>
+                [
+                    'name' => 'Русский'
+                ],
+
+                'en' =>
+                [
+                    'name' => 'Английский'
+                ],
             ]
         ],
     ],

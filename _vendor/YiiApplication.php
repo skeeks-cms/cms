@@ -12,6 +12,8 @@
 namespace yii\web;
 
 use skeeks\cms\components\CurrentSite;
+use skeeks\cms\components\Langs;
+use skeeks\cms\components\PageOptions;
 use skeeks\cms\components\PublicationTypes;
 use skeeks\cms\components\RegisteredLayouts;
 use skeeks\cms\components\RegisteredModels;
@@ -30,6 +32,8 @@ use skeeks\cms\modules\admin\components\Menu;
  * @property Menu                           $adminMenu
  * @property CurrentSite                    $currentSite
  * @property RegisteredLayouts              $registeredLayouts
+ * @property Langs                          $langs
+ * @property PageOptions                    $pageOptions
  *
  * Class Application
  * @package yii\web

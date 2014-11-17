@@ -337,7 +337,7 @@ class TreeBehavior extends ActiveRecordBehavior
         }
 
         $this->owner->setAttribute($this->hasChildrenAttrName, 1);
-        $this->owner->save();
+        $this->owner->save(false);
 
         return $target;
     }
