@@ -37,7 +37,28 @@ class TreeController extends Controller
      */
     public function actionView(Tree $model)
     {
-        return $this->output($model->primaryKey);
+        $viewName = 'default';
+
+        //Если задан тип страницы
+        if ($type = $model->getType())
+        {
+            //Если у этого типа задан шаблон по умолчанию
+            if ($template = $type->getTemplate())
+            {
+                $viewName = $template->id;
+            }
+
+            if ($layout = $type->getLayout())
+            {
+                $this->layout = $layout->path;
+            }
+        }
+
+
+
+        return $this->render($viewName, [
+            'model' => $model
+        ]);
     }
 
 }

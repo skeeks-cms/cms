@@ -34,6 +34,7 @@ class Site extends Core
 {
     static public $sites = null;
     static public $sitesKeyTreeId = null;
+    static public $sitesKeyHostName = null;
 
     /**
      * @inheritdoc
@@ -149,6 +150,30 @@ class Site extends Core
     }
 
     /**
+     * @return static[];
+     */
+    static public function getAllKeyHostName()
+    {
+        if (static::$sitesKeyHostName === null)
+        {
+            $models = static::getAll();
+            if ($models)
+            {
+                foreach ($models as $model)
+                {
+                    static::$sitesKeyHostName[$model->host_name] = $model;
+                }
+            } else
+            {
+                static::$sitesKeyHostName = [];
+            }
+        }
+
+        return static::$sitesKeyHostName;
+    }
+
+
+    /**
      * @param $id
      * @return static
      */
@@ -172,5 +197,13 @@ class Site extends Core
     public function getName()
     {
         return $this->name ? $this->name : $this->host_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return '//' . $this->host_name;
     }
 }

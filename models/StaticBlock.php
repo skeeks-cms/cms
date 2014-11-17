@@ -203,7 +203,7 @@ class StaticBlock extends Core
     {
         if ($sections)
         {
-            if (is_string($sections))
+            if (is_string($sections) || is_int($sections))
             {
                 if (isset($this->getValues()[$sections]))
                 {

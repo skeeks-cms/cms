@@ -69,7 +69,7 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
     public function actionCreate()
     {
         /**
-         * @var $model \skeeks\cms\base\db\ActiveRecord
+         * @var $model StaticBlock
          */
         $modelClass = $this->_modelClassName;
         $model      = new $modelClass();
@@ -80,7 +80,7 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
             $value = $model->value;
             $model->value = [];
 
-            $model->setValue($value);
+            $model->setValue($value, \Yii::$app->request->get('section'));
             $model->save(false);
 
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
@@ -105,13 +105,24 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
      */
     public function actionUpdate()
     {
+        /**
+         * @var $model StaticBlock
+         */
         $model = $this->getCurrentModel();
+        $valueOld = $model->value;
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        if ($model->load(\Yii::$app->request->post()))
         {
+            $valueNew = $model->value;
+            $model->value = $valueOld;
+
+            $model->setValue($valueNew, \Yii::$app->request->get('section'));
+            $model->save(false);
+
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
             return $this->redirect(['update', 'id' => $model->id]);
-        } else
+        }
+        else
         {
 
             if (\Yii::$app->request->isPost)
@@ -119,7 +130,7 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
 
-            $model->value = $model->getDefaultValue();
+            $model->value = $model->getValue(\Yii::$app->request->get('section'));
 
             return $this->render('_form', [
                 'model' => $model,

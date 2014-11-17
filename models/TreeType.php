@@ -20,4 +20,41 @@ class TreeType extends Model
 {
     public $id;
     public $name;
+
+    /**
+     * @var string
+     */
+    public $layout;
+
+    /**
+     * @var string
+     */
+    public $template;
+
+
+    /**
+     * @return null|Layout
+     */
+    public function getLayout()
+    {
+        if ($this->layout)
+        {
+            return \Yii::$app->registeredLayouts->getComponent($this->layout);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|TreeType
+     */
+    public function getTemplate()
+    {
+        if ($this->template)
+        {
+            return \Yii::$app->treeTypes->getComponent($this->template);
+        }
+
+        return null;
+    }
 }

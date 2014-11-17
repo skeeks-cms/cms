@@ -58,6 +58,7 @@ class m141104_100557_create_cms_tree_table extends Migration
             
             
             'pid'                   => Schema::TYPE_INTEGER . ' NULL',
+            'pid_main'              => Schema::TYPE_INTEGER . ' NULL',
             'pids'                  => Schema::TYPE_STRING . '(255) NULL',
             'level'                 => Schema::TYPE_INTEGER . ' DEFAULT 0',
             'dir'                   => Schema::TYPE_TEXT . ' NULL',
@@ -86,12 +87,14 @@ class m141104_100557_create_cms_tree_table extends Migration
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(status_adult);");
 
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(pid);");
+        $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(pid_main);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(pids);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(level);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(priority);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(has_children);");
 
         $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(pid, seo_page_name);");
+        $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(pid_main, dir);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(main_root);");
 
         $this->execute("ALTER TABLE {{%cms_tree}} COMMENT = 'Страницы дерево';");
@@ -102,6 +105,12 @@ class m141104_100557_create_cms_tree_table extends Migration
             'cms_tree_pid_cms_tree', "{{%cms_tree}}",
             'pid', '{{%cms_tree}}', 'id', 'RESTRICT', 'RESTRICT'
         );
+
+        $this->addForeignKey(
+            'pid_main_pid_cms_tree', "{{%cms_tree}}",
+            'pid_main', '{{%cms_tree}}', 'id', 'RESTRICT', 'RESTRICT'
+        );
+
 
         $this->addForeignKey(
             'cms_tree_created_by', "{{%cms_tree}}",
@@ -117,6 +126,7 @@ class m141104_100557_create_cms_tree_table extends Migration
 
     public function down()
     {
+        $this->dropForeignKey("pid_main_pid_cms_tree", "{{%cms_tree}}");
         $this->dropForeignKey("cms_tree_pid_cms_tree", "{{%cms_tree}}");
         $this->dropForeignKey("cms_tree_created_by", "{{%cms_tree}}");
         $this->dropForeignKey("cms_tree_updated_by", "{{%cms_tree}}");

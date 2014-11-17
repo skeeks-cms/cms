@@ -66,6 +66,7 @@ class TreeUrlRule
             return $this->_go();
         }
 
+        //Если урл преобразован, редирректим по новой
         $pathInfoNormal = $this->_normalizeDir($pathInfo);
         if ($pathInfo != $pathInfoNormal)
         {
@@ -77,20 +78,33 @@ class TreeUrlRule
 
     protected function _go($normalizeDir = null)
     {
-        $mainRoot = Tree::findCurrentRoot();
-        if (!$mainRoot)
-        {
-            return false;
-        }
-
         if ($this->useLastDelimetr)
         {
             $normalizeDir = substr($normalizeDir, 0, (strlen($normalizeDir) - 1));
         }
 
-        $treeNode           = Tree::find()->where([
-            $mainRoot->dirAttrName => $normalizeDir,
-        ])->one();
+        if (!$normalizeDir) //главная страница
+        {
+            $treeNode = Tree::findCurrentRoot();
+            if (!$treeNode)
+            {
+                return false;
+            }
+
+        } else //второстепенная страница
+        {
+            $treeRoot = Tree::findCurrentRoot();
+            if (!$treeRoot)
+            {
+                return false;
+            }
+
+            $treeNode           = Tree::find()->where([
+                $treeRoot->dirAttrName      => $normalizeDir,
+                $treeRoot->pidMainAttrName  => $treeRoot->id,
+            ])->one();
+
+        }
 
         if ($treeNode)
         {
@@ -101,6 +115,13 @@ class TreeUrlRule
             return false;
         }
     }
+
+
+    /**
+     * Преобразование path, убираем лишние слэши, если надо добавляем последний слэш
+     * @param $pathInfo
+     * @return string
+     */
     protected function _normalizeDir($pathInfo)
     {
         $filter             = new NormalizeDir();

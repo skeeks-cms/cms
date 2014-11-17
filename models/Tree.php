@@ -19,6 +19,9 @@ use Yii;
 use yii\db\ActiveQuery;
 
 /**
+ *
+ * @property string $type
+ *
  * Class Tree
  * @package skeeks\cms\models
  */
@@ -75,29 +78,40 @@ class Tree extends PageAdvanced
      */
     public function createUrl()
     {
-        if ($this->getDir())
+        $sites = Site::getAllKeyTreeId();
+        if ($this->isRoot())
         {
-            return  DIRECTORY_SEPARATOR . $this->getDir();
+            $site = $sites[$this->id];
         } else
         {
-            return  DIRECTORY_SEPARATOR;
+            $site = $sites[$this->getPidMain()];
+        }
+
+        if ($site)
+        {
+            if ($this->getDir())
+            {
+                return  $site->getBaseUrl() .  DIRECTORY_SEPARATOR . $this->getDir();
+            } else
+            {
+                return  $site->getBaseUrl();
+            }
+        } else
+        {
+            if ($this->getDir())
+            {
+                return  DIRECTORY_SEPARATOR . $this->getDir();
+            } else
+            {
+                return  DIRECTORY_SEPARATOR;
+            }
+
         }
     }
 
     public function createAbsoluteUrl()
     {
-        if ($this->getDir())
-        {
-            return  DIRECTORY_SEPARATOR . $this->getDir();
-        } else
-        {
-            return  DIRECTORY_SEPARATOR;
-        }
-    }
-    
-    public function getBaseUrl()
-    {
-
+        return $this->createUrl();
     }
 
 
@@ -111,10 +125,29 @@ class Tree extends PageAdvanced
     }
 
     /**
-     * @return Tree
+     * @return static
      */
     static public function findCurrentRoot()
     {
-        return self::findDefaultRoot();
+        if ($site = \Yii::$app->currentSite->get())
+        {
+            return self::find()->where(['id' => $site->cms_tree_id])->one();
+        } else
+        {
+            return self::findDefaultRoot();
+        }
+    }
+
+    /**
+     * @return null|TreeType
+     */
+    public function getType()
+    {
+        if ($this->type)
+        {
+            return \Yii::$app->treeTypes->getComponent($this->type);
+        }
+
+        return null;
     }
 }

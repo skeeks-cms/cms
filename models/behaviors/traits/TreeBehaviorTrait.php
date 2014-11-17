@@ -21,6 +21,7 @@ use skeeks\cms\models\Tree;
  * @method bool                 isRoot()
  *
  * @property string $pidAttrName
+ * @property string $pidMainAttrName
  * @property string $pidsAttrName
  * @property string $levelAttrName
  * @property string $dirAttrName

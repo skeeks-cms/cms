@@ -36,7 +36,8 @@ use yii\validators\Validator;
  */
 class TreeBehavior extends ActiveRecordBehavior
 {
-    public $pidAttrName         = "pid";
+    public $pidAttrName         = "pid"; //Непосредственный родитель
+    public $pidMainAttrName     = "pid_main"; //Корневой родитель
     public $pidsAttrName        = "pids";
     public $levelAttrName       = "level";
     public $dirAttrName         = "dir";
@@ -88,7 +89,24 @@ class TreeBehavior extends ActiveRecordBehavior
         {
             $this->generateSeoPageName();
         }
+
+
+
+        //Обновляем главного родителя
+        if ($this->getLevel() == 0)
+        {
+            $this->owner->{$this->pidMainAttrName} = null;
+        } else if ($this->getLevel() == 1)
+        {
+            $this->owner->{$this->pidMainAttrName} = $this->getPid();
+        } else
+        {
+            $pids = explode($this->delimetr, $this->owner->{$this->pidsAttrName});
+            $this->owner->{$this->pidMainAttrName} = array_shift($pids);
+        }
     }
+
+
 
     public function beforeDeleteNode(Event $event)
     {
@@ -488,5 +506,13 @@ class TreeBehavior extends ActiveRecordBehavior
     public function getPid()
     {
         return (int) $this->owner->{$this->pidAttrName};
+    }
+
+    /**
+     * @return int
+     */
+    public function getPidMain()
+    {
+        return (int) $this->owner->{$this->pidMainAttrName};
     }
 }

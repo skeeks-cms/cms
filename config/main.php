@@ -72,6 +72,8 @@ $config =
             ]
         ],
 
+        'currentSite' => ['class' => 'skeeks\cms\components\CurrentSite'],
+
         'registeredModels' =>
         [
             'class' => 'skeeks\cms\components\RegisteredModels',
@@ -127,7 +129,6 @@ $config =
         [
             'class' => 'skeeks\cms\components\RegisteredWidgets',
             'widgets' => include_once 'widgets.php'
-
         ],
 
         //Админское меню
@@ -137,6 +138,8 @@ $config =
             'groups' => include_once 'admin-menu.php'
         ],
 
+
+
         //Типы разделов
         'treeTypes' =>
         [
@@ -144,7 +147,7 @@ $config =
 
             'components' =>
             [
-                'news' =>
+                /*'news' =>
                 [
                     'name'      => 'Новостной раздел'
                 ],
@@ -152,8 +155,34 @@ $config =
                 'article' =>
                 [
                     'name'      => 'Раздел статей',
-                ]
+                ]*/
             ]
+        ],
+
+        'treeTemplates' =>
+        [
+            'class'         => '\skeeks\cms\components\TreeTemplates',
+            /*'components' =>
+            [
+                'home' =>
+                [
+                    'name' => 'Главная страница',
+                    'code' => 'home'
+                ]
+            ]*/
+        ],
+
+        'registeredLayouts' =>
+        [
+            'class'         => '\skeeks\cms\components\RegisteredLayouts',
+            /*'components'    =>
+            [
+                'default' =>
+                [
+                    'name' => 'По умолчанию',
+                    'path' => '@app/views/layouts/main.php'
+                ]
+            ]*/
         ],
 
         //Типы публикаций

@@ -11,9 +11,10 @@
 
 namespace yii\web;
 
+use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\PublicationTypes;
+use skeeks\cms\components\RegisteredLayouts;
 use skeeks\cms\components\RegisteredModels;
-use skeeks\cms\components\RegisteredSites;
 use skeeks\cms\components\RegisteredWidgets;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\components\TreeTypes;
@@ -27,7 +28,8 @@ use skeeks\cms\modules\admin\components\Menu;
  * @property RegisteredWidgets              $registeredWidgets
  * @property RegisteredModels               $registeredModels
  * @property Menu                           $adminMenu
- * @property RegisteredSites                $registeredSites
+ * @property CurrentSite                    $currentSite
+ * @property RegisteredLayouts              $registeredLayouts
  *
  * Class Application
  * @package yii\web
