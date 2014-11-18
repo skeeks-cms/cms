@@ -44,7 +44,7 @@ class HasMultiLangAndSiteFields extends ActiveRecord
     {
         parent::init();
 
-        if (!$this->currentSite)
+        /*if (!$this->currentSite)
         {
             $this->currentSite = \Yii::$app->currentSite;
         }
@@ -52,25 +52,26 @@ class HasMultiLangAndSiteFields extends ActiveRecord
         if (!$this->currentLang)
         {
             $this->currentSite = \Yii::$app->language;
-        }
+        }*/
     }
 
-    public function events()
+    /*public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_INSERT      => "beforeInsertMultifields",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE      => "beforeUpdateMultifields",
         ];
     }
 
-    public function beforeInsertMultifields(Event $event)
+    public function beforeUpdateMultifields(Event $event)
     {
         foreach ($this->fields as $fieldName)
         {
+            print_r($this->owner);die;
             $value = $this->owner->{$fieldName};
             $this->owner->{$fieldName} = [];
-            $this->setMultiFieldValue($fieldName, $value);
+            //$this->setMultiFieldValue($fieldName, $value);
         }
-    }
+    }*/
 
 
 
@@ -80,8 +81,8 @@ class HasMultiLangAndSiteFields extends ActiveRecord
      */
     public function attach($owner)
     {
-        $owner->attachBehavior("serialize_multi_lang_and_site_fields", [
-            "class"  => Serialize::className(),
+        $owner->attachBehavior("json_multi_lang_and_site_fields", [
+            "class"  => HasJsonFieldsBehavior::className(),
             "fields" => $this->fields
         ]);
 
@@ -174,6 +175,9 @@ class HasMultiLangAndSiteFields extends ActiveRecord
             if ($this->currentSite instanceof Site)
             {
                 $site = $this->currentSite->primaryKey;
+            } else
+            {
+                $site = $this->currentSite;
             }
         }
 
@@ -184,10 +188,14 @@ class HasMultiLangAndSiteFields extends ActiveRecord
             if ($this->currentLang instanceof Lang)
             {
                 $lang = $this->currentLang->id;
+            } else
+            {
+                $lang = $this->currentLang;
             }
         }
 
         $allValues = $this->getMultiFieldValues($field);
+
 
         if ($site && $lang)
         {
@@ -213,13 +221,14 @@ class HasMultiLangAndSiteFields extends ActiveRecord
 
         } else if ($lang)
         {
+
             if (isset($allValues[$lang][self::DEFAULT_VALUE_SECTION]))
             {
                 return $allValues[$lang][self::DEFAULT_VALUE_SECTION];
             }
         }
 
-        return $this->getMultiFieldValue($field);
+        return $this->getMultiFieldDefaultValue($field);
     }
 
 

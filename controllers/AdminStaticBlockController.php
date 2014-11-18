@@ -74,22 +74,6 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
         $modelClass = $this->_modelClassName;
         $model      = new $modelClass();
 
-        if ($site = \Yii::$app->request->get('site'))
-        {
-            $model->setCurrentSite($site);
-        } else
-        {
-            $model->setCurrentSite(null);
-        }
-
-        if ($lang = \Yii::$app->request->get('lang'))
-        {
-            $model->setCurrentLang($lang);
-        } else
-        {
-            $model->setCurrentLang(null);
-        }
-
         if ($model->load(\Yii::$app->request->post()))
         {
             $model->save(false);
@@ -120,14 +104,13 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
          * @var $model StaticBlock
          */
         $model = $this->getCurrentModel();
-        $valueOld = $model->value;
+        $oldValue = $model->value;
 
         if ($model->load(\Yii::$app->request->post()))
         {
-            $valueNew = $model->value;
-            $model->value = $valueOld;
+            $newValue = $model->value;
+            $model->value = ArrayHelper::merge($oldValue, $model->value);
 
-            $model->setValue($valueNew, \Yii::$app->request->get('site'));
             $model->save(false);
 
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
@@ -135,13 +118,10 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
         }
         else
         {
-
             if (\Yii::$app->request->isPost)
             {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
-
-            $model->value = $model->getValue(\Yii::$app->request->get('site'));
 
             return $this->render('_form', [
                 'model' => $model,
