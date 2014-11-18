@@ -68,9 +68,22 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                         <?= App::moduleAdmin()->getCurrentSite() ? App::moduleAdmin()->getCurrentSite()->host_name : 'Сайт'?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
+                          <? if (App::moduleAdmin()->getCurrentSite()) : ?>
+                              <li>
+                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', ''); ?>" data-method="post">
+                                    Сбросить сайт
+                                </a>
+                              </li>
+                          <? endif; ?>
+
                         <? foreach ($sites as $site) : ?>
-                            <li><a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); ?>" data-method="post"><?= $site->host_name; ?> (<?= $site->name; ?>)</a></li>
+                            <li>
+                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); ?>" data-method="post">
+                                    <?= $site->host_name; ?> (<?= $site->name; ?>)
+                                </a>
+                            </li>
                         <? endforeach; ?>
+
                       </ul>
                     </div>
                 </li>
@@ -83,6 +96,15 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                         <?= App::moduleAdmin()->getCurrentLang() ? App::moduleAdmin()->getCurrentLang()->name . ' (' . App::moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
+
+                          <? if (App::moduleAdmin()->getCurrentLang()) : ?>
+                              <li>
+                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', ''); ?>" data-method="post">
+                                    Сбросить язык
+                                </a>
+                              </li>
+                          <? endif; ?>
+
                         <? foreach ($langs as $lang) : ?>
                             <li><a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', $lang->id); ?>" data-method="post"><?= $lang->name; ?> (<?= $lang->id; ?>)</a></li>
                         <? endforeach; ?>

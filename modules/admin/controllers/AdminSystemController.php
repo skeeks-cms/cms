@@ -50,17 +50,14 @@ class AdminSystemController extends AdminController
 
     public function actionSession()
     {
-
-        $site = \Yii::$app->request->get('site');
-        if ($site)
+        if (\Yii::$app->request->get('site') !== null)
         {
-            \Yii::$app->getSession()->set('site', $site);
+            \Yii::$app->getSession()->set('site', \Yii::$app->request->get('site'));
         }
 
-        $lang = \Yii::$app->request->get('lang');
-        if ($lang)
+        if (\Yii::$app->request->get('lang') !== null)
         {
-            \Yii::$app->getSession()->set('lang', $lang);
+            \Yii::$app->getSession()->set('lang', \Yii::$app->request->get('lang'));
         }
 
         return $this->redirect(\Yii::$app->request->getReferrer());

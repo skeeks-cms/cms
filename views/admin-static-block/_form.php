@@ -9,69 +9,6 @@ use skeeks\cms\models\Tree;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<? $this->registerJs(<<<JS
-(function(sx, $, _)
-{
-    sx.createNamespace('classes.app', sx);
-
-    sx.classes.app.SelectSite = sx.classes.Widget.extend({
-
-        _init: function()
-        {
-
-        },
-
-        _onDomReady: function()
-        {
-            var self = this;
-            this._JForm = this.getWrapper();
-            this._JSelectSite = $('select', this.getWrapper());
-
-            this._JSelectSite.on('change', function()
-            {
-                self.getWrapper().submit();
-            });
-        },
-
-        _onWindowReady: function()
-        {}
-    });
-
-    new sx.classes.app.SelectSite('#select-site');
-})(sx, sx.$, sx._);
-JS
-) ?>
-
-<form id="select-site">
-    <?=
-        \skeeks\widget\chosen\Chosen::widget([
-            'name' => 'site',
-            'value' => \Yii::$app->request->get('site'),
-            'items' =>
-                \yii\helpers\ArrayHelper::map(
-                 \skeeks\cms\models\Site::getAll(),
-                 "id",
-                 "host_name"
-             ),
-        ]);
-    ?>
-
-    <?=
-        \skeeks\widget\chosen\Chosen::widget([
-            'name' => 'lang',
-            'value' => \Yii::$app->request->get('lang'),
-            'items' =>
-                \yii\helpers\ArrayHelper::map(
-                 \Yii::$app->langs->getComponents(),
-                 "id",
-                 "name"
-             ),
-        ]);
-    ?>
-
-    <input type="hidden" name="id" value="<?= $model->id; ?>" />
-</form>
-<hr />
 
 <?php $form = ActiveForm::begin(); ?>
 
