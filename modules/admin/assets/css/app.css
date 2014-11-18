@@ -33,6 +33,13 @@ body.sidebar-hidden .main
 {
     color: #a6ed18;
 }
+
+.navbar .navbar-nav.navbar-right:last-child
+{
+    padding-left: 15px;
+    border-left: 1px solid #d1d4d7;
+}
+
 footer.sx-admin-footer
 {
     width: 100%;

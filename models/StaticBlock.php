@@ -13,7 +13,9 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\behaviors\traits\HasMultiLangAndSiteFieldsTrait;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -28,6 +30,7 @@ class StaticBlock extends Core
     const DEFAULT_VALUE_SECTION = '_';
 
     use behaviors\traits\HasFiles;
+    use HasMultiLangAndSiteFieldsTrait;
     /**
      * @inheritdoc
      */
@@ -41,8 +44,10 @@ class StaticBlock extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
+
+            HasMultiLangAndSiteFields::className() =>
             [
-                "class"  => behaviors\Serialize::className(),
+                'class' => HasMultiLangAndSiteFields::className(),
                 'fields' => ['value']
             ],
 
@@ -141,79 +146,4 @@ class StaticBlock extends Core
 
 
 
-
-
-
-
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function setDefaultValue($value)
-    {
-        $values = $this->getValues();
-        $values[self::DEFAULT_VALUE_SECTION] = $value;
-        $this->setAttribute('value', $values);
-        return $this;
-    }
-
-    /**
-     * @param $value
-     * @param null $sections
-     * @return $this
-     */
-    public function setValue($value, $sections = null)
-    {
-        $values = $this->getValues();
-        if (!$sections)
-        {
-            return $this->setDefaultValue($value);
-        }
-
-        if (is_string($sections))
-        {
-            $values = $this->getValues();
-            $values[$sections] = $value;
-            $this->setAttribute('value', $values);
-            return $this;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getValues()
-    {
-        return (array) $this->value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultValue()
-    {
-        return (string) ArrayHelper::getValue($this->getValues(), self::DEFAULT_VALUE_SECTION);
-    }
-
-    /**
-     * @param null $sections
-     * @return string
-     */
-    public function getValue($sections = null)
-    {
-        if ($sections)
-        {
-            if (is_string($sections) || is_int($sections))
-            {
-                if (isset($this->getValues()[$sections]))
-                {
-                    return (string) ArrayHelper::getValue($this->getValues(), $sections);
-                }
-            }
-        }
-
-        return $this->getDefaultValue();
-    }
 }

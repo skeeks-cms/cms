@@ -13,6 +13,7 @@ namespace skeeks\cms\modules\admin;
 use skeeks\cms\base\Module as CmsModule;
 use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\Site;
 use skeeks\cms\modules\admin\components\UrlRule;
 
 /**
@@ -112,5 +113,36 @@ class Module extends CmsModule
         }
 
         return false;
+    }
+
+
+    /**
+     * @return null|\skeeks\cms\models\Lang
+     */
+    public function getCurrentLang()
+    {
+        $langId = (string) \Yii::$app->getSession()->get('lang');
+
+        if ($langId)
+        {
+            return \Yii::$app->langs->getComponent($langId);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|Site
+     */
+    public function getCurrentSite()
+    {
+        $siteId = \Yii::$app->getSession()->get('site');
+
+        if ($siteId)
+        {
+            return Site::findById($siteId);
+        }
+
+        return null;
     }
 }

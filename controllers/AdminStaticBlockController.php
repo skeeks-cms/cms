@@ -74,13 +74,24 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
         $modelClass = $this->_modelClassName;
         $model      = new $modelClass();
 
+        if ($site = \Yii::$app->request->get('site'))
+        {
+            $model->setCurrentSite($site);
+        } else
+        {
+            $model->setCurrentSite(null);
+        }
+
+        if ($lang = \Yii::$app->request->get('lang'))
+        {
+            $model->setCurrentLang($lang);
+        } else
+        {
+            $model->setCurrentLang(null);
+        }
 
         if ($model->load(\Yii::$app->request->post()))
         {
-            $value = $model->value;
-            $model->value = [];
-
-            $model->setValue($value, \Yii::$app->request->get('site'));
             $model->save(false);
 
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');

@@ -10,6 +10,11 @@
  */
 namespace skeeks\cms\models\behaviors;
 use skeeks\cms\base\behaviors\ActiveRecord;
+use skeeks\cms\models\Lang;
+use skeeks\cms\models\Site;
+use yii\base\Event;
+use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class HasPageOptions
@@ -22,6 +27,52 @@ class HasMultiLangAndSiteFields extends ActiveRecord
      * @var string
      */
     public $fields = [];
+
+
+    /**
+     * @var null|Site|int|string
+     */
+    public $currentSite = null;
+
+    /**
+     * @var null|Lang|string
+     */
+    public $currentLang = null;
+
+
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->currentSite)
+        {
+            $this->currentSite = \Yii::$app->currentSite;
+        }
+
+        if (!$this->currentLang)
+        {
+            $this->currentSite = \Yii::$app->language;
+        }
+    }
+
+    public function events()
+    {
+        return [
+            BaseActiveRecord::EVENT_BEFORE_INSERT      => "beforeInsertMultifields",
+        ];
+    }
+
+    public function beforeInsertMultifields(Event $event)
+    {
+        foreach ($this->fields as $fieldName)
+        {
+            $value = $this->owner->{$fieldName};
+            $this->owner->{$fieldName} = [];
+            $this->setMultiFieldValue($fieldName, $value);
+        }
+    }
+
+
 
     /**
      * @param \skeeks\cms\base\db\ActiveRecord $owner
@@ -37,6 +88,210 @@ class HasMultiLangAndSiteFields extends ActiveRecord
         parent::attach($owner);
     }
 
+
+    /**
+     * @param Site|int|string $site
+     * @return \skeeks\cms\base\db\ActiveRecord
+     */
+    public function setCurrentSite($site)
+    {
+        $this->currentSite = $site;
+        return $this->owner;
+    }
+    /**
+     * @param Lang|string $lang
+     * @return \skeeks\cms\base\db\ActiveRecord
+     */
+    public function setCurrentLang($lang)
+    {
+        $this->currentLang = $lang;
+        return $this->owner;
+    }
+
+
+    /**
+     * @param $field
+     * @param $value
+     * @return \skeeks\cms\base\db\ActiveRecord
+     */
+    public function setMultiFieldValue($field, $value)
+    {
+        $site = null;
+        if ($this->currentSite)
+        {
+            if ($this->currentSite instanceof Site)
+            {
+                $site = (string) $this->currentSite->primaryKey;
+            } else
+            {
+                $site = (string) $this->currentSite;
+            }
+        }
+
+
+        $lang = null;
+        if ($this->currentLang)
+        {
+            if ($this->currentLang instanceof Lang)
+            {
+                $lang = (string) $this->currentLang->id;
+            } else
+            {
+                $lang = (string) $this->currentLang;
+            }
+        }
+
+        $allValues = $this->getMultiFieldValues($field);
+
+        if ($site && $lang)
+        {
+            $allValues[$site][$lang][self::DEFAULT_VALUE_SECTION] = $value;
+        } else if ($site)
+        {
+            $allValues[$site][self::DEFAULT_VALUE_SECTION] = $value;
+        } else if($lang)
+        {
+            $allValues[$lang][self::DEFAULT_VALUE_SECTION] = $value;
+        } else
+        {
+            $allValues[self::DEFAULT_VALUE_SECTION] = $value;
+        }
+
+        $this->owner->{$field} = $allValues;
+
+        return $this->owner;
+    }
+
+    /**
+     * @param string $field
+     * @return mixed
+     */
+    public function getMultiFieldValue($field)
+    {
+        $site = null;
+        if ($this->currentSite)
+        {
+            if ($this->currentSite instanceof Site)
+            {
+                $site = $this->currentSite->primaryKey;
+            }
+        }
+
+
+        $lang = null;
+        if ($this->currentLang)
+        {
+            if ($this->currentLang instanceof Lang)
+            {
+                $lang = $this->currentLang->id;
+            }
+        }
+
+        $allValues = $this->getMultiFieldValues($field);
+
+        if ($site && $lang)
+        {
+            if (isset($allValues[$site][$lang][self::DEFAULT_VALUE_SECTION]))
+            {
+                return $allValues[$site][$lang][self::DEFAULT_VALUE_SECTION];
+
+            } else if (isset($allValues[$site][self::DEFAULT_VALUE_SECTION]))
+            {
+                return $allValues[$site][self::DEFAULT_VALUE_SECTION];
+
+            } else if (isset($allValues[$lang][self::DEFAULT_VALUE_SECTION]))
+            {
+                return $allValues[$lang][self::DEFAULT_VALUE_SECTION];
+            }
+
+        } else if ($site)
+        {
+            if (isset($allValues[$site][self::DEFAULT_VALUE_SECTION]))
+            {
+                return $allValues[$site][self::DEFAULT_VALUE_SECTION];
+            }
+
+        } else if ($lang)
+        {
+            if (isset($allValues[$lang][self::DEFAULT_VALUE_SECTION]))
+            {
+                return $allValues[$lang][self::DEFAULT_VALUE_SECTION];
+            }
+        }
+
+        return $this->getMultiFieldValue($field);
+    }
+
+
+    /**
+     *
+     * Значение поля для сайта
+     *
+     * @param string $field
+     * @param Site|int|string $site
+     * @return array|null
+     */
+    public function getMultiFieldSiteValues($field, $site)
+    {
+        if ($site instanceof Site)
+        {
+            $site = $site->primaryKey;
+        }
+
+        if (is_string($site) || is_int($site))
+        {
+            return ArrayHelper::getValue($this->getMultiFieldValues($field), $site);
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * Получить значение для какого то языка
+     *
+     * @param string $field
+     * @param int|string $lang
+     * @return array|null
+     */
+    public function getMultiFieldLangValues($field, $lang)
+    {
+        if ($lang instanceof Lang)
+        {
+            $lang = $lang->id;
+        }
+
+        if (is_string($lang) || is_int($lang))
+        {
+            return ArrayHelper::getValue($this->getMultiFieldValues($field), $lang);
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * Значение по умолчанию.
+     *
+     * @param $field
+     * @return mixed
+     */
+    public function getMultiFieldDefaultValue($field)
+    {
+        return ArrayHelper::getValue($this->getMultiFieldValues($field), self::DEFAULT_VALUE_SECTION);
+    }
+
+    /**
+     *
+     * Все значения поля.
+     *
+     * @param $field
+     * @return array
+     */
+    public function getMultiFieldValues($field)
+    {
+        return (array) $this->owner->{$field};
+    }
 
 
 }

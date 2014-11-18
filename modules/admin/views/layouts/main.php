@@ -46,20 +46,52 @@ $sidebarHidden = App::getAuth()->getIsGuest();
 
     <? endif; ?>
 
-    <ul class="nav navbar-nav visible-md visible-lg">
+    <!--<ul class="nav navbar-nav visible-md visible-lg">
         <li>&nbsp;</li>
         <li>
-            <?= Html::button('Перейти на сайт', [
+            <?/*= Html::button('Перейти на сайт', [
                 'class' => 'btn btn-default',
                 'onclick' => 'sx.helpers.Url.redirect("' . \yii\helpers\Url::home() . '"); return false;'
-            ])?>
+            ])*/?>
         </li>
-    </ul>
+    </ul>-->
 
     <ul class="nav navbar-nav navbar-right visible-md visible-lg">
-        <li><span class="timer"><i class="icon-clock"></i> <span id="clock"><!-- JavaScript clock will be displayed here, if you want to remove clock delete parent <li> --></span></span></li>
+        <!--<li><span class="timer"><i class="icon-clock"></i> <span id="clock"></span></span></li>-->
         <li class="dropdown visible-md visible-lg"></li>
         <? if (!Yii::$app->user->isGuest): ?>
+
+            <? if ($sites = \skeeks\cms\models\Site::getAll()) : ?>
+                <li>
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <?= App::moduleAdmin()->getCurrentSite() ? App::moduleAdmin()->getCurrentSite()->host_name : 'Сайт'?> <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <? foreach ($sites as $site) : ?>
+                            <li><a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); ?>" data-method="post"><?= $site->host_name; ?> (<?= $site->name; ?>)</a></li>
+                        <? endforeach; ?>
+                      </ul>
+                    </div>
+                </li>
+            <? endif; ?>
+
+            <? if ($langs = \Yii::$app->langs->getComponents()) : ?>
+                <li>
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <?= App::moduleAdmin()->getCurrentLang() ? App::moduleAdmin()->getCurrentLang()->name . ' (' . App::moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'?> <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <? foreach ($langs as $lang) : ?>
+                            <li><a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', $lang->id); ?>" data-method="post"><?= $lang->name; ?> (<?= $lang->id; ?>)</a></li>
+                        <? endforeach; ?>
+                      </ul>
+                    </div>
+                </li>
+            <? endif; ?>
+
+
         <li class="dropdown visible-md visible-lg">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-settings"></i><!--<span class="badge">!</span>--></a>
             <ul class="dropdown-menu">
