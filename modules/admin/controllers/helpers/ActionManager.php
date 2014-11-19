@@ -13,6 +13,7 @@ use skeeks\cms\Exception;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use yii\base\Behavior;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Action
@@ -117,7 +118,24 @@ class ActionManager extends Behavior
             }
         }
 
-        return $result;
+
+        $lastResult = [];
+        if ($result)
+        {
+            foreach ($result as $code => $actionData)
+            {
+                if (!ArrayHelper::getValue($actionData, 'priority', 0))
+                {
+                    unset($result[$code]);
+                    $lastResult[$code] = $actionData;
+                }
+            }
+
+            $lastResult = array_merge($lastResult, $result);
+        }
+
+
+        return $lastResult;
     }
 
     /**

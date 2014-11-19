@@ -13,6 +13,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use Yii;
 
@@ -38,9 +39,16 @@ class Infoblock extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
+
+            HasMultiLangAndSiteFields::className() =>
+            [
+                'class' => HasMultiLangAndSiteFields::className(),
+                'fields' => ['config']
+            ],
+
             [
                 "class"  => behaviors\Serialize::className(),
-                'fields' => ['config', 'rules']
+                'fields' => ['rules']
             ],
 
             behaviors\HasFiles::className() =>
@@ -93,9 +101,9 @@ class Infoblock extends Core
     {
         return array_merge(parent::rules(), [
             [['name'], 'required'],
-            [['description', 'widget', 'config', 'rules', 'template'], 'string'],
+            [['description', 'widget', 'rules', 'template'], 'string'],
             [['code'], 'unique'],
-            [["images", "files", "image_cover", "image"], 'safe'],
+            [["images", "files", "image_cover", "image", 'config', 'multiConfig'], 'safe'],
         ]);
     }
 
@@ -163,8 +171,28 @@ class Infoblock extends Core
      */
     public function getWidgetConfig()
     {
-        return (array) $this->config;
+        return (array) $this->multiConfig;
     }
+
+
+
+    /**
+     * @return mixed
+     */
+    public function getMultiConfig()
+    {
+        return $this->getMultiFieldValue('config');
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setMultiConfig($value)
+    {
+        return $this->setMultiFieldValue('config', $value);
+    }
+
 
     /**
      * @return array
@@ -195,7 +223,7 @@ class Infoblock extends Core
             return $result;
         }
 
-        $config = array_merge($this->getWidgetConfig(), $config);
+        $config = array_merge($this->multiConfig, $config);
         $widget = $model->createWidget($config);
 
         return $widget->run();

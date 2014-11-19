@@ -37,6 +37,4 @@ class PageOption extends Model
      * @var mixed
      */
     public $value;
-
-
 }

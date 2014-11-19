@@ -39,20 +39,22 @@ class HasMultiLangAndSiteFields extends ActiveRecord
      */
     public $currentLang = null;
 
-
+    /**
+     *
+     */
     public function init()
     {
         parent::init();
 
-        /*if (!$this->currentSite)
+        if (!$this->currentSite)
         {
-            $this->currentSite = \Yii::$app->currentSite;
+            $this->currentSite = \Yii::$app->currentSite->get();
         }
 
         if (!$this->currentLang)
         {
             $this->currentSite = \Yii::$app->language;
-        }*/
+        }
     }
 
     /*public function events()
@@ -122,7 +124,10 @@ class HasMultiLangAndSiteFields extends ActiveRecord
         {
             if ($this->currentSite instanceof Site)
             {
-                $site = (string) $this->currentSite->primaryKey;
+                if ($this->currentSite->getCode())
+                {
+                    $site = $this->currentSite->getCode();
+                }
             } else
             {
                 $site = (string) $this->currentSite;
@@ -174,13 +179,15 @@ class HasMultiLangAndSiteFields extends ActiveRecord
         {
             if ($this->currentSite instanceof Site)
             {
-                $site = $this->currentSite->primaryKey;
+                if ($this->currentSite->getCode())
+                {
+                    $site = $this->currentSite->getCode();
+                }
             } else
             {
                 $site = $this->currentSite;
             }
         }
-
 
         $lang = null;
         if ($this->currentLang)
@@ -195,7 +202,6 @@ class HasMultiLangAndSiteFields extends ActiveRecord
         }
 
         $allValues = $this->getMultiFieldValues($field);
-
 
         if ($site && $lang)
         {
@@ -221,7 +227,6 @@ class HasMultiLangAndSiteFields extends ActiveRecord
 
         } else if ($lang)
         {
-
             if (isset($allValues[$lang][self::DEFAULT_VALUE_SECTION]))
             {
                 return $allValues[$lang][self::DEFAULT_VALUE_SECTION];
@@ -230,6 +235,7 @@ class HasMultiLangAndSiteFields extends ActiveRecord
 
         return $this->getMultiFieldDefaultValue($field);
     }
+
 
 
     /**
@@ -244,7 +250,7 @@ class HasMultiLangAndSiteFields extends ActiveRecord
     {
         if ($site instanceof Site)
         {
-            $site = $site->primaryKey;
+            $site = $site->getCode();
         }
 
         if (is_string($site) || is_int($site))

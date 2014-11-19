@@ -103,7 +103,7 @@ class StaticBlock extends Core
             [['code'], 'required'],
             [['description'], 'string'],
             [['code'], 'unique'],
-            [["images", "files", "image_cover", "image", 'value'], 'safe'],
+            [["images", "files", "image_cover", "image", 'value', 'multiValue'], 'safe'],
         ]);
     }
 
@@ -144,6 +144,23 @@ class StaticBlock extends Core
         return static::find()->where(['code' => (string) $code])->one();
     }
 
+
+    /**
+     * @return mixed
+     */
+    public function getMultiValue()
+    {
+        return $this->getMultiFieldValue('value');
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setMultiValue($value)
+    {
+        return $this->setMultiFieldValue('value', $value);
+    }
 
 
 }

@@ -20,6 +20,7 @@ use skeeks\cms\base\db\ActiveRecord;
  * @method array|null       getMultiFieldLangValues($field, $lang)
  * @method mixed            getMultiFieldDefaultValue($field)
  * @method array            getMultiFieldValues($field)
+ * @method mixed            getMultiFieldValue($field)
  *
  * Class HasMultiLangAndSiteFieldsTrait
  * @package skeeks\cms\models\behaviors\traits

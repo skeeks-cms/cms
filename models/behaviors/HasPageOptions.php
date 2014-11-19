@@ -10,6 +10,8 @@
  */
 namespace skeeks\cms\models\behaviors;
 use skeeks\cms\base\behaviors\ActiveRecord;
+use skeeks\cms\models\Lang;
+use skeeks\cms\models\Site;
 
 /**
  * Class HasPageOptions
@@ -40,11 +42,45 @@ class HasPageOptions extends ActiveRecord
      */
     public function attach($owner)
     {
-        $owner->attachBehavior("serialize", [
-            "class"  => Serialize::className(),
+        $owner->attachBehavior(HasMultiLangAndSiteFields::className(), [
+            "class"  => HasMultiLangAndSiteFields::className(),
             "fields" => [$this->fieldName]
         ]);
 
         parent::attach($owner);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getMultiPageOptions()
+    {
+        return $this->getMultiFieldValue($this->fieldName);
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setMultiPageOptions($value)
+    {
+        return $this->setMultiFieldValue($this->fieldName, $value);
+    }
+
+
+    /**
+     * @param $id
+     * @return null
+     */
+    public function getPageOptionValue($id)
+    {
+        $options = $this->getMultiPageOptions();
+        if (isset($options[$id]))
+        {
+            return $options[$id];
+        }
+
+        return null;
+    }
+
 }

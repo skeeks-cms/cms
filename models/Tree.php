@@ -75,7 +75,7 @@ class Tree extends PageAdvanced
         return array_merge(parent::rules(), [
             [['type'], 'string'],
             [['pid_main'], 'integer'],
-            [['page_options'], 'safe'],
+            [['page_options', 'multiPageOptions'], 'safe'],
         ]);
     }
 

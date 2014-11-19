@@ -77,7 +77,7 @@ class multiLangAndSiteTextarea extends InputWidget
             if ($this->site)
             {
                 $this->model->setCurrentSite($this->site);
-                $fieldName[] = '[' . $this->site->primaryKey . ']';
+                $fieldName[] = '[' . $this->site->getCode() . ']';
             }
 
             if ($this->lang)

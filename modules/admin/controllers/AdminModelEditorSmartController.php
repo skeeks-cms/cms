@@ -34,6 +34,7 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\ModelHasBehaviors;
 use yii\base\ActionEvent;
 use yii\base\Behavior;
 use yii\base\Component;
+use yii\base\Model;
 use yii\base\View;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
@@ -339,4 +340,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             ]));
         }
     }
+
+
+
 }

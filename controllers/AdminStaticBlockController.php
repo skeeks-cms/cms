@@ -29,7 +29,8 @@ use yii\helpers\ArrayHelper;
 
 /**
  *
- * @method Infoblock getCurrentModel()
+ * @method StaticBlock getCurrentModel()
+ * @method StaticBlock createCurrentModel()
  *
  * Class AdminUserController
  * @package skeeks\cms\controllers
@@ -44,88 +45,6 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
         parent::init();
     }
 
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
 
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                "actions" =>
-                [
 
-                ]
-            ]
-        ]);
-    }
-
-    /**
-     * Creates a new Game model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        /**
-         * @var $model StaticBlock
-         */
-        $modelClass = $this->_modelClassName;
-        $model      = new $modelClass();
-
-        if ($model->load(\Yii::$app->request->post()))
-        {
-            $model->save(false);
-
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else
-        {
-            if (\Yii::$app->request->isPost)
-            {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-            }
-
-            return $this->render('_form', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionUpdate()
-    {
-        /**
-         * @var $model StaticBlock
-         */
-        $model = $this->getCurrentModel();
-        $oldValue = $model->value;
-
-        if ($model->load(\Yii::$app->request->post()))
-        {
-            $newValue = $model->value;
-            $model->value = ArrayHelper::merge($oldValue, $model->value);
-
-            $model->save(false);
-
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(['update', 'id' => $model->id]);
-        }
-        else
-        {
-            if (\Yii::$app->request->isPost)
-            {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-            }
-
-            return $this->render('_form', [
-                'model' => $model,
-            ]);
-        }
-    }
 }

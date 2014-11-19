@@ -47,14 +47,6 @@ class StaticBlock extends Widget
             }
         }
 
-        if (!$this->sections)
-        {
-            if ($site = \Yii::$app->currentSite->get())
-            {
-                $this->sections = $site->id;
-            }
-        }
-
-        return $staticBlock->getValue($this->sections);
+        return $staticBlock->multiValue;
     }
 }

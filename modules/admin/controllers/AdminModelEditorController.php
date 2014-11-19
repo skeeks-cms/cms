@@ -16,6 +16,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\controllers;
+use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
 use skeeks\cms\models\Search;
@@ -27,6 +28,7 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;
+use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -204,12 +206,44 @@ class AdminModelEditorController extends AdminController
         }
         $this->_currentModel = $this->_findModel($id);
 
+
         if (!$this->_currentModel->primaryKey)
         {
             //throw new Exception("У модели нет первичного ключа, не сможем с ней работать");
             $this->_currentModel = false;
             return $this;
         }
+
+        $this->_setLangAndSite($this->_currentModel);
+
+        return $this;
+    }
+
+    /**
+     * @param Model $model
+     * @return $this
+     */
+    protected function _setLangAndSite(Model $model)
+    {
+        try
+        {
+            if ($site = App::moduleAdmin()->getCurrentSite())
+            {
+                $model->setCurrentSite($site);
+            } else
+            {
+                $model->setCurrentSite(null);
+            }
+
+            if ($lang = App::moduleAdmin()->getCurrentLang())
+            {
+                $model->setCurrentLang($lang);
+            } else
+            {
+                $model->setCurrentLang(null);
+            }
+        } catch (\Exception $e)
+        {}
 
         return $this;
     }
@@ -227,6 +261,19 @@ class AdminModelEditorController extends AdminController
         }
 
         return $this->_currentModel;
+    }
+
+    /**
+     * @return ActiveRecord
+     */
+    public function createCurrentModel()
+    {
+        $modelClass = $this->_modelClassName;
+        $model = new $modelClass();
+
+        $this->_setLangAndSite($model);
+
+        return $model;
     }
 
     /**
@@ -375,8 +422,7 @@ class AdminModelEditorController extends AdminController
         /**
          * @var $model ActiveRecord
          */
-        $modelClass = $this->_modelClassName;
-        $model      = new $modelClass();
+        $model = $this->createCurrentModel();
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {

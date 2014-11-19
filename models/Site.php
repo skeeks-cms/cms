@@ -194,6 +194,14 @@ class Site extends Core
     /**
      * @return string
      */
+    public function getCode()
+    {
+        return $this->primaryKey ? 'site-' . $this->primaryKey : '';
+    }
+
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name ? $this->name : $this->host_name;

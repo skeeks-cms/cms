@@ -107,7 +107,7 @@ class AdminInfoblockController extends AdminModelEditorSmartController
         {
             if ($data = \Yii::$app->request->post('WidgetConfig'))
             {
-                $this->getCurrentModel()->setAttribute('config', $data);
+                $this->getCurrentModel()->setMultiConfig($data);
                 $this->getCurrentModel()->save(false);
 
                 $widgetConfig = new WidgetConfig([
