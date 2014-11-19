@@ -32,10 +32,6 @@ class m141019_100557_create_publication_table extends Migration
             'description_short'     => Schema::TYPE_TEXT,
             'description_full'      => Schema::TYPE_TEXT,
 
-            'meta_title'            => Schema::TYPE_STRING . '(255)',
-            'meta_description'      => Schema::TYPE_TEXT,
-            'meta_keywords'         => Schema::TYPE_TEXT,
-
             'image'                 => Schema::TYPE_TEXT. ' NULL', //главное изображение
             'image_cover'           => Schema::TYPE_TEXT. ' NULL', //обложка
             'images'                => Schema::TYPE_TEXT. ' NULL', //
@@ -58,6 +54,8 @@ class m141019_100557_create_publication_table extends Migration
 
             'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10', //статус, активна некативна, удалено
             'status_adult'          => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0', //Возрастной статус 0 - не проверено, 1-для всех, 2-типо эротические материалы, 3-порно
+
+            'page_options'          => Schema::TYPE_TEXT. ' NULL', //
 
         ], $tableOptions);
 

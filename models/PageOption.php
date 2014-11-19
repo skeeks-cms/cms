@@ -35,9 +35,9 @@ class PageOption extends Model
     public $description;
 
     /**
-     * @var mixed
+     * @var array
      */
-    public $value;
+    public $defaultValue;
 
 
     /**
@@ -57,24 +57,26 @@ class PageOption extends Model
         }
 
         $modelValueClassName = $this->modelValueClass;
-        return new $modelValueClassName($this->value);
+        return new $modelValueClassName($this->defaultValue);
     }
 
     /**
-     * @var null|PageOptionValue
+     * @var PageOptionValue
      */
-    protected $_modelValue = null;
+    protected $_value = null;
+
 
     /**
-     * @return null|PageOptionValue
+     * @return PageOptionValue
      */
-    public function getModelValue()
+    public function getValue()
     {
-        if ($this->_modelValue === null)
+        if ($this->_value === null)
         {
-            $this->_modelValue = $this->createModelValue();
+            $this->_value = $this->createModelValue();
         }
 
-        return $this->_modelValue;
+        return $this->_value;
     }
+
 }

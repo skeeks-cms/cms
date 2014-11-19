@@ -48,10 +48,6 @@ class m140902_110812_create_storage_file_table extends Migration
             'description_short'     => Schema::TYPE_TEXT,
             'description_full'      => Schema::TYPE_TEXT,
 
-            'meta_title'            => Schema::TYPE_STRING . '(255)',
-            'meta_description'      => Schema::TYPE_TEXT,
-            'meta_keywords'         => Schema::TYPE_TEXT,
-
             //Если файл картинка, заполняем дополнительные сведения
             'image_height'          => Schema::TYPE_INTEGER . ' NULL',
             'image_width'           => Schema::TYPE_INTEGER . ' NULL',
@@ -70,6 +66,8 @@ class m140902_110812_create_storage_file_table extends Migration
 
             'linked_to_model'       => Schema::TYPE_STRING. '(255) NULL', //Коммент обязательно должен быть к кому то привязан
             'linked_to_value'       => Schema::TYPE_STRING. '(255) NULL', //Коммент обязательно должен быть к кому то привязан
+
+            'page_options'          => Schema::TYPE_TEXT. ' NULL', //
 
         ], $tableOptions);
 

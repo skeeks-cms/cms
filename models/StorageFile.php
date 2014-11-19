@@ -3,6 +3,7 @@
 namespace skeeks\cms\models;
 use skeeks\cms\base\db\ActiveRecord;
 
+use skeeks\cms\models\behaviors\HasPageOptions;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
@@ -76,7 +77,8 @@ class StorageFile extends Core
             [['cluster_id', 'type', 'mime_type', 'extension'], 'string', 'max' => 16],
             [['name_to_save'], 'string', 'max' => 32],
             [['src'], 'unique'],
-            [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => 'The combination of Cluster ID and Cluster Src has already been taken.']
+            [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => 'The combination of Cluster ID and Cluster Src has already been taken.'],
+            [['page_options', 'multiPageOptions'], 'safe'],
         ]);
     }
 
@@ -118,6 +120,7 @@ class StorageFile extends Core
             'users_votes_down' => Yii::t('app', 'Users Votes Down'),
             'linked_to_model' => Yii::t('app', 'Linked To Model'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
+            'page_options'  => Yii::t('app', 'Дополнительные свойства'),
         ]);
     }
 
@@ -140,6 +143,7 @@ class StorageFile extends Core
             behaviors\HasComments::className(),
             behaviors\HasSubscribes::className(),
             behaviors\HasVotes::className(),
+            HasPageOptions::className() => HasPageOptions::className()
         ]);
     }
 

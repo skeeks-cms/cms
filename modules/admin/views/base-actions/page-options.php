@@ -63,5 +63,5 @@ $dataProvider = new \yii\data\ArrayDataProvider([
 <? if ($pageOption) : ?>
     <hr />
     <h2>Настройка свойства — <?= $pageOption->name; ?></h2>
-    <?= $pageOption->getModelValue()->renderForm(); ?>
+    <?= $pageOption->getValue()->renderForm(); ?>
 <? endif;?>

@@ -14,6 +14,7 @@ namespace skeeks\cms\models;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
+use skeeks\cms\models\behaviors\HasPageOptions;
 use Yii;
 
 /**
@@ -40,7 +41,8 @@ class Publication extends PageAdvanced
     {
         return array_merge(parent::behaviors(), [
             CanBeLinkedToModel::className(),
-            CanBeLinkedToTree::className()
+            CanBeLinkedToTree::className(),
+            HasPageOptions::className() => HasPageOptions::className()
         ]);
     }
 
@@ -50,8 +52,9 @@ class Publication extends PageAdvanced
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'type'      => Yii::t('app', 'Publication type'),
-            'tree_ids'  => Yii::t('app', 'Разделы'),
+            'type'          => Yii::t('app', 'Publication type'),
+            'tree_ids'      => Yii::t('app', 'Разделы'),
+            'page_options'  => Yii::t('app', 'Дополнительные свойства'),
         ]);
     }
 
@@ -62,7 +65,7 @@ class Publication extends PageAdvanced
     {
         return array_merge(parent::rules(), [
             [['type'], 'string'],
-            [['tree_ids'], 'safe'],
+            [['tree_ids', 'page_options', 'multiPageOptions'], 'safe'],
         ]);
     }
 

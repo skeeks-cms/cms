@@ -294,30 +294,36 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     {
         $model = $this->getModel();
 
-        $optionsCurrent = $model->getMultiPageOptions();
+        $optionsCurrent = $model->getMultiPageOptionsData();
 
-        $pageOptionValue    = null;
         $pageOption         = null;
         if ($pageOptionId = \Yii::$app->request->getQueryParam('page-option'))
         {
-            if ($pageOption = \Yii::$app->pageOptions->getComponent($pageOptionId))
+            $pageOption = \Yii::$app->pageOptions->getComponent($pageOptionId);
+
+            if ($model->hasPageOptionValueData($pageOptionId))
             {
-                if ($pageOptionValue = $pageOption->getModelValue())
-                {}
+                $pageOption->getValue()->setAttributes($model->getPageOptionValueData($pageOptionId));
+
             }
         }
 
-        if ($pageOptionValue && \Yii::$app->request->isPost)
+
+
+
+
+        if ($pageOption && \Yii::$app->request->isPost)
         {
-            if ($pageOptionValue->load(\Yii::$app->request->post()))
+            if ($pageOption->getValue()->load(\Yii::$app->request->post()))
             {
-                $optionsCurrent[$pageOptionId] = $pageOptionValue->attributes;
-                $model->setMultiPageOptions($optionsCurrent);
+                $optionsCurrent[$pageOptionId] = $pageOption->getValue()->attributes;
+                $model->setMultiPageOptionsData($optionsCurrent);
                 $model->save(false);
 
                 return $this->redirect(['page-options', 'id' => $model->id]);
             }
         }
+
 
         return $this->output(App::moduleAdmin()->renderFile("base-actions/page-options.php", [
             "model"         => $this->getModel(),

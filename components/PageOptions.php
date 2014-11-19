@@ -41,11 +41,11 @@ class PageOptions extends CollectionComponents
     {
         Validate::ensure(new HasBehaviorsAnd(HasPageOptions::className()), $model);
 
-        if ($modelPageOptionValues = $model->getMultiPageOptions())
+        if ($modelPageOptionValues = $model->getMultiPageOptionsData())
         {
             foreach ($modelPageOptionValues as $idPageOption => $value)
             {
-                $this->getComponent($idPageOption)->value = $value;
+                $this->getComponent($idPageOption)->getValue()->setAttributes((array) $value);
             }
         }
 

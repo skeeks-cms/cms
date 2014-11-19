@@ -51,9 +51,10 @@ class HasPageOptions extends ActiveRecord
     }
 
     /**
+     *
      * @return array
      */
-    public function getMultiPageOptions()
+    public function getMultiPageOptionsData()
     {
         return (array) $this->owner->getMultiFieldValue($this->fieldName);
     }
@@ -62,7 +63,7 @@ class HasPageOptions extends ActiveRecord
      * @param $value
      * @return $this
      */
-    public function setMultiPageOptions($value)
+    public function setMultiPageOptionsData($value)
     {
         return $this->owner->setMultiFieldValue($this->fieldName, $value);
     }
@@ -72,9 +73,9 @@ class HasPageOptions extends ActiveRecord
      * @param $id
      * @return null
      */
-    public function getPageOptionValue($id)
+    public function getPageOptionValueData($id)
     {
-        $options = $this->owner->getMultiPageOptions();
+        $options = $this->owner->getMultiPageOptionsData();
         if (isset($options[$id]))
         {
             return $options[$id];
@@ -87,15 +88,36 @@ class HasPageOptions extends ActiveRecord
      * @param $id
      * @return bool
      */
-    public function hasPageOptionValue($id)
+    public function hasPageOptionValueData($id)
     {
-        $options = $this->owner->getMultiPageOptions();
+        $options = $this->owner->getMultiPageOptionsData();
         if (isset($options[$id]))
         {
             return true;
         }
 
         return false;
+    }
+
+
+    /**
+     * @param $id
+     * @return null|\skeeks\cms\models\pageOption\PageOptionValue
+     */
+    public function getPageOptionValue($id)
+    {
+        $options = $this->owner->getMultiPageOptionsData();
+        if (isset($options[$id]))
+        {
+            if ($compoment = \Yii::$app->pageOptions->getComponent($id))
+            {
+                $modelValue = $compoment->createModelValue();
+            }
+            $modelValue->load($options[$id]);
+            return $modelValue;
+        }
+
+        return null;
     }
 
 }

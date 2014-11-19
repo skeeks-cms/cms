@@ -29,7 +29,6 @@ use Yii;
  */
 abstract class Page extends Core
 {
-    use \skeeks\cms\models\behaviors\traits\HasMetaData;
     use \skeeks\cms\models\behaviors\traits\HasPageUrl;
 
     /**
@@ -44,7 +43,6 @@ abstract class Page extends Core
     {
         return array_merge(parent::behaviors(), [
             SeoPageName::className(),
-            HasMetaData::className(),
             [
                 "class"             => HasSeoPageUrl::className(),
                 "viewPageTemplate"  => $this->viewPageTemplate
@@ -59,9 +57,6 @@ abstract class Page extends Core
     {
         return array_merge(parent::attributeLabels(), [
             'name' => Yii::t('app', 'Name'),
-            'meta_title' => Yii::t('app', 'Meta Title'),
-            'meta_description' => Yii::t('app', 'Meta Description'),
-            'meta_keywords' => Yii::t('app', 'Meta Keywords'),
             'seo_page_name' => Yii::t('app', 'Seo Page Name'),
         ]);
     }
@@ -72,10 +67,9 @@ abstract class Page extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['name', 'meta_title'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 255],
             [['seo_page_name'], 'string', 'max' => 64],
             [['seo_page_name'], 'unique'],
-            [['meta_description', 'meta_keywords'], 'string'],
         ]);
     }
 
