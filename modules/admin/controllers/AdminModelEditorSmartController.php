@@ -294,15 +294,35 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     {
         $model = $this->getModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        $optionsCurrent = $model->getMultiPageOptions();
+
+        $pageOptionValue    = null;
+        $pageOption         = null;
+        if ($pageOptionId = \Yii::$app->request->getQueryParam('page-option'))
         {
-            return $this->redirect(['page-options', 'id' => $model->id]);
-        } else
-        {
-            return $this->output(App::moduleAdmin()->renderFile("base-actions/page-options.php", [
-                "model" => $this->getModel()
-            ]));
+            if ($pageOption = \Yii::$app->pageOptions->getComponent($pageOptionId))
+            {
+                if ($pageOptionValue = $pageOption->getModelValue())
+                {}
+            }
         }
+
+        if ($pageOptionValue && \Yii::$app->request->isPost)
+        {
+            if ($pageOptionValue->load(\Yii::$app->request->post()))
+            {
+                $optionsCurrent[$pageOptionId] = $pageOptionValue->attributes;
+                $model->setMultiPageOptions($optionsCurrent);
+                $model->save(false);
+
+                return $this->redirect(['page-options', 'id' => $model->id]);
+            }
+        }
+
+        return $this->output(App::moduleAdmin()->renderFile("base-actions/page-options.php", [
+            "model"         => $this->getModel(),
+            "pageOption"    => $pageOption
+        ]));
     }
 
     /**

@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\base\db\ActiveRecord */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $pageOption \skeeks\cms\models\PageOption */
 
 
 $dataProvider = new \yii\data\ArrayDataProvider([
@@ -35,6 +36,8 @@ $dataProvider = new \yii\data\ArrayDataProvider([
             'format'         => 'html',
             'value'     =>     function(\skeeks\cms\models\PageOption $pageOption)
             {
+                $params = \Yii::$app->request->getQueryParams();
+
                 return '';
             }
 
@@ -47,19 +50,18 @@ $dataProvider = new \yii\data\ArrayDataProvider([
             'format'         => 'html',
             'value' => function(\skeeks\cms\models\PageOption $model)
             {
-                return Html::a('Настроить', '#' . $model->id, ['class' => 'btn btn-primary btn-xs']);
+                $params = \Yii::$app->request->getQueryParams();
+                $params['page-option'] = $model->id;
+
+                return Html::a('Настроить', \yii\helpers\Url::to($params), ['class' => 'btn btn-primary btn-xs']);
             }
         ],
-
-
-        /*[
-            'class'         => \yii\grid\DataColumn::className(),
-            'attribute'     => 'schemaName',
-            'label'         => 'Количество внешних ключей',
-            'value' => function(yii\db\TableSchema $model)
-            {
-                return count($model->foreignKeys);
-            }
-        ],*/
     ],
 ]); ?>
+
+
+<? if ($pageOption) : ?>
+    <hr />
+    <h2>Настройка свойства — <?= $pageOption->name; ?></h2>
+    <?= $pageOption->getModelValue()->renderForm(); ?>
+<? endif;?>

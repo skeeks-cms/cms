@@ -51,11 +51,11 @@ class HasPageOptions extends ActiveRecord
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getMultiPageOptions()
     {
-        return $this->getMultiFieldValue($this->fieldName);
+        return (array) $this->owner->getMultiFieldValue($this->fieldName);
     }
 
     /**
@@ -64,7 +64,7 @@ class HasPageOptions extends ActiveRecord
      */
     public function setMultiPageOptions($value)
     {
-        return $this->setMultiFieldValue($this->fieldName, $value);
+        return $this->owner->setMultiFieldValue($this->fieldName, $value);
     }
 
 
@@ -74,13 +74,28 @@ class HasPageOptions extends ActiveRecord
      */
     public function getPageOptionValue($id)
     {
-        $options = $this->getMultiPageOptions();
+        $options = $this->owner->getMultiPageOptions();
         if (isset($options[$id]))
         {
             return $options[$id];
         }
 
         return null;
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function hasPageOptionValue($id)
+    {
+        $options = $this->owner->getMultiPageOptions();
+        if (isset($options[$id]))
+        {
+            return true;
+        }
+
+        return false;
     }
 
 }
