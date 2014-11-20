@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\components\storage;
 
+use skeeks\cms\components\CollectionComponents;
 use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Component;
@@ -31,31 +32,17 @@ use \skeeks\sx\Dir;
 }*/
 
 /**
+ *
+ * @method Cluster[]   getComponents()
+ * @method Cluster     getComponent($id)
+ *
+ *
  * Class Storage
  * @package common\components\Storage
  */
-class Storage extends Component
+class Storage extends CollectionComponents
 {
-    public $clusters                = [];
-
-    protected $_clustersLoaded      = [];
-
-    public function init()
-    {
-        parent::init();
-
-        if ($this->clusters)
-        {
-            foreach ($this->clusters as $clusterConfig)
-            {
-                $class = $clusterConfig["class"];
-                unset($clusterConfig["class"]);
-                $this->_clustersLoaded[$clusterConfig["id"]] = new $class($clusterConfig);
-            }
-        }
-    }
-
-
+    public $componentClassName  = 'skeeks\cms\components\storage\ClusterLocal';
     /**
      *
      * Загрузить файл в хранилище, добавить в базу, вернуть модель StorageFile
@@ -123,24 +110,25 @@ class Storage extends Component
      */
     public function getClusters()
     {
-        return $this->_clustersLoaded;
+        return $this->getComponents();
     }
 
     /**
-     * @param null $clusterId
-     * @return Cluster|null
+     * @param null $id
+     * @return Cluster
      */
-    public function getCluster($clusterId = null)
+    public function getCluster($id = null)
     {
-        if ($clusterId == null)
+        if ($id == null)
         {
-            foreach ($this->_clustersLoaded as $clusterId => $clusterConfig)
+            foreach ($this->getComponents() as $clusterId => $cluster)
             {
-                return $this->_clustersLoaded[$clusterId];
+                return $cluster;
             }
+
         } else
         {
-            return \yii\helpers\ArrayHelper::getValue($this->_clustersLoaded, $clusterId);
+            return $this->getCluster($id);
         }
     }
 }

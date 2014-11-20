@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\components\storage;
+use skeeks\cms\models\ComponentModel;
 use Yii;
 use yii\base\Component;
 
@@ -21,9 +22,8 @@ use \skeeks\sx\Dir;
  * Class Cluster
  * @package skeeks\cms\components\storage
  */
-abstract class Cluster extends Component
+abstract class Cluster extends ComponentModel
 {
-    public $id;
     public $publicBaseUrl; //   http://c1.s.skeeks.com/uploads/
 
     /**
@@ -54,8 +54,6 @@ abstract class Cluster extends Component
     }
 
     abstract protected function _upload(File $file);
-
-
 
     public function update($clusterFileUniqSrc, $file)
     {}

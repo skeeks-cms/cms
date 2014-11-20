@@ -50,9 +50,11 @@ abstract class CollectionComponents extends Component
 
                     if (ArrayHelper::getValue($data, 'enabled', true) === true)
                     {
-                        if ($newClass = ArrayHelper::getValue($data, 'class', false) !== false)
+                        $newClass = ArrayHelper::getValue($data, 'class', false);
+                        if ($newClass !== false)
                         {
                             $class = $newClass;
+                            unset($data['class']);
                         }
 
                         $data['id'] = $id;

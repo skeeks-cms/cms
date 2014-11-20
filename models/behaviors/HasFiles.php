@@ -149,7 +149,7 @@ class HasFiles extends HasLinkedModels
         $files[]            = $file->src;
         $this->owner->setAttribute($fieldName, array_unique($files));
 
-        $this->owner->save();
+        $this->owner->save(false);
         return $this;
     }
 
@@ -168,7 +168,7 @@ class HasFiles extends HasLinkedModels
     {
         //Вяжем файл к этой сущьности
         $file->setAttributes($this->owner->getRef()->toArray(), false);
-        $file->save();
+        $file->save(false);
         $this->_appendFile($file, $fieldName);
 
         return $this;
@@ -195,7 +195,7 @@ class HasFiles extends HasLinkedModels
             }
 
             $this->owner->setAttribute($fieldName, $result);
-            $this->owner->save();
+            $this->owner->save(false);
         }
 
         return $this;

@@ -27,13 +27,13 @@ $config =
 
         'storage' => [
             'class' => 'skeeks\cms\components\Storage',
-            'clusters' =>
+            'components' =>
             [
                 'local' =>
                 [
                     'class'                 => 'skeeks\cms\components\storage\ClusterLocal',
-                    "id"                    => "local",
 
+                    "name"                  => "Локальное хранилище",
                     "publicBaseUrl"         => "/uploads/all",
                     "rootBasePath"          =>  Yii::getAlias("@frontend/web/uploads/all"),
                 ]
