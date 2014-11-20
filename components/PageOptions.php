@@ -28,7 +28,6 @@ class PageOptions extends CollectionComponents
 {
     public $componentClassName  = 'skeeks\cms\models\PageOption';
 
-
     /**
      *
      * Установка значения опция из модели, которая умеет хранить в себе настройки pageOptions
@@ -51,4 +50,7 @@ class PageOptions extends CollectionComponents
 
         return $this;
     }
+
+
+
 }

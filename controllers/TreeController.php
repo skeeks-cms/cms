@@ -26,39 +26,15 @@ class TreeController extends Controller
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function actions()
     {
-        return [];
+        return
+        [
+            'view' =>
+            [
+                'class' => 'skeeks\cms\actions\ViewModelAction',
+                'view'  => 'default',
+            ],
+        ];
     }
-
-    /**
-     * @param Tree $model
-     * @return string
-     */
-    public function actionView(Tree $model)
-    {
-        $viewName = 'default';
-
-        //Если задан тип страницы
-        if ($type = $model->getType())
-        {
-            //Если у этого типа задан шаблон по умолчанию
-            if ($template = $type->getTemplate())
-            {
-                $viewName = $template->id;
-            }
-
-            if ($layout = $type->getLayout())
-            {
-                $this->layout = $layout->path;
-            }
-        }
-
-
-
-        return $this->render($viewName, [
-            'model' => $model
-        ]);
-    }
-
 }

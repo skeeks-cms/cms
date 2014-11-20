@@ -28,6 +28,7 @@ $dataProvider = new \yii\data\ArrayDataProvider([
 
         'id',
         'name',
+        'description',
 
         [
             'class'         => \yii\grid\DataColumn::className(),
@@ -37,7 +38,6 @@ $dataProvider = new \yii\data\ArrayDataProvider([
             'value'     =>     function(\skeeks\cms\models\PageOption $pageOption)
             {
                 $params = \Yii::$app->request->getQueryParams();
-
                 return '';
             }
 
@@ -63,5 +63,7 @@ $dataProvider = new \yii\data\ArrayDataProvider([
 <? if ($pageOption) : ?>
     <hr />
     <h2>Настройка свойства — <?= $pageOption->name; ?></h2>
-    <?= $pageOption->getValue()->renderForm(); ?>
+    <?= $pageOption->getValue()->renderForm([
+        'modelEntity' => $model
+    ]); ?>
 <? endif;?>

@@ -115,6 +115,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     'subscribes' =>
                     [
                         "label"     => "Подписаны",
+                        "icon"     => "glyphicon glyphicon-heart-empty",
                         "rules"     =>
                         [
                             [
@@ -139,6 +140,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     'seo-page-url' =>
                     [
                         "label"     => "Адрес на сайте",
+                        "icon"     => "glyphicon glyphicon-magnet",
                         "rules"     =>
                         [
                             [
@@ -307,10 +309,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
             }
         }
-
-
-
-
 
         if ($pageOption && \Yii::$app->request->isPost)
         {

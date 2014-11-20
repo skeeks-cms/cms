@@ -38,7 +38,6 @@ abstract class CollectionComponents extends Component
      */
     public function getComponents()
     {
-        $class = $this->componentClassName;
         if ($this->_components === null)
         {
             $this->_components = [];
@@ -47,8 +46,15 @@ abstract class CollectionComponents extends Component
             {
                 foreach ($this->components as $id => $data)
                 {
+                    $class = $this->componentClassName;
+
                     if (ArrayHelper::getValue($data, 'enabled', true) === true)
                     {
+                        if ($newClass = ArrayHelper::getValue($data, 'class', false) !== false)
+                        {
+                            $class = $newClass;
+                        }
+
                         $data['id'] = $id;
                         $this->_components[$id] = new $class($data);
                     }

@@ -17,7 +17,7 @@ use skeeks\cms\models\Tree;
 <?= $form->field($model, 'type')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
-                 \Yii::$app->treeTypes->getComponents(),
+                 \Yii::$app->registeredModels->getDescriptor($model)->getTypes()->getComponents(),
                  "id",
                  "name"
              ),

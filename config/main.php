@@ -78,50 +78,7 @@ $config =
         [
             'class' => 'skeeks\cms\components\RegisteredModels',
             //Модели к которым можно крепить другие, то есть эти модели имеют ссылку на себя объект Ref
-            'models' =>
-            [
-                'publication' =>
-                [
-                    'class'                 => 'skeeks\cms\models\Publication',
-                    'name'                  => 'Публикация',
-                ],
-
-                'tree' =>
-                [
-                    'class'             => 'skeeks\cms\models\Tree',
-                    'name'             => 'Страница',
-                ],
-
-                'comment' =>
-                [
-                    'class'             => 'skeeks\cms\models\Comment',
-                    'name'             => 'Комментарий',
-                ],
-
-                'user' =>
-                [
-                    'class'             => 'skeeks\cms\models\User',
-                    'name'             => 'Пользователь',
-                ],
-
-                'userGroup' =>
-                [
-                    'class'             => 'skeeks\cms\models\UserGroup',
-                    'name'             => 'Группа пользователя',
-                ],
-
-                'vote'      =>
-                [
-                    'class' => 'skeeks\cms\models\Vote',
-                    'name' => 'Голос'
-                ],
-
-                'subscribe'   =>
-                [
-                    'class' => 'skeeks\cms\models\Subscribe',
-                    'name' => 'Подписка'
-                ],
-            ],
+            'components' => include_once 'models.php'
         ],
 
         //Зарегистрированные виджеты
@@ -138,40 +95,6 @@ $config =
             'groups' => include_once 'admin-menu.php'
         ],
 
-
-
-        //Типы разделов
-        'treeTypes' =>
-        [
-            'class' => \skeeks\cms\components\TreeTypes::className(),
-
-            'components' =>
-            [
-                /*'news' =>
-                [
-                    'name'      => 'Новостной раздел'
-                ],
-
-                'article' =>
-                [
-                    'name'      => 'Раздел статей',
-                ]*/
-            ]
-        ],
-
-        'treeTemplates' =>
-        [
-            'class'         => '\skeeks\cms\components\TreeTemplates',
-            /*'components' =>
-            [
-                'home' =>
-                [
-                    'name' => 'Главная страница',
-                    'code' => 'home'
-                ]
-            ]*/
-        ],
-
         'registeredLayouts' =>
         [
             'class'         => '\skeeks\cms\components\RegisteredLayouts',
@@ -185,61 +108,19 @@ $config =
             ]*/
         ],
 
-        //Типы публикаций
-        'publicationTypes' =>
-        [
-            'class' => \skeeks\cms\components\PublicationTypes::className(),
 
-            'components' =>
-            [
-                'news' =>
-                [
-                    'name' => 'Новость'
-                ],
-
-                'article' =>
-                [
-                    'name'      => 'Статья',
-                ],
-
-                'demo' =>
-                [
-                    'name'      => 'Демо нода',
-                    'enabled'   => false
-                ]
-            ]
-        ],
-
-        //Опции страницы
+        //Глобальные опции страниц
         'pageOptions' =>
         [
             'class' => '\skeeks\cms\components\PageOptions',
-
-            'components' =>
-            [
-                'meta_title' =>
-                [
-                    'name' => 'Мета title'
-                ],
-
-                'meta_keywords' =>
-                [
-                    'name' => 'Мета keywords'
-                ],
-
-                'meta_description' =>
-                [
-                    'name' => 'Мета description'
-                ],
-            ]
+            'components' =>  include_once 'page-options.php'
         ],
 
 
-        //Опции страницы
+        //Языки проекта
         'langs' =>
         [
             'class' => '\skeeks\cms\components\Langs',
-
             'components' =>
             [
                 'ru' =>
@@ -260,12 +141,12 @@ $config =
 
         'admin' =>
         [
-            'class' => \skeeks\cms\modules\admin\Module::className()
+            'class' => '\skeeks\cms\modules\admin\Module'
         ],
 
         'cms' =>
         [
-            'class'             => \skeeks\cms\Module::className(),
+            'class' => '\skeeks\cms\Module',
         ],
     ],
 ];

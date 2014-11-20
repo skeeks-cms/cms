@@ -69,4 +69,17 @@ class Publication extends PageAdvanced
         ]);
     }
 
+    /**
+     * @return null|ModelType
+     */
+    public function getType()
+    {
+        if ($this->type)
+        {
+            return \Yii::$app->registeredModels->getDescriptor($this)->getTypes()->getComponent($this->type);
+        }
+
+        return null;
+    }
+
 }

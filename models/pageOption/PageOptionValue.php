@@ -49,4 +49,20 @@ class PageOptionValue extends Model
             $data
         ));
     }
+
+    /**
+     * @return string
+     */
+    public function toString()
+    {
+        return (string) $this->value;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
+    }
 }

@@ -12,24 +12,24 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\ModelDescriptor;
 use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Component;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
 /**
+ * @method ModelDescriptor[]   getComponents()
+ * @method ModelDescriptor     getComponent($id)
+ *
  * Class RegisterdModels
  * @package skeeks\cms\components
  */
-class RegisteredModels extends Component
+class RegisteredModels extends CollectionComponents
 {
-    public $models           = [];
-
-    public function init()
-    {
-        parent::init();
-    }
+    public $componentClassName  = 'skeeks\cms\models\ModelDescriptor';
 
     /**
      *
@@ -40,7 +40,7 @@ class RegisteredModels extends Component
      */
     public function getClassNameByCode($code)
     {
-        $modelData = ArrayHelper::getValue($this->models, $code);
+        $modelData = ArrayHelper::getValue($this->components, $code);
 
         if (!$modelData)
         {
@@ -64,7 +64,7 @@ class RegisteredModels extends Component
      */
     public function getModelDataByCode($code)
     {
-        $modelData = (array) ArrayHelper::getValue($this->models, $code);
+        $modelData = (array) ArrayHelper::getValue($this->components, $code);
 
         if (!$modelData)
         {
@@ -84,7 +84,7 @@ class RegisteredModels extends Component
      */
     public function getCodeByModel(ActiveRecord $model)
     {
-        foreach ($this->models as $code => $modelData)
+        foreach ($this->components as $code => $modelData)
         {
             if (is_array($modelData))
             {
@@ -104,4 +104,29 @@ class RegisteredModels extends Component
         }
     }
 
+
+    /**
+     * @param $className
+     * @return null|ModelDescriptor
+     */
+    public function getDescriptor($className)
+    {
+        if ($className instanceof Model)
+        {
+            $className = $className->className();
+        }
+
+        if ($this->getComponents())
+        {
+            foreach ($this->getComponents() as $id => $component)
+            {
+                if ($className == $component->modelClass)
+                {
+                    return $component;
+                }
+            }
+        }
+
+        return null;
+    }
 }

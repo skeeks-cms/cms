@@ -145,13 +145,13 @@ class Tree extends PageAdvanced
     }
 
     /**
-     * @return null|TreeType
+     * @return null|ModelType
      */
     public function getType()
     {
         if ($this->type)
         {
-            return \Yii::$app->treeTypes->getComponent($this->type);
+            return \Yii::$app->registeredModels->getDescriptor($this)->getTypes()->getComponent($this->type);
         }
 
         return null;
