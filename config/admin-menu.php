@@ -100,4 +100,24 @@ return
             ],
         ]
     ],
+
+
+    'access' =>
+    [
+        'label'     => 'Права доступа',
+        'priority'  => 0,
+        'enabled'   => true,
+
+        'items' =>
+        [
+            [
+                "label"     => "Роли",
+                "url"       => ["admin/roles"],
+                'enabled'   => true,
+                'priority'  => 0,
+            ],
+
+
+        ]
+    ],
 ];
