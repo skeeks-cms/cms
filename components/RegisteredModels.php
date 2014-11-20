@@ -49,7 +49,7 @@ class RegisteredModels extends CollectionComponents
 
         if (is_array($modelData))
         {
-            return ArrayHelper::getValue($modelData, "class", false);
+            return ArrayHelper::getValue($modelData, "modelClass", false);
         } else if (is_string($modelData))
         {
             return $modelData;
@@ -88,7 +88,7 @@ class RegisteredModels extends CollectionComponents
         {
             if (is_array($modelData))
             {
-                $className = ArrayHelper::getValue($modelData, "class", false);
+                $className = ArrayHelper::getValue($modelData, "modelClass", false);
             } else if (is_string($modelData))
             {
                 $className = $modelData;

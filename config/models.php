@@ -100,4 +100,10 @@ return
         'modelClass' => 'skeeks\cms\models\Subscribe',
         'name' => 'Подписка'
     ],
+
+    'storageFile'   =>
+    [
+        'modelClass' => 'skeeks\cms\models\StorageFile',
+        'name' => 'Файл хранилища'
+    ],
 ];

@@ -39,6 +39,6 @@ return [
     [
         'name'              => 'Шаблон для отрисовки сущьности',
         'description'       => 'Шаблон отрисовки конкретной сущьности',
-        'modelValueClass'   => '\skeeks\cms\pageOptionValues\layout\LayoutPageOptionValue'
+        'modelValueClass'   => '\skeeks\cms\pageOptionValues\actionView\ActionViewPageOptionValue'
     ],
 ];

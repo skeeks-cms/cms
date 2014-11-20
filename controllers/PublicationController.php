@@ -12,7 +12,7 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\Controller;
+use skeeks\cms\base\Controller;
 use skeeks\cms\models\Publication;
 use skeeks\cms\models\searchs\Publication as PublicationSearch;
 use Yii;
@@ -26,9 +26,16 @@ class PublicationController extends Controller
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function actions()
     {
-        return [];
+        return
+        [
+            'view' =>
+            [
+                'class'                 => 'skeeks\cms\actions\ViewModelActionSeo',
+                'modelClassName'        => Publication::className(),
+            ],
+        ];
     }
 
 
@@ -42,18 +49,4 @@ class PublicationController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
-
-    /**
-     * @param $seo_page_name
-     * @return string
-     */
-    public function actionView($seo_page_name)
-    {
-        $model = Publication::findOne(["seo_page_name" => $seo_page_name]);
-
-        return $this->render('view', [
-            'model'         => $model,
-        ]);
-    }
-
 }

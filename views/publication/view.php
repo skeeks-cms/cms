@@ -14,9 +14,6 @@ use yii\helpers\Html;
 /* @var $model common\models\Publication */
 /* @var $personal bool */
 
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = $this->title;
-
 $game = "";//$model->getGame()->one();
 ?>
 

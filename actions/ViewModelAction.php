@@ -37,21 +37,34 @@ class ViewModelAction extends Action
      */
     protected $_model = null;
 
-
     /**
      * Runs the action
      *
      * @return string result content
      */
-    public function run(Model $model)
+    public function run($model)
     {
         $this->_model = $model;
-        \Yii::$app->pageOptions->setValuesFromModel($model);
+        return $this->_go();
+    }
+
+    /**
+     * @return string
+     */
+    protected function _go()
+    {
+        if (!$this->_model)
+        {
+            return false;
+        }
+
+        \Yii::$app->pageOptions->setValuesFromModel($this->_model);
 
         $this
             ->_initMetaData()
             ->_initTypes()
             ->_initGlobalLayout()
+            ->_initActionView()
         ;
 
         if (Yii::$app->getRequest()->getIsAjax())
@@ -61,11 +74,25 @@ class ViewModelAction extends Action
         {
 
             return $this->controller->render($this->view ?: $this->id, [
-                'model' => $model
+                'model' => $this->_model
             ]);
         }
     }
 
+
+    /**
+     * Установка глобального layout-a
+     * @return $this
+     */
+    protected function _initActionView()
+    {
+        if ($value = \Yii::$app->pageOptions->getComponent('action_view')->getValue()->value)
+        {
+            $this->view = $value;
+        }
+
+        return $this;
+    }
 
     /**
      * Установка глобального layout-a

@@ -18,7 +18,7 @@ use yii\helpers\Html;
 <?= $form->field($model, 'value')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
-                 \Yii::$app->registeredLayouts->getComponents(),
+                 \Yii::$app->registeredModels->getDescriptor($modelEntity)->getActionViews()->getComponents(),
                  "id",
                  "name"
              ),
@@ -27,6 +27,4 @@ use yii\helpers\Html;
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
-
-
 

@@ -108,6 +108,7 @@ class StorageFilesController extends Controller
         {
 
             $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
+
             /**
              * @var \common\models\Game $model
              */
