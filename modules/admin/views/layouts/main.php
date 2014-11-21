@@ -165,7 +165,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
-            <? if ($items = \Yii::$app->adminMenu->groups) : ?>
+            <? if ($items = \Yii::$app->adminMenu->getAllowData()) : ?>
                 <? foreach ($items as $keyGroup => $groupData) : ?>
 
                     <? if (\yii\helpers\ArrayHelper::getValue($groupData, 'enabled' , true) === true) : ?>

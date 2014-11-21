@@ -9,6 +9,8 @@
  * @since 1.0.0
  */
 namespace skeeks\cms;
+use skeeks\cms\modules\admin\components\UrlRule;
+
 /**
  * Class Module
  * @package skeeks\cms
@@ -37,4 +39,6 @@ class Module extends base\Module
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
         ]);
     }
+
+
 }

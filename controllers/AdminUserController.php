@@ -21,6 +21,9 @@ use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\rbac\Item;
+use yii\web\Response;
 
 /**
  * Class AdminUserController
@@ -62,6 +65,17 @@ class AdminUserController extends AdminModelEditorSmartController
                             ]
                         ]
                     ],
+
+                    'permission' =>
+                    [
+                        "label" => "Привилегии",
+                        "rules" =>
+                        [
+                            [
+                                "class" => HasModel::className()
+                            ]
+                        ]
+                    ],
                 ]
             ]
         ]);
@@ -96,5 +110,126 @@ class AdminUserController extends AdminModelEditorSmartController
                 'model' => $modelForm,
             ]);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function actionPermission()
+    {
+        $model = $this->getCurrentModel();
+        $authManager = Yii::$app->authManager;
+        $avaliable = [];
+        $assigned = [];
+        foreach ($authManager->getRolesByUser($model->primaryKey) as $role) {
+            $type = $role->type;
+            $assigned[$type == Item::TYPE_ROLE ? 'Roles' : 'Permissions'][$role->name] = $role->name;
+        }
+        foreach ($authManager->getRoles() as $role) {
+            if (!isset($assigned['Roles'][$role->name])) {
+                $avaliable['Roles'][$role->name] = $role->name;
+            }
+        }
+        foreach ($authManager->getPermissions() as $role) {
+            if ($role->name[0] !== '/' && !isset($assigned['Permissions'][$role->name])) {
+                $avaliable['Permissions'][$role->name] = $role->name;
+            }
+        }
+
+        return $this->render('permission', [
+                'model' => $model,
+                'avaliable' => $avaliable,
+                'assigned' => $assigned,
+                'idField' => 'id',
+                'usernameField' => 'username',
+        ]);
+    }
+
+
+
+    /**
+     * Assign or revoke assignment to user
+     * @param  integer $id
+     * @param  string  $action
+     * @return mixed
+     */
+    public function actionAssign($id, $action)
+    {
+        $post = Yii::$app->request->post();
+        $roles = $post['roles'];
+        $manager = Yii::$app->authManager;
+        $error = [];
+        if ($action == 'assign') {
+            foreach ($roles as $name) {
+                try {
+                    $item = $manager->getRole($name);
+                    $item = $item ? : $manager->getPermission($name);
+                    $manager->assign($item, $id);
+                } catch (\Exception $exc) {
+                    $error[] = $exc->getMessage();
+                }
+            }
+        } else {
+            foreach ($roles as $name) {
+                try {
+                    $item = $manager->getRole($name);
+                    $item = $item ? : $manager->getPermission($name);
+                    $manager->revoke($item, $id);
+                } catch (\Exception $exc) {
+                    $error[] = $exc->getMessage();
+                }
+            }
+        }
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return [$this->actionRoleSearch($id, 'avaliable', $post['search_av']),
+            $this->actionRoleSearch($id, 'assigned', $post['search_asgn']),
+            $error];
+    }
+
+    /**
+     * Search roles of user
+     * @param  integer $id
+     * @param  string  $target
+     * @param  string  $term
+     * @return string
+     */
+    public function actionRoleSearch($id, $target, $term = '')
+    {
+        $authManager = Yii::$app->authManager;
+        $avaliable = [];
+        $assigned = [];
+        foreach ($authManager->getRolesByUser($id) as $role) {
+            $type = $role->type;
+            $assigned[$type == Item::TYPE_ROLE ? 'Roles' : 'Permissions'][$role->name] = $role->name;
+        }
+        foreach ($authManager->getRoles() as $role) {
+            if (!isset($assigned['Roles'][$role->name])) {
+                $avaliable['Roles'][$role->name] = $role->name;
+            }
+        }
+        foreach ($authManager->getPermissions() as $role) {
+            if ($role->name[0] !== '/' && !isset($assigned['Permissions'][$role->name])) {
+                $avaliable['Permissions'][$role->name] = $role->name;
+            }
+        }
+
+        $result = [];
+        $var = ${$target};
+        if (!empty($term)) {
+            foreach (['Roles', 'Permissions'] as $type) {
+                if (isset($var[$type])) {
+                    foreach ($var[$type] as $role) {
+                        if (strpos($role, $term) !== false) {
+                            $result[$type][$role] = $role;
+                        }
+                    }
+                }
+            }
+        } else {
+            $result = $var;
+        }
+
+        return Html::renderSelectOptions('', $result);
     }
 }

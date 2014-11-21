@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms;
 use skeeks\cms\base\components\Descriptor;
-use skeeks\cms\base\Module;
 use skeeks\cms\models\User;
 use skeeks\sx\models\IdentityMap;
 /**

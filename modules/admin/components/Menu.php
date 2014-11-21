@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\components;
+use skeeks\cms\App;
 use skeeks\cms\base\Component;
 
 /**
@@ -45,4 +46,44 @@ class Menu
             ]
         ]*/
     ];
+
+
+    /**
+        Получение только доступного меню
+     * @return array
+     */
+    public function getAllowData()
+    {
+        $groups = [];
+
+        foreach ($this->groups as $groupCode => $groupData)
+        {
+            if ($groupData['items'])
+            {
+                $items = [];
+                foreach ($groupData['items'] as $itemCode => $itemData)
+                {
+                    $permissionCode = App::moduleAdmin()->getPermissionCode($itemData['url'][0]);
+                    if ($permission = \Yii::$app->authManager->getPermission($permissionCode))
+                    {
+                        if (\Yii::$app->user->can($permission->name))
+                        {
+                            $items[$itemCode] = $itemData;
+                        }
+                    } else
+                    {
+                        $items[$itemCode] = $itemData;
+                    }
+                }
+
+                if ($items)
+                {
+                    $groupData['items'] = $items;
+                    $groups[$groupCode] = $groupData;
+                }
+            }
+        }
+
+        return $groups;
+    }
 }

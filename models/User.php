@@ -317,7 +317,7 @@ class User
      * Finds user by username
      *
      * @param string $username
-     * @return static|null
+     * @return User
      */
     public static function findByUsername($username)
     {

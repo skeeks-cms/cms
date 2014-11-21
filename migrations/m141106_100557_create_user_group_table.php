@@ -106,7 +106,7 @@ class m141106_100557_create_user_group_table extends Migration
 
 
         $this->insert('{{%cms_user}}', [
-            "username"              => "admin",
+            "username"              => "root",
             "name"                  => "Семенов Александр",
             "city"                  => "Зеленоград",
             "address"               => "Зеленоград, ул. Каменка, 2004-25",

@@ -26,13 +26,17 @@ use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\behaviors\BlameableBehavior;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -303,6 +307,41 @@ class AdminModelEditorController extends AdminController
         $this->_currentModel = $model;
         return $this;
     }
+
+
+
+
+
+    protected function _actionAccess(ActionEvent $e)
+    {
+        if ($this->getCurrentModel())
+        {
+            if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->getCurrentModel())->isValid())
+            {
+                $acttionPermissionNameOwn = App::moduleAdmin()->getPermissionCode($this->getUniqueId() . '/' . $e->action->id);
+                if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionNameOwn))
+                {
+                    if (!\Yii::$app->user->can($permission->name, [
+                        'model' => $this->getCurrentModel()
+                    ]))
+                    {
+                        throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
+                    }
+                }
+            } else
+            {
+                parent::_actionAccess($e);
+            }
+
+
+        } else
+        {
+            parent::_actionAccess($e);
+        }
+
+        return $this;
+    }
+
 
 
     /**

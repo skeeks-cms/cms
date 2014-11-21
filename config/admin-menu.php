@@ -112,12 +112,24 @@ return
         [
             [
                 "label"     => "Роли",
-                "url"       => ["admin/roles"],
+                "url"       => ["admin/role"],
                 'enabled'   => true,
                 'priority'  => 0,
             ],
 
+            [
+                "label"     => "Привилегии",
+                "url"       => ["admin/permission"],
+                'enabled'   => true,
+                'priority'  => 0,
+            ],
 
+            /*[
+                "label"     => "Правила",
+                "url"       => ["admin/rule"],
+                'enabled'   => true,
+                'priority'  => 0,
+            ],*/
         ]
     ],
 ];

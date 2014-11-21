@@ -145,4 +145,19 @@ class Module extends CmsModule
 
         return null;
     }
+
+
+    /**
+     * @param string $route
+     * @return string
+     */
+    public function getPermissionCode($route = '')
+    {
+        return UrlRule::ADMIN_PARAM_VALUE . '__' . $route;
+    }
+
+    public function getPermissionCodeOwn($route = '')
+    {
+        return $this->getPermissionCode($route) . '/own';
+    }
 }
