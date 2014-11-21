@@ -142,6 +142,9 @@ php yii migrate --migrationPath=@skeeks/cms/migrations
 
 # установка миграций проекта (по умолчанию их не будет, cms с собой принесет все что нужно)
 php yii migrate
+
+# установка прав доступа
+php yii cms/rbac/init
 ~~~
 
 
