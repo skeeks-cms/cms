@@ -13,6 +13,8 @@ namespace skeeks\cms\modules\admin\controllers;
 
 use skeeks\cms\models\AuthItem;
 use skeeks\cms\models\searchs\AuthItem as AuthItemSearch;
+use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -22,21 +24,75 @@ use yii\helpers\Html;
 /**
  * AuthItemController implements the CRUD actions for AuthItem model.
  */
-class RoleController extends Controller
+class RoleController extends AdminController
 {
+    public function init()
+    {
+        $this->_label                   = "Управление ролями";
+        parent::init();
+    }
+
     /**
      * @inheritdoc
      */
     public function behaviors()
     {
-        return [
+        return ArrayHelper::merge(parent::behaviors(), [
+
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
                 ],
             ],
-        ];
+
+            self::BEHAVIOR_ACTION_MANAGER =>
+            [
+                "actions" =>
+                [
+                    "index" =>
+                    [
+                        "label"         => "Список",
+                        "icon"         => "glyphicon glyphicon-th-list",
+                        "rules"         => NoModel::className()
+                    ],
+
+                    "create" =>
+                    [
+                        "label"         => "Добавить",
+                        "icon"          => "glyphicon glyphicon-plus",
+                        "rules"         => NoModel::className()
+                    ],
+
+
+
+
+                    /*"view" =>
+                    [
+                        "label"         => "Смотреть",
+                        "icon"          => "glyphicon glyphicon-eye-open",
+                        "rules"         => HasModel::className()
+                    ],
+
+                    "update" =>
+                    [
+                        "label"         => "Редактировать",
+                        "icon"          => "glyphicon glyphicon-pencil",
+                        "rules"         => HasModel::className()
+                    ],
+
+                    "delete" =>
+                    [
+                        "label"         => "Удалить",
+                        "icon"          => "glyphicon glyphicon-trash",
+                        "method"        => "post",
+                        "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+                        "priority"      => 9999,
+                        "rules"         => HasModel::className()
+                    ]*/
+                ]
+            ]
+        ]);
     }
     /**
      * Lists all AuthItem models.

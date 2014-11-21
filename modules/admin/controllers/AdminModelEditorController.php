@@ -154,7 +154,7 @@ class AdminModelEditorController extends AdminController
 
         if (!is_subclass_of($this->_modelClassName, ActiveRecord::className()))
         {
-            throw new InvalidConfigException("{$this->_modelClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
+            //throw new InvalidConfigException("{$this->_modelClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
         }
 
         //TODO: доработать
@@ -167,7 +167,7 @@ class AdminModelEditorController extends AdminController
 
             if (!is_subclass_of($this->_modelSearchClassName, ActiveRecord::className()))
             {
-                throw new InvalidConfigException("{$this->_modelSearchClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
+                //throw new InvalidConfigException("{$this->_modelSearchClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
             }
         }
     }
@@ -308,39 +308,6 @@ class AdminModelEditorController extends AdminController
         return $this;
     }
 
-
-
-
-
-    protected function _actionAccess(ActionEvent $e)
-    {
-        if ($this->getCurrentModel())
-        {
-            if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->getCurrentModel())->isValid())
-            {
-                $acttionPermissionNameOwn = App::moduleAdmin()->getPermissionCode($this->getUniqueId() . '/' . $e->action->id);
-                if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionNameOwn))
-                {
-                    if (!\Yii::$app->user->can($permission->name, [
-                        'model' => $this->getCurrentModel()
-                    ]))
-                    {
-                        throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
-                    }
-                }
-            } else
-            {
-                parent::_actionAccess($e);
-            }
-
-
-        } else
-        {
-            parent::_actionAccess($e);
-        }
-
-        return $this;
-    }
 
 
 

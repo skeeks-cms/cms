@@ -19,6 +19,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
+use skeeks\cms\modules\admin\filters\AccessRule;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
@@ -55,11 +56,14 @@ abstract class AdminController extends Controller
             'access' =>
             [
                 'class' => AccessControl::className(),
-                'rules' => [
+                'ruleConfig' => ['class' => AccessRule::className()],
+
+                'rules' =>
+                [
                     [
                         'allow' => true,
                         'roles' => ['cms.admin-access'],
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -144,28 +148,9 @@ abstract class AdminController extends Controller
      */
     protected function _beforeAction(ActionEvent $e)
     {
-        $this->_actionAccess($e);
-
         $this->_renderActions($e);
         $this->_renderBreadcrumbs($e);
         $this->_renderMetadata($e);
-    }
-
-    protected function _actionAccess(ActionEvent $e)
-    {
-
-            //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
-        $acttionPermissionName = App::moduleAdmin()->getPermissionCode($this->getUniqueId() . '/' . $e->action->id);
-
-        if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
-        {
-            if (!\Yii::$app->user->can($permission->name))
-            {
-                throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
-            }
-        }
-
-        return $this;
     }
 
     /**

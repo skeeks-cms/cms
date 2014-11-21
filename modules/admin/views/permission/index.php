@@ -36,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'description',
                 'label' => Yii::t('app', 'Description'),
             ],
+
             ['class' => 'yii\grid\ActionColumn',],
         ],
     ]);
