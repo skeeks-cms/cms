@@ -18,6 +18,8 @@ class m140801_201442_create_user_table extends Migration
 {
     public function up()
     {
+        $authManager = $this->getAuthManager();
+
         $tableExist = $this->db->getTableSchema("{{%cms_user}}", true);
         if ($tableExist)
         {
@@ -91,6 +93,25 @@ class m140801_201442_create_user_table extends Migration
         $this->execute("ALTER TABLE {{%cms_user}} COMMENT = 'Пользователь';");
 
 
+
+        $this->addForeignKey(
+            $authManager->assignmentTable . '_user_id', $authManager->assignmentTable,
+            'user_id', '{{%cms_user}}', 'id', 'CASCADE', 'CASCADE'
+        );
+
+    }
+
+    /**
+     * @throws yii\base\InvalidConfigException
+     * @return \yii\rbac\DbManager
+     */
+    protected function getAuthManager()
+    {
+        $authManager = Yii::$app->getAuthManager();
+        if (!$authManager instanceof \yii\rbac\DbManager) {
+            throw new \yii\base\InvalidConfigException('You should configure "authManager" component to use database before executing this migration.');
+        }
+        return $authManager;
     }
 
     public function down()

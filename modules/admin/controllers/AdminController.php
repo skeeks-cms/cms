@@ -75,27 +75,6 @@ abstract class AdminController extends Controller
 
         $this->_ensure();
         $this->layout = App::moduleAdmin()->layout;
-
-
-        //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
-        $controllerPermissionName = App::moduleAdmin()->getPermissionCode($this->getUniqueId());
-        if ($permission = \Yii::$app->authManager->getPermission($controllerPermissionName))
-        {
-            if (!\Yii::$app->user->can($permission->name))
-            {
-                if (\Yii::$app->user->getIsGuest())
-                {
-                    \Yii::$app->getResponse()->redirect(
-                        UrlHelper::construct("admin/auth/login")->setCurrentRef()->enableAdmin()->createUrl()
-                    );
-                } else
-                {
-                    throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
-                }
-
-            }
-        }
-
         $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
     }
 

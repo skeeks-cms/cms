@@ -20,6 +20,7 @@ use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\Action;
 use yii\behaviors\BlameableBehavior;
+use yii\console\Application;
 use yii\web\Request;
 use yii\web\User;
 use yii\web\ForbiddenHttpException;

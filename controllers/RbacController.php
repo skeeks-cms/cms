@@ -97,7 +97,6 @@ class RbacController extends Controller
                                 foreach ($actions as $actionCode => $actionData)
                                 {
                                     $permissionCode = App::moduleAdmin()->getPermissionCode($controller->getUniqueId() . '/' . $actionCode);
-
                                     //Привилегия доступу к админке
                                     if (!$adminAccess = $auth->getPermission($permissionCode))
                                     {

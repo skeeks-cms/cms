@@ -153,7 +153,7 @@ class Module extends CmsModule
      */
     public function getPermissionCode($route = '')
     {
-        return UrlRule::ADMIN_PARAM_VALUE . '__' . $route;
+        return $route;
     }
 
     public function getPermissionCodeOwn($route = '')
