@@ -178,21 +178,23 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                             <? if ($itemsGroup = \yii\helpers\ArrayHelper::getValue($groupData, 'items', [])) : ?>
                                 <ul class="nav nav-sidebar">
                                     <? foreach ($itemsGroup as $itemData) : ?>
-                                        <li <?= strpos('-' . \Yii::$app->controller->route, $itemData["url"][0]) ? 'class="active"' : '' ?>>
-                                            <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#">
-                                                <? if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : ?>
-                                                    <? list($assetClassName, $localPath) = $imgData; ?>
-                                                    <span class="sx-icon">
-                                                        <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); ?>" />
-                                                    </span>
-                                                <? else: ?>
-                                                    <span class="sx-icon">
-                                                        <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register($this), 'images/icons/ico_block.gif'); ?>" />
-                                                    </span>
-                                                <? endif; ?>
-                                                <span class="txt"><?= $itemData["label"]; ?></span>
-                                            </a>
-                                        </li>
+                                        <? if (\yii\helpers\ArrayHelper::getValue($itemData, 'enabled' , true) === true) : ?>
+                                            <li <?= strpos('-' . \Yii::$app->controller->route, $itemData["url"][0]) ? 'class="active"' : '' ?>>
+                                                <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#">
+                                                    <? if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : ?>
+                                                        <? list($assetClassName, $localPath) = $imgData; ?>
+                                                        <span class="sx-icon">
+                                                            <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); ?>" />
+                                                        </span>
+                                                    <? else: ?>
+                                                        <span class="sx-icon">
+                                                            <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register($this), 'images/icons/ico_block.gif'); ?>" />
+                                                        </span>
+                                                    <? endif; ?>
+                                                    <span class="txt"><?= $itemData["label"]; ?></span>
+                                                </a>
+                                            </li>
+                                        <? endif; ?>
                                     <? endforeach; ?>
                                 </ul>
                             <? endif; ?>

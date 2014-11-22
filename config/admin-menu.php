@@ -50,7 +50,8 @@ return
             [
                 "label"     => "Управление группами пользователей",
                 "url"       => ["cms/admin-user-group"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png']
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
+                'enabled'   => false
             ],
 
             [
@@ -113,6 +114,7 @@ return
             [
                 "label"     => "Роли",
                 "url"       => ["admin/role"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
                 'enabled'   => true,
                 'priority'  => 0,
             ],
