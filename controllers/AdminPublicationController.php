@@ -30,7 +30,7 @@ class AdminPublicationController extends AdminModelEditorSmartController
     {
         $this->_label                   = "Управление публикациями";
 
-        $this->_modelShowAttribute      = "id";
+        $this->_modelShowAttribute      = "name";
 
         $this->_modelClassName          = Publication::className();
 

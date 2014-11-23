@@ -14,6 +14,7 @@ use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\controllers\AdminSubscribeController;
 use skeeks\cms\Exception;
+use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
@@ -151,14 +152,14 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     ],
 
 
-                    'meta-data' =>
+                    'universal-link' =>
                     [
-                        "label"     => "Мета данные",
+                        "label"     => "Универсальная связь",
                         "rules"     =>
                         [
                             [
                                 "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasMetaData::className()
+                                "behaviors" => CanBeLinkedToModel::className()
                             ]
                         ]
                     ],
@@ -281,7 +282,23 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     {
         $model = $this->getModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        {
+            return $this->redirect(['seo-page-url', 'id' => $model->id]);
+        } else
+        {
+            return $this->output(App::moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
+
+    public function actionUniversalLink()
+    {
+        $model = $this->getModel();
+        die('1');
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             return $this->redirect(['seo-page-url', 'id' => $model->id]);
         } else
@@ -329,23 +346,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         ]));
     }
 
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionMetaData()
-    {
-        $model = $this->getModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
-        {
-            return $this->redirect(['meta-data', 'id' => $model->id]);
-        } else
-        {
-            return $this->output(App::moduleAdmin()->renderFile("base-actions/meta-data.php", [
-                "model" => $this->getModel()
-            ]));
-        }
-    }
 
     /**
      * @return string|\yii\web\Response
@@ -354,7 +355,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     {
         $model = $this->getModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             return $this->redirect(['descriptions', 'id' => $model->id]);
         } else
