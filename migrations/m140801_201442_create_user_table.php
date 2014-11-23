@@ -95,7 +95,7 @@ class m140801_201442_create_user_table extends Migration
 
 
         $this->addForeignKey(
-            $authManager->assignmentTable . '_user_id', $authManager->assignmentTable,
+            'auth_assignment_user_id', $authManager->assignmentTable,
             'user_id', '{{%cms_user}}', 'id', 'CASCADE', 'CASCADE'
         );
 
@@ -116,6 +116,9 @@ class m140801_201442_create_user_table extends Migration
 
     public function down()
     {
+        $authManager = $this->getAuthManager();
+
+        $this->dropForeignKey("auth_assignment_user_id", $authManager->assignmentTable);
         $this->dropTable('{{%cms_user}}');
     }
 }
