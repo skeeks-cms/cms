@@ -16,12 +16,15 @@ use skeeks\sx\traits\Entity;
 use skeeks\sx\traits\InstanceObject;
 use yii\base\Object;
 use yii\helpers\ArrayHelper;
+use yii\helpers\BaseUrl;
+use yii\helpers\Url;
 
 /**
  * Class RequestOptions
  * @package skeeks\cms\helpers
  */
 class UrlHelper
+    extends BaseUrl
 {
     use Entity;
 
@@ -62,6 +65,15 @@ class UrlHelper
         return $url;
     }
 
+
+    /**
+     * @return $this
+     */
+    public function normalizeCurrentRoute()
+    {
+        $this->_route = self::normalizeRoute($this->_route);
+        return $this;
+    }
     /**
      * @param $route
      * @return $this

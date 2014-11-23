@@ -14,6 +14,7 @@ use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\controllers\AdminSubscribeController;
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
@@ -39,6 +40,7 @@ use yii\base\Model;
 use yii\base\View;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
@@ -284,7 +286,8 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
-            return $this->redirect(['seo-page-url', 'id' => $model->id]);
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            return $this->redirect(UrlHelper::constructCurrent()->setRoute('seo-page-url')->normalizeCurrentRoute()->enableAdmin()->toString());
         } else
         {
             return $this->output(App::moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
@@ -296,8 +299,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     public function actionUniversalLink()
     {
         $model = $this->getModel();
-        die('1');
-
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             return $this->redirect(['seo-page-url', 'id' => $model->id]);
