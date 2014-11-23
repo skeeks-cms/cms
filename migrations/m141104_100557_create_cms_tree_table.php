@@ -92,7 +92,7 @@ class m141104_100557_create_cms_tree_table extends Migration
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(has_children);");
 
         $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(pid, seo_page_name);");
-        $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(pid_main, dir);");
+        //$this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(pid_main, dir);");
         $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(main_root);");
 
         $this->execute("ALTER TABLE {{%cms_tree}} COMMENT = 'Страницы дерево';");
