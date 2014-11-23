@@ -26,6 +26,7 @@ use skeeks\sx\validators\ChainAnd;
 use yii\base\Event;
 use yii\base\ModelEvent;
 use yii\db\ActiveQuery;
+use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Json;
 use yii\validators\Validator;
@@ -72,11 +73,23 @@ class TreeBehavior extends ActiveRecordBehavior
         return array_merge(parent::events(), [
             BaseActiveRecord::EVENT_BEFORE_INSERT          => "beforeSaveNode",
             BaseActiveRecord::EVENT_BEFORE_UPDATE          => "beforeSaveNode",
+            BaseActiveRecord::EVENT_AFTER_UPDATE           => "afterUpdateNode",
             BaseActiveRecord::EVENT_BEFORE_DELETE          => "beforeDeleteNode",
             BaseActiveRecord::EVENT_AFTER_DELETE           => "afterDeleteNode",
         ]);
     }
 
+    public function afterUpdateNode(AfterSaveEvent $event)
+    {
+        if ($event->changedAttributes)
+        {
+            //Если изменилось название seo_page_name
+            if (isset($event->changedAttributes[$this->pageAttrName]))
+            {
+                $event->sender->processNormalize();
+            }
+        }
+    }
     public function beforeSaveNode(ModelEvent $event)
     {
         //Если не заполнено название, нужно сгенерить
@@ -89,8 +102,6 @@ class TreeBehavior extends ActiveRecordBehavior
         {
             $this->generateSeoPageName();
         }
-
-
 
         //Обновляем главного родителя
         if ($this->getLevel() == 0)
@@ -399,13 +410,13 @@ class TreeBehavior extends ActiveRecordBehavior
         if (!$this->hasParent())
         {
             $this->owner->setAttribute($this->dirAttrName, null);
-            $this->owner->save();
+            $this->owner->save(false);
         }
         else
         {
             $parent = $this->findParent();
             $this->setAttributesForFutureParent($parent);
-            $this->owner->save();
+            $this->owner->save(false);
         }
 
 
@@ -414,7 +425,7 @@ class TreeBehavior extends ActiveRecordBehavior
         if ($childModels)
         {
             $this->owner->setAttribute($this->hasChildrenAttrName, 1);
-            $this->owner->save();
+            $this->owner->save(false);
 
             foreach ($childModels as $childModel)
             {
@@ -423,7 +434,7 @@ class TreeBehavior extends ActiveRecordBehavior
         } else
         {
             $this->owner->setAttribute($this->hasChildrenAttrName, 0);
-            $this->owner->save();
+            $this->owner->save(false);
         }
 
         return $this->owner;
