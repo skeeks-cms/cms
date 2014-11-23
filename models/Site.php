@@ -62,7 +62,7 @@ class Site extends Core
             'name' => 'Главная страница',
         ]);
 
-        if (!$tree->save())
+        if (!$tree->save(false))
         {
             throw new Exception('Не удалось создать раздел дерева');
         }
