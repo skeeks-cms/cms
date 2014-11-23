@@ -27,10 +27,11 @@ class m141111_100557_alter_tables_tree_and_publication extends Migration
 
 
         $this->execute(<<<SQL
-INSERT INTO {{%cms_tree}} (`id`, `created_by`, `updated_by`, `created_at`, `updated_at`, `name`, `description_short`, `description_full`, `meta_title`, `meta_description`, `meta_keywords`, `image`, `image_cover`, `images`, `files`, `seo_page_name`, `count_comment`, `count_subscribe`, `users_subscribers`, `count_vote`, `result_vote`, `users_votes_up`, `users_votes_down`, `status`, `status_adult`, `pid`, `pids`, `level`, `dir`, `has_children`, `main_root`, `priority`, `type`) VALUES
-(1, 1, 1, 1416084922, 1416084922, 'Главная страница', NULL, NULL, NULL, NULL, NULL, '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, '', '', 10, 0, NULL, '', 0, NULL, 0, 1, 0, NULL);
+        INSERT INTO `cms_tree` (`id`, `created_by`, `updated_by`, `created_at`, `updated_at`, `name`, `description_short`, `description_full`, `image`, `image_cover`, `images`, `files`, `seo_page_name`, `count_comment`, `count_subscribe`, `users_subscribers`, `count_vote`, `result_vote`, `users_votes_up`, `users_votes_down`, `status`, `status_adult`, `pid`, `pid_main`, `pids`, `level`, `dir`, `has_children`, `main_root`, `priority`, `type`, `page_options`) VALUES
+(1, 1, 1, 1416084922, 1416491862, 'Главная страница', NULL, NULL, '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, '', '', 10, 0, NULL, NULL, '', 0, NULL, 1, 1, 0, 'homePage', '{"_":{"meta_title":{"value":"Главная страница по умолчанию"},"meta_keywords":{"value":"Главная страница по умолчанию"},"meta_description":{"value":"Главная страница по умолчанию"}}}');
 SQL
 );
+
     }
 
     public function down()

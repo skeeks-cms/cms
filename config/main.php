@@ -125,7 +125,7 @@ $config =
         'langs' =>
         [
             'class' => '\skeeks\cms\components\Langs',
-            'components' =>
+            /*'components' =>
             [
                 'ru' =>
                 [
@@ -136,7 +136,7 @@ $config =
                 [
                     'name' => 'Английский'
                 ],
-            ]
+            ]*/
         ],
     ],
 
