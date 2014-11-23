@@ -179,7 +179,7 @@ $application->run();
 
 Root доступ для управления:
 
-user: admin
+user: root
 
 password: skeeks
 
