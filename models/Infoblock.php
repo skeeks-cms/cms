@@ -175,13 +175,12 @@ class Infoblock extends Core
     }
 
 
-
     /**
-     * @return mixed
+     * @return array
      */
     public function getMultiConfig()
     {
-        return $this->getMultiFieldValue('config');
+        return (array) $this->getMultiFieldValue('config');
     }
 
     /**

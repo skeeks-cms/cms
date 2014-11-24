@@ -21,9 +21,11 @@
  */
 namespace skeeks\cms\models;
 
+use skeeks\cms\models\behaviors\HasAdultStatus;
 use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
+use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
 
@@ -75,6 +77,8 @@ abstract class PageAdvanced extends Page
             HasSubscribes::className(),
             HasVotes::className(),
             HasDescriptionsBehavior::className(),
+            HasAdultStatus::className() => HasAdultStatus::className(),
+            HasStatus::className() => HasStatus::className(),
             behaviors\HasFiles::className() =>
             [
                 "class"  => HasFiles::className(),

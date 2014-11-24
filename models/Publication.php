@@ -14,7 +14,9 @@ namespace skeeks\cms\models;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
+use skeeks\cms\models\behaviors\HasAdultStatus;
 use skeeks\cms\models\behaviors\HasPageOptions;
+use skeeks\cms\models\behaviors\HasStatus;
 use Yii;
 
 /**
@@ -42,7 +44,7 @@ class Publication extends PageAdvanced
         return array_merge(parent::behaviors(), [
             CanBeLinkedToModel::className(),
             CanBeLinkedToTree::className(),
-            HasPageOptions::className() => HasPageOptions::className()
+            HasPageOptions::className() => HasPageOptions::className(),
         ]);
     }
 

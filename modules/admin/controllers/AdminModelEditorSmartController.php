@@ -16,12 +16,14 @@ use skeeks\cms\controllers\AdminSubscribeController;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
+use skeeks\cms\models\behaviors\HasAdultStatus;
 use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMetaData;
 use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\HasSeoPageUrl;
+use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
 use skeeks\cms\models\behaviors\HasPublications;
@@ -175,6 +177,33 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             [
                                 "class"     => HasModelBehaviors::className(),
                                 "behaviors" => HasPageOptions::className()
+                            ]
+                        ]
+                    ],
+
+
+                    'status' =>
+                    [
+                        "label"     => "Статус",
+                        'icon'      => 'glyphicon glyphicon-plus-sign',
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasStatus::className()
+                            ]
+                        ]
+                    ],
+
+                    'status-adult' =>
+                    [
+                        "label"     => "Возрастной статус",
+                        'icon'      => 'glyphicon glyphicon-plus-sign',
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasAdultStatus::className()
                             ]
                         ]
                     ],
@@ -368,5 +397,42 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     }
 
 
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionStatus()
+    {
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        {
+            return $this->redirect([$this->action->id, 'id' => $model->id]);
+        } else
+        {
+            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/status.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
+
+
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionStatusAdult()
+    {
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        {
+            return $this->redirect([$this->action->id, 'id' => $model->id]);
+        } else
+        {
+            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/status-adult.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
 
 }

@@ -184,16 +184,16 @@ class Cms extends \skeeks\cms\base\Component
      *
      * Вызов инфоблока
      *
-     * @param string $code
+     * @param string|int $id
      * @param array $config
      * @param array $options
      * @return string
      */
-    public function widgetInfoblock($code, $config = [], $options = [])
+    public function widgetInfoblock($id, $config = [], $options = [])
     {
         return Infoblock::widget(ArrayHelper::merge($options, [
-            'code'      => (string) $code,
-            'config'    => (string) $config
+            'id'        => $id,
+            'config'    => $config
         ]));
     }
 

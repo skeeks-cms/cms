@@ -12,7 +12,9 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\behaviors\HasAdultStatus;
 use skeeks\cms\models\behaviors\HasPageOptions;
+use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;

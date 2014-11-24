@@ -18,14 +18,9 @@ use skeeks\cms\base\Widget;
 class Infoblock extends Widget
 {
     /**
-     * @var null|int
+     * @var int|string
      */
     public $id = null;
-
-    /**
-     * @var null|string
-     */
-    public $code = null;
 
     /**
      * Дополнительные настройки
@@ -33,6 +28,32 @@ class Infoblock extends Widget
      */
     public $config = [];
 
+    /**
+     * Делать новый запрос в базу обязательно, или использовать сохраненное ранее значение
+     * @var bool
+     */
+    public $refetch = false;
+
+
+    /**
+     * @var array
+     */
+    static public $regsteredBlocks = [];
+
+    /**
+     * @param $code
+     * @return bool|string
+     */
+    public function getRegistered($code)
+    {
+        if (isset(self::$regsteredBlocks[$code]))
+        {
+            return self::$regsteredBlocks[$code];
+        } else
+        {
+            return false;
+        }
+    }
 
     /**
      * @return string
@@ -41,19 +62,33 @@ class Infoblock extends Widget
     {
         $result = "";
 
-        if ($this->id)
+        if (!$this->id)
         {
-            $modelInfoblock = \skeeks\cms\models\Infoblock::findById($this->id);
-        } else if ($this->code)
-        {
-            $modelInfoblock = \skeeks\cms\models\Infoblock::findByCode($this->code);
+            return '';
         }
 
-        if (!$modelInfoblock)
+        $result = $this->getRegistered($this->id);
+
+        if ($result === false || $this->refetch)
         {
-            return $result;
+            if (is_string($this->id))
+            {
+                $modelInfoblock = \skeeks\cms\models\Infoblock::findByCode($this->id);
+            } else if (is_int($this->id))
+            {
+                $modelInfoblock = \skeeks\cms\models\Infoblock::findById($this->id);
+            }
+
+            if (!$modelInfoblock)
+            {
+                $result = '';
+            }
+
+            $result = $modelInfoblock->run($this->config);
+
+            self::$regsteredBlocks[$this->id] = $result;
         }
 
-        return $modelInfoblock->run($this->config);
+        return $result;
     }
 }
