@@ -23,7 +23,18 @@ class StaticBlock extends Widget
     /**
      * @var string
      */
-    public $code = null;
+    public $code    = null;
+
+    /**
+     * @var string Значение по умолчанию
+     */
+    public $default = null;
+
+    /**
+     * Делать новый запрос в базу обязательно, или использовать сохраненное ранее значение
+     * @var bool
+     */
+    public $refetch = false;
 
     /**
      * TODO: доработать, учитывать
@@ -32,21 +43,51 @@ class StaticBlock extends Widget
     public $sections = null;
 
     /**
+     * @var array
+     */
+    static public $regsteredBlocks = [];
+
+    /**
+     * @param $code
+     * @return bool|string
+     */
+    public function getRegistered($code)
+    {
+        if (isset(self::$regsteredBlocks[$code]))
+        {
+            return self::$regsteredBlocks[$code];
+        } else
+        {
+            return false;
+        }
+    }
+
+    /**
      * @return string
      */
     public function run()
     {
+        //Код не указан вернем значение по умолчанию
         if (!$this->code)
         {
-            return '';
-        } else
+            return $this->default;
+        }
+
+        $value = $this->getRegistered($this->code);
+
+        if ($value === false || $this->refetch)
         {
             if (!$staticBlock = \skeeks\cms\models\StaticBlock::findByCode($this->code))
             {
-                return '';
+                $value = $this->default;
+            } else
+            {
+                $value = $staticBlock->multiValue;
             }
+
+            self::$regsteredBlocks[$this->code] = $value;
         }
 
-        return $staticBlock->multiValue;
+        return $value;
     }
 }

@@ -84,8 +84,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 "action" => Yii::$app->urlManager->createUrl(["publication/add"]),
             ]); ?>
                 <div class="ub">
-                    <a href="<?= \skeeks\cms\App::user() ? \skeeks\cms\App::user()->getPageUrl() : "#" ?>" class="uph-img">
-                        <img src="<?= \skeeks\cms\App::user() ? \skeeks\cms\App::user()->getMainImage() : \Yii::$app->params["noimage"] ?>" alt="<?= \skeeks\cms\App::user() ? \skeeks\cms\App::user()->getDisplayName() : "" ?>">
+                    <a href="<?= \Yii::$app->cms->getAuthUser() ? \Yii::$app->cms->getAuthUser()->getPageUrl() : "#" ?>" class="uph-img">
+                        <img src="<?= \Yii::$app->cms->getAuthUser() ? \Yii::$app->cms->getAuthUser()->getMainImage() : \Yii::$app->params["noimage"] ?>" alt="<?= \Yii::$app->cms->getAuthUser() ? \Yii::$app->cms->getAuthUser()->getDisplayName() : "" ?>">
                     </a>
                 </div>
                 <div class="comment-input">
@@ -101,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="wrapp-main">
                 <? if ($publications = $model->getPublications()->orderBy("created_at DESC")->all()): ?>
-                    <?= skeeks\cms\App::renderFrontend("widgets/publication/list.php", [
+                    <?= \Yii::$app->cms->renderFrontend("widgets/publication/list.php", [
                         "publications" => $publications
                     ])?>
                 <? endif; ?>

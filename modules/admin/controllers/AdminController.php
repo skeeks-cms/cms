@@ -74,7 +74,7 @@ abstract class AdminController extends Controller
         parent::init();
 
         $this->_ensure();
-        $this->layout = App::moduleAdmin()->layout;
+        $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
         $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
     }
 

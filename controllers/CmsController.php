@@ -22,11 +22,11 @@ class CmsController extends Controller
 {
     public function actionIndex()
     {
-        return $this->output(App::moduleCms()->getDescriptor());
+        return $this->output(\Yii::$app->cms->moduleCms()->getDescriptor());
     }
 
     public function actionVersion()
     {
-        return $this->output(App::moduleCms()->getDescriptor());
+        return $this->output(\Yii::$app->cms->moduleCms()->getDescriptor());
     }
 }

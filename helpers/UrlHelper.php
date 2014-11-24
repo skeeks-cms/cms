@@ -57,7 +57,7 @@ class UrlHelper
     static public function constructCurrent()
     {
         $url = new static("/", \Yii::$app->request->getQueryParams());
-        if (App::moduleAdmin()->requestIsAdmin())
+        if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
         {
             $url->enableAdmin();
         }

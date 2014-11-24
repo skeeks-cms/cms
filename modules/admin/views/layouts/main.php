@@ -12,7 +12,7 @@ use skeeks\cms\helpers\UrlHelper;
 
 AdminAsset::register($this);
 
-$sidebarHidden = App::getAuth()->getIsGuest();
+$sidebarHidden = \Yii::$app->user->getIsGuest();
 
 ?>
 <?php $this->beginPage() ?>
@@ -23,7 +23,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <!-- <?= App::moduleCms()->getDescriptor()->getCopyright(); ?> -->
+    <!-- <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?> -->
     <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
     <?php $this->head() ?>
 </head>
@@ -34,7 +34,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
 <?php $this->beginBody() ?>
 <div class="navbar" role="navigation">
     <div class="navbar-header">
-        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>Cms</span>', App::moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
+        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>Cms</span>', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
     </div>
 
     <? if (!$sidebarHidden): ?>
@@ -65,10 +65,10 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                 <li>
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?= App::moduleAdmin()->getCurrentSite() ? App::moduleAdmin()->getCurrentSite()->host_name : 'Сайт'?> <span class="caret"></span>
+                        <?= \Yii::$app->cms->moduleAdmin()->getCurrentSite() ? \Yii::$app->cms->moduleAdmin()->getCurrentSite()->host_name : 'Сайт'?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                          <? if (App::moduleAdmin()->getCurrentSite()) : ?>
+                          <? if (\Yii::$app->cms->moduleAdmin()->getCurrentSite()) : ?>
                               <li>
                                 <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', ''); ?>" data-method="post">
                                     Сбросить сайт
@@ -93,11 +93,11 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                 <li>
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?= App::moduleAdmin()->getCurrentLang() ? App::moduleAdmin()->getCurrentLang()->name . ' (' . App::moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'?> <span class="caret"></span>
+                        <?= \Yii::$app->cms->moduleAdmin()->getCurrentLang() ? \Yii::$app->cms->moduleAdmin()->getCurrentLang()->name . ' (' . \Yii::$app->cms->moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
 
-                          <? if (App::moduleAdmin()->getCurrentLang()) : ?>
+                          <? if (\Yii::$app->cms->moduleAdmin()->getCurrentLang()) : ?>
                               <li>
                                 <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', ''); ?>" data-method="post">
                                     Сбросить язык
@@ -180,7 +180,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
                                     <? foreach ($itemsGroup as $itemData) : ?>
                                         <? if (\yii\helpers\ArrayHelper::getValue($itemData, 'enabled' , true) === true) : ?>
                                             <li <?= strpos('-' . \Yii::$app->controller->route, $itemData["url"][0]) ? 'class="active"' : '' ?>>
-                                                <a href="<?= App::moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#">
+                                                <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#">
                                                     <? if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : ?>
                                                         <? list($assetClassName, $localPath) = $imgData; ?>
                                                         <span class="sx-icon">
@@ -257,7 +257,7 @@ $sidebarHidden = App::getAuth()->getIsGuest();
 <footer class="sx-admin-footer">
     <div class="row">
         <div class="col-sm-5">
-            <?= App::moduleCms()->getDescriptor()->getCopyright(); ?>
+            <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
              | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
         </div><!--/.col-->
         <div class="col-sm-7 text-right">

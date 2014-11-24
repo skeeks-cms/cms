@@ -1,76 +1,37 @@
 <?php
 /**
- * App
+ * Cms
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
- * @date 28.10.2014
+ * @date 24.11.2014
  * @since 1.0.0
  */
-namespace skeeks\cms;
-use skeeks\cms\base\components\Descriptor;
-use skeeks\cms\models\User;
+namespace skeeks\cms\components;
+
+use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\Site;
+use skeeks\cms\models\StorageFile;
+use skeeks\cms\models\TreeType;
+use skeeks\cms\widgets\Infoblock;
+use skeeks\cms\widgets\StaticBlock;
 use skeeks\sx\models\IdentityMap;
+use Yii;
+use yii\base\Component;
+use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
+
 /**
- *
- *
- * Class App
- * @package skeeks\cms
+ * Class Cms
+ * @package skeeks\cms\components
  */
-class App
+class Cms extends \skeeks\cms\base\Component
 {
-    /**
-     * @var null
-     */
-    static protected $_instance = null;
-
-    /**
-     * @return static
-     */
-    static public function getInstance()
-    {
-        if (is_null(self::$_instance))
-        {
-            self::$_instance = new static();
-        }
-
-        return self::$_instance;
-    }
-
-    /**
-     * @return App
-     */
-    static public function instance()
-    {
-        return static::getInstance();
-    }
-
-    protected function __construct()
-    {}
-
-    /**
-     * @var IdentityMap
-     */
-    protected $_entityMap = null;
-    /**
-     * @return IdentityMap
-     */
-    public function getEntityMap()
-    {
-        if (null === $this->_entityMap)
-        {
-            $this->_entityMap = new IdentityMap();
-        }
-
-        return $this->_entityMap;
-    }
-
-
     /**
      * @return \yii\web\User|\common\models\User|models\User|null
      */
-    static public function getUser()
+    static public function getAuthUser()
     {
         if (\Yii::$app->user->isGuest)
         {
@@ -78,31 +39,6 @@ class App
         }
 
         return \Yii::$app->user->identity;
-    }
-
-    /**
-     * @return mixed|\yii\web\User
-     */
-    static public function getAuth()
-    {
-        return \Yii::$app->user;
-    }
-
-
-    /**
-     * @return \yii\web\User
-     */
-    static public function auth()
-    {
-        return static::getAuth();
-    }
-
-    /**
-     * @return \common\models\User|\yii\web\User|models\User
-     */
-    static public function user()
-    {
-        return static::getUser();
     }
 
     /**
@@ -130,25 +66,6 @@ class App
     }
 
 
-        /**
-         * Удобный и быстрый доступ к модулям
-         */
-
-    /**
-     * @return null|\skeeks\cms\modules\admin\Module
-     */
-    static public function moduleAdmin()
-    {
-        return \Yii::$app->getModule("admin");
-    }
-
-    /**
-     * @return null|\skeeks\cms\Module
-     */
-    static public function moduleCms()
-    {
-        return \Yii::$app->getModule("cms");
-    }
 
     /**
      *
@@ -208,4 +125,76 @@ class App
     {
         return \Yii::$app->view->renderFile(\Yii::getAlias("@frontend/views/") . $template, $data);
     }
+
+
+    /**
+     * @return null|\skeeks\cms\modules\admin\Module
+     */
+    static public function moduleAdmin()
+    {
+        return \Yii::$app->getModule("admin");
+    }
+
+    /**
+     * @return null|\skeeks\cms\Module
+     */
+    static public function moduleCms()
+    {
+        return \Yii::$app->getModule("cms");
+    }
+
+
+
+    /**
+     * @var IdentityMap
+     */
+    protected $_entityMap = null;
+    /**
+     * @return IdentityMap
+     */
+    public function getEntityMap()
+    {
+        if (null === $this->_entityMap)
+        {
+            $this->_entityMap = new IdentityMap();
+        }
+
+        return $this->_entityMap;
+    }
+
+
+    /**
+     *
+     * Виджет статический блок
+     *
+     * @param string $code
+     * @param string $defaultValue
+     * @param array $options
+     * @return string
+     */
+    public function widgetStaticBlock($code, $defaultValue = '', $options = [])
+    {
+        return StaticBlock::widget(ArrayHelper::merge($options, [
+            'code'      => (string) $code,
+            'default'   => (string) $defaultValue
+        ]));
+    }
+
+    /**
+     *
+     * Вызов инфоблока
+     *
+     * @param string $code
+     * @param array $config
+     * @param array $options
+     * @return string
+     */
+    public function widgetInfoblock($code, $config = [], $options = [])
+    {
+        return Infoblock::widget(ArrayHelper::merge($options, [
+            'code'      => (string) $code,
+            'config'    => (string) $config
+        ]));
+    }
+
 }

@@ -69,7 +69,7 @@ class Module extends CmsModule
      */
     private function _loadMenuItems()
     {
-        $modules = App::getModules();
+        $modules = \Yii::$app->cms->getModules();
 
         $result = [];
         /**
@@ -81,7 +81,7 @@ class Module extends CmsModule
             $result = array_merge($result, $module->getAdminMenuItems());
         }
 
-        $result = array_merge($result, App::getAdminMenuItems());
+        $result = array_merge($result, \Yii::$app->cms->getAdminMenuItems());
 
         return $result;
     }

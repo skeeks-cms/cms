@@ -70,9 +70,9 @@ class AdminUserGroupController extends AdminModelEditorSmartController
 
         $dataProvider->query->andWhere(["group_id" => $this->getCurrentModel()->id]);
 
-        $controller = App::moduleCms()->createControllerByID("admin-user");
+        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-user");
 
-        return $this->output(App::moduleCms()->renderFile("admin-user/index.php", [
+        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-user/index.php", [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,

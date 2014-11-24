@@ -205,7 +205,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         }
 
-        return $this->output(App::moduleAdmin()->renderFile("base-actions/files.php", [
+        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
             "model"         => $this->getModel(),
             "allowFields"   => $allowFields
         ]));
@@ -220,9 +220,9 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
 
-        $controller = App::moduleCms()->createControllerByID("admin-comment");
+        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-comment");
 
-        return $this->output(App::moduleCms()->renderFile("admin-comment/index.php", [
+        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-comment/index.php", [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,
@@ -237,9 +237,9 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
 
-        $controller = App::moduleCms()->createControllerByID("admin-vote");
+        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-vote");
 
-        return $this->output(App::moduleCms()->renderFile("admin-vote/index.php", [
+        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-vote/index.php", [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,
@@ -254,9 +254,9 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
 
-        $controller = App::moduleCms()->createControllerByID("admin-publication");
+        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-publication");
 
-        return $this->output(App::moduleCms()->renderFile("admin-publication/index.php", [
+        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-publication/index.php", [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,
@@ -271,9 +271,9 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
 
-        $controller = App::moduleCms()->createControllerByID("admin-subscribe");
+        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-subscribe");
 
-        return $this->output(App::moduleCms()->renderFile("admin-subscribe/index.php", [
+        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-subscribe/index.php", [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,
@@ -290,7 +290,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             return $this->redirect(UrlHelper::constructCurrent()->setRoute('seo-page-url')->normalizeCurrentRoute()->enableAdmin()->toString());
         } else
         {
-            return $this->output(App::moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
+            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
                 "model" => $this->getModel()
             ]));
         }
@@ -304,7 +304,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             return $this->redirect(['seo-page-url', 'id' => $model->id]);
         } else
         {
-            return $this->output(App::moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
+            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
                 "model" => $this->getModel()
             ]));
         }
@@ -341,7 +341,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         }
 
 
-        return $this->output(App::moduleAdmin()->renderFile("base-actions/page-options.php", [
+        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/page-options.php", [
             "model"         => $this->getModel(),
             "pageOption"    => $pageOption
         ]));
@@ -361,7 +361,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             return $this->redirect(['descriptions', 'id' => $model->id]);
         } else
         {
-            return $this->output(App::moduleAdmin()->renderFile("base-actions/descriptions.php", [
+            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/descriptions.php", [
                 "model" => $this->getModel()
             ]));
         }

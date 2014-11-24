@@ -231,7 +231,7 @@ class AdminModelEditorController extends AdminController
     {
         try
         {
-            if ($site = App::moduleAdmin()->getCurrentSite())
+            if ($site = \Yii::$app->cms->moduleAdmin()->getCurrentSite())
             {
                 $model->setCurrentSite($site);
             } else
@@ -239,7 +239,7 @@ class AdminModelEditorController extends AdminController
                 $model->setCurrentSite(null);
             }
 
-            if ($lang = App::moduleAdmin()->getCurrentLang())
+            if ($lang = \Yii::$app->cms->moduleAdmin()->getCurrentLang())
             {
                 $model->setCurrentLang($lang);
             } else

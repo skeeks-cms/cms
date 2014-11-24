@@ -63,7 +63,7 @@ class Menu
                 $items = [];
                 foreach ($groupData['items'] as $itemCode => $itemData)
                 {
-                    $permissionCode = App::moduleAdmin()->getPermissionCode($itemData['url'][0]);
+                    $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($itemData['url'][0]);
                     if ($permission = \Yii::$app->authManager->getPermission($permissionCode))
                     {
                         if (\Yii::$app->user->can($permission->name))

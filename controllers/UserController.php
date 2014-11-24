@@ -51,19 +51,19 @@ class UserController extends Controller
         $model      = null;
         $personal   = false;
         //Если пользователь авторизован
-        if (App::user())
+        if (\Yii::$app->cms->getAuthUser())
         {
             //Если это личный профиль
-            if (App::user()->username == $username)
+            if (\Yii::$app->cms->getAuthUser()->username == $username)
             {
-                $model = App::user();
+                $model = \Yii::$app->cms->getAuthUser();
                 $personal = true;
             }
         }
 
         if (!$model)
         {
-            $model = App::findUser()->where(["username" => $username])->one(); //(["username" => $username]);
+            $model = \Yii::$app->cms->findUser()->where(["username" => $username])->one(); //(["username" => $username]);
         }
 
 

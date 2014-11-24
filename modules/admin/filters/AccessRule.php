@@ -47,7 +47,7 @@ class AccessRule extends \yii\filters\AccessRule
             {
                 if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $action->controller->getCurrentModel())->isValid())
                 {
-                    $acttionPermissionNameOwn = App::moduleAdmin()->getPermissionCode($action->controller->getUniqueId() . '/' . $action->id);
+                    $acttionPermissionNameOwn = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId() . '/' . $action->id);
                     if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionNameOwn))
                     {
                         if (!\Yii::$app->user->can($permission->name, [
@@ -62,7 +62,7 @@ class AccessRule extends \yii\filters\AccessRule
         {
 
             //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
-            $acttionPermissionName = App::moduleAdmin()->getPermissionCode($action->controller->getUniqueId() . '/' . $action->id);
+            $acttionPermissionName = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId() . '/' . $action->id);
 
             if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
             {

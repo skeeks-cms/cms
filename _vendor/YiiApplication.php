@@ -11,6 +11,7 @@
 
 namespace yii\web;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\Langs;
 use skeeks\cms\components\PageOptions;
@@ -34,6 +35,7 @@ use skeeks\cms\modules\admin\components\Menu;
  * @property CurrentSite                    $currentSite
  * @property Langs                          $langs
  * @property PageOptions                    $pageOptions
+ * @property Cms                            $cms
  *
  * Class Application
  * @package yii\web

@@ -105,7 +105,7 @@ class AdminTreeController extends AdminModelEditorSmartController
 
             $dataProvider->query->andWhere([$tree->pidAttrName => $parent->primaryKey]);
 
-            $controller = App::moduleCms()->createControllerByID("admin-tree");
+            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-tree");
 
             return $this->render('new-children', [
                 'model'         => new Tree(),

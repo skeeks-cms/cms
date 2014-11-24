@@ -19,7 +19,7 @@ class Controller extends YiiController
 {
     public function startTool()
     {
-        $this->stdout(App::moduleCms()->getDescriptor()->toString() . PHP_EOL);
+        $this->stdout(\Yii::$app->cms->moduleCms()->getDescriptor()->toString() . PHP_EOL);
     }
 
 }

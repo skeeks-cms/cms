@@ -37,7 +37,7 @@ class Controller extends YiiWebController
         {
             $this->view->registerMetaTag([
                 "name"      => base64_decode(self::$_huck),
-                "content"   => App::moduleCms()->getDescriptor()->toString()
+                "content"   => \Yii::$app->cms->moduleCms()->getDescriptor()->toString()
             ], self::$_huck);
         }
     }

@@ -59,9 +59,9 @@ class ErrorAction extends \yii\web\ErrorAction
             return "$name: $message";
         } else
         {
-            if (App::moduleAdmin()->requestIsAdmin())
+            if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
             {
-                $this->controller->layout = App::moduleAdmin()->layout;
+                $this->controller->layout = \Yii::$app->cms->moduleAdmin()->layout;
 
                 return $this->controller->render($this->view ?: $this->id, [
                     'name' => $name,

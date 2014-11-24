@@ -158,7 +158,7 @@ class HasSubscribes extends HasLinkedModels
     {
         if ($user === null)
         {
-            if (!$user = \skeeks\cms\App::user())
+            if (!$user = \Yii::$app->cms->getAuthUser())
             {
                 return null;
             }
@@ -176,7 +176,7 @@ class HasSubscribes extends HasLinkedModels
     {
         if ($user === null)
         {
-            if (!$user = App::user())
+            if (!$user = \Yii::$app->cms->getAuthUser())
             {
                 return false;
             }

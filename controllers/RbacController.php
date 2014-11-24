@@ -74,7 +74,7 @@ class RbacController extends Controller
                 {
                     if ($controller instanceof AdminController)
                     {
-                        $permissionCode = App::moduleAdmin()->getPermissionCode($controller->getUniqueId());
+                        $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
 
                         //Привилегия доступу к админке
                         if (!$adminAccess = $auth->getPermission($permissionCode))
@@ -96,7 +96,7 @@ class RbacController extends Controller
                             {
                                 foreach ($actions as $actionCode => $actionData)
                                 {
-                                    $permissionCode = App::moduleAdmin()->getPermissionCode($controller->getUniqueId() . '/' . $actionCode);
+                                    $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId() . '/' . $actionCode);
                                     //Привилегия доступу к админке
                                     if (!$adminAccess = $auth->getPermission($permissionCode))
                                     {
@@ -110,7 +110,7 @@ class RbacController extends Controller
                                         }
                                     }
 
-                                    $permissionCode = App::moduleAdmin()->getPermissionCodeOwn($permissionCode);
+                                    $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCodeOwn($permissionCode);
                                     if (!$adminAccessOwn = $auth->getPermission($permissionCode))
                                     {
                                         $rule = new AuthorRule();

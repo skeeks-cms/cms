@@ -86,7 +86,7 @@ $game = "";//$model->getGame()->one();
                 <a href="<?= $model->getCreatedBy()->one()->getPageUrl(); ?>" class="un"><?= $model->getCreatedBy()->one()->getDisplayName(); ?><span class="online">•</span></a>
             </div>
 
-            <? if ($user = \skeeks\cms\App::user()) : ?>
+            <? if ($user = \Yii::$app->cms->getAuthUser()) : ?>
                 <? if ($model->getCreatedBy()->one()->getId() != $user->getId()) : ?>
                     <? echo \frontend\widgets\Subscribe::widget([
                         "model" => $model->getCreatedBy()->one()

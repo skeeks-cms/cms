@@ -138,6 +138,11 @@ $config =
                 ],
             ]*/
         ],
+
+        'cms' =>
+        [
+            'class' => '\skeeks\cms\components\Cms',
+        ]
     ],
 
 

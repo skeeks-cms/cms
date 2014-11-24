@@ -186,7 +186,7 @@ class HasVotes extends HasLinkedModels
     {
         if ($user === null)
         {
-            if (!$user = App::user())
+            if (!$user = \Yii::$app->cms->getAuthUser())
             {
                 return null;
             }
@@ -245,7 +245,7 @@ class HasVotes extends HasLinkedModels
     {
         if ($user === null)
         {
-            if (!$user = App::user())
+            if (!$user = \Yii::$app->cms->getAuthUser())
             {
                 return 0;
             }

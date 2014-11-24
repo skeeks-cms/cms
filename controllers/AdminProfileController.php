@@ -58,7 +58,7 @@ class AdminProfileController extends AdminModelEditorSmartController
     {
         if ($this->_currentModel === null)
         {
-            $this->_currentModel = App::getUser();
+            $this->_currentModel = \Yii::$app->cms->getAuthUser();
         }
 
         return $this->_currentModel;
