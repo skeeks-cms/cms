@@ -84,12 +84,12 @@ return
 
         'items' =>
         [
-            [
+            /*[
                 "label"     => "Генератор кода",
                 "url"       => ["admin/gii"],
                 'enabled'   => true,
                 'priority'  => 0,
-            ],
+            ],*/
 
             [
                 "label"     => "Удаление и чистка",
