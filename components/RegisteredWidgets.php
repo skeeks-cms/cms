@@ -12,19 +12,25 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\base\db\ActiveRecord;
-use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\models\StorageFile;
+use skeeks\cms\models\WidgetDescriptor;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
 /**
- * Class RegisterdModels
+ *
+ * @method WidgetDescriptor[]   getComponents()
+ * @method WidgetDescriptor     getComponent($id)
+ *
+ *
+ * Class RegisteredWidgets
  * @package skeeks\cms\components
  */
-class RegisteredWidgets extends Component
+class RegisteredWidgets extends CollectionComponents
 {
+    public $componentClassName  = 'skeeks\cms\models\WidgetDescriptor';
 
     /**
      *
@@ -46,69 +52,12 @@ class RegisteredWidgets extends Component
      *
      * @var array
      */
-    public $widgets           = [];
-
-    public function init()
-    {
-        parent::init();
-    }
-
-    protected $_models = null;
-
-    /**
-     * @return Model[]
-     */
-    public function getModels()
-    {
-        if ($this->_models === null)
-        {
-            $this->_models = [];
-
-            if ($this->widgets)
-            {
-                foreach ($this->widgets as $class => $data)
-                {
-                    $data['class'] = $class;
-                    $this->_models[$class] = new Model($data);
-                }
-            }
-        }
-
-        return $this->_models;
-    }
-
-    /**
-     * @return Model[]
-     */
-    public function getEnabledModels()
-    {
-        $result = [];
-
-        if ($this->getModels())
-        {
-            foreach ($this->getModels() as $model)
-            {
-                if ($model->enabled)
-                {
-                    $result[$model->class] = $model;
-                }
-            }
-        }
-
-        return $result;
-    }
-
     /**
      * @param $classNameWiget
-     * @return Model|null
+     * @return WidgetDescriptor|null
      */
-    public function getModel($classNameWiget)
+    public function getDescriptor($classNameWiget)
     {
-        if ($models = $this->getModels())
-        {
-            return ArrayHelper::getValue($models, (string) $classNameWiget, null);
-        }
-
-        return null;
+        return $this->getComponent($classNameWiget);
     }
 }

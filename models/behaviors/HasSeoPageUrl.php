@@ -40,7 +40,7 @@ class HasSeoPageUrl extends HasPageUrl
      */
     public function getPageUrl()
     {
-        return $this->createUrl();
+        return $this->owner->createUrl();
     }
 
 

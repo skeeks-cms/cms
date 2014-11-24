@@ -85,7 +85,6 @@ class Infoblock extends Widget
             }
 
             $result = $modelInfoblock->run($this->config);
-
             self::$regsteredBlocks[$this->id] = $result;
         }
 

@@ -229,10 +229,10 @@ class Infoblock extends Core
     }
 
     /**
-     * @return Model
+     * @return null|WidgetDescriptor
      */
     public function getRegisterdWidgetModel()
     {
-        return \Yii::$app->registeredWidgets->getModel($this->getWidgetClassName());
+        return \Yii::$app->registeredWidgets->getDescriptor($this->getWidgetClassName());
     }
 }

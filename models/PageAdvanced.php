@@ -141,6 +141,8 @@ abstract class PageAdvanced extends Page
             'users_votes_down' => Yii::t('app', 'Users Votes Down'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
+            'status' => Yii::t('app', 'Status'),
+            'status_adult' => Yii::t('app', 'Status Adult'),
         ]);
     }
 
@@ -153,7 +155,7 @@ abstract class PageAdvanced extends Page
             [['description_short', 'description_full'], 'string'],
             [["users_subscribers", "users_votes_up", "users_votes_down"], 'safe'],
             [["images", "files", "image_cover", "image"], 'safe'],
-            [['count_comment', 'count_subscribe', 'count_vote'], 'integer'],
+            [['count_comment', 'count_subscribe', 'count_vote', 'status', 'status_adult'], 'integer'],
         ]);
     }
 

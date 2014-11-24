@@ -7,6 +7,7 @@ use skeeks\cms\models\Tree;
 /* @var $this yii\web\View */
 /* @var $model Tree */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 
 
@@ -19,9 +20,9 @@ use skeeks\cms\models\Tree;
 <?= $form->field($model, 'widget')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
-                 \Yii::$app->registeredWidgets->getEnabledModels(),
-                 "class",
-                 "label"
+                 \Yii::$app->registeredWidgets->getComponents(),
+                 "id",
+                 "name"
              ),
     ]);
 ?>

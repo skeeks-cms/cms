@@ -27,7 +27,7 @@ use yii\grid\GridView;
             'controller'    => $controller
         ],
 
-        ['class' => \skeeks\cms\grid\ImageColumn::className()],
+        ///['class' => \skeeks\cms\grid\ImageColumn::className()],
 
         'name',
         'code',

@@ -27,4 +27,12 @@ class Widget extends \yii\base\Widget
      */
     protected function _ensure()
     {}
+
+    /**
+     * @return \skeeks\cms\models\WidgetDescriptor
+     */
+    public function getDescriptor()
+    {
+        return \Yii::$app->registeredWidgets->getComponent($this->className());
+    }
 }

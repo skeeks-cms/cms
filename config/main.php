@@ -89,7 +89,7 @@ $config =
         'registeredWidgets' =>
         [
             'class' => 'skeeks\cms\components\RegisteredWidgets',
-            'widgets' => include_once 'widgets.php'
+            'components' => include_once 'widgets.php'
         ],
 
         //Админское меню

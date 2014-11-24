@@ -13,29 +13,29 @@ return
 [
     'skeeks\cms\widgets\text\Text' =>
     [
-        'label'         => 'Текст',
+        'name'          => 'Текст',
         'description'   => 'Виджет просто выводит текст',
         'templates'     =>
         [
             'default' =>
             [
-                'label' => 'Шаблон по умолчанию'
+                'name' => 'Шаблон по умолчанию'
             ]
         ],
-        'enabled'       => true
     ],
 
-    'skeeks\cms\widgets\infoblocks\Infoblocks' =>
+    'skeeks\cms\widgets\treeChildrens\TreeChildrens' =>
     [
-        'label'         => 'Список инфоблоков',
-        'description'   => 'Виджет который содержит в себе другие инфоблоки',
+        'name'          => 'Дерево разделов (вывод дочерних разделов)',
+        'description'   => 'Виджет выводит нужные одразделы',
+
         'templates'     =>
         [
             'default' =>
             [
-                'label' => 'Шаблон по умолчанию'
+                'name' => 'Шаблон по умолчанию'
             ]
         ],
-        'enabled'       => true
-    ]
+    ],
+
 ];

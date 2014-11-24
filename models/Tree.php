@@ -99,7 +99,8 @@ class Tree extends PageAdvanced
         {
             if ($this->getDir())
             {
-                return  $site->getBaseUrl() .  DIRECTORY_SEPARATOR . $this->getDir();
+
+                return  $site->getBaseUrl() .  DIRECTORY_SEPARATOR . $this->getDir() . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
             } else
             {
                 return  $site->getBaseUrl();
@@ -108,7 +109,7 @@ class Tree extends PageAdvanced
         {
             if ($this->getDir())
             {
-                return  \Yii::$app->request->getHostInfo() . DIRECTORY_SEPARATOR . $this->getDir();
+                return  \Yii::$app->request->getHostInfo() . DIRECTORY_SEPARATOR . $this->getDir() . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
             } else
             {
                 return  \Yii::$app->request->getHostInfo();
@@ -158,4 +159,7 @@ class Tree extends PageAdvanced
 
         return null;
     }
+
+
+
 }

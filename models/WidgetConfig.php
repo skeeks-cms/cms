@@ -44,4 +44,12 @@ class WidgetConfig extends Model
 
         return null;
     }
+
+    /**
+     * @return WidgetDescriptor
+     */
+    public function getWidgetDescriptor()
+    {
+        return \Yii::$app->registeredWidgets->getComponent($this->widget);
+    }
 }

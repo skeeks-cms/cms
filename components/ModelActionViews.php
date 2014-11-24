@@ -11,6 +11,7 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\ActionViewModel;
 use skeeks\cms\models\ComponentModel;
 use skeeks\cms\models\StorageFile;
 use Yii;
@@ -19,13 +20,13 @@ use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
 /**
- * @method ComponentModel[]   getComponents()
- * @method ComponentModel     getComponent($id)
+ * @method ActionViewModel[]   getComponents()
+ * @method ActionViewModel     getComponent($id)
  *
  * Class CollectionComponents
  * @package skeeks\cms\components
  */
 class ModelActionViews extends CollectionComponents
 {
-    public $componentClassName  = 'skeeks\cms\models\ComponentModel';
+    public $componentClassName  = 'skeeks\cms\models\ActionViewModel';
 }

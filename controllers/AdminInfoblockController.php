@@ -65,17 +65,6 @@ class AdminInfoblockController extends AdminModelEditorSmartController
                         ]
                     ],
 
-                    'template' =>
-                    [
-                        "label" => "Выбор шаблона",
-                        "rules" =>
-                        [
-                            [
-                                "class" => HasModel::className()
-                            ]
-                        ]
-                    ],
-
                     'rules' =>
                     [
                         "label" => "Правила показа",
@@ -89,11 +78,6 @@ class AdminInfoblockController extends AdminModelEditorSmartController
                 ]
             ]
         ]);
-    }
-
-    public function actionTemplate()
-    {
-
     }
 
     public function actionConfig()
