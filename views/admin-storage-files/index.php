@@ -18,9 +18,12 @@ use yii\grid\GridView;
 ?>
 
 <?= GridView::widget([
+
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
+
     'columns' => [
+
         ['class' => 'yii\grid\SerialColumn'],
 
         [
@@ -38,4 +41,5 @@ use yii\grid\GridView;
         ['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
 
     ],
+
 ]); ?>

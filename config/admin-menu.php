@@ -74,8 +74,24 @@ return
                 "url"       => ["cms/admin-subscribe/index"],
             ],
 
+
+        ]
+    ],
+
+    'storage' =>
+    [
+        'label' => 'Файловое хранилище',
+        'enabled' => true,
+
+        'items' =>
+        [
             [
-                "label"     => "Файловое хранилище",
+                "label"     => "Сервера",
+                "url"       => ["cms/admin-storage/index"],
+            ],
+
+            [
+                "label"     => "Файлы",
                 "url"       => ["cms/admin-storage-files/index"],
             ],
         ]
