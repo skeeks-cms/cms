@@ -73,6 +73,11 @@ return
                 "label"     => "Подписки",
                 "url"       => ["cms/admin-subscribe/index"],
             ],
+
+            [
+                "label"     => "Файловое хранилище",
+                "url"       => ["cms/admin-storage-files/index"],
+            ],
         ]
     ],
 

@@ -3,6 +3,7 @@
 namespace skeeks\cms\models;
 use skeeks\cms\base\db\ActiveRecord;
 
+use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasPageOptions;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -143,6 +144,7 @@ class StorageFile extends Core
             behaviors\HasComments::className(),
             behaviors\HasSubscribes::className(),
             behaviors\HasVotes::className(),
+            CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
             HasPageOptions::className() => HasPageOptions::className()
         ]);
     }
