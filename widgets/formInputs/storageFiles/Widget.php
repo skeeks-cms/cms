@@ -30,7 +30,6 @@ class Widget extends InputWidget
      */
     public $clientOptions = [];
 
-
     protected $_modelAttributeConfig = [];
     /**
      * @var HasFiles
