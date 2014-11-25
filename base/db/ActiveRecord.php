@@ -24,4 +24,12 @@ use \yii\db\ActiveRecord as YiiActiveRecord;
  */
 class ActiveRecord
     extends YiiActiveRecord
-{}
+{
+    /**
+     * @return \skeeks\cms\models\ModelDescriptor
+     */
+    public function getDescriptor()
+    {
+        return \Yii::$app->registeredModels->getDescriptor($this->className());
+    }
+}

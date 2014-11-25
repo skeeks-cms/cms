@@ -11,6 +11,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Model;
+use skeeks\sx\Entity;
 
 /**
  * Class ModelType
@@ -28,6 +29,11 @@ class ModelType extends ComponentModel
      */
     public $actionView;
 
+    /**
+     * @var array
+     */
+    public $additional = [];
+
 
     /**
      * @return null|Layout
@@ -40,6 +46,25 @@ class ModelType extends ComponentModel
         }
 
         return null;
+    }
+
+
+    /**
+     * @var Entity
+     */
+    protected $_additional = null;
+
+    /**
+     * @return Entity
+     */
+    public function getAdditional()
+    {
+        if ($this->_additional === null)
+        {
+            $this->_additional = new Entity($this->additional);
+        }
+
+        return $this->_additional;
     }
 
     /**

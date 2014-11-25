@@ -63,6 +63,4 @@ class ModelDescriptor extends ComponentModel
 
         return $this->_types;
     }
-
-
 }

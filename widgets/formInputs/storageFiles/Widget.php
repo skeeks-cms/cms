@@ -84,7 +84,7 @@ class Widget extends InputWidget
 
 
 
-            $valueArray = Html::getAttributeValue($this->model, $this->attribute);
+            $valueArray = (array) Html::getAttributeValue($this->model, $this->attribute);
             $files = [];
             foreach ($valueArray as $src)
             {
