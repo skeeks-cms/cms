@@ -54,18 +54,9 @@ class Infoblock extends Core
             behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
-                "fields" =>
+                "groups" =>
                 [
                     "image" =>
-                    [
-                        behaviors\HasFiles::MAX_SIZE_TOTAL      => 1*1024, //1Mb
-                        behaviors\HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        behaviors\HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                        behaviors\HasFiles::MAX_COUNT_FILES     => 1,
-                        behaviors\HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                    ],
-
-                    "image_cover" =>
                     [
                         behaviors\HasFiles::MAX_SIZE_TOTAL      => 1*1024, //1Mb
                         behaviors\HasFiles::MAX_SIZE            => 1*1024, //1Mb

@@ -84,7 +84,7 @@ class User
             behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
-                "fields" =>
+                "groups" =>
                 [
                     "image" =>
                     [

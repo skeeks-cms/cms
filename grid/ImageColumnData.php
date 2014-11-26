@@ -26,6 +26,7 @@ class ImageColumnData extends DataColumn
      */
     protected function renderDataCellContent($model, $key, $index)
     {
+        return 'image';
         $src = $this->noImage;
         $images = $model->{$this->attribute};
         if ($images)

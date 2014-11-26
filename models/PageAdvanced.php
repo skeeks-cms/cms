@@ -58,7 +58,6 @@ abstract class PageAdvanced extends Page
     protected $_maxCountFiles           = 100;
     protected $_maxCountImages          = 100;
     protected $_maxCountImage           = 1;
-    protected $_maxCountImageCover      = 1;
 
     use THasComments;
     use THasSubscribes;
@@ -82,7 +81,7 @@ abstract class PageAdvanced extends Page
             behaviors\HasFiles::className() =>
             [
                 "class"  => HasFiles::className(),
-                "fields" =>
+                "groups" =>
                 [
                     "image" =>
                     [
@@ -90,15 +89,6 @@ abstract class PageAdvanced extends Page
                         HasFiles::MAX_SIZE            => 1*1024, //1Mb
                         HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
                         HasFiles::MAX_COUNT_FILES     => $this->_maxCountImage,
-                        HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                    ],
-
-                    "image_cover" =>
-                    [
-                        //HasFiles::MAX_SIZE_TOTAL      => 1*1024, //1Mb
-                        HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                        HasFiles::MAX_COUNT_FILES     => $this->_maxCountImageCover,
                         HasFiles::ACCEPT_MIME_TYPE    => "image/*",
                     ],
 

@@ -12,11 +12,14 @@ namespace skeeks\cms\models\behaviors;
 
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
+use skeeks\cms\models\helpers\ModelRef;
 use skeeks\cms\models\searchs\User;
 use yii\base\Behavior;
 use yii\db\BaseActiveRecord;
 
 /**
+ * @method ModelRef getRef()
+ *
  * Class HasLinkedModels
  * @package skeeks\cms\models\behaviors
  */

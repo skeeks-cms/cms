@@ -12,6 +12,7 @@ namespace skeeks\cms\models\behaviors;
 
 use skeeks\cms\components\storage\Exception;
 use skeeks\cms\models\behaviors\events\AfterUnLinkedModel;
+use skeeks\cms\models\helpers\ModelFilesGroups;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Vote;
 use yii\db\BaseActiveRecord;
@@ -49,32 +50,55 @@ class HasFiles extends HasLinkedModels
     public $canBeLinkedModels       = ['skeeks\cms\models\StorageFile'];
     public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные файлы";
 
+    /**
+     * Все возможные настройки
+     */
     const MAX_SIZE_TOTAL        = "maxSizeTotal";
     const MAX_SIZE              = "maxSize";
     const ALLOWED_EXTENSIONS    = "allowedExtensions";
     const MAX_COUNT_FILES       = "maxCountFiles";
     const ACCEPT_MIME_TYPE      = "acceptMimeType";
 
-    public $fields = [];
+    /**
+     * Настройки групп файлов
+     * @var array
+     */
+    public $groups = [];
+
+    /**
+     * Общий конфиг, будет добавляться к каждой группе
+     * @var array
+     */
+    public $config = [];
+
+    /**
+     * Названия поля в базе данных где будут храниться файлы
+     * @var string
+     */
+    public $filesFieldName = 'files';
 
 
+    /**
+     * Все группы будем хранить в json encode
+     * @param \skeeks\cms\base\db\ActiveRecord $owner
+     */
     public function attach($owner)
     {
-        $owner->attachBehavior("implode_files", [
-            "class"  => Implode::className(),
-            "fields" =>  array_keys($this->fields)
+        $owner->attachBehavior(HasJsonFieldsBehavior::className() . $this->className(), [
+            "class"  => HasJsonFieldsBehavior::className(),
+            "fields" => [$this->filesFieldName]
         ]);
 
         parent::attach($owner);
     }
 
-
-
-
+    /**
+     * При отсоединении файла от модели, нужно убрать этот файл из всех групп.
+     * @return array
+     */
     public function events()
     {
         return array_merge(parent::events(), [
-            //CanBeLinkedToModel::EVENT_AFTER_LINKED          => "linkedModel",
             CanBeLinkedToModel::EVENT_AFTER_UN_LINKED       => "unLinkedModel",
         ]);
     }
@@ -98,6 +122,81 @@ class HasFiles extends HasLinkedModels
     }
 
 
+    /**
+     * Запрос на поиск файлов привязанных к текущей сущьности
+     * TODO: реализовать
+     * @return \yii\db\ActiveQuery
+     */
+    public function findFiles()
+    {
+        return StorageFile::find();
+    }
+
+    /**
+     * Получение всех файлов привязанных к сущности.
+     * TODO: реализовать
+     * @return StorageFile[]
+     */
+    public function getFiles()
+    {
+        return StorageFile::find();
+    }
+
+    /**
+     * Конфиг для загрузки файлов
+     * @return array
+     */
+    public function getFilesConfig()
+    {
+        return (array) $this->config;
+    }
+
+    /**
+     * @var ModelFilesGroups
+     */
+    protected $_groups = null;
+    /**
+     * @return ModelFilesGroups
+     */
+    public function getFilesGroups()
+    {
+        if ($this->_groups === null)
+        {
+            $oiginalFilesData = $this->owner->{$this->filesFieldName};
+            $dataForComponent = [];
+            foreach ($this->groups as $id => $config)
+            {
+                $dataForComponent[$id]['config'] = $config;
+                if (isset($oiginalFilesData[$id]))
+                {
+                    $dataForComponent[$id]['items'] = (array) $oiginalFilesData[$id];
+                }
+
+                $dataForComponent[$id]['owner'] = $this->owner;
+            }
+
+            $this->_groups = new ModelFilesGroups([
+                'components' => $dataForComponent,
+            ]);
+        }
+
+        return $this->_groups;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -108,7 +207,7 @@ class HasFiles extends HasLinkedModels
      * @return mixed
      * @throws Exception
      */
-    public function getOptionForField($optionName, $fieldName, $defaultValue = null)
+    /*public function getOptionForField($optionName, $fieldName, $defaultValue = null)
     {
         if (!$this->hasField($fieldName))
         {
@@ -117,72 +216,41 @@ class HasFiles extends HasLinkedModels
 
         $config = $this->getFieldConfig($fieldName);
         return \yii\helpers\ArrayHelper::getValue($config, $optionName, $defaultValue);
-    }
+    }*/
 
-
-
-    public function getFilesConfig()
-    {
-        return [
-            //static::MAX_SIZE_TOTAL      => 1*1024, //1Mb
-            //static::MAX_SIZE            => 1*1024, //1Mb
-            //static::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-            static::MAX_COUNT_FILES     => 0,
-            static::ACCEPT_MIME_TYPE    => "*",
-        ];
-    }
-
-
-    public function getFields()
-    {
-        return $this->fields;
-    }
 
     /**
      * Применяется ли к полю
      * @param string $fieldName
      * @return bool
      */
-    public function hasField($fieldName)
+    /*public function hasField($fieldName)
     {
         return isset($this->fields[$fieldName]);
-    }
+    }*/
 
     /**
      * Берем настройки для поля
      * @param string $fieldName
      * @return array
      */
-    public function getFieldConfig($fieldName)
+    /*public function getFieldConfig($fieldName)
     {
         return $this->hasField($fieldName) ? (array) $this->fields[$fieldName] : [];
-    }
+    }*/
 
 
 
 
 
 
-
-
-
-
-    /**
-     * Файлы привязанные к полю
-     * @param $fieldName
-     * @return array of src
-     */
-    public function getFiles($fieldName)
-    {
-        return (array) $this->owner->{$fieldName};
-    }
 
     /**
      * @param StorageFile $file
      * @param $fieldName
      * @return $this
      */
-    protected function _appendFile(StorageFile $file, $fieldName)
+    /*protected function _appendFile(StorageFile $file, $fieldName)
     {
         $files              = $this->getFiles($fieldName);
         $files[]            = $file->src;
@@ -190,7 +258,7 @@ class HasFiles extends HasLinkedModels
 
         $this->owner->save(false);
         return $this;
-    }
+    }*/
 
     /**
      *
@@ -203,7 +271,7 @@ class HasFiles extends HasLinkedModels
      * @param $fieldName
      * @return $this
      */
-    public function appendFile(StorageFile $file, $fieldName)
+    /*public function appendFile(StorageFile $file, $fieldName)
     {
         //Вяжем файл к этой сущьности
         $file->setAttributes($this->owner->getRef()->toArray(), false);
@@ -211,14 +279,14 @@ class HasFiles extends HasLinkedModels
         $this->_appendFile($file, $fieldName);
 
         return $this;
-    }
+    }*/
 
     /**
      * @param $fieldName
      * @param $src
      * @return $this
      */
-    public function detachFile($fieldName, $src)
+    /*public function detachFile($fieldName, $src)
     {
         $files  = $this->getFiles($fieldName);
 
@@ -238,6 +306,6 @@ class HasFiles extends HasLinkedModels
         }
 
         return $this;
-    }
+    }*/
 
 }
