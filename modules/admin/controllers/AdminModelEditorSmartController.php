@@ -31,6 +31,7 @@ use skeeks\cms\models\behaviors\HasPublications;
 use skeeks\cms\models\Comment;
 use skeeks\cms\models\Publication;
 use skeeks\cms\models\Search;
+use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Subscribe;
 use skeeks\cms\models\Vote;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
@@ -78,7 +79,20 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'files' =>
                     [
-                        "label"     => "Файлы",
+                        "label"     => "Группы Файлов",
+                        "icon"     => "glyphicon glyphicon-folder-open",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasFiles::className()
+                            ]
+                        ]
+                    ],
+
+                    'files-all' =>
+                    [
+                        "label"     => "Все файлы",
                         "icon"     => "glyphicon glyphicon-folder-open",
                         "rules"     =>
                         [
@@ -237,6 +251,27 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
             "model"         => $this->getModel(),
             "allowFields"   => $allowFields
+        ]));
+    }
+
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionFilesAll()
+    {
+        $search = new Search(StorageFile::className());
+        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+        $searchModel    = $search->getLoadedModel();
+
+        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+
+        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-storage-files");
+
+        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-storage-files/index.php", [
+            'searchModel'   => $searchModel,
+            'dataProvider'  => $dataProvider,
+            'controller'    => $controller,
         ]));
     }
 

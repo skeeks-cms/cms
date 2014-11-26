@@ -488,7 +488,7 @@ class AdminModelEditorController extends AdminController
         {
             \Yii::$app->getSession()->setFlash('error', 'Не получилось удалить запись');
         }
-        return $this->redirect(['index']);
+        return $this->redirect(\Yii::$app->request->getReferrer());
     }
 
 }

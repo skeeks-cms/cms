@@ -201,14 +201,20 @@ body.sidebar-hidden footer.sx-admin-footer
     height: 43px;
 }
 
+
 .sx-sidebar
 {
     background: none;
-    padding-bottom: 40px;
-    padding-left: 10px;
+
+    margin-left: 10px;
     z-index: 1;
     width: 270px;
 }
+
+    .sx-sidebar .sidebar-collapse
+    {
+        margin-bottom: 70px;
+    }
 
     .sx-sidebar a
     {

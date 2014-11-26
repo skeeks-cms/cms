@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\modules\admin\controllers\helpers;
 
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
@@ -22,6 +23,10 @@ use yii\base\Component;
 class Action extends Component
 {
     public $code            = "";
+
+    /**
+     * @var AdminController
+     */
     public $controller      = "";
 
     public $label   = "";
@@ -93,23 +98,33 @@ class Action extends Component
     }
 
 
+
     /**
-     * @return array
+     * @return string
      */
-    public function getUrlData()
+    public function getUrl()
     {
-        $url = [$this->code, UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE];
+        if ($this->controller->module instanceof \skeeks\cms\Module)
+        {
+            $route = $this->controller->module->id . '/' . $this->controller->id . '/' . $this->code;
+        } else
+        {
+            $route = $this->controller->id . '/' . $this->code;
+        }
+
+        $url = UrlHelper::constructCurrent()->setRoute($route)
+            ->set(UrlRule::ADMIN_PARAM_NAME, UrlRule::ADMIN_PARAM_VALUE);
+
         if ($this->controller instanceof AdminModelEditorController)
         {
             if ($model = $this->controller->getModel())
             {
-                $url['id'] = $model->id;
+                $url->set('id', $model->id);
             }
         }
 
-        return $url;
+        return $url->toString();
     }
-
 
 
 }

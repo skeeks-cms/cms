@@ -111,7 +111,7 @@ class ControllerActions
             $linkOptions["data-confirm"]        = $action->confirm;
 
             $actionData = array_merge($actionData, [
-                "url"               => Url::to($action->getUrlData()),
+                "url"               => $action->getUrl(),
                 "isOpenNewWindow"   => $action->isOpenNewWindow(),
                 "newWindowName"     => $action->getNewWindowName()
             ]);
@@ -124,7 +124,7 @@ class ControllerActions
 
             $actionDataJson = Json::encode($actionData);
             $result[] = Html::tag("li",
-                Html::a($icon . '  ' . $label, $action->getUrlData(), $linkOptions)
+                Html::a($icon . '  ' . $label, $action->getUrl(), $linkOptions)
                 ,
                 [
                     "class" => $this->currentActionCode == $code ? "active" : "",

@@ -11,6 +11,7 @@
 namespace skeeks\cms\models\behaviors;
 
 use skeeks\cms\components\storage\Exception;
+use skeeks\cms\models\behaviors\events\AfterUnLinkedModel;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Vote;
 use yii\db\BaseActiveRecord;
@@ -57,18 +58,46 @@ class HasFiles extends HasLinkedModels
     public $fields = [];
 
 
-
     public function attach($owner)
     {
         $owner->attachBehavior("implode_files", [
             "class"  => Implode::className(),
-            "fields" =>  [
-                "image_cover", "image", "images", "files"
-            ]
+            "fields" =>  array_keys($this->fields)
         ]);
 
         parent::attach($owner);
     }
+
+
+
+
+    public function events()
+    {
+        return array_merge(parent::events(), [
+            //CanBeLinkedToModel::EVENT_AFTER_LINKED          => "linkedModel",
+            CanBeLinkedToModel::EVENT_AFTER_UN_LINKED       => "unLinkedModel",
+        ]);
+    }
+
+    /**
+     * Если отвязана сущьность голос, то пересчитываем количество голосов
+     * @param AfterUnLinkedModel $event
+     */
+    public function unLinkedModel(AfterUnLinkedModel $event)
+    {
+        if ($event->model)
+        {
+            if ($event->model instanceof StorageFile)
+            {
+                foreach ($this->fields as $fieldName => $data)
+                {
+                    $this->detachFile($fieldName, $event->model->src);
+                }
+            }
+        }
+    }
+
+
 
 
 
@@ -92,6 +121,16 @@ class HasFiles extends HasLinkedModels
 
 
 
+    public function getFilesConfig()
+    {
+        return [
+            //static::MAX_SIZE_TOTAL      => 1*1024, //1Mb
+            //static::MAX_SIZE            => 1*1024, //1Mb
+            //static::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
+            static::MAX_COUNT_FILES     => 0,
+            static::ACCEPT_MIME_TYPE    => "*",
+        ];
+    }
 
 
     public function getFields()

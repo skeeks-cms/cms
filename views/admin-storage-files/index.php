@@ -46,6 +46,32 @@ use yii\grid\GridView;
             'format' => 'html'
         ],
 
+        'name',
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function(\skeeks\cms\models\StorageFile $model)
+            {
+                return \yii\helpers\Html::tag('pre', $model->src);
+            },
+
+            'format' => 'html',
+            'attribute' => 'src'
+        ],
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function(\skeeks\cms\models\StorageFile $model)
+            {
+                $model->cluster_id;
+                $cluster = \Yii::$app->storage->getCluster($model->cluster_id);
+                return $cluster->name;
+            },
+
+            'format' => 'html',
+        ],
+
+        'name_to_save',
         'mime_type',
 
         [

@@ -125,10 +125,9 @@ class Storage extends CollectionComponents
             {
                 return $cluster;
             }
-
         } else
         {
-            return $this->getCluster($id);
+            return $this->getComponent($id);
         }
     }
 }

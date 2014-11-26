@@ -4,6 +4,7 @@ namespace skeeks\cms\models;
 use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
+use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasPageOptions;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -142,10 +143,13 @@ class StorageFile extends Core
     {
         return array_merge(parent::behaviors(), [
             behaviors\HasComments::className(),
+            behaviors\HasStatus::className() => behaviors\HasStatus::className(),
+            behaviors\HasAdultStatus::className() => behaviors\HasAdultStatus::className(),
             behaviors\HasSubscribes::className(),
             behaviors\HasVotes::className(),
             CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
-            HasPageOptions::className() => HasPageOptions::className()
+            HasPageOptions::className() => HasPageOptions::className(),
+            HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className()
         ]);
     }
 
@@ -166,9 +170,6 @@ class StorageFile extends Core
     public function delete()
     {
         //Сначала удалить файл
-        /**
-         * @var \common\components\storage\Storage $storage
-         */
         try
         {
             $storage = Yii::$app->storage;
