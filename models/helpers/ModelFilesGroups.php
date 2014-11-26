@@ -9,8 +9,13 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\models\helpers;
+use skeeks\cms\components\CollectionComponents;
 
 /**
+ *
+ * @method ModelFilesGroup[]   getComponents()
+ * @method ModelFilesGroup     getComponent($id)
+ *
  * Class FilesGroups
  * @package skeeks\cms\models\helpers
  */

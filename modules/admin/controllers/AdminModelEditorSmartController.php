@@ -79,7 +79,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'files' =>
                     [
-                        "label"     => "Группы Файлов",
+                        "label"     => "Файлы",
                         "icon"     => "glyphicon glyphicon-folder-open",
                         "rules"     =>
                         [
@@ -90,18 +90,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                         ]
                     ],
 
-                    'files-all' =>
-                    [
-                        "label"     => "Все файлы",
-                        "icon"     => "glyphicon glyphicon-folder-open",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasFiles::className()
-                            ]
-                        ]
-                    ],
 
 
                     'comments' =>
@@ -234,32 +222,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
      */
     public function actionFiles()
     {
-        $allowFields = [];
-
-        if ($behaviors = $this->getModel()->getBehaviors())
-        {
-            foreach ($behaviors as $behavior)
-            {
-                if ($behavior instanceof HasFiles)
-                {
-                    $allowFields = array_merge($allowFields, array_keys($behavior->fields));
-                }
-            }
-
-        }
-
-        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
-            "model"         => $this->getModel(),
-            "allowFields"   => $allowFields
-        ]));
-    }
-
-
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionFilesAll()
-    {
         $search = new Search(StorageFile::className());
         $dataProvider   = $search->search(\Yii::$app->request->queryParams);
         $searchModel    = $search->getLoadedModel();
@@ -268,11 +230,13 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-storage-files");
 
-        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-storage-files/index.php", [
+        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
+            "model"         => $this->getModel(),
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,
         ]));
+
     }
 
 

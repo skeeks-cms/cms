@@ -73,6 +73,7 @@ use yii\grid\GridView;
 
         'name_to_save',
         'mime_type',
+        'extension',
 
         [
             'class' => \skeeks\cms\grid\FileSizeColumnData::className(),

@@ -10,14 +10,16 @@
  */
 namespace skeeks\cms\models\behaviors\traits;
 
+use skeeks\cms\models\helpers\ModelFilesGroups;
 use skeeks\cms\models\StorageFile;
+use yii\db\ActiveQuery;
 
 /**
+ * @method ModelFilesGroups     getFilesGroups()
+ * @method ActiveQuery          findFiles()
+ *
  * Class HasFiles
  * @package skeeks\cms\models\behaviors\traits
  */
 trait HasFiles
-{
-
-
-}
+{}

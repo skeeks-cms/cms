@@ -166,13 +166,13 @@ class HasFiles extends HasLinkedModels
             $dataForComponent = [];
             foreach ($this->groups as $id => $config)
             {
-                $dataForComponent[$id]['config'] = $config;
                 if (isset($oiginalFilesData[$id]))
                 {
-                    $dataForComponent[$id]['items'] = (array) $oiginalFilesData[$id];
+                    $config['items'] = (array) $oiginalFilesData[$id];
                 }
 
-                $dataForComponent[$id]['owner'] = $this->owner;
+                $config['owner'] = $this->owner;
+                $dataForComponent[$id] = $config;
             }
 
             $this->_groups = new ModelFilesGroups([

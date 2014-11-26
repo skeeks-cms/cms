@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\models\helpers;
+use skeeks\cms\models\ComponentModel;
 use yii\db\ActiveRecord;
 
 /**

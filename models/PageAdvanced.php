@@ -55,10 +55,6 @@ use Yii;
  */
 abstract class PageAdvanced extends Page
 {
-    protected $_maxCountFiles           = 100;
-    protected $_maxCountImages          = 100;
-    protected $_maxCountImage           = 1;
-
     use THasComments;
     use THasSubscribes;
     use THasVotes;
@@ -85,27 +81,36 @@ abstract class PageAdvanced extends Page
                 [
                     "image" =>
                     [
-                        //HasFiles::MAX_SIZE_TOTAL      => 1*1024, //1Mb
-                        HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                        HasFiles::MAX_COUNT_FILES     => $this->_maxCountImage,
-                        HasFiles::ACCEPT_MIME_TYPE    => "image/*",
+                        'name'      => 'Главное изображение',
+                        'config'    =>
+                        [
+                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
+                            HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
+                            HasFiles::MAX_COUNT_FILES     => 1,
+                            HasFiles::ACCEPT_MIME_TYPE    => "image/*",
+                        ]
                     ],
 
                     "images" =>
                     [
-                        //HasFiles::MAX_SIZE_TOTAL      => 15*1024, //1Mb
-                        HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                        HasFiles::MAX_COUNT_FILES     => $this->_maxCountImages,
-                        HasFiles::ACCEPT_MIME_TYPE    => "image/*",
+                        'name'      => 'Изображения',
+                        'config' =>
+                        [
+                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
+                            HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
+                            HasFiles::MAX_COUNT_FILES     => 50,
+                            HasFiles::ACCEPT_MIME_TYPE    => "image/*",
+                        ]
                     ],
 
                     "files" =>
                     [
-                        //HasFiles::MAX_SIZE_TOTAL      => 15*1024, //1Mb
-                        HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        HasFiles::MAX_COUNT_FILES     => $this->_maxCountFiles,
+                        'name'      => 'Файлы',
+                        'config'    =>
+                        [
+                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
+                            HasFiles::MAX_COUNT_FILES     => 50,
+                        ]
                     ],
                 ]
             ],

@@ -54,33 +54,6 @@ class StaticBlock extends Core
             behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
-                "groups" =>
-                [
-                    "image" =>
-                    [
-                        behaviors\HasFiles::MAX_SIZE_TOTAL      => 1*1024, //1Mb
-                        behaviors\HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        behaviors\HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                        behaviors\HasFiles::MAX_COUNT_FILES     => 1,
-                        behaviors\HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                    ],
-
-                    "images" =>
-                    [
-                        behaviors\HasFiles::MAX_SIZE_TOTAL      => 15*1024, //1Mb
-                        behaviors\HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        behaviors\HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                        behaviors\HasFiles::MAX_COUNT_FILES     => 10,
-                        behaviors\HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                    ],
-
-                    "files" =>
-                    [
-                        behaviors\HasFiles::MAX_SIZE_TOTAL      => 15*1024, //1Mb
-                        behaviors\HasFiles::MAX_SIZE            => 1*1024, //1Mb
-                        behaviors\HasFiles::MAX_COUNT_FILES     => 10,
-                    ],
-                ]
             ],
         ]);
     }
