@@ -79,7 +79,7 @@ class Storage extends CollectionComponents
         }
 
         ;
-        $data["type"]       = $tmpfile->getMimeType();
+        $data["type"]       = $tmpfile->getType();
         $data["mime_type"]  = $tmpfile->getMimeType();
         $data["size"]       = $tmpfile->size()->getBytes();
         $data["extension"]  = $tmpfile->getExtension();

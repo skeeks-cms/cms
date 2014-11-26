@@ -14,7 +14,6 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
 ?>
 
 <?= GridView::widget([
@@ -31,14 +30,36 @@ use yii\grid\GridView;
             'controller'    => $controller
         ],
 
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function(\skeeks\cms\models\StorageFile $model)
+            {
+                if ($model->isImage())
+                {
+                    return \yii\helpers\Html::img($model->src, [
+                        'width' => '80'
+                    ]);
+                }
+
+                return \yii\helpers\Html::tag('span', $model->extension, ['class' => 'label label-primary', 'style' => 'font-size: 18px;']);
+            },
+            'format' => 'html'
+        ],
+
+        'mime_type',
+
+        [
+            'class' => \skeeks\cms\grid\FileSizeColumnData::className(),
+            'attribute' => 'size'
+        ],
         ['class' => \skeeks\cms\grid\LinkedToType::className()],
         ['class' => \skeeks\cms\grid\LinkedToModel::className()],
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
+        //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+        //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
 
     ],
 

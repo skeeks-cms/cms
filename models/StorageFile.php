@@ -181,4 +181,28 @@ class StorageFile extends Core
 
         return parent::delete();
     }
+
+    /**
+     * Тип файла - первая часть mime_type
+     * @return string
+     */
+    public function getFileType()
+    {
+        $dataMimeType = explode('/', $this->mime_type);
+        return (string) $dataMimeType[0];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isImage()
+    {
+        if ($this->getFileType() == 'image')
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 }

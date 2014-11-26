@@ -88,11 +88,13 @@ return
             [
                 "label"     => "Сервера",
                 "url"       => ["cms/admin-storage/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
 
             [
                 "label"     => "Файлы",
                 "url"       => ["cms/admin-storage-files/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
         ]
     ],
@@ -105,20 +107,15 @@ return
 
         'items' =>
         [
-            /*[
-                "label"     => "Генератор кода",
-                "url"       => ["admin/gii"],
-                'enabled'   => true,
-                'priority'  => 0,
-            ],*/
-
             [
                 "label"     => "Удаление и чистка",
                 "url"       => ["admin/clear"],
             ],
+
             [
                 "label"     => "Работа с базой данных",
                 "url"       => ["admin/db"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
             ],
         ]
     ],
@@ -143,6 +140,7 @@ return
             [
                 "label"     => "Привилегии",
                 "url"       => ["admin/permission"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/access.png'],
                 'enabled'   => true,
                 'priority'  => 0,
             ],
