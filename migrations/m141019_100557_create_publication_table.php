@@ -47,6 +47,7 @@ class m141019_100557_create_publication_table extends Migration
             'count_subscribe'       => Schema::TYPE_INTEGER . ' NULL', //Количество подписчиков
             'users_subscribers'     => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые подписались (их id через запятую)
 
+
             'count_vote'            => Schema::TYPE_INTEGER . ' NULL', //Количество голосов
             'result_vote'           => Schema::TYPE_INTEGER . ' NULL', //Результат голосования
             'users_votes_up'        => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые проголосовали +
