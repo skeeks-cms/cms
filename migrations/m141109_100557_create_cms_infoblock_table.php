@@ -51,9 +51,6 @@ class m141109_100557_create_cms_infoblock_table extends Migration
 
             'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10',
 
-            'image'                 => Schema::TYPE_TEXT. ' NULL', //главное изображение
-            'image_cover'           => Schema::TYPE_TEXT. ' NULL', //обложка
-            'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
         ], $tableOptions);

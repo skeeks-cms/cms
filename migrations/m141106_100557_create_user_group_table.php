@@ -44,9 +44,6 @@ class m141106_100557_create_user_group_table extends Migration
 
             'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10',
 
-            'image'                 => Schema::TYPE_TEXT. ' NULL', //главное изображение
-            'image_cover'           => Schema::TYPE_TEXT. ' NULL', //обложка
-            'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
         ], $tableOptions);

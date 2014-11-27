@@ -52,9 +52,6 @@ class m140801_201442_create_user_table extends Migration
             'address'               => Schema::TYPE_STRING . '(255)',
             'info'                  => Schema::TYPE_TEXT,
 
-            'image'                 => Schema::TYPE_TEXT. ' NULL', //главное изображение
-            'image_cover'           => Schema::TYPE_TEXT. ' NULL', //обложка
-            'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
             'count_subscribe'       => Schema::TYPE_INTEGER . ' NULL',

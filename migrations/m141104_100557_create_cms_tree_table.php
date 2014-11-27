@@ -32,9 +32,6 @@ class m141104_100557_create_cms_tree_table extends Migration
             'description_short'     => Schema::TYPE_TEXT,
             'description_full'      => Schema::TYPE_TEXT,
 
-            'image'                 => Schema::TYPE_TEXT. ' NULL', //главное изображение
-            'image_cover'           => Schema::TYPE_TEXT. ' NULL', //обложка
-            'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
             'page_options'          => Schema::TYPE_TEXT. ' NULL', //

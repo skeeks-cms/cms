@@ -43,9 +43,6 @@ class m141116_100557_create_teable_static_block extends Migration
             'description'           => Schema::TYPE_TEXT . ' NULL',
             'value'                 => Schema::TYPE_TEXT . ' NULL',
 
-            'image'                 => Schema::TYPE_TEXT. ' NULL', //главное изображение
-            'image_cover'           => Schema::TYPE_TEXT. ' NULL', //обложка
-            'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
         ], $tableOptions);

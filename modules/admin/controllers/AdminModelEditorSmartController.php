@@ -41,6 +41,7 @@ use yii\base\Behavior;
 use yii\base\Component;
 use yii\base\Model;
 use yii\base\View;
+use yii\filters\VerbFilter;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -222,21 +223,88 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
      */
     public function actionFiles()
     {
-        $search = new Search(StorageFile::className());
+        if (\Yii::$app->request->isPost)
+        {
+            $group = \Yii::$app->request->post('group');
+            \Yii::$app->getSession()->set('cms-admin-files-group', $group);
+        } else
+        {
+            $group = \Yii::$app->getSession()->get('cms-admin-files-group');
+        }
+
+        $search         = new Search(StorageFile::className());
         $dataProvider   = $search->search(\Yii::$app->request->queryParams);
         $searchModel    = $search->getLoadedModel();
 
         $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
 
+        if ($group)
+        {
+            if ($groupObject = $this->getModel()->getFilesGroups()->getComponent($group))
+            {
+                $dataProvider->query->andWhere(['src' => (array) $groupObject->items]);
+            }
+        }
+
         $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-storage-files");
 
+        $clientOptions['simpleUpload'] = $this->_getSourceSimpleUploadOptions($group);
+
+
         return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
-            "model"         => $this->getModel(),
-            'searchModel'   => $searchModel,
-            'dataProvider'  => $dataProvider,
-            'controller'    => $controller,
+            "model"             => $this->getModel(),
+            'searchModel'       => $searchModel,
+            'dataProvider'      => $dataProvider,
+            'controller'        => $controller,
+            'group'              => $group,
+            'clientOptions'     => (array) $clientOptions,
         ]));
 
+    }
+
+
+    private function _getSourceSimpleUploadOptions($group = '')
+    {
+        $backendSimpleUpload = \Yii::$app->urlManager->createUrl(["cms/storage-files/upload",
+            "linked_to_model"   => $this->getModel()->getRef()->getCode(),
+            "linked_to_value"   => $this->getModel()->getRef()->getValue(),
+            "group"              => $group
+        ]);
+
+
+        //Опции которые перетирать нельзя
+        $mainOptions =
+        [
+            "url"               => $backendSimpleUpload,
+            "name"              => "imgfile", //TODO: хардкод
+            "hoverClass"        => 'btn-hover',
+            "focusClass"        => 'active',
+            "disabledClass"     => 'disabled',
+            "responseType"      => 'json',
+            "multiplie"          => true,
+
+        ];
+
+        //Опции которые вычисляются из поведения моедли
+        $fromBehaviorOptions = [];
+        /*$config = $this->_modelAttributeConfig;
+        if (isset($config[HasFiles::MAX_SIZE]))
+        {
+            $fromBehaviorOptions["maxSize"] = $config[HasFiles::MAX_SIZE];
+        }
+
+        if (isset($config[HasFiles::ALLOWED_EXTENSIONS]))
+        {
+            $fromBehaviorOptions["allowedExtensions"] = $config[HasFiles::ALLOWED_EXTENSIONS];
+        }
+
+        if (isset($config[HasFiles::ACCEPT_MIME_TYPE]))
+        {
+            $fromBehaviorOptions["accept"] = $config[HasFiles::ACCEPT_MIME_TYPE];
+        }*/
+
+
+        return array_merge($fromBehaviorOptions, $mainOptions);
     }
 
 

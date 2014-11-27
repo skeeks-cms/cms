@@ -87,13 +87,48 @@ class CanBeLinkedToModel extends \skeeks\cms\base\behaviors\ActiveRecord
         $this->owner->linked_to_model = $ref->getCode();
         $this->owner->linked_to_value = $ref->getValue();
 
-        $this->owner->save();
+        $this->owner->save(false);
 
-        $modelForLink->trigger(self::EVENT_AFTER_LINKED, new Event([
+        $modelForLink->trigger(self::EVENT_AFTER_LINKED, new AfterLinkedModel([
             "sender"    => $this
         ]));
     }
 
+    /**
+     *
+     * Текущая сущьность привязана к моделе?
+     *
+     * @param ActiveRecord $modelForLink
+     * @return bool
+     */
+    public function isLinkedToModel(ActiveRecord $modelForLink)
+    {
+        if (!$ref = $modelForLink->getRef())
+        {
+            return false;
+        }
+
+        if ($this->owner->linked_to_model == $ref->getCode() && $this->owner->linked_to_value == $ref->getValue())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Пригреплен ли вообще?
+     * @return bool
+     */
+    public function isLinked()
+    {
+        if ($this->owner->linked_to_model && $this->owner->linked_to_value)
+        {
+            return true;
+        }
+
+        return false;
+    }
     /**
      *
      * Найти модель к которой привязана текущая модель.

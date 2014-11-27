@@ -66,7 +66,7 @@ class StorageFilesController extends Controller
         ]);
     }
 
-    public function actionDetachFile()
+    /*public function actionDetachFile()
     {
         $response =
         [
@@ -82,7 +82,6 @@ class StorageFilesController extends Controller
 
             /**
              * @var Game $model
-             */
             if (!$model = $ref->findModel())
             {
                 throw new Exception("Не найдена сущьность к которой обавляется файл");
@@ -93,7 +92,7 @@ class StorageFilesController extends Controller
 
 
         return $response;
-    }
+    }*/
     public function actionUpload()
     {
         $response =
@@ -104,7 +103,7 @@ class StorageFilesController extends Controller
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $request = Yii::$app->getRequest();
-        if ($request->get("linked_to_model") && $request->get("linked_to_value") && $request->get("field"))
+        if ($request->get("linked_to_model") && $request->get("linked_to_value"))
         {
 
             $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
@@ -142,7 +141,22 @@ class StorageFilesController extends Controller
                     ]
                 ));
 
-                $model->appendFile($storageFile, $request->get("field"));
+                $storageFile->linkToModel($model);
+
+                if ($group = $request->get("group"))
+                {
+
+                    /**
+                     *
+                     * @var \skeeks\cms\models\helpers\ModelFilesGroup $group
+                     */
+                    $group = $model->getFilesGroups()->getComponent($group);
+                    if ($group)
+                    {
+                        $group->attachFile($storageFile)->save();
+                    }
+                }
+
 
                 $response["success"]  = true;
                 $response["file"]     = $storageFile;

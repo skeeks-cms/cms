@@ -113,9 +113,9 @@ class HasFiles extends HasLinkedModels
         {
             if ($event->model instanceof StorageFile)
             {
-                foreach ($this->fields as $fieldName => $data)
+                foreach ($this->getFilesGroups()->getComponents() as $group)
                 {
-                    $this->detachFile($fieldName, $event->model->src);
+                    $group->detachFile($event->model->src);
                 }
             }
         }
@@ -162,28 +162,58 @@ class HasFiles extends HasLinkedModels
     {
         if ($this->_groups === null)
         {
-            $oiginalFilesData = $this->owner->{$this->filesFieldName};
-            $dataForComponent = [];
-            foreach ($this->groups as $id => $config)
-            {
-                if (isset($oiginalFilesData[$id]))
+            //if ($this->groups)
+            //{
+                $oiginalFilesData = $this->owner->{$this->filesFieldName};
+                $dataForComponent = [];
+                foreach ($this->groups as $id => $config)
                 {
-                    $config['items'] = (array) $oiginalFilesData[$id];
+                    if (isset($oiginalFilesData[$id]))
+                    {
+                        $config['items'] = (array) $oiginalFilesData[$id];
+                    }
+
+                    $config['owner']        = $this->owner;
+                    $config['behavior']     = $this;
+
+                    $dataForComponent[$id] = $config;
                 }
 
-                $config['owner'] = $this->owner;
-                $dataForComponent[$id] = $config;
-            }
-
-            $this->_groups = new ModelFilesGroups([
-                'components' => $dataForComponent,
-            ]);
+                $this->_groups = new ModelFilesGroups([
+                    'components' => $dataForComponent,
+                ]);
+            //}
         }
 
         return $this->_groups;
     }
 
 
+    /**
+     *
+     * Установить значние поля filesFieldName, использую состояние объекта групп.
+     * Без сохранения в базу, просто установка значения поля в моделе
+     *
+     * @return $this
+     */
+    public function setInstanceFilesFromGroup()
+    {
+        $result = [];
+
+        if ($components = $this->getFilesGroups()->getComponents())
+        {
+            foreach ($components as $component)
+            {
+                if ($items = (array) $component->items)
+                {
+                    $result[$component->id] = $items;
+                }
+            }
+        }
+
+        $this->owner->{$this->filesFieldName} = $result;
+        return $this;
+    }
 
 
 

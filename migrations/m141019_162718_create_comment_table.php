@@ -29,7 +29,6 @@ class m141019_162718_create_comment_table extends Migration
 
             'content'               => Schema::TYPE_TEXT,
 
-            'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
             'linked_to_model'       => Schema::TYPE_STRING. '(255) NOT NULL', //Коммент обязательно должен быть к кому то привязан

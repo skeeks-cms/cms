@@ -32,9 +32,6 @@ class m141019_100557_create_publication_table extends Migration
             'description_short'     => Schema::TYPE_TEXT,
             'description_full'      => Schema::TYPE_TEXT,
 
-            'image'                 => Schema::TYPE_TEXT. ' NULL', //главное изображение
-            'image_cover'           => Schema::TYPE_TEXT. ' NULL', //обложка
-            'images'                => Schema::TYPE_TEXT. ' NULL', //
             'files'                 => Schema::TYPE_TEXT. ' NULL', //
 
             'linked_to_model'       => Schema::TYPE_STRING. '(255) NULL', //Коммент обязательно должен быть к кому то привязан
