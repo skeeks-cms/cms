@@ -20,7 +20,7 @@ use skeeks\cms\validators\db\NotSame;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\cms\validators\model\TreeSeoPageName;
 use skeeks\cms\validators\NewRecord;
-use skeeks\sx\filters\string\SeoPageName;
+use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
 use skeeks\sx\validate\Validate;
 use skeeks\sx\validators\ChainAnd;
 use yii\base\Event;
@@ -156,7 +156,7 @@ class TreeBehavior extends ActiveRecordBehavior
             $this->owner->setAttribute($this->pageAttrName, null);
         } else
         {
-            $filter     = new SeoPageName();
+            $filter     = new FilterSeoPageName();
             $newName    = $filter->filter($this->getName());
 
             if (Validate::validate(new TreeSeoPageName($this->owner), $newName)->isInvalid())
