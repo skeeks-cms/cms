@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\components;
 
+use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;

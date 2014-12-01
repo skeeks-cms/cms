@@ -24,6 +24,7 @@ class ModelDescriptor extends ComponentModel
     public $types               = [];
     public $actionViews         = [];
     public $adminController     = null;
+    public $behaviors           = [];
 
     /**
      * @var ModelActionViews|null
