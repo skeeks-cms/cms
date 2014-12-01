@@ -53,7 +53,8 @@ class Infoblock extends Core
 
             behaviors\HasFiles::className() =>
             [
-                "class"  => behaviors\HasFiles::className(),
+                "class"     => behaviors\HasFiles::className(),
+                "groups"    => [],
             ],
         ]);
     }

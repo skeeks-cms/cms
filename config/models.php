@@ -106,4 +106,16 @@ return
         'modelClass' => 'skeeks\cms\models\StorageFile',
         'name' => 'Файл хранилища'
     ],
+
+    'infoblock'   =>
+    [
+        'modelClass'    => 'skeeks\cms\models\Infoblock',
+        'name'          => 'Инфоблок'
+    ],
+
+    'staticBlock'   =>
+    [
+        'modelClass'    => 'skeeks\cms\models\StaticBlock',
+        'name'          => 'Инфоблок'
+    ],
 ];

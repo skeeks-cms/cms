@@ -26,6 +26,7 @@ class Tree
         foreach ($tree->findRoots()->all() as $tree)
         {
             $result[$tree->id] = $tree->name;
+
         }
 
         return $result;
