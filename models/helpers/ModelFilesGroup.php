@@ -133,4 +133,12 @@ class ModelFilesGroup extends ComponentModel
     {
         return $this->fetchFiles();
     }
+
+    /**
+     * @return string
+     */
+    public function getFirstSrc()
+    {
+        return (string) array_shift($this->items);
+    }
 }

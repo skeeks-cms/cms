@@ -153,39 +153,4 @@ abstract class PageAdvanced extends Page
             [['count_comment', 'count_subscribe', 'count_vote', 'status', 'status_adult'], 'integer'],
         ]);
     }
-
-
-    /**
-     * @return array
-     */
-    public function getImages()
-    {
-        return (array) $this->images;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMainImage()
-    {
-        if ($this->image)
-        {
-            return (string) array_shift($this->image);
-        }
-
-        return \Yii::$app->params["noimage"];
-    }
-
-    /**
-     * @return string
-     */
-    public function getImageCover()
-    {
-        if ($this->image)
-        {
-            return (string) array_shift($this->image_cover);
-        }
-
-        return \Yii::$app->params["noimage"];
-    }
 }
