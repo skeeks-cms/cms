@@ -6,7 +6,10 @@ Apache + Nginx рекоммендации
 - for application 1 `/var/www/sites/test.ru/frontend/web/` and using the URL `http://test.ru/`
 - for application 2 `/var/www/sites/test.ru/backend/web/` and using the URL `http://application2.test.ru/`
 
-Пока оставлю это здесь.
+Пока оставлю это здесь (рабочие примеры).
+
+Nginx config
+------------
 
 ```
 # #########################################################
@@ -34,5 +37,43 @@ server {
         access_log off;
         error_log /var/log/nginx/errors-main.blank.cms.skeeks.com.log;
 }
+
+```
+
+Apache config
+
+```
+
+# #########################################################
+# Шаблон ▒^▒^▒^▒^▒^▒ипи▒^▒^▒^▒^▒^▒ного ▒^▒^▒^▒^▒^▒о▒^▒^▒^▒^▒^▒▒^▒^▒^▒^▒^▒а
+# @date 13.09.14
+# @copyright skeeks.com
+# @author Semenov Alexander <semenov@skeeks.com>
+# #########################################################
+
+<VirtualHost *:8080>
+    ServerAdmin admin@skeeks.com
+
+
+    ServerName main.blank.cms.skeeks.com
+    ServerAlias *.main.blank.cms.skeeks.com
+
+    DocumentRoot /var/www/sites/main.blank.cms.skeeks.com/frontend/web
+
+    <Directory /var/www/sites/main.blank.cms.skeeks.com/frontend/web>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    Header set X-Apache2-RT %D
+
+    ErrorLog ${APACHE_LOG_DIR}/main.blank.cms.skeeks.com-error.log
+    LogLevel warn
+    CustomLog /dev/null combined
+
+</VirtualHost>
+
 
 ```
