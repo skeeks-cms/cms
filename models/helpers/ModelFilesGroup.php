@@ -139,6 +139,7 @@ class ModelFilesGroup extends ComponentModel
      */
     public function getFirstSrc()
     {
-        return (string) array_shift($this->items);
+        $array = $this->items;
+        return (string) array_shift($array);
     }
 }
