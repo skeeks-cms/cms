@@ -34,7 +34,21 @@ abstract class Core extends ActiveRecord
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            BlameableBehavior::className(),
+            BlameableBehavior::className() =>
+            [
+                'class' => BlameableBehavior::className(),
+                'value' => function($event)
+                {
+                    if (\Yii::$app instanceof \yii\console\Application)
+                    {
+                        return null;
+                    } else
+                    {
+                        $user = Yii::$app->get('user', false);
+                        return $user && !$user->isGuest ? $user->id : null;
+                    }
+                },
+            ],
             TimestampBehavior::className(),
         ]);
     }

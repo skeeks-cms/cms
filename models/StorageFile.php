@@ -175,6 +175,7 @@ class StorageFile extends Core
             $storage = Yii::$app->storage;
             $cluster = $storage->getCluster($this->cluster_id);
             $cluster->delete($this->cluster_file);
+
         } catch (\common\components\storage\Exception $e)
         {
             return false;

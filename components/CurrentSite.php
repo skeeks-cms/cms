@@ -16,6 +16,7 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\TreeType;
 use Yii;
 use yii\base\Component;
+use yii\console\Application;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
@@ -36,6 +37,12 @@ class CurrentSite extends \skeeks\cms\base\Component
     public function init()
     {
         parent::init();
+
+        //TODO: Если это консольное приложение нужно предусмотреть этот момент
+        if (\Yii::$app instanceof \yii\console\Application)
+        {
+            $this->site = false;
+        }
 
         if ($this->site === null)
         {

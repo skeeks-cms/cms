@@ -115,7 +115,7 @@ class HasFiles extends HasLinkedModels
             {
                 foreach ($this->getFilesGroups()->getComponents() as $group)
                 {
-                    $group->detachFile($event->model->src);
+                    $group->detachFile($event->model->src)->save();
                 }
             }
         }

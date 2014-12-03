@@ -66,7 +66,10 @@ class ClusterLocal extends Cluster
     protected function _delete($clusterFileSrc)
     {
         $file = new File($this->rootBasePath . DIRECTORY_SEPARATOR . $clusterFileSrc);
-        $file->remove();
+        if ($file->isExist())
+        {
+            $file->remove();
+        }
 
         return true;
     }
