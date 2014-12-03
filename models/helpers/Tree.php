@@ -16,19 +16,27 @@ namespace skeeks\cms\models\helpers;
  */
 class Tree
 {
-    /**
-     * @return array
-     */
     static public function getMultiOptions()
     {
-        $result = [];
         $tree = new \skeeks\cms\models\Tree();
-        foreach ($tree->findRoots()->all() as $tree)
-        {
-            $result[$tree->id] = $tree->name;
+        return self::buildTreeArrayRecursive($tree);
+    }
 
+    /**
+     * Строит рекурсивно массив дерева
+     * @param \skeeks\cms\models\Tree $tree
+     * @return array
+     */
+    public static function buildTreeArrayRecursive(\skeeks\cms\models\Tree $tree)
+    {
+        $result = [];
+        $childs = $tree->findChildrens()->all();
+        foreach ($childs as $child) {
+            $level = $child->getLevel();
+            $result[$child->id] = str_repeat("-", $level) . $child->name;
+            $next_childs = self::buildTreeArrayRecursive($child);
+            $result = array_merge($result, $next_childs);
         }
-
         return $result;
     }
 }
