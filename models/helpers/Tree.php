@@ -16,6 +16,9 @@ namespace skeeks\cms\models\helpers;
  */
 class Tree
 {
+    /**
+     * @return array
+     */
     static public function getMultiOptions()
     {
         $tree = new \skeeks\cms\models\Tree();
@@ -31,7 +34,8 @@ class Tree
     {
         $result = [];
         $childs = $tree->findChildrens()->all();
-        foreach ($childs as $child) {
+        foreach ($childs as $child)
+        {
             $level = $child->getLevel();
             $result[$child->id] = str_repeat("-", $level) . $child->name;
             $next_childs = self::buildTreeArrayRecursive($child);
