@@ -27,6 +27,8 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\jui\Draggable;
+use yii\jui\Sortable;
 
 /**
  * Class ControllerActions
@@ -323,7 +325,8 @@ class Tree
                         , ["class" => "row"])
                         . $child ,
                         [
-                            "class" => "sx-tree-node " . ($isActive ? " active" : "") . ($isOpen ? " open" : "")
+                            "class" => "sx-tree-node " . ($isActive ? " active" : "") . ($isOpen ? " open" : ""),
+                            "data-id" => $model->id
                         ]
             );
         };
@@ -336,8 +339,7 @@ class Tree
 
     public function registerAssets()
     {
-        \kartik\sortable\SortableAsset::register($this->getView());
-
+        Sortable::widget();
 
         $models     = \skeeks\cms\models\Tree::find()->where(["id" => $this->_getSelectedIds()])->all();
         $options    = Json::encode(['selected' => $models]);
@@ -362,10 +364,30 @@ class Tree
 
                 _onDomReady: function()
                 {
-                    $('.sx-tree ul').find('ul').sortable().bind('sortupdate', function()
+
+                    $(".sx-tree ul").find("ul").sortable(
                     {
-                        console.log('1');
-                        console.log(this);
+                        out: function( event, ui )
+                        {
+                            var newSort = [];
+                            $(ui.item).closest("ul").children("li").each(function(i, element)
+                            {
+                                newSort.push($(this).data("id"));
+                            });
+
+                            sx.ajax.preparePostQuery(
+                                "{$backend}",
+                                {
+                                    "ids" : newSort,
+                                    "changeId" : $(ui.item).data("id")
+                                }
+                            )
+                            .onError(function(e, data)
+                            {
+                                sx.message.error({text : "Изменения не сохранились"});
+                            })
+                            .execute();
+                        }
                     });
 
                     var self = this;

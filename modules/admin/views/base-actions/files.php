@@ -67,8 +67,16 @@ $groups = $model->getFilesGroups();
                 {
                     if ($model->isImage())
                     {
+                        \Yii::$app->view->registerCss(<<<CSS
+    .sx-img-small {
+        max-height: 50px;
+    }
+CSS
+);
+
                         return \yii\helpers\Html::img($model->src, [
-                            'width' => '80'
+                            'width' => '50',
+                            'class' => 'sx-img-small'
                         ]);
                     }
 
