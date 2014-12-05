@@ -19,6 +19,7 @@
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "*",
+        "yii2-jui": "*",
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "yiisoft/yii2-authclient": "*",
@@ -30,8 +31,7 @@
         "skeeks/yii2-widget-simpleajaxuploader": "*",
         "skeeks/yii2-widget-ckeditor": "*",
         "skeeks/yii2-widget-chosen": "*",
-        "skeeks/yii2-widget-highcharts": "*",
-        "kartik-v/yii2-sortable": "*"
+        "skeeks/yii2-widget-highcharts": "*"
     },
     "config": {
         "process-timeout": 1800

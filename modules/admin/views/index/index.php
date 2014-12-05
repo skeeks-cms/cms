@@ -14,6 +14,18 @@ $usedSpace = $totalSpace - $freeSpace;
 
 $freeSpacePercent = ($freeSpace * 100) / $totalSpace;
 $usedSpacePercent = 100 - $freeSpacePercent;
+
+
+use kartik\sortable\Sortable;
+echo Sortable::widget([
+    'type' => Sortable::TYPE_LIST,
+    'items' => [
+        ['content' => 'Item # 1'],
+        ['content' => 'Item # 2'],
+        ['content' => 'Item # 3'],
+    ]
+]);
+
 ?>
 <div class="site-index">
 

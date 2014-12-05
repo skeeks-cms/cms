@@ -142,6 +142,8 @@ class Tree
         $this->_openedTmp = $openedModels;
 
         $this->registerAssets();
+
+
         return Html::tag('div',
 
             Html::tag("div",
@@ -334,6 +336,9 @@ class Tree
 
     public function registerAssets()
     {
+        \kartik\sortable\SortableAsset::register($this->getView());
+
+
         $models     = \skeeks\cms\models\Tree::find()->where(["id" => $this->_getSelectedIds()])->all();
         $options    = Json::encode(['selected' => $models]);
 
@@ -352,12 +357,17 @@ class Tree
                     {
                         this._parentWidget = sx.Window.openerWidget();
 
-
                     }
                 },
 
                 _onDomReady: function()
                 {
+                    $('.sx-tree ul').find('ul').sortable().bind('sortupdate', function()
+                    {
+                        console.log('1');
+                        console.log(this);
+                    });
+
                     var self = this;
                     $('.sx-controll-btn-select').on('click', function()
                     {
