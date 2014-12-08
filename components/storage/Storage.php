@@ -43,6 +43,7 @@ use \skeeks\sx\Dir;
 class Storage extends CollectionComponents
 {
     public $componentClassName  = 'skeeks\cms\components\storage\ClusterLocal';
+
     /**
      *
      * Загрузить файл в хранилище, добавить в базу, вернуть модель StorageFile

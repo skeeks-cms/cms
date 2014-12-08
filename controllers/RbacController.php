@@ -12,7 +12,6 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\App;
 use skeeks\cms\base\console\Controller;
 use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\components\UrlRule;

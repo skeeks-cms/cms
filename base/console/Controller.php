@@ -17,9 +17,43 @@ use yii\helpers\Console;
 
 class Controller extends YiiController
 {
-    public function startTool()
+    /**
+     *
+     */
+    public function init()
     {
-        $this->stdout(\Yii::$app->cms->moduleCms()->getDescriptor()->toString() . PHP_EOL);
+        parent::init();
+        $this->startTool();
     }
 
+    /**
+     * @return $this
+     */
+    public function startTool()
+    {
+        $this->stdoutN('Yii2 (' . \Yii::getVersion() . ')');
+        $this->stdoutN(\Yii::$app->cms->moduleCms()->getDescriptor()->toString());
+        $this->stdoutN('App:' . \Yii::$app->id);
+        $this->hr();
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function hr()
+    {
+        $this->stdoutN('-----------------------------');
+        return $this;
+    }
+
+    /**
+     * @param $text
+     * @return $this
+     */
+    public function stdoutN($text)
+    {
+        $this->stdout("{$text}" . PHP_EOL);
+        return $this;
+    }
 }

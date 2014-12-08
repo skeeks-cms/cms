@@ -60,7 +60,14 @@ class SeoPageName extends AttributeBehavior
         if ($this->value === null)
         {
             $filter = new FilterSeoPageName();
-            return $filter->filter($this->owner->{$this->fromAttribute});
+            if ($this->owner->{$this->generatedAttribute})
+            {
+                return $filter->filter($this->owner->{$this->generatedAttribute});
+            } else
+            {
+                return $filter->filter($this->owner->{$this->fromAttribute});
+            }
+
         } else
         {
             return call_user_func($this->value, $event);

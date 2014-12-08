@@ -14,6 +14,7 @@ $usedSpace = $totalSpace - $freeSpace;
 
 $freeSpacePercent = ($freeSpace * 100) / $totalSpace;
 $usedSpacePercent = 100 - $freeSpacePercent;
+
 ?>
 <div class="site-index">
 

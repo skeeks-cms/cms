@@ -52,8 +52,17 @@ class ModelFilesGroup extends ComponentModel
     {
         if ($file->isLinkedToModel($this->owner))
         {
-            $this->items[] = $file->src;
-            $this->items = array_unique($this->items);
+
+            if ($files = $this->fetchFiles())
+            {
+                $this->items    = [];
+                foreach ($files as $fileAttached)
+                {
+                    $this->items[]  = $fileAttached->src;
+                }
+            }
+            $this->items[]  = $file->src;
+            $this->items    = array_unique($this->items);
         }
 
         $this->behavior->setInstanceFilesFromGroup();
@@ -78,6 +87,15 @@ class ModelFilesGroup extends ComponentModel
         {
             $src = $file;
         }
+
+       /* if ($files = $this->fetchFiles())
+        {
+            $this->items    = [];
+            foreach ($files as $fileAttached)
+            {
+                $this->items[]  = $fileAttached->src;
+            }
+        }*/
 
         if ($this->items)
         {

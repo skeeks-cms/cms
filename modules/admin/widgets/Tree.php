@@ -27,6 +27,8 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\jui\Draggable;
+use yii\jui\Sortable;
 
 /**
  * Class ControllerActions
@@ -142,6 +144,8 @@ class Tree
         $this->_openedTmp = $openedModels;
 
         $this->registerAssets();
+
+
         return Html::tag('div',
 
             Html::tag("div",
@@ -321,7 +325,8 @@ class Tree
                         , ["class" => "row"])
                         . $child ,
                         [
-                            "class" => "sx-tree-node " . ($isActive ? " active" : "") . ($isOpen ? " open" : "")
+                            "class" => "sx-tree-node " . ($isActive ? " active" : "") . ($isOpen ? " open" : ""),
+                            "data-id" => $model->id
                         ]
             );
         };
@@ -334,6 +339,8 @@ class Tree
 
     public function registerAssets()
     {
+        Sortable::widget();
+
         $models     = \skeeks\cms\models\Tree::find()->where(["id" => $this->_getSelectedIds()])->all();
         $options    = Json::encode(['selected' => $models]);
 
@@ -352,12 +359,37 @@ class Tree
                     {
                         this._parentWidget = sx.Window.openerWidget();
 
-
                     }
                 },
 
                 _onDomReady: function()
                 {
+
+                    $(".sx-tree ul").find("ul").sortable(
+                    {
+                        out: function( event, ui )
+                        {
+                            var newSort = [];
+                            $(ui.item).closest("ul").children("li").each(function(i, element)
+                            {
+                                newSort.push($(this).data("id"));
+                            });
+
+                            sx.ajax.preparePostQuery(
+                                "{$backend}",
+                                {
+                                    "ids" : newSort,
+                                    "changeId" : $(ui.item).data("id")
+                                }
+                            )
+                            .onError(function(e, data)
+                            {
+                                sx.message.error({text : "Изменения не сохранились"});
+                            })
+                            .execute();
+                        }
+                    });
+
                     var self = this;
                     $('.sx-controll-btn-select').on('click', function()
                     {
