@@ -14,32 +14,63 @@ namespace skeeks\cms\models\helpers;
  * Class Tree
  * @package skeeks\cms\models\helpers
  */
-class Tree
+class Tree extends \skeeks\cms\models\Tree
 {
+    private $filter = array();
+
     /**
+     * Строит массив для селекта
+     * @param array $tree
      * @return array
      */
-    static public function getMultiOptions()
+    public function getMultiOptions()
     {
-        $tree = new \skeeks\cms\models\Tree();
-        return self::buildTreeArrayRecursive($tree);
+        return $this->buildTreeArrayRecursive($this, $this->filter);
     }
 
     /**
      * Строит рекурсивно массив дерева
-     * @param \skeeks\cms\models\Tree $tree
+     * @param \skeeks\cms\models\Tree $model
+     * @param array $filter
      * @return array
      */
-    public static function buildTreeArrayRecursive(\skeeks\cms\models\Tree $tree)
+    private function buildTreeArrayRecursive($model, $filter)
     {
         $result = [];
-        $childs = $tree->findChildrens()->all();
-        foreach ($childs as $child)
-        {
+        $is_filter_set = !empty($filter);
+        $childs = $model->findChildrens()->all();
+        foreach ($childs as $child) {
             $level = $child->getLevel();
-            $result[$child->id] = str_repeat("-", $level) . $child->name;
-            $next_childs = self::buildTreeArrayRecursive($child);
+            $id = $child->id;
+            if (!$is_filter_set || in_array($id, $filter)) {
+                $result[$id] = str_repeat("-", $level) . $child->name;
+            }
+            $next_childs = $this->buildTreeArrayRecursive($child, $filter);
             $result = array_merge($result, $next_childs);
+        }
+        return $result;
+    }
+
+    /**
+     * Фильтрует дерево по заданному условию
+     * @param $condition
+     */
+    public function filter($condition)
+    {
+        $items = $this->find()->where($condition)->all();
+        $this->filter = $this->getTreeNodesIds($items);
+    }
+
+    /**
+     * Возвращает массив id элементов дерева
+     * @param $nodes
+     * @return array
+     */
+    private function getTreeNodesIds($nodes)
+    {
+        $result = [];
+        foreach ($nodes as $node) {
+            $result[] = $node->id;
         }
         return $result;
     }
