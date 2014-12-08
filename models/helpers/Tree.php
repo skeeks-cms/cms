@@ -16,7 +16,29 @@ namespace skeeks\cms\models\helpers;
  */
 class Tree extends \skeeks\cms\models\Tree
 {
-    private $filter = array();
+    /**
+     * @var string символ будет добавляться перед називанием раздела.
+     */
+    public $repeat = '— ';
+
+    /**
+     * @var array
+     */
+    private $_filter = [];
+
+    /**
+     * Строит всего дерева
+     * @return array
+     */
+    static public function getAllMultiOptions()
+    {
+        return \yii\helpers\ArrayHelper::map(
+             (new static())->getMultiOptions(),
+             "id",
+             "name"
+        );
+    }
+
 
     /**
      * Строит массив для селекта
@@ -25,7 +47,7 @@ class Tree extends \skeeks\cms\models\Tree
      */
     public function getMultiOptions()
     {
-        return $this->buildTreeArrayRecursive($this, $this->filter);
+        return $this->_buildTreeArrayRecursive($this, $this->_filter);
     }
 
     /**
@@ -34,20 +56,27 @@ class Tree extends \skeeks\cms\models\Tree
      * @param array $filter
      * @return array
      */
-    private function buildTreeArrayRecursive($model, $filter)
+    private function _buildTreeArrayRecursive($model, $filter)
     {
         $result = [];
         $is_filter_set = !empty($filter);
         $childs = $model->findChildrens()->all();
-        foreach ($childs as $child) {
-            $level = $child->getLevel();
-            $id = $child->id;
-            if (!$is_filter_set || in_array($id, $filter)) {
-                $result[$id] = str_repeat("-", $level) . $child->name;
+
+        foreach ($childs as $child)
+        {
+            $level  = $child->getLevel();
+            $id     = $child->id;
+            if (!$is_filter_set || in_array($id, $filter))
+            {
+                $child->name = str_repeat($this->repeat, $level) . $child->name;
+                $result[$id] = $child;
             }
-            $next_childs = $this->buildTreeArrayRecursive($child, $filter);
-            $result = array_merge($result, $next_childs);
+            $next_childs    = $this->_buildTreeArrayRecursive($child, $filter);
+
+            $result         = array_merge($result, $next_childs);
+
         }
+
         return $result;
     }
 
@@ -58,7 +87,7 @@ class Tree extends \skeeks\cms\models\Tree
     public function filter($condition)
     {
         $items = $this->find()->where($condition)->all();
-        $this->filter = $this->getTreeNodesIds($items);
+        $this->_filter = $this->_getTreeNodesIds($items);
     }
 
     /**
@@ -66,12 +95,15 @@ class Tree extends \skeeks\cms\models\Tree
      * @param $nodes
      * @return array
      */
-    private function getTreeNodesIds($nodes)
+    private function _getTreeNodesIds($nodes)
     {
         $result = [];
-        foreach ($nodes as $node) {
+
+        foreach ($nodes as $node)
+        {
             $result[] = $node->id;
         }
+
         return $result;
     }
 }

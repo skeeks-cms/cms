@@ -8,6 +8,7 @@
  * @date 09.11.2014
  * @since 1.0.0
  */
+
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -31,16 +32,29 @@ $tree = new \skeeks\cms\models\Tree();
 ?>
 
 
+<?= $form->field($model, 'title')->textInput(); ?>
 
-<?= $form->field($model, 'pid')->widget(
+
+<?= $form->field($model, 'tree_ids')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions()
+        'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions(),
+        'multiple' => true
     ]);
 ?>
 
 
 <?= $form->field($model, 'limit')->textInput(); ?>
 
+<?= $form->field($model, 'types')->widget(
+    \skeeks\widget\chosen\Chosen::className(), [
+        'items'   => \yii\helpers\ArrayHelper::map(
+            (new \skeeks\cms\models\Publication())->getDescriptor()->getTypes()->getComponents(),
+            "id",
+             "name"
+        ),
+        'multiple' => true,
+    ]);
+?>
 <?= $form->field($model, 'statuses')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleStatuses(),

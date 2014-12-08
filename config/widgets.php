@@ -38,4 +38,17 @@ return
         ],
     ],
 
+    'skeeks\cms\widgets\publications\Publications' =>
+    [
+        'name'          => 'Виджет публикаций',
+        'description'   => 'Виджет выводит нужные одразделы',
+
+        'templates'     =>
+        [
+            'default' =>
+            [
+                'name' => 'Шаблон по умолчанию'
+            ]
+        ],
+    ],
 ];
