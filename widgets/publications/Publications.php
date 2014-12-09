@@ -76,4 +76,32 @@ class Publications extends WidgetHasTemplate
 
         return $this;
     }
+
+    /**
+     * @return array|null|Tree
+     */
+    public function fetchFirstTree()
+    {
+        if ($id = $this->getFirstTreeId())
+        {
+            return Tree::find()->where(['id' => $id])->one();
+        } else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getFirstTreeId()
+    {
+        if ($this->tree_ids)
+        {
+            return (int) array_shift($this->tree_ids);
+        } else
+        {
+            return 0;
+        }
+    }
 }

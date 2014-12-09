@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
 
 <?= $form->field($model, 'description_short')->widget(\skeeks\widget\ckeditor\CKEditor::className(), [
     'options' => ['rows' => 6],
-    'preset' => 'basic'
+    'preset' => 'full'
 ]) ?>
 
 
