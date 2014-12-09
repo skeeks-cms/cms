@@ -16,7 +16,14 @@ use yii\widgets\ActiveForm;
 <? if (\skeeks\sx\validate\Validate::validate(
     new \skeeks\cms\validators\HasBehavior(\yii\behaviors\TimestampBehavior::className()), $model
 )->isValid()) : ?>
-    <?= $form->field($model, 'created_at')->textInput(); ?>
+    <?= $form->field($model, 'created_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'type' => 'datetime',
+//        'displayFormat' => $config->displayFormat, // 'php:d-F-Y' or 'php:d-F-Y H:i:s'
+    //    'displayTimezone'=>'Asia/Kolkata',
+       // 'saveTimezone'=>'UTC',
+      //  'saveOptions' => $saveOptions,
+       // 'options' => $options
+    ]); ?>
 <? endif;?>
 
 
