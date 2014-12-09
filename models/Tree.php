@@ -31,6 +31,7 @@ use yii\db\ActiveQuery;
 class Tree extends PageAdvanced
 {
     use TreeBehaviorTrait;
+    use \skeeks\cms\models\behaviors\traits\HasPageOptions;
 
     public function behaviors()
     {

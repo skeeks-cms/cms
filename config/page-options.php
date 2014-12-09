@@ -41,4 +41,11 @@ return [
         'description'       => 'Шаблон отрисовки конкретной сущьности',
         'modelValueClass'   => '\skeeks\cms\pageOptionValues\actionView\ActionViewPageOptionValue'
     ],
+
+    'infoblocks' =>
+    [
+        'name'              => 'Инфоблоки',
+        'description'       => 'Инфоблоки, которые будут показываться на этой странице',
+        'modelValueClass'   => '\skeeks\cms\pageOptionValues\infoblocks\Infoblocks'
+    ],
 ];

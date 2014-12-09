@@ -101,7 +101,7 @@ class Infoblock extends Core
      * @param $id
      * @return static
      */
-    static public function findById($id)
+    static public function fetchById($id)
     {
         return static::find()->where(['id' => (int) $id])->one();
     }
@@ -110,7 +110,7 @@ class Infoblock extends Core
      * @param $code
      * @return static
      */
-    static public function findByCode($code)
+    static public function fetchByCode($code)
     {
         return static::find()->where(['code' => (string) $code])->one();
     }

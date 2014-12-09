@@ -433,6 +433,13 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                 $model->save(false);
 
                 return $this->redirect(['page-options', 'id' => $model->id]);
+            } else
+            {
+                $optionsCurrent[$pageOptionId] = $pageOption->getValue()->attributes;
+                $model->setMultiPageOptionsData('');
+                $model->save(false);
+
+                return $this->redirect(['page-options', 'id' => $model->id]);
             }
         }
 
