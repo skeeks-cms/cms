@@ -16,6 +16,7 @@ use skeeks\cms\models\behaviors\HasAdultStatus;
 use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\SeoPageName;
+use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
@@ -47,6 +48,7 @@ class Tree extends PageAdvanced
 
         $result[] = TreeBehavior::className();
         $result[HasPageOptions::className()] = HasPageOptions::className();
+        $result[TimestampPublishedBehavior::className()] = TimestampPublishedBehavior::className();
         return $result;
     }
     /**

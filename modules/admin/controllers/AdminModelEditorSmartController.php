@@ -28,6 +28,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasVotes;
 use skeeks\cms\models\behaviors\HasPublications;
 
+use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\Comment;
 use skeeks\cms\models\Publication;
 use skeeks\cms\models\Search;
@@ -41,6 +42,8 @@ use yii\base\Behavior;
 use yii\base\Component;
 use yii\base\Model;
 use yii\base\View;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
 use yii\filters\VerbFilter;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
@@ -207,6 +210,32 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             [
                                 "class"     => HasModelBehaviors::className(),
                                 "behaviors" => HasAdultStatus::className()
+                            ]
+                        ]
+                    ],
+
+                    'author' =>
+                    [
+                        "label"     => "Автор",
+                        'icon'      => 'glyphicon glyphicon-user',
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => BlameableBehavior::className()
+                            ]
+                        ]
+                    ],
+
+                    'timestamp' =>
+                    [
+                        "label"     => "Время создания",
+                        'icon'      => 'glyphicon glyphicon-time',
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => [TimestampBehavior::className(), TimestampPublishedBehavior::className()]
                             ]
                         ]
                     ],
@@ -387,6 +416,38 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
+
+    public function actionAuthor()
+    {
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        {
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            return $this->redirect(UrlHelper::constructCurrent()->setRoute('author')->normalizeCurrentRoute()->enableAdmin()->toString());
+        } else
+        {
+            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/author.php", [
+                "model" => $this->getModel()
+            ]));
+        }
+    }
+
+    public function actionTimestamp()
+    {
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        {
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            return $this->redirect(UrlHelper::constructCurrent()->setRoute('author')->normalizeCurrentRoute()->enableAdmin()->toString());
+        } else
+        {
+            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/timestamp.php", [
                 "model" => $this->getModel()
             ]));
         }

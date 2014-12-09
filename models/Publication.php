@@ -17,6 +17,7 @@ use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasAdultStatus;
 use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\HasStatus;
+use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use Yii;
 
 /**
@@ -44,6 +45,7 @@ class Publication extends PageAdvanced
         return array_merge(parent::behaviors(), [
             CanBeLinkedToModel::className(),
             CanBeLinkedToTree::className(),
+            TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
             HasPageOptions::className() => HasPageOptions::className(),
         ]);
     }

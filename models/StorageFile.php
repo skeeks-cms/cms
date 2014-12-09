@@ -6,12 +6,14 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasPageOptions;
+use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
 
 use skeeks\sx\models\Ref;
 use yii\base\Event;
+
 /**
  * This is the model class for table "{{%cms_storage_file}}".
  *
@@ -149,7 +151,8 @@ class StorageFile extends Core
             behaviors\HasVotes::className(),
             CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
             HasPageOptions::className() => HasPageOptions::className(),
-            HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className()
+            HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className(),
+            TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className()
         ]);
     }
 
