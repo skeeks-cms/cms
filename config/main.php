@@ -171,15 +171,15 @@ $config =
             // format settings for saving each date attribute (PHP format example)
             'saveSettings' => [
                 \kartik\datecontrol\Module::FORMAT_DATE => 'php:U', // saves as unix timestamp
-                \kartik\datecontrol\Module::FORMAT_TIME => 'php:H:i:s',
-                \kartik\datecontrol\Module::FORMAT_DATETIME => 'php:Y-m-d H:i:s',
+                \kartik\datecontrol\Module::FORMAT_TIME => 'php:U', //'php:H:i:s',
+                \kartik\datecontrol\Module::FORMAT_DATETIME => 'php:U', //'php:Y-m-d H:i:s',
             ],
 
             // set your display timezone
-            'displayTimezone' => 'Asia/Kolkata',
+            //'displayTimezone' => 'Asia/Kolkata',
 
             // set your timezone for date saved to db
-            'saveTimezone' => 'UTC',
+            //'saveTimezone' => 'UTC',
 
             // automatically use kartik\widgets for each of the above formats
             'autoWidget' => true,
@@ -198,9 +198,19 @@ $config =
             // this will be used when autoWidget is set to false at module or widget level.
             'widgetSettings' => [
                 \kartik\datecontrol\Module::FORMAT_DATE => [
-                    'class' => '\yii\jui\DatePicker', // example
+                    //'class' => '\yii\jui\DatePicker', // example
+                    'class' => '\kartik\datetime\DatePicker',
                     'options' => [
                         'dateFormat' => 'php:d-M-Y',
+                        'options' => ['class'=>'form-control'],
+                    ]
+                ],
+
+                \kartik\datecontrol\Module::FORMAT_DATETIME => [
+                    //'class' => '\yii\jui\DatePicker', // example
+                    'class' => '\kartik\datetime\DateTimePicker',
+                    'options' => [
+                        'dateFormat' => 'php:d-F-Y H:i:s',
                         'options' => ['class'=>'form-control'],
                     ]
                 ]
