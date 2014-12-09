@@ -31,7 +31,8 @@
         "skeeks/yii2-widget-simpleajaxuploader": "*",
         "skeeks/yii2-widget-ckeditor": "*",
         "skeeks/yii2-widget-chosen": "*",
-        "skeeks/yii2-widget-highcharts": "*"
+        "skeeks/yii2-widget-highcharts": "*",
+        "kartik-v/yii2-datecontrol": "dev-master"
     },
     "config": {
         "process-timeout": 1800
