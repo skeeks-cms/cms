@@ -444,7 +444,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(UrlHelper::constructCurrent()->setRoute('author')->normalizeCurrentRoute()->enableAdmin()->toString());
+            return $this->redirect(UrlHelper::constructCurrent()->setRoute('timestamp')->normalizeCurrentRoute()->enableAdmin()->toString());
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/timestamp.php", [

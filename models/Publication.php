@@ -59,6 +59,7 @@ class Publication extends PageAdvanced
             'type'          => Yii::t('app', 'Publication type'),
             'tree_ids'      => Yii::t('app', 'Разделы'),
             'page_options'  => Yii::t('app', 'Дополнительные свойства'),
+            'published_at'  => Yii::t('app', 'Дата публикации'),
         ]);
     }
 
@@ -69,6 +70,7 @@ class Publication extends PageAdvanced
     {
         return array_merge(parent::rules(), [
             [['type'], 'string'],
+            [['published_at'], 'integer'],
             [['tree_ids', 'page_options', 'multiPageOptions'], 'safe'],
         ]);
     }

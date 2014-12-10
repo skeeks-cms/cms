@@ -164,8 +164,8 @@ $config =
             // format settings for displaying each date attribute (ICU format example)
             'displaySettings' => [
                 \kartik\datecontrol\Module::FORMAT_DATE => 'dd-MM-yyyy',
-                \kartik\datecontrol\Module::FORMAT_TIME => 'HH:mm:ss a',
-                \kartik\datecontrol\Module::FORMAT_DATETIME => 'dd-MM-yyyy HH:mm:ss a',
+                \kartik\datecontrol\Module::FORMAT_TIME => 'HH:mm:ss',
+                \kartik\datecontrol\Module::FORMAT_DATETIME => 'dd-MM-yyyy HH:mm:ss',
             ],
 
             // format settings for saving each date attribute (PHP format example)
@@ -176,10 +176,10 @@ $config =
             ],
 
             // set your display timezone
-            //'displayTimezone' => 'Asia/Kolkata',
+            'displayTimezone' => 'Asia/Kolkata',
 
             // set your timezone for date saved to db
-            //'saveTimezone' => 'UTC',
+            'saveTimezone' => 'UTC',
 
             // automatically use kartik\widgets for each of the above formats
             'autoWidget' => true,

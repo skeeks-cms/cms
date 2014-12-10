@@ -69,6 +69,7 @@ class Tree extends PageAdvanced
             'type' => Yii::t('app', 'Tree type'),
             'pid_main' => Yii::t('app', 'Pid main'),
             'page_options' => Yii::t('app', 'Page Options'),
+            'published_at'  => Yii::t('app', 'Дата публикации'),
         ]);
     }
 
@@ -79,7 +80,7 @@ class Tree extends PageAdvanced
     {
         return array_merge(parent::rules(), [
             [['type'], 'string'],
-            [['pid_main'], 'integer'],
+            [['pid_main', 'published_at'], 'integer'],
             [['page_options', 'multiPageOptions'], 'safe'],
         ]);
     }

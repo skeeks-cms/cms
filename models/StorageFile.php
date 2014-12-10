@@ -75,7 +75,7 @@ class StorageFile extends Core
         return array_merge(parent::rules(), [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             [['src'], 'required'],
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'status', 'image_height', 'image_width', 'count_comment', 'count_subscribe', 'count_vote', 'result_vote'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'status', 'image_height', 'image_width', 'count_comment', 'count_subscribe', 'count_vote', 'result_vote', 'published_at'], 'integer'],
             [['description_short', 'description_full', 'meta_description', 'meta_keywords', 'users_subscribers', 'users_votes_up', 'users_votes_down'], 'string'],
             [['src', 'cluster_file', 'original_name', 'name', 'meta_title', 'linked_to_model', 'linked_to_value'], 'string', 'max' => 255],
             [['cluster_id', 'type', 'mime_type', 'extension'], 'string', 'max' => 16],
@@ -125,6 +125,7 @@ class StorageFile extends Core
             'linked_to_model' => Yii::t('app', 'Linked To Model'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
             'page_options'  => Yii::t('app', 'Дополнительные свойства'),
+            'published_at'  => Yii::t('app', 'Дата публикации'),
         ]);
     }
 
