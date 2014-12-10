@@ -72,6 +72,9 @@ class Publications extends WidgetHasTemplate
             $find->andWhere(['type' => $this->types]);
         }
 
+        $find->andWhere(['<=', 'published_at', time()]);
+        $find->orderBy('published_at DESC');
+
         $this->_data->set('models', $find->all());
 
         return $this;

@@ -176,7 +176,7 @@ $config =
             ],
 
             // set your display timezone
-            'displayTimezone' => 'Asia/Kolkata',
+            'displayTimezone' => 'Europe/Moscow',
 
             // set your timezone for date saved to db
             'saveTimezone' => 'UTC',
