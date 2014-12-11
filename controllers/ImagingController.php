@@ -82,7 +82,7 @@ class ImagingController extends Controller
         try
         {
             $filter->setOriginalRootFilePath($originalFileRoot)->setNewRootFilePath($newFileRoot)->save();
-            return \Yii::$app->response->redirect(\Yii::$app->request->getUrl(), 301);
+            return \Yii::$app->response->redirect(\Yii::$app->request->getUrl() . '?sx-url', 301);
         } catch(\Exception $e)
         {
             return $e->getMessage();

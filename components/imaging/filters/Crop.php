@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\components\imaging\filters;
 use yii\base\Component;
+use yii\imagine\Image;
 
 /**
  * Class Filter
@@ -18,14 +19,13 @@ use yii\base\Component;
  */
 class Crop extends \skeeks\cms\components\imaging\Filter
 {
-    public $l       = 0;
-    public $t       = 0;
     public $w       = 0;
     public $h       = 0;
+    public $s       = [0, 0];
 
     protected function _save()
     {
-
-
+        Image::crop($this->_originalRootFilePath, $this->w, $this->h, $this->s)->save($this->_newRootFilePath);
+        Image::thumbnail($this->_originalRootFilePath, $this->w, $this->h, $this->s)->save($this->_newRootFilePath);
     }
 }

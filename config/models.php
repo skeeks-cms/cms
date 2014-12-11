@@ -123,6 +123,11 @@ return
     'f-crop' =>
     [
         'modelClass'    => 'skeeks\cms\components\imaging\filters\Crop',
-        'name'          => 'Фильтро обрезать'
+        'name'          => 'Фильтр обрезать'
+    ],
+    'f-thumbnail' =>
+    [
+        'modelClass'    => 'skeeks\cms\components\imaging\filters\Thumbnail',
+        'name'          => 'Фильтр Thumbnail'
     ],
 ];

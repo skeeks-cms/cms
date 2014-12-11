@@ -118,6 +118,7 @@ abstract class Filter extends Component
     protected function _createNewDir()
     {
         $newFile = new \skeeks\sx\File($this->_newRootFilePath);
+
         if (!$newFile->getDir()->make())
         {
             throw new \ErrorException("Не удалось создать диррикторию для нового файла");
