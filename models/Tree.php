@@ -154,6 +154,7 @@ class Tree extends PageAdvanced
     /**
      * @return null|ModelType
      */
+
     public function getType()
     {
         if ($this->type)

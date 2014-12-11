@@ -118,4 +118,11 @@ return
         'modelClass'    => 'skeeks\cms\models\StaticBlock',
         'name'          => 'Инфоблок'
     ],
+
+
+    'f-crop' =>
+    [
+        'modelClass'    => 'skeeks\cms\components\imaging\filters\Crop',
+        'name'          => 'Фильтро обрезать'
+    ],
 ];
