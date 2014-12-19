@@ -526,4 +526,19 @@ class TreeBehavior extends ActiveRecordBehavior
     {
         return (int) $this->owner->{$this->pidMainAttrName};
     }
+
+
+    public function recalculateChildrenPrioritiesByAlpha()
+    {
+        $children = $this->findChildrens()->orderBy("name")->all();
+
+        $i = count($children)*10;
+
+        foreach($children as $child)
+        {
+            $child->priority = $i;
+            $child->save(false);
+            $i -= 10;
+        }
+    }
 }
