@@ -10,6 +10,9 @@
  */
 namespace skeeks\cms;
 use skeeks\cms\modules\admin\components\UrlRule;
+use yii\base\Event;
+use yii\web\Application;
+use yii\web\View;
 
 /**
  * Class Module
@@ -28,7 +31,6 @@ class Module extends base\Module
      * @var string
      */
     //public $layout ='@skeeks/cms/modules/admin/views/layouts/main.php';
-
     /**
      * @return array
      */

@@ -14,7 +14,7 @@ $config =
 [
     'id' => 'skeeks-cms-app',
     'language' => 'ru',
-    'bootstrap' => ['log'],
+    'bootstrap' => ['cms', 'log'],
 
     'components' => [
 
@@ -114,6 +114,10 @@ $config =
             ]*/
         ],
 
+        'seoGenerator' =>
+        [
+            'class' => \skeeks\cms\components\SeoGenerator::className()
+        ],
 
         //Глобальные опции страниц
         'pageOptions' =>

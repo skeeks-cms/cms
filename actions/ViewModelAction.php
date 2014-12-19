@@ -38,6 +38,11 @@ class ViewModelAction extends Action
     protected $_model = null;
 
     /**
+     * @var
+     */
+    public $callback;
+
+    /**
      * Runs the action
      *
      * @return string result content
@@ -53,6 +58,7 @@ class ViewModelAction extends Action
      */
     protected function _go()
     {
+
         if (!$this->_model)
         {
             return false;
@@ -67,12 +73,26 @@ class ViewModelAction extends Action
             ->_initActionView()
         ;
 
+
+        if ($this->callback)
+        {
+            if (!is_callable($this->callback)) {
+                throw new InvalidConfigException('"' . get_class($this) . '::callback" should be a valid callback.');
+            }
+
+            $result = call_user_func($this->callback, $this);
+
+            if ($result)
+            {
+                return $result;
+            }
+        }
+
         if (Yii::$app->getRequest()->getIsAjax())
         {
             return "test: test";
         } else
         {
-
             return $this->controller->render($this->view ?: $this->id, [
                 'model' => $this->_model
             ]);
@@ -174,7 +194,9 @@ class ViewModelAction extends Action
                 "name"      => 'keywords',
                 "content"   => $meta_keywords
             ], 'keywords');
-        } else
+        }
+
+        /*else
         {
             if (isset($model->name))
             {
@@ -183,7 +205,7 @@ class ViewModelAction extends Action
                     "content"   => $model->name
                 ], 'keywords');
             }
-        }
+        }*/
 
 
         if ($meta_descripption = \Yii::$app->pageOptions->getComponent('meta_description')->getValue()->value)
@@ -192,7 +214,8 @@ class ViewModelAction extends Action
                 "name"      => 'description',
                 "content"   => $meta_descripption
             ], 'description');
-        } else
+        }
+        else
         {
             if (isset($model->name))
             {
