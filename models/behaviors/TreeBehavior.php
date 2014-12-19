@@ -528,17 +528,38 @@ class TreeBehavior extends ActiveRecordBehavior
     }
 
 
-    public function recalculateChildrenPrioritiesByAlpha()
+    /**
+     * Пересчитывает приоритеты детей в соответствии со занчениями заданного поля
+     * @param string $field Название поля
+     * @param bool $is_asc Упорядочивать ли по возрастанию
+     */
+    public function recalculateChildrenPriorities($field = "name", $is_asc = false)
     {
-        $children = $this->findChildrens()->orderBy("name")->all();
+        //если второй аргумент - true, то сортируем по-возрастанию,
+        //по-умолчанию - false: сортировка по-убыванию,
+        //потому что как правило везде элементы сортируются по убыванию приоритета:
+        //чем больше приоритет, тем выше элемент стоит в списке.
+        if($is_asc)
+        {
+            $order = SORT_ASC;
+        }
+        else
+        {
+            $order = SORT_DESC;
+        }
 
-        $i = count($children)*10;
+        $children = $this->findChildrens()->orderBy([$field => $order])->all();
+
+        //значения приориетов начинаются со 100 и кратны 100,
+        //на тот случай, если между какими-то элементами
+        //нужно будет вручную добавить другие
+        $i = 100;
 
         foreach($children as $child)
         {
             $child->priority = $i;
             $child->save(false);
-            $i -= 10;
+            $i += 100;
         }
     }
 }
