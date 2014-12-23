@@ -562,4 +562,20 @@ class TreeBehavior extends ActiveRecordBehavior
             $i += 100;
         }
     }
+
+    /**
+     * Производит обмен значений приоритетов между текущим элементом дерева и элементом, переданном в аргументе
+     * @param $swap_node Элемент дерева с которым произвести обмен приоритетами
+     */
+    public function swapPriorities($swap_node)
+    {
+        $this_priority = $this->owner->priority;
+        $swap_priority = $swap_node->priority;
+
+        $this->owner->priority = $swap_priority;
+        $this->owner->save(false);
+
+        $swap_node->priority = $this_priority;
+        $swap_node->save(false);
+    }
 }
