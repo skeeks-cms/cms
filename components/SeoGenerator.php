@@ -58,7 +58,7 @@ class SeoGenerator extends Component
 
     public function generateBeforeOutputPage(\yii\web\View $view)
     {
-        $content = ob_get_clean();
+        $content = ob_get_contents();
 
         if (!isset($view->metaTags['keywords']))
         {
@@ -77,7 +77,9 @@ class SeoGenerator extends Component
         }
 
         $content = str_replace('</title>', "</title>" . PHP_EOL . "<!-- " . \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright() . " -->", $content);
-        echo $content;
+
+        \Yii::$app->response->content = $content;
+
     }
 
     /**

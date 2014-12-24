@@ -24,6 +24,12 @@ use yii\filters\VerbFilter;
  */
 class AuthController extends AdminController
 {
+    /**
+     * @var boolean whether to enable CSRF validation for the actions in this controller.
+     * CSRF validation is enabled only when both this property and [[Request::enableCsrfValidation]] are true.
+     */
+    //public $enableCsrfValidation = false;
+
     public function behaviors()
     {
         return
@@ -72,6 +78,9 @@ class AuthController extends AdminController
      */
     public function actions()
     {
+        //var_dump(\Yii::$app->request->getCookies()->getValue(\Yii::$app->request->csrfParam));
+       // var_dump(\Yii::$app->request->getBodyParam(\Yii::$app->request->csrfParam));
+       // die;
         return [
             'logout' => [
                 'class' => LogoutAction::className(),
