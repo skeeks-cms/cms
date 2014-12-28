@@ -88,4 +88,29 @@ class Publication extends PageAdvanced
         return null;
     }
 
+
+
+
+    /**
+     * @return string
+     */
+    public function getMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage->getFirstSrc())
+        {
+            return $mainImage->getFirstSrc();
+        }
+
+        return \Yii::$app->params['noimage'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getImagesSrc()
+    {
+        return $this->getFilesGroups()->getComponent('images')->items;
+    }
 }

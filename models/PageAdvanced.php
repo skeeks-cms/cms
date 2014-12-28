@@ -84,7 +84,7 @@ abstract class PageAdvanced extends Page
                         'name'      => 'Главное изображение',
                         'config'    =>
                         [
-                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
+                            HasFiles::MAX_SIZE            => 10*1024, //1Mb
                             HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
                             HasFiles::MAX_COUNT_FILES     => 1,
                             HasFiles::ACCEPT_MIME_TYPE    => "image/*",
@@ -96,7 +96,7 @@ abstract class PageAdvanced extends Page
                         'name'      => 'Изображения',
                         'config' =>
                         [
-                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
+                            HasFiles::MAX_SIZE            => 10*1024, //1Mb
                             HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
                             HasFiles::MAX_COUNT_FILES     => 50,
                             HasFiles::ACCEPT_MIME_TYPE    => "image/*",
@@ -108,7 +108,7 @@ abstract class PageAdvanced extends Page
                         'name'      => 'Файлы',
                         'config'    =>
                         [
-                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
+                            HasFiles::MAX_SIZE            => 10*1024, //1Mb
                             HasFiles::MAX_COUNT_FILES     => 50,
                         ]
                     ],
