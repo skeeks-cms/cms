@@ -32,6 +32,8 @@ use yii\web\View;
  */
 class Cms extends \skeeks\cms\base\Component
 {
+    public $staticKeySold = '';
+
     public function init()
     {
         parent::init();
@@ -214,4 +216,12 @@ class Cms extends \skeeks\cms\base\Component
         ]));
     }
 
+    public function getStaticKey()
+    {
+        return md5(implode('', [
+            (string) $this->moduleCms()->getDescriptor()->getVersion(),
+            $this->staticKeySold,
+            Yii::getVersion()
+        ]));
+    }
 }
