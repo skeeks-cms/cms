@@ -23,7 +23,6 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <!-- <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?> -->
     <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
     <?php $this->head() ?>
 </head>

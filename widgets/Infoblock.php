@@ -71,17 +71,19 @@ class Infoblock extends Widget
 
         if ($result === false || $this->refetch)
         {
+
             if (is_string($this->id))
             {
-                $modelInfoblock = \skeeks\cms\models\Infoblock::findByCode($this->id);
+                $modelInfoblock = \skeeks\cms\models\Infoblock::fetchByCode($this->id);
             } else if (is_int($this->id))
             {
-                $modelInfoblock = \skeeks\cms\models\Infoblock::findById($this->id);
+                $modelInfoblock = \skeeks\cms\models\Infoblock::fetchById($this->id);
             }
 
             if (!$modelInfoblock)
             {
                 $result = '';
+                return $result;
             }
 
             $result = $modelInfoblock->run($this->config);

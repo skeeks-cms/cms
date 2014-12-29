@@ -17,6 +17,7 @@ use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasAdultStatus;
 use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\HasStatus;
+use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use Yii;
 
 /**
@@ -44,6 +45,7 @@ class Publication extends PageAdvanced
         return array_merge(parent::behaviors(), [
             CanBeLinkedToModel::className(),
             CanBeLinkedToTree::className(),
+            TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
             HasPageOptions::className() => HasPageOptions::className(),
         ]);
     }
@@ -57,6 +59,7 @@ class Publication extends PageAdvanced
             'type'          => Yii::t('app', 'Publication type'),
             'tree_ids'      => Yii::t('app', 'Разделы'),
             'page_options'  => Yii::t('app', 'Дополнительные свойства'),
+            'published_at'  => Yii::t('app', 'Дата публикации'),
         ]);
     }
 
@@ -67,6 +70,7 @@ class Publication extends PageAdvanced
     {
         return array_merge(parent::rules(), [
             [['type'], 'string'],
+            [['published_at'], 'integer'],
             [['tree_ids', 'page_options', 'multiPageOptions'], 'safe'],
         ]);
     }
@@ -84,4 +88,29 @@ class Publication extends PageAdvanced
         return null;
     }
 
+
+
+
+    /**
+     * @return string
+     */
+    public function getMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage->getFirstSrc())
+        {
+            return $mainImage->getFirstSrc();
+        }
+
+        return \Yii::$app->params['noimage'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getImagesSrc()
+    {
+        return $this->getFilesGroups()->getComponent('images')->items;
+    }
 }

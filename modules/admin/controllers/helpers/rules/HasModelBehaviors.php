@@ -12,6 +12,7 @@ namespace skeeks\cms\modules\admin\controllers\helpers\rules;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\cms\validators\HasBehaviorsAnd;
+use skeeks\cms\validators\HasBehaviorsOr;
 use skeeks\sx\validate\Validate;
 
 /**
@@ -23,7 +24,11 @@ class HasModelBehaviors extends HasModel
     /**
      * @var array|string
      */
-    public $behaviors = null;
+    public $behaviors   = null;
+    /**
+     * @var bool использовать условие ИЛИ (проверка наличия хотябы одного поведения)
+     */
+    public $useOr       = false;
 
     public function isAllow()
     {
@@ -40,6 +45,12 @@ class HasModelBehaviors extends HasModel
         $model = $this->controller->getModel();
         $behaviors = $this->behaviors;
 
-        return Validate::validate(new HasBehaviorsAnd($behaviors), $model)->isValid();
+        if ($this->useOr)
+        {
+            return Validate::validate(new HasBehaviorsOr($behaviors), $model)->isValid();
+        } else
+        {
+            return Validate::validate(new HasBehaviorsAnd($behaviors), $model)->isValid();
+        }
     }
 }

@@ -27,11 +27,15 @@
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
+        "yiisoft/yii2-imagine": "*",
         "skeeks/yii2-sx": "*",
         "skeeks/yii2-widget-simpleajaxuploader": "*",
         "skeeks/yii2-widget-ckeditor": "*",
         "skeeks/yii2-widget-chosen": "*",
-        "skeeks/yii2-widget-highcharts": "*"
+        "skeeks/yii2-widget-highcharts": "*",
+        "kartik-v/yii2-datecontrol": "*",
+        "kartik-v/yii2-widget-datepicker": "*",
+        "kartik-v/yii2-widget-datetimepicker": "*"
     },
     "config": {
         "process-timeout": 1800

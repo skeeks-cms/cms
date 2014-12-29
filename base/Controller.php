@@ -27,20 +27,6 @@ class Controller extends YiiWebController
      */
     public $beforeRender = '@app/views/modules/';
 
-    private static $_huck = 'Z2VuZXJhdG9y';
-
-    public function init()
-    {
-        parent::init();
-
-        if (!isset($this->view->metaTags[self::$_huck]))
-        {
-            $this->view->registerMetaTag([
-                "name"      => base64_decode(self::$_huck),
-                "content"   => \Yii::$app->cms->moduleCms()->getDescriptor()->toString()
-            ], self::$_huck);
-        }
-    }
     /**
      *
      * Если не хочется рендерить шаблон текущего действия, можно воспользоваться этой функцией.

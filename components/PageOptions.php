@@ -44,7 +44,10 @@ class PageOptions extends CollectionComponents
         {
             foreach ($modelPageOptionValues as $idPageOption => $value)
             {
-                $this->getComponent($idPageOption)->getValue()->setAttributes((array) $value);
+                if ($this->getComponent($idPageOption))
+                {
+                    $this->getComponent($idPageOption)->getValue()->setAttributes((array) $value);
+                }
             }
         }
 

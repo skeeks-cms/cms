@@ -15,13 +15,16 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\TreeType;
+use skeeks\cms\models\User;
 use skeeks\cms\widgets\Infoblock;
 use skeeks\cms\widgets\StaticBlock;
 use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
+use yii\web\View;
 
 /**
  * Class Cms
@@ -29,6 +32,19 @@ use yii\web\UploadedFile;
  */
 class Cms extends \skeeks\cms\base\Component
 {
+    public function init()
+    {
+        parent::init();
+
+        /**
+         * Генерация SEO метатегов.
+         * */
+        \Yii::$app->view->on(View::EVENT_END_PAGE, function(Event $e)
+        {
+            \Yii::$app->seoGenerator->generateBeforeOutputPage($e->sender);
+        });
+    }
+
     /**
      * @return \yii\web\User|\common\models\User|models\User|null
      */

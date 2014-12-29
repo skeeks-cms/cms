@@ -72,8 +72,39 @@ class Publications extends WidgetHasTemplate
             $find->andWhere(['type' => $this->types]);
         }
 
+        $find->andWhere(['<=', 'published_at', time()]);
+        $find->orderBy('published_at DESC');
+
         $this->_data->set('models', $find->all());
 
         return $this;
+    }
+
+    /**
+     * @return array|null|Tree
+     */
+    public function fetchFirstTree()
+    {
+        if ($id = $this->getFirstTreeId())
+        {
+            return Tree::find()->where(['id' => $id])->one();
+        } else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getFirstTreeId()
+    {
+        if ($this->tree_ids)
+        {
+            return (int) array_shift($this->tree_ids);
+        } else
+        {
+            return 0;
+        }
     }
 }

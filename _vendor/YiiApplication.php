@@ -13,6 +13,7 @@ namespace yii\web;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CurrentSite;
+use skeeks\cms\components\Imaging;
 use skeeks\cms\components\Langs;
 use skeeks\cms\components\PageOptions;
 use skeeks\cms\components\PublicationTypes;
@@ -21,6 +22,7 @@ use skeeks\cms\components\RegisteredLayouts;
 use skeeks\cms\components\RegisteredModels;
 use skeeks\cms\components\RegisteredModelTypes;
 use skeeks\cms\components\RegisteredWidgets;
+use skeeks\cms\components\SeoGenerator;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\components\TreeTypes;
 use skeeks\cms\modules\admin\components\Menu;
@@ -36,6 +38,8 @@ use skeeks\cms\modules\admin\components\Menu;
  * @property Langs                          $langs
  * @property PageOptions                    $pageOptions
  * @property Cms                            $cms
+ * @property Imaging                        $imaging
+ * @property SeoGenerator                   $seoGenerator
  *
  * Class Application
  * @package yii\web
