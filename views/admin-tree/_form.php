@@ -1,8 +1,8 @@
 <?php
 
+use skeeks\cms\models\Tree;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use skeeks\cms\models\Tree;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
@@ -23,6 +23,8 @@ use skeeks\cms\models\Tree;
              ),
     ]);
 ?>
+
+<?= $form->field($model, 'priority')->textInput(['maxlength' => 255]) ?>
 
 <div class="form-group">
     <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

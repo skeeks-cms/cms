@@ -526,4 +526,56 @@ class TreeBehavior extends ActiveRecordBehavior
     {
         return (int) $this->owner->{$this->pidMainAttrName};
     }
+
+
+    /**
+     * Пересчитывает приоритеты детей в соответствии со занчениями заданного поля
+     * @param string $field Название поля
+     * @param bool $is_asc Упорядочивать ли по возрастанию
+     */
+    public function recalculateChildrenPriorities($field = "name", $is_asc = false)
+    {
+        //если второй аргумент - true, то сортируем по-возрастанию,
+        //по-умолчанию - false: сортировка по-убыванию,
+        //потому что как правило везде элементы сортируются по убыванию приоритета:
+        //чем больше приоритет, тем выше элемент стоит в списке.
+        if($is_asc)
+        {
+            $order = SORT_ASC;
+        }
+        else
+        {
+            $order = SORT_DESC;
+        }
+
+        $children = $this->findChildrens()->orderBy([$field => $order])->all();
+
+        //значения приориетов начинаются со 100 и кратны 100,
+        //на тот случай, если между какими-то элементами
+        //нужно будет вручную добавить другие
+        $i = 100;
+
+        foreach($children as $child)
+        {
+            $child->priority = $i;
+            $child->save(false);
+            $i += 100;
+        }
+    }
+
+    /**
+     * Производит обмен значений приоритетов между текущим элементом дерева и элементом, переданном в аргументе
+     * @param $swap_node Элемент дерева с которым произвести обмен приоритетами
+     */
+    public function swapPriorities($swap_node)
+    {
+        $this_priority = $this->owner->priority;
+        $swap_priority = $swap_node->priority;
+
+        $this->owner->priority = $swap_priority;
+        $this->owner->save(false);
+
+        $swap_node->priority = $this_priority;
+        $swap_node->save(false);
+    }
 }

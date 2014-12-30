@@ -89,10 +89,25 @@ class AdminTreeController extends AdminModelEditorSmartController
 
         if (\Yii::$app->request->isPost)
         {
-            $childTree = new Tree();
-            $childTree->load(\Yii::$app->request->post());
+            $post = \Yii::$app->request->post();
 
-            $parent->processAddNode($childTree);
+            if($post["recalculate_children_priorities"])
+            {
+                $sort = $post["sort"]=="asc"?true:false;
+
+                $parent->recalculateChildrenPriorities($post["column"], $sort);
+
+                //$node1 = $tree->find()->where(['priority'=>200])->one();
+                //$node2 = $tree->find()->where(['priority'=>300])->one();
+                //$node1->swapPriorities($node2);
+            }
+            else
+            {
+                $childTree = new Tree();
+                $childTree->load(\Yii::$app->request->post());
+
+                $parent->processAddNode($childTree);
+            }
 
             $this->redirect(Url::to(["new-children", "id" => $parent->primaryKey]));
         }

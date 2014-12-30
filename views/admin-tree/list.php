@@ -31,6 +31,8 @@ use yii\grid\GridView;
 
         'name',
 
+        'priority',
+
         ['class' => \skeeks\cms\grid\DescriptionShortColumn::className()],
         ['class' => \skeeks\cms\grid\DescriptionFullColumn::className()],
 
