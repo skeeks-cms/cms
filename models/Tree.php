@@ -11,7 +11,9 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasPageOptions;
+use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
@@ -70,6 +72,13 @@ class Tree extends PageAdvanced
         }
 
         $result[] = TreeBehavior::className();
+        $result[] = CanBeLinkedToTree::className();
+        $result[] = [
+            'class' => Implode::className(),
+            "fields" =>  [
+                "tree_menu_ids"
+            ]
+        ];
         $result[HasPageOptions::className()] = HasPageOptions::className();
         return $result;
     }
@@ -80,9 +89,12 @@ class Tree extends PageAdvanced
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'type' => Yii::t('app', 'Tree type'),
-            'pid_main' => Yii::t('app', 'Pid main'),
-            'page_options' => Yii::t('app', 'Page Options'),
+            'type'              => Yii::t('app', 'Tree type'),
+            'pid_main'          => Yii::t('app', 'Pid main'),
+            'page_options'      => Yii::t('app', 'Page Options'),
+            'tree_ids'          => Yii::t('app', 'Связан с разделами'),
+            'redirect'          => Yii::t('app', 'Redirect'),
+            'tree_menu_ids'      => Yii::t('app', 'Позиции меню'),
         ]);
     }
 
@@ -94,7 +106,7 @@ class Tree extends PageAdvanced
         return array_merge(parent::rules(), [
             [['type'], 'string'],
             [['pid_main', 'priority'], 'integer'],
-            [['page_options', 'multiPageOptions'], 'safe'],
+            [['page_options', 'multiPageOptions', 'tree_ids', 'tree_menu_ids', 'redirect'], 'safe'],
         ]);
     }
 

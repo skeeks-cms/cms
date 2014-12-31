@@ -24,7 +24,28 @@ use yii\widgets\ActiveForm;
     ]);
 ?>
 
-<?= $form->field($model, 'priority')->textInput(['maxlength' => 255]) ?>
+<?= $form->field($model, 'priority')->textInput([
+    'maxlength' => 255
+]) ?>
+<?= $form->field($model, 'redirect')->textInput(['maxlength' => 500]) ?>
+
+<?= $form->field($model, 'tree_ids')->widget(
+    \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+    [
+
+    ]);
+?>
+
+<?= $form->field($model, 'tree_menu_ids')->widget(
+    \skeeks\widget\chosen\Chosen::className(), [
+            'items' => \yii\helpers\ArrayHelper::map(
+                 \skeeks\cms\models\TreeMenu::find()->all(),
+                 "id",
+                 "name"
+             ),
+            'multiple' => true
+    ]);
+?>
 
 <div class="form-group">
     <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

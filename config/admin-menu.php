@@ -30,6 +30,12 @@ return
             ],
 
             [
+                "label"     => "Позиции меню",
+                "url"       => ["cms/admin-tree-menu"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
+            ],
+
+            [
                 "label"     => 'Статические блоки',
                 "url"       => ["cms/admin-static-block"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.conct.png']

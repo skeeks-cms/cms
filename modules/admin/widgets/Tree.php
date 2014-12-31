@@ -341,6 +341,7 @@ class Tree
     {
         Sortable::widget();
 
+
         $models     = \skeeks\cms\models\Tree::find()->where(["id" => $this->_getSelectedIds()])->all();
         $options    = Json::encode(['selected' => $models]);
 
