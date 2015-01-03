@@ -51,4 +51,18 @@ return
             ]
         ],
     ],
+
+    'skeeks\cms\widgets\treeFixed\TreeFixed' =>
+    [
+        'name'          => 'Виджет фиксированного меню',
+        'description'   => 'Виджет фиксированного меню',
+
+        'templates'     =>
+        [
+            'default' =>
+            [
+                'name' => 'Шаблон по умолчанию'
+            ]
+        ],
+    ],
 ];

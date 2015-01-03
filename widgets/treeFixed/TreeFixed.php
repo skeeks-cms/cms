@@ -8,7 +8,7 @@
  * @date 31.12.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\widgets\treeChildrens;
+namespace skeeks\cms\widgets\treeFixed;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\models\Tree;
@@ -16,8 +16,8 @@ use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
 
 /**
- * Class TreeChildrens
- * @package skeeks\cms\widgets\tree
+ * Class TreeFixed
+ * @package skeeks\cms\widgets\treeFixed
  */
 class TreeFixed extends WidgetHasTemplate
 {
