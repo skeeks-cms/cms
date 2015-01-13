@@ -377,7 +377,7 @@ class Tree
                             });
 
                             sx.ajax.preparePostQuery(
-                                "{$backend}",
+                                "resort",
                                 {
                                     "ids" : newSort,
                                     "changeId" : $(ui.item).data("id")
