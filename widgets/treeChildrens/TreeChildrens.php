@@ -51,7 +51,7 @@ class TreeChildrens extends WidgetHasTemplate
 
         if ($this->orderBy)
         {
-            $find->orderBy($this->limit);
+            $find->orderBy(["priority" => SORT_DESC]);
         }
 
         if ($this->statuses)
