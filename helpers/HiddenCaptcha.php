@@ -32,6 +32,11 @@ class HiddenCaptcha extends Component
      */
     public function verify($captcha2 = '')
     {
+        if (!$this->_captchaSource)
+        {
+            return false;
+        }
+
         return (bool) ($this->getVerifyedCaptcha() == $captcha2);
     }
 
