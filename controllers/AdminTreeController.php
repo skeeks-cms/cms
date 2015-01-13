@@ -174,4 +174,29 @@ class AdminTreeController extends AdminModelEditorSmartController
             'controller'    => $this,
         ]);
     }
+
+    /**
+     * Пересортирует элементы дерева при перетаскивании
+     */
+    public function actionResort()
+    {
+        if (\Yii::$app->request->isPost)
+        {
+            $tree = new Tree();
+
+            $post = \Yii::$app->request->post();
+
+            $ids = array_reverse(array_filter($post['ids']));
+
+            $priority = 100;
+
+            foreach($ids as $id)
+            {
+                $node = $tree->find()->where(['id'=>$id])->one();
+                $node->priority = $priority;
+                $node->save(false);
+                $priority += 100;
+            }
+        }
+    }
 }
