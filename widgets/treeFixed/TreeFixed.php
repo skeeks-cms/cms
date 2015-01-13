@@ -49,10 +49,7 @@ class TreeFixed extends WidgetHasTemplate
             $find->andWhere(['tree_menu_ids' => $this->treeMenuId]);
         }
 
-        if ($this->orderBy)
-        {
-            $find->orderBy(["priority" => SORT_DESC]);
-        }
+        $find->orderBy(["priority" => SORT_DESC]);
 
         if ($this->statuses)
         {
