@@ -106,6 +106,11 @@ class AdminTreeController extends AdminModelEditorSmartController
                 $childTree = new Tree();
                 $childTree->load(\Yii::$app->request->post());
 
+                if(!$childTree->priority)
+                {
+                    $childTree->priority = 0;
+                }
+
                 $parent->processAddNode($childTree);
             }
 
