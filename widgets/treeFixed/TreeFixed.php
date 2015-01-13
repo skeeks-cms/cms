@@ -24,8 +24,8 @@ class TreeFixed extends WidgetHasTemplate
     /**
      * @var null|string
      */
-    public $pid                 = null;
     public $types               = [];
+    public $treeMenuId          = null;
     public $statuses            = [];
     public $statusesAdults      = [];
     public $limit               = 0;
@@ -39,14 +39,14 @@ class TreeFixed extends WidgetHasTemplate
     {
         $find = Tree::find();
 
-        if ($this->pid)
-        {
-            $find->andWhere(['pid' => $this->pid]);
-        }
-
         if ($this->limit)
         {
             $find->limit($this->limit);
+        }
+
+        if ($this->treeMenuId)
+        {
+            $find->andWhere(['tree_menu_ids' => $this->treeMenuId]);
         }
 
         if ($this->orderBy)
