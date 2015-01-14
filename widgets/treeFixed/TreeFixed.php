@@ -46,7 +46,8 @@ class TreeFixed extends WidgetHasTemplate
 
         if ($this->treeMenuId)
         {
-            $find->andWhere(['tree_menu_ids' => $this->treeMenuId]);
+            //$find->andWhere(['like', 'tree_menu_ids', $this->treeMenuId]);
+            $find->andWhere("FIND_IN_SET('" . $this->treeMenuId . "', tree_menu_ids)");
         }
 
         $find->orderBy(["priority" => SORT_DESC]);
