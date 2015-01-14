@@ -186,16 +186,34 @@ class AdminTreeController extends AdminModelEditorSmartController
 
             $post = \Yii::$app->request->post();
 
-            $ids = array_reverse(array_filter($post['ids']));
+            $resortIds = array_filter($post['ids']);
+            $changeId = intval($post['changeId']);
 
-            $priority = 100;
+            $changeNode = $tree->find()->where(['id' => $changeId])->one();
 
-            foreach($ids as $id)
+            $nodes = $tree->find()->where(['pid' =>$changeNode->pid])->orderBy(["priority" => SORT_DESC])->all();
+            $origIds = [];
+            foreach($nodes as $node)
             {
+                $origIds[] = $node->id;
+            }
+
+            $origPos = array_search($changeId, $origIds);
+            $resortPos = array_search($changeId, $resortIds);
+
+            if($origPos > $resortPos)
+            {
+                $origIds = array_reverse($origIds);
+                $offset = count($origIds) - 1;
+                $origPos = $offset - $origPos;
+                $resortPos = $offset - $resortPos;
+            }
+
+            for($i = $origPos+1; $i <= $resortPos; $i++)
+            {
+                $id = $origIds[$i];
                 $node = $tree->find()->where(['id'=>$id])->one();
-                $node->priority = $priority;
-                $node->save(false);
-                $priority += 100;
+                $changeNode->swapPriorities($node);
             }
         }
     }
