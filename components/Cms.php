@@ -140,7 +140,7 @@ class Cms extends \skeeks\cms\base\Component
      * @param $data
      * @return string
      */
-    static public function renderFrontend($template, $data)
+    public function renderFrontend($template, $data = [])
     {
         return \Yii::$app->view->renderFile(\Yii::getAlias("@frontend/views/") . $template, $data);
     }
