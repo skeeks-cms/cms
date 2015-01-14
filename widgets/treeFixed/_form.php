@@ -33,9 +33,13 @@ $tree = new \skeeks\cms\models\Tree();
 
 
 
-<?= $form->field($model, 'pid')->widget(
+<?= $form->field($model, 'treeMenuId')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions()
+            'items' => \yii\helpers\ArrayHelper::map(
+                 \skeeks\cms\models\TreeMenu::find()->all(),
+                 "id",
+                 "name"
+             ),
     ]);
 ?>
 
