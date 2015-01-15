@@ -10,6 +10,8 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\actions\ViewModelAction;
+use skeeks\cms\actions\ViewModelActionSeo;
 use skeeks\cms\base\Controller;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\User;
@@ -32,9 +34,18 @@ class TreeController extends Controller
         [
             'view' =>
             [
-                'class' => 'skeeks\cms\actions\ViewModelAction',
-                'view'  => 'default',
+                'class'     => 'skeeks\cms\actions\ViewModelAction',
+                'view'      => 'default',
+                'callback'  =>  [$this, 'viewTree']
             ],
         ];
+    }
+
+    /**
+     * @param ViewModelActionSeo $action
+     */
+    public function viewTree(ViewModelAction $action)
+    {
+        \Yii::$app->cms->setCurrentTree($action->getModel());
     }
 }

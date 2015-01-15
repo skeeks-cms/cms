@@ -228,4 +228,12 @@ class ViewModelAction extends Action
 
         return $this;
     }
+
+    /**
+     * @return null|Model
+     */
+    public function getModel()
+    {
+        return $this->_model;
+    }
 }

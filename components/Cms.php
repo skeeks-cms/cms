@@ -14,6 +14,7 @@ use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
+use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
 use skeeks\cms\widgets\Infoblock;
@@ -223,5 +224,29 @@ class Cms extends \skeeks\cms\base\Component
             $this->staticKeySold,
             Yii::getVersion()
         ]));
+    }
+
+
+    /**
+     * @var Tree
+     */
+    protected $_tree = null;
+
+    /**
+     * @param Tree $tree
+     * @return $this
+     */
+    public function setCurrentTree(Tree $tree)
+    {
+        $this->_tree = $tree;
+        return $this;
+    }
+
+    /**
+     * @return Tree
+     */
+    public function getCurrentTree()
+    {
+        return $this->_tree;
     }
 }

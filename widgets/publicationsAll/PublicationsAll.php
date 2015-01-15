@@ -8,7 +8,7 @@
  * @date 08.12.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\widgets\publications;
+namespace skeeks\cms\widgets\publicationsAll;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\models\Publication;
@@ -18,15 +18,14 @@ use Yii;
 
 /**
  * Class Publications
- * @package skeeks\cms\widgets\publications
+ * @package skeeks\cms\widgets\PublicationsAll
  */
-class Publications extends WidgetHasTemplate
+class PublicationsAll extends WidgetHasTemplate
 {
     /**
      * @var null|string
      */
     public $title                   = '';
-    public $tree_ids                = [];
     public $types                   = [];
     public $statuses                = [];
     public $statusesAdults          = [];
@@ -41,12 +40,27 @@ class Publications extends WidgetHasTemplate
     {
         $find = Publication::find();
 
-        if ($this->tree_ids)
+        $tree = \Yii::$app->cms->getCurrentTree();
+
+        if ($tree)
         {
-            foreach ($this->tree_ids as $id)
+            $ids[] = $tree->id;
+            if ($tree->hasChildrens())
+            {
+                if ($childrens = $tree->fetchChildrens())
+                {
+                    foreach ($childrens as $chidren)
+                    {
+                        $ids[] = $chidren->id;
+                    }
+                }
+            }
+
+            foreach ($ids as $id)
             {
                 $find->orWhere("FIND_IN_SET ('{$id}', tree_ids)");
             }
+
         }
 
         if ($this->limit)

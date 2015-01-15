@@ -160,5 +160,12 @@ class Tree extends PageAdvanced
     }
 
 
+    /**
+     * @return $this[];
+     */
+    public function fetchChildrens()
+    {
+        return $this->findChildrens()->all();
+    }
 
 }
