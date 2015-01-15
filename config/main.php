@@ -153,6 +153,11 @@ $config =
         'imaging' =>
         [
             'class' => '\skeeks\cms\components\Imaging',
+        ],
+
+        'breadcrumbs' =>
+        [
+            'class' => '\skeeks\cms\components\Breadcrumbs',
         ]
     ],
 

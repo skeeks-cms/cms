@@ -232,6 +232,7 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected $_tree = null;
 
+
     /**
      * @param Tree $tree
      * @return $this

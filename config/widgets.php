@@ -80,4 +80,24 @@ return
             ]
         ],
     ],
+
+    'skeeks\cms\widgets\breadcrumbs\Breadcrumbs' =>
+    [
+        'name'          => 'Хлебные крошки',
+        'description'   => 'Виджет фиксированного меню',
+
+        'templates'     =>
+        [
+            'default' =>
+            [
+                'name' => 'Шаблон по умолчанию'
+            ],
+
+            'project' =>
+            [
+                'name'      => 'Проект',
+                'baseDir'   => '@app/views/widgets/breadcrumbs'
+            ]
+        ],
+    ],
 ];

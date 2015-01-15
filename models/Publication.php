@@ -89,8 +89,21 @@ class Publication extends PageAdvanced
     }
 
 
+    /**
+     * @return bool
+     */
+    public function hasMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
 
-
+        if ($mainImage->getFirstSrc())
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
     /**
      * @return string
      */

@@ -11,6 +11,7 @@
 
 namespace yii\web;
 
+use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\Imaging;
@@ -40,6 +41,7 @@ use skeeks\cms\modules\admin\components\Menu;
  * @property Cms                            $cms
  * @property Imaging                        $imaging
  * @property SeoGenerator                   $seoGenerator
+ * @property Breadcrumbs                    $breadcrumbs
  *
  * Class Application
  * @package yii\web

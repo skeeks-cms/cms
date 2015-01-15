@@ -47,5 +47,6 @@ class TreeController extends Controller
     public function viewTree(ViewModelAction $action)
     {
         \Yii::$app->cms->setCurrentTree($action->getModel());
+        \Yii::$app->breadcrumbs->setPartsByTree($action->getModel());
     }
 }
