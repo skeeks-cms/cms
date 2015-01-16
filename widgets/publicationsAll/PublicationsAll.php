@@ -58,7 +58,7 @@ class PublicationsAll extends WidgetHasTemplate
 
             foreach ($ids as $id)
             {
-                $find->orWhere("FIND_IN_SET ('{$id}', tree_ids)");
+                $find->orWhere("(FIND_IN_SET ('{$id}', tree_ids) or tree_id = '{$id}')");
             }
 
         }

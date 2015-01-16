@@ -24,6 +24,12 @@ use skeeks\cms\models\Tree;
     ]);
 ?>
 
+<?= $form->field($model, 'tree_id')->widget(
+    \skeeks\widget\chosen\Chosen::className(), [
+        'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions()
+    ]);
+?>
+
 
 <?= $form->field($model, 'tree_ids')->widget(
     \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),

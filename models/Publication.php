@@ -58,6 +58,7 @@ class Publication extends PageAdvanced
         return array_merge(parent::attributeLabels(), [
             'type'          => Yii::t('app', 'Publication type'),
             'tree_ids'      => Yii::t('app', 'Разделы'),
+            'tree_id'       => Yii::t('app', 'Главный раздел'),
             'page_options'  => Yii::t('app', 'Дополнительные свойства'),
             'published_at'  => Yii::t('app', 'Дата публикации'),
         ]);
@@ -70,7 +71,7 @@ class Publication extends PageAdvanced
     {
         return array_merge(parent::rules(), [
             [['type'], 'string'],
-            [['published_at'], 'integer'],
+            [['published_at', 'tree_id'], 'integer'],
             [['tree_ids', 'page_options', 'multiPageOptions'], 'safe'],
         ]);
     }
@@ -88,6 +89,59 @@ class Publication extends PageAdvanced
         return null;
     }
 
+
+    /**
+     * @return null|Tree
+     */
+    public function fetchMainTree()
+    {
+        if ($treeId = $this->getMainTreeId())
+        {
+            return Tree::find()->where(['id' => $treeId])->limit(1)->one();
+        }
+
+        return null;
+    }
+    /**
+     * @return int
+     */
+    public function getMainTreeId()
+    {
+        return (int) array_shift($this->getTreeIds());
+    }
+
+    /**
+     * @return array
+     */
+    public function getTreeIds()
+    {
+        $result = [];
+
+        if ($this->tree_id)
+        {
+            $result[] = (int) $this->tree_id;
+        }
+
+        if ($this->tree_ids)
+        {
+            $result = array_merge($result, $this->tree_ids);
+        }
+
+        return array_unique($result);
+    }
+
+    /**
+     * @return Tree[]
+     */
+    public function fetchTrees()
+    {
+        if ($treeIds = $this->getTreeIds())
+        {
+            return Tree::find()->where(['id' => $treeIds])->all();
+        }
+
+        return [];
+    }
 
     /**
      * @return bool

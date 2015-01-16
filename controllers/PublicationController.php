@@ -12,6 +12,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\actions\ViewModelAction;
 use skeeks\cms\base\Controller;
 use skeeks\cms\models\Publication;
 use skeeks\cms\models\searchs\Publication as PublicationSearch;
@@ -34,8 +35,32 @@ class PublicationController extends Controller
             [
                 'class'                 => 'skeeks\cms\actions\ViewModelActionSeo',
                 'modelClassName'        => Publication::className(),
+                'callback'              =>  [$this, 'viewPublication']
             ],
         ];
+    }
+
+    /**
+     * @param ViewModelActionSeo $action
+     */
+    public function viewPublication(ViewModelAction $action)
+    {
+        /**
+         * @var Publication $publication
+         */
+        $publication = $action->getModel();
+        $tree = $publication->fetchMainTree();
+
+        if ($tree)
+        {
+            \Yii::$app->cms->setCurrentTree($tree);
+            \Yii::$app->breadcrumbs->setPartsByTree($tree);
+
+            \Yii::$app->breadcrumbs->append([
+                'url' => $publication->getPageUrl(),
+                'name' => $publication->name
+            ]);
+        }
     }
 
 
