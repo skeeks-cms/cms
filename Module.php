@@ -36,6 +36,7 @@ class Module extends base\Module
      */
     protected function _descriptor()
     {
+        die;
         return array_merge(parent::_descriptor(), [
             "version"               => "1.0.0",
 
