@@ -47,9 +47,12 @@ class Tree extends \skeeks\cms\models\Tree
      */
     public function getMultiOptions()
     {
+        $this->_tmpResult = [];
         return $this->_buildTreeArrayRecursive($this, $this->_filter);
     }
 
+
+    protected $_tmpResult = [];
     /**
      * Строит рекурсивно массив дерева
      * @param \skeeks\cms\models\Tree $model
@@ -58,7 +61,6 @@ class Tree extends \skeeks\cms\models\Tree
      */
     private function _buildTreeArrayRecursive($model, $filter)
     {
-        $result = [];
         $is_filter_set = !empty($filter);
         $childs = $model->findChildrens()->all();
 
@@ -69,15 +71,12 @@ class Tree extends \skeeks\cms\models\Tree
             if (!$is_filter_set || in_array($id, $filter))
             {
                 $child->name = str_repeat($this->repeat, $level) . $child->name;
-                $result[$id] = $child;
+                $this->_tmpResult[$id] = $child;
             }
-            $next_childs    = $this->_buildTreeArrayRecursive($child, $filter);
-
-            $result         = array_merge($result, $next_childs);
-
+            $this->_buildTreeArrayRecursive($child, $filter);
         }
 
-        return $result;
+        return $this->_tmpResult;
     }
 
     /**
