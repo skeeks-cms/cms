@@ -108,7 +108,9 @@ class TreeUrlRule
 
         if ($treeNode)
         {
-            $params['model']        = $treeNode;
+            \Yii::$app->cms->setCurrentTree($treeNode);
+
+            $params['id']        = $treeNode->id;
             return ['cms/tree/view', $params];
         } else
         {

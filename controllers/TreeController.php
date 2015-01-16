@@ -34,7 +34,7 @@ class TreeController extends Controller
         [
             'view' =>
             [
-                'class'     => 'skeeks\cms\actions\ViewModelAction',
+                'class'     => 'skeeks\cms\actions\ViewModelActionTree',
                 'view'      => 'default',
                 'callback'  =>  [$this, 'viewTree']
             ],

@@ -23,7 +23,7 @@ use yii\base\UserException;
  * Class ErrorAction
  * @package skeeks\cms\actions
  */
-class ViewModelAction extends Action
+abstract class ViewModelAction extends Action
 {
     /**
      * @var string the view file to be rendered. If not set, it will take the value of [[id]].
