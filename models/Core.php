@@ -53,7 +53,6 @@ abstract class Core extends ActiveRecord
         ]);
     }
 
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -67,6 +66,39 @@ abstract class Core extends ActiveRecord
     public function getUpdatedBy()
     {
         return $this->hasOne(User::className(), ['id' => 'updated_by']);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function findCreatedBy()
+    {
+        return $this->hasOne(User::className(), ['id' => 'created_by']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function findUpdatedBy()
+    {
+        return $this->hasOne(User::className(), ['id' => 'updated_by']);
+    }
+
+
+    /**
+     * @return null|User
+     */
+    public function fetchCreatedBy()
+    {
+        return $this->findCreatedBy()->one();
+    }
+
+    /**
+     * @return null|User
+     */
+    public function fetchUpdatedBy()
+    {
+        return $this->findUpdatedBy()->one();
     }
 
     /**

@@ -272,32 +272,6 @@ class User
     }
 
 
-    /**
-     * @return string
-     */
-    public function getMainImage()
-    {
-        if ($this->image)
-        {
-            return (string) array_shift($this->image);
-        }
-
-        return \Yii::$app->params["noimage"];
-    }
-
-    /**
-     * @return string
-     */
-    public function getImageCover()
-    {
-        if ($this->image)
-        {
-            return (string) array_shift($this->image_cover);
-        }
-
-        return Yii::$app->params["noimage"];
-    }
-
 
     /**
      * @inheritdoc
@@ -430,4 +404,44 @@ class User
         $this->password_reset_token = null;
     }
 
+
+
+
+    /**
+     * @return bool
+     */
+    public function hasMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage->getFirstSrc())
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
+    /**
+     * @return string
+     */
+    public function getMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage->getFirstSrc())
+        {
+            return $mainImage->getFirstSrc();
+        }
+
+        return \Yii::$app->params['noimage'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getImagesSrc()
+    {
+        return $this->getFilesGroups()->getComponent('images')->items;
+    }
 }
