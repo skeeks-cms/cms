@@ -42,6 +42,11 @@ class UserController extends Controller
         ]);
     }
 
+    public function actionEdit($username)
+    {
+        print_r($username);die;
+    }
+
     /**
      * @param $username
      * @return string
