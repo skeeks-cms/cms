@@ -145,7 +145,6 @@ class User
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
-            [['image_cover', 'image'], 'default', 'value' => NULL],
         ];
     }
 
@@ -170,8 +169,6 @@ class User
             'city' => Yii::t('app', 'City'),
             'address' => Yii::t('app', 'Address'),
             'info' => Yii::t('app', 'Info'),
-            'image' => Yii::t('app', 'Image'),
-            'image_cover' => Yii::t('app', 'Image Cover'),
             'gender' => Yii::t('app', 'Gender'),
         ];
     }
@@ -271,6 +268,19 @@ class User
         return \Yii::$app->urlManager->createUrl(["cms/user/view", "username" => $this->username]);
     }
 
+
+    /**
+     * @return string
+     */
+    public function getMainImage()
+    {
+        if ($this->image)
+        {
+            return (string) array_shift($this->image);
+        }
+
+        return \Yii::$app->params["noimage"];
+    }
 
 
     /**

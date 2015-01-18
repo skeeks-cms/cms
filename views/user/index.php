@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     [
                         'class' => \yii\grid\DataColumn::className(),
                         'value' => function ($model, $key, $index, $widget) {
-                            return "<img src='" . $model->getMainImage() . "' style='width: 100px;' />";
+                            //return "<img src='" . $model->() . "' style='width: 100px;' />";
                         },
                         'attribute' => 'image',
                         'format' => 'html',
