@@ -34,9 +34,9 @@ use yii\grid\GridView;
         'description',
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
+        //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+       // ['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
     ],
 ]); ?>
