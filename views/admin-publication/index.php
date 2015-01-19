@@ -44,5 +44,38 @@ $dataProvider->query->orderBy('published_at DESC');
 
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
         //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function($model)
+            {
+                $class = 'label-default';
+                if ($model->status == \skeeks\cms\models\behaviors\HasStatus::STATUS_ACTIVE)
+                {
+                    $class = 'label-success';
+                } else if ($model->status == \skeeks\cms\models\behaviors\HasStatus::STATUS_DELETED)
+                {
+                    $class = 'label-danger';
+                } else if ($model->status == \skeeks\cms\models\behaviors\HasStatus::STATUS_ONMODER)
+                {
+                    $class = 'label-warning';
+                }
+                return '<span class="label ' . $class . '">' . $model->getStatusText() . '</span>';
+            },
+            'format' => 'html'
+        ],
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function($model)
+            {
+                return \yii\helpers\Html::a('<small>Смотреть</small>', $model->getPageUrl(), [
+                    'target' => '_blank',
+                    'title' => 'Откроется в новом окне'
+                ]);
+            },
+            'format' => 'html'
+        ],
     ],
 ]); ?>

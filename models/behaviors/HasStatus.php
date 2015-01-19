@@ -17,6 +17,7 @@ use skeeks\cms\models\Subscribe;
 use skeeks\cms\models\User;
 use yii\db\BaseActiveRecord;
 use \yii\base\Behavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class HasSubscribes
@@ -55,5 +56,10 @@ class HasStatus extends \skeeks\cms\base\behaviors\ActiveRecord
     public function getStatus()
     {
         return (int) $this->owner->{$this->field};
+    }
+
+    public function getStatusText()
+    {
+        return ArrayHelper::getValue($this->getPossibleStatuses(), $this->getStatus());
     }
 }
