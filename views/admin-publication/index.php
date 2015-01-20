@@ -43,10 +43,11 @@ $dataProvider->query->orderBy('published_at DESC');
         ['class' => \skeeks\cms\grid\PublishedAtColumn::className()],
 
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
+        ['class' => \skeeks\cms\grid\StatusColumn::className()],
         //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
 
 
-        [
+        /*[
             'class'     => \yii\grid\DataColumn::className(),
             'value'     => function($model)
             {
@@ -64,7 +65,7 @@ $dataProvider->query->orderBy('published_at DESC');
                 return '<span class="label ' . $class . '">' . $model->getStatusText() . '</span>';
             },
             'format' => 'html'
-        ],
+        ],*/
 
         [
             'class'     => \yii\grid\DataColumn::className(),
