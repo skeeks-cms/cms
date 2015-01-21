@@ -92,4 +92,28 @@ class AuthController extends Controller
             ]);
         }
     }
+    public function actionRegister()
+    {
+        if (!\Yii::$app->user->isGuest)
+        {
+            return $this->goHome();
+        }
+
+        $model = new LoginForm();
+        if ($model->load(\Yii::$app->request->post()) && $model->login())
+        {
+            if ($ref = UrlHelper::getCurrent()->getRef())
+            {
+                return $this->redirect($ref);
+            } else
+            {
+                return $this->goBack();
+            }
+
+        } else {
+            return $this->render('register', [
+                'model' => $model,
+            ]);
+        }
+    }
 }

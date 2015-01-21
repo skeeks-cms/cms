@@ -70,7 +70,7 @@ $config =
                 '<_c:(user)>/<username>'                => 'cms/<_c>/view',
                 '<_c:(user)>/<username>/<action>'       => 'cms/<_c>/<action>',
 
-                '<_a:(login|logout)>'                   => 'cms/auth/<_a>',
+                '<_a:(login|logout|register)>'                   => 'cms/auth/<_a>',
 
                 'skeeks-cms'                            => 'cms/cms/index',
                 'skeeks-cms/<action>'                   => 'cms/cms/<action>',
