@@ -51,7 +51,7 @@ class Controller extends YiiController
      * @param $text
      * @return $this
      */
-    public function stdoutN($text)
+    public function stdoutN($text = '')
     {
         $this->stdout("{$text}" . PHP_EOL);
         return $this;
