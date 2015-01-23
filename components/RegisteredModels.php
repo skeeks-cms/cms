@@ -102,6 +102,28 @@ class RegisteredModels extends CollectionComponents
                 return (string) $code;
             }
         }
+
+        //Если класс явно не определен, пробуем опредилить класс использую is_subclass_of (например если мы переопределили какую нибудь модель в конфиге)
+
+        foreach ($this->components as $code => $modelData)
+        {
+            if (is_array($modelData))
+            {
+                $className = ArrayHelper::getValue($modelData, "modelClass", false);
+            } else if (is_string($modelData))
+            {
+                $className = $modelData;
+            } else
+            {
+                continue;
+            }
+
+            if ( is_subclass_of($model, $className))
+            {
+                return (string) $code;
+            }
+        }
+
     }
 
 

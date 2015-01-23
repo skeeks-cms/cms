@@ -16,5 +16,13 @@ namespace skeeks\cms\grid;
  */
 class ImageColumn extends ImageColumnData
 {
-    public $attribute = "image";
+
+    /**
+     * @inheritdoc
+     */
+    protected function renderDataCellContent($model, $key, $index)
+    {
+        $src = $model->getMainImageSrc();
+        return "<img src='" . $src . "' style='width: " . $this->maxWidth . "px;' />";
+    }
 }

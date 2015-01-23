@@ -12,12 +12,14 @@ namespace skeeks\cms\actions;
 
 
 use skeeks\cms\App;
+use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\Tree;
 use Yii;
 use yii\base\Action;
 use yii\base\Exception;
 use yii\base\Model;
 use yii\base\UserException;
+use yii\web\HttpException;
 
 /**
  * Class ErrorAction
@@ -61,10 +63,16 @@ abstract class ViewModelAction extends Action
 
         if (!$this->_model)
         {
-            return false;
+            throw new HttpException(404);
         }
 
         \Yii::$app->pageOptions->setValuesFromModel($this->_model);
+
+        if (!in_array($this->_model->status, [HasStatus::STATUS_ACTIVE, HasStatus::STATUS_INACTIVE]))
+        {
+            throw new HttpException(404);
+        }
+
 
         $this
             ->_initMetaData()
@@ -72,6 +80,7 @@ abstract class ViewModelAction extends Action
             ->_initGlobalLayout()
             ->_initActionView()
         ;
+
 
 
         if ($this->callback)

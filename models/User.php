@@ -145,7 +145,6 @@ class User
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
-            [['image_cover', 'image'], 'default', 'value' => NULL],
         ];
     }
 
@@ -170,8 +169,6 @@ class User
             'city' => Yii::t('app', 'City'),
             'address' => Yii::t('app', 'Address'),
             'info' => Yii::t('app', 'Info'),
-            'image' => Yii::t('app', 'Image'),
-            'image_cover' => Yii::t('app', 'Image Cover'),
             'gender' => Yii::t('app', 'Gender'),
         ];
     }
@@ -283,19 +280,6 @@ class User
         }
 
         return \Yii::$app->params["noimage"];
-    }
-
-    /**
-     * @return string
-     */
-    public function getImageCover()
-    {
-        if ($this->image)
-        {
-            return (string) array_shift($this->image_cover);
-        }
-
-        return Yii::$app->params["noimage"];
     }
 
 
@@ -430,4 +414,44 @@ class User
         $this->password_reset_token = null;
     }
 
+
+
+
+    /**
+     * @return bool
+     */
+    public function hasMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage->getFirstSrc())
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
+    /**
+     * @return string
+     */
+    public function getMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage->getFirstSrc())
+        {
+            return $mainImage->getFirstSrc();
+        }
+
+        return \Yii::$app->params['noimage'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getImagesSrc()
+    {
+        return $this->getFilesGroups()->getComponent('images')->items;
+    }
 }

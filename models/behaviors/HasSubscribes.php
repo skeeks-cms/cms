@@ -110,7 +110,7 @@ class HasSubscribes extends HasLinkedModels
     public function addSubscribe()
     {
         $subscribe = new Subscribe($this->owner->getRef()->toArray());
-        $subscribe = $subscribe->save(false);
+        $subscribe->save(false);
         return $subscribe;
     }
 
@@ -135,7 +135,7 @@ class HasSubscribes extends HasLinkedModels
         }
         $this->owner->setAttribute("count_subscribe", count($result));
         $this->owner->setAttribute("users_subscribers", $result);
-        $this->owner->save();
+        $this->owner->save(false);
         return $this;
     }
 

@@ -104,7 +104,7 @@ class Action extends Component
      */
     public function getUrl()
     {
-        if ($this->controller->module instanceof \skeeks\cms\Module)
+        if ($this->controller->module instanceof \skeeks\cms\base\Module)
         {
             $route = $this->controller->module->id . '/' . $this->controller->id . '/' . $this->code;
         } else

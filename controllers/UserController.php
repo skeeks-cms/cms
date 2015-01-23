@@ -44,9 +44,10 @@ class UserController extends Controller
 
     /**
      * @param $username
-     * @return string
+     * @return array
+     * @throws \skeeks\cms\components\Exception
      */
-    public function actionView($username)
+    protected function _user($username)
     {
         $model      = null;
         $personal   = false;
@@ -67,10 +68,32 @@ class UserController extends Controller
         }
 
 
-        return $this->render('view', [
+        return [
             'model'         => $model,
             'personal'      => $personal,
-        ]);
+        ];
+    }
+
+    public function actionPublications($username)
+    {
+        $data = $this->_user($username);
+        return $this->render('publications', $data);
+    }
+
+    public function actionEdit($username)
+    {
+        $data = $this->_user($username);
+        return $this->render('edit', $data);
+    }
+
+    /**
+     * @param $username
+     * @return string
+     */
+    public function actionView($username)
+    {
+        $data = $this->_user($username);
+        return $this->render('view', $data);
     }
 
 }

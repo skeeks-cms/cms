@@ -27,15 +27,15 @@ use yii\grid\GridView;
             'controller'    => $controller
         ],
 
-        ['class' => \skeeks\cms\grid\ImageColumn::className()],
+        ///['class' => \skeeks\cms\grid\ImageColumn::className()],
 
         'code',
         'description',
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
+       // ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+       // ['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
     ],
 ]); ?>
