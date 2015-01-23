@@ -222,7 +222,8 @@ class Cms extends \skeeks\cms\base\Component
         return md5(implode('', [
             (string) $this->moduleCms()->getDescriptor()->getVersion(),
             $this->staticKeySold,
-            Yii::getVersion()
+            Yii::getVersion(),
+            'system-sold-1'
         ]));
     }
 
