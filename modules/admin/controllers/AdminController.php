@@ -210,6 +210,13 @@ abstract class AdminController extends Controller
     }
 
 
+    /**
+     * @return \yii\web\Response
+     */
+    public function redirectRefresh()
+    {
+        return $this->redirect(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString());
+    }
 
 
 

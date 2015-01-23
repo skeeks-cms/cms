@@ -37,6 +37,9 @@ class ControllerActions
     public $currentActionCode   = null;
 
 
+    public $isOpenNewWindow       = false;
+
+
     public $ulOptions = [
         "class" => "nav nav-pills sx-nav"
     ];
@@ -112,7 +115,7 @@ class ControllerActions
 
             $actionData = array_merge($actionData, [
                 "url"               => $action->getUrl(),
-                "isOpenNewWindow"   => $action->isOpenNewWindow(),
+                "isOpenNewWindow"   => $this->isOpenNewWindow,
                 "newWindowName"     => $action->getNewWindowName()
             ]);
 

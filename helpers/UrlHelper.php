@@ -148,7 +148,12 @@ class UrlHelper
      */
     public function setCurrentRef()
     {
-        return $this->setRef(\Yii::$app->request->getUrl());
+        if (!$this->getRef())
+        {
+            return $this->setRef(\Yii::$app->request->getUrl());
+        }
+
+        return $this;
     }
 
     /**

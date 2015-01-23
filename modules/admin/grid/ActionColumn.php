@@ -29,6 +29,7 @@ class ActionColumn extends DataColumn
      * @var AdminModelEditorController
      */
     public $controller      = null;
+    public $isOpenNewWindow      = null;
 
     /**
      * @inheritdoc
@@ -58,6 +59,7 @@ class ActionColumn extends DataColumn
 
         return DropdownControllerActions::begin([
                     "controller"    => $controller,
+                    "isOpenNewWindow"    => $this->isOpenNewWindow,
                 ])->run();
     }
 }

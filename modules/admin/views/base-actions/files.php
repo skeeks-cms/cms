@@ -58,7 +58,8 @@ $groups = $model->getFilesGroups();
 
             [
                 'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                'controller'    => $controller
+                'controller'    => $controller,
+                'isOpenNewWindow'    => true
             ],
 
             [

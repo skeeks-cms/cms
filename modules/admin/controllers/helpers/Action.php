@@ -113,7 +113,9 @@ class Action extends Component
         }
 
         $url = UrlHelper::constructCurrent()->setRoute($route)
-            ->set(UrlRule::ADMIN_PARAM_NAME, UrlRule::ADMIN_PARAM_VALUE);
+            ->set(UrlRule::ADMIN_PARAM_NAME, UrlRule::ADMIN_PARAM_VALUE)
+            ->setCurrentRef()
+        ;
 
         if ($this->controller instanceof AdminModelEditorController)
         {

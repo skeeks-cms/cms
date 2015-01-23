@@ -19,6 +19,7 @@ namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
@@ -433,7 +434,9 @@ class AdminModelEditorController extends AdminController
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
-            return $this->redirect(['index']);
+            return $this->redirect(
+                UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
+            );
         } else
         {
             if (\Yii::$app->request->isPost)
@@ -459,7 +462,7 @@ class AdminModelEditorController extends AdminController
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(['update', 'id' => $model->id]);
+            return $this->redirectRefresh();
         } else
         {
 
@@ -488,7 +491,16 @@ class AdminModelEditorController extends AdminController
         {
             \Yii::$app->getSession()->setFlash('error', 'Не получилось удалить запись');
         }
-        return $this->redirect(\Yii::$app->request->getReferrer());
+
+        if ($ref = UrlHelper::getCurrent()->getRef())
+        {
+            return $this->redirect($ref);
+        } else
+        {
+            return $this->goBack();
+        }
+
+        //return $this->redirect(\Yii::$app->request->getReferrer());
     }
 
 }
