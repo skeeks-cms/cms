@@ -39,4 +39,23 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
             ['class' => 'form-group']
         );
     }
+
+    public function fieldSet($name)
+    {
+        return <<<HTML
+        <div class="sx-form-fieldset">
+            <h3 class="sx-form-fieldset-title">{$name}</h3>
+            <div class="sx-form-fieldset-content">
+HTML;
+
+    }
+
+    public function fieldSetEnd()
+    {
+        return <<<HTML
+            </div>
+        </div>
+HTML;
+
+    }
 }

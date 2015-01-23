@@ -20,11 +20,13 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
     <?= \yii\helpers\Html::activeHiddenInput($model, $widget->fieldNameLat); ?>
     <?= \yii\helpers\Html::activeHiddenInput($model, $widget->fieldNameLng); ?>
     <label>Координаты и адрес:</label>
-    <?= \yii\helpers\Html::activeTextInput($model, $widget->fieldNameAddress, [
-        'class' => 'form-control'
-    ]); ?>
+    <? if ($widget->showAddressField): ?>
+        <?= \yii\helpers\Html::activeTextInput($model, $widget->fieldNameAddress, [
+            'class' => 'form-control'
+        ]); ?>
+    <? endif; ?>
 
-    <div id="<?= $idMap; ?>" class="sx-yandex-map-container">
+    <div id="<?= $idMap; ?>" class="sx-yandex-map-container" style="<?= $yandexMapStyles; ?>">
     </div>
 </div>
 
