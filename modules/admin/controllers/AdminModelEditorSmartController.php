@@ -412,7 +412,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(UrlHelper::constructCurrent()->setRoute('seo-page-url')->normalizeCurrentRoute()->enableAdmin()->toString());
+            return $this->redirectRefresh();
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
@@ -428,7 +428,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(UrlHelper::constructCurrent()->setRoute('author')->normalizeCurrentRoute()->enableAdmin()->toString());
+            return $this->redirectRefresh();
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/author.php", [
@@ -444,7 +444,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(UrlHelper::constructCurrent()->setRoute('timestamp')->normalizeCurrentRoute()->enableAdmin()->toString());
+            return $this->redirectRefresh();
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/timestamp.php", [
@@ -458,7 +458,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         $model = $this->getModel();
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
-            return $this->redirect(['seo-page-url', 'id' => $model->id]);
+            return $this->redirectRefresh();
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
@@ -493,14 +493,14 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                 $model->setMultiPageOptionsData($optionsCurrent);
                 $model->save(false);
 
-                return $this->redirect(['page-options', 'id' => $model->id]);
+                return $this->redirectRefresh();
             } else
             {
                 $optionsCurrent[$pageOptionId] = $pageOption->getValue()->attributes;
                 $model->setMultiPageOptionsData('');
                 $model->save(false);
 
-                return $this->redirect(['page-options', 'id' => $model->id]);
+                return $this->redirectRefresh();
             }
         }
 
@@ -522,7 +522,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
-            return $this->redirect(['descriptions', 'id' => $model->id]);
+            return $this->redirectRefresh();
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/descriptions.php", [
@@ -541,7 +541,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
-            return $this->redirect([$this->action->id, 'id' => $model->id]);
+            return $this->redirectRefresh();
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/status.php", [
@@ -561,7 +561,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
-            return $this->redirect([$this->action->id, 'id' => $model->id]);
+            return $this->redirectRefresh();
         } else
         {
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/status-adult.php", [

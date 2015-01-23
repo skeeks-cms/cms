@@ -34,7 +34,9 @@ class Map extends InputWidget
     public $fieldNameLng        = 'lng';
     public $fieldNameAddress    = 'address';
 
-    public $showAddresField     = true;
+    public $showAddressField     = true;
+
+    public $yandexMapStyles     = 'width: 100%; height: 400px;';
 
     /**
      * Берем поведения модели
@@ -87,7 +89,7 @@ class Map extends InputWidget
 
                 'fieldNameLng'      => Html::getInputId($this->model, $this->fieldNameLng),
                 'fieldNameLat'      => Html::getInputId($this->model, $this->fieldNameLat),
-                'fieldNameAddress'  => Html::getInputId($this->model, $this->fieldNameAddress),
+                'fieldNameAddress'  => $this->showAddressField ? Html::getInputId($this->model, $this->fieldNameAddress) : '',
             ]);
 
             return $this->render('map', [
@@ -96,6 +98,7 @@ class Map extends InputWidget
                 'idMap'             => $idMap,
                 'model'             => $this->model,
                 'clientOptions'     => $clientOptions,
+                'yandexMapStyles'   => $this->yandexMapStyles,
             ]);
 
         } catch (Exception $e)
