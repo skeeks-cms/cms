@@ -26,16 +26,13 @@ class ImageColumnData extends DataColumn
      */
     protected function renderDataCellContent($model, $key, $index)
     {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage->getFirstSrc())
+        return 'image';
+        $src = $this->noImage;
+        $images = $model->{$this->attribute};
+        if ($images)
         {
-            return $mainImage->getFirstSrc();
+            $src = array_shift($images);
         }
-
-        return \Yii::$app->params['noimage'];
-
-        $model->getMainImageSrc()
 
         return "<img src='" . $src . "' style='width: " . $this->maxWidth . "px;' />";
     }
