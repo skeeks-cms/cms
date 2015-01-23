@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\assets;
-use yii\web\AssetBundle;
+use skeeks\cms\base\AssetBundle;
 
 /**
  * Class AppAsset

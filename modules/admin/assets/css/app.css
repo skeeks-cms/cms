@@ -204,11 +204,15 @@ body.sidebar-hidden footer.sx-admin-footer
 
 .sx-sidebar
 {
-    background: none;
-
-    margin-left: 10px;
+    background: rgba(208, 208, 208, 0.32);
+    padding-left: 10px;
     z-index: 1;
     width: 270px;
+}
+
+.sx-sidebar:hover
+{
+    background: rgba(208, 208, 208, 0.5);
 }
 
     .sx-sidebar .sidebar-collapse
@@ -224,9 +228,11 @@ body.sidebar-hidden footer.sx-admin-footer
     .sx-sidebar .inner-wrapper
     {
         overflow-y: auto;
-        width: 270px;
+        width: 260px;
         height: 100%;
     }
+
+
 
 
     .sx-sidebar .sidebar-menu
