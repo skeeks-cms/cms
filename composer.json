@@ -28,7 +28,7 @@
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
         "yiisoft/yii2-imagine": "*",
-        "skeeks/yii2-sx": "dev-release",
+        "skeeks/yii2-sx": "*",
         "skeeks/yii2-widget-simpleajaxuploader": "*",
         "skeeks/yii2-widget-ckeditor": "*",
         "skeeks/yii2-widget-chosen": "*",
