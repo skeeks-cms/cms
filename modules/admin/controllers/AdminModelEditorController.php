@@ -31,6 +31,7 @@ use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;
+use yii\base\InvalidParamException;
 use yii\base\Model;
 use yii\behaviors\BlameableBehavior;
 use yii\data\ActiveDataProvider;
@@ -406,7 +407,7 @@ class AdminModelEditorController extends AdminController
                 'dataProvider'  => $dataProvider,
                 'controller'    => $this,
             ]);
-        } catch (\Exception $e)
+        } catch (InvalidParamException $e)
         {
             $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/index.php',
                 [
@@ -479,7 +480,7 @@ class AdminModelEditorController extends AdminController
                     'model' => $model,
                 ]);
 
-            } catch (\Exception $e)
+            } catch (InvalidParamException $e)
             {
                 $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
                     [
@@ -520,7 +521,7 @@ class AdminModelEditorController extends AdminController
                     'model' => $model,
                 ]);
 
-            } catch (\Exception $e)
+            } catch (InvalidParamException $e)
             {
                 $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
                     [
