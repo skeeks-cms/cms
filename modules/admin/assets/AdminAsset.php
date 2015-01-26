@@ -32,6 +32,7 @@ class AdminAsset extends AssetBundle
         'yii\bootstrap\BootstrapPluginAsset',
 
         '\skeeks\sx\assets\Custom',
+        '\skeeks\sx\assets\ComponentAjaxLoader',
         '\skeeks\cms\modules\admin\assets\JqueryScrollbarAsset',
         '\skeeks\cms\modules\admin\assets\ThemeRealAdminAsset',
     ];

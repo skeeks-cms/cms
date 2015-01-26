@@ -125,6 +125,7 @@
         _init: function()
         {
             this._navigation            = new sx.classes.app.MainNav(this.get("navigation"));
+            this.ajaxLoader             = new sx.classes.AjaxLoader();
         },
 
         _onWindowReady: function()

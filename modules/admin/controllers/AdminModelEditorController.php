@@ -31,6 +31,7 @@ use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
 use yii\base\InvalidConfigException;
+use yii\base\InvalidParamException;
 use yii\base\Model;
 use yii\behaviors\BlameableBehavior;
 use yii\data\ActiveDataProvider;
@@ -399,15 +400,44 @@ class AdminModelEditorController extends AdminController
             $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
         }
 
+        try
+        {
+            return $this->render('index', [
+                'searchModel'   => $searchModel,
+                'dataProvider'  => $dataProvider,
+                'controller'    => $this,
+            ]);
+        } catch (InvalidParamException $e)
+        {
+            $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/index.php',
+                [
+                    'searchModel'   => $searchModel,
+                    'dataProvider'  => $dataProvider,
+                    'controller'    => $this,
+                    'columns'       => $this->getIndexColumns(),
+                ]
+            );
 
+            return $this->output($output);
+        }
 
-        return $this->render('index', [
-            'searchModel'   => $searchModel,
-            'dataProvider'  => $dataProvider,
-            'controller'    => $this,
-        ]);
     }
 
+    public function getIndexColumns()
+    {
+        $columns = [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            [
+                'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'controller'    => $this
+            ],
+
+            'name',
+        ];
+
+        return $columns;
+    }
     /**
      * @return string
      */
@@ -444,9 +474,23 @@ class AdminModelEditorController extends AdminController
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
 
-            return $this->render('_form', [
-                'model' => $model,
-            ]);
+            try
+            {
+                return $this->render('_form', [
+                    'model' => $model,
+                ]);
+
+            } catch (InvalidParamException $e)
+            {
+                $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
+                    [
+                        'model' => $model,
+                    ]
+                );
+
+                return $this->output($output);
+            }
+
         }
     }
 
@@ -471,9 +515,22 @@ class AdminModelEditorController extends AdminController
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
 
-            return $this->render('_form', [
-                'model' => $model,
-            ]);
+            try
+            {
+                return $this->render('_form', [
+                    'model' => $model,
+                ]);
+
+            } catch (InvalidParamException $e)
+            {
+                $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
+                    [
+                        'model' => $model,
+                    ]
+                );
+
+                return $this->output($output);
+            }
         }
     }
 

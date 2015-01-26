@@ -19,7 +19,9 @@ use yii\grid\DataColumn;
  */
 class StatusColumn extends DataColumn
 {
+    public $filter = true;
     public $format = 'html';
+    public $attribute = 'status';
     /**
      * @inheritdoc
      */
