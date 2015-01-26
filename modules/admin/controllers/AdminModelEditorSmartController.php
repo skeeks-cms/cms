@@ -37,6 +37,8 @@ use skeeks\cms\models\Subscribe;
 use skeeks\cms\models\Vote;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
 use skeeks\cms\modules\admin\controllers\helpers\rules\ModelHasBehaviors;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
 use yii\base\Behavior;
 use yii\base\Component;
@@ -96,7 +98,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
 
 
-                    'comments' =>
+                    /*'comments' =>
                     [
                         "label"     => "Комментарии",
                         'icon'      => 'glyphicon glyphicon-comment',
@@ -134,7 +136,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                                 "behaviors" => HasSubscribes::className()
                             ]
                         ]
-                    ],
+                    ],*/
 
                     'publications' =>
                     [
@@ -235,7 +237,26 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                         [
                             [
                                 "class"     => HasModelBehaviors::className(),
-                                "behaviors" => [TimestampBehavior::className(), TimestampPublishedBehavior::className()]
+                                "behaviors" => [TimestampBehavior::className(), TimestampPublishedBehavior::className()],
+                                "useOr" => true
+                            ]
+                        ]
+                    ],
+
+                    'social' =>
+                    [
+                        "label"     => "Социальные данные",
+                        'icon'      => 'glyphicon glyphicon-thumbs-up',
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => [
+                                    HasVotes::className(),
+                                    HasComments::className(),
+                                    HasSubscribes::className()
+                                ],
+                                "useOr" => true
                             ]
                         ]
                     ],
@@ -337,38 +358,100 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     }
 
 
-    public function actionComments()
+    protected function _actionComments()
     {
-        $search = new Search(Comment::className());
-        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-        $searchModel    = $search->getLoadedModel();
+        $result = "";
 
-        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+        if ( Validate::isValid(new HasBehavior(HasComments::className()), $this->getCurrentModel()) )
+        {
+            $search = new Search(Comment::className());
+            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+            $searchModel    = $search->getLoadedModel();
 
-        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-comment");
+            $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
 
-        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-comment/index.php", [
-            'searchModel'   => $searchModel,
-            'dataProvider'  => $dataProvider,
-            'controller'    => $controller,
-        ]));
+            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-comment");
+
+            $result = \Yii::$app->cms->moduleCms()->renderFile("admin-comment/index.php", [
+                'searchModel'   => $searchModel,
+                'dataProvider'  => $dataProvider,
+                'controller'    => $controller,
+            ]);
+        }
+
+        return $result;
     }
 
-    public function actionVotes()
+    /**
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function _actionVotes()
     {
-        $search = new Search(Vote::className());
-        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-        $searchModel    = $search->getLoadedModel();
+        $result = "";
 
-        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+        if ( Validate::isValid(new HasBehavior(HasVotes::className()), $this->getCurrentModel()) )
+        {
+            $search = new Search(Vote::className());
+            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+            $searchModel    = $search->getLoadedModel();
 
-        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-vote");
+            $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
 
-        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-vote/index.php", [
-            'searchModel'   => $searchModel,
-            'dataProvider'  => $dataProvider,
-            'controller'    => $controller,
+            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-vote");
+
+            $result = \Yii::$app->cms->moduleCms()->renderFile("admin-vote/index.php", [
+                'searchModel'   => $searchModel,
+                'dataProvider'  => $dataProvider,
+                'controller'    => $controller,
+            ]);
+        };
+
+        return $result;
+    }
+
+    /**
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function _actionSubscribes()
+    {
+        $result = "";
+
+        if ( Validate::isValid(new HasBehavior(HasSubscribes::className()), $this->getCurrentModel()) )
+        {
+            $search = new Search(Subscribe::className());
+            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+            $searchModel    = $search->getLoadedModel();
+
+            $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
+
+            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-subscribe");
+
+            $result = \Yii::$app->cms->moduleCms()->renderFile("admin-subscribe/index.php", [
+                'searchModel'   => $searchModel,
+                'dataProvider'  => $dataProvider,
+                'controller'    => $controller,
+            ]);
+        }
+
+        return $result;
+
+    }
+
+
+    public function actionSocial()
+    {
+        $subscribes = $this->_actionSubscribes();
+        $comments   = $this->_actionComments();
+        $votes      = $this->_actionVotes();
+
+        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/social.php", [
+            'subscribes'   => $subscribes,
+            'comments'   => $comments,
+            'votes'   => $votes,
         ]));
+
     }
 
     public function actionPublications()
@@ -388,22 +471,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         ]));
     }
 
-    public function actionSubscribes()
-    {
-        $search = new Search(Subscribe::className());
-        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-        $searchModel    = $search->getLoadedModel();
 
-        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
-
-        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-subscribe");
-
-        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-subscribe/index.php", [
-            'searchModel'   => $searchModel,
-            'dataProvider'  => $dataProvider,
-            'controller'    => $controller,
-        ]));
-    }
 
     public function actionSeoPageUrl()
     {
