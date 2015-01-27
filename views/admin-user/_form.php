@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormStyled as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
@@ -9,9 +9,9 @@ use common\models\User;
 ?>
 
 
-<?php $form = ActiveFormUseTab::begin(); ?>
+<?php $form = ActiveForm::begin(); ?>
 
-<?= $form->tabRun('Общая ниформация')?>
+<?= $form->fieldSet('Общая ниформация')?>
     <?= $form->field($model, 'group_id')->label('Группа пользователя')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
                 'items' => \yii\helpers\ArrayHelper::map(
@@ -28,14 +28,14 @@ use common\models\User;
     <?= $form->field($model, 'address')->textInput(); ?>
     <?= $form->field($model, 'info')->textarea(); ?>
     <?= $form->field($model, 'status_of_life')->textarea(); ?>
-<?= $form->tabEnd(); ?>
+<?= $form->fieldSetEnd(); ?>
 
-<?= $form->tabRun('Контакты')?>
+<?= $form->fieldSet('Контакты')?>
     <?= $form->field($model, 'email')->textInput(); ?>
     <?= $form->field($model, 'phone')->textInput(); ?>
-<?= $form->tabEnd(); ?>
+<?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
-<?php ActiveFormUseTab::end(); ?>
+<?php ActiveForm::end(); ?>
 
