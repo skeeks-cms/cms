@@ -30,6 +30,7 @@ use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
 use yii\base\Model;
@@ -52,6 +53,7 @@ class AdminModelEditorController extends AdminController
      */
     public $defaultActionModel      = "view";
     protected $_modelShowAttribute  = "id";
+    public $modelPkAttribute        = "id";
 
     /**
      * обязателено указывать!
@@ -213,12 +215,12 @@ class AdminModelEditorController extends AdminController
         $this->_currentModel = $this->_findModel($id);
 
 
-        if (!$this->_currentModel->primaryKey)
-        {
+        //if (!$this->_currentModel->primaryKey)
+        //{
             //throw new Exception("У модели нет первичного ключа, не сможем с ней работать");
-            $this->_currentModel = false;
-            return $this;
-        }
+        //    $this->_currentModel = false;
+        //    return $this;
+        //}
 
         $this->_setLangAndSite($this->_currentModel);
 
@@ -291,10 +293,10 @@ class AdminModelEditorController extends AdminController
     }
 
     /**
-     * @param ActiveRecord $model
+     * @param Component $model
      * @return $this
      */
-    public function setModel(ActiveRecord $model)
+    public function setModel($model)
     {
         $this->_currentModel = $model;
         return $this;
@@ -336,9 +338,9 @@ class AdminModelEditorController extends AdminController
             ]];
         }
 
-        $this->getView()->params['breadcrumbs'][] = ['label' => $this->getCurrentModel()->getAttribute($this->_modelShowAttribute), 'url' => [
+        $this->getView()->params['breadcrumbs'][] = ['label' => $this->getCurrentModel()->{$this->_modelShowAttribute}, 'url' => [
             $this->defaultActionModel,
-            "id" => $this->getCurrentModel()->getPrimaryKey(),
+            "id" => $this->getCurrentModel()->{$this->modelPkAttribute},
             UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
         ]];
 
@@ -368,7 +370,7 @@ class AdminModelEditorController extends AdminController
         $actionTitle    = $currentAction->label;
 
         $result[] = $actionTitle;
-        $result[] = $this->getCurrentModel()->getAttribute($this->_modelShowAttribute);
+        $result[] = $this->getCurrentModel()->{$this->_modelShowAttribute};
         $result[] = $this->_label;
 
         $this->getView()->title = implode(" / ", $result);

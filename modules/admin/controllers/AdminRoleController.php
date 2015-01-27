@@ -1,11 +1,11 @@
 <?php
 /**
- * RoleController
+ * AdminRoleController
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
- * @date 21.11.2014
+ * @date 27.01.2015
  * @since 1.0.0
  */
 
@@ -15,6 +15,7 @@ use skeeks\cms\models\AuthItem;
 use skeeks\cms\models\searchs\AuthItem as AuthItemSearch;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use yii\helpers\ArrayHelper;
+use yii\rbac\Role;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -24,12 +25,30 @@ use yii\helpers\Html;
 /**
  * AuthItemController implements the CRUD actions for AuthItem model.
  */
-class RoleController extends AdminController
+class AdminRoleController extends AdminModelEditorController
 {
+
+
     public function init()
     {
         $this->_label                   = "Управление ролями";
+        $this->_modelShowAttribute      = "name";
+        $this->modelPkAttribute         = "name";
+        $this->_modelClassName          = Role::className();
+
         parent::init();
+    }
+
+    /**
+     * Finds the Game model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return ActiveRecord the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function _findModel($id)
+    {
+        return $this->findModel($id);
     }
 
     /**
@@ -105,6 +124,7 @@ class RoleController extends AdminController
         return $this->render('index', [
                 'dataProvider' => $dataProvider,
                 'searchModel' => $searchModel,
+                'controller' => $this,
         ]);
     }
     /**

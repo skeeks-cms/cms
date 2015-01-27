@@ -25,9 +25,9 @@ use yii\grid\GridView;
         [
             'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
             'controller'    => $controller
-        ],
+        ]
 
-        ['class' => \skeeks\cms\grid\ImageColumn::className()],
+        /*['class' => \skeeks\cms\grid\ImageColumn::className()]*/,
 
         'groupname',
         'description',

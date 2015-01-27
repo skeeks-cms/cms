@@ -48,19 +48,6 @@ return
             ],
 
             [
-                "label"     => "Управление пользователями",
-                "url"       => ["cms/admin-user"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users.png']
-            ],
-
-            [
-                "label"     => "Управление группами пользователей",
-                "url"       => ["cms/admin-user-group"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
-                'enabled'   => false
-            ],
-
-            [
                 "label"     => "Публикации",
                 "url"       => ["cms/admin-publication/index"],
             ],
@@ -81,6 +68,52 @@ return
             ],
 
 
+        ]
+    ],
+
+    'access' =>
+    [
+        'label'     => 'Пользователи, права доступа',
+        'priority'  => 0,
+        'enabled'   => true,
+
+        'items' =>
+        [
+            [
+                "label"     => "Управление пользователями",
+                "url"       => ["cms/admin-user"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users.png']
+            ],
+
+            [
+                "label"     => "Управление группами пользователей",
+                "url"       => ["cms/admin-user-group"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
+                //'enabled'   => false
+            ],
+
+            [
+                "label"     => "Роли",
+                "url"       => ["admin/admin-role"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
+                'enabled'   => true,
+                'priority'  => 0,
+            ],
+
+            [
+                "label"     => "Привилегии",
+                "url"       => ["admin/admin-permission"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/access.png'],
+                'enabled'   => true,
+                'priority'  => 0,
+            ],
+
+            /*[
+                "label"     => "Правила",
+                "url"       => ["admin/rule"],
+                'enabled'   => true,
+                'priority'  => 0,
+            ],*/
         ]
     ],
 
@@ -127,36 +160,5 @@ return
     ],
 
 
-    'access' =>
-    [
-        'label'     => 'Права доступа',
-        'priority'  => 0,
-        'enabled'   => true,
 
-        'items' =>
-        [
-            [
-                "label"     => "Роли",
-                "url"       => ["admin/role"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
-                'enabled'   => true,
-                'priority'  => 0,
-            ],
-
-            [
-                "label"     => "Привилегии",
-                "url"       => ["admin/permission"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/access.png'],
-                'enabled'   => true,
-                'priority'  => 0,
-            ],
-
-            /*[
-                "label"     => "Правила",
-                "url"       => ["admin/rule"],
-                'enabled'   => true,
-                'priority'  => 0,
-            ],*/
-        ]
-    ],
 ];
