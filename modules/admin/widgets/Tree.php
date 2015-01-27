@@ -321,7 +321,15 @@ class Tree
                                 [
                                     "class" => "sx-controll-node"
                                 ]
-                            )
+                            ) /*.
+
+                            Html::tag("div",
+                                <<<HTML
+                                <a href="#"><span class="glyphicon glyphicon-plus"></span></a>
+HTML
+
+                            )*/
+
                         , ["class" => "row"])
                         . $child ,
                         [
@@ -462,7 +470,7 @@ JS
 
     .sx-tree ul li.sx-tree-node .sx-controll-node
     {
-        width: 50px;
+        width: 30px;
         float: left;
         margin-left: 10px;
     }
