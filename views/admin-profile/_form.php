@@ -12,17 +12,16 @@
 
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Game */
-/* @var $form yii\widgets\ActiveForm */
 ?>
 
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'group_id')->widget(
+<?/*= $form->field($model, 'group_id')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\UserGroup::find()->asArray()->all(),
@@ -30,7 +29,7 @@ use yii\widgets\ActiveForm;
                  "groupname"
              ),
     ]);
-?>
+*/?>
 
 <?= $form->field($model, 'username')->textInput(['maxlength' => 12]) ?>
 <?= $form->field($model, 'name')->textInput(); ?>
@@ -39,11 +38,6 @@ use yii\widgets\ActiveForm;
 <?= $form->field($model, 'info')->textarea(); ?>
 <?= $form->field($model, 'status_of_life')->textarea(); ?>
 
-
-
-<div class="form-group">
-    <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
-
+<?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 

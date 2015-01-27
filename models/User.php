@@ -156,20 +156,22 @@ class User
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'username' => Yii::t('app', 'Username'),
+            'username' => Yii::t('app', 'Логин'),
             'auth_key' => Yii::t('app', 'Auth Key'),
             'password_hash' => Yii::t('app', 'Password Hash'),
             'password_reset_token' => Yii::t('app', 'Password Reset Token'),
             'email' => Yii::t('app', 'Email'),
+            'phone' => Yii::t('app', 'Телефон'),
             'role' => Yii::t('app', 'Role'),
             'status' => Yii::t('app', 'Status'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'city' => Yii::t('app', 'City'),
-            'address' => Yii::t('app', 'Address'),
-            'info' => Yii::t('app', 'Info'),
-            'gender' => Yii::t('app', 'Gender'),
+            'name' => Yii::t('app', 'Имя'),
+            'city' => Yii::t('app', 'Город'),
+            'address' => Yii::t('app', 'Адрес'),
+            'info' => Yii::t('app', 'Информация'),
+            'gender' => Yii::t('app', 'Пол'),
+            'status_of_life' => Yii::t('app', 'Статус'),
         ];
     }
 

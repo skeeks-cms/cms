@@ -22,14 +22,14 @@ class ThemeRealAdminAsset extends AssetBundle
     public $sourcePath = '@skeeks/cms/modules/admin/assets';
 
     public $css = [
-        'themes/real-admin/css/jquery.mmenu.css',
+        //'themes/real-admin/css/jquery.mmenu.css',
         'themes/real-admin/css/simple-line-icons.css',
         'themes/real-admin/css/font-awesome.min.css',
         'themes/real-admin/css/add-ons.min.css',
         'themes/real-admin/css/style.min.css',
     ];
     public $js = [
-        'themes/real-admin/js/jquery.mmenu.min.js',
+        //'themes/real-admin/js/jquery.mmenu.min.js',
     ];
     public $depends = [
     ];
