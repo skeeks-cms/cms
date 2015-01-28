@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\base\widgets;
+use yii\helpers\Html;
 
 /**
  * Class ActiveForm
@@ -16,16 +17,5 @@ namespace skeeks\cms\base\widgets;
  */
 class ActiveForm extends \yii\widgets\ActiveForm
 {
-    /**
-     * @param $model
-     * @param $attribute
-     * @param array $options
-     * @return \yii\widgets\ActiveField
-     */
-    public function fieldNoLabel($model, $attribute, $options = [])
-    {
-        return parent::field($model, $attribute, array_merge($options,
-            ['parts' => ['{label}' => '']]
-        ));
-    }
+
 }

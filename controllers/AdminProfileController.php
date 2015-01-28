@@ -44,6 +44,8 @@ class AdminProfileController extends AdminModelEditorSmartController
     {
         $behaviors = parent::behaviors();
         unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['delete']);
+        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['social']);
+        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['system']);
 
         return $behaviors;
     }

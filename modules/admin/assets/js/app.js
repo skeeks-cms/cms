@@ -26,8 +26,6 @@
                 $("body").addClass("empty");
             }
 
-
-
             $("ul.nav-sidebar").find("a").each(function() {
                 /** @type {string} */
                 var line = String(window.location);
@@ -221,56 +219,3 @@
     });
 
 })(sx, sx.$, sx._);
-
-
-
-/**
- * @return {undefined}
- */
-function startTime() {
-  /** @type {Date} */
-  var t2 = new Date;
-  /** @type {number} */
-  var front = t2.getHours();
-  /** @type {number} */
-  var tag = t2.getMinutes();
-  /** @type {number} */
-  var description = t2.getSeconds();
-  tag = checkTime(tag);
-  description = checkTime(description);
-  /** @type {string} */
-  document.getElementById("clock").innerHTML = front + ":" + tag + ":" + description;
-  /** @type {number} */
-  var to = setTimeout(function() {
-    startTime();
-  }, 500);
-}
-/**
- * @param {number} b
- * @return {?}
- */
-function checkTime(b) {
-  if (b < 10) {
-    /** @type {string} */
-    b = "0" + b;
-  }
-  return b;
-}
-
-
-
-
-
-
-
-
-
-$(function()
-{
-    if ($("#clock").length) {
-        startTime();
-      }
-});
-
-
-

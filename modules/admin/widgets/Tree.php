@@ -314,21 +314,28 @@ class Tree
                                     "class" => "sx-label-node level-" . $model->level
                                 ]
                             ) .
-                            Html::tag("div",
-                                DropdownControllerActions::begin([
-                                    "controller"    => $controller,
-                                ])->run(),
-                                [
-                                    "class" => "sx-controll-node"
-                                ]
-                            ) /*.
 
                             Html::tag("div",
-                                <<<HTML
-                                <a href="#"><span class="glyphicon glyphicon-plus"></span></a>
+                                    DropdownControllerActions::begin([
+                                        "controller"    => $controller,
+                                        "containerClass"     => "dropdown pull-left"
+                                    ])->run() .
+
+                                    Html::tag("div",
+                                        <<<HTML
+                                        <a href="#" class="btn btn-xs" title="Создать подраздел"><span class="glyphicon glyphicon-plus"></span></a>
 HTML
+                                    ,
+                                        [
+                                            "class" => "pull-left sx-controll-act"
+                                        ]
 
-                            )*/
+                                    )
+                                ,
+                                [
+                                    "class" => "sx-controll-node row"
+                                ]
+                            )
 
                         , ["class" => "row"])
                         . $child ,
@@ -393,7 +400,17 @@ HTML
                             )
                             .onError(function(e, data)
                             {
-                                sx.message.error({text : "Изменения не сохранились"});
+                                sx.notify.error("Изменения не сохранились");
+                                sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                _.delay(function()
+                                {
+                                    window.location.reload();
+                                }, 2000);
+                            })
+                            .onSuccess(function(e, data)
+                            {
+                                sx.notify.success("Изменения сохранены");
+
                             })
                             .execute();
                         }
@@ -439,6 +456,11 @@ JS
         margin: 2px 0px;
     }
 
+        .sx-tree ul li.sx-tree-node .sx-controll-act
+        {
+            margin-left: 5px;
+        }
+
     .sx-tree ul li.sx-tree-node.open
     {}
 
@@ -470,9 +492,10 @@ JS
 
     .sx-tree ul li.sx-tree-node .sx-controll-node
     {
-        width: 30px;
+        width: 50px;
         float: left;
         margin-left: 10px;
+        padding-top: 2px;
     }
 
         .sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button

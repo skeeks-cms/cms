@@ -12,6 +12,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
 use Yii;
 
@@ -38,9 +39,9 @@ class UserGroup extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            behaviors\HasFiles::className() =>
+            HasFiles::className() =>
             [
-                "class"  => behaviors\HasFiles::className(),
+                "class"  => HasFiles::className(),
                 "groups" =>
                 [
                     "image" =>

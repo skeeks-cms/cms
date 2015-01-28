@@ -223,7 +223,7 @@ class Cms extends \skeeks\cms\base\Component
             (string) $this->moduleCms()->getDescriptor()->getVersion(),
             $this->staticKeySold,
             Yii::getVersion(),
-            'system-sold-1'
+            'system-sold-2'
         ]));
     }
 

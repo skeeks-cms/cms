@@ -90,7 +90,7 @@ class Action extends Component
         {
             if ($model = $this->controller->getModel())
             {
-                return $this->controller->id . $model->id;
+                return $this->controller->id . $model->{$this->controller->modelPkAttribute};
             }
         }
 
@@ -121,7 +121,7 @@ class Action extends Component
         {
             if ($model = $this->controller->getModel())
             {
-                $url->set('id', $model->id);
+                $url->set('id', $model->{$this->controller->modelPkAttribute});
             }
         }
 
