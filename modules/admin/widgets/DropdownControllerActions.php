@@ -35,12 +35,14 @@ class DropdownControllerActions
         "class" => "dropdown-menu"
     ];
 
+    public $containerClass = 'dropdown';
+
     /**
      * @return string
      */
     public function run()
     {
-        return "<div class='dropdown'>
+        return "<div class='{$this->containerClass}' title='Возможные действия'>
             <button type=\"button\" class='btn btn-xs btn-default' data-toggle=\"dropdown\">
                <span class=\"caret\"></span>
             </button>" .

@@ -12,6 +12,7 @@
 namespace skeeks\cms\modules\admin\assets;
 use skeeks\cms\base\AssetBundle;
 
+
 /**
  * Class AppAsset
  * @package skeeks\cms\modules\admin
@@ -28,6 +29,7 @@ class AdminAsset extends AssetBundle
         'js/app.js',
     ];
     public $depends = [
+
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapPluginAsset',
 

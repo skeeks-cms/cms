@@ -38,4 +38,3 @@ use common\models\User;
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
 <?php ActiveForm::end(); ?>
-

@@ -180,6 +180,13 @@ class AdminTreeController extends AdminModelEditorSmartController
      */
     public function actionResort()
     {
+        $response =
+        [
+            'success' => false
+        ];
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
         if (\Yii::$app->request->isPost)
         {
             $tree = new Tree();
@@ -215,6 +222,10 @@ class AdminTreeController extends AdminModelEditorSmartController
                 $node = $tree->find()->where(['id'=>$id])->one();
                 $changeNode->swapPriorities($node);
             }
+
+            $response['success'] = true;
         }
+
+        return $response;
     }
 }

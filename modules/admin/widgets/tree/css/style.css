@@ -6,9 +6,32 @@
 .sx-tree ul li.sx-tree-node .row .sx-label-node
 {
     background: url("../images/ico_folder.gif") no-repeat 2px 5px;
+    padding-top: 2px;
 }
 
 .sx-tree ul li.sx-tree-node.open > .row > .sx-label-node
 {
     background: url("../images/ico_folder_open.gif") no-repeat 2px 5px;
+}
+
+.sx-tree ul li.sx-tree-node .row
+{
+    height: 24px;
+    cursor: move;
+}
+
+.sx-tree ul li.sx-tree-node .row:hover
+{
+    background: rgba(192, 192, 192, 0.17);
+}
+
+.sx-tree ul li.sx-tree-node .row .sx-controll-node
+{
+    display: none;
+    float: right;
+}
+
+.sx-tree ul li.sx-tree-node .row:hover .sx-controll-node
+{
+    display: block;
 }
