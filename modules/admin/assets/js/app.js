@@ -114,6 +114,24 @@
 
     });
 
+
+    sx.classes.Blocker  = sx.classes.BlockerJqueyUi.extend({
+
+        _init: function()
+        {
+            this.applyParentMethod(sx.classes.BlockerJqueyUi, '_init', []);
+
+            this.defaultOpts({
+                message: "<div style='padding: 5px;'>Подождите...</div>",
+                css: {
+                    border: '1px solid #108acb',
+                    padding: '10px;',
+                }
+            });
+        },
+
+    });
+
     /**
      * Основной класс для управления админкой
      * @type {extend|*|Function|extend|void|extend}

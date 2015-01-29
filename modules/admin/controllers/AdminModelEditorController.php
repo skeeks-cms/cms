@@ -100,15 +100,12 @@ class AdminModelEditorController extends AdminController
                         "rules"         => NoModel::className()
                     ],
 
-
-
-
-                    "view" =>
+                    /*"view" =>
                     [
                         "label"         => "Смотреть",
                         "icon"          => "glyphicon glyphicon-eye-open",
                         "rules"         => HasModel::className()
-                    ],
+                    ],*/
 
                     "update" =>
                     [

@@ -385,22 +385,31 @@ HTML
                     {
                         out: function( event, ui )
                         {
+                            var Jul = $(ui.item).closest("ul");
                             var newSort = [];
-                            $(ui.item).closest("ul").children("li").each(function(i, element)
+                            Jul.children("li").each(function(i, element)
                             {
                                 newSort.push($(this).data("id"));
                             });
 
-                            sx.ajax.preparePostQuery(
+                            var blocker = sx.block(Jul);
+
+                            var ajax = sx.ajax.preparePostQuery(
                                 "resort",
                                 {
                                     "ids" : newSort,
                                     "changeId" : $(ui.item).data("id")
                                 }
-                            )
-                            .onError(function(e, data)
+                            );
+
+                            new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+                            new sx.classes.AjaxHandlerNotify(ajax, {
+                                'error': "Изменения не сохранились",
+                                'success': "Изменения сохранены",
+                            }); //отключение глобального загрузчика
+
+                            ajax.onError(function(e, data)
                             {
-                                sx.notify.error("Изменения не сохранились");
                                 sx.notify.info("Подождите сейчас страница будет перезагружена");
                                 _.delay(function()
                                 {
@@ -409,8 +418,7 @@ HTML
                             })
                             .onSuccess(function(e, data)
                             {
-                                sx.notify.success("Изменения сохранены");
-
+                                blocker.unblock();
                             })
                             .execute();
                         }

@@ -21,6 +21,7 @@ return
             [
                 "label"     => "Сайты",
                 "url"       => ["cms/admin-site"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
             ],
 
             [
@@ -32,7 +33,7 @@ return
             [
                 "label"     => "Позиции меню",
                 "url"       => ["cms/admin-tree-menu"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
             ],
 
             [
@@ -44,32 +45,22 @@ return
             [
                 "label"     => "Инфоблоки",
                 "url"       => ["cms/admin-infoblock"],
-
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
             ],
 
             [
                 "label"     => "Публикации",
                 "url"       => ["cms/admin-publication/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png']
             ],
 
-            [
-                "label"     => "Комментарии",
-                "url"       => ["cms/admin-comment/index"],
-            ],
-
-            [
-                "label"     => "Голоса",
-                "url"       => ["cms/admin-vote/index"],
-            ],
-
-            [
-                "label"     => "Подписки",
-                "url"       => ["cms/admin-subscribe/index"],
-            ],
 
 
         ]
     ],
+
+
+
 
     'access' =>
     [
@@ -82,7 +73,7 @@ return
             [
                 "label"     => "Управление пользователями",
                 "url"       => ["cms/admin-user"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users.png']
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png']
             ],
 
             [
@@ -127,16 +118,44 @@ return
             [
                 "label"     => "Сервера",
                 "url"       => ["cms/admin-storage/index"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
             ],
 
             [
-                "label"     => "Файлы",
+                "label"     => "Файлы в хранилище",
                 "url"       => ["cms/admin-storage-files/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
         ]
     ],
+
+    'social' =>
+    [
+        'label'     => 'Социальные элементы',
+        'priority'  => 0,
+        'enabled'   => true,
+
+        'items' =>
+        [
+            [
+                "label"     => "Комментарии",
+                "url"       => ["cms/admin-comment/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/comments.png']
+            ],
+
+            [
+                "label"     => "Голоса",
+                "url"       => ["cms/admin-vote/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/votes.png']
+            ],
+
+            [
+                "label"     => "Подписки",
+                "url"       => ["cms/admin-subscribe/index"],
+            ],
+        ]
+    ],
+
 
     'dev' =>
     [
@@ -147,8 +166,9 @@ return
         'items' =>
         [
             [
-                "label"     => "Удаление и чистка",
+                "label"     => "Читска временных данных",
                 "url"       => ["admin/clear"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clear.png'],
             ],
 
             [
