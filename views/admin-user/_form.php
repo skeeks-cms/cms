@@ -31,6 +31,7 @@ use common\models\User;
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Контакты')?>
+
     <?= $form->field($model, 'email')->textInput(); ?>
     <?= $form->field($model, 'phone')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
