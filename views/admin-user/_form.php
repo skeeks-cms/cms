@@ -5,11 +5,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormStyled as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Game */
+/* @var $model \yii\db\ActiveRecord */
 ?>
 
 
 <?php $form = ActiveForm::begin(); ?>
+<?php  ?>
 
 <?= $form->fieldSet('Общая ниформация')?>
     <?= $form->field($model, 'group_id')->label('Группа пользователя')->widget(
@@ -30,11 +31,13 @@ use common\models\User;
     <?= $form->field($model, 'status_of_life')->textarea(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Контакты')?>
+<? if (!$model->isNewRecord) : ?>
+    <?= $form->fieldSet('Контакты')?>
 
-    <?= $form->field($model, 'email')->textInput(); ?>
-    <?= $form->field($model, 'phone')->textInput(); ?>
-<?= $form->fieldSetEnd(); ?>
+        <?= $form->field($model, 'email')->textInput(); ?>
+        <?= $form->field($model, 'phone')->textInput(); ?>
+    <?= $form->fieldSetEnd(); ?>
+<? endif; ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
