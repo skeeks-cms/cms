@@ -10,30 +10,29 @@
  * @since 1.0.0
  */
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 $tree = new \skeeks\cms\models\Tree();
 
 /* @var $this yii\web\View */
-/* @var $form yii\widgets\ActiveForm */
 /* @var $model \skeeks\cms\models\WidgetConfig */
 
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'template')->widget(
+<?= $form->field($model, 'template')->label("Шаблон")->widget(
     \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 $model->getWidgetDescriptor()->getTemplatesObject()->getComponents(),
-                 "id",
-                 "name"
-             ),
+        'items' => \yii\helpers\ArrayHelper::map(
+             $model->getWidgetDescriptor()->getTemplatesObject()->getComponents(),
+             "id",
+             "name"
+         ),
     ]);
 ?>
 
 
 
-<?= $form->field($model, 'treeMenuId')->widget(
+<?= $form->field($model, 'treeMenuId')->label('Меню')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\TreeMenu::find()->all(),
@@ -44,25 +43,23 @@ $tree = new \skeeks\cms\models\Tree();
 ?>
 
 
-<?= $form->field($model, 'limit')->textInput(); ?>
+<?= $form->field($model, 'limit')->label('Количество')->textInput(); ?>
 
-<?= $form->field($model, 'statuses')->widget(
+<?= $form->field($model, 'statuses')->label('Записи с какими статусами разрешны к показу?')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleStatuses(),
         'multiple' => true,
     ]);
 ?>
 
-<?= $form->field($model, 'statusesAdult')->widget(
+<?= $form->field($model, 'statusesAdult')->label('Записи с какими возрастным статусами разрешны к показу?')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleAdultStatuses(),
         'multiple' => true,
     ]);
 ?>
 
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
+<?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
 
