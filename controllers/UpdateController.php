@@ -39,13 +39,28 @@ class UpdateController extends Controller
             ->actionMigration()
             ->actionClearRuntime()
             ->actionGenerateModulesConfigFile()
+            ->actionDbRefresh()
+            ->actionRbacUpdate()
         ;
-        
+
+
+
+
         $this->stdoutBlock("Update chmods");
         $this->systemCmd("chown -R www-data:www-data " . \Yii::getAlias('@root/vendor'));
     }
 
 
+    /**
+     * @return $this
+     */
+    public function actionRbacUpdate()
+    {
+        $this->stdoutBlock("Обновление и добавления прав доступа");
+        $this->systemCmd("php yii cms/rbac/init");
+
+        return $this;
+    }
     /**
      * @return $this
      */
@@ -57,6 +72,13 @@ class UpdateController extends Controller
         return $this;
     }
 
+    public function actionDbRefresh()
+    {
+        $this->stdoutBlock('Инвалидация кэша стуктуры базы данных');
+        \Yii::$app->db->getSchema()->refresh();
+
+        return $this;
+    }
     public function actionClearRuntime()
     {
         $this->stdoutBlock("clear all runtime dirs");
@@ -83,13 +105,16 @@ class UpdateController extends Controller
     {
         $this->stdoutBlock("Update migrations");
 
+        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations" ;
+        $this->systemCmd($cmd);
+
         foreach (\Yii::$app->extensions as $code => $data)
         {
             if ($data['alias'])
             {
                 foreach ($data['alias'] as $code => $path)
                 {
-                    $cmd = "php yii migrate --migrationPath=" . $path;
+                    $cmd = "php yii migrate --migrationPath=" . $path . '/migrations' ;
                     $this->systemCmd($cmd);
                 }
             }
