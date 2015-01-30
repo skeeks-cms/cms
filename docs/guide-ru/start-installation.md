@@ -25,8 +25,14 @@
 # перейти в папку своего проекта
 cd /var/www/sites/test.ru/
 
-#запустить команду, и отвечать на вопросы
-python yii.py
+# установка composer (если уже установлен пропускаем этот шаг). Так же следует учесть чтобы в пхп был включен модуль phar 
+php -r "readfile('https://getcomposer.org/installer');" | php
+
+# устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
+php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
+
+# устанавливаем шаблон приложения skeeks-cms
+php composer.phar create-project skeeks/cms-app
 ~~~
 
 
