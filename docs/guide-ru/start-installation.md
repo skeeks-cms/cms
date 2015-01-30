@@ -203,3 +203,21 @@ user: root
 
 password: skeeks
 
+
+
+5) Обновление проекта
+-------
+
+~~~
+# Полное обновление проекта
+php yii cms/update/project
+
+
+#так же можно использовать по отдельности команды
+php yii cms/update/clear-runtime
+php yii cms/update/migration
+php yii cms/update/composer
+php yii cms/update/update
+php yii cms/update/generate-modules-config-file
+~~~
+
