@@ -299,6 +299,7 @@ class Cms extends \skeeks\cms\base\Component
             }
         }
 
+
         if ($config)
         {
 

@@ -106,8 +106,6 @@ class ClearController extends AdminController
 
         if (\Yii::$app->request->isPost)
         {
-            \Yii::$app->cms->generateModulesConfigFile();
-
             foreach ($clearDirs as $data)
             {
                 $dir = ArrayHelper::getValue($data, 'dir');
@@ -120,6 +118,8 @@ class ClearController extends AdminController
                     }
                 }
             }
+
+            \Yii::$app->cms->generateModulesConfigFile();
         }
 
         return $this->render('index', [
