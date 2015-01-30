@@ -47,7 +47,7 @@ class UpdateController extends Controller
 
 
         $this->stdoutBlock("Update chmods");
-        $this->systemCmd("chown -R www-data:www-data " . \Yii::getAlias('@root/vendor'));
+        $this->systemCmd("chown -R www-data:www-data " . \Yii::getAlias('@root'));
     }
 
 
