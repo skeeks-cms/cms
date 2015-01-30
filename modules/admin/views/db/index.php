@@ -9,7 +9,6 @@
  * @since 1.0.0
  */
 
-
 $db = \Yii::$app->db;
 $schema = $db->getSchema();
 $schema->refresh()

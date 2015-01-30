@@ -12,6 +12,7 @@ namespace skeeks\cms\components;
 
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\base\Module;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
@@ -19,6 +20,7 @@ use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
 use skeeks\cms\widgets\Infoblock;
 use skeeks\cms\widgets\StaticBlock;
+use skeeks\sx\File;
 use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
@@ -34,6 +36,8 @@ use yii\web\View;
 class Cms extends \skeeks\cms\base\Component
 {
     public $staticKeySold = '';
+    public $tmpModulesConfigFile;
+
 
     public function init()
     {
@@ -217,14 +221,27 @@ class Cms extends \skeeks\cms\base\Component
         ]));
     }
 
+    private $_staticKey = null;
     public function getStaticKey()
     {
-        return md5(implode('', [
-            (string) $this->moduleCms()->getDescriptor()->getVersion(),
-            $this->staticKeySold,
-            Yii::getVersion(),
-            'system-sold-2'
-        ]));
+        if ($this->_staticKey === null)
+        {
+            $fileConfigSold = '';
+            if (file_exists((string) $this->tmpModulesConfigFile))
+            {
+                $fileConfigSold = filemtime((string) $this->tmpModulesConfigFile);
+            }
+
+            $this->_staticKey = md5(implode('', [
+                (string) $this->moduleCms()->getDescriptor()->getVersion(),
+                $this->staticKeySold,
+                Yii::getVersion(),
+                'system-sold-2',
+                $fileConfigSold
+            ]));
+        }
+
+        return $this->_staticKey;
     }
 
 
@@ -250,5 +267,66 @@ class Cms extends \skeeks\cms\base\Component
     public function getCurrentTree()
     {
         return $this->_tree;
+    }
+
+    /**
+     * Пройтись по всем расширениям уставноленным в проект, и сгенерировать конфиг файл.
+     * @return $this
+     */
+    public function generateModulesConfigFile()
+    {
+        $config     = [];
+
+        foreach ((array) \Yii::$app->extensions as $code => $data)
+        {
+            if (is_array($data['alias']))
+            {
+                $configTmp  = [];
+
+                foreach ($data['alias'] as $code => $path)
+                {
+                    $file = new \skeeks\sx\File($path . '/configs/main.php');
+                    if ($file->isExist())
+                    {
+                        $config[] = $file->getPath();
+                    }
+                    $file = new \skeeks\sx\File($path . '/config/main.php');
+                    if ($file->isExist())
+                    {
+                        $config[] = $file->getPath();
+                    }
+                }
+            }
+        }
+
+        if ($config)
+        {
+
+            $date = date("dd.mm.YY", time());
+            $fileContent = <<<PHP
+<?php
+/**
+ * Автоматически сгенерированные конфиг, можно просто удалить этот файл.
+ *
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010-2014 SkeekS (Sx)
+ * @date {$date}
+ * @since 1.0.0
+ */
+ return [
+
+PHP;
+            foreach ($config as $filePach)
+            {
+                $fileContent .= "\"" . $filePach . "\", \n";
+            }
+            $fileContent .= '];';
+
+            $file = new File((string) $this->tmpModulesConfigFile);
+            $file->write($fileContent);
+        }
+
+        return $this;
     }
 }
