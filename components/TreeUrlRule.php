@@ -13,6 +13,7 @@ use skeeks\cms\App;
 use skeeks\cms\filters\NormalizeDir;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /**
@@ -48,7 +49,30 @@ class TreeUrlRule
     {
         if ($route == 'cms/tree/view')
         {
-            $id = $params['id'];
+            $id = (int) ArrayHelper::getValue($params, 'id');
+            if (!$id)
+            {
+                return false;
+            }
+
+            $tree = Tree::findOne(['id' => $id]);
+            if (!$tree)
+            {
+                return false;
+            }
+
+            $url = $tree->getPageUrl();
+
+            unset($params['id']);
+            /*if ($url !== '') {
+                $url .= ($this->suffix === null ? $manager->suffix : $this->suffix);
+            }*/
+
+            if (!empty($params) && ($query = http_build_query($params)) !== '') {
+                $url .= '?' . $query;
+            }
+
+            return $url;
 
         }
         return false;

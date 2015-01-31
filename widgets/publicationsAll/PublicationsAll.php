@@ -95,7 +95,11 @@ class PublicationsAll extends WidgetHasTemplate
 
         $countQuery = clone $find;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
-        $pages->defaultPageSize = 5;
+
+        if ($this->limit)
+        {
+            $pages->defaultPageSize = $this->limit;
+        }
 
         $models = $find->offset($pages->offset)
                           ->limit($pages->limit)
