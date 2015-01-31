@@ -46,7 +46,11 @@ class TreeUrlRule
      */
     public function createUrl($manager, $route, $params)
     {
+        if ($route == 'cms/tree/view')
+        {
+            $id = $params['id'];
 
+        }
         return false;
     }
 

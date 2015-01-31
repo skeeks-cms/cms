@@ -27,6 +27,17 @@ class ViewModelActionTree extends ViewModelAction
     public function run($id)
     {
         $this->_model   = \Yii::$app->cms->getCurrentTree();
+
+        if (!$this->_model)
+        {
+            $treeNode           = Tree::find()->where([
+                'id' => $id
+            ])->one();
+
+            \Yii::$app->cms->setCurrentTree($treeNode);
+            $this->_model   = \Yii::$app->cms->getCurrentTree();
+        }
+
         return $this->_go();
     }
 
