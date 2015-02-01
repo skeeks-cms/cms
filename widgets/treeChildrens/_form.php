@@ -9,18 +9,17 @@
  * @since 1.0.0
  */
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 $tree = new \skeeks\cms\models\Tree();
 
 /* @var $this yii\web\View */
-/* @var $form yii\widgets\ActiveForm */
 /* @var $model \skeeks\cms\models\WidgetConfig */
 
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'template')->widget(
+<?= $form->field($model, 'template')->label('Шаблон')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  $model->getWidgetDescriptor()->getTemplatesObject()->getComponents(),
@@ -32,32 +31,29 @@ $tree = new \skeeks\cms\models\Tree();
 
 
 
-<?= $form->field($model, 'pid')->widget(
+<?= $form->field($model, 'pid')->label("Родительский раздел")->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions()
     ]);
 ?>
 
 
-<?= $form->field($model, 'limit')->textInput(); ?>
+<?= $form->field($model, 'limit')->label('Количество')->textInput(); ?>
 
-<?= $form->field($model, 'statuses')->widget(
+<?= $form->field($model, 'statuses')->label("Статусы")->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleStatuses(),
         'multiple' => true,
     ]);
 ?>
 
-<?= $form->field($model, 'statusesAdult')->widget(
+<?= $form->field($model, 'statusesAdult')->label("Возрастной статус")->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleAdultStatuses(),
         'multiple' => true,
     ]);
 ?>
-
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
+<?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
 
