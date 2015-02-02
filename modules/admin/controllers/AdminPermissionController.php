@@ -180,8 +180,11 @@ class AdminPermissionController extends AdminModelEditorController
      * @param  string $id
      * @return mixed
      */
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
+        $model = $this->getCurrentModel();
+        $id = $model->name;
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->getRequest()->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->name]);
@@ -194,8 +197,11 @@ class AdminPermissionController extends AdminModelEditorController
      * @param  string $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete()
     {
+        $model = $this->getCurrentModel();
+        $id = $model->name;
+
         $model = $this->findModel($id);
         Yii::$app->getAuthManager()->remove($model->item);
         return $this->redirect(['index']);
