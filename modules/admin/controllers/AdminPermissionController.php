@@ -76,6 +76,13 @@ class AdminPermissionController extends AdminModelEditorController
                         "rules"         => NoModel::className()
                     ],
 
+                    "view" =>
+                    [
+                        "label"         => "Смотреть",
+                        "icon"          => "glyphicon glyphicon-eye-open",
+                        "rules"         => HasModel::className()
+                    ],
+
                     "create" =>
                     [
                         "label"         => "Добавить",
@@ -86,12 +93,7 @@ class AdminPermissionController extends AdminModelEditorController
 
 
 
-                    /*"view" =>
-                    [
-                        "label"         => "Смотреть",
-                        "icon"          => "glyphicon glyphicon-eye-open",
-                        "rules"         => HasModel::className()
-                    ],
+                    /*
 
                     "update" =>
                     [
@@ -132,8 +134,10 @@ class AdminPermissionController extends AdminModelEditorController
      * @param string $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView()
     {
+        $model = $this->getCurrentModel();
+        $id = $model->name;
         $model = $this->findModel($id);
         $authManager = Yii::$app->getAuthManager();
         $avaliable = $assigned = [
