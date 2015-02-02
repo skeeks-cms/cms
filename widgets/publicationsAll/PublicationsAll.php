@@ -15,6 +15,7 @@ use skeeks\cms\models\Publication;
 use skeeks\cms\models\Tree;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
+use yii\data\Pagination;
 
 /**
  * Class Publications
@@ -63,10 +64,10 @@ class PublicationsAll extends WidgetHasTemplate
 
         }
 
-        if ($this->limit)
+        /*if ($this->limit)
         {
             $find->limit($this->limit);
-        }
+        }*/
 
         if ($this->orderBy)
         {
@@ -91,7 +92,21 @@ class PublicationsAll extends WidgetHasTemplate
         $find->andWhere(['<=', 'published_at', time()]);
         $find->orderBy('published_at DESC');
 
-        $this->_data->set('models', $find->all());
+
+        $countQuery = clone $find;
+        $pages = new Pagination(['totalCount' => $countQuery->count()]);
+
+        if ($this->limit)
+        {
+            $pages->defaultPageSize = $this->limit;
+        }
+
+        $models = $find->offset($pages->offset)
+                          ->limit($pages->limit)
+                          ->all();
+
+        $this->_data->set('models', $models);
+        $this->_data->set('pages', $pages);
 
         return $this;
     }
