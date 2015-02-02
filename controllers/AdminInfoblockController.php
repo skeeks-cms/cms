@@ -103,8 +103,11 @@ class AdminInfoblockController extends AdminModelEditorSmartController
             }
         }
 
-        return $this->output($this->getCurrentModel()->getRegisterdWidgetModel()->renderForm([
-            'model' => $widgetConfig
-        ]));
+        return $this->render('config', [
+            'model' => $widgetConfig,
+            'form' => $this->getCurrentModel()->getRegisterdWidgetModel()->renderForm([
+                'model' => $widgetConfig
+            ])
+        ]);
     }
 }

@@ -30,6 +30,9 @@ class Search extends ActiveRecord
      */
     public $modelClassName = null;
 
+    /**
+     * @param array $modelClassName
+     */
     public function __construct($modelClassName)
     {
         $this->modelClassName = $modelClassName;
@@ -51,14 +54,40 @@ class Search extends ActiveRecord
     }
 
     /**
-     * @return ActiveRecord
-     */
-     public function getLoadedModel()
-     {
-         return $this->_loadedModel;
-     }
+    * @return ActiveRecord
+    */
+    public function getLoadedModel()
+    {
+        if ($this->_loadedModel === null)
+        {
+            $className  = $this->modelClassName;
+            $this->_loadedModel = new $className();
+        }
+
+        return $this->_loadedModel;
+    }
 
     protected $_loadedModel = null;
+    protected $_dataProvider = null;
+
+    /**
+     * @return ActiveDataProvider
+     */
+    public function getDataProvider()
+    {
+        if ($this->_dataProvider === null)
+        {
+            $className  = $this->modelClassName;
+            $query      = $className::find();
+
+            $this->_dataProvider = new ActiveDataProvider([
+                'query' => $query,
+            ]);
+        }
+
+        return $this->_dataProvider;
+    }
+
     /**
      * Creates data provider instance with search query applied
      *
@@ -68,21 +97,14 @@ class Search extends ActiveRecord
      */
     public function search($params)
     {
-        $className = $this->modelClassName;
-        $query = $className::find();
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-
-        $this->_loadedModel = new $className();
-
-        if (!($this->_loadedModel->load($params)))
+        if (!($this->getLoadedModel()->load($params)))
         {
-            return $dataProvider;
+            return $this->getDataProvider();
         }
 
-        if ($columns = $this->_loadedModel->getTableSchema()->columns)
+        $query = $this->getDataProvider()->query;
+
+        if ($columns = $this->getLoadedModel()->getTableSchema()->columns)
         {
             /**
              * @var \yii\db\ColumnSchema $column
@@ -118,6 +140,6 @@ class Search extends ActiveRecord
             ->andFilterWhere(['like', 'image', $this->image])
             ->andFilterWhere(['like', 'image_cover', $this->image_cover]);*/
 
-        return $dataProvider;
+        return $this->getDataProvider();
     }
 }

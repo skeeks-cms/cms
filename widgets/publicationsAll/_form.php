@@ -10,7 +10,7 @@
  */
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\ActiveForm;
+use skeeks\cms\widgets\base\hasTemplate\ActiveForm;
 
 $tree = new \skeeks\cms\models\Tree();
 
@@ -20,16 +20,8 @@ $tree = new \skeeks\cms\models\Tree();
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'template')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 $model->getWidgetDescriptor()->getTemplatesObject()->getComponents(),
-                 "id",
-                 "name"
-             ),
-    ])->label('Шаблон');
-?>
 
+<?= $form->templateElement($model); ?>
 
 <?= $form->field($model, 'title')->label('Заголовок')->textInput(); ?>
 

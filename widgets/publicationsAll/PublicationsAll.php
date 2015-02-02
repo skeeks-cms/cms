@@ -12,6 +12,7 @@ namespace skeeks\cms\widgets\publicationsAll;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\models\Publication;
+use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
@@ -21,7 +22,7 @@ use yii\data\Pagination;
  * Class Publications
  * @package skeeks\cms\widgets\PublicationsAll
  */
-class PublicationsAll extends WidgetHasTemplate
+class PublicationsAll extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
     /**
      * @var null|string
@@ -39,7 +40,11 @@ class PublicationsAll extends WidgetHasTemplate
      */
     public function bind()
     {
+        //$search         = new Search(Publication::className());
+        //$dataProvider   = $search->search(\Yii::$app->request->queryParams);
+
         $find = Publication::find();
+        //$find = $dataProvider->query;
 
         $tree = \Yii::$app->cms->getCurrentTree();
 

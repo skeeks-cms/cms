@@ -10,7 +10,7 @@
  */
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\widgets\base\hasTemplate\ActiveForm;
 
 $tree = new \skeeks\cms\models\Tree();
 
@@ -21,15 +21,7 @@ $tree = new \skeeks\cms\models\Tree();
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'template')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 $model->getWidgetDescriptor()->getTemplatesObject()->getComponents(),
-                 "id",
-                 "name"
-             ),
-    ]);
-?>
+<?= $form->templateElement($model); ?>
 
 
 <?= $form->field($model, 'title')->textInput(); ?>

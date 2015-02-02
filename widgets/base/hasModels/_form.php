@@ -10,20 +10,24 @@
  */
 
 use yii\helpers\Html;
-use skeeks\cms\widgets\base\hasTemplate\ActiveForm;
-
-$tree = new \skeeks\cms\models\Tree();
+use skeeks\cms\widgets\base\hasModels\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\WidgetConfig */
-
+\Yii::$app->registeredModels->getComponents()
 ?>
 <?php $form = ActiveForm::begin(); ?>
-
 <?= $form->templateElement($model); ?>
 
-<?= $form->field($model, 'title')->textInput(); ?>
-
+<?= $form->field($model, 'modelClassName')->label('Модель (сущьность)')->widget(
+    \skeeks\widget\chosen\Chosen::className(), [
+        'items'   => \yii\helpers\ArrayHelper::map(
+            \Yii::$app->registeredModels->getComponents(),
+            "id",
+             "name"
+        ),
+    ]);
+?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
