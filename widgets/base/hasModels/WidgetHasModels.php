@@ -27,14 +27,49 @@ class WidgetHasModels extends WidgetHasTemplate
 {
     public $modelClassName          = null;
 
-    public $sort                    = [];
-    public $pagination              = [];
+    public $defaultSortField        = 'id';
+    public $defaultSort             = SORT_DESC;
 
+    public $defaultPageSize         = 10;
+
+    /**
+     * @return string
+     */
+    public function getModelClassName()
+    {
+        $className = \Yii::$app->registeredModels->getClassNameByCode($this->modelClassName);
+        if ($className)
+        {
+            return (string) $className;
+        } else
+        {
+            return (string) $this->modelClassName;
+        }
+    }
+
+
+    /**
+     * @return Search
+     */
+    public function getSearch()
+    {
+        return $this->_data->search;
+    }
 
     public function buildSearch()
     {
+        $modelClassName = $this->getModelClassName();
         $search         = new Search($modelClassName);
-        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
+
+        $dataProvider = $search->getDataProvider();
+        $dataProvider->getPagination()->defaultPageSize = $this->defaultPageSize;
+
+        if ($this->defaultSortField)
+        {
+            $dataProvider->getSort()->defaultOrder = [
+                $this->defaultSortField => $this->defaultSort
+            ];
+        }
 
         $this->_data->set('dataProvider',   $dataProvider);
         $this->_data->set('search',         $search);
@@ -46,7 +81,7 @@ class WidgetHasModels extends WidgetHasTemplate
     public function bind()
     {
         $this->buildSearch();
-        die;
+        $this->_data->search->search(\Yii::$app->request->queryParams);
         return $this;
     }
 

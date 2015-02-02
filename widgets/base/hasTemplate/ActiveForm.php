@@ -9,18 +9,20 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\widgets\base\hasTemplate;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormStyled;
 
 /**
  * Class ActiveForm
  * @package skeeks\cms\widgets\widgetHasTemplate
  */
-class ActiveForm extends \skeeks\cms\modules\admin\widgets\ActiveForm
+class ActiveForm extends ActiveFormStyled
 {
     /**
      * @param $model
      */
     public function templateElement($model)
     {
+        echo $this->fieldSet('Настройки отображения');
         echo $this->field($model, 'template')->label('Шаблон')->widget(
             \skeeks\widget\chosen\Chosen::className(),
             [
@@ -31,5 +33,6 @@ class ActiveForm extends \skeeks\cms\modules\admin\widgets\ActiveForm
                  ),
             ]
         );
+        echo $this->fieldSetEnd();
     }
 }

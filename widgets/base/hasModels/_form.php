@@ -14,20 +14,48 @@ use skeeks\cms\widgets\base\hasModels\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\WidgetConfig */
+
 \Yii::$app->registeredModels->getComponents()
 ?>
 <?php $form = ActiveForm::begin(); ?>
 <?= $form->templateElement($model); ?>
 
-<?= $form->field($model, 'modelClassName')->label('Модель (сущьность)')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-        'items'   => \yii\helpers\ArrayHelper::map(
-            \Yii::$app->registeredModels->getComponents(),
-            "id",
-             "name"
-        ),
-    ]);
-?>
+<?= $form->fieldSet('Выбор сущьности'); ?>
+    <?= $form->field($model, 'modelClassName')->label('Модель (сущьность)')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items'   => \yii\helpers\ArrayHelper::map(
+                \Yii::$app->registeredModels->getComponents(),
+                "id",
+                 "name"
+            ),
+        ]);
+    ?>
+<?= $form->fieldSetEnd()?>
+
+<?= $form->fieldSet('Сортировка'); ?>
+    <?= $form->field($model, 'sort')->label('Модель (сущьность)')->widget(
+        \skeeks\widget\chosen\Chosen::className(),
+        [
+            'items'   => \yii\helpers\ArrayHelper::map(
+                \Yii::$app->registeredModels->getComponents(),
+                "id",
+                 "name"
+            ),
+        ]);
+    ?>
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Фильтрация'); ?>
+    <?= $form->field($model, 'sort')->label('Модель (сущьность)')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items'   => \yii\helpers\ArrayHelper::map(
+                \Yii::$app->registeredModels->getComponents(),
+                "id",
+                 "name"
+            ),
+        ]);
+    ?>
+<?= $form->fieldSetEnd() ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

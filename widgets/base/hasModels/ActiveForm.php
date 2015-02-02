@@ -12,7 +12,7 @@ namespace skeeks\cms\widgets\base\hasModels;
 
 /**
  * Class ActiveForm
- * @package skeeks\cms\widgets\widgetHasTemplate
+ * @package skeeks\cms\widgets\base\hasModels
  */
 class ActiveForm extends \skeeks\cms\widgets\base\hasTemplate\ActiveForm
 {

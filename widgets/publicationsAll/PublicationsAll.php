@@ -14,6 +14,8 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\models\Publication;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
+use skeeks\cms\widgets\base\hasModels\WidgetHasModels;
+use skeeks\cms\widgets\base\hasModelsSmart\WidgetHasModelsSmart;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
 use yii\data\Pagination;
@@ -22,8 +24,10 @@ use yii\data\Pagination;
  * Class Publications
  * @package skeeks\cms\widgets\PublicationsAll
  */
-class PublicationsAll extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
+class PublicationsAll extends WidgetHasModelsSmart
 {
+    public $modelClassName          = '\skeeks\cms\models\Publication';
+
     /**
      * @var null|string
      */
@@ -31,8 +35,6 @@ class PublicationsAll extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemp
     public $types                   = [];
     public $statuses                = [];
     public $statusesAdults          = [];
-    public $limit                   = 0;
-    public $orderBy                 = null;
 
     /**
      * Подготовка данных для шаблона
@@ -40,14 +42,14 @@ class PublicationsAll extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemp
      */
     public function bind()
     {
-        //$search         = new Search(Publication::className());
-        //$dataProvider   = $search->search(\Yii::$app->request->queryParams);
+        $this->buildSearch();
+        $this->getSearch()->search(\Yii::$app->request->queryParams);
+        $dataProvider = $this->getSearch()->getDataProvider();
+        $find = $dataProvider->query;
 
-        $find = Publication::find();
-        //$find = $dataProvider->query;
+
 
         $tree = \Yii::$app->cms->getCurrentTree();
-
         if ($tree)
         {
             $ids[] = $tree->id;
@@ -66,18 +68,9 @@ class PublicationsAll extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemp
             {
                 $find->orWhere("(FIND_IN_SET ('{$id}', tree_ids) or tree_id = '{$id}')");
             }
-
         }
 
-        /*if ($this->limit)
-        {
-            $find->limit($this->limit);
-        }*/
 
-        if ($this->orderBy)
-        {
-            $find->orderBy($this->limit);
-        }
 
         if ($this->statuses)
         {
@@ -94,27 +87,23 @@ class PublicationsAll extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemp
             $find->andWhere(['type' => $this->types]);
         }
 
-        $find->andWhere(['<=', 'published_at', time()]);
-        $find->orderBy('published_at DESC');
 
-
-        $countQuery = clone $find;
-        $pages = new Pagination(['totalCount' => $countQuery->count()]);
-
-        if ($this->limit)
+        if ($this->createdBy)
         {
-            $pages->defaultPageSize = $this->limit;
+            $find->andWhere(['created_by' => $this->createdBy]);
         }
 
-        $models = $find->offset($pages->offset)
-                          ->limit($pages->limit)
-                          ->all();
 
-        $this->_data->set('models', $models);
-        $this->_data->set('pages', $pages);
+        if ($this->updatedBy)
+        {
+            $find->andWhere(['updated_by' => $this->updatedBy]);
+        }
 
         return $this;
     }
+
+
+
 
     /**
      * @return array|null|Tree
