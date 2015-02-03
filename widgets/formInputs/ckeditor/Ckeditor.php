@@ -37,12 +37,21 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
         $callback_images = $this->callbackImages;
 		$ar_files = array();
 
-		//TODO $callback_images instanceof \skeeks\cms\models
-		//TODO Реализовать для случая, когда $callback_images - не модель
-		if(is_object($callback_images))
+        $has_files_behavior = false;
+        $behavior_class = 'skeeks\cms\models\behaviors\HasFiles';
+        foreach ($callback_images->getBehaviors() as $behavior)
+        {
+            if ($behavior instanceof $behavior_class)
+            {
+                $has_files_behavior = true;
+            }
+        }
+
+		if($has_files_behavior)
 		{
-			$files = \skeeks\cms\models\StorageFile::find()->where(['linked_to_value' => $callback_images->id])->all();
-			foreach ($files as $file) {
+			//$files = \skeeks\cms\models\StorageFile::find()->where(['linked_to_value' => $callback_images->id])->all();
+            $files = $callback_images->getFiles()->where(['linked_to_value' => $callback_images->id, 'type' => 'image'])->all();
+            foreach ($files as $file) {
 				$ar_files[] = array(
 					$file["original_name"],
 					$file["src"]
@@ -50,8 +59,12 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
 			}
 		}
 
+        $bundle = Yii::$app->getAssetManager()->getBundle(Asset::className());
+        $icon = \Yii::$app->getAssetManager()->getAssetUrl($bundle, 'imageselect.png');
+
         $options = Json::encode([
-            'files' => $ar_files
+            'files' => $ar_files,
+            'icon' => $icon,
         ]);
 
         $this->getView()->registerJs(<<<JS
@@ -65,30 +78,22 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
                     {},
 
 
-                    marenovPlugin: function()
+                    imageselectPlugin: function()
                     {
                             var imgsel = CKEDITOR.plugins.get('imageselect');
                             var files = this.get('files');
-                            //console.log(imgsel);
+                            var icon = this.get('icon');
                             if(!imgsel) {
-                                files.unshift([ '- Не выбрано -', '' ]);
+                                files.unshift([ '- Не выбран -', '' ]);
                                 CKEDITOR.plugins.add('imageselect',
                                     {
                                         init: function (editor) {
                                             editor.addCommand('fileSelectDialog', new CKEDITOR.dialogCommand('fileSelectDialog' ));
-
-                                            /*var command = new CKEDITOR.command( editor, {
-                                                exec: function( editor ) {
-                                                    alert( editor.document.getBody().getHtml() );
-                                                }
-                                            } );*/
-
-                                            //editor.addCommand('fileSelectDialog', command );
                                             editor.ui.addButton('ImageSelect',
                                                 {
                                                     label: 'Выбрать привязанное изображение',
                                                     command: 'fileSelectDialog',
-                                                    //icon: scriptSource + '../images/imageselect.png'
+                                                    icon: icon
                                                 });
                                             CKEDITOR.dialog.add( 'fileSelectDialog', function( editor )
                                             {
@@ -110,7 +115,7 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
                                                                         {
                                                                             type : 'select',
                                                                             id : 'file',
-                                                                            label : 'Файл',
+                                                                            label : 'Файл:',
                                                                             items : files,
                                                                             commit : function( data )
                                                                             {
@@ -167,7 +172,7 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
                     _onDomReady: function()
                     {
                         var self = this;
-                        self.marenovPlugin();
+                        self.imageselectPlugin();
 
                     },
 
