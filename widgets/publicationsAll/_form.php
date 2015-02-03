@@ -10,62 +10,62 @@
  */
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\widgets\base\hasModelsSmart\ActiveForm;
 
 $tree = new \skeeks\cms\models\Tree();
 
 /* @var $this yii\web\View */
-/* @var $form yii\widgets\ActiveForm */
 /* @var $model \skeeks\cms\models\WidgetConfig */
-
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'template')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 $model->getWidgetDescriptor()->getTemplatesObject()->getComponents(),
-                 "id",
+
+<?= $form->standartElements($model, $model); ?>
+
+
+
+<?= $form->fieldSet('Дополнительные фильтры'); ?>
+    <?= $form->field($model, 'types')->label('Типы публикаций')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items'   => \yii\helpers\ArrayHelper::map(
+                (new \skeeks\cms\models\Publication())->getDescriptor()->getTypes()->getComponents(),
+                "id",
                  "name"
-             ),
-    ]);
-?>
+            ),
+            'multiple' => true,
+        ]);
+    ?>
+    <?= $form->field($model, 'statuses')->label('Статусы')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items' => $tree->getPossibleStatuses(),
+            'multiple' => true,
+        ]);
+    ?>
 
+    <?= $form->field($model, 'statusesAdult')->label('Возрсатные статусы')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items' => $tree->getPossibleAdultStatuses(),
+            'multiple' => true,
+        ]);
+    ?>
 
-<?= $form->field($model, 'title')->textInput(); ?>
+    <?= $form->field($model, 'createdBy')->label('Авторы')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items' => \yii\helpers\ArrayHelper::map(
+                \common\models\User::find()->all(),
+                'id',
+                'username'
+            ),
+            'multiple' => true,
+        ]);
+    ?>
+<?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet('Прочее'); ?>
+    <?= $form->field($model, 'title')->label('Заголовок')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
 
-
-
-<?= $form->field($model, 'limit')->textInput(); ?>
-
-<?= $form->field($model, 'types')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-        'items'   => \yii\helpers\ArrayHelper::map(
-            (new \skeeks\cms\models\Publication())->getDescriptor()->getTypes()->getComponents(),
-            "id",
-             "name"
-        ),
-        'multiple' => true,
-    ]);
-?>
-<?= $form->field($model, 'statuses')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-        'items' => $tree->getPossibleStatuses(),
-        'multiple' => true,
-    ]);
-?>
-
-<?= $form->field($model, 'statusesAdult')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-        'items' => $tree->getPossibleAdultStatuses(),
-        'multiple' => true,
-    ]);
-?>
-
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
+<?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
 

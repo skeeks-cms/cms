@@ -15,6 +15,7 @@ class m150121_273203_alter_table__cms_user extends Migration
 {
     public function up()
     {
+        \Yii::$app->db->getSchema()->refresh();
         $userTable = \Yii::$app->db->getTableSchema('{{%cms_user}}');
         if ($userTable->getColumn('count_vote'))
         {

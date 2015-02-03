@@ -14,7 +14,8 @@ use yii\grid\GridView;
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$dataProvider->query->orderBy('published_at DESC');
+$dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]])
+//$dataProvider->query->orderBy('published_at DESC');
 ?>
 
 <?= GridView::widget([

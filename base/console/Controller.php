@@ -56,4 +56,25 @@ class Controller extends YiiController
         $this->stdout("{$text}" . PHP_EOL);
         return $this;
     }
+
+    /**
+     * @param string $text
+     * @return $this
+     */
+    public function stdoutBlock($text = '')
+    {
+        $this->stdoutN('');
+        $this->stdout(" ****** {$text} *****" . PHP_EOL);
+        $this->stdoutN('');
+        return $this;
+    }
+
+    /**
+     * @param $cmd
+     */
+    public function systemCmd($cmd)
+    {
+        $this->stdoutN(' - system cmd: ' . $cmd);
+        system($cmd);
+    }
 }

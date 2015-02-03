@@ -37,12 +37,13 @@ class Module extends base\Module
     protected function _descriptor()
     {
         return array_merge(parent::_descriptor(), [
-            "version"               => "1.0.1",
+            "version"               => "1.0.2",
 
             "name"          => "SkeekS cms",
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
         ]);
     }
+
 
 
 }

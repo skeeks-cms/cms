@@ -10,34 +10,22 @@
  */
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\widgets\base\hasTemplate\ActiveForm;
 
 $tree = new \skeeks\cms\models\Tree();
 
 /* @var $this yii\web\View */
-/* @var $form yii\widgets\ActiveForm */
 /* @var $model \skeeks\cms\models\WidgetConfig */
 
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'template')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 $model->getWidgetDescriptor()->getTemplatesObject()->getComponents(),
-                 "id",
-                 "name"
-             ),
-    ]);
-?>
-
+<?= $form->templateElement($model); ?>
 
 <?= $form->field($model, 'title')->textInput(); ?>
 
 
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
+<?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
 

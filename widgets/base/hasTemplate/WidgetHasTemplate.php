@@ -9,7 +9,7 @@
  * @date 24.11.2014
  * @since 1.0.0
  */
-namespace skeeks\cms\widgets;
+namespace skeeks\cms\widgets\base\hasTemplate;
 
 use skeeks\cms\base\Widget;
 use skeeks\sx\Entity;
@@ -17,8 +17,8 @@ use Yii;
 use yii\base\Exception;
 
 /**
- * Class TreeChildrens
- * @package skeeks\cms\widgets\tree
+ * Class WidgetHasTemplate
+ * @package skeeks\cms\widgets\base\hasTemplate
  */
 abstract class WidgetHasTemplate extends Widget
 {
@@ -31,6 +31,7 @@ abstract class WidgetHasTemplate extends Widget
      * @var Entity
      */
     protected $_data = null;
+    protected $_binded = null;
 
     public function init()
     {
@@ -52,7 +53,12 @@ abstract class WidgetHasTemplate extends Widget
      */
     public function run()
     {
-        $this->bind();
+        if ($this->_binded === null)
+        {
+            $this->bind();
+            $this->_binded = true;
+        }
+
         $this->_data->set('widget', $this);
 
         $result = '';

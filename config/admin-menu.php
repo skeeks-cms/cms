@@ -159,12 +159,18 @@ return
 
     'dev' =>
     [
-        'label'     => 'Для разработчика',
+        'label'     => 'Система',
         'priority'  => 0,
         'enabled'   => true,
 
         'items' =>
         [
+            [
+                "label"     => "Информация",
+                "url"       => ["admin/info"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png'],
+            ],
+
             [
                 "label"     => "Читска временных данных",
                 "url"       => ["admin/clear"],

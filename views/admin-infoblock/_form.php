@@ -29,17 +29,4 @@ use skeeks\cms\models\Tree;
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
-<div class="well well-sm">
-    <h2>Немного информации</h2>
-    <p>Инфоблоки — промежуточное звено между виджетами и сайтом. Все виджеты поставляются различными модулями и дописываются в проекте.</p>
-    <p>Можете использовать подобную конструкцию в любом коде, для того чтобы отрисовать инфоблок</p>
-    <code>
-        Yii::$app->cms->widgetInfoblock('Уникальный код инфоблока или его id')
-    </code>
-    <p></p>
-    <!--<p>Для текущего блока:</p>
-    <p></p>
-    <code>
-        \Yii::$app->cms->widgetStaticBlock("уникальный код блока")
-    </code>-->
-</div>
+<?= $this->render('_about'); ?>

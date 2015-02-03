@@ -20,7 +20,7 @@ use Yii;
  * Class Breadcrumbs
  * @package skeeks\cms\widgets\breadcrumbs
  */
-class Breadcrumbs extends WidgetHasTemplate
+class Breadcrumbs extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
     /**
      * @var null|string

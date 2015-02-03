@@ -12,16 +12,22 @@ namespace skeeks\cms\widgets\publicationsAll;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\models\Publication;
+use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
+use skeeks\cms\widgets\base\hasModels\WidgetHasModels;
+use skeeks\cms\widgets\base\hasModelsSmart\WidgetHasModelsSmart;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
+use yii\data\Pagination;
 
 /**
  * Class Publications
  * @package skeeks\cms\widgets\PublicationsAll
  */
-class PublicationsAll extends WidgetHasTemplate
+class PublicationsAll extends WidgetHasModelsSmart
 {
+    public $modelClassName          = '\skeeks\cms\models\Publication';
+
     /**
      * @var null|string
      */
@@ -29,8 +35,6 @@ class PublicationsAll extends WidgetHasTemplate
     public $types                   = [];
     public $statuses                = [];
     public $statusesAdults          = [];
-    public $limit                   = 0;
-    public $orderBy                 = null;
 
     /**
      * Подготовка данных для шаблона
@@ -38,10 +42,14 @@ class PublicationsAll extends WidgetHasTemplate
      */
     public function bind()
     {
-        $find = Publication::find();
+        $this->buildSearch();
+        $this->getSearch()->search(\Yii::$app->request->queryParams);
+        $dataProvider = $this->getSearch()->getDataProvider();
+        $find = $dataProvider->query;
+
+
 
         $tree = \Yii::$app->cms->getCurrentTree();
-
         if ($tree)
         {
             $ids[] = $tree->id;
@@ -60,18 +68,9 @@ class PublicationsAll extends WidgetHasTemplate
             {
                 $find->orWhere("(FIND_IN_SET ('{$id}', tree_ids) or tree_id = '{$id}')");
             }
-
         }
 
-        if ($this->limit)
-        {
-            $find->limit($this->limit);
-        }
 
-        if ($this->orderBy)
-        {
-            $find->orderBy($this->limit);
-        }
 
         if ($this->statuses)
         {
@@ -88,13 +87,23 @@ class PublicationsAll extends WidgetHasTemplate
             $find->andWhere(['type' => $this->types]);
         }
 
-        $find->andWhere(['<=', 'published_at', time()]);
-        $find->orderBy('published_at DESC');
 
-        $this->_data->set('models', $find->all());
+        if ($this->createdBy)
+        {
+            $find->andWhere(['created_by' => $this->createdBy]);
+        }
+
+
+        if ($this->updatedBy)
+        {
+            $find->andWhere(['updated_by' => $this->updatedBy]);
+        }
 
         return $this;
     }
+
+
+
 
     /**
      * @return array|null|Tree

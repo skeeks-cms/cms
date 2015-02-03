@@ -57,27 +57,48 @@ class ClearController extends AdminController
         $clearDirs =
         [
             [
-                'label'     => 'Временные закрытые файлы',
+                'label'     => 'common временные файлы',
+                'dir'       => new Dir(\Yii::getAlias('@common/runtime'), false)
+            ],
+
+            [
+                'label'     => 'console временные файлы',
+                'dir'       => new Dir(\Yii::getAlias('@console/runtime'), false)
+            ],
+
+            [
+                'label'     => 'frontend временные файлы',
+                'dir'       => new Dir(\Yii::getAlias('@frontend/runtime'), false)
+            ],
+
+            [
+                'label'     => 'frontend2 временные файлы',
+                'dir'       => new Dir(\Yii::getAlias('@frontend2/runtime'), false)
+            ],
+
+
+            [
+                'label'     => 'runtime (текущий сайт)',
                 'dir'       => new Dir(\Yii::getAlias('@runtime'), false)
             ],
 
             [
-                'label'     => 'Файлы кэша',
+                'label'     => 'Файлы кэша (текущий сайт)',
                 'dir'       => new Dir(\Yii::getAlias('@runtime/cache'), false)
             ],
 
             [
-                'label'     => 'Файлы дебаг информации',
+                'label'     => 'Файлы дебаг информации (текущий сайт)',
                 'dir'       => new Dir(\Yii::getAlias('@runtime/debug'), false)
             ],
 
             [
-                'label'     => 'Файлы логов',
+                'label'     => 'Файлы логов (текущий сайт)',
                 'dir'       => new Dir(\Yii::getAlias('@runtime/logs'), false)
             ],
 
             [
-                'label'     => 'Временные js и css файлы',
+                'label'     => 'Временные js и css файлы (текущий сайт)',
                 'dir'       => new Dir(\Yii::getAlias('@app/web/assets'), false)
             ]
 
@@ -87,7 +108,6 @@ class ClearController extends AdminController
         {
             foreach ($clearDirs as $data)
             {
-
                 $dir = ArrayHelper::getValue($data, 'dir');
                 if ($dir instanceof Dir)
                 {
@@ -98,6 +118,8 @@ class ClearController extends AdminController
                     }
                 }
             }
+
+            \Yii::$app->cms->generateModulesConfigFile();
         }
 
         return $this->render('index', [

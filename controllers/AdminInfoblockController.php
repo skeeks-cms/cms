@@ -98,11 +98,16 @@ class AdminInfoblockController extends AdminModelEditorSmartController
                     'widget'    => $this->getCurrentModel()->getWidgetClassName(),
                     'config'    => $this->getCurrentModel()->getWidgetConfig()
                 ]);
+
+                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
             }
         }
 
-        return $this->output($this->getCurrentModel()->getRegisterdWidgetModel()->renderForm([
-            'model' => $widgetConfig
-        ]));
+        return $this->render('config', [
+            'model' => $widgetConfig,
+            'form' => $this->getCurrentModel()->getRegisterdWidgetModel()->renderForm([
+                'model' => $widgetConfig
+            ])
+        ]);
     }
 }
