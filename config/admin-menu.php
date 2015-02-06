@@ -54,6 +54,12 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png']
             ],
 
+            [
+                "label"     => "Файловый менеджер",
+                "url"       => ["cms/admin-file-manager/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+            ],
+
 
 
         ]

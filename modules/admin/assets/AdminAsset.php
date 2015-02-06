@@ -39,3 +39,4 @@ class AdminAsset extends AssetBundle
         '\skeeks\cms\modules\admin\assets\ThemeRealAdminAsset',
     ];
 }
+
