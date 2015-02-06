@@ -19,7 +19,7 @@ use Yii;
  * Class TreeFixed
  * @package skeeks\cms\widgets\treeFixed
  */
-class TreeFixed extends WidgetHasTemplate
+class TreeFixed extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
     /**
      * @var null|string

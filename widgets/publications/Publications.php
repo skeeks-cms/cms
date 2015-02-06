@@ -20,7 +20,7 @@ use Yii;
  * Class Publications
  * @package skeeks\cms\widgets\publications
  */
-class Publications extends WidgetHasTemplate
+class Publications extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
     /**
      * @var null|string

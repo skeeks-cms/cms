@@ -32,6 +32,7 @@ use yii\grid\GridView;
         'name',
         'code',
         'description',
+        'widget',
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
         //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],

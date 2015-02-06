@@ -19,7 +19,7 @@ use Yii;
  * Class TreeChildrens
  * @package skeeks\cms\widgets\tree
  */
-class TreeChildrens extends WidgetHasTemplate
+class TreeChildrens extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
     /**
      * @var null|string
