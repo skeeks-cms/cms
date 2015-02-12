@@ -11,7 +11,7 @@
 
 namespace skeeks\cms\components\imaging\filters;
 use yii\base\Component;
-use yii\imagine\Image;
+use skeeks\imagine\Image;
 
 /**
  * Class Filter
