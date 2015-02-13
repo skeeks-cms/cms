@@ -29,7 +29,7 @@ cd /var/www/sites/test.ru/
 php -r "readfile('https://getcomposer.org/installer');" | php
 
 # устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
-php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
+php composer.phar global require "fxp/composer-asset-plugin:1.0.0"
 
 # устанавливаем шаблон приложения skeeks-cms
 php composer.phar create-project skeeks/cms-app
@@ -48,7 +48,7 @@ cd /var/www/sites/test.ru/
 php -r "readfile('https://getcomposer.org/installer');" | php
 
 # устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
-php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
+php composer.phar global require "fxp/composer-asset-plugin:1.0.0"
 
 # устанавливаем шаблон приложения skeeks-cms
 php composer.phar create-project skeeks/cms-app
