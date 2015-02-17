@@ -323,7 +323,7 @@ class Tree
 
                                     Html::tag("div",
                                         <<<HTML
-                                        <a href="#" class="btn btn-xs" title="Создать подраздел"><span class="glyphicon glyphicon-plus"></span></a>
+                                        <a href="#" class="btn btn-xs add-tree-child" title="Создать подраздел" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
 HTML
                                     ,
                                         [
@@ -432,6 +432,54 @@ HTML
                         });
 
                         window.close();
+                        return false;
+                    });
+
+                    $('.add-tree-child').on('click', function()
+                    {
+                        var child_name = prompt("Введите название элемента");
+
+                        if (child_name != null)
+                        {
+                            var blocker = sx.block($(this));
+
+                            var ajax = sx.ajax.preparePostQuery(
+                                    "new-children",
+                                    {
+                                        "pid" : $(this).data('id'),
+                                        "Tree" : {"name" : child_name},
+                                        "no_redirect": true
+                                    }
+                            );
+
+                            new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+
+                            new sx.classes.AjaxHandlerNotify(ajax, {
+                                'error': "Изменения не сохранились",
+                                'success': "Изменения сохранены"
+                            }); //отключение глобального загрузчика
+
+                            ajax.onError(function(e, data)
+                            {
+                                sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                _.delay(function()
+                                {
+                                    window.location.reload();
+                                }, 2000);
+                            })
+                            .onSuccess(function(e, data)
+                            {
+                                blocker.unblock();
+
+                                sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                _.delay(function()
+                                {
+                                    window.location.reload();
+                                }, 2000);
+                            })
+                            .execute();
+                        }
+
                         return false;
                     });
                 },
