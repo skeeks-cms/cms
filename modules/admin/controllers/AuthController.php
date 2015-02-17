@@ -88,8 +88,11 @@ class AuthController extends AdminController
         ];
     }
 
+
     public function actionLogin()
     {
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/auth.php';
+
         if (!\Yii::$app->user->isGuest)
         {
             return $this->goHome();
