@@ -35,6 +35,7 @@ class PublicationsAll extends WidgetHasModelsSmart
     public $types                   = [];
     public $statuses                = [];
     public $statusesAdults          = [];
+    public $useCurrentTree          = true;
 
     /**
      * Подготовка данных для шаблона
@@ -48,27 +49,29 @@ class PublicationsAll extends WidgetHasModelsSmart
         $dataProvider = $this->getSearch()->getDataProvider();
         $find = $dataProvider->query;
 
-        $tree = \Yii::$app->cms->getCurrentTree();
-        if ($tree)
+        if ($this->useCurrentTree)
         {
-            $ids[] = $tree->id;
-            if ($tree->hasChildrens())
+            $tree = \Yii::$app->cms->getCurrentTree();
+            if ($tree)
             {
-                if ($childrens = $tree->fetchChildrens())
+                $ids[] = $tree->id;
+                if ($tree->hasChildrens())
                 {
-                    foreach ($childrens as $chidren)
+                    if ($childrens = $tree->fetchChildrens())
                     {
-                        $ids[] = $chidren->id;
+                        foreach ($childrens as $chidren)
+                        {
+                            $ids[] = $chidren->id;
+                        }
                     }
                 }
-            }
 
-            foreach ($ids as $id)
-            {
-                $find->orWhere("(FIND_IN_SET ('{$id}', tree_ids) or tree_id = '{$id}')");
+                foreach ($ids as $id)
+                {
+                    $find->orWhere("(FIND_IN_SET ('{$id}', tree_ids) or tree_id = '{$id}')");
+                }
             }
         }
-
 
 
         if ($this->statuses)

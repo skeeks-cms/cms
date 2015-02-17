@@ -25,7 +25,15 @@ $tree = new \skeeks\cms\models\Tree();
 
 
 <?= $form->fieldSet('Дополнительные фильтры'); ?>
-    <?= $form->field($model, 'types')->label('Типы публикаций')->widget(
+    <?= $form->field($model, 'useCurrentTree')->label('Показывать публикации привязанные к разделу, где находится пользователь')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items'   => [
+                '0' => 'нет',
+                '1' => 'да',
+            ]
+        ]);
+    ?>
+<?= $form->field($model, 'types')->label('Типы публикаций')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
             'items'   => \yii\helpers\ArrayHelper::map(
                 (new \skeeks\cms\models\Publication())->getDescriptor()->getTypes()->getComponents(),
