@@ -303,6 +303,10 @@ class Tree
                 }
             }
 
+            $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
+                             $model->createAbsoluteUrl(),
+                             ["target" => "_blank", "class" => "btn btn-xs", "title" => "Показать на сайте"]
+                    );
 
             return Html::tag("li",
                         Html::tag("div",
@@ -326,6 +330,13 @@ class Tree
                                         <a href="#" class="btn btn-xs add-tree-child" title="Создать подраздел" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
 HTML
                                     ,
+                                        [
+                                            "class" => "pull-left sx-controll-act"
+                                        ]
+
+                                    ) .
+
+                                    Html::tag("div", $link,
                                         [
                                             "class" => "pull-left sx-controll-act"
                                         ]
@@ -548,7 +559,7 @@ JS
 
     .sx-tree ul li.sx-tree-node .sx-controll-node
     {
-        width: 50px;
+        width: 80px;
         float: left;
         margin-left: 10px;
         padding-top: 2px;
