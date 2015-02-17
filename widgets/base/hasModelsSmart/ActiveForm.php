@@ -28,8 +28,21 @@ class ActiveForm extends \skeeks\cms\widgets\base\hasTemplate\ActiveForm
 
         $this->templateElement($model);
 
-        echo $this->fieldSet('Сортировка и количество записей на странице');
-            echo $this->field($model, 'defaultPageSize')->label('Количество записей на странице')->textInput();
+        echo $this->fieldSet('Настройки');
+            echo $this->field($model, 'applySearchParams')->label('Зависит от GET и POST параметров')->hint('Если да то записи будут фильтроваться согласно параметрам')->widget(
+            \skeeks\widget\chosen\Chosen::className(), [
+                'items'   => [
+                    '0' => 'нет',
+                    '1' => 'да',
+                ],
+            ]);
+            ;
+
+
+
+            echo $this->field($model, 'limit')->label('Максимальное количество записей')->hint('Если не будет указано будут выбраны все записи')->textInput();
+
+
             echo $this->field($model, 'defaultSortField')->label('По какому полю сортировать')->widget(
                 \skeeks\widget\chosen\Chosen::className(), [
                     'items'   => $entity->attributeLabels(),
@@ -42,8 +55,24 @@ class ActiveForm extends \skeeks\cms\widgets\base\hasTemplate\ActiveForm
                 ],
             ]);
 
-
-
         echo $this->fieldSetEnd();
+
+        echo $this->fieldSet('Настройки постраничной навигации');
+
+            echo $this->field($model, 'usePaging')->label('Включить постраничную навигацию')->hint('Если да то список публикаций можно показывать с постраничной навигацией')->widget(
+                \skeeks\widget\chosen\Chosen::className(), [
+                    'items'   => [
+                        '0' => 'нет',
+                        '1' => 'да',
+                    ],
+                ]);
+                ;
+
+            echo $this->field($model, 'defaultPageSize')->label('Количество записей на странице')->textInput();
+            echo $this->field($model, 'pageParam')->label('Название параметра')->textInput();
+        echo $this->fieldSetEnd();
+
     }
+
+
 }

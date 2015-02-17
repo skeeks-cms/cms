@@ -35,13 +35,22 @@ class WidgetHasModelsSmart extends WidgetHasModels
     public $updatedBy               = [];
 
     /**
+     * @var bool
+     */
+    public $applySearchParams       = 1;
+
+
+    /**
      * Подготовка данных для шаблона
      * @return $this
      */
     public function bind()
     {
         $this->buildSearch();
-        $this->_data->search->search(\Yii::$app->request->queryParams);
+        if ($this->applySearchParams)
+        {
+            $this->_data->search->search(\Yii::$app->request->queryParams);
+        }
         return $this;
     }
 

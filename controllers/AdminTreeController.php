@@ -104,17 +104,37 @@ class AdminTreeController extends AdminModelEditorSmartController
             else
             {
                 $childTree = new Tree();
-                $childTree->load(\Yii::$app->request->post());
+
+                if(!$parent)
+                {
+                    $parent = $childTree->find()->where(['id' => $post["pid"]])->one();
+                }
+
+                $childTree->load($post);
 
                 if(!$childTree->priority)
                 {
                     $childTree->priority = 0;
                 }
 
-                $parent->processAddNode($childTree);
+                $response = ['success' => false];
+
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+                if($parent && $parent->processAddNode($childTree))
+                {
+                    $response['success'] = true;
+                }
             }
 
-            $this->redirect(Url::to(["new-children", "id" => $parent->primaryKey]));
+            if(!$post["no_redirect"])
+            {
+                $this->redirect(Url::to(["new-children", "id" => $parent->primaryKey]));
+            }
+            else
+            {
+                return $response;
+            }
         }
         else
         {
