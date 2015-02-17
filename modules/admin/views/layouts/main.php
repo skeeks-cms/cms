@@ -33,7 +33,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 <?php $this->beginBody() ?>
 <div class="navbar" role="navigation">
     <div class="navbar-header">
-        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>Cms</span>', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
+        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>SkeekS Cms</span>', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
     </div>
 
     <? if (!$sidebarHidden): ?>

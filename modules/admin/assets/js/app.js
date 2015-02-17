@@ -146,11 +146,6 @@
 
         _onWindowReady: function()
         {
-            _.delay(function()
-            {
-                $(".windows8").fadeOut();
-                $(".sx-panel").fadeIn();
-            }, 100);
 
         },
 
@@ -171,6 +166,12 @@
 
 
             $(".sx-sidebar .scrollbar-macosx").scrollbar();
+
+            _.delay(function()
+            {
+                $(".windows8").fadeOut();
+                $(".sx-panel").fadeIn();
+            }, 100);
         },
 
         /**
