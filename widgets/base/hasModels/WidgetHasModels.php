@@ -32,6 +32,11 @@ class WidgetHasModels extends WidgetHasTemplate
 
     public $defaultPageSize         = 10;
 
+    public $usePaging               = 1;
+
+    public $limit                   = 0;
+    public $pageParam               = 'page';
+
     /**
      * @return string
      */
@@ -62,7 +67,16 @@ class WidgetHasModels extends WidgetHasTemplate
         $search         = new Search($modelClassName);
 
         $dataProvider = $search->getDataProvider();
-        $dataProvider->getPagination()->defaultPageSize = $this->defaultPageSize;
+
+        if ($this->usePaging)
+        {
+            $dataProvider->getPagination()->defaultPageSize = $this->defaultPageSize;
+            $dataProvider->getPagination()->pageParam = $this->pageParam;
+        } else
+        {
+            $dataProvider->pagination = false;
+        }
+
 
         if ($this->defaultSortField)
         {
@@ -71,8 +85,16 @@ class WidgetHasModels extends WidgetHasTemplate
             ];
         }
 
+
         $this->_data->set('dataProvider',   $dataProvider);
         $this->_data->set('search',         $search);
+
+        if ($this->limit)
+        {
+            $dataProvider = $this->getSearch()->getDataProvider();
+            $dataProvider->query->limit((int) $this->limit);
+        }
+
     }
     /**
      * Подготовка данных для шаблона

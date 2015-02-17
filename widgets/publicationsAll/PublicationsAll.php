@@ -42,12 +42,11 @@ class PublicationsAll extends WidgetHasModelsSmart
      */
     public function bind()
     {
-        $this->buildSearch();
-        $this->getSearch()->search(\Yii::$app->request->queryParams);
+        /*$this->buildSearch();
+        $this->getSearch()->search(\Yii::$app->request->queryParams);*/
+        parent::bind();
         $dataProvider = $this->getSearch()->getDataProvider();
         $find = $dataProvider->query;
-
-
 
         $tree = \Yii::$app->cms->getCurrentTree();
         if ($tree)
