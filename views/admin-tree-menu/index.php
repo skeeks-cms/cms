@@ -8,7 +8,7 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
-use yii\grid\GridView;
+use skeeks\cms\modules\admin\widgets\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\searchs\Game */

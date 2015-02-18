@@ -57,8 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;*/
  * @date 30.10.2014
  * @since 1.0.0
  */
-use yii\grid\GridView;
-
+use skeeks\cms\modules\admin\widgets\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
