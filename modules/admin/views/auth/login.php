@@ -138,6 +138,7 @@ $this->registerJs(<<<JS
                 });
 
                 this.JloginContainer = $('.sx-act-login');
+                this.JSuccessLoginContainer = $('.sx-act-successLogin');
                 this.JForgetContainer = $('.sx-act-forget');
             },
 
@@ -188,6 +189,38 @@ $this->registerJs(<<<JS
                     self.JForgetContainer.slideDown(500);
                 });
                 return this;
+            },
+
+            goActSuccessLogin: function()
+            {
+                var self = this;
+                $(".sx-act:visible").fadeOut(500, function()
+                {
+                    self.JSuccessLoginContainer.fadeIn(500);
+                });
+                return this;
+            },
+
+            loginnedSuccess: function(urlGo)
+            {
+                var self = this;
+
+                _.delay(function()
+                {
+                    $(".navbar").slideUp(800);
+                    $(".sx-admin-footer").slideUp(800);
+                }, 300);
+
+                _.delay(function()
+                {
+                    self.goActSuccessLogin();
+                }, 300);
+
+                _.delay(function()
+                {
+                    window.location.href = urlGo;
+                }, 3000);
+
             }
         });
 
@@ -218,6 +251,15 @@ JS
                                 'blockContainer'        => '.sx-panel'
                             ],
                         ]); ?>
+                            <? if (\Yii::$app->request->isAjax && $success) : ?>
+                                <? $this->registerJs(<<<JS
+                                (function(sx, $, _)
+                                {
+                                    sx.auth.loginnedSuccess('{$goUrl}');
+                                })(sx, sx.$, sx._);
+JS
+)?>
+                            <? endif;?>
                             <?= $form->field($model, 'username')->label('Логин'); ?>
                             <?= $form->field($model, 'password')->passwordInput()->label('Пароль') ?>
                                 <div class="form-group sx-submit-group">
@@ -231,6 +273,11 @@ JS
                                     </div>
                                 </div>
                         <?php ActiveForm::end(); ?>
+                    </div>
+
+                    <div class="sx-act sx-act-successLogin">
+                        <p class="sx-step sx-step-1">Авторизация прошла успешно</p>
+                        <p class="sx-step sx-step-2">Ожидайте сейчас все будет...</p>
                     </div>
 
                     <div class="sx-act sx-act-forget">
