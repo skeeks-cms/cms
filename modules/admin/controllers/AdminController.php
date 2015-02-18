@@ -127,9 +127,13 @@ abstract class AdminController extends Controller
      */
     protected function _beforeAction(ActionEvent $e)
     {
-        $this->_renderActions($e);
-        $this->_renderBreadcrumbs($e);
-        $this->_renderMetadata($e);
+        if (!\Yii::$app->request->isAjax)
+        {
+            $this->_renderActions($e);
+            $this->_renderBreadcrumbs($e);
+            $this->_renderMetadata($e);
+        }
+
     }
 
     /**

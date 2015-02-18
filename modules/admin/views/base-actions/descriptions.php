@@ -8,8 +8,12 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-
-<?php $form = ActiveForm::begin(); ?>
+<?php \yii\widgets\Pjax::begin([
+    'id' => 'my-pjax',
+]); ?>
+<?php $form = ActiveForm::begin([
+    'options' => ['data-pjax' => true]
+]); ?>
 
 <?= $form->field($model, 'description_full')->widget(
     //\skeeks\widget\ckeditor\CKEditor::className()
@@ -49,4 +53,6 @@ use yii\widgets\ActiveForm;
 </div>
 
 <?php ActiveForm::end(); ?>
+
+<?php \yii\widgets\Pjax::end(); ?>
 
