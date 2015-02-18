@@ -86,17 +86,28 @@ $this->registerJs(<<<JS
 
             _init: function()
             {
-
+                this.loader = new sx.classes.AjaxLoader();
+                this.blocker = new sx.classes.Blocker();
             },
 
             _onDomReady: function()
             {
-                console.log($(".sx-panel").width());
+                this.blocker = sx.block('html', {
+                    message: "<div style='padding: 10px;'><h2>Загрузка...</h2></div>",
+                    css: {
+                        "border-radius": "6px",
+                        "border-width": "3px",
+                        "border-color": "rgba(32, 168, 216, 0.25)",
+                        "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
+                    }
+                });
             },
 
             _onWindowReady: function()
             {
                 $("body").addClass('sx-styled');
+
+                this.blocker.unblock();
 
                 _.delay(function()
                 {
