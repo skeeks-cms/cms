@@ -188,6 +188,12 @@ return
                 "url"       => ["admin/db"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
             ],
+
+            [
+                "label"     => "Обновления",
+                "url"       => ["admin/update"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
+            ],
         ]
     ],
 
