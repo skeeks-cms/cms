@@ -98,21 +98,39 @@ class AuthController extends AdminController
             return $this->goHome();
         }
 
-        $model = new LoginForm();
-        if ($model->load(\Yii::$app->request->post()) && $model->login())
-        {
-            if ($ref = UrlHelper::getCurrent()->getRef())
-            {
-                return $this->redirect($ref);
-            } else
-            {
-                return $this->goBack();
-            }
+        $goUrl = "";
+        $success = false;
 
-        } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
+        $model = new LoginForm();
+        if (\Yii::$app->request->isPost)
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->login())
+            {
+                $success = true;
+
+                if ($ref = UrlHelper::getCurrent()->getRef())
+                {
+                    $goUrl = $ref;
+                } else
+                {
+                    $goUrl = Yii::$app->getUser()->getReturnUrl($defaultUrl);
+                }
+
+                if (\Yii::$app->request->isAjax)
+                {
+
+                } else
+                {
+                    return $this->redirect($goUrl);
+                }
+            }
         }
+
+
+        return $this->render('login', [
+            'model' => $model,
+            'goUrl' => $goUrl,
+            'success' => $success
+        ]);
     }
 }

@@ -11,7 +11,7 @@
 
 .sx-tree ul li.sx-tree-node.open > .row > .sx-label-node
 {
-    background: url("../images/ico-folder-open-blue.png") no-repeat 2px 5px;
+    background: url("../images/ico-folder-open-blue.png") no-repeat 2px 3px;
 }
 
 .sx-tree ul li.sx-tree-node .row
