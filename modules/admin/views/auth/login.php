@@ -92,6 +92,7 @@ $this->registerJs(<<<JS
 
             _onDomReady: function()
             {
+                var self = this;
                 this.blocker = sx.block('html', {
                     message: "<div style='padding: 10px;'><h2>Загрузка...</h2></div>",
                     css: {
@@ -101,6 +102,26 @@ $this->registerJs(<<<JS
                         "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
                     }
                 });
+
+                this.blockerPanel = new sx.classes.Blocker('.sx-panel', {
+                    message: "<div style='padding: 10px;'><h2>Загрузка...</h2></div>",
+                    css: {
+                        "border-radius": "6px",
+                        "border-width": "1px",
+                        "border-color": "rgba(32, 168, 216, 0.25)",
+                        "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
+                    }
+                });
+
+                //TODO: плохое решение, временное.
+                $(document)
+                    .bind(sx.ajax.ajaxStart, function(e, data){
+                        self.blockerPanel.block();
+                    })
+                    .bind(sx.ajax.ajaxStop, function(e, data){
+                        self.blockerPanel.unblock();
+                    })
+                ;
             },
 
             _onWindowReady: function()
