@@ -113,7 +113,7 @@ $this->registerJs(<<<JS
                     }
                 });
 
-                //TODO: плохое решение, временное.
+                //TODO: плохое решение, временное. Но пусть будет... красиво же )
                 $(document)
                     .bind(sx.ajax.ajaxStart, function(e, data){
                         self.blockerPanel.block();
