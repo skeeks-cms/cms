@@ -190,6 +190,7 @@ $config =
                             'name'      => 'Корень (robots.txt тут)'
                         ],
 
+
                         [
                             'path'  => 'uploads/inbox',
                             'name'  => 'Общие расшаренные файлы'

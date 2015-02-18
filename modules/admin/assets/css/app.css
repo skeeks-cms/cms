@@ -140,6 +140,12 @@ body.sidebar-hidden footer.sx-admin-footer
         line-height: normal;
     }
 
+    form.sx-form-admin
+    {
+        border: 1px solid rgba(32, 168, 216, 0.23);
+        padding: 10px;
+    }
+
         .sx-panel .breadcrumb>.active
         {
             color: #ffffff;

@@ -50,13 +50,13 @@ return
 
             [
                 "label"     => "Публикации",
-                "url"       => ["cms/admin-publication/index"],
+                "url"       => ["cms/admin-publication"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png']
             ],
 
             [
                 "label"     => "Файловый менеджер",
-                "url"       => ["cms/admin-file-manager/index"],
+                "url"       => ["cms/admin-file-manager"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
 

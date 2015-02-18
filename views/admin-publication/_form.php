@@ -3,18 +3,13 @@
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 use skeeks\cms\models\Tree;
+use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
 ?>
 
-<?php \yii\widgets\Pjax::begin([
-    'id' => 'my-pjax',
-]); ?>
-
-    <?php $form = ActiveForm::begin([
-        'options' => ['data-pjax' => true]
-]); ?>
+<?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
@@ -45,39 +40,8 @@ use skeeks\cms\models\Tree;
     <?= $form->buttonsCreateOrUpdate($model); ?>
 
 
+<?php ActiveForm::end(); ?>
 
-    <?php ActiveForm::end(); ?>
-<? if ($notify): ?>
-    <?  $type = $notify[0];?>
-    <?  $message = $notify[1];?>
-    <? \Yii::$app->view->registerJs(<<<JS
-        (function(sx, $, _)
-        {
-            sx.notify.$type("$message");
-        })(sx, sx.$, sx._);
-JS
-    );
-    ?>
-<? endif; ?>
 
-<? \Yii::$app->view->registerJs(<<<JS
-        (function(sx, $, _)
-        {
-            var blockerPanel = new sx.classes.Blocker('.sx-panel');
 
-            $(document).on('pjax:send', function(e)
-            {
-                var blockerPanel = new sx.classes.Blocker($(e.target));
-                blockerPanel.block();
-            })
 
-            $(document).on('pjax:complete', function(e) {
-                blockerPanel.unblock();
-            })
-
-        })(sx, sx.$, sx._);
-JS
-    );
-    ?>
-
-<?php \yii\widgets\Pjax::end(); ?>

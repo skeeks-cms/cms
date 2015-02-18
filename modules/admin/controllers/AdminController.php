@@ -129,10 +129,12 @@ abstract class AdminController extends Controller
     {
         if (!\Yii::$app->request->isAjax)
         {
-            $this->_renderActions($e);
-            $this->_renderBreadcrumbs($e);
+
             $this->_renderMetadata($e);
         }
+
+        $this->_renderActions($e);
+        $this->_renderBreadcrumbs($e);
 
     }
 
@@ -221,6 +223,9 @@ abstract class AdminController extends Controller
     {
         return $this->redirect(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString());
     }
+
+
+
 
 
 

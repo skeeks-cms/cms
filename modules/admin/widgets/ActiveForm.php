@@ -13,7 +13,9 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use skeeks\cms\modules\admin\widgets\Pjax;
 
 /**
  * Class ActiveForm
@@ -21,6 +23,62 @@ use yii\helpers\Html;
  */
 class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 {
+    /**
+     * @var bool
+     */
+    public $usePjax = true;
+    /**
+     * @var array
+     */
+    public $PjaxOptions = [];
+
+    /**
+     * Initializes the widget.
+     * This renders the form open tag.
+     */
+    public function init()
+    {
+        $this->options = ArrayHelper::merge($this->options, [
+            'class' => 'sx-form-admin'
+        ]);
+
+        if ($this->usePjax)
+        {
+            Pjax::begin(ArrayHelper::merge([
+                'id' => 'sx-pjax',
+            ], $this->PjaxOptions));
+
+            $this->options = ArrayHelper::merge($this->options, [
+                'data-pjax' => true
+            ]);
+
+            echo \skeeks\cms\modules\admin\widgets\Alert::widget();
+        }
+
+        parent::init();
+    }
+
+    public function run()
+    {
+        /*$js = <<<JS
+        // get the form id and set the event
+        $('#{$this->id}').on('beforeSubmit', function(e) {
+           alert('111');
+        }).on('submit', function(e){
+            alert('222');
+        });
+JS;
+        $this->view->registerJs($js);*/
+
+        parent::run();
+
+        if ($this->usePjax)
+        {
+            Pjax::end();
+        }
+    }
+
+
     /**
      * @param Model $model
      * @return string

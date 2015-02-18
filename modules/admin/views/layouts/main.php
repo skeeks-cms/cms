@@ -211,13 +211,13 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 <div class="main">
 
-
+<?php /*\yii\widgets\Pjax::begin([
+    'id' => 'sx-pjax-global',
+    'linkSelector' => 'body a',
+]); */?>
 
     <div class="col-lg-12">
-
-
         <div class="panel panel-primary sx-panel">
-
             <div class="panel-heading sx-no-icon">
                 <h2>
                     <?= Breadcrumbs::widget([
@@ -229,13 +229,9 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                     ]) ?>
                 </h2>
                 <div class="panel-actions">
-
                 </div>
-
             </div><!-- End .panel-heading -->
-
             <div class="panel-body">
-
                     <div class="panel-content-before">
                         <?= $this->params['actions'] ?>
                         <?/*= Alert::widget() */?>
@@ -244,13 +240,12 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                         <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
                         <?= $content ?>
                     </div><!-- End .panel-body -->
-
-
             </div><!-- End .panel-body -->
         </div><!-- End .widget -->
 
     </div><!-- End .col-lg-12  -->
 
+    <?php /*\yii\widgets\Pjax::end(); */?>
 
 </div>
 

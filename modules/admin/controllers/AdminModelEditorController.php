@@ -517,25 +517,22 @@ class AdminModelEditorController extends AdminController
             {
                 \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 //return $this->redirectRefresh();
-                $notify = ['success', 'Успешно сохранено'];
                 //return $this->redirectRefresh();
                 //print_r(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString() . '&asdasdasd');die;
 
 
             } else
             {
-                if (\Yii::$app->request->isPost)
-                {
-                    //\Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-                    $notify = ['error', 'Не удалось сохранить'];
-                }
+                //if (\Yii::$app->request->isPost)
+                //{
+                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                //}
             }
 
             try
             {
                 return $this->render('_form', [
                     'model'     => $model,
-                    'notify'    => $notify,
                 ]);
 
             } catch (InvalidParamException $e)
