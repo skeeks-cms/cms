@@ -54,6 +54,8 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                 </li>
             </ul>
         </li>
+        <? else: ?>
+            <a href="/">Перейти на сайт &rarr;</a>
         <? endif; ?>
     </ul>
 </div>

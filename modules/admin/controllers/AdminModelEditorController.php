@@ -463,9 +463,18 @@ class AdminModelEditorController extends AdminController
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
-            return $this->redirect(
-                UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
-            );
+
+            //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', '/?aaa');
+            if (\Yii::$app->request->isAjax)
+            {
+                \Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
+            } else
+            {
+                return $this->redirect(
+                    UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
+                );
+            }
+
         } else
         {
             if (\Yii::$app->request->isPost)
@@ -502,22 +511,28 @@ class AdminModelEditorController extends AdminController
     {
         $model = $this->getCurrentModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        if (\Yii::$app->request->isAjax)
         {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirectRefresh();
-        } else
-        {
-
-            if (\Yii::$app->request->isPost)
+            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                //return $this->redirectRefresh();
+                //return $this->redirectRefresh();
+                //print_r(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString() . '&asdasdasd');die;
+
+
+            } else
+            {
+                //if (\Yii::$app->request->isPost)
+                //{
+                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                //}
             }
 
             try
             {
                 return $this->render('_form', [
-                    'model' => $model,
+                    'model'     => $model,
                 ]);
 
             } catch (InvalidParamException $e)
@@ -529,6 +544,39 @@ class AdminModelEditorController extends AdminController
                 );
 
                 return $this->output($output);
+            }
+
+
+        } else
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+            {
+                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                return $this->redirectRefresh();
+            } else
+            {
+
+                if (\Yii::$app->request->isPost)
+                {
+                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                }
+
+                try
+                {
+                    return $this->render('_form', [
+                        'model' => $model,
+                    ]);
+
+                } catch (InvalidParamException $e)
+                {
+                    $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
+                        [
+                            'model' => $model,
+                        ]
+                    );
+
+                    return $this->output($output);
+                }
             }
         }
     }

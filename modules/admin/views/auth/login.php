@@ -48,6 +48,7 @@ $this->registerCss(<<<CSS
             border-width: 3px;
             border-color: rgba(32, 168, 216, 0.25);
             box-shadow: 0 11px 51px 9px rgba(0,0,0,.55);
+            padding: 10px;
         }
 
         .sx-auth form input
@@ -75,6 +76,29 @@ $this->registerCss(<<<CSS
     {
         display: none;
     }
+
+    form.sx-form-admin
+    {
+        border: none;
+        padding: 0px;
+    }
+
+    .sx-act
+    {
+        display: none;
+    }
+
+    .sx-act-controll
+    {
+        border-bottom: 1px dashed;
+        text-decoration: none;
+    }
+
+    .sx-act-controll:hover
+    {
+        border-bottom: 1px dashed;
+        text-decoration: none;
+    }
 CSS
 );
 $this->registerJs(<<<JS
@@ -86,17 +110,43 @@ $this->registerJs(<<<JS
 
             _init: function()
             {
-
+                this.loader = new sx.classes.AjaxLoader();
+                this.blocker = new sx.classes.Blocker();
             },
 
             _onDomReady: function()
             {
-                console.log($(".sx-panel").width());
+                var self = this;
+                this.blockerHtml = sx.block('html', {
+                    message: "<div style='padding: 10px;'><h2>Загрузка...</h2></div>",
+                    css: {
+                        "border-radius": "6px",
+                        "border-width": "3px",
+                        "border-color": "rgba(32, 168, 216, 0.25)",
+                        "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
+                    }
+                });
+
+                this.blockerLogin = new sx.classes.Blocker('.sx-panel', {
+                    message: "<div style='padding: 10px;'><h2>Загрузка...</h2></div>",
+                    css: {
+                        "border-radius": "6px",
+                        "border-width": "1px",
+                        "border-color": "rgba(32, 168, 216, 0.25)",
+                        "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
+                    }
+                });
+
+                this.JloginContainer = $('.sx-act-login');
+                this.JForgetContainer = $('.sx-act-forget');
             },
 
             _onWindowReady: function()
             {
+                var self = this;
                 $("body").addClass('sx-styled');
+
+                this.blockerHtml.unblock();
 
                 _.delay(function()
                 {
@@ -105,12 +155,43 @@ $this->registerJs(<<<JS
 
                 _.delay(function()
                 {
+                    self.JloginContainer.fadeIn();
+                }, 500);
+
+                _.delay(function()
+                {
                     $('.navbar, .sx-admin-footer').addClass('op-05').fadeIn();
                 }, 1000);
+            },
+
+            closeAllActs: function()
+            {
+                $(".sx-act").fadeOut();
+                return this;
+            },
+
+            goActLogin: function()
+            {
+                var self = this;
+                $(".sx-act:visible").slideUp(200, function()
+                {
+                    self.JloginContainer.slideDown(500);
+                });
+                return this;
+            },
+
+            goActForget: function()
+            {
+                var self = this;
+                $(".sx-act:visible").slideUp(200, function()
+                {
+                    self.JForgetContainer.slideDown(500);
+                });
+                return this;
             }
         });
 
-        new sx.classes.Auth({
+        sx.auth = new sx.classes.Auth({
             'bg': '{$urlBg}'
         });
     })(sx, sx.$, sx._);
@@ -125,46 +206,65 @@ JS
 
     <div class="col-lg-4">
         <div class="panel panel-primary sx-panel">
-
             <div class="panel-body">
                 <div class="panel-content">
 
-                    <div class="site-login" style="padding: 20px;">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <?php \yii\widgets\Pjax::begin(['id' => 'my-pjax']); ?>
-                                    <?php $form = ActiveForm::begin([
-                                        'id' => 'login-form',
-                                        'options' => ['data-pjax' => true]
-                                    ]); ?>
-                                        <?= $form->field($model, 'username')->label('Логин'); ?>
-                                        <?= $form->field($model, 'password')->passwordInput()->label('Пароль') ?>
+                    <div class="sx-act sx-act-login">
+                        <?php $form = ActiveForm::begin([
+                            'id' => 'login-form',
+                            'PjaxOptions' =>
+                            [
+                                'blockPjaxContainer'   => false,
+                                'blockContainer'        => '.sx-panel'
+                            ],
+                        ]); ?>
+                            <?= $form->field($model, 'username')->label('Логин'); ?>
+                            <?= $form->field($model, 'password')->passwordInput()->label('Пароль') ?>
+                                <div class="form-group sx-submit-group">
+                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> Войти", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                                </div>
 
-                                        <div class="form-group sx-submit-group">
-                                            <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> Войти", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-                                        </div>
-
-                                        <div class="sx-hidden">
-                                            <hr />
-                                            <div style="color:#999;margin:1em 0">
-                                                Если вы забыли пароль, обратитесь к администратору сайта, или разработчикам. В целях безопастности, мы не даем возможности автоматического восстановления пароля.
-                                            </div>
-                                        </div>
-                                    <?php ActiveForm::end(); ?>
-                                <?php \yii\widgets\Pjax::end(); ?>
-                            </div>
-
-                            <!--Или социальные сети
-                            --><?/*= yii\authclient\widgets\AuthChoice::widget([
-                                 'baseAuthUrl' => ['site/auth']
-                            ]) */?>
-                        </div>
+                                <div class="sx-hidden1">
+                                    <hr />
+                                    <div style="color:#999;margin:1em 0">
+                                        Данная опция пока не работает, но она будет тут: <a href="#" class="sx-act-controll" onclick="sx.auth.goActForget(); return false;">восстановить пароль</a>
+                                    </div>
+                                </div>
+                        <?php ActiveForm::end(); ?>
                     </div>
 
+                    <div class="sx-act sx-act-forget">
+                        <?php $form = ActiveForm::begin([
+                            'id' => 'forget-form',
+                            'PjaxOptions' =>
+                            [
+                                'blockPjaxContainer'   => false,
+                                'blockContainer'        => '.sx-panel-login'
+                            ],
+                        ]); ?>
+                            <?= $form->field($model, 'username')->label('Логин'); ?>
+                            <p style="text-align: center;">Или</p>
+                            <?= $form->field($model, 'username')->label('Логин'); ?>
+                                <div class="form-group sx-submit-group">
+                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> Восстановить пароль", [
+                                        'class' => 'btn btn-primary',
+                                        'name' => 'login-button',
+                                        'onclick' => 'sx.notify.info("Не нажимайте пока меня, я еще не работаю )"); return false;'
+                                    ]) ?>
+                                </div>
 
-                </div><!-- End .panel-body -->
-            </div><!-- End .panel-body -->
-        </div><!-- End .widget -->
+                                <div class="sx-hidden1">
+                                    <hr />
+                                    <div style="color:#999;margin:1em 0">
+                                        Я вспомнил пароль <a href="#" class="sx-act-controll" onclick="sx.auth.goActLogin(); return false;">авторизоваться</a>
+                                    </div>
+                                </div>
+
+                        <?php ActiveForm::end(); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div><!-- End .col-lg-12  -->
 

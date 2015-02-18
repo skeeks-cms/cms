@@ -162,10 +162,10 @@ class AdminTreeController extends AdminModelEditorSmartController
         $tree = new Tree();
         $models = $tree->findRoots()->all();
 
-        $widget = \skeeks\cms\modules\admin\widgets\Tree::begin([
-            "models" => $models
+
+        return $this->render('index', [
+            'models' => $models
         ]);
-        return $this->output($widget->run());
     }
 
 

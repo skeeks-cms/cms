@@ -511,7 +511,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
     public function actionSystem()
     {
-        $model = $this->getModel();
+        /*$model = $this->getModel();
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
@@ -522,7 +522,31 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/system.php", [
                 "model" => $this->getModel()
             ]));
+        }*/
+
+
+
+        $model = $this->getModel();
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        {
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            if (!\Yii::$app->request->isAjax)
+            {
+                return $this->redirectRefresh();
+            }
+
+        } else
+        {
+            if (\Yii::$app->request->isPost)
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
         }
+
+        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/system.php", [
+            "model" => $this->getModel()
+        ]));
     }
 
     /*public function actionAuthor()
@@ -626,13 +650,23 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
-            return $this->redirectRefresh();
+            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            if (!\Yii::$app->request->isAjax)
+            {
+                return $this->redirectRefresh();
+            }
+
         } else
         {
-            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/descriptions.php", [
-                "model" => $this->getModel()
-            ]));
+            if (\Yii::$app->request->isPost)
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
         }
+
+        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/descriptions.php", [
+            "model" => $this->getModel()
+        ]));
     }
 
 

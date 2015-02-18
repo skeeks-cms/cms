@@ -1,15 +1,13 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\base\db\ActiveRecord */
-/* @var $form yii\widgets\ActiveForm */
 ?>
 
-
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = ActiveForm::begin([]); ?>
 
 <?= $form->field($model, 'description_full')->widget(
     //\skeeks\widget\ckeditor\CKEditor::className()
@@ -43,10 +41,8 @@ use yii\widgets\ActiveForm;
 
 
 
-
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-primary']) ?>
-</div>
+<?= $form->buttonsCreateOrUpdate($model); ?>
 
 <?php ActiveForm::end(); ?>
+
 

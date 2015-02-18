@@ -29,7 +29,6 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 <body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?>">
 
 
-
 <?php $this->beginBody() ?>
 <div class="navbar" role="navigation">
     <div class="navbar-header">
@@ -179,7 +178,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                                     <? foreach ($itemsGroup as $itemData) : ?>
                                         <? if (\yii\helpers\ArrayHelper::getValue($itemData, 'enabled' , true) === true) : ?>
                                             <li <?= strpos('-' . \Yii::$app->controller->route, $itemData["url"][0]) ? 'class="active"' : '' ?>>
-                                                <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#">
+                                                <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#" class="sx-test">
                                                     <? if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : ?>
                                                         <? list($assetClassName, $localPath) = $imgData; ?>
                                                         <span class="sx-icon">
@@ -212,13 +211,13 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 <div class="main">
 
-
+<?php /*\yii\widgets\Pjax::begin([
+    'id' => 'sx-pjax-global',
+    'linkSelector' => 'body a',
+]); */?>
 
     <div class="col-lg-12">
-
-
         <div class="panel panel-primary sx-panel">
-
             <div class="panel-heading sx-no-icon">
                 <h2>
                     <?= Breadcrumbs::widget([
@@ -230,26 +229,23 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                     ]) ?>
                 </h2>
                 <div class="panel-actions">
-
                 </div>
-
             </div><!-- End .panel-heading -->
-
             <div class="panel-body">
-                <div class="panel-content-before">
-                    <?= $this->params['actions'] ?>
-                    <?/*= Alert::widget() */?>
-                </div>
-                <div class="panel-content">
-                    <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
-                    <?= $content ?>
-                </div><!-- End .panel-body -->
+                    <div class="panel-content-before">
+                        <?= $this->params['actions'] ?>
+                        <?/*= Alert::widget() */?>
+                    </div>
+                    <div class="panel-content">
+                        <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
+                        <?= $content ?>
+                    </div><!-- End .panel-body -->
             </div><!-- End .panel-body -->
         </div><!-- End .widget -->
 
     </div><!-- End .col-lg-12  -->
 
-
+    <?php /*\yii\widgets\Pjax::end(); */?>
 
 </div>
 

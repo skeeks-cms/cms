@@ -129,7 +129,7 @@ body.sidebar-hidden footer.sx-admin-footer
 .sx-panel
 {
     box-shadow: 1px 7px 16px rgba(0, 0, 0, 0.42);
-    display: none;
+    //display: none;
     margin-bottom: 60px;
 }
 
@@ -138,6 +138,12 @@ body.sidebar-hidden footer.sx-admin-footer
         height: auto;
         padding: 8px 15px;
         line-height: normal;
+    }
+
+    form.sx-form-admin
+    {
+        border: 1px solid rgba(32, 168, 216, 0.23);
+        padding: 10px;
     }
 
         .sx-panel .breadcrumb>.active

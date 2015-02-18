@@ -48,7 +48,10 @@ class Cms extends \skeeks\cms\base\Component
          * */
         \Yii::$app->view->on(View::EVENT_END_PAGE, function(Event $e)
         {
-            \Yii::$app->seoGenerator->generateBeforeOutputPage($e->sender);
+            if (!\Yii::$app->request->isAjax)
+            {
+                \Yii::$app->seoGenerator->generateBeforeOutputPage($e->sender);
+            }
         });
     }
 

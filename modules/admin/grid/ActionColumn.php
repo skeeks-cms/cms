@@ -57,9 +57,9 @@ class ActionColumn extends DataColumn
         $controller = clone $this->controller;
         $controller->setModel($model);
 
-        return DropdownControllerActions::begin([
+        return DropdownControllerActions::widget([
                     "controller"    => $controller,
                     "isOpenNewWindow"    => $this->isOpenNewWindow,
-                ])->run();
+                ]);
     }
 }

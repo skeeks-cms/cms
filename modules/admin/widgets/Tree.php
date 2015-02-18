@@ -320,10 +320,10 @@ class Tree
                             ) .
 
                             Html::tag("div",
-                                    DropdownControllerActions::begin([
+                                    DropdownControllerActions::widget([
                                         "controller"    => $controller,
                                         "containerClass"     => "dropdown pull-left"
-                                    ])->run() .
+                                    ]) .
 
                                     Html::tag("div",
                                         <<<HTML

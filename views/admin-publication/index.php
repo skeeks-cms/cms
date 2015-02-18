@@ -17,6 +17,9 @@ use yii\grid\GridView;
 $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]])
 //$dataProvider->query->orderBy('published_at DESC');
 ?>
+<?php \yii\widgets\Pjax::begin([
+    'id' => 'sx-pjax',
+]); ?>
 
 <?= GridView::widget([
     'dataProvider'  => $dataProvider,
@@ -81,3 +84,24 @@ $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]])
         ],
     ],
 ]); ?>
+
+<? $this->registerJs(<<<JS
+        (function(sx, $, _)
+        {
+            var blockerPanel = new sx.classes.Blocker('.sx-panel');
+
+            $(document).on('pjax:send', function(e)
+            {
+                var blockerPanel = new sx.classes.Blocker($(e.target));
+                blockerPanel.block();
+            })
+
+            $(document).on('pjax:complete', function(e) {
+                blockerPanel.unblock();
+            })
+
+        })(sx, sx.$, sx._);
+JS
+    );
+    ?>
+<?php \yii\widgets\Pjax::end(); ?>
