@@ -5,13 +5,13 @@
 
 .sx-tree ul li.sx-tree-node .row .sx-label-node
 {
-    background: url("../images/ico_folder.gif") no-repeat 2px 5px;
+    background: url("../images/ico-folder-blue.png") no-repeat 2px 3px;
     padding-top: 2px;
 }
 
 .sx-tree ul li.sx-tree-node.open > .row > .sx-label-node
 {
-    background: url("../images/ico_folder_open.gif") no-repeat 2px 5px;
+    background: url("../images/ico-folder-open-blue.png") no-repeat 2px 5px;
 }
 
 .sx-tree ul li.sx-tree-node .row
