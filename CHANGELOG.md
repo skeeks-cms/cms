@@ -3,6 +3,7 @@ Updates to the development of the project
 
 1.0.4
 -----------------
+  * ajax grgids
   * ajax авторизация
   * ajax отправка форм по умолчанию
   * ajax дерево разделов

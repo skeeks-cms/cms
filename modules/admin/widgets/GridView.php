@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\modules\admin\widgets;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Pjax
@@ -17,5 +18,32 @@ namespace skeeks\cms\modules\admin\widgets;
  */
 class GridView extends \yii\grid\GridView
 {
+    /**
+     * @var bool
+     */
+    public $usePjax = true;
+    /**
+     * @var array
+     */
+    public $PjaxOptions = [];
 
+    /**
+     * Runs the widget.
+     */
+    public function run()
+    {
+        if ($this->usePjax) {
+            Pjax::begin(ArrayHelper::merge([
+                'id' => 'sx-pjax-grid-' . $this->id,
+            ], $this->PjaxOptions));
+
+        }
+
+        parent::run();
+
+        if ($this->usePjax)
+        {
+            Pjax::end();
+        }
+    }
 }
