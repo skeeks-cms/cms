@@ -18,6 +18,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
+        "fxp/composer-asset-plugin": "1.0.0",
         "yiisoft/yii2": "*",
         "yiisoft/yii2-jui": "*",
         "yiisoft/yii2-bootstrap": "*",
