@@ -57,8 +57,8 @@ php composer.phar create-project skeeks/cms-app
 
 
 #TODO: Довести до ума временно
-COMPOSER_HOME=.composer php composer.phar global require "fxp/composer-asset-plugin:1.0.0"
-COMPOSER_HOME=.composer php composer.phar install
+COMPOSER_HOME=.composer php composer.phar global require "fxp/composer-asset-plugin:1.0.0" --profile
+COMPOSER_HOME=.composer php composer.phar install --profile
 
 
 
