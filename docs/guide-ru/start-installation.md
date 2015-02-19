@@ -33,37 +33,9 @@ php composer.phar global require "fxp/composer-asset-plugin:1.0.0"
 
 # устанавливаем шаблон приложения skeeks-cms
 php composer.phar create-project skeeks/cms-app
-~~~
 
-
-### - Установка с использованием только Composer
-
-Вы можете установить приложение с помощью следующих команд (необходим доступ по ssh):
-
-~~~
-# перейти в папку своего проекта
-cd /var/www/sites/test.ru/
-
-# установка composer (если уже установлен пропускаем этот шаг). Так же следует учесть чтобы в пхп был включен модуль phar 
-php -r "readfile('https://getcomposer.org/installer');" | php
-
-# устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
-php composer.phar global require "fxp/composer-asset-plugin:1.0.0"
-
-# устанавливаем шаблон приложения skeeks-cms
-php composer.phar create-project skeeks/cms-app
-
-
-
-
-#TODO: Довести до ума временно
-COMPOSER_HOME=.composer php composer.phar global require "fxp/composer-asset-plugin:1.0.0" --profile
-COMPOSER_HOME=.composer php composer.phar install --profile
-
-
-
-# Если делали под другим пользователем
-chown -R www-data:www-data ../
+# финал
+php init install --env=auto //или --env=dev .... и.д. auto будет использовать getenv();
 ~~~
 
 
@@ -80,19 +52,10 @@ cd /var/www/sites/test.ru/
 git clone http://git.skeeks.com/skeeks/cms-app.git
 
 # переключаемся на релизную ветку (стабилная версия проекта)
-git checkout origin/master
+git checkout origin/release
 
-# установка composer (если уже установлен пропускаем этот шаг). Так же следует учесть чтобы в пхп был включен модуль phar 
-php -r "readfile('https://getcomposer.org/installer');" | php
-
-# устанавливаем composer-asset-plugin глобально. Это нужно сделать один раз.
-php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
-
-# запускаем установку cms и всех необходимых зависимостей
-php composer.phar install
-
-# Если делали под другим пользователем
-chown -R www-data:www-data ../
+# финал
+php init install --env=auto //или --env=dev .... и.д. auto будет использовать getenv();
 ~~~
 
 ### - Установка используя FTP (пока невозможно)
@@ -101,9 +64,7 @@ chown -R www-data:www-data ../
 
 2) заливаем все файлы на FTP
 
-Далее необходимо установить композер, и запустить установку через композер
-
-TODO: необходимо доработать этот момент, чтобы можно было запускать через браузер все это дело.
+Открываем сайт в браузере
 
 
 2) Базовое конфигурирование проекта
