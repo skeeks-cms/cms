@@ -38,6 +38,13 @@
         "kartik-v/yii2-widget-datetimepicker": "*",
         "mihaildev/yii2-elfinder": "*"
     },
+    "minimum-stability": "dev",
+    "extra": {
+        "asset-installer-paths": {
+            "npm-asset-library": "vendor/npm",
+            "bower-asset-library": "vendor/bower"
+        }
+    },
     "autoload": {
         "psr-4": {
             "skeeks\\cms\\": ""
