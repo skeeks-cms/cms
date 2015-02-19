@@ -88,14 +88,7 @@ class UpdateController extends Controller
 
         $dir = new Dir(\Yii::getAlias('@frontend/runtime'));
         $dir->clear();
-
-        $dir = new Dir(\Yii::getAlias('@frontend2/runtime'));
-        $dir->clear();
-
         $dir = new Dir(\Yii::getAlias('@frontend/web/assets'));
-        $dir->clear();
-
-        return $this;$dir = new Dir(\Yii::getAlias('@frontend2/web/assets'));
         $dir->clear();
 
         return $this;
@@ -105,7 +98,7 @@ class UpdateController extends Controller
     {
         $this->stdoutBlock("Update migrations");
 
-        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations" ;
+        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations --interactive=false" ;
         $this->systemCmd($cmd);
 
         foreach (\Yii::$app->extensions as $code => $data)
@@ -114,7 +107,7 @@ class UpdateController extends Controller
             {
                 foreach ($data['alias'] as $code => $path)
                 {
-                    $cmd = "php yii migrate --migrationPath=" . $path . '/migrations' ;
+                    $cmd = "php yii migrate --migrationPath=" . $path . '/migrations  --interactive=false' ;
                     $this->systemCmd($cmd);
                 }
             }
