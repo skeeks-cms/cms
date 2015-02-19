@@ -71,10 +71,6 @@ class ClearController extends AdminController
                 'dir'       => new Dir(\Yii::getAlias('@frontend/runtime'), false)
             ],
 
-            [
-                'label'     => 'frontend2 временные файлы',
-                'dir'       => new Dir(\Yii::getAlias('@frontend2/runtime'), false)
-            ],
 
 
             [
