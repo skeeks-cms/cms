@@ -98,7 +98,7 @@ class UpdateController extends Controller
     {
         $this->stdoutBlock("Update migrations");
 
-        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations --interactive=false" ;
+        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations --interactive=0" ;
         $this->systemCmd($cmd);
 
         foreach (\Yii::$app->extensions as $code => $data)
@@ -107,7 +107,7 @@ class UpdateController extends Controller
             {
                 foreach ($data['alias'] as $code => $path)
                 {
-                    $cmd = "php yii migrate --migrationPath=" . $path . '/migrations  --interactive=false' ;
+                    $cmd = "php yii migrate --migrationPath=" . $path . '/migrations  --interactive=0' ;
                     $this->systemCmd($cmd);
                 }
             }

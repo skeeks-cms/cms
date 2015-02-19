@@ -16,8 +16,8 @@
 ### - Установка с использованием Git репозитория (необходим доступ по ssh)
 
 ~~~
-# клонирование проекта из git репозитория
-git clone http://git.skeeks.com/skeeks/cms-app.git
+# клонирование проекта из git репозитория (вы находитесь уже в папке с проектом)
+git clone http://git.skeeks.com/skeeks/cms-app.git ./
 
 # переключаемся на релизную ветку (стабилная версия проекта)
 git checkout origin/release
