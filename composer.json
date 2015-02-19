@@ -28,7 +28,7 @@
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
         "skeeks/yii2-imagine": "*",
-        "skeeks/yii2-sx": ">=1.0.0",
+        "skeeks/yii2-sx": ">=1.0.5",
         "skeeks/yii2-widget-simpleajaxuploader": "*",
         "skeeks/yii2-widget-ckeditor": "*",
         "skeeks/yii2-widget-chosen": "*",
