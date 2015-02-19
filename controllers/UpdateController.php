@@ -31,11 +31,11 @@ class UpdateController extends Controller
     {
         $this->stdoutBlock("Cms project updater");
 
-        $this->systemCmd("rm -f " . \Yii::getAlias('@root/composer.lock'));
+        //$this->systemCmd("rm -f " . \Yii::getAlias('@root/composer.lock'));
 
         $this
-            ->actionComposer()
-            ->actionUpdate()
+            //->actionComposer()
+            //->actionUpdate()
             ->actionMigration()
             ->actionClearRuntime()
             ->actionGenerateModulesConfigFile()
@@ -46,8 +46,8 @@ class UpdateController extends Controller
 
 
 
-        $this->stdoutBlock("Update chmods");
-        $this->systemCmd("chown -R www-data:www-data " . \Yii::getAlias('@root'));
+        //$this->stdoutBlock("Update chmods");
+        //$this->systemCmd("chown -R www-data:www-data " . \Yii::getAlias('@root'));
     }
 
 
