@@ -305,7 +305,7 @@ class Tree
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
                              $model->createAbsoluteUrl(),
-                             ["target" => "_blank", "class" => "btn btn-xs", "title" => "Показать на сайте"]
+                             ["target" => "_blank", "class" => "btn btn-xs show-at-site", "title" => "Показать на сайте"]
                     );
 
             return Html::tag("li",
@@ -490,6 +490,13 @@ HTML
                             })
                             .execute();
                         }
+
+                        return false;
+                    });
+
+                    $('.show-at-site').on('click', function()
+                    {
+                        window.open($(this).attr('href'));
 
                         return false;
                     });
