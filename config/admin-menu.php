@@ -192,7 +192,13 @@ return
             [
                 "label"     => "Обновления",
                 "url"       => ["admin/update"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update.png'],
+            ],
+
+            [
+                "label"     => "Ssh console",
+                "url"       => ["admin/ssh"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
             ],
         ]
     ],
