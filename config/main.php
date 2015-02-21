@@ -149,7 +149,6 @@ $config =
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
-            'tmpModulesConfigFile'          => Yii::getAlias('@common/runtime/auto-generated-config.php'),
         ],
 
         'imaging' =>

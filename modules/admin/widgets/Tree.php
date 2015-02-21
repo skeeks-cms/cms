@@ -284,6 +284,9 @@ class Tree
                     'onclick'   => 'location.href="' . $link . '"'
                 ]);
 
+            } else
+            {
+                $controllElement = '';
             }
 
 

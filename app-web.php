@@ -10,32 +10,11 @@
  */
 //Определение всех неопределенных необходимых констант
 require(__DIR__ . '/global.php');
-//Загрузка
-require(__DIR__ . '/bootstrap.php');
+//Стандартный загрузчик конфигов
+$config = require(__DIR__ . '/bootstrap.php');
 
-/*$config = coreIncludeConfigs([
+//$config->appendDependency(Yii::getVersion()); //Так можно подмешать чего либо к сбросу кэша
 
-]);*/
-$confCommonEnv = [];
-if (file_exists(COMMON_ENV_CONFIG_DIR . '/main.php'))
-{
-    $confCommonEnv = require(COMMON_ENV_CONFIG_DIR . '/main.php');
-}
-
-$confAppEnv = [];
-if (file_exists(APP_ENV_CONFIG_DIR . '/main.php'))
-{
-    $confAppEnv = require(APP_ENV_CONFIG_DIR . '/main.php');
-}
-
-$config = yii\helpers\ArrayHelper::merge(
-    require(COMMON_CONFIG_DIR . '/main.php'), //common общий
-    $confCommonEnv,                                     //common для текущего окружения
-    require(APP_CONFIG_DIR . '/main.php'),           //app общий
-    $confAppEnv                                         //app для текущего окружения
-);
-
-
-$application = new yii\web\Application($config);
+$application = new yii\web\Application($config->getResult());
 $application->run();
 

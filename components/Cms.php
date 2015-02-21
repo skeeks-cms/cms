@@ -36,7 +36,6 @@ use yii\web\View;
 class Cms extends \skeeks\cms\base\Component
 {
     public $staticKeySold = '';
-    public $tmpModulesConfigFile;
 
 
     public function init()
@@ -230,9 +229,9 @@ class Cms extends \skeeks\cms\base\Component
         if ($this->_staticKey === null)
         {
             $fileConfigSold = '';
-            if (file_exists((string) $this->tmpModulesConfigFile))
+            if (file_exists(TMP_AUTO_GENERATE_MODULES))
             {
-                $fileConfigSold = filemtime((string) $this->tmpModulesConfigFile);
+                $fileConfigSold = filemtime((string) TMP_AUTO_GENERATE_MODULES);
             }
 
             $this->_staticKey = md5(implode('', [
@@ -327,7 +326,7 @@ PHP;
             }
             $fileContent .= '];';
 
-            $file = new File((string) $this->tmpModulesConfigFile);
+            $file = new File(TMP_AUTO_GENERATE_MODULES);
             $file->write($fileContent);
         }
 
