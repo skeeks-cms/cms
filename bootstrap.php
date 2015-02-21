@@ -17,8 +17,8 @@ require(APP_CONFIG_DIR . '/bootstrap.php');
 $config = new \skeeks\cms\Config([SKEEKS_CONFIG_DIR . '/main.php']); //добавлены пути к конфигам cms
 //Автоматически созданный файл, хранит пути к конфигам всех модулей
 $modulesConfigFiles = [];
-if (file_exists(TMP_AUTO_GENERATE_MODULES)) {
-    $modulesConfigFiles = include TMP_AUTO_GENERATE_MODULES;
+if (file_exists(AUTO_GENERATED_MODULES_FILE)) {
+    $modulesConfigFiles = include AUTO_GENERATED_MODULES_FILE;
 }
 
 $config->appendFiles($modulesConfigFiles); //добавлены пути к конфигам всех файлов
@@ -36,5 +36,6 @@ $config->name       = 'Standart all config';
 
 $config->appendDependency(Yii::getVersion());
 $config->appendDependency(filemtime(COMMON_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
+$config->appendDependency(APP_DIR); //кэш будет сбрасываться при редактировании файла с общим конфигом
 
 return $config;

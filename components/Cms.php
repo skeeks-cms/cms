@@ -229,9 +229,9 @@ class Cms extends \skeeks\cms\base\Component
         if ($this->_staticKey === null)
         {
             $fileConfigSold = '';
-            if (file_exists(TMP_AUTO_GENERATE_MODULES))
+            if (file_exists(AUTO_GENERATED_MODULES_FILE))
             {
-                $fileConfigSold = filemtime((string) TMP_AUTO_GENERATE_MODULES);
+                $fileConfigSold = filemtime((string) AUTO_GENERATED_MODULES_FILE);
             }
 
             $this->_staticKey = md5(implode('', [
@@ -326,7 +326,7 @@ PHP;
             }
             $fileContent .= '];';
 
-            $file = new File(TMP_AUTO_GENERATE_MODULES);
+            $file = new File(AUTO_GENERATED_MODULES_FILE);
             $file->write($fileContent);
         }
 

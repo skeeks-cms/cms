@@ -16,9 +16,9 @@ $included   = [];
 //Текущий модуль cms его конфиги
 $included[] = __DIR__ . '/main.php';
 //Автоматическое подключение модулей. Можно отключить эту штуку. Перекрыть ниже по совему.
-if (file_exists(TMP_AUTO_GENERATE_MODULES))
+if (file_exists(AUTO_GENERATED_MODULES_FILE))
 {
-    $enableFiles = include TMP_AUTO_GENERATE_MODULES;
+    $enableFiles = include AUTO_GENERATED_MODULES_FILE;
     $enableFiles = array_unique($enableFiles);
 
     if (is_array($enableFiles))
