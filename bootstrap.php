@@ -43,6 +43,6 @@ $config->cache      = CONFIG_CACHE;
 $config->appendDependency(Yii::getVersion());
 $config->appendDependency(filemtime(COMMON_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(APP_DIR); //кэш будет сбрасываться при редактировании файла с общим конфигом
-$config->appendDependency((int) ENABLE_MODULES_CONF); //кэш будет сбрасываться при включении и отключении модульных конфигов
+//$config->appendDependency((int) ENABLE_MODULES_CONF); //кэш будет сбрасываться при включении и отключении модульных конфигов
 
 return $config;

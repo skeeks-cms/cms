@@ -68,8 +68,9 @@ class Config
     public function getCacheKey()
     {
         return $this->name . '__' . md5(
-            implode("", (array) $this->cacheDependency) .
-            implode("", (array) $this->files)
+            implode("", (array) $this->cacheDependency)
+            //TODO: подумать
+            //implode("", (array) $this->files)
         ) . '.cache.conf';
     }
 
@@ -86,7 +87,8 @@ class Config
      */
     public function cacheIsAllow()
     {
-        return (bool) ($this->cache && $this->cacheDir);
+        $isAllow = (bool) ($this->cache && $this->cacheDir);
+        return $isAllow;
     }
 
     /**
@@ -114,6 +116,7 @@ class Config
     public function saveCache()
     {
         \Yii::beginProfile('save cache: ' . $this->name);
+        \Yii::trace('save cache ' . $this->name . ' file: ' . $this->getCacheFile());
             $file = fopen($this->getCacheFile(), "w");
             fwrite($file, serialize($this->result));
             fclose($file);
@@ -139,9 +142,11 @@ class Config
 
         if ($this->result === null)
         {
+            \Yii::trace('cache allow ' . $this->name . ': ' . (int) $this->cacheIsAllow());
             //Разрешено использовать кэш
             if ($this->cacheIsAllow())
             {
+                \Yii::trace('cache read ' . $this->name . ' : ' . $this->getCacheFile());
                 $this->result = $this->readCache();
 
             } else
