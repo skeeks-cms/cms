@@ -67,7 +67,10 @@ class Config
      */
     public function getCacheKey()
     {
-        return $this->name . '__' . md5(implode("", (array) $this->cacheDependency)) . '.cache.conf';
+        return $this->name . '__' . md5(
+            implode("", (array) $this->cacheDependency) .
+            implode("", (array) $this->files)
+        ) . '.cache.conf';
     }
 
     /**

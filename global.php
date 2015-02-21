@@ -49,5 +49,7 @@ defined('CONFIG_CACHE') or define("CONFIG_CACHE", true);
 //Временный файл, в котором храняться пути к подключенным модулям
 defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", COMMON_RUNTIME_DIR . '/auto-generated-config.php' );
 
+//Включить в конфиги, мерж конфигов всех модулей
+defined('ENABLE_MODULES_CONF') or define('ENABLE_MODULES_CONF', true);
 //Определение всех неопределенных необходимых констант
 require(SKEEKS_DIR . '/config/global.php');
