@@ -1,6 +1,6 @@
 <?php
 /**
- * Запуск веб приложения
+ * Запуск console приложения
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
@@ -12,8 +12,10 @@
 defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
-defined('ENABLE_MODULES_CONF') or define('ENABLE_MODULES_CONF', false);
+//defined('ENABLE_MODULES_CONF') or define('ENABLE_MODULES_CONF', false);
 defined('CONFIG_CACHE') or define('CONFIG_CACHE', false);
+
+defined('APP_TYPE') or define('APP_TYPE', 'console');
 
 //Определение всех неопределенных необходимых констант
 require(__DIR__ . '/global.php');

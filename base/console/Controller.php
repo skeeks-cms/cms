@@ -23,7 +23,6 @@ class Controller extends YiiController
     public function init()
     {
         parent::init();
-        $this->startTool();
     }
 
     /**

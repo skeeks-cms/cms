@@ -37,6 +37,7 @@ defined('APP_DIR') or die('Please specify the constant "APP_DIR" in index.php in
 //Корень запущеного приложения
 defined('APP_CONFIG_DIR') or die('Please specify the constant "APP_CONFIG_DIR" in index.php in your application.');
 
+defined('APP_TYPE') or define('APP_TYPE', 'web');
 
 defined('COMMON_DIR') or define('COMMON_DIR', ROOT_DIR . '/common');
 defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', COMMON_DIR . '/config');
