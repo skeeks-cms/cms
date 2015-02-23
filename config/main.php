@@ -19,7 +19,7 @@ $config =
     'components' => [
 
         'user' => [
-            'class'         => \yii\web\User::className(),
+            'class'         => '\yii\web\User',
             'identityClass' => 'skeeks\cms\models\User',
             'enableAutoLogin' => true,
         ],
@@ -54,7 +54,7 @@ $config =
         ],
 
         'authManager' => [
-            'class' => skeeks\cms\rbac\DbManager::className(),
+            'class' => '\skeeks\cms\rbac\DbManager',
         ],
 
         'urlManager' => [
@@ -98,7 +98,7 @@ $config =
         //Админское меню
         'adminMenu' =>
         [
-            'class' => \skeeks\cms\modules\admin\components\Menu::className(),
+            'class' => '\skeeks\cms\modules\admin\components\Menu',
             'groups' => include_once 'admin-menu.php'
         ],
 
@@ -117,7 +117,7 @@ $config =
 
         'seoGenerator' =>
         [
-            'class' => \skeeks\cms\components\SeoGenerator::className()
+            'class' => '\skeeks\cms\components\SeoGenerator'
         ],
 
         //Глобальные опции страниц
@@ -149,7 +149,6 @@ $config =
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
-            'tmpModulesConfigFile'          => Yii::getAlias('@common/runtime/auto-generated-config.php'),
         ],
 
         'imaging' =>

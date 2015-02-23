@@ -121,15 +121,24 @@ class Tree extends PageAdvanced
     public function createUrl()
     {
         $sites = Site::getAllKeyTreeId();
+        $site = '';
         if ($this->isRoot())
         {
-            $site = $sites[$this->id];
+            if (isset($sites[$this->getPidMain()]))
+            {
+                $site = $sites[$this->id];
+            }
         } else
         {
-            $site = $sites[$this->getPidMain()];
+            if (isset($sites[$this->getPidMain()]))
+            {
+                $site = $sites[$this->getPidMain()];
+            }
+
         }
 
-        if ($site) {
+        if ($site)
+        {
             if ($this->getDir()) {
 
                 return $site->getBaseUrl() . DIRECTORY_SEPARATOR . $this->getDir() . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');

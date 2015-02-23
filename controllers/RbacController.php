@@ -20,6 +20,13 @@ use skeeks\cms\rbac\AuthorRule;
 use Yii;
 use yii\helpers\Console;
 
+/**
+ * Настройка прав доступа
+ *
+ *
+ * Class RbacController
+ * @package skeeks\cms\controllers
+ */
 class RbacController extends Controller
 {
     public function actionInit()

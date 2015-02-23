@@ -36,7 +36,6 @@ use yii\web\View;
 class Cms extends \skeeks\cms\base\Component
 {
     public $staticKeySold = '';
-    public $tmpModulesConfigFile;
 
 
     public function init()
@@ -230,9 +229,9 @@ class Cms extends \skeeks\cms\base\Component
         if ($this->_staticKey === null)
         {
             $fileConfigSold = '';
-            if (file_exists((string) $this->tmpModulesConfigFile))
+            if (file_exists(AUTO_GENERATED_MODULES_FILE))
             {
-                $fileConfigSold = filemtime((string) $this->tmpModulesConfigFile);
+                $fileConfigSold = filemtime((string) AUTO_GENERATED_MODULES_FILE);
             }
 
             $this->_staticKey = md5(implode('', [
@@ -272,13 +271,26 @@ class Cms extends \skeeks\cms\base\Component
         return $this->_tree;
     }
 
+
     /**
-     * Пройтись по всем расширениям уставноленным в проект, и сгенерировать конфиг файл.
-     * @return $this
+     *
+     * Взять все установленные расширения, и вернуть пути к конфигам
+     *
+     * @param string|array $fileName
+     * @return array
      */
-    public function generateModulesConfigFile()
+    public function findConfigFiles($fileName = '/config/main.php')
     {
         $config     = [];
+
+        $fileNames = [];
+        if (is_string($fileName))
+        {
+            $fileNames[] = $fileName;
+        } else if (is_array($fileName))
+        {
+            $fileNames = $fileName;
+        }
 
         foreach ((array) \Yii::$app->extensions as $code => $data)
         {
@@ -288,22 +300,30 @@ class Cms extends \skeeks\cms\base\Component
 
                 foreach ($data['alias'] as $code => $path)
                 {
-                    $file = new \skeeks\sx\File($path . '/configs/main.php');
-                    if ($file->isExist())
+                    foreach ($fileNames as $fileName)
                     {
-                        $config[] = $file->getPath();
-                    }
-                    $file = new \skeeks\sx\File($path . '/config/main.php');
-                    if ($file->isExist())
-                    {
-                        $config[] = $file->getPath();
+                        $file = new \skeeks\sx\File($path . $fileName);
+                        if ($file->isExist())
+                        {
+                            $config[] = $file->getPath();
+                        }
                     }
                 }
             }
         }
 
+        return $config;
+    }
+    /**
+     * Пройтись по всем расширениям уставноленным в проект, и сгенерировать конфиг файл.
+     * @return $this
+     */
+    public function generateModulesConfigFile()
+    {
+        $configs            = $this->findConfigFiles(['/config/main.php']);
+        $configsConsole     = $this->findConfigFiles(['/config/main-console.php']);
 
-        if ($config)
+        if ($configs || $configsConsole)
         {
 
             $date = date("dd.mm.YY", time());
@@ -321,13 +341,25 @@ class Cms extends \skeeks\cms\base\Component
  return [
 
 PHP;
-            foreach ($config as $filePach)
+            $fileContent .= "'web' => [\n";
+
+            foreach ($configs as $filePach)
             {
                 $fileContent .= "\"" . $filePach . "\", \n";
             }
-            $fileContent .= '];';
+            $fileContent .= "],\n";
 
-            $file = new File((string) $this->tmpModulesConfigFile);
+            $fileContent .= "'console' => [\n";
+
+            foreach ($configsConsole as $filePach)
+            {
+                $fileContent .= "\"" . $filePach . "\", \n";
+            }
+            $fileContent .= "]\n";
+
+$fileContent .= '];';
+
+            $file = new File(AUTO_GENERATED_MODULES_FILE);
             $file->write($fileContent);
         }
 
