@@ -22,8 +22,8 @@ git clone http://git.skeeks.com/skeeks/cms-app.git ./
 # переключаемся на релизную ветку (стабилная версия проекта)
 git checkout origin/release
 
-# запускаем полный процесс установки
-php init install --env=auto //или --env=dev .... и.д. auto будет использовать getenv();
+# запускаем полный процесс установки (php init help)
+php init install --autoremove --unlock
 ~~~
 
 ### - Установка через composer (необходим доступ по ssh):
@@ -39,8 +39,8 @@ php composer.phar global require "fxp/composer-asset-plugin:1.0.0"
 # устанавливаем шаблон приложения skeeks-cms
 php composer.phar create-project skeeks/cms-app
 
-# финал
-php init install --env=auto //или --env=dev .... и.д. auto будет использовать getenv();
+# запускаем полный процесс установки (php init help)
+php init install --autoremove --unlock
 ~~~
 
 
