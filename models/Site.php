@@ -83,6 +83,17 @@ class Site extends Core
         ]);
     }
 
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = ['host_name'];
+        $scenarios['update'] = ['host_name'];
+
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -90,10 +101,21 @@ class Site extends Core
     {
         return array_merge(parent::rules(), [
             [['host_name', 'cms_tree_id'], 'required'],
+            [['host_name'], 'validateHost'],
             [['host_name'], 'unique'],
             [['description', 'name', 'host_name'], 'string'],
             [['params'], 'safe'],
         ]);
+    }
+
+
+
+    public function validateHost($attribute)
+    {
+        if(!preg_match('/^[а-яa-z0-9.]{3,255}$/', $this->$attribute))
+        {
+            $this->addError($attribute, 'Используйте только буквы в нижнем регистре и цифры. Пример site.ru (3-255 символов)');
+        }
     }
 
 
@@ -104,8 +126,8 @@ class Site extends Core
     {
         return  array_merge(parent::attributeLabels(), [
             'id' => Yii::t('app', 'ID'),
-            'host_name' => Yii::t('app', 'Host Name'),
-            'description' => Yii::t('app', 'Description'),
+            'host_name' => 'Название хоста (домена)',
+            'description' => "Описание",
             'name' => Yii::t('app', 'Name'),
             'params' => Yii::t('app', 'Params'),
             'cms_tree_id' => Yii::t('app', 'Tree Id'),
