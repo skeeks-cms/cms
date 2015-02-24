@@ -15,9 +15,14 @@ use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\user\UserEmail;
+use skeeks\sx\validate\Validate;
 use Yii;
+use yii\base\ErrorException;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
+use yii\validators\EmailValidator;
 use yii\web\IdentityInterface;
 
 use skeeks\cms\models\behaviors\HasSubscribes;
@@ -75,6 +80,44 @@ class User
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        parent::init();
+
+        //$this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, "checkEmailBeforeInstert"]);
+        //$this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, "checkEmail"]);
+    }
+
+
+    public function checkEmailBeforeInstert()
+    {
+        if ($this->email)
+        {
+            $email = UserEmail::find()->where(["value" => $this->email]);
+            if ($email)
+            {
+                throw new ErrorException("Этот email уже занят");
+            }
+
+            $email = new UserEmail([
+                'value' => $this->email
+            ]);
+
+            if (!$email->save())
+            {
+                throw new ErrorException("Email не удалось добавить");
+            };
+        }
+
+        //$this->oldAttributes['email'];
+        //die;
+    }
+
+
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
@@ -89,7 +132,7 @@ class User
                 [
                     "image" =>
                     [
-                        'name'      => 'Главное изображение',
+                        'name'      => 'Аватар',
                         'config'    =>
                         [
                             HasFiles::MAX_SIZE            => 1*2048, //1Mb
@@ -125,6 +168,14 @@ class User
         ]);
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['create'] = ['username'];
+        $scenarios['update'] = ['username'];
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -137,15 +188,25 @@ class User
             ['role', 'default', 'value' => self::ROLE_USER],
             ['role', 'in', 'range' => [self::ROLE_USER]],
 
-            ['username', 'string', 'min' => 3, 'max' => 12],
-
-            [['username', 'auth_key', 'password_hash', 'email'], 'required'],
+            [['username', 'auth_key', 'password_hash'], 'required'],
             [['role', 'status', 'created_at', 'updated_at', 'group_id'], 'integer'],
             [['info', 'gender', 'status_of_life'], 'string'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address', 'email'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
+
+            [['username'], 'required'],
+            ['username', 'string', 'min' => 3, 'max' => 12],
             [['username'], 'unique'],
+            [['username'], 'validateLogin'],
         ];
+    }
+
+    public function validateLogin($attribute)
+    {
+        if(!preg_match('/^[a-z]{1}[a-z0-1]{2,11}$/', $this->$attribute))
+        {
+            $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример demo1.');
+        }
     }
 
 

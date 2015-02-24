@@ -58,6 +58,16 @@ class StaticBlock extends Core
         ]);
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = ['code', 'name'];
+        $scenarios['update'] = ['code', 'name'];
+
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -65,10 +75,19 @@ class StaticBlock extends Core
     {
         return array_merge(parent::rules(), [
             [['code'], 'required'],
+            [['code'], 'validateCode'],
             [['description'], 'string'],
             [['code'], 'unique'],
             [["images", "files", "image_cover", "image", 'value', 'multiValue'], 'safe'],
         ]);
+    }
+
+    public function validateCode($attribute)
+    {
+        if(!preg_match('/^[a-z]{1}[a-z0-1]{2,11}$/', $this->$attribute))
+        {
+            $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример block1.');
+        }
     }
 
 

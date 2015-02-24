@@ -54,6 +54,8 @@ class AdminModelEditorController extends AdminController
     public $defaultActionModel      = "view";
     protected $_modelShowAttribute  = "id";
     public $modelPkAttribute        = "id";
+    public $modelValidate           = false;
+    public $enableScenarios         = false;
 
     /**
      * обязателено указывать!
@@ -127,6 +129,25 @@ class AdminModelEditorController extends AdminController
             ]
         ]);
     }
+
+    /**
+     * @param ActionEvent $e
+     */
+    protected function _beforeAction(ActionEvent $e)
+    {
+        parent::_beforeAction($e);
+
+        if ($this->enableScenarios)
+        {
+            if (!$this->getCurrentModel())
+            {
+                $this->setCurrentModel($this->createCurrentModel());
+            }
+
+            $this->getCurrentModel()->scenario = $e->action->id;
+        }
+    }
+
     /**
      * @throws InvalidConfigException
      */
@@ -303,7 +324,7 @@ class AdminModelEditorController extends AdminController
      * @param ActiveRecord $model
      * @return $this
      */
-    public function setCurrentModel(ActiveRecord $model)
+    public function setCurrentModel(\yii\db\ActiveRecord $model)
     {
         $this->_currentModel = $model;
         return $this;
@@ -382,6 +403,7 @@ class AdminModelEditorController extends AdminController
 
     /**
      * Lists all Game models.
+     * @var asdasd
      * @return mixed
      */
     public function actionIndex()
@@ -458,9 +480,13 @@ class AdminModelEditorController extends AdminController
         /**
          * @var $model ActiveRecord
          */
-        $model = $this->createCurrentModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        if (!$model = $this->getCurrentModel())
+        {
+            $model = $this->createCurrentModel();
+        }
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
 
@@ -513,7 +539,7 @@ class AdminModelEditorController extends AdminController
 
         if (\Yii::$app->request->isAjax)
         {
-            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
                 \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 //return $this->redirectRefresh();
@@ -549,7 +575,7 @@ class AdminModelEditorController extends AdminController
 
         } else
         {
-            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
                 \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 return $this->redirectRefresh();

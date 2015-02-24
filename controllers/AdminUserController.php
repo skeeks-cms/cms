@@ -19,6 +19,7 @@ use skeeks\cms\widgets\ActiveForm;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\base\ActionEvent;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -26,6 +27,11 @@ use yii\rbac\Item;
 use yii\web\Response;
 
 /**
+ * Test
+ * asas
+ * asdasdasdasdasdasd
+ * @link asd
+ *
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
@@ -40,9 +46,32 @@ class AdminUserController extends AdminModelEditorSmartController
         $this->_modelClassName          = User::className();
         $this->_modelSearchClassName    = UserSearch::className();
 
+        $this->modelValidate = true;
+
         parent::init();
 
     }
+
+    /**
+     * @param ActionEvent $e
+     */
+    protected function _beforeAction(ActionEvent $e)
+    {
+        parent::_beforeAction($e);
+
+        if ($e->action->id == 'create')
+        {
+            $this->setCurrentModel($this->createCurrentModel());
+            $this->getCurrentModel()->scenario = 'create';
+        }
+
+        if ($e->action->id == 'update')
+        {
+            $this->getCurrentModel()->scenario = 'update';
+        }
+
+    }
+
 
     /**
      * @return array

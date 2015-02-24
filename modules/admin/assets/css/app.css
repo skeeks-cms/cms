@@ -83,6 +83,21 @@ body.sidebar-hidden footer.sx-admin-footer
 
 
 
+    body.empty
+    {
+        min-height: 100%;
+    }
+
+    body.empty .sx-panel-content
+    {
+        min-height: 100%;
+    }
+
+    body.empty .panel-heading
+    {
+        display: none;
+    }
+
     body.empty .sx-sidebar
     {
         display: none;

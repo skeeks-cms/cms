@@ -24,8 +24,10 @@ use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
+use yii\base\InlineAction;
 use yii\behaviors\BlameableBehavior;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Console;
 use yii\helpers\Inflector;
 use yii\web\ForbiddenHttpException;
 
@@ -223,10 +225,4 @@ abstract class AdminController extends Controller
     {
         return $this->redirect(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString());
     }
-
-
-
-
-
-
 }

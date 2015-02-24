@@ -28,6 +28,7 @@ class UserEmail extends ActiveRecord
         return '{{%cms_user_email}}';
     }
 
+
     /**
      * @inheritdoc
      */
@@ -47,7 +48,19 @@ class UserEmail extends ActiveRecord
             [['user_id', 'value'], 'required'],
             [['user_id', 'created_at', 'updated_at', 'approved'], 'integer'],
             [['value', 'approved_key'], 'string'],
+            [['value'], 'email'],
+            [['value'], 'unique'],
         ];
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = ['value', 'user_id'];
+        $scenarios['update'] = ['value', 'user_id'];
+
+        return $scenarios;
     }
 
     /**
@@ -58,9 +71,8 @@ class UserEmail extends ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'Пользователь'),
-            'provider' => Yii::t('app', 'Provider'),
-            'provider_identifier' => Yii::t('app', 'Provider Identifier'),
-            'provider_data' => Yii::t('app', 'Provider Data'),
+            'value' => "Email",
+            'approved' => "Подтвержден",
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];

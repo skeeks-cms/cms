@@ -29,11 +29,11 @@ class AdminPublicationController extends AdminModelEditorSmartController
     public function init()
     {
         $this->_label                   = "Управление публикациями";
-
         $this->_modelShowAttribute      = "name";
-
         $this->_modelClassName          = Publication::className();
 
+        $this->modelValidate = true;
+        $this->enableScenarios = true;
         parent::init();
 
     }

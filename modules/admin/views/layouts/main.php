@@ -217,7 +217,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 ]); */?>
 
     <div class="col-lg-12">
-        <div class="panel panel-primary sx-panel">
+        <div class="panel panel-primary sx-panel sx-panel-content">
             <div class="panel-heading sx-no-icon">
                 <h2>
                     <?= Breadcrumbs::widget([

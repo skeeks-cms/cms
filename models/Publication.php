@@ -64,12 +64,23 @@ class Publication extends PageAdvanced
         ]);
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = ['name'];
+        $scenarios['update'] = ['name'];
+
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return array_merge(parent::rules(), [
+            [['name'], 'required'],
             [['type'], 'string'],
             [['published_at', 'tree_id'], 'integer'],
             [['tree_ids', 'page_options', 'multiPageOptions'], 'safe'],

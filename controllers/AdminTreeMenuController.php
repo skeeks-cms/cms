@@ -43,6 +43,8 @@ class AdminTreeMenuController extends AdminModelEditorSmartController
         $this->_label                   = "Управление позициями меню";
         $this->_modelShowAttribute      = "name";
         $this->_modelClassName          = TreeMenu::className();
+        $this->modelValidate = true;
+        $this->enableScenarios = true;
         parent::init();
     }
 

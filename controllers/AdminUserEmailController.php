@@ -1,54 +1,48 @@
 <?php
 /**
- * AdminStaticBlockController
+ * AdminUserEmailController
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
- * @date 16.11.2014
+ * @date 24.02.2015
  * @since 1.0.0
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\App;
-use skeeks\cms\models\Infoblock;
-use skeeks\cms\models\Search;
-use skeeks\cms\models\StaticBlock;
-use skeeks\cms\models\UserGroup;
-use skeeks\cms\models\WidgetConfig;
-use skeeks\cms\models\WidgetSettings;
+use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
-use skeeks\cms\widgets\text\Text;
+use skeeks\cms\widgets\ActiveForm;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
-use yii\base\ActionEvent;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\rbac\Item;
+use yii\web\Response;
 
 /**
- *
- * @method StaticBlock getCurrentModel()
- * @method StaticBlock createCurrentModel()
- *
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
-class AdminStaticBlockController extends AdminModelEditorSmartController
+class AdminUserEmailController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление статическим блоками";
-        $this->_modelShowAttribute      = "code";
-        $this->_modelClassName          = StaticBlock::className();
+        $this->_label                   = "Управление email адресами";
+        $this->_modelShowAttribute      = "value";
+        $this->_modelClassName          = UserEmail::className();
+
         $this->modelValidate            = true;
         $this->enableScenarios          = true;
+
         parent::init();
+
     }
-
-
-
 
 }
