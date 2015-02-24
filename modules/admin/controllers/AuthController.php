@@ -16,7 +16,9 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * Class AuthController
@@ -102,6 +104,14 @@ class AuthController extends AdminController
         $success = false;
 
         $model = new LoginForm();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if (\Yii::$app->request->isPost)
         {
             if ($model->load(\Yii::$app->request->post()) && $model->login())

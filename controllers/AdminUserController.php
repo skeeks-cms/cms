@@ -111,6 +111,7 @@ class AdminUserController extends AdminModelEditorSmartController
     }
 
 
+
     /**
      * Updates an existing Game model.
      * If update is successful, the browser will be redirected to the 'view' page.

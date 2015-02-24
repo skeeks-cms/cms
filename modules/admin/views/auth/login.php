@@ -245,6 +245,7 @@ JS
                     <div class="sx-act sx-act-login">
                         <?php $form = ActiveForm::begin([
                             'id' => 'login-form',
+                            'enableAjaxValidation' => false,
                             'PjaxOptions' =>
                             [
                                 'blockPjaxContainer'   => false,

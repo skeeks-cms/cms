@@ -18,6 +18,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
@@ -41,6 +42,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * Class AdminEntityEditor
@@ -486,13 +488,24 @@ class AdminModelEditorController extends AdminController
             $model = $this->createCurrentModel();
         }
 
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
 
             //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', '/?aaa');
-            if (\Yii::$app->request->isAjax)
+            if (\Yii::$app->request->isPjax)
             {
+
+                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', \Yii::$app->request->referrer);
+
+                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
                 \Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
             } else
             {
@@ -536,6 +549,13 @@ class AdminModelEditorController extends AdminController
     public function actionUpdate()
     {
         $model = $this->getCurrentModel();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
 
         if (\Yii::$app->request->isAjax)
         {

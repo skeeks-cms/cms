@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormStyled as ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
@@ -39,7 +39,7 @@ use common\models\User;
                     var window = new sx.classes.Window(this.get('action'));
                     window.bind("close", function()
                     {
-                        sx.notify.info('ready');
+                        $.pjax.reload('#sx-table-emails', {});
                     });
 
                     window.open();
@@ -55,8 +55,6 @@ use common\models\User;
 JS
 );
     ?>
-
-
     <a class="btn btn-default" onclick="<?= new \yii\web\JsExpression(<<<JS
     new sx.classes.CreateUserEmail({'action': '{$action}'}); return false;
 JS
@@ -66,15 +64,18 @@ JS
             $search->getDataProvider()->query->where(['user_id' => $model->id]);
         ?>
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+            'PjaxOptions' => [
+                'id' => 'sx-table-emails'
+            ],
             'dataProvider'  => $search->getDataProvider(),
             'layout' => "\n{items}\n{pager}",
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],
 
                 [
-                    'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                    'controller'    => \Yii::$app->createController('cms/admin-user-email')[0],
-                    'isOpenNewWindow'    => true
+                    'class'                 => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                    'controller'            => \Yii::$app->createController('cms/admin-user-email')[0],
+                    'isOpenNewWindow'       => true
                 ],
 
                 'value',
@@ -84,4 +85,49 @@ JS
 
 <? endif; ?>
 
+
+
+
+
+
+<?/*
+        $this->registerJs(<<<JS
+
+    $('#test').on('beforeSubmit', function (event, attribute, message) {
+
+        var form = $(this);
+        if (form.find('.has-error').length) {
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            data: $(this).serialize(),
+            success: function(response) {
+                sx.notify.info("success");
+                $.pjax.reload('#sx-table-emails', {});
+            },
+            error: function(response) {
+                sx.notify.info("error");
+            }
+        });
+
+        return false;
+    });
+JS
+);
+        $userEmail = new \skeeks\cms\models\user\UserEmail();
+
+        $form2 = ActiveForm::begin([
+            'action'   => \skeeks\cms\helpers\UrlHelper::construct('cms/admin-user-email/create', ['user_id' => $model->id])->enableAdmin()->toString(),
+            'enableAjaxValidation'   => true,
+            'usePjax'   => true,
+            'id'   => "test",
+    ])*/?>
+
+        <?/*= $form2->field($userEmail, 'value')->textInput()->label(); */?><!--
+        <?/*= $form2->field($userEmail, 'user_id')->hiddenInput(['value' => $model->id])->label(false); */?>
+        <?/*= $form2->buttonsCreateOrUpdate($userEmail); */?>
+    --><?php /*ActiveForm::end(); */?>
 
