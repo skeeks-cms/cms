@@ -15,20 +15,24 @@ use skeeks\cms\modules\admin\widgets\GridView;
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 $groups = $model->getFilesGroups();
+
+$dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 ?>
 <div id="sx-file-manager">
     <div class="sx-upload-sources">
-        <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload">Загрузить с компьютера</a>
-        <a href="#" class="btn btn-primary btn-sm">Загрузить по ссылке http://</a>
-        <a href="#" class="btn btn-primary btn-sm">Добавить из файлового менеджера</a>
+        <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a>
+        <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-globe"></i> Загрузить по ссылке http://</a>
+        <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;"class="btn btn-default btn-sm"><i class="glyphicon glyphicon-folder-open"></i> Добавить из файлового менеджера</a>
         <div class="sx-progress-bar"></div>
+        <p></p>
     </div>
     <? if ($groupsObjects = $groups->getComponents()) : ?>
     <div class="sx-select-group">
          <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
              'usePjax' => true
          ]); ?>
-            <label>Группа файлов:</label>
+
+            <label><i class="glyphicon glyphicon-tags"></i> Метки файлов:</label>
 
             <?= \skeeks\widget\chosen\Chosen::widget([
                     'name' => 'group',
@@ -40,11 +44,14 @@ $groups = $model->getFilesGroups();
                     ),
                 ]);
             ?>
+            <? if ($group): ?>
+                <p><a href="#" data-sx-widget="tooltip" data-original-title="Показать/скрыть требования к файлам этой группы">Требования к файлам этой группы</a></p>
+            <? endif; ?>
             <small>
-                Вы можете загружать файлы и привязывать их к определенным группам.<br />
+                Вы можете загружать файлы и привязывать их к определенным меткам.<br />
                 От этого будет зависеть, в каком месте на сайте будет показываться этот файл.
             </small>
-            <? print_r($groups->getComponent($group)->config);die; ?>
+            <?/* print_r();die; */?>
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
     </div>
     <? endif; ?>
@@ -105,10 +112,20 @@ CSS
                     if ($groups = $file->getFilesGroups())
                     {
                         $result = \yii\helpers\ArrayHelper::map($groups, "id", "name");
-                        return implode(', ', $result);
+
+                        if ($result)
+                        {
+                            foreach ($result as $key => $name)
+                            {
+                                $result[$key] = '<span class="label label-info"><i class="glyphicon glyphicon-tag"></i> ' . $name . '</span>';
+                            }
+                        }
+
+                        return implode(' ', $result);
                     }
                 },
-                'format' => 'html'
+                'format' => 'html',
+                'label' => 'Метки'
             ],
 
             'name',

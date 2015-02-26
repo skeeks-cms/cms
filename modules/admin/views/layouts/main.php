@@ -236,9 +236,11 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                         <?= $this->params['actions'] ?>
                         <?/*= Alert::widget() */?>
                     </div>
-                    <div class="panel-content">
-                        <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
-                        <?= $content ?>
+                    <div class="panel-content sx-unblock-onWindowReady">
+                        <div class="sx-show-onWindowReady">
+                            <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
+                            <?= $content ?>
+                        </div><!-- End .panel-body -->
                     </div><!-- End .panel-body -->
             </div><!-- End .panel-body -->
         </div><!-- End .widget -->

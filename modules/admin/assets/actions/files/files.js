@@ -272,6 +272,7 @@
 
             this.getWrapper().on("change", ".sx-select-group select", function()
             {
+                console.log('111');
                 $(this).closest("form").submit();
 
                 _.delay(function()

@@ -458,3 +458,9 @@ div#jGrowl
 {
     top: 130px;
 }
+
+
+.sx-show-onWindowReady
+{
+    display: none;
+}

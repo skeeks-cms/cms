@@ -31,7 +31,7 @@ return
             ],
 
             [
-                "label"     => "Позиции меню",
+                "label"     => "Метки разделов",
                 "url"       => ["cms/admin-tree-menu"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
             ],
