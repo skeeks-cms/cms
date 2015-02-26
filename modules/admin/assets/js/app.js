@@ -143,22 +143,42 @@
             this._navigation            = new sx.classes.app.MainNav(this.get("navigation"));
             this.ajaxLoader             = new sx.classes.AjaxLoader();
 
-            this.onWindowReadyBlocker   = sx.block('.sx-unblock-onWindowReady');
+            this.onWindowReadyBlocker   = null;
         },
 
         _onWindowReady: function()
         {
             var self = this;
+            this.readyWindowTrigger = true;
 
-            _.delay(function()
+            _.defer(function()
             {
-                $(".sx-show-onWindowReady").slideDown();
-                self.onWindowReadyBlocker.unblock();
-            }, 100);
+                $(".sx-show-onWindowReady").slideDown(300, function()
+                {
+                    _.delay(function()
+                    {
+                        self.onWindowReadyBlocker.unblock();
+                    }, 200);
+                });
+            });
+
         },
 
         _onDomReady: function()
         {
+            var self = this;
+
+            this.readyWindowTrigger = false;
+
+            //Если window не будет готово через 200 мс, покажем загрузку.
+            _.delay(function()
+            {
+                if (self.readyWindowTrigger === false)
+                {
+                    self.onWindowReadyBlocker   = sx.block('.sx-unblock-onWindowReady');
+                }
+
+            }, 200);
 
 
             this._initBootstrap();
