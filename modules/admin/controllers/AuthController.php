@@ -105,6 +105,7 @@ class AuthController extends AdminController
         $goUrl = "";
         $success = false;
 
+
         $loginModel = new LoginFormUsernameOrEmail();
 
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
