@@ -50,7 +50,7 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
 		if($has_files_behavior)
 		{
 			//$files = \skeeks\cms\models\StorageFile::find()->where(['linked_to_value' => $callback_images->id])->all();
-            $files = $callback_images->getFiles()->where(['linked_to_value' => $callback_images->id, 'type' => 'image'])->all();
+            $files = \skeeks\cms\models\StorageFile::find()->where(['linked_to_value' => $callback_images->id, 'type' => 'image'])->all();
             foreach ($files as $file) {
 				$ar_files[] = array(
 					$file["original_name"],

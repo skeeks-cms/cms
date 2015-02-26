@@ -129,7 +129,14 @@ class HasFiles extends HasLinkedModels
      */
     public function findFiles()
     {
-        return StorageFile::find();
+        $className = \Yii::$app->registeredModels->getClassNameByCode($this->owner->className());
+
+        if (!$className)
+        {
+            return null;
+        }
+
+        return StorageFile::find()->where(['linked_to_model' => $className]);
     }
 
     /**
@@ -139,8 +146,14 @@ class HasFiles extends HasLinkedModels
      */
     public function getFiles()
     {
-        return StorageFile::find();
+        if ($find = $this->findFiles())
+        {
+            return $find->all();
+        }
+
+        return [];
     }
+
 
     /**
      * Конфиг для загрузки файлов

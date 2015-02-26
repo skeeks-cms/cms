@@ -140,5 +140,4 @@ class CanBeLinkedToModel extends \skeeks\cms\base\behaviors\ActiveRecord
         $ref = new ModelRef($this->owner->linked_to_model, $this->owner->linked_to_value);
         return $ref->findModel();
     }
-
 }

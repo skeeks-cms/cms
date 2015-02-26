@@ -4,14 +4,11 @@
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 06.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 26.02.2015
  */
-
 namespace skeeks\cms\models\helpers;
 use skeeks\cms\base\db\ActiveRecord;
-
 /**
  * Class ModelRef
  * @package skeeks\cms\models\helpers
@@ -78,6 +75,7 @@ class ModelRef
         $find = $className::find()->where([$className::primaryKey()[0] => $this->_pkValue]);
         return $find->one();
     }
+
 
     /**
      * @return string

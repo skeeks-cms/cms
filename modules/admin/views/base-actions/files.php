@@ -1,4 +1,3 @@
-
 <?php
 /**
  * index
@@ -9,7 +8,7 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
-use yii\grid\GridView;
+use skeeks\cms\modules\admin\widgets\GridView;
 
 /* @var $model \skeeks\cms\models\Publication */
 /* @var $this yii\web\View */
@@ -18,9 +17,17 @@ use yii\grid\GridView;
 $groups = $model->getFilesGroups();
 ?>
 <div id="sx-file-manager">
+    <div class="sx-upload-sources">
+        <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload">Загрузить с компьютера</a>
+        <a href="#" class="btn btn-primary btn-sm">Загрузить по ссылке http://</a>
+        <a href="#" class="btn btn-primary btn-sm">Добавить из файлового менеджера</a>
+        <div class="sx-progress-bar"></div>
+    </div>
     <? if ($groupsObjects = $groups->getComponents()) : ?>
     <div class="sx-select-group">
-         <? \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
+         <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
+             'usePjax' => true
+         ]); ?>
             <label>Группа файлов:</label>
 
             <?= \skeeks\widget\chosen\Chosen::widget([
@@ -33,24 +40,27 @@ $groups = $model->getFilesGroups();
                     ),
                 ]);
             ?>
+            <small>
+                Вы можете загружать файлы и привязывать их к определенным группам.<br />
+                От этого будет зависеть, в каком месте на сайте будет показываться этот файл.
+            </small>
+            <? print_r($groups->getComponent($group)->config);die; ?>
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
-        <hr />
     </div>
     <? endif; ?>
 
-    <div class="sx-upload-sources">
-        <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload">Загрузить с компьютера</a>
-        <a href="#" class="btn btn-primary btn-sm">Загрузить по ссылке http://</a>
-        <a href="#" class="btn btn-primary btn-sm">Добавить из файлового менеджера</a>
-        <hr />
-        <div class="sx-progress-bar"></div>
-    </div>
 
+    <br />
+    <br />
 
     <?= GridView::widget([
 
         'dataProvider'  => $dataProvider,
         'filterModel'   => $searchModel,
+        'PjaxOptions' =>
+        [
+            'id' => 'sx-table-files'
+        ],
 
         'columns' => [
 
@@ -86,9 +96,24 @@ CSS
                 'format' => 'html'
             ],
 
-            'name',
+
 
             [
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function(\skeeks\cms\models\StorageFile $file)
+                {
+                    if ($groups = $file->getFilesGroups())
+                    {
+                        $result = \yii\helpers\ArrayHelper::map($groups, "id", "name");
+                        return implode(', ', $result);
+                    }
+                },
+                'format' => 'html'
+            ],
+
+            'name',
+
+            /*[
                 'class'     => \yii\grid\DataColumn::className(),
                 'value'     => function(\skeeks\cms\models\StorageFile $model)
                 {
@@ -97,9 +122,9 @@ CSS
 
                 'format' => 'html',
                 'attribute' => 'src'
-            ],
+            ],*/
 
-            [
+            /*[
                 'class'     => \yii\grid\DataColumn::className(),
                 'value'     => function(\skeeks\cms\models\StorageFile $model)
                 {
@@ -109,7 +134,7 @@ CSS
                 },
 
                 'format' => 'html',
-            ],
+            ],*/
 
             //'name_to_save',
             'mime_type',
@@ -120,10 +145,10 @@ CSS
                 'attribute' => 'size'
             ],
 
-            ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+            //['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
             //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 
-            ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
+           // ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
             //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
 
         ],
@@ -140,6 +165,8 @@ $clientOptionsString = \yii\helpers\Json::encode($clientOptions);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
+
+
     sx.FileMangager = new sx.classes.files.Manager('#sx-file-manager', {$clientOptionsString});
 })(sx, sx.$, sx._);
 JS

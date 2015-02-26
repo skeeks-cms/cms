@@ -17,6 +17,7 @@ use yii\db\ActiveQuery;
 /**
  * @method ModelFilesGroups     getFilesGroups()
  * @method ActiveQuery          findFiles()
+ * @method StorageFile[]        getFiles()
  *
  * Class HasFiles
  * @package skeeks\cms\models\behaviors\traits
