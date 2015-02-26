@@ -193,8 +193,8 @@ JS
 JS
 )?>
                             <? endif;?>
-                            <?= $form->field($model, 'username')->label('Логин или email'); ?>
-                            <?= $form->field($model, 'password')->passwordInput()->label('Пароль') ?>
+                            <?= $form->field($loginModel, 'identifier')->label('Логин или email'); ?>
+                            <?= $form->field($loginModel, 'password')->passwordInput()->label('Пароль') ?>
                                 <div class="form-group sx-submit-group">
                                     <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> Войти", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                                 </div>
@@ -222,7 +222,7 @@ JS
                                 'blockContainer'        => '.sx-panel-login'
                             ],
                         ]); ?>
-                            <?= $form->field($model, 'username')->label('Логин или email'); ?>
+                            <?= $form->field($loginModel, 'identifier')->label('Логин или email'); ?>
                                 <div class="form-group sx-submit-group">
                                     <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> Восстановить пароль", [
                                         'class' => 'btn btn-primary',

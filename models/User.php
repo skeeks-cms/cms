@@ -16,6 +16,8 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\user\UserEmail;
+use skeeks\cms\validators\string\LoginValidator;
+use skeeks\cms\validators\user\UserEmailValidator;
 use skeeks\sx\validate\Validate;
 use Yii;
 use yii\base\ErrorException;
@@ -84,35 +86,75 @@ class User
     {
         parent::init();
 
-        //$this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, "checkEmailBeforeInstert"]);
-        //$this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, "checkEmail"]);
+        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT,    [$this, "checkDataBeforeInsert"]);
+        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE,    [$this, "checkDataBeforeUpdate"]);
+
+        $this->on(BaseActiveRecord::EVENT_AFTER_INSERT,    [$this, "checkDataAfterSave"]);
+        $this->on(BaseActiveRecord::EVENT_AFTER_UPDATE,    [$this, "checkDataAfterSave"]);
     }
 
-
-    public function checkEmailBeforeInstert()
+    public function checkDataAfterSave()
     {
         if ($this->email)
         {
-            $email = UserEmail::find()->where(["value" => $this->email]);
+            $email              = UserEmail::find()->where(['value' => $this->email])->one();
+
             if ($email)
             {
-                throw new ErrorException("Этот email уже занят");
+                $email->user_id     = $this->id;
+                $email->save();
             }
 
+        }
+    }
+
+    public function checkDataBeforeInsert()
+    {
+        //Если установлен email новому пользователю
+        if ($this->email)
+        {
+            //Проверим
+            Validate::ensure(new UserEmailValidator(), $this);
+
+            //Создаем mail
             $email = new UserEmail([
                 'value' => $this->email
             ]);
+
+            $email->scenario = "nouser";
 
             if (!$email->save())
             {
                 throw new ErrorException("Email не удалось добавить");
             };
         }
-
-        //$this->oldAttributes['email'];
-        //die;
     }
 
+    public function checkDataBeforeUpdate()
+    {
+        if ($this->email)
+        {
+            //Если email изменен
+            if ($this->oldAttributes['email'] != $this->email)
+            {
+                Validate::ensure(new UserEmailValidator(), $this);
+
+                if (!$myEmail = $this->findEmail()->where(["value" => $this->email])->one())
+                {
+                    $email = new UserEmail([
+                        'value' => $this->email,
+                        'user_id' => $this->id
+                    ]);
+
+                    if (!$email->save())
+                    {
+                        throw new ErrorException("Email не удалось добавить");
+                    };
+                }
+
+            }
+        }
+    }
 
 
     /**
@@ -171,8 +213,8 @@ class User
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['create'] = ['username'];
-        $scenarios['update'] = ['username'];
+        $scenarios['create'] = ['username', 'email'];
+        $scenarios['update'] = ['username', 'email'];
         return $scenarios;
     }
 
@@ -191,8 +233,13 @@ class User
             [['username', 'auth_key', 'password_hash'], 'required'],
             [['role', 'status', 'created_at', 'updated_at', 'group_id'], 'integer'],
             [['info', 'gender', 'status_of_life'], 'string'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address', 'email'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
+
+            [['email'], 'required'],
+            [['email'], 'unique'],
+            [['email'], 'email'],
+            [['email'], 'validateEmails'],
 
             [['username'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 12],
@@ -201,14 +248,32 @@ class User
         ];
     }
 
+    /**
+     * @param $attribute
+     */
     public function validateLogin($attribute)
     {
-        if(!preg_match('/^[a-z]{1}[a-z0-1]{2,11}$/', $this->$attribute))
+        $validate = Validate::validate(new LoginValidator(), $this->$attribute);
+
+        if ($validate->isInvalid())
         {
-            $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример demo1.');
+            $this->addError($attribute, $validate->getErrorMessage());
         }
     }
 
+    /**
+     * Проверка базы email адресов
+     * @param $attribute
+     */
+    public function validateEmails($attribute)
+    {
+        $validate = Validate::validate(new UserEmailValidator(), $this);
+
+        if ($validate->isInvalid())
+        {
+            $this->addError($attribute, $validate->getErrorMessage());
+        }
+    }
 
     /**
      * @inheritdoc
@@ -366,11 +431,43 @@ class User
      * Finds user by username
      *
      * @param string $username
-     * @return User
+     * @return static
      */
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Finds user by email
+     *
+     * @param $email
+     * @return static
+     */
+    public static function findByEmail($email)
+    {
+        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
+    }
+
+
+    /**
+     * Поиск пользователя по email или логину
+     * @param $value
+     * @return User
+     */
+    static public function findByUsernameOrEmail($value)
+    {
+        if ($user = static::findByUsername($value))
+        {
+            return $user;
+        }
+
+        if ($user = static::findByEmail($value))
+        {
+            return $user;
+        }
+
+        return null;
     }
 
     /**
@@ -516,5 +613,18 @@ class User
     public function getImagesSrc()
     {
         return $this->getFilesGroups()->getComponent('images')->items;
+    }
+
+
+
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function findEmail()
+    {
+        return $this->hasOne(UserEmail::className(), ['user_id' => 'id']);
     }
 }

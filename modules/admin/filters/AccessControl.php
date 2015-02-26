@@ -35,7 +35,7 @@ class AccessControl extends \yii\filters\AccessControl
         if ($user->getIsGuest())
         {
             \Yii::$app->getResponse()->redirect(
-                UrlHelper::construct("admin/auth/login")->setCurrentRef()->enableAdmin()->createUrl()
+                UrlHelper::construct("admin/auth")->setCurrentRef()->enableAdmin()->createUrl()
             );
         } else
         {

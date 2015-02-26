@@ -138,6 +138,20 @@ body.sidebar-hidden footer.sx-admin-footer
     box-shadow: 1px 7px 16px rgba(0, 0, 0, 0.42);
 }
 
+
+/** Оформление форм админки */
+
+form.sx-form-admin
+{
+    border: 1px solid rgba(32, 168, 216, 0.23);
+    padding: 10px;
+}
+
+    form.sx-form-admin .hint-block
+    {
+        font-size: 11px;
+    }
+
 /**
 * Доработка панелей
 */
@@ -155,11 +169,7 @@ body.sidebar-hidden footer.sx-admin-footer
         line-height: normal;
     }
 
-    form.sx-form-admin
-    {
-        border: 1px solid rgba(32, 168, 216, 0.23);
-        padding: 10px;
-    }
+
 
         .sx-panel .breadcrumb>.active
         {

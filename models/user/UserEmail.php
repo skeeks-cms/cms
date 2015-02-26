@@ -59,6 +59,7 @@ class UserEmail extends ActiveRecord
 
         $scenarios['create'] = ['value', 'user_id'];
         $scenarios['update'] = ['value', 'user_id'];
+        $scenarios['nouser'] = ['value'];
 
         return $scenarios;
     }

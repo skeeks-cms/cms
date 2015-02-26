@@ -14,17 +14,18 @@ use common\models\User;
 <?php  ?>
 
 <?= $form->fieldSet('Общая ниформация')?>
-    <?= $form->field($model, 'username')->textInput(['maxlength' => 12]) ?>
-<? if (!$model->isNewRecord) : ?>
+    <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
+    <?= $form->field($model, 'email')->textInput(); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'city')->textInput(); ?>
     <?= $form->field($model, 'address')->textInput(); ?>
     <?= $form->field($model, 'info')->textarea(); ?>
     <?= $form->field($model, 'status_of_life')->textarea(); ?>
-<? endif; ?>
 <?= $form->fieldSetEnd(); ?>
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
+
+
 
 <? if (!$model->isNewRecord) : ?>
     <?

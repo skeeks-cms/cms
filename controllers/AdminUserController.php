@@ -69,7 +69,6 @@ class AdminUserController extends AdminModelEditorSmartController
         {
             $this->getCurrentModel()->scenario = 'update';
         }
-
     }
 
 
@@ -124,6 +123,14 @@ class AdminUserController extends AdminModelEditorSmartController
         $modelForm = new PasswordChangeForm([
             'user' => $model
         ]);
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $modelForm->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return \skeeks\cms\modules\admin\widgets\ActiveForm::validate($modelForm);
+        }
+
 
         if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
         {
