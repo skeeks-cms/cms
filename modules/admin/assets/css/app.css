@@ -486,3 +486,49 @@ div#jGrowl
     left: 12px;
     right: auto;
 }
+
+
+
+
+
+
+.sx-main-menu-toggle
+{
+    position: fixed;
+    top: 50%;
+    left: 270px;
+}
+
+.sx-main-menu-toggle-open
+{
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 12px;
+}
+
+.sx-main-menu-toggle-close
+{
+    display: block;
+}
+
+    body.sidebar-hidden .sx-main-menu-toggle-open
+    {
+        display: block;
+    }
+
+    body.sidebar-hidden .sx-main-menu-toggle-close
+    {
+        display: none;
+    }
+
+    body.sidebar-hidden .sx-sidebar
+    {
+        display: block;
+        width: 25px;
+    }
+
+    body.sidebar-hidden .sx-sidebar .inner-wrapper
+    {
+        display: none;
+    }
