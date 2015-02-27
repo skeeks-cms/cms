@@ -14,6 +14,7 @@ use skeeks\cms\base\Module as CmsModule;
 use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Site;
+use skeeks\cms\modules\admin\assets\AdminAsset;
 use skeeks\cms\modules\admin\components\UrlRule;
 
 /**
@@ -39,6 +40,18 @@ class Module extends CmsModule
             "name"          => "Админка cms",
             "description"   => "Модуль входит в состав модуля cms, содержит все необходимые элементы для админки",
         ]);
+    }
+
+    public $noImage = '';
+
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->noImage)
+        {
+            $this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
+        }
     }
 
 

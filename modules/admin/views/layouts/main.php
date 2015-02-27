@@ -129,7 +129,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                 <? if (Yii::$app->cms->getAuthUser()->hasMainImage()) : ?>
                     <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
                 <? else : ?>
-                    <i class="icon-settings"></i>
+                    <img src="<?= Yii::$app->cms->moduleAdmin()->noImage; ?>" width="49" height="49"/>
                 <? endif; ?>
             </a>
             <!--sx-dropdown-menu-left-->
@@ -137,11 +137,11 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                 <li class="dropdown-menu-header text-center">
                     <strong><?= Yii::$app->cms->getAuthUser()->username ?></strong>
                 </li>
-                <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
+                <li><a href="<?= UrlHelper::construct("cms/admin-profile/update")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
                 <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
                 <li class="divider"></li>
                 <li>
-                    <?= Html::a('<i class="fa fa-lock"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+                    <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
                 </li>
             </ul>
         </li>
