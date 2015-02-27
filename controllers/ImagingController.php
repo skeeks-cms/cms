@@ -124,7 +124,7 @@ class ImagingController extends Controller
         /**
          * @var Filter $filter
          */
-        $filter = new $filterClass((array) $options);
+        $filter = new $filterClass((array) $params);
         if (!is_subclass_of($filter, Filter::className()))
         {
             throw new \ErrorException("Не дочерний класс фильтра");
