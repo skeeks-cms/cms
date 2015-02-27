@@ -1,4 +1,3 @@
-
 <?php
 /**
  * index
@@ -9,19 +8,31 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
-use yii\grid\GridView;
+use skeeks\cms\modules\admin\widgets\GridView;
 
 /* @var $model \skeeks\cms\models\Publication */
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 $groups = $model->getFilesGroups();
+
+$dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 ?>
 <div id="sx-file-manager">
+    <div class="sx-upload-sources">
+        <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a>
+        <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-globe"></i> Загрузить по ссылке http://</a>
+        <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;"class="btn btn-default btn-sm"><i class="glyphicon glyphicon-folder-open"></i> Добавить из файлового менеджера</a>
+        <div class="sx-progress-bar"></div>
+        <p></p>
+    </div>
     <? if ($groupsObjects = $groups->getComponents()) : ?>
     <div class="sx-select-group">
-         <? \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
-            <label>Группа файлов:</label>
+         <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
+             'usePjax' => true
+         ]); ?>
+
+            <label><i class="glyphicon glyphicon-tags"></i> Метки файлов:</label>
 
             <?= \skeeks\widget\chosen\Chosen::widget([
                     'name' => 'group',
@@ -33,24 +44,30 @@ $groups = $model->getFilesGroups();
                     ),
                 ]);
             ?>
+            <? if ($group): ?>
+                <p><a href="#" data-sx-widget="tooltip" data-original-title="Показать/скрыть требования к файлам этой группы">Требования к файлам этой группы</a></p>
+            <? endif; ?>
+            <small>
+                Вы можете загружать файлы и привязывать их к определенным меткам.<br />
+                От этого будет зависеть, в каком месте на сайте будет показываться этот файл.
+            </small>
+            <?/* print_r();die; */?>
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
-        <hr />
     </div>
     <? endif; ?>
 
-    <div class="sx-upload-sources">
-        <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload">Загрузить с компьютера</a>
-        <a href="#" class="btn btn-primary btn-sm">Загрузить по ссылке http://</a>
-        <a href="#" class="btn btn-primary btn-sm">Добавить из файлового менеджера</a>
-        <hr />
-        <div class="sx-progress-bar"></div>
-    </div>
 
+    <br />
+    <br />
 
     <?= GridView::widget([
 
         'dataProvider'  => $dataProvider,
         'filterModel'   => $searchModel,
+        'PjaxOptions' =>
+        [
+            'id' => 'sx-table-files'
+        ],
 
         'columns' => [
 
@@ -86,9 +103,34 @@ CSS
                 'format' => 'html'
             ],
 
-            'name',
+
 
             [
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function(\skeeks\cms\models\StorageFile $file)
+                {
+                    if ($groups = $file->getFilesGroups())
+                    {
+                        $result = \yii\helpers\ArrayHelper::map($groups, "id", "name");
+
+                        if ($result)
+                        {
+                            foreach ($result as $key => $name)
+                            {
+                                $result[$key] = '<span class="label label-info"><i class="glyphicon glyphicon-tag"></i> ' . $name . '</span>';
+                            }
+                        }
+
+                        return implode(' ', $result);
+                    }
+                },
+                'format' => 'html',
+                'label' => 'Метки'
+            ],
+
+            'name',
+
+            /*[
                 'class'     => \yii\grid\DataColumn::className(),
                 'value'     => function(\skeeks\cms\models\StorageFile $model)
                 {
@@ -97,9 +139,9 @@ CSS
 
                 'format' => 'html',
                 'attribute' => 'src'
-            ],
+            ],*/
 
-            [
+            /*[
                 'class'     => \yii\grid\DataColumn::className(),
                 'value'     => function(\skeeks\cms\models\StorageFile $model)
                 {
@@ -109,7 +151,7 @@ CSS
                 },
 
                 'format' => 'html',
-            ],
+            ],*/
 
             //'name_to_save',
             'mime_type',
@@ -120,10 +162,10 @@ CSS
                 'attribute' => 'size'
             ],
 
-            ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+            //['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
             //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 
-            ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
+           // ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
             //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
 
         ],
@@ -140,6 +182,8 @@ $clientOptionsString = \yii\helpers\Json::encode($clientOptions);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
+
+
     sx.FileMangager = new sx.classes.files.Manager('#sx-file-manager', {$clientOptionsString});
 })(sx, sx.$, sx._);
 JS

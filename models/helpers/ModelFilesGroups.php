@@ -13,6 +13,7 @@ use skeeks\cms\components\CollectionComponents;
 
 /**
  *
+ * @method ModelFilesGroup[]   all()
  * @method ModelFilesGroup[]   getComponents()
  * @method ModelFilesGroup     getComponent($id)
  *

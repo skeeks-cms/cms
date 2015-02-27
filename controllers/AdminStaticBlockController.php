@@ -25,6 +25,7 @@ use skeeks\cms\widgets\text\Text;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\base\ActionEvent;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -42,8 +43,11 @@ class AdminStaticBlockController extends AdminModelEditorSmartController
         $this->_label                   = "Управление статическим блоками";
         $this->_modelShowAttribute      = "code";
         $this->_modelClassName          = StaticBlock::className();
+        $this->modelValidate            = true;
+        $this->enableScenarios          = true;
         parent::init();
     }
+
 
 
 

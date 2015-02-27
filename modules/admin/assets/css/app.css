@@ -38,12 +38,21 @@ body.sidebar-hidden .main
     color: #a6ed18;
 }
 
+.sx-navbar
+{
+    box-shadow: 1px 5px 9px rgba(0, 0, 0, 0.17);
+}
+
 .navbar .navbar-nav.navbar-right:last-child
 {
-    padding-left: 15px;
+    padding-left: 0px;
     border-left: 1px solid #d1d4d7;
 }
 
+.navbar .navbar-nav.navbar-right:last-child
+{
+    margin-right: 0px;
+}
 footer.sx-admin-footer
 {
     width: 100%;
@@ -58,7 +67,7 @@ footer.sx-admin-footer
     bottom: 0;
     z-index: 1;
     font-size: 10px;
-    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.15), 0 -1px 5px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.17), 1px -5px 9px rgba(0, 0, 0, 0.17);
 }
 
 
@@ -82,6 +91,21 @@ body.sidebar-hidden footer.sx-admin-footer
 
 
 
+
+    body.empty
+    {
+        min-height: 100%;
+    }
+
+    body.empty .sx-panel-content
+    {
+        min-height: 100%;
+    }
+
+    body.empty .panel-heading
+    {
+        display: none;
+    }
 
     body.empty .sx-sidebar
     {
@@ -123,6 +147,20 @@ body.sidebar-hidden footer.sx-admin-footer
     box-shadow: 1px 7px 16px rgba(0, 0, 0, 0.42);
 }
 
+
+/** Оформление форм админки */
+
+form.sx-form-admin
+{
+    border: 1px solid rgba(32, 168, 216, 0.23);
+    padding: 10px;
+}
+
+    form.sx-form-admin .hint-block
+    {
+        font-size: 11px;
+    }
+
 /**
 * Доработка панелей
 */
@@ -140,11 +178,7 @@ body.sidebar-hidden footer.sx-admin-footer
         line-height: normal;
     }
 
-    form.sx-form-admin
-    {
-        border: 1px solid rgba(32, 168, 216, 0.23);
-        padding: 10px;
-    }
+
 
         .sx-panel .breadcrumb>.active
         {
@@ -432,4 +466,23 @@ body.sidebar-hidden footer.sx-admin-footer
 div#jGrowl
 {
     top: 130px;
+}
+
+
+.sx-show-onWindowReady
+{
+    display: none;
+}
+
+
+.navbar .navbar-nav li .sx-dropdown-menu-left:before
+{
+    left: 12px;
+    right: auto;
+}
+
+.navbar .navbar-nav li .sx-dropdown-menu-left:after
+{
+    left: 12px;
+    right: auto;
 }

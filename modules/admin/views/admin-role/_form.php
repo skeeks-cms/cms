@@ -1,20 +1,17 @@
 <?php
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 /**
  * @var yii\web\View $this
  * @var \skeeks\cms\models\AuthItem $model
- * @var yii\widgets\ActiveForm $form
  */
 ?>
 
-<div class="auth-item-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 64]) ?>
-
-    <?= $form->field($model, 'description')->textarea(['rows' => 2]) ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 2])->label('Описание') ?>
 
     <?/*=
     $form->field($model, 'ruleName')->widget('yii\jui\AutoComplete', [
@@ -27,14 +24,8 @@ use yii\widgets\ActiveForm;
     ])
     */?>
 
-    <?= $form->field($model, 'data')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'data')->textarea(['rows' => 6, 'readonly' => 'readonly'])->label('Данные') ?>
 
-    <div class="form-group">
-        <?php
-        echo Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), [
-            'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary'])
-        ?>
-    </div>
+    <?= $form->buttonsCreateOrUpdate($model); ?>
 
     <?php ActiveForm::end(); ?>
-</div>

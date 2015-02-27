@@ -11,13 +11,21 @@
 
 namespace skeeks\cms\models;
 
+use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\user\UserEmail;
+use skeeks\cms\validators\string\LoginValidator;
+use skeeks\cms\validators\user\UserEmailValidator;
+use skeeks\sx\validate\Validate;
 use Yii;
+use yii\base\ErrorException;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
+use yii\validators\EmailValidator;
 use yii\web\IdentityInterface;
 
 use skeeks\cms\models\behaviors\HasSubscribes;
@@ -75,6 +83,84 @@ class User
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT,    [$this, "checkDataBeforeInsert"]);
+        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE,    [$this, "checkDataBeforeUpdate"]);
+
+        $this->on(BaseActiveRecord::EVENT_AFTER_INSERT,    [$this, "checkDataAfterSave"]);
+        $this->on(BaseActiveRecord::EVENT_AFTER_UPDATE,    [$this, "checkDataAfterSave"]);
+    }
+
+    public function checkDataAfterSave()
+    {
+        if ($this->email)
+        {
+            $email              = UserEmail::find()->where(['value' => $this->email])->one();
+
+            if ($email)
+            {
+                $email->user_id     = $this->id;
+                $email->save();
+            }
+
+        }
+    }
+
+    public function checkDataBeforeInsert()
+    {
+        //Если установлен email новому пользователю
+        if ($this->email)
+        {
+            //Проверим
+            Validate::ensure(new UserEmailValidator(), $this);
+
+            //Создаем mail
+            $email = new UserEmail([
+                'value' => $this->email
+            ]);
+
+            $email->scenario = "nouser";
+
+            if (!$email->save())
+            {
+                throw new ErrorException("Email не удалось добавить");
+            };
+        }
+    }
+
+    public function checkDataBeforeUpdate()
+    {
+        if ($this->email)
+        {
+            //Если email изменен
+            if ($this->oldAttributes['email'] != $this->email)
+            {
+                Validate::ensure(new UserEmailValidator(), $this);
+
+                if (!$myEmail = $this->findEmail()->where(["value" => $this->email])->one())
+                {
+                    $email = new UserEmail([
+                        'value' => $this->email,
+                        'user_id' => $this->id
+                    ]);
+
+                    if (!$email->save())
+                    {
+                        throw new ErrorException("Email не удалось добавить");
+                    };
+                }
+
+            }
+        }
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
@@ -89,7 +175,7 @@ class User
                 [
                     "image" =>
                     [
-                        'name'      => 'Главное изображение',
+                        'name'      => 'Аватар',
                         'config'    =>
                         [
                             HasFiles::MAX_SIZE            => 1*2048, //1Mb
@@ -125,6 +211,14 @@ class User
         ]);
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['create'] = ['username', 'email'];
+        $scenarios['update'] = ['username', 'email'];
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -137,17 +231,50 @@ class User
             ['role', 'default', 'value' => self::ROLE_USER],
             ['role', 'in', 'range' => [self::ROLE_USER]],
 
-            ['username', 'string', 'min' => 3, 'max' => 12],
-
-            [['username', 'auth_key', 'password_hash', 'email'], 'required'],
+            [['username', 'auth_key', 'password_hash'], 'required'],
             [['role', 'status', 'created_at', 'updated_at', 'group_id'], 'integer'],
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
+
+            [['email'], 'required'],
+            [['email'], 'unique'],
+            [['email'], 'email'],
+            [['email'], 'validateEmails'],
+
+            [['username'], 'required'],
+            ['username', 'string', 'min' => 3, 'max' => 12],
             [['username'], 'unique'],
+            [['username'], 'validateLogin'],
         ];
     }
 
+    /**
+     * @param $attribute
+     */
+    public function validateLogin($attribute)
+    {
+        $validate = Validate::validate(new LoginValidator(), $this->$attribute);
+
+        if ($validate->isInvalid())
+        {
+            $this->addError($attribute, $validate->getErrorMessage());
+        }
+    }
+
+    /**
+     * Проверка базы email адресов
+     * @param $attribute
+     */
+    public function validateEmails($attribute)
+    {
+        $validate = Validate::validate(new UserEmailValidator(), $this);
+
+        if ($validate->isInvalid())
+        {
+            $this->addError($attribute, $validate->getErrorMessage());
+        }
+    }
 
     /**
      * @inheritdoc
@@ -270,21 +397,6 @@ class User
         return \Yii::$app->urlManager->createUrl(["cms/user/view", "username" => $this->username]);
     }
 
-
-    /**
-     * @return string
-     */
-    public function getMainImage()
-    {
-        if ($this->image)
-        {
-            return (string) array_shift($this->image);
-        }
-
-        return \Yii::$app->params["noimage"];
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -305,11 +417,43 @@ class User
      * Finds user by username
      *
      * @param string $username
-     * @return User
+     * @return static
      */
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Finds user by email
+     *
+     * @param $email
+     * @return static
+     */
+    public static function findByEmail($email)
+    {
+        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
+    }
+
+
+    /**
+     * Поиск пользователя по email или логину
+     * @param $value
+     * @return User
+     */
+    static public function findByUsernameOrEmail($value)
+    {
+        if ($user = static::findByUsername($value))
+        {
+            return $user;
+        }
+
+        if ($user = static::findByEmail($value))
+        {
+            return $user;
+        }
+
+        return null;
     }
 
     /**
@@ -419,41 +563,35 @@ class User
 
 
 
+
+
+
     /**
-     * @return bool
+     * @return \yii\db\ActiveQuery
      */
-    public function hasMainImageSrc()
+    public function findEmail()
     {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage->getFirstSrc())
-        {
-            return true;
-        } else
-        {
-            return false;
-        }
-    }
-    /**
-     * @return string
-     */
-    public function getMainImageSrc()
-    {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage->getFirstSrc())
-        {
-            return $mainImage->getFirstSrc();
-        }
-
-        return \Yii::$app->params['noimage'];
+        return $this->hasOne(UserEmail::className(), ['user_id' => 'id']);
     }
 
+
     /**
-     * @return array
+     * @param int $width
+     * @param int $height
+     * @param $mode
+     * @return mixed|null|string
      */
-    public function getImagesSrc()
+    public function getAvatarSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
     {
-        return $this->getFilesGroups()->getComponent('images')->items;
+        if ($this->hasMainImage())
+        {
+            return \Yii::$app->imaging->getImagingUrl($this->getMainImageSrc(), new \skeeks\cms\components\imaging\filters\Thumbnail([
+                'w'    => $width,
+                'h'    => $height,
+                'm'    => $mode,
+            ]));
+        }
+
+        return null;
     }
 }

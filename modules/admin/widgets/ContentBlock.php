@@ -41,7 +41,7 @@ class ContentBlock
         echo <<<HTML
         <div class="main">
             <div class="col-lg-12">
-                <div class="panel panel-primary sx-panel">
+                <div class="panel panel-primary sx-panel sx-panel-content">
                     <div class="panel-heading sx-no-icon">
                         <h2>
                             {$breadcrumbs}

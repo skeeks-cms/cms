@@ -40,6 +40,8 @@ class AdminInfoblockController extends AdminModelEditorSmartController
         $this->_label                   = "Управление инфоблоками";
         $this->_modelShowAttribute      = "name";
         $this->_modelClassName          = Infoblock::className();
+        $this->modelValidate            = true;
+        $this->enableScenarios          = true;
         parent::init();
     }
 

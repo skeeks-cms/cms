@@ -243,12 +243,14 @@
 
             this._sourceSimpleUpload.bind("error", function(e, message)
             {
-                sx.classes.modal.Alert(message);
+                sx.notify.error(message);
             });
 
             this._sourceSimpleUpload.bind("filesAdded", function(e, file)
             {
-                window.location.reload();
+                sx.notify.success('Файлы успешно загружены');
+                $.pjax.reload('#sx-table-files', {});
+                //window.location.reload();
             });
         },
 
@@ -268,9 +270,15 @@
             this.JselectType        = $('.sx-select-group', this.getWrapper());
             this.JselectTypeForm    = $('form', this.JselectType);
 
-            $('select', this.JselectTypeForm).on('change', function()
+            this.getWrapper().on("change", ".sx-select-group select", function()
             {
-                self.JselectTypeForm.submit();
+                console.log('111');
+                $(this).closest("form").submit();
+
+                _.delay(function()
+                {
+                    $.pjax.reload('#sx-table-files', {});
+                }, 500);
                 return false;
             });
 

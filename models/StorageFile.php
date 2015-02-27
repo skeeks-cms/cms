@@ -1,12 +1,24 @@
 <?php
+/**
+ * StorageFile
+ *
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 26.02.2015
+ */
 
 namespace skeeks\cms\models;
 use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
+use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
+use skeeks\cms\models\helpers\ModelFilesGroup;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\sx\validate\Validate;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
@@ -166,7 +178,52 @@ class StorageFile extends Core
         return static::findOne(['src' => $src]);
     }
 
+    /**
+     * Найти сущьность к которой привязан файл.
+     *
+     * @return null|ActiveRecord
+     */
+    public function getLinkedToModel()
+    {
+        return $this->findLinkedToModel();
+    }
 
+    /**
+     * Ресурсозатратно, но пока так...
+     * Получение всех групп к которым привязан файл.
+     *
+     * @return ModelFilesGroup[]
+     */
+    public function getFilesGroups()
+    {
+        $result = [];
+        //Если этот файл вообще имеет привязку
+        if ($this->isLinked())
+        {
+            //Найдена модель к которой привязан файл
+            if ($toModel = $this->getLinkedToModel())
+            {
+                if (Validate::validate(new HasBehavior(HasFiles::className()), $toModel)->isValid())
+                {
+                    if ($groups = $toModel->getFilesGroups()->all())
+                    {
+                        /**
+                         * @var $filesGroup ModelFilesGroup
+                         */
+                        foreach ($groups as $key => $filesGroup)
+                        {
+                            if ($filesGroup->hasFile($this))
+                            {
+                                $result[$key] = $filesGroup;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
     /**
      * @return bool|int
      * @throws \Exception

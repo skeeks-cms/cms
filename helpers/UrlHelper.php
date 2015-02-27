@@ -32,6 +32,8 @@ class UrlHelper
 
     protected $_route = "";
 
+    protected $_absolute = false;
+
     /**
      * @var null|UrlHelper
      */
@@ -205,10 +207,41 @@ class UrlHelper
     {
         return \Yii::$app->urlManager->createUrl($this->toArray());
     }
+    /**
+     * @return string
+     */
+    public function createAbsoluteUrl()
+    {
+        return \Yii::$app->urlManager->createAbsoluteUrl($this->toArray());
+    }
+
+
+    /**
+     * Включить абсолютный адрес
+     * @return $this
+     */
+    public function enableAbsolute()
+    {
+        $this->_absolute = true;
+        return $this;
+    }
+
+    public function disableAbsolute()
+    {
+        $this->_absolute = false;
+        return $this;
+    }
 
     public function toString()
     {
-        return $this->createUrl();
+        if ($this->_absolute)
+        {
+            return $this->createAbsoluteUrl();
+        } else
+        {
+            return $this->createUrl();
+        }
+
     }
     /**
      * @return array

@@ -71,6 +71,12 @@ class ClusterLocal extends Cluster
             $file->remove();
         }
 
+        $dir = new Dir($file->getDirName() . "/" . $file->getFileName());
+        if ($dir->isExist())
+        {
+            $dir->remove();
+        }
+
         return true;
     }
 

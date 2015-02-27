@@ -17,6 +17,14 @@ use yii\db\ActiveQuery;
 /**
  * @method ModelFilesGroups     getFilesGroups()
  * @method ActiveQuery          findFiles()
+ * @method StorageFile[]        getFiles()
+ *
+ * @method bool                 hasMainImage()      Есть ли изображение с меткой image
+ * @method string               getMainImageSrc()   Получение первого изображения с меткой image
+ * @method array                getMainImagesSrc()  Получение всех изображений с меткой image
+ * @method array                getImagesSrc()      Получить src[] изображений из группы images
+ * @method array                getFilesSrc()       Получить src[] изображений из группы files
+ *
  *
  * Class HasFiles
  * @package skeeks\cms\models\behaviors\traits

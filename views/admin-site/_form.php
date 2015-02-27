@@ -1,12 +1,11 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 use skeeks\cms\models\Tree;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
-/* @var $form yii\widgets\ActiveForm */
 ?>
 
 
@@ -15,8 +14,6 @@ use skeeks\cms\models\Tree;
 <?= $form->field($model, 'host_name')->textInput(['maxlength' => 255]) ?>
 <?= $form->field($model, 'name')->textarea() ?>
 <?= $form->field($model, 'description')->textarea() ?>
+<?= $form->buttonsCreateOrUpdate($model) ?>
 
-<div class="form-group">
-    <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
 <?php ActiveForm::end(); ?>

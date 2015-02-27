@@ -97,47 +97,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     ],
 
 
-
-                    /*'comments' =>
-                    [
-                        "label"     => "Комментарии",
-                        'icon'      => 'glyphicon glyphicon-comment',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasComments::className()
-                            ]
-                        ]
-                    ],
-
-                    'votes' =>
-                    [
-                        "label"     => "Голоса",
-                        'icon'      => 'glyphicon glyphicon-thumbs-up',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasVotes::className()
-                            ]
-                        ]
-                    ],
-
-
-                    'subscribes' =>
-                    [
-                        "label"     => "Подписаны",
-                        "icon"     => "glyphicon glyphicon-heart-empty",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasSubscribes::className()
-                            ]
-                        ]
-                    ],*/
-
                     'publications' =>
                     [
                         "label"     => "Публикации",
@@ -149,32 +108,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             ]
                         ]
                     ],
-
-                    /*'seo-page-url' =>
-                    [
-                        "label"     => "Адрес на сайте",
-                        "icon"     => "glyphicon glyphicon-magnet",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasSeoPageUrl::className()
-                            ]
-                        ]
-                    ],*/
-
-
-                    /*'universal-link' =>
-                    [
-                        "label"     => "Универсальная связь",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => CanBeLinkedToModel::className()
-                            ]
-                        ]
-                    ],*/
 
                     'page-options' =>
                     [
@@ -189,59 +122,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                         ]
                     ],
 
-
-                    /*'status' =>
-                    [
-                        "label"     => "Статус",
-                        'icon'      => 'glyphicon glyphicon-plus-sign',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasStatus::className()
-                            ]
-                        ]
-                    ],*/
-
-                    /*'status-adult' =>
-                    [
-                        "label"     => "Возрастной статус",
-                        'icon'      => 'glyphicon glyphicon-plus-sign',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasAdultStatus::className()
-                            ]
-                        ]
-                    ],*/
-
-                    /*'author' =>
-                    [
-                        "label"     => "Автор",
-                        'icon'      => 'glyphicon glyphicon-user',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => BlameableBehavior::className()
-                            ]
-                        ]
-                    ],*/
-
-                    /*'timestamp' =>
-                    [
-                        "label"     => "Время создания",
-                        'icon'      => 'glyphicon glyphicon-time',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => [TimestampBehavior::className(), TimestampPublishedBehavior::className()],
-                                "useOr" => true
-                            ]
-                        ]
-                    ],*/
 
                     'system' =>
                     [
@@ -263,6 +143,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             ]
                         ]
                     ],
+
                     'social' =>
                     [
                         "label"     => "Социальные данные",
@@ -493,22 +374,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
 
 
-    /*public function actionSeoPageUrl()
-    {
-        $model = $this->getModel();
-
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-        {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirectRefresh();
-        } else
-        {
-            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
-                "model" => $this->getModel()
-            ]));
-        }
-    }*/
-
     public function actionSystem()
     {
         /*$model = $this->getModel();
@@ -549,51 +414,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         ]));
     }
 
-    /*public function actionAuthor()
-    {
-        $model = $this->getModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-        {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirectRefresh();
-        } else
-        {
-            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/author.php", [
-                "model" => $this->getModel()
-            ]));
-        }
-    }
-
-    public function actionTimestamp()
-    {
-        $model = $this->getModel();
-
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-        {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirectRefresh();
-        } else
-        {
-            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/timestamp.php", [
-                "model" => $this->getModel()
-            ]));
-        }
-    }
-
-    public function actionUniversalLink()
-    {
-        $model = $this->getModel();
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-        {
-            return $this->redirectRefresh();
-        } else
-        {
-            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/seo-page-url.php", [
-                "model" => $this->getModel()
-            ]));
-        }
-    }*/
 
     public function actionPageOptions()
     {
@@ -670,42 +491,5 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     }
 
 
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionStatus()
-    {
-        $model = $this->getModel();
-
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-        {
-            return $this->redirectRefresh();
-        } else
-        {
-            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/status.php", [
-                "model" => $this->getModel()
-            ]));
-        }
-    }
-
-
-
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionStatusAdult()
-    {
-        $model = $this->getModel();
-
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-        {
-            return $this->redirectRefresh();
-        } else
-        {
-            return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/status-adult.php", [
-                "model" => $this->getModel()
-            ]));
-        }
-    }
 
 }

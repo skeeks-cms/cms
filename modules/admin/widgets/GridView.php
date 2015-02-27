@@ -33,10 +33,9 @@ class GridView extends \yii\grid\GridView
     public function run()
     {
         if ($this->usePjax) {
-            Pjax::begin(ArrayHelper::merge([
+            $pjax = Pjax::begin(ArrayHelper::merge([
                 'id' => 'sx-pjax-grid-' . $this->id,
             ], $this->PjaxOptions));
-
         }
 
         parent::run();
@@ -46,4 +45,6 @@ class GridView extends \yii\grid\GridView
             Pjax::end();
         }
     }
+
+    
 }

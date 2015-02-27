@@ -59,6 +59,16 @@ class Infoblock extends Core
         ]);
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = ['code', 'name'];
+        $scenarios['update'] = ['code', 'name'];
+
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -68,8 +78,17 @@ class Infoblock extends Core
             [['name'], 'required'],
             [['description', 'widget', 'rules', 'template'], 'string'],
             [['code'], 'unique'],
+            [['code'], 'validateCode'],
             [["images", "files", "image_cover", "image", 'config', 'multiConfig'], 'safe'],
         ]);
+    }
+
+    public function validateCode($attribute)
+    {
+        if(!preg_match('/^[a-z]{1}[a-z0-1]{2,11}$/', $this->$attribute))
+        {
+            $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример block1.');
+        }
     }
 
 

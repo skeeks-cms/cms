@@ -126,6 +126,27 @@ class ModelFilesGroup extends ComponentModel
         return $this;
     }
 
+    /**
+     *
+     * Содержит ли эта группа файл?
+     *
+     * @param $file
+     * @return bool
+     */
+    public function hasFile($file)
+    {
+        $result = [];
+
+        if ($file instanceof StorageFile)
+        {
+            $src = $file->src;
+        } else
+        {
+            $src = $file;
+        }
+
+        return (bool) in_array($src, $this->items);
+    }
 
 
     /**

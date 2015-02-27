@@ -42,24 +42,11 @@ class AdminSiteController extends AdminModelEditorSmartController
         $this->_label                   = "Управление сайтами";
         $this->_modelShowAttribute      = "host_name";
         $this->_modelClassName          = Site::className();
+
+        $this->modelValidate = true;
+        $this->enableScenarios = true;
         parent::init();
     }
 
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                "actions" =>
-                [
-
-                ]
-            ]
-        ]);
-    }
 
 }

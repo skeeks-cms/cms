@@ -18,6 +18,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
@@ -41,6 +42,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * Class AdminEntityEditor
@@ -54,6 +56,8 @@ class AdminModelEditorController extends AdminController
     public $defaultActionModel      = "view";
     protected $_modelShowAttribute  = "id";
     public $modelPkAttribute        = "id";
+    public $modelValidate           = false;
+    public $enableScenarios         = false;
 
     /**
      * обязателено указывать!
@@ -127,6 +131,25 @@ class AdminModelEditorController extends AdminController
             ]
         ]);
     }
+
+    /**
+     * @param ActionEvent $e
+     */
+    protected function _beforeAction(ActionEvent $e)
+    {
+        parent::_beforeAction($e);
+
+        if ($this->enableScenarios)
+        {
+            if (!$this->getCurrentModel())
+            {
+                $this->setCurrentModel($this->createCurrentModel());
+            }
+
+            $this->getCurrentModel()->scenario = $e->action->id;
+        }
+    }
+
     /**
      * @throws InvalidConfigException
      */
@@ -303,7 +326,7 @@ class AdminModelEditorController extends AdminController
      * @param ActiveRecord $model
      * @return $this
      */
-    public function setCurrentModel(ActiveRecord $model)
+    public function setCurrentModel(\yii\db\ActiveRecord $model)
     {
         $this->_currentModel = $model;
         return $this;
@@ -382,6 +405,7 @@ class AdminModelEditorController extends AdminController
 
     /**
      * Lists all Game models.
+     * @var asdasd
      * @return mixed
      */
     public function actionIndex()
@@ -458,15 +482,30 @@ class AdminModelEditorController extends AdminController
         /**
          * @var $model ActiveRecord
          */
-        $model = $this->createCurrentModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        if (!$model = $this->getCurrentModel())
+        {
+            $model = $this->createCurrentModel();
+        }
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
 
             //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', '/?aaa');
-            if (\Yii::$app->request->isAjax)
+            if (\Yii::$app->request->isPjax)
             {
+
+                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', \Yii::$app->request->referrer);
+
+                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
                 \Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
             } else
             {
@@ -511,9 +550,16 @@ class AdminModelEditorController extends AdminController
     {
         $model = $this->getCurrentModel();
 
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if (\Yii::$app->request->isAjax)
         {
-            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
                 \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 //return $this->redirectRefresh();
@@ -549,7 +595,7 @@ class AdminModelEditorController extends AdminController
 
         } else
         {
-            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
                 \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 return $this->redirectRefresh();

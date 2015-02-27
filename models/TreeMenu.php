@@ -36,6 +36,14 @@ class TreeMenu extends Core
     }
 
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['create'] = ['name'];
+        $scenarios['update'] = ['name'];
+        return $scenarios;
+    }
+
 
     /**
      * @inheritdoc
@@ -48,12 +56,15 @@ class TreeMenu extends Core
         ]);
     }
 
+
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return array_merge(parent::rules(), [
+            [['name'], 'required'],
             [['name', 'description'], 'string'],
         ]);
     }

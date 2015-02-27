@@ -142,15 +142,53 @@
         {
             this._navigation            = new sx.classes.app.MainNav(this.get("navigation"));
             this.ajaxLoader             = new sx.classes.AjaxLoader();
+
+            this.onWindowReadyBlocker   = null;
+
+
+
+            this.readyWindowTrigger = false;
+            var self = this;
+            //Если window не будет готово через 200 мс, покажем загрузку.
+            _.delay(function()
+            {
+                if (self.readyWindowTrigger === false)
+                {
+                    self.onDomReady(function()
+                    {
+                        self.onWindowReadyBlocker   = sx.block('.sx-unblock-onWindowReady');
+                    });
+                }
+
+            }, 200);
         },
 
         _onWindowReady: function()
         {
+            var self = this;
+            this.readyWindowTrigger = true;
+
+            _.defer(function()
+            {
+                $(".sx-show-onWindowReady").slideDown(300, function()
+                {});
+            });
+
+            _.delay(function()
+            {
+                if (self.onWindowReadyBlocker)
+                {
+                    self.onWindowReadyBlocker.unblock();
+                }
+
+            }, 200);
 
         },
 
         _onDomReady: function()
         {
+            var self = this;
+
             this._initBootstrap();
 
             //Отключение пустых ссылок
@@ -169,9 +207,11 @@
 
             _.delay(function()
             {
-                $(".windows8").fadeOut();
                 $(".sx-panel").fadeIn();
             }, 100);
+
+
+
         },
 
         /**
