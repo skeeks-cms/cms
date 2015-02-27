@@ -71,6 +71,14 @@ password: skeeks
 
 ~~~
 # Полное обновление проекта
-php init update
+php yii cms/update
+~~~
+
+
+~~~
+# Полезно использовать help.
+php yii help cms/update
+php yii help cms/update/all
+php yii
 ~~~
 

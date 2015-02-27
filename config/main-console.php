@@ -77,10 +77,7 @@ $config =
 
         'cms' =>
         [
-            'class'                         => '\skeeks\cms\Module',
-
-            'controllerMap' => [
-            ],
+            'class' => '\skeeks\cms\ConsoleModule',
         ],
     ],
 ];
