@@ -12,7 +12,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 ?>
 
 <? Pjax::begin([
-    'id' => 'sx-pjax',
+    'id' => 'sx-pjax-tree',
     'blockPjaxContainer' => false,
     'blockContainer' => '.sx-panel',
 ]);?>
@@ -20,5 +20,6 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= \skeeks\cms\modules\admin\widgets\Tree::widget([
     "models" => $models
 ]); ?>
+
 
 <? Pjax::end(); ?>
