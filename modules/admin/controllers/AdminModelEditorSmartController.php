@@ -200,6 +200,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-storage-files");
 
         $clientOptions['simpleUpload'] = $this->_getSourceSimpleUploadOptions($group);
+        $clientOptions['simpleUploadBase'] = $this->_getSourceSimpleUploadOptions()['url'];
 
 
         return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
@@ -216,11 +217,19 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
     private function _getSourceSimpleUploadOptions($group = '')
     {
-        $backendSimpleUpload = \Yii::$app->urlManager->createUrl(["cms/storage-files/upload",
+        $urlData = [
+            "cms/storage-files/upload",
             "linked_to_model"   => $this->getModel()->getRef()->getCode(),
             "linked_to_value"   => $this->getModel()->getRef()->getValue(),
-            "group"              => $group
-        ]);
+        ];
+
+
+        if ($group)
+        {
+            $urlData["group"] = $group;
+        }
+
+        $backendSimpleUpload = \Yii::$app->urlManager->createUrl($urlData);
 
 
         //Опции которые перетирать нельзя

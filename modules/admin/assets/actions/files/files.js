@@ -95,6 +95,8 @@
                     self.triggerEndUploads();
                 }, 50);
             });
+
+            this.uploaderObj = null;
         },
 
         /**
@@ -118,7 +120,7 @@
             var btn     = document.getElementById('upload-btn'),
                 wrap        = document.getElementById('pic-progress-wrap');
 
-            var uploader = new ss.SimpleUpload(_.extend(this.get("options"), {
+            this.uploaderObj = new ss.SimpleUpload(_.extend(this.get("options"), {
                 queue: true,
                 maxUploads: 1,
                 multiple: true,
@@ -228,7 +230,6 @@
 
         _init: function()
         {
-            console.log(this.getOpts());
             this._JsourceSimpleUpload   = $(".source-simpleUpload", this.getWrapper());
             var simpleOptions = _.extend(this.get("simpleUpload"),
                 {
@@ -272,7 +273,12 @@
 
             this.getWrapper().on("change", ".sx-select-group select", function()
             {
-                console.log('111');
+                if (self._sourceSimpleUpload.uploaderObj)
+                {
+                    self._sourceSimpleUpload.uploaderObj.setData({'group' : $(this).val()});
+                    console.log(self._sourceSimpleUpload.uploaderObj);
+                }
+
                 $(this).closest("form").submit();
 
                 _.delay(function()
