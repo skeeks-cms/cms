@@ -1,16 +1,11 @@
 <?php
 /**
- * Найти все модули, у них попросить все возможные привилегии
- *
- * TODO: добавить возможность генерации
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 21.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 27.02.2015
  */
-namespace skeeks\cms\controllers;
+namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\base\console\Controller;
 use skeeks\cms\models\User;

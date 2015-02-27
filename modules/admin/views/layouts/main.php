@@ -38,8 +38,6 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <? if (!$sidebarHidden): ?>
 
     <ul class="nav navbar-nav navbar-actions navbar-left">
-        <li class="visible-md visible-lg"><a href="#" id="main-menu-toggle" data-sx-widget="tooltip" data-original-title="Открыть закрыть левое меню"><i class="fa fa-bars"></i></a></li>
-        <li class="visible-xs visible-sm"><a href="#" id="sidebar-menu"><i class="fa fa-bars"></i></a></li>
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <? if (Yii::$app->cms->getAuthUser()->hasMainImage()) : ?>
@@ -50,7 +48,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
             </a>
             <ul class="dropdown-menu sx-dropdown-menu-left">
                 <li class="dropdown-menu-header text-center">
-                    <strong><?= Yii::$app->cms->getAuthUser()->username ?><?= Yii::$app->cms->getAuthUser()->getMainImageSrc() ?></strong>
+                    <strong><?= Yii::$app->cms->getAuthUser()->username ?></strong>
                 </li>
                 <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
                 <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
@@ -60,6 +58,10 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                 </li>
             </ul>
         </li>
+
+        <li class="visible-md visible-lg"><a href="#" id="main-menu-toggle" data-sx-widget="tooltip" data-original-title="Открыть закрыть левое меню"><i class="fa fa-bars"></i></a></li>
+        <li class="visible-xs visible-sm"><a href="#" id="sidebar-menu"><i class="fa fa-bars"></i></a></li>
+
 
     </ul>
 

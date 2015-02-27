@@ -76,4 +76,13 @@ class Controller extends YiiController
         $this->stdoutN(' - system cmd: ' . $cmd);
         system($cmd);
     }
+
+    /**
+     * @param $cmd
+     */
+    public function systemCmdRoot($cmd)
+    {
+        $this->stdoutN(' - system cmd: ' . $cmd);
+        system("cd " . ROOT_DIR. "; " . $cmd);
+    }
 }
