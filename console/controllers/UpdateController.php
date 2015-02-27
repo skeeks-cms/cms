@@ -125,7 +125,7 @@ class UpdateController extends Controller
                 foreach ($data['alias'] as $code => $path)
                 {
                     $cmd = "php yii migrate --migrationPath=" . $path . '/migrations  --interactive=0' ;
-                    $this->systemCmdRootRoot($cmd);
+                    $this->systemCmdRoot($cmd);
                 }
             }
         }
