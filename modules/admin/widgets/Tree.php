@@ -469,27 +469,29 @@ HTML
                             new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
 
                             new sx.classes.AjaxHandlerNotify(ajax, {
-                                'error': "Изменения не сохранились",
-                                'success': "Изменения сохранены"
+                                'error': "Не удалось добавить новый раздел",
+                                'success': "Новый раздел добавлен"
                             }); //отключение глобального загрузчика
 
                             ajax.onError(function(e, data)
                             {
-                                sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                $.pjax.reload('#sx-pjax-tree', {});
+                                /*sx.notify.info("Подождите сейчас страница будет перезагружена");
                                 _.delay(function()
                                 {
                                     window.location.reload();
-                                }, 2000);
+                                }, 2000);*/
                             })
                             .onSuccess(function(e, data)
                             {
                                 blocker.unblock();
 
-                                sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                $.pjax.reload('#sx-pjax-tree', {});
+                                /*sx.notify.info("Подождите сейчас страница будет перезагружена");
                                 _.delay(function()
                                 {
                                     window.location.reload();
-                                }, 2000);
+                                }, 2000);*/
                             })
                             .execute();
                         }
