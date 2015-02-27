@@ -198,6 +198,9 @@ class AdminTreeController extends AdminModelEditorSmartController
     /**
      * Пересортирует элементы дерева при перетаскивании
      */
+    //TODO от swapPriorities нет пользы, когда приоритеты нод равны (закомментировання часть)
+    //TODO нужно сделать так, чтобы при равных приортетах менялись приоритеты
+    //TODO пока что циклом меняем приоритеты всех нод
     public function actionResort()
     {
         $response =
@@ -207,6 +210,28 @@ class AdminTreeController extends AdminModelEditorSmartController
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
+        if (\Yii::$app->request->isPost)
+        {
+            $tree = new Tree();
+
+            $post = \Yii::$app->request->post();
+
+            $ids = array_reverse(array_filter($post['ids']));
+
+            $priority = 100;
+
+            foreach($ids as $id)
+            {
+                $node = $tree->find()->where(['id'=>$id])->one();
+                $node->priority = $priority;
+                $node->save(false);
+                $priority += 100;
+            }
+
+            $response['success'] = true;
+        }
+
+        /*
         if (\Yii::$app->request->isPost)
         {
             $tree = new Tree();
@@ -245,6 +270,7 @@ class AdminTreeController extends AdminModelEditorSmartController
 
             $response['success'] = true;
         }
+        */
 
         return $response;
     }
