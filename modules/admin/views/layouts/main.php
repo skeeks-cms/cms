@@ -30,16 +30,37 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 
 <?php $this->beginBody() ?>
-<div class="navbar" role="navigation">
-    <div class="navbar-header">
-        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>SkeekS Cms</span>', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
-    </div>
+<div class="navbar sx-navbar" role="navigation">
+    <!--<div class="navbar-header">
+        <?/*= Html::a('<i class="fa fa-lightbulb-o"></i> <span>Logo</span>', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); */?>
+    </div>-->
 
     <? if (!$sidebarHidden): ?>
 
     <ul class="nav navbar-nav navbar-actions navbar-left">
-        <li class="visible-md visible-lg"><a href="#" id="main-menu-toggle"><i class="fa fa-bars"></i></a></li>
+        <li class="visible-md visible-lg"><a href="#" id="main-menu-toggle" data-sx-widget="tooltip" data-original-title="Открыть закрыть левое меню"><i class="fa fa-bars"></i></a></li>
         <li class="visible-xs visible-sm"><a href="#" id="sidebar-menu"><i class="fa fa-bars"></i></a></li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <? if (Yii::$app->cms->getAuthUser()->hasMainImage()) : ?>
+                    <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
+                <? else : ?>
+                    <i class="icon-settings"></i>
+                <? endif; ?>
+            </a>
+            <ul class="dropdown-menu sx-dropdown-menu-left">
+                <li class="dropdown-menu-header text-center">
+                    <strong><?= Yii::$app->cms->getAuthUser()->username ?><?= Yii::$app->cms->getAuthUser()->getMainImageSrc() ?></strong>
+                </li>
+                <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
+                <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
+                <li class="divider"></li>
+                <li>
+                    <?= Html::a('<i class="fa fa-lock"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+                </li>
+            </ul>
+        </li>
+
     </ul>
 
     <? endif; ?>
@@ -113,18 +134,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 
         <li class="dropdown visible-md visible-lg">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-settings"></i><!--<span class="badge">!</span>--></a>
-            <ul class="dropdown-menu">
-                <li class="dropdown-menu-header text-center">
-                    <strong><?= Yii::$app->user->identity->username ?></strong>
-                </li>
-                <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
-                <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
-                <li class="divider"></li>
-                <li>
-                    <?= Html::a('<i class="fa fa-lock"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
-                </li>
-            </ul>
+            <a href="/" style="width: auto;" target="_blank">Перейти на сайт →</a>
         </li>
         <? endif; ?>
     </ul>
@@ -237,10 +247,10 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                         <?/*= Alert::widget() */?>
                     </div>
                     <div class="panel-content sx-unblock-onWindowReady">
-                        <div class="sx-show-onWindowReady">
+                        <!--<div class="sx-show-onWindowReady">-->
                             <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
                             <?= $content ?>
-                        </div><!-- End .panel-body -->
+                        <!--</div>-->
                     </div><!-- End .panel-body -->
             </div><!-- End .panel-body -->
         </div><!-- End .widget -->

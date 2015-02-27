@@ -19,6 +19,7 @@ use skeeks\sx\String;
 use skeeks\sx\validate\Validate;
 use yii\base\Component;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\FileHelper;
 
 /**
@@ -27,28 +28,130 @@ use yii\helpers\FileHelper;
  */
 class Imaging extends Component
 {
-    public $extensions      = ["jpg", "png", "jpeg", "gif"];
-    public $splitLongNames  = 100;
+    /**
+     * @var array   Расширения файлов с которыми работают фильтры. Может и не совсем правильно указывать их тут... но пока будет так.
+     */
+    public $extensions      =
+    [
+        "jpg", "png", "jpeg", "gif"
+    ];
+
+    /**
+     * @var string  Соль подмешивается к параметрам
+     */
+    public $sold  = "sold_for_check_params";
+
+    /**
+     * Константа для разбора URL - это некая метка, с этого момента идет указание фильтра
+     */
+    const THUMBNAIL_PREFIX = "sx-filter__";
+    const DEFAULT_THUMBNAIL_FILENAME = "sx-file";
 
 
-    public function getImagingUrl($imageSrc, Filter $filter)
+    /**
+     * Собрать URL на thumbnail, который будет сгенерирован автоматически в момент запроса.
+     *
+     *
+     * @param $originalSrc          Путь к оригинальному изображению
+     * @param Filter $filter        Объект фильтр, который будет заниматься преобразованием
+     * @param string $nameForSave   Название для сохраненеия файла (нужно для сео)
+     * @return string
+     */
+    public function thumbnailUrlOnRequest($originalSrc, Filter $filter, $nameForSave = '')
     {
-        $imageSrc               = (string) $imageSrc;
-        $sourceOriginalFile     = File::object($imageSrc);
+        $originalSrc                = (string) $originalSrc;
+        $extension                  = static::getExtension($originalSrc);
 
-        $extension              = $sourceOriginalFile->getExtension();
-
-        if ($extension)
+        if (!$extension)
         {
-            if (Validate::validate(new AllowExtension(), $extension)->isInvalid())
-            {
-                return $imageSrc;
-            }
+            return $originalSrc;
         }
 
-        $imageSrcResult = str_replace('.' . $extension, DIRECTORY_SEPARATOR . $this->_assembleParams($filter) . '.' . $extension, $imageSrc);
+        if (!$this->isAllowExtension($extension))
+        {
+            return $originalSrc;
+        }
+
+        if (!$nameForSave)
+        {
+            $nameForSave = static::DEFAULT_THUMBNAIL_FILENAME;
+        }
+
+        $params = [];
+        if ($filter->getConfig())
+        {
+            $params = $filter->getConfig();
+        }
+
+
+        $replacePart    =   DIRECTORY_SEPARATOR . static::THUMBNAIL_PREFIX . $filter->getId()
+                            . ($params ? DIRECTORY_SEPARATOR . $this->getParamsCheckString($params) : "")
+                            . DIRECTORY_SEPARATOR . $nameForSave;
+
+        $imageSrcResult = str_replace('.' . $extension, $replacePart . '.' . $extension, $originalSrc);
+
+        if ($params)
+        {
+            $imageSrcResult = $imageSrcResult . '?' . http_build_query($params);
+        }
+
         return $imageSrcResult;
     }
+
+    /**
+     * @param $extension
+     * @return bool
+     */
+    public function isAllowExtension($extension)
+    {
+        return (bool) in_array(strtolower($extension), $this->extensions);
+    }
+
+    /**
+     * @param $filePath
+     * @return string|bool
+     */
+    static public function getExtension($filePath)
+    {
+        $extension                  = end(explode(".", $filePath));
+
+        if (!$extension)
+        {
+            return false;
+        }
+
+        //Убираются гет параметры
+        $extension = explode("?", $extension);
+        $extension = $extension[0];
+        return $extension;
+    }
+
+    /**
+     * Проверочная строка параметров.
+     *
+     * @param array $params
+     * @return string
+     */
+    public function getParamsCheckString($params = [])
+    {
+        if ($params)
+        {
+            return md5($this->sold . http_build_query($params));
+        }
+
+        return "";
+    }
+
+    /**
+     * TODO:: depricated
+     * @param $imageSrc
+     * @param Filter $filter
+     */
+    public function getImagingUrl($imageSrc, Filter $filter)
+    {
+        return $this->thumbnailUrlOnRequest($imageSrc, $filter);
+    }
+
 
 
     /**
@@ -57,7 +160,7 @@ class Imaging extends Component
      */
     protected function _assembleParams(Filter $filter)
     {
-        $params[] = $filter->getId();
+        /*$params[] = $filter->getId();
 
         if ($filter->getConfig())
         {
@@ -69,6 +172,6 @@ class Imaging extends Component
         $result = str_split($result, $this->splitLongNames);
         $result = implode("/", $result);
 
-        return $result;
+        return $result;*/
     }
 }

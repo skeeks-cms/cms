@@ -243,6 +243,108 @@ class HasFiles extends HasLinkedModels
 
 
 
+
+
+
+
+
+
+    /**
+     * Есть ли у модели главное изображение?
+     * Не делает запрос в базу.
+     *
+     * @return bool
+     */
+    public function hasMainImage()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage)
+        {
+            if ($mainImage->getFirstSrc())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    /**
+     * Получить адрес главного изображения.
+     * Не делает запрос в базу.
+     *
+     * @return string
+     */
+    public function getMainImageSrc()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage)
+        {
+            if ($mainImage->getFirstSrc())
+            {
+                return $mainImage->getFirstSrc();
+            }
+        }
+
+
+        return null;
+    }
+
+    /**
+     * Получить src[] изображений
+     * Не делает запрос в базу.
+     *
+     * @return array
+     */
+    public function getImagesSrc()
+    {
+        if ($this->getFilesGroups())
+        {
+            return (array) $this->getFilesGroups()->getComponent('images')->items;
+        }
+
+        return [];
+    }
+
+
+    /**
+     * Получить src[] изображений
+     * Не делает запрос в базу.
+     *
+     * @return array
+     */
+    public function getFilesSrc()
+    {
+        if ($this->getFilesGroups())
+        {
+            return (array) $this->getFilesGroups()->getComponent('files')->items;
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getMainImagesSrc()
+    {
+        if ($this->getFilesGroups())
+        {
+            return (array) $this->getFilesGroups()->getComponent('image')->items;
+        }
+
+        return [];
+    }
+
+
+
+
+
+
+
+
+
     /**
      * @param $optionName
      * @param $fieldName

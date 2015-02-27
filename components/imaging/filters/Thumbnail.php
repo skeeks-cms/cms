@@ -20,8 +20,8 @@ use Imagine\Image\ManipulatorInterface;
  */
 class Thumbnail extends \skeeks\cms\components\imaging\Filter
 {
-    public $w       = 0;
-    public $h       = 0;
+    public $w       = 50;
+    public $h       = 50;
     public $m       = ManipulatorInterface::THUMBNAIL_OUTBOUND;
 
     protected function _save()

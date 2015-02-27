@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models;
 
+use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\models\behaviors\HasFiles;
@@ -396,21 +397,6 @@ class User
         return \Yii::$app->urlManager->createUrl(["cms/user/view", "username" => $this->username]);
     }
 
-
-    /**
-     * @return string
-     */
-    public function getMainImage()
-    {
-        if ($this->image)
-        {
-            return (string) array_shift($this->image);
-        }
-
-        return \Yii::$app->params["noimage"];
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -577,46 +563,6 @@ class User
 
 
 
-    /**
-     * @return bool
-     */
-    public function hasMainImageSrc()
-    {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage->getFirstSrc())
-        {
-            return true;
-        } else
-        {
-            return false;
-        }
-    }
-    /**
-     * @return string
-     */
-    public function getMainImageSrc()
-    {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage->getFirstSrc())
-        {
-            return $mainImage->getFirstSrc();
-        }
-
-        return \Yii::$app->params['noimage'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getImagesSrc()
-    {
-        return $this->getFilesGroups()->getComponent('images')->items;
-    }
-
-
-
 
 
 
@@ -626,5 +572,26 @@ class User
     public function findEmail()
     {
         return $this->hasOne(UserEmail::className(), ['user_id' => 'id']);
+    }
+
+
+    /**
+     * @param int $width
+     * @param int $height
+     * @param $mode
+     * @return mixed|null|string
+     */
+    public function getAvatarSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
+    {
+        if ($this->hasMainImage())
+        {
+            return \Yii::$app->imaging->getImagingUrl($this->getMainImageSrc(), new \skeeks\cms\components\imaging\filters\Thumbnail([
+                'w'    => $width,
+                'h'    => $height,
+                'm'    => $mode,
+            ]));
+        }
+
+        return null;
     }
 }

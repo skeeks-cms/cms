@@ -151,4 +151,19 @@ class RegisteredModels extends CollectionComponents
 
         return null;
     }
+
+
+    /**
+     * @param string $id
+     * @return Component|null
+     */
+    /*public function getComponent($id)
+    {
+        if ($component = parent::getComponent($id))
+        {
+            return $component;
+        }
+
+
+    }*/
 }

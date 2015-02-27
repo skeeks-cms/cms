@@ -45,7 +45,7 @@ use \skeeks\cms\validators\HasBehavior;
 <? endif;?>
 
 <? if (Validate::validate( new HasBehavior(\skeeks\cms\models\behaviors\HasSeoPageUrl::className()), $model)->isValid()) : ?>
-    Текущий адрес на сайте: <?= Html::a($model->createAbsoluteUrl(), $model->createAbsoluteUrl(), ["target" => "_blank"])?>
+    Текущий адрес на сайте: <?= Html::a($model->createAbsoluteUrl(), $model->createAbsoluteUrl(), ["target" => "_blank", 'onclick' => 'window.location.href="' . $model->createAbsoluteUrl() . '"; return false;'])?>
     <?= $form->field($model, $model->seoPageNameAttribute)->textInput(['maxlength' => 64]) ?>
 <? endif;?>
 

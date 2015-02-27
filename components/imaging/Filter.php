@@ -43,7 +43,15 @@ abstract class Filter extends Component
      */
     public function getId()
     {
-        return (string) $this->getDescriptor()->id;
+        if ($this->getDescriptor())
+        {
+            if ($this->getDescriptor()->id)
+            {
+                return (string) $this->getDescriptor()->id;
+            }
+        }
+
+        return str_replace("\\", '-', $this->className());
     }
 
     /**
