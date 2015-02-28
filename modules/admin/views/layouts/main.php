@@ -32,35 +32,19 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 <?php $this->beginBody() ?>
 <div class="navbar sx-navbar" role="navigation">
     <!--<div class="navbar-header">
-        <?/*= Html::a('<i class="fa fa-lightbulb-o"></i> <span>Logo</span>', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); */?>
+        <?/*= Html::a('<i class="fa fa-lightbulb-o"></i> <!--<span>Logo</span>-->', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); */?>
     </div>-->
 
     <? if (!$sidebarHidden): ?>
 
     <ul class="nav navbar-nav navbar-actions navbar-left">
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <? if (Yii::$app->cms->getAuthUser()->hasMainImage()) : ?>
-                    <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
-                <? else : ?>
-                    <i class="icon-settings"></i>
-                <? endif; ?>
-            </a>
-            <ul class="dropdown-menu sx-dropdown-menu-left">
-                <li class="dropdown-menu-header text-center">
-                    <strong><?= Yii::$app->cms->getAuthUser()->username ?></strong>
-                </li>
-                <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
-                <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
-                <li class="divider"></li>
-                <li>
-                    <?= Html::a('<i class="fa fa-lock"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
-                </li>
-            </ul>
-        </li>
 
-        <li class="visible-md visible-lg"><a href="#" id="main-menu-toggle" data-sx-widget="tooltip" data-original-title="Открыть закрыть левое меню"><i class="fa fa-bars"></i></a></li>
-        <li class="visible-xs visible-sm"><a href="#" id="sidebar-menu"><i class="fa fa-bars"></i></a></li>
+
+        <li class="visible-md visible-lg">
+            <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]); ?>" data-sx-widget="tooltip-b" data-original-title="На главную страницу админки"><i class="glyphicon glyphicon-home"></i></a>
+        </li>
+        <!--<li class="visible-md visible-lg"><a href="#" id="main-menu-toggle" class="main-menu-toggle" data-sx-widget="tooltip-b" data-original-title="Открыть/закрыть левое меню"><i class="fa fa-bars"></i></a></li>
+        --><li class="visible-xs visible-sm"><a href="#" id="sidebar-menu"><i class="fa fa-bars"></i></a></li>
 
 
     </ul>
@@ -135,9 +119,33 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
             <? endif; ?>
 
 
+
         <li class="dropdown visible-md visible-lg">
-            <a href="/" style="width: auto;" target="_blank">Перейти на сайт →</a>
+            <a href="/" style="width: auto;" target="_blank" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть (новая вкладка)"><i class="glyphicon glyphicon-globe"></i></a>
         </li>
+
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="Ваш профиль">
+                <? if (Yii::$app->cms->getAuthUser()->hasMainImage()) : ?>
+                    <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
+                <? else : ?>
+                    <img src="<?= Yii::$app->cms->moduleAdmin()->noImage; ?>" width="49" height="49"/>
+                <? endif; ?>
+            </a>
+            <!--sx-dropdown-menu-left-->
+            <ul class="dropdown-menu ">
+                <li class="dropdown-menu-header text-center">
+                    <strong><?= Yii::$app->cms->getAuthUser()->username ?></strong>
+                </li>
+                <li><a href="<?= UrlHelper::construct("cms/admin-profile/update")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
+                <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
+                <li class="divider"></li>
+                <li>
+                    <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+                </li>
+            </ul>
+        </li>
+
         <? endif; ?>
     </ul>
 
@@ -172,6 +180,16 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 <? if (!$sidebarHidden): ?>
 <!-- start: Main Menu -->
 <div class="sidebar sx-sidebar">
+
+    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="Закрыть меню">
+        <i class="glyphicon glyphicon-menu-left"></i>
+    </a>
+
+    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-closed" data-sx-widget="tooltip-r" data-original-title="Открыть меню">
+        <i class="glyphicon glyphicon-menu-right"></i>
+    </a>
+
+
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 

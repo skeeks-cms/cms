@@ -1,150 +1,27 @@
 /*!
- *
- * Общие скрипты админки
- *
- * @date 16.10.2014
- * @copyright skeeks.com
  * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 28.02.2015
  */
-
 (function(sx, $, _)
 {
-    sx.createNamespace('classes.app', sx);
+    sx.createNamespace('classes', sx);
 
     /**
-     * @type {*|Function|void}
-     */
-    sx.classes.app.MainNav = sx.classes.Component.extend({
-
-        _init: function()
-        {},
-
-        _onDomReady: function()
-        {
-            if (window.opener)
-            {
-                $("body").addClass("empty");
-            }
-
-            $("ul.nav-sidebar").find("a").each(function() {
-                /** @type {string} */
-                var line = String(window.location);
-                if (line.substr(line.length - 1) == "#") {
-                  /** @type {string} */
-                  line = line.slice(0, -1);
-                }
-                if ($($(this))[0].href == line) {
-                  $(this).parent().addClass("active");
-                  $(this).parents("ul").add(this).each(function() {
-                    $(this).show().parent().addClass("opened");
-                  });
-                }
-              });
-              $(".nav-sidebar").on("click", "a", function(types) {
-                if ($.ajaxLoad) {
-                  types.preventDefault();
-                }
-                if (!$(this).parent().hasClass("hover"))
-                {
-                  if ($(this).parent().find("ul").size() != 0) {
-                    if ($(this).parent().hasClass("opened")) {
-                      $(this).parent().removeClass("opened");
-                    } else {
-                      $(this).parent().addClass("opened");
-                    }
-                    $(this).parent().find("ul").first().slideToggle("slow", function() {
-                      //dropSidebarShadow();
-                    });
-                    $(this).parent().parent().find("ul").each(function() {
-                      if (!$(this).parent().hasClass("opened")) {
-                        $(this).slideUp();
-                      }
-                    });
-                    if (!$(this).parent().parent().parent().hasClass("opened")) {
-                      $(".nav a").not(this).parent().find("ul").slideUp("slow", function() {
-                        $(this).parent().removeClass("opened").find(".opened").each(function() {
-                          $(this).removeClass("opened");
-                        });
-                      });
-                    }
-                  } else {
-                    if (!$(this).parent().parent().parent().hasClass("opened")) {
-                      $(".nav a").not(this).parent().find("ul").slideUp("slow", function() {
-                        $(this).parent().removeClass("opened").find(".opened").each(function() {
-                          $(this).removeClass("opened");
-                        });
-                      });
-                    }
-                  }
-                }
-              });
-              $(".nav-sidebar > li").hover(function() {
-                if ($("body").hasClass("sidebar-minified")) {
-                  $(this).addClass("opened hover");
-                }
-              }, function() {
-                if ($("body").hasClass("sidebar-minified")) {
-                  $(this).removeClass("opened hover");
-                }
-              });
-              $("#main-menu-toggle").click(function() {
-                if ($("body").hasClass("sidebar-hidden")) {
-                  $("body").removeClass("sidebar-hidden");
-                } else {
-                  $("body").addClass("sidebar-hidden");
-                }
-              });
-              $("#sidebar-menu").click(function() {
-                $(".sidebar").trigger("open");
-              });
-              $("#sidebar-minify").click(function() {
-                if ($("body").hasClass("sidebar-minified")) {
-                  $("body").removeClass("sidebar-minified");
-                  $("#sidebar-minify i").removeClass("fa-list").addClass("fa-ellipsis-v");
-                } else {
-                  $("body").addClass("sidebar-minified");
-                  $("#sidebar-minify i").removeClass("fa-ellipsis-v").addClass("fa-list");
-                }
-              });
-
-              //dropSidebarShadow();
-              //$(".sidebar").mmenu();
-
-        }
-
-    });
-
-
-    sx.classes.Blocker  = sx.classes.BlockerJqueyUi.extend({
-
-        _init: function()
-        {
-            this.applyParentMethod(sx.classes.BlockerJqueyUi, '_init', []);
-
-            this.defaultOpts({
-                message: "<div style='padding: 5px;'>Подождите...</div>",
-                css: {
-                    border: '1px solid #108acb',
-                    padding: '10px;',
-                }
-            });
-        },
-
-    });
-
-    /**
-     * Основной класс для управления админкой
+     * TODO: нужно порефакторить
+     * Основной класс для управления админкой - объект админки
      * @type {extend|*|Function|extend|void|extend}
      */
-    sx.classes.app.Admin = sx.classes.Component.extend({
+    sx.classes.Admin = sx.classes.Component.extend({
 
         _init: function()
         {
-            this._navigation            = new sx.classes.app.MainNav(this.get("navigation"));
+            this._navigation            = new sx.classes.MainNav(this.get("navigation"));
+            this.Menu                   = new sx.classes.AdminMenu(this.get("menu"));
             this.ajaxLoader             = new sx.classes.AjaxLoader();
 
             this.onWindowReadyBlocker   = null;
-
 
 
             this.readyWindowTrigger = false;
@@ -209,9 +86,6 @@
             {
                 $(".sx-panel").fadeIn();
             }, 100);
-
-
-
         },
 
         /**
@@ -254,27 +128,20 @@
             });
 
             return this;
-        },
-
-        /**
-         * @returns {Sidebar|*}
-         */
-        getSidebar: function()
-        {
-            return this._sidebar;
         }
     });
-
 
     /**
      * Запускаем глобальный класс админки
      * @type {Admin}
      */
-    sx.app = new sx.classes.app.Admin({
+    sx.app = new sx.classes.Admin({
         //Отключение ссылок с href="#"
         disableCetainLink: false,
-        globalAjaxLoader: true
-
+        globalAjaxLoader: true,
+        menu: {}
     });
+
+    console.log(sx.app);
 
 })(sx, sx.$, sx._);
