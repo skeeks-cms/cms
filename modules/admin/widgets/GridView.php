@@ -28,12 +28,16 @@ class GridView extends \yii\grid\GridView
     public $PjaxOptions = [];
 
     /**
+     * @var Pjax для того чтобы потом можно было обратиться к объекту pjax.
+     */
+    public $pjax    = false;
+    /**
      * Runs the widget.
      */
     public function run()
     {
         if ($this->usePjax) {
-            $pjax = Pjax::begin(ArrayHelper::merge([
+            $this->pjax = Pjax::begin(ArrayHelper::merge([
                 'id' => 'sx-pjax-grid-' . $this->id,
             ], $this->PjaxOptions));
         }

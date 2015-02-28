@@ -36,6 +36,8 @@ class ControllerActions
      */
     public $currentActionCode   = null;
 
+    public $clientOptions       = [];
+
 
     public $isOpenNewWindow       = false;
 
@@ -110,13 +112,16 @@ class ControllerActions
             $action         = $actionManager->getAction($code);
             $label          = $action->label;
 
-            $linkOptions["data-method"]         = $action->method;
-            $linkOptions["data-confirm"]        = $action->confirm;
+            //$linkOptions["data-method"]         = $action->method;
+            //$linkOptions["data-confirm"]        = $action->confirm;
 
-            $actionData = array_merge($actionData, [
+            $actionData = array_merge($actionData, $this->clientOptions, [
                 "url"               => $action->getUrl(),
                 "isOpenNewWindow"   => $this->isOpenNewWindow,
-                "newWindowName"     => $action->getNewWindowName()
+                "newWindowName"     => $action->getNewWindowName(),
+                "confirm"           => $action->confirm,
+                "method"            => $action->method,
+                "request"           => $action->request,
             ]);
 
             $icon = '';
@@ -127,8 +132,7 @@ class ControllerActions
 
             $actionDataJson = Json::encode($actionData);
             $result[] = Html::tag("li",
-                Html::a($icon . '  ' . $label, $action->getUrl(), $linkOptions)
-                ,
+                Html::a($icon . '  ' . $label, $action->getUrl(), $linkOptions),
                 [
                     "class" => $this->currentActionCode == $code ? "active" : "",
                     "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;"
