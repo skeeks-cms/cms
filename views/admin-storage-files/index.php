@@ -23,6 +23,7 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
     'columns' => [
 
+        ['class' => 'yii\grid\CheckboxColumn'],
         ['class' => 'yii\grid\SerialColumn'],
 
         [
@@ -55,7 +56,7 @@ CSS
 
         'name',
 
-        [
+        /*[
             'class'     => \yii\grid\DataColumn::className(),
             'value'     => function(\skeeks\cms\models\StorageFile $model)
             {
@@ -64,7 +65,7 @@ CSS
 
             'format' => 'html',
             'attribute' => 'src'
-        ],
+        ],*/
 
         [
             'class'     => \yii\grid\DataColumn::className(),

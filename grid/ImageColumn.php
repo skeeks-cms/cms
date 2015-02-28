@@ -23,6 +23,10 @@ class ImageColumn extends ImageColumnData
     protected function renderDataCellContent($model, $key, $index)
     {
         $src = $model->getMainImageSrc();
+        if (!$src)
+        {
+            $src = \Yii::$app->cms->moduleAdmin()->noImage;
+        }
         return "<img src='" . $src . "' style='width: " . $this->maxWidth . "px;' />";
     }
 }
