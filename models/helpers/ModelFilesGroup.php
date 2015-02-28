@@ -52,7 +52,6 @@ class ModelFilesGroup extends ComponentModel
     {
         if ($file->isLinkedToModel($this->owner))
         {
-
             if ($files = $this->fetchFiles())
             {
                 $this->items    = [];

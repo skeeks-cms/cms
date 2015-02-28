@@ -46,6 +46,23 @@ JS
 
                         'value',
                         'approved',
+
+                        [
+                            'class'     => \yii\grid\DataColumn::className(),
+                            'value'     => function(\skeeks\cms\models\user\UserEmail $model)
+                            {
+                                if ($model->isMain())
+                                {
+                                    return "да";
+                                }
+
+                                return '-';
+                            },
+                            'format' => 'html',
+                            'label' => 'Основной'
+                        ],
+
+
                     ],
                 ]); ?>
 
