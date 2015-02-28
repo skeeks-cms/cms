@@ -181,11 +181,11 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 <!-- start: Main Menu -->
 <div class="sidebar sx-sidebar">
 
-    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-close" data-sx-widget="tooltip-l" data-original-title="Закрыть меню">
+    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="Закрыть меню">
         <i class="glyphicon glyphicon-menu-left"></i>
     </a>
 
-    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-open" data-sx-widget="tooltip-r" data-original-title="Открыть меню">
+    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-closed" data-sx-widget="tooltip-r" data-original-title="Открыть меню">
         <i class="glyphicon glyphicon-menu-right"></i>
     </a>
 

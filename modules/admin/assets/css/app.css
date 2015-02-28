@@ -492,14 +492,16 @@ div#jGrowl
 
 
 
-.sx-main-menu-toggle
+.sx-main-menu-toggle-opened
 {
     position: fixed;
     top: 50%;
-    left: 270px;
+    left: 258px;
+    z-index: 10000;
+    display: block;
 }
 
-.sx-main-menu-toggle-open
+.sx-main-menu-toggle-closed
 {
     display: none;
     position: fixed;
@@ -507,17 +509,18 @@ div#jGrowl
     left: 12px;
 }
 
-.sx-main-menu-toggle-close
-{
-    display: block;
-}
 
-    body.sidebar-hidden .sx-main-menu-toggle-open
+
+
+
+
+
+    body.sidebar-hidden .sx-main-menu-toggle-closed
     {
         display: block;
     }
 
-    body.sidebar-hidden .sx-main-menu-toggle-close
+    body.sidebar-hidden .sx-main-menu-toggle-opened
     {
         display: none;
     }
