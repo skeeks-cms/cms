@@ -14,6 +14,8 @@ use common\models\User;
 <?php  ?>
 
 <?= $form->fieldSet('Общая ниформация')?>
+
+    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\MainStorageFile::className())->label(false); ?>
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
     <?= $form->field($model, 'email')->textInput(); ?>
 
