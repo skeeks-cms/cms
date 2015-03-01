@@ -1,16 +1,14 @@
 <?php
 /**
- * UserEmail
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 27.01.2015
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 28.02.2015
  */
 namespace skeeks\cms\models\user;
 
 use Yii;
+use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
 use \yii\db\ActiveRecord;
 
@@ -82,8 +80,86 @@ class UserEmail extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function findUser()
+    {
+        $userClass = \Yii::$app->user->identityClass;
+        return $this->hasOne($userClass::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return array|null|ActiveRecord
+     */
+    public function fetchUser()
+    {
+        return $this->findUser()->one();
+    }
+
+    /**
+     * @return array|null|ActiveRecord
+     */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->fetchUser();
     }
+
+    /**
+     * Этот email является главным?
+     *
+     * @return bool
+     */
+    public function isMain()
+    {
+        if ($user = $this->getUser())
+        {
+            if ($user->email == $this->value)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Сделать этот email основным для пользователя.
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function setMainForUser()
+    {
+        if (!$user = $this->getUser())
+        {
+            throw new Exception("Email не привязан к пользователю");
+        }
+
+        if ($this->isMain())
+        {
+            return $this;
+        }
+
+        $user->email    = $this->value;
+        $user->scenario = "update";
+        if (!$user->save())
+        {
+            throw new Exception("Не удалось сохранить данные пользователя");
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return bool|int
+     * @throws \Exception
+     */
+    public function delete()
+    {
+        if ($this->isMain())
+        {
+            throw new Exception("Этот email является основным и не может быть удален. Для начала его необходимо отвязать.");
+        }
+
+        return parent::delete();
+    }
+
 }

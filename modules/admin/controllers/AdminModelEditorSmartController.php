@@ -85,8 +85,8 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'files' =>
                     [
-                        "label"     => "Файлы",
-                        "icon"     => "glyphicon glyphicon-folder-open",
+                        "label"     => "Файлы хранилища",
+                        "icon"     => "glyphicon glyphicon-cloud",
                         "rules"     =>
                         [
                             [

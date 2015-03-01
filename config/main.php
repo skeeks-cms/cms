@@ -176,6 +176,21 @@ $config =
             'class'                         => '\skeeks\cms\Module',
 
             'controllerMap' => [
+                'elfinder-user-files' =>
+                [
+                    'class' => 'skeeks\cms\controllers\ElfinderController',
+                    'access' => ['@'], //глобальный доступ к фаил менеджеру @ - для авторизорованных , ? - для гостей , чтоб открыть всем ['@', '?']
+                    'disabledCommands' => ['netmount'], //отключение ненужных команд https://github.com/Studio-42/elFinder/wiki/Client-configuration-options#commands
+                    'roots' =>
+                    [
+                        [
+                            'class' => 'mihaildev\elfinder\UserPath',
+                            'path'  => 'uploads/users/{id}',
+                            'name'  => 'Личные файлы'
+                        ],
+                    ]
+                ],
+
                 'elfinder' =>
                 [
                     'class' => 'skeeks\cms\controllers\ElfinderController',

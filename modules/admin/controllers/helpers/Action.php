@@ -34,6 +34,7 @@ class Action extends Component
     public $priority    = null;
     public $method      = null;
     public $confirm     = null;
+    public $request     = null;
 
     public $icon     = null;
     public $img      = null;

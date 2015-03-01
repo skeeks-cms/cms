@@ -30,6 +30,7 @@ class ActionColumn extends DataColumn
      */
     public $controller      = null;
     public $isOpenNewWindow      = null;
+    public $clientOptions      = [];
 
     /**
      * @inheritdoc
@@ -54,12 +55,20 @@ class ActionColumn extends DataColumn
      */
     protected function renderDataCellContent($model, $key, $index)
     {
+        //print_r($this->grid->pjax);die;
+        //Строемся в гриде который использует pjax
+        if ($this->grid->pjax)
+        {
+            $this->clientOptions['pjax-id'] = $this->grid->pjax->options['id'];
+        }
+
         $controller = clone $this->controller;
         $controller->setModel($model);
 
         return DropdownControllerActions::widget([
-                    "controller"    => $controller,
-                    "isOpenNewWindow"    => $this->isOpenNewWindow,
+                    "controller"            => $controller,
+                    "isOpenNewWindow"       => $this->isOpenNewWindow,
+                    "clientOptions"         => $this->clientOptions,
                 ]);
     }
 }

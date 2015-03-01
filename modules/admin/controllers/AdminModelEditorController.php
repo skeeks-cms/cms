@@ -123,6 +123,7 @@ class AdminModelEditorController extends AdminController
                         "label"         => "Удалить",
                         "icon"          => "glyphicon glyphicon-trash",
                         "method"        => "post",
+                        "request"       => "ajax",
                         "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
                         "priority"      => 9999,
                         "rules"         => HasModel::className()
@@ -634,20 +635,55 @@ class AdminModelEditorController extends AdminController
      */
     public function actionDelete()
     {
-        if ($this->getCurrentModel()->delete())
+        if (\Yii::$app->request->isAjax)
         {
-            \Yii::$app->getSession()->setFlash('success', 'Запись успешно удалена');
-        } else
-        {
-            \Yii::$app->getSession()->setFlash('error', 'Не получилось удалить запись');
-        }
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            $success = false;
 
-        if ($ref = UrlHelper::getCurrent()->getRef())
-        {
-            return $this->redirect($ref);
+            try
+            {
+                if ($this->getCurrentModel()->delete())
+                {
+                    $message = 'Запись успешно удалена';
+                    //\Yii::$app->getSession()->setFlash('success', $message);
+                    $success = true;
+                } else
+                {
+                    $message = 'Не получилось удалить запись';
+                    //\Yii::$app->getSession()->setFlash('error', $message);
+                    $success = false;
+                }
+            } catch (\Exception $e)
+            {
+                $message = $e->getMessage();
+                    //\Yii::$app->getSession()->setFlash('error', $message);
+                $success = false;
+            }
+
+
+
+            return [
+                'message' => $message,
+                'success' => $success,
+            ];
+
         } else
         {
-            return $this->goBack();
+            if ($this->getCurrentModel()->delete())
+            {
+                \Yii::$app->getSession()->setFlash('success', 'Запись успешно удалена');
+            } else
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не получилось удалить запись');
+            }
+
+            if ($ref = UrlHelper::getCurrent()->getRef())
+            {
+                return $this->redirect($ref);
+            } else
+            {
+                return $this->goBack();
+            }
         }
 
         //return $this->redirect(\Yii::$app->request->getReferrer());

@@ -153,7 +153,13 @@ class StorageFilesController extends Controller
                     $group = $model->getFilesGroups()->getComponent($group);
                     if ($group)
                     {
-                        $group->attachFile($storageFile)->save();
+                        try
+                        {
+                            $group->attachFile($storageFile)->save();
+                        } catch (\yii\base\Exception $e)
+                        {
+                            $response["msgError"]  = $e->getMessage();
+                        }
                     }
                 }
 

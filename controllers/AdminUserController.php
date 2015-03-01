@@ -83,9 +83,22 @@ class AdminUserController extends AdminModelEditorSmartController
             [
                 "actions" =>
                 [
+                    /*'file-manager' =>
+                    [
+                        "label"     => "Личные файлы",
+                        "icon"      => "glyphicon glyphicon-folder-open",
+                        "rules"     =>
+                        [
+                            [
+                                "class" => HasModel::className()
+                            ]
+                        ]
+                    ],*/
+
                     'change-password' =>
                     [
                         "label" => "Изменение пароля",
+                        "icon"     => "glyphicon glyphicon-cog",
                         "rules" =>
                         [
                             [
@@ -97,6 +110,7 @@ class AdminUserController extends AdminModelEditorSmartController
                     'permission' =>
                     [
                         "label" => "Привилегии",
+                        "icon"     => "glyphicon glyphicon-exclamation-sign",
                         "rules" =>
                         [
                             [
@@ -106,6 +120,21 @@ class AdminUserController extends AdminModelEditorSmartController
                     ],
                 ]
             ]
+        ]);
+    }
+
+
+    /**
+     * Updates an existing Game model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionFileManager()
+    {
+        $model = $this->getCurrentModel();
+
+        return $this->render('file-manager', [
+            'model' => $model,
         ]);
     }
 

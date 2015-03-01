@@ -325,7 +325,11 @@ class Tree
                             Html::tag("div",
                                     DropdownControllerActions::widget([
                                         "controller"    => $controller,
-                                        "containerClass"     => "dropdown pull-left"
+                                        "containerClass"     => "dropdown pull-left",
+                                        'clientOptions' =>
+                                        [
+                                            'pjax-id' => 'sx-pjax-tree'
+                                        ]
                                     ]) .
 
                                     Html::tag("div",

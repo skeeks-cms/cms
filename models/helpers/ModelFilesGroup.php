@@ -12,8 +12,11 @@ namespace skeeks\cms\models\helpers;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\ComponentModel;
 use skeeks\cms\models\StorageFile;
+use skeeks\sx\String;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class ModelFilesGroup
@@ -42,6 +45,83 @@ class ModelFilesGroup extends ComponentModel
 
 
     /**
+     * Может ли быть файл привязан в эту группу.
+     *
+     * @param StorageFile $file
+     * @return bool
+     * @throws Exception
+     */
+    public function canBeAttachedFile(StorageFile $file)
+    {
+        //Если файл не привязан к этой сущьности то и в группу добавить его нельзя
+        if (!$file->isLinkedToModel($this->owner))
+        {
+            throw new Exception('Файл не привязан к текущей моделе, поэтому не может быть добавлен в эту группу.');
+        }
+
+        //Если в конфиге указаны допустимые расширения файлов то проверим расширение файла
+        if ($allowedExtensions = $this->getConfigAllowedExtensions())
+        {
+            if (!in_array(String::strtolower($file->extension), $allowedExtensions))
+            {
+                throw new Exception("Файл с расширением {$file->extension} не может быть привязан. Допустимые расширения: " . implode(", ", $allowedExtensions));
+            }
+        }
+
+        //Если в конфиге указан максимальный размер файла
+        if ($maxSize = $this->getConfigMaxSize())
+        {
+            if ((int) $file->size > (int) $maxSize)
+            {
+                $sizeFormated       = \Yii::$app->formatter->asSize($file->size);
+                $maxSizeFormated    = \Yii::$app->formatter->asSize($maxSize);
+                throw new Exception("Файл с размером {$sizeFormated} не может быть привязан. Максимальный размер файла: " . $maxSizeFormated);
+            }
+        }
+
+        //Максимальное количество файлов
+        if ($maxCountFiles = $this->getConfigMaxCountFiles())
+        {
+            if ($attachedFiles = count($this->fetchFiles()) >= $maxCountFiles)
+            {
+                throw new Exception("Максимально к этой группе можно привязать {$maxCountFiles}, уже привязано {$attachedFiles}");
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Допустимые расширения файлов
+     *
+     * @return array
+     */
+    public function getConfigAllowedExtensions()
+    {
+        return (array) ArrayHelper::getValue($this->config, HasFiles::ALLOWED_EXTENSIONS, []);
+    }
+
+    /**
+     * Максимальный размер файла
+     *
+     * @return int
+     */
+    public function getConfigMaxSize()
+    {
+        return (int) ArrayHelper::getValue($this->config, HasFiles::MAX_SIZE, 0);
+    }
+
+    /**
+     * Проверка максимального количества файлов
+     *
+     * @return int
+     */
+    public function getConfigMaxCountFiles()
+    {
+        return (int) ArrayHelper::getValue($this->config, HasFiles::MAX_COUNT_FILES, 0);
+    }
+
+    /**
      *
      * Можно добавляь файл в группу, только если файл уже привязан к моделе
      *
@@ -50,20 +130,18 @@ class ModelFilesGroup extends ComponentModel
      */
     public function attachFile(StorageFile $file)
     {
-        if ($file->isLinkedToModel($this->owner))
-        {
+        $this->canBeAttachedFile($file);
 
-            if ($files = $this->fetchFiles())
+        if ($files = $this->fetchFiles())
+        {
+            $this->items    = [];
+            foreach ($files as $fileAttached)
             {
-                $this->items    = [];
-                foreach ($files as $fileAttached)
-                {
-                    $this->items[]  = $fileAttached->src;
-                }
+                $this->items[]  = $fileAttached->src;
             }
-            $this->items[]  = $file->src;
-            $this->items    = array_unique($this->items);
         }
+        $this->items[]  = $file->src;
+        $this->items    = array_unique($this->items);
 
         $this->behavior->setInstanceFilesFromGroup();
         return $this;

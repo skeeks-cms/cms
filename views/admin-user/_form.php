@@ -16,6 +16,59 @@ use common\models\User;
 <?= $form->fieldSet('Общая ниформация')?>
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
     <?= $form->field($model, 'email')->textInput(); ?>
+
+<? if (!$model->isNewRecord) : ?>
+    <p><small>Можно привязать несколько email адресов к аккаунту.</small></p>
+    <? $action = \skeeks\cms\helpers\UrlHelper::construct('cms/admin-user-email/create', ['user_id' => $model->id])->enableAdmin()->toString(); ?>
+<div>
+        <a class="btn btn-default btn-xs" onclick="<?= new \yii\web\JsExpression(<<<JS
+            new sx.classes.CreateUserEmail({'action': '{$action}'}); return false;
+JS
+        ); ?>"><i class="glyphicon glyphicon-plus"></i>Добавить еще</a>
+                <?
+                    $search = new \skeeks\cms\models\Search(\skeeks\cms\models\user\UserEmail::className());
+                    $search->getDataProvider()->query->where(['user_id' => $model->id]);
+                ?>
+                <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+                    'PjaxOptions' => [
+                        'id' => 'sx-table-emails'
+                    ],
+                    'dataProvider'  => $search->getDataProvider(),
+                    'layout' => "\n{items}\n{pager}",
+                    'columns' => [
+                        //['class' => 'yii\grid\SerialColumn'],
+
+                        [
+                            'class'                 => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                            'controller'            => \Yii::$app->createController('cms/admin-user-email')[0],
+                            'isOpenNewWindow'       => true
+                        ],
+
+                        'value',
+                        'approved',
+
+                        [
+                            'class'     => \yii\grid\DataColumn::className(),
+                            'value'     => function(\skeeks\cms\models\user\UserEmail $model)
+                            {
+                                if ($model->isMain())
+                                {
+                                    return "да";
+                                }
+
+                                return '-';
+                            },
+                            'format' => 'html',
+                            'label' => 'Основной'
+                        ],
+
+
+                    ],
+                ]); ?>
+
+
+    </div>
+<? endif; ?>
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'city')->textInput(); ?>
     <?= $form->field($model, 'address')->textInput(); ?>
@@ -29,7 +82,7 @@ use common\models\User;
 
 <? if (!$model->isNewRecord) : ?>
     <?
-        $action = \skeeks\cms\helpers\UrlHelper::construct('cms/admin-user-email/create', ['user_id' => $model->id])->enableAdmin()->toString();
+
         $this->registerJs(<<<JS
         (function(sx, $, _)
         {
@@ -56,38 +109,10 @@ use common\models\User;
 JS
 );
     ?>
-    <a class="btn btn-default" onclick="<?= new \yii\web\JsExpression(<<<JS
-    new sx.classes.CreateUserEmail({'action': '{$action}'}); return false;
-JS
-); ?>">Добавить</a>
-        <?
-            $search = new \skeeks\cms\models\Search(\skeeks\cms\models\user\UserEmail::className());
-            $search->getDataProvider()->query->where(['user_id' => $model->id]);
-        ?>
-        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-            'PjaxOptions' => [
-                'id' => 'sx-table-emails'
-            ],
-            'dataProvider'  => $search->getDataProvider(),
-            'layout' => "\n{items}\n{pager}",
-            'columns' => [
-                //['class' => 'yii\grid\SerialColumn'],
 
-                [
-                    'class'                 => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                    'controller'            => \Yii::$app->createController('cms/admin-user-email')[0],
-                    'isOpenNewWindow'       => true
-                ],
 
-                'value',
-                'approved',
-            ],
-        ]); ?>
 
 <? endif; ?>
-
-
-
 
 
 

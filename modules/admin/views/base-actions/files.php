@@ -45,7 +45,27 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
                 ]);
             ?>
             <? if ($group): ?>
-                <p><a href="#" data-sx-widget="tooltip" data-original-title="Показать/скрыть требования к файлам этой группы">Требования к файлам этой группы</a></p>
+                <? $selectedGroup = $groups->getComponent($group);
+                ?>
+                <p>
+                    <a href="#" data-sx-widget="tooltip" data-original-title="Показать/скрыть требования к файлам этой группы">Требования к файлам этой группы: </a>
+                    <br />
+                    <? foreach($selectedGroup->config as $key => $val) : ?>
+                        <small><?= \skeeks\cms\models\behaviors\HasFiles::configLabels()[$key]; ?>:
+                            <? if (is_array($val)) : ?>
+                                <?= implode(", ", $val); ?>
+                            <? else:?>
+                                <? if ($key == \skeeks\cms\models\behaviors\HasFiles::MAX_SIZE) : ?>
+                                    <?= \Yii::$app->formatter->asShortSize($selectedGroup->getConfigMaxSize()); ?>
+                                <? else: ?>
+                                    <?= $val; ?>
+                                <? endif; ?>
+
+                            <? endif;?>
+                            </small>
+                        <br />
+                    <? endforeach; ?>
+                </p>
             <? endif; ?>
             <small>
                 Вы можете загружать файлы и привязывать их к определенным меткам.<br />

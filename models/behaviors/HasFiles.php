@@ -17,6 +17,7 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Vote;
 use yii\db\BaseActiveRecord;
 use \yii\base\Behavior;
+use yii\helpers\ArrayHelper;
 
 /**
  *
@@ -55,7 +56,10 @@ class HasFiles extends HasLinkedModels
      */
     const MAX_SIZE_TOTAL        = "maxSizeTotal";
     const MAX_SIZE              = "maxSize";
+    const MIN_SIZE              = "minSize";
+
     const ALLOWED_EXTENSIONS    = "allowedExtensions";
+
     const MAX_COUNT_FILES       = "maxCountFiles";
     const ACCEPT_MIME_TYPE      = "acceptMimeType";
 
@@ -77,6 +81,77 @@ class HasFiles extends HasLinkedModels
      */
     public $filesFieldName = 'files';
 
+    /**
+     * Использовать стандартный конфиг
+     *
+     * @var bool
+     */
+    public $defaultGroups = true;
+
+    public function init()
+    {
+        parent::init();
+
+        /**
+         * Использовать стандартную конфигурацию групп
+         */
+        if ($this->defaultGroups)
+        {
+            $this->groups = ArrayHelper::merge(
+                [
+                    "image" =>
+                    [
+                        'name'      => 'Главное изображение',
+                        'config'    =>
+                        [
+                            static::MAX_SIZE            => 10*1024*1024, //10Mb
+                            static::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
+                            static::MAX_COUNT_FILES     => 1,
+                            static::ACCEPT_MIME_TYPE    => "image/*",
+                        ]
+                    ],
+
+                    "images" =>
+                    [
+                        'name'      => 'Изображения',
+                        'config' =>
+                        [
+                            static::MAX_SIZE            => 10*1024*1024, //10Mb
+                            static::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
+                            static::MAX_COUNT_FILES     => 50,
+                            static::ACCEPT_MIME_TYPE    => "image/*",
+                        ]
+                    ],
+
+                    "files" =>
+                    [
+                        'name'      => 'Файлы',
+                        'config'    =>
+                        [
+                            static::MAX_SIZE            => 10*1024*1024, //10Mb
+                            static::MAX_COUNT_FILES     => 50,
+                        ]
+                    ]
+                ],
+                $this->groups
+            );
+        }
+    }
+
+    /**
+     * @return array
+     */
+    static public function configLabels()
+    {
+        return [
+            self::MAX_SIZE_TOTAL        => 'Максимальный суммарный размер всех файлов',
+            self::MAX_SIZE              => 'Максимальный размер одного файла',
+            self::MIN_SIZE              => 'Минимальный размер одного файла',
+            self::ALLOWED_EXTENSIONS    => 'Разрешенные расширения файлов',
+            self::MAX_COUNT_FILES       => 'Максимальное количество файлов',
+            self::ACCEPT_MIME_TYPE      => 'Разрешенные mime types файлов',
+        ];
+    }
 
     /**
      * Все группы будем хранить в json encode
