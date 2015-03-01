@@ -176,35 +176,6 @@ class User
                     "image" =>
                     [
                         'name'      => 'Аватар',
-                        'config'    =>
-                        [
-                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
-                            HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                            HasFiles::MAX_COUNT_FILES     => 1,
-                            HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                        ]
-                    ],
-
-                    "images" =>
-                    [
-                        'name'      => 'Изображения',
-                        'config' =>
-                        [
-                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
-                            HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                            HasFiles::MAX_COUNT_FILES     => 50,
-                            HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                        ]
-                    ],
-
-                    "files" =>
-                    [
-                        'name'      => 'Файлы',
-                        'config'    =>
-                        [
-                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
-                            HasFiles::MAX_COUNT_FILES     => 50,
-                        ]
                     ],
                 ]
             ],

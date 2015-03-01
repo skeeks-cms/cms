@@ -48,7 +48,7 @@ class Storage extends CollectionComponents
      *
      * Загрузить файл в хранилище, добавить в базу, вернуть модель StorageFile
      *
-     * @param $file
+     * @param UploadedFile|string $file    объект UploadedFile или rootPath до файла локально
      * @param array $data
      * @param null $clusterId
      * @return StorageFile

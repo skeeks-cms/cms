@@ -74,46 +74,7 @@ abstract class PageAdvanced extends Page
             HasDescriptionsBehavior::className(),
             HasAdultStatus::className() => HasAdultStatus::className(),
             HasStatus::className() => HasStatus::className(),
-            behaviors\HasFiles::className() =>
-            [
-                "class"  => HasFiles::className(),
-                "groups" =>
-                [
-                    "image" =>
-                    [
-                        'name'      => 'Главное изображение',
-                        'config'    =>
-                        [
-                            HasFiles::MAX_SIZE            => 10*1024, //1Mb
-                            HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                            HasFiles::MAX_COUNT_FILES     => 1,
-                            HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                        ]
-                    ],
-
-                    "images" =>
-                    [
-                        'name'      => 'Изображения',
-                        'config' =>
-                        [
-                            HasFiles::MAX_SIZE            => 10*1024, //1Mb
-                            HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                            HasFiles::MAX_COUNT_FILES     => 50,
-                            HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                        ]
-                    ],
-
-                    "files" =>
-                    [
-                        'name'      => 'Файлы',
-                        'config'    =>
-                        [
-                            HasFiles::MAX_SIZE            => 10*1024, //1Mb
-                            HasFiles::MAX_COUNT_FILES     => 50,
-                        ]
-                    ],
-                ]
-            ],
+            behaviors\HasFiles::className() => behaviors\HasFiles::className()
         ]);
     }
 

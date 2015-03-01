@@ -83,7 +83,7 @@ class AdminUserController extends AdminModelEditorSmartController
             [
                 "actions" =>
                 [
-                    'file-manager' =>
+                    /*'file-manager' =>
                     [
                         "label"     => "Личные файлы",
                         "icon"      => "glyphicon glyphicon-folder-open",
@@ -93,7 +93,7 @@ class AdminUserController extends AdminModelEditorSmartController
                                 "class" => HasModel::className()
                             ]
                         ]
-                    ],
+                    ],*/
 
                     'change-password' =>
                     [
