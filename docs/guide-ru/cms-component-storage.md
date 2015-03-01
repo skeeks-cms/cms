@@ -27,9 +27,9 @@ $storageFile = Yii::$app->storage->upload($file, [
  *
  * Загрузить файл в хранилище, добавить в базу, вернуть модель StorageFile
  *
- * @param UploadedFile|string $file    объект UploadedFile или rootPath до файла локально
- * @param array $data
- * @param null $clusterId
+ * @param UploadedFile|string|File $file    объект UploadedFile или File или rootPath до файла локально или http:// путь к файлу (TODO:: доделать)
+ * @param array $data                       данные для сохранения в базу
+ * @param null $clusterId                   идентификатор кластера по умолчанию будет выбран первый из конфигурации
  * @return StorageFile
  * @throws Exception
  */
