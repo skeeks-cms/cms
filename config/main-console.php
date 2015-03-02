@@ -70,11 +70,6 @@ $config =
 
     'modules' => [
 
-        'admin' =>
-        [
-            'class' => '\skeeks\cms\modules\admin\Module'
-        ],
-
         'cms' =>
         [
             'class' => '\skeeks\cms\ConsoleModule',
