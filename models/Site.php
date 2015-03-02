@@ -13,6 +13,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\Exception;
+use skeeks\cms\exceptions\NotFoundDb;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasRef;
 use Yii;
@@ -140,10 +141,21 @@ class Site extends Core
      */
     static public function getAll()
     {
-        if (static::$sites === null)
+        try
         {
-            static::$sites = static::find()->all();
+            if (static::$sites === null)
+            {
+                static::$sites = static::find()->all();
+            }
+
+        } catch (\yii\db\Exception $e)
+        {
+            if (!\Yii::$app->db->getTableSchema(static::tableName(), true))
+            {
+                throw new NotFoundDb();
+            }
         }
+
 
         return static::$sites;
     }
