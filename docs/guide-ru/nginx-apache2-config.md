@@ -3,8 +3,7 @@ Apache + Nginx рекоммендации
 
 Подробное конфигурирование пока не даем. Но важно понимать, что схема должны быть следующей
 
-- for application 1 `/var/www/sites/test.ru/frontend/web/` and using the URL `http://test.ru/`
-- for application 2 `/var/www/sites/test.ru/backend/web/` and using the URL `http://application2.test.ru/`
+- `/var/www/sites/test.ru/frontend/web/` and using the URL `http://test.ru/`
 
 Пока оставлю это здесь (рабочие примеры).
 
@@ -28,14 +27,10 @@ server {
         root $root;
         index index.html index.htm index.php;
 
-        include /var/www/libs/_skeeks/additional/nginx/conf/vz/backends/apache2/php55.conf;
-        include /var/www/libs/_skeeks/additional/nginx/conf/vz/contrib/protected.conf;
-        include /var/www/libs/_skeeks/additional/nginx/conf/vz/contrib/static-files.conf;
-        include /var/www/libs/_skeeks/additional/nginx/conf/vz/contrib/error-404.conf;
-
-
-        access_log off;
-        error_log /var/log/nginx/errors-main.blank.cms.skeeks.com.log;
+        include backends/apache2/php55.conf;
+        include contrib/protected.conf;
+        include contrib/static-files.conf;
+        include /contrib/error-404.conf;
 }
 
 ```
