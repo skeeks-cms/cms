@@ -65,6 +65,11 @@ $config =
         [
             'class' => '\skeeks\cms\components\Imaging',
         ],
+
+        'authManager' => [
+            'class' => '\skeeks\cms\rbac\DbManager',
+            //'defaultRoles' => ['user'],
+        ],
     ],
 
 
