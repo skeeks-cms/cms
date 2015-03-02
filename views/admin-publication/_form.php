@@ -11,6 +11,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
     <?= $form->field($model, 'type')->label('Тип публикации')->widget(

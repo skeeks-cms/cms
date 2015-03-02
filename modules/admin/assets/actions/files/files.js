@@ -135,6 +135,7 @@
                 },
                 endXHR: function(filename, uploadBtn)
                 {
+                    //console.log(filename);
                     //console.log(uploader.getQueueSize());
                 },
                 onChange: function(filename, extension, uploadBtn)

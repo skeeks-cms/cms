@@ -23,6 +23,9 @@ use skeeks\cms\modules\admin\components\UrlRule;
  */
 class Module extends CmsModule
 {
+    //Скрывать кнопки действи сущьности
+    const SYSTEM_QUERY_NO_ACTIONS_MODEL = 'no-actions';
+
     public $controllerNamespace = 'skeeks\cms\modules\admin\controllers';
 
     /**

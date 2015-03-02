@@ -72,6 +72,18 @@ Cms Widget
 * Правила написания widget-ов для cms
 
 
+Компоненты cms
+----------
+* [Хранилище файлов storage](cms-component-storage.md)
+* Компонент registeredModels
+* Компонент registeredWidgets
+* Компонент registeredLayouts
+* Компонент adminMenu
+* Компонент seoGenerator
+* Компонент pageOptions
+* Компонент langs
+
+
 
 > [![skeeks!](https://gravatar.com/userimage/74431132/13d04d83218593564422770b616e5622.jpg)](http://www.skeeks.com)  
 <i>Web development has never been so fun!</i>  
