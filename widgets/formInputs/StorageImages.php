@@ -10,6 +10,7 @@ namespace skeeks\cms\widgets\formInputs;
 use skeeks\cms\Exception;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\Publication;
+use skeeks\cms\modules\admin\Module;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\helpers\Html;
@@ -18,10 +19,10 @@ use yii\widgets\InputWidget;
 use Yii;
 
 /**
- * Class MainStorageFile
+ * Class StorageImages
  * @package skeeks\cms\widgets\formInputs
  */
-class MainStorageFile extends InputWidget
+class StorageImages extends InputWidget
 {
     /**
      * @var array
@@ -55,7 +56,19 @@ class MainStorageFile extends InputWidget
         {
             $this->_initAndValidate();
 
-            $group = $this->model->getFilesGroups()->getComponent('image');
+            $groupMainImage = $this->model->getFilesGroups()->getComponent('image');
+            $groupImages = $this->model->getFilesGroups()->getComponent('images');
+
+            $uploaderUrl = \skeeks\cms\helpers\UrlHelper::construct(\Yii::$app->controller->module->id . '/' . \Yii::$app->controller->id . '/files', [
+                'id' => $this->model->id,
+                'group' => "images",
+                'mode' => "sx-onlyUpload"
+            ])
+                ->enableAdmin()
+                ->setSystem([
+                    Module::SYSTEM_QUERY_NO_ACTIONS_MODEL => 'true'
+                ])
+                ->toString();
 
             if ($this->model->isNewRecord)
             {
@@ -63,9 +76,10 @@ class MainStorageFile extends InputWidget
                 return;
             }
 
-            echo $this->render('main-storage-file', [
+            echo $this->render('storage-images', [
                 'model' => $this->model,
-                'widget' => $this
+                'widget' => $this,
+                'uploaderUrl' => $uploaderUrl
             ]);
 
         } catch (Exception $e)

@@ -3,6 +3,7 @@ Updates to the development of the project
 
 1.0.5
 -----------------
+  * \skeeks\cms\widgets\formInputs\StorageImages - очень полезный видежт форм
   * Возможность привязки несокльких email для одного пользователя
   * Добавлены личные файлы каждому пользователю
   * Начало переписывания js админки.

@@ -18,7 +18,7 @@ $groups = $model->getFilesGroups();
 
 $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 ?>
-<div id="sx-file-manager">
+<div id="sx-file-manager" class="<?= $mode; ?>">
     <div class="sx-upload-sources">
         <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a>
         <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-globe"></i> Загрузить по ссылке http://</a>
@@ -77,6 +77,7 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
     <? endif; ?>
 
 
+    <div class="sx-files-table">
     <br />
     <br />
 
@@ -191,6 +192,7 @@ CSS
         ],
 
     ]); ?>
+    </div>
 </div>
 
 
@@ -207,6 +209,23 @@ $this->registerJs(<<<JS
     sx.FileMangager = new sx.classes.files.Manager('#sx-file-manager', {$clientOptionsString});
 })(sx, sx.$, sx._);
 JS
+);
+
+?>
+
+<?
+
+$this->registerCss(<<<CSS
+.sx-onlyUpload .sx-select-group
+{
+    display: none;
+}
+
+.sx-onlyUpload .sx-files-table
+{
+    display: none;
+}
+CSS
 );
 
 ?>

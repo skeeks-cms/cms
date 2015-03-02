@@ -15,13 +15,15 @@ use common\models\User;
 
 <?= $form->fieldSet('Общая ниформация')?>
 
-    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\MainStorageFile::className())->label(false); ?>
+    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
     <?= $form->field($model, 'email')->textInput(); ?>
 
 <? if (!$model->isNewRecord) : ?>
     <p><small>Можно привязать несколько email адресов к аккаунту.</small></p>
-    <? $action = \skeeks\cms\helpers\UrlHelper::construct('cms/admin-user-email/create', ['user_id' => $model->id])->enableAdmin()->toString(); ?>
+    <? $action = \skeeks\cms\helpers\UrlHelper::construct('cms/admin-user-email/create', ['user_id' => $model->id])->setSystem([
+                    \skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL => 'true'
+                ])->enableAdmin()->toString(); ?>
 <div>
         <a class="btn btn-default btn-xs" onclick="<?= new \yii\web\JsExpression(<<<JS
             new sx.classes.CreateUserEmail({'action': '{$action}'}); return false;

@@ -178,6 +178,10 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         {
             $group = \Yii::$app->request->post('group');
             \Yii::$app->getSession()->set('cms-admin-files-group', $group);
+        } else if (\Yii::$app->request->get("group"))
+        {
+            $group = \Yii::$app->request->get('group');
+            \Yii::$app->getSession()->set('cms-admin-files-group', $group);
         } else
         {
             $group = \Yii::$app->getSession()->get('cms-admin-files-group');
@@ -210,6 +214,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             'controller'        => $controller,
             'group'              => $group,
             'clientOptions'     => (array) $clientOptions,
+            'mode'              => \Yii::$app->request->get("mode"),
         ]));
 
     }
