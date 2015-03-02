@@ -29,4 +29,10 @@ class CmsController extends Controller
     {
         return $this->output(\Yii::$app->cms->moduleCms()->getDescriptor());
     }
+
+    public function actionInstall()
+    {
+        echo '11';die;
+        return \Yii::$app->cms->moduleCms()->getDescriptor();
+    }
 }
