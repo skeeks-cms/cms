@@ -74,7 +74,10 @@ abstract class PageAdvanced extends Page
             HasDescriptionsBehavior::className(),
             HasAdultStatus::className() => HasAdultStatus::className(),
             HasStatus::className() => HasStatus::className(),
-            behaviors\HasFiles::className() => behaviors\HasFiles::className()
+            behaviors\HasFiles::className() =>
+            [
+                'class' => behaviors\HasFiles::className()
+            ]
         ]);
     }
 
