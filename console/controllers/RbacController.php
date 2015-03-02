@@ -26,11 +26,9 @@ class RbacController extends Controller
 {
     public function actionInit()
     {
-        $this->startTool();
-        $this->stdout("Cms Rbac init\n");
         $this
             ->_initBaseData()
-            ->_initAdminData()
+            //->_initAdminData()
             ->_initRootUser()
         ;
     }
@@ -47,7 +45,11 @@ class RbacController extends Controller
         $aManager = \Yii::$app->authManager;
         if ($root && $aManager->getRole('root'))
         {
-            $aManager->assign($aManager->getRole('root'), $root->primaryKey);
+            if (!$aManager->getAssignment('root', $root->primaryKey))
+            {
+                $aManager->assign($aManager->getRole('root'), $root->primaryKey);
+            }
+
         }
 
         return $this;

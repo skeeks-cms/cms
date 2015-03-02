@@ -40,14 +40,17 @@ class AccessRule extends \yii\filters\AccessRule
      */
     public function allows($action, $user, $request)
     {
+
         if ($action->controller instanceof AdminModelEditorController)
         {
-
             if ($action->controller->getCurrentModel())
             {
+
                 if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $action->controller->getCurrentModel())->isValid())
                 {
                     $acttionPermissionNameOwn = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId() . '/' . $action->id);
+
+
                     if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionNameOwn))
                     {
                         if (!\Yii::$app->user->can($permission->name, [
@@ -68,7 +71,6 @@ class AccessRule extends \yii\filters\AccessRule
             {
                 if (!\Yii::$app->user->can($permission->name))
                 {
-
                     return false;
                 }
 
