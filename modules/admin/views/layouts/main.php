@@ -26,7 +26,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
     <?php $this->head() ?>
 </head>
-<body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?>">
+<body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?> <?= UrlHelper::getCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT) ? "empty" : ""?>">
 
 
 <?php $this->beginBody() ?>

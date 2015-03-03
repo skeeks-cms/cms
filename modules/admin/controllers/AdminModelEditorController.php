@@ -560,6 +560,7 @@ class AdminModelEditorController extends AdminController
 
         if (\Yii::$app->request->isAjax)
         {
+            $model->load(\Yii::$app->request->post());
             if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
                 \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');

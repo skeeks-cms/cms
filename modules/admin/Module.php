@@ -25,6 +25,7 @@ class Module extends CmsModule
 {
     //Скрывать кнопки действи сущьности
     const SYSTEM_QUERY_NO_ACTIONS_MODEL = 'no-actions';
+    const SYSTEM_QUERY_EMPTY_LAYOUT     = 'sx-empty-layout';
 
     public $controllerNamespace = 'skeeks\cms\modules\admin\controllers';
 

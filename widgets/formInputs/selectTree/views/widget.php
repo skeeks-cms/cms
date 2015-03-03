@@ -16,6 +16,7 @@
 ?>
 
 <div id="<?= $id; ?>">
+    <iframe src="<?= $src; ?>" width="100%;" height="200px;"></iframe>
     <div class="sx-selected">
         <?= $select; ?>
         <ul>

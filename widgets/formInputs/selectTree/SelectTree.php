@@ -14,6 +14,7 @@ use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\Tree;
+use skeeks\cms\modules\admin\Module;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -66,18 +67,22 @@ class SelectTree extends InputWidget
                 'style' => 'display: none;'
             ]);
 
+            $src = UrlHelper::construct('/cms/admin-tree')
+                            ->set('mode', $this->mode)
+                            ->set('s', $valueArray)
+                            ->setSystemParam(Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                            ->setSystemParam(Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                            ->enableAdmin()->toString();
 
             $id = "sx-id-" . Yii::$app->security->generateRandomString(6);
             return $this->render('widget', [
                 'widget'            => $this,
                 'id'                => $id,
                 'select'            => $select,
+                'src'               => $src,
                 'clientOptions'     => Json::encode(
                     [
-                        'src'       => UrlHelper::construct('/cms/admin-tree')
-                            ->set('mode', $this->mode)
-                            ->set('s', $valueArray)
-                            ->enableAdmin()->toString(),
+                        'src'       => $src,
                         'name'      => $id,
                         'selected'  => $trees
                     ]

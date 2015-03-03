@@ -21,7 +21,7 @@
         {
             if (window.opener)
             {
-                $("body").addClass("empty");
+                //$("body").addClass("empty");
             }
 
             $("ul.nav-sidebar").find("a").each(function() {

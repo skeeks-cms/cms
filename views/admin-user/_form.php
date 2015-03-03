@@ -21,9 +21,10 @@ use common\models\User;
 
 <? if (!$model->isNewRecord) : ?>
     <p><small>Можно привязать несколько email адресов к аккаунту.</small></p>
-    <? $action = \skeeks\cms\helpers\UrlHelper::construct('cms/admin-user-email/create', ['user_id' => $model->id])->setSystem([
-                    \skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL => 'true'
-                ])->enableAdmin()->toString(); ?>
+    <? $action = \skeeks\cms\helpers\UrlHelper::construct('cms/admin-user-email/create', ['user_id' => $model->id])
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                ->enableAdmin()->toString(); ?>
 <div>
         <a class="btn btn-default btn-xs" onclick="<?= new \yii\web\JsExpression(<<<JS
             new sx.classes.CreateUserEmail({'action': '{$action}'}); return false;
