@@ -13,6 +13,7 @@ namespace skeeks\cms\modules\admin\controllers;
 
 use skeeks\cms\actions\LogoutAction;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\User;
 use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestForm;
@@ -104,10 +105,45 @@ class AuthController extends AdminController
             return $this->goHome();
         }
 
+        $token = \Yii::$app->request->get('token');
+
+        if(!$token)
+        {
+            return $this->goHome();
+        }
+
+        $user = User::findByPasswordResetToken($token);
+
+        if($user)
+        {
+            $password = \Yii::$app->getSecurity()->generateRandomString(10);
+
+            $user->setPassword($password);
+
+            $user->generatePasswordResetToken();
+
+            if ($user->save()) {
+
+                \Yii::$app->mailer->setViewPath(\Yii::$app->cms->moduleCms()->basePath . '/mail');
+
+                \Yii::$app->mailer->compose('newPassword', ['user' => $user, 'password' => $password])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                    ->setTo($user->email)
+                    ->setSubject('Новый пароль для ' . \Yii::$app->name)
+                    ->send();
+
+                $message = 'Новый пароль отправлен на ваш e-mail';
+            }
+        }
+
+        if(!$message)
+        {
+            $message = 'Ошибка, попробуйте еще раз';
+        }
+
         return $this->render('reset-password', [
-
+            'message' => $message,
         ]);
-
     }
 
     public function actionAuth()
