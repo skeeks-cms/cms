@@ -202,7 +202,7 @@ JS
                                 <div>
                                     <hr />
                                     <div style="color:#999;margin:1em 0">
-                                        Данная опция пока не работает, но она будет тут: <a href="#" class="sx-act-controll" onclick="sx.auth.goActForget(); return false;">восстановить пароль</a>
+                                        <a href="#" class="sx-act-controll" onclick="sx.auth.goActForget(); return false;">восстановить пароль</a>
                                     </div>
                                 </div>
                         <?php ActiveForm::end(); ?>
