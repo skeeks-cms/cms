@@ -1,6 +1,11 @@
 Updates to the development of the project
 ==============
 
+1.0.6
+-----------------
+  * Обновлены инсталляционные скрипты
+  * Отключено js определение window.opener, теперь принудильно указываем для ссылки свойства
+
 1.0.5
 -----------------
   * \skeeks\cms\widgets\formInputs\StorageImages - очень полезный видежт форм

@@ -100,6 +100,35 @@ class Action extends Component
 
 
 
+    public function getUrlNewWindow()
+    {
+        if ($this->controller->module instanceof \skeeks\cms\base\Module)
+        {
+            $route = $this->controller->module->id . '/' . $this->controller->id . '/' . $this->code;
+        } else
+        {
+            $route = $this->controller->id . '/' . $this->code;
+        }
+
+        $url = UrlHelper::constructCurrent()->setRoute($route)
+            ->set(UrlRule::ADMIN_PARAM_NAME, UrlRule::ADMIN_PARAM_VALUE)
+            ->setCurrentRef()
+        ;
+
+        if ($this->controller instanceof AdminModelEditorController)
+        {
+            if ($model = $this->controller->getModel())
+            {
+                $url->set('id', $model->{$this->controller->modelPkAttribute});
+            }
+        }
+
+        $url->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+            ;
+            //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true');
+
+        return $url->toString();
+    }
     /**
      * @return string
      */

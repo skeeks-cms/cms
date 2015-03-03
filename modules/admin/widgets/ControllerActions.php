@@ -116,7 +116,7 @@ class ControllerActions
             //$linkOptions["data-confirm"]        = $action->confirm;
 
             $actionData = array_merge($actionData, $this->clientOptions, [
-                "url"               => $action->getUrl(),
+                "url"               => $this->isOpenNewWindow ? $action->getUrlNewWindow() : $action->getUrl(),
                 "isOpenNewWindow"   => $this->isOpenNewWindow,
                 "newWindowName"     => $action->getNewWindowName(),
                 "confirm"           => $action->confirm,

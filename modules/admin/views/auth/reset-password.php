@@ -61,6 +61,9 @@ $this->registerCss(<<<CSS
     }
 CSS
 );
+
+$authLink = \skeeks\cms\helpers\UrlHelper::construct('admin/index')->enableAbsolute()->enableAdmin();
+
 $this->registerJs(<<<JS
     (function(sx, $, _)
     {
@@ -90,7 +93,10 @@ $this->registerJs(<<<JS
                     $('.sx-auth').fadeIn();
                 }, 500);
 
-
+                _.delay(function()
+                {
+                    window.location.replace('$authLink')
+                }, 5000);
             },
         });
 
@@ -109,7 +115,7 @@ JS
                 <div class="panel-content">
 
                     <div class="sx-act sx-act-reset-password">
-                        Отлично. Проверьте ваш email. Мы отправили туда новый пароль.
+                        <?=$message?>
                     </div>
 
                 </div>

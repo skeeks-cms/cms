@@ -145,18 +145,22 @@ class Tree
 
         $this->registerAssets();
 
+        $addBtn = '';
+        if ($this->_getMode() == 'multi')
+        {
+            $addBtn = Html::tag("div",
+                    Html::a("Добавить отмеченное", '#', ['class' => 'btn btn-primary btn-sm sx-controll-btn-select'])
+                    /*Html::a("Открыть все разделы", UrlHelper::construct("cms/admin-tree/index")->set('setting-open-all', 'true'), ['class' => 'btn btn-primary btn-sm']) .
+                    Html::a("Закрыть все разделы", UrlHelper::construct("cms/admin-tree/index"), ['class' => 'btn btn-primary btn-sm'])*/
+                , ['class' => "sx-container-controlls col-md-2"]);
+        }
 
         return Html::tag('div',
 
-            Html::tag("div",
-                Html::tag("div", $this->renderNodes($this->models), $this->containerOptions)
-            , ['class' => "sx-container-tree col-md-6"]) .
+                Html::tag("div",
+                    Html::tag("div", $this->renderNodes($this->models), $this->containerOptions)
+                , ['class' => "sx-container-tree col-md-6"]) . $addBtn
 
-            Html::tag("div",
-                Html::a("Добавить отмеченное", '#', ['class' => 'btn btn-primary btn-sm sx-controll-btn-select'])
-                /*Html::a("Открыть все разделы", UrlHelper::construct("cms/admin-tree/index")->set('setting-open-all', 'true'), ['class' => 'btn btn-primary btn-sm']) .
-                Html::a("Закрыть все разделы", UrlHelper::construct("cms/admin-tree/index"), ['class' => 'btn btn-primary btn-sm'])*/
-            , ['class' => "sx-container-controlls col-md-2"])
 
             ,['class' => 'row-fluid']
         );
@@ -263,6 +267,7 @@ class Tree
                     'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
                     'onclick'   => 'location.href="' . $link . '"'
                 ]);
+
 
             } else if ($this->_getMode() == 'single')
             {
@@ -380,6 +385,11 @@ HTML
 
         Asset::register($this->getView());
         $this->getView()->registerJs(<<<JS
+        $(window).resize(function()
+        {
+            console.log('resize');
+        });
+
         (function(window, sx, $, _)
         {
             sx.createNamespace('classes.app', sx);
