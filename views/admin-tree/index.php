@@ -16,10 +16,10 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     'blockPjaxContainer' => false,
     'blockContainer' => '.sx-panel',
 ]);?>
-
+<div class="col-md-8">
 <?= \skeeks\cms\modules\admin\widgets\Tree::widget([
     "models" => $models
 ]); ?>
-
+</div>
 
 <? Pjax::end(); ?>

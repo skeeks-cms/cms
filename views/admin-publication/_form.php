@@ -32,11 +32,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     ?>
 
 
-    <?= $form->field($model, 'tree_ids')->label('Дополнительные разделы сайта')->widget(
+    <?= $form->field($model, 'tree_ids')->label('Разделы сайта')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
 
-        ])->hint('Дополнительные разделы сайта, где бы хотелось видеть эту публикацию');
+        ])->hint('Укажите разделы сайт, где бы хотелось видеть эту публикацию');
     ?>
 
     <?= $form->buttonsCreateOrUpdate($model); ?>

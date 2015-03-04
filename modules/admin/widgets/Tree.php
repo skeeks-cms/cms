@@ -1,12 +1,11 @@
 <?php
 /**
- * ControllerActions
+ * TODO: Эту хрень нужно всю переписать... Но пока работает кое как. Получилась каша, и много хардкода. Изначально не те цели преследовались.
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 30.10.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 05.03.2015
  */
 
 namespace skeeks\cms\modules\admin\widgets;
@@ -160,7 +159,7 @@ class Tree
 
                 Html::tag("div",
                     Html::tag("div", $this->renderNodes($this->models), $this->containerOptions)
-                , ['class' => "sx-container-tree col-md-6"]) . $addBtn
+                , ['class' => "sx-container-tree col-md-12"]) . $addBtn
 
 
             ,['class' => 'row-fluid']
@@ -296,10 +295,56 @@ JS
 )
                 ]);
 
+            }  else if ($this->_getMode() == 'combo')
+            {
+                $params = \Yii::$app->request->getQueryParams();
+                $isSelected = in_array($model->id, $this->_getSelectedIds()) ? true : false;
+                if ($isSelected)
+                {
+                    $result = [];
+                    foreach ($this->_getSelectedIds() as $id)
+                    {
+                        if ($id != $model->id)
+                        {
+                            $result[] = $id;
+                        }
+                    }
+                    $params[$this->selectedRequestName] = $result;
+                } else
+                {
+                    $params[$this->selectedRequestName] = array_unique(array_merge($this->_getSelectedIds(), [$model->id]));
+                }
+
+                $link = UrlHelper::construct("cms/admin-tree/index")->setData($params);
+
+                $controllElement = Html::radio('tree_id', false, [
+                                    'value'     => $model->id,
+                                    'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                                    'onclick'   => new JsExpression(<<<JS
+                        sx.Tree.selectSingle("{$model->id}"); return false;
+JS
+                )
+                    ]);
+
+
+                $controllElement .= Html::checkbox('tree_id', $isSelected, [
+                    'value'     => $model->id,
+                    'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                    'onclick'   => new JsExpression(<<<JS
+        sx.Tree.select("{$model->id}", "{$link}"); return false;
+JS
+)
+                ]);
+
+
+
+
             } else
             {
                 $controllElement = '';
             }
+
+
 
 
 
@@ -529,7 +574,7 @@ HTML
                     $("input[type='checkbox']:checked").each(function()
                     {
                         selected.push($(this).val());
-                    })
+                    });
 
                     this.trigger("select", {
                         'selected': selected,
@@ -538,7 +583,8 @@ HTML
 
                     _.delay(function()
                     {
-                        $(".sx-tree").append()
+                        $(".sx-tree").append();
+
                         $("<a>", {
                             'href':link,
                             'style':'display:none;'
@@ -546,6 +592,13 @@ HTML
 
                         //window.location.href = link;
                     }, 100);
+                },
+
+                selectSingle: function(id)
+                {
+                    this.trigger("selectSingle", {
+                        'id': id
+                    });
                 }
             });
 

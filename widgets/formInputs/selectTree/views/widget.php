@@ -50,6 +50,11 @@ $idSmartFrame = $id . "-smart-frame";
                     {
                         self.addTrees(data.selected);
                     });
+
+                    self.Iframe.sx.Tree.bind('selectSingle', function(e, data)
+                    {
+                        self.addTrees(data.id);
+                    });
                 }
             });
 

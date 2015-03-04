@@ -34,7 +34,7 @@ class SelectTree extends InputWidget
      */
     public $clientOptions = [];
 
-    public $mode = 'multi';
+    public $mode = 'combo';
 
 
     /**
