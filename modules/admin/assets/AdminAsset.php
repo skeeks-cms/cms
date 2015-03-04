@@ -29,6 +29,7 @@ class AdminAsset extends AssetBundle
         'js/classes/Blocker.js',
         'js/classes/OldNav.js',
         'js/classes/Menu.js',
+        'js/classes/FrameManager.js',
         'js/app.js',
     ];
     public $depends = [

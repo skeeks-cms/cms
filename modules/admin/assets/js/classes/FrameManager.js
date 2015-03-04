@@ -14,9 +14,40 @@
     sx.classes._FrameManager  = sx.classes.Component.extend({
 
         _init: function()
-        {},
+        {
+            this.isFrame                =   false;
+            this.parentFrameManager     =   null;
+            this.frameElement           =   window.frameElement;
+            this.window                 =   window;
 
-        getCurrentHeight : function()
+            if (window.parent.window != window.window)
+            {
+                this.frameElement = window.frameElement;
+                this.isFrame = true;
+            }
+
+            if (window.parent.window.sx.FrameManager)
+            {
+                this.parentFrameManager = window.parent.window.sx.FrameManager;
+            }
+
+        },
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            if (this.parentFrameManager && this.isFrame)
+            {
+                setInterval(function()
+                {
+                    self.pushHeight();
+                }, 1000);
+            }
+        },
+
+
+        _getCurrentHeight : function()
         {
             myHeight = 0;
 
@@ -31,27 +62,33 @@
             return myHeight;
         },
 
-        publishHeight : function()
+        pushHeight : function()
         {
             if (this.FrameId == '') return;
             // если нет jQuery - воспользуемся решениями для  определения размеров из яндекса
             if(typeof jQuery === "undefined") {
                 var actualHeight = (document.body.scrollHeight > document.body.offsetHeight)?document.body.scrollHeight:document.body.offsetHeight;
-                var currentHeight = this.getCurrentHeight();
+                var currentHeight = this._getCurrentHeight();
             } else {
-                var actualHeight = $("body").height();
+                var actualHeight = $(".sx-panel-content").height();
                 var currentHeight = $(window).height();
             }
 
+
+            this.parentFrameManager.updateFrameHeightElement(this, actualHeight);
+
             if(Math.abs(actualHeight - currentHeight) > 20)
             {
-                pm({
-                  target: window.parent,
-                  type: this.FrameId,
-                  data: {height:actualHeight, id:this.FrameId}
-                });
+
             }
+        },
+
+        updateFrameHeightElement: function(frameManager, actualHeight)
+        {
+            frameManager.frameElement.setAttribute("height", actualHeight + 2);
+            frameManager.frameElement.setAttribute("scrolling", "no");
         }
+
     });
 
     sx.classes.FrameManager = sx.classes._FrameManager.extend({});
