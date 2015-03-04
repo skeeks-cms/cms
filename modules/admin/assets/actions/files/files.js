@@ -134,7 +134,6 @@
          */
         triggerOnProgress: function(data)
         {
-            console.log(data);
             this.trigger("onProgress", data);
             return this;
         },
@@ -196,8 +195,55 @@
      */
     sx.classes.files.sources.RemoteUpload = sx.classes.files._Source.extend({
 
-        _init: function ()
-        {}
+        _init: function()
+        {
+            var self = this;
+
+            //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
+            //По нажатию кнопки начало загрузки.
+
+            //1) считаем сколько всего пользователь указал ссылок (это делается на js)
+            this.httpLinks = [];
+
+            self.queue      = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
+            self.inProcess  = true;                     //Загрузчик в работе
+
+            self.triggerStartUpload({
+                'queueLength' : _.size(this.httpLinks), //сообщаем сколько файлов к загрузке всего
+            });
+
+            //Берем каждую, и обрабатываем по очереди.
+            _.each(this.httpLinks, function(link, key)
+            {
+                //Кидаем событие, начало работы с файлом
+                self.triggerStartUploadFile({
+                    'name'          : link,      //ссылка к загрузке
+                    'additional'    : {},  //дополнительная информация
+                });
+
+                //Формируем ajax объект
+                var ajax = sx.ajax.preparePostQuery('тут наш бэкенд', {
+                    'link': link
+                });
+
+                ajax.onComplete(function(e, data)
+                {
+                    self.triggerCompleteUploadFile({
+                        'response' : data,
+                    });
+
+                    self.queue = self.queue - 1;
+
+                    if (self.queue == 0)
+                    {
+                        self.inProcess  = false;
+                        self.triggerCompleteUpload({});
+                    }
+                });
+
+                ajax.execute();
+            });
+        }
     });
 
     /**
@@ -380,13 +426,11 @@
         {
             var self = this;
 
-            console.log(this.getManager());
-
             this.getManager().bind("startUpload", function(e, data)
             {
                 self.updateProgress(0);
-                $('.sx-uploadedFiles', self.getWrapper()).empty();
-                $('.sx-allFiles', self.getWrapper()).empty();
+                $('.sx-uploadedFiles', self.getWrapper()).empty().append(0);
+                $('.sx-allFiles', self.getWrapper()).empty().append(Number(data.queueLength));;
 
                 self.getWrapper().show();
                 //data.queueLength
@@ -411,7 +455,30 @@
     /**
      * Прогрессбар загрузки одного файла
      */
-    sx.classes.files.OneFileUploadProgress = sx.classes.files._UploadProgress.extend({});
+    sx.classes.files.OneFileUploadProgress = sx.classes.files._UploadProgress.extend({
+        _init: function()
+        {
+            var self = this;
+
+            this.getManager().bind("startUploadFile", function(e, data)
+            {
+                self.updateProgress(0);
+                self.getWrapper().show();
+
+                $('.sx-uploaded-file-name', self.getWrapper()).empty().append(data.name);
+            });
+
+            this.getManager().bind("completeUploadFile", function(e, data)
+            {
+                self.getWrapper().hide();
+            });
+
+            this.getManager().bind("onProgressFile", function(e, data)
+            {
+                self.updateProgress(data.pct);
+            });
+        },
+    });
 
 
         /**
@@ -574,6 +641,7 @@
 
 
             this.AllUploadProgress = new sx.classes.files.AllUploadProgress(this, ".sx-progress-bar");
+            this.OneFileUploadProgress = new sx.classes.files.OneFileUploadProgress(this, ".sx-progress-bar-file");
         }
 
     });
