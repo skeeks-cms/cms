@@ -16,6 +16,7 @@ use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Component;
 use yii\web\UploadedFile;
+use yii\helpers\BaseUrl;
 
 use \skeeks\sx\File;
 use \skeeks\sx\Dir;
@@ -69,17 +70,42 @@ class Storage extends CollectionComponents
             {
                 throw new Exception("Файл не загружен во временную диррикторию");
             }
-        } else if ($file instanceof File || is_string($file))
+        } else if ($file instanceof File || (is_string($file) && BaseUrl::isRelative($file)))
         {
             $file       = File::object($file);
             $tmpfile->setExtension($file->getExtension());
             $tmpfile    = $file->move($tmpfile);
+        } else if (is_string($file) && !BaseUrl::isRelative($file))
+        {
+            $curl_session = curl_init($file);
+
+            if (!$curl_session) {
+                throw new Exception("Неверная ссылка");
+            }
+
+            curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_session, CURLOPT_BINARYTRANSFER, true);
+
+            $file_content = curl_exec($curl_session);
+
+            curl_close($curl_session);
+
+            if (!$file_content) {
+                throw new Exception("Не удалось скачать файл");
+            }
+
+            $tmpfile->setExtension(pathinfo($file, PATHINFO_EXTENSION));
+
+            $is_file_saved = file_put_contents($tmpfile, $file_content);
+
+            if (!$is_file_saved) {
+                throw new Exception("Не удалось сохранить файл");
+            }
         } else
         {
             throw new Exception("Файл должен быть определен как \yii\web\UploadedFile или \skeeks\sx\File или string");
         }
 
-        ;
         $data["type"]       = $tmpfile->getType();
         $data["mime_type"]  = $tmpfile->getMimeType();
         $data["size"]       = $tmpfile->size()->getBytes();
