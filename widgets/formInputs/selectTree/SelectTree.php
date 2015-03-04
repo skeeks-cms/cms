@@ -75,6 +75,13 @@ class SelectTree extends InputWidget
                             ->enableAdmin()->toString();
 
             $id = "sx-id-" . Yii::$app->security->generateRandomString(6);
+
+            $selected = [];
+            foreach ($trees as $tree)
+            {
+                $selected[] = $tree->id;
+            }
+
             return $this->render('widget', [
                 'widget'            => $this,
                 'id'                => $id,
@@ -84,7 +91,7 @@ class SelectTree extends InputWidget
                     [
                         'src'       => $src,
                         'name'      => $id,
-                        'selected'  => $trees
+                        'selected'  => $selected
                     ]
                 )
 

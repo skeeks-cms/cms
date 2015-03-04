@@ -100,6 +100,7 @@ body.sidebar-hidden footer.sx-admin-footer
     body.empty .sx-panel-content
     {
         min-height: 100%;
+        border: 0px;
     }
 
     body.empty .panel-heading

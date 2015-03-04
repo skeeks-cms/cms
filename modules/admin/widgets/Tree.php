@@ -29,6 +29,7 @@ use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\jui\Draggable;
 use yii\jui\Sortable;
+use yii\web\JsExpression;
 
 /**
  * Class ControllerActions
@@ -146,14 +147,14 @@ class Tree
         $this->registerAssets();
 
         $addBtn = '';
-        if ($this->_getMode() == 'multi')
+        /*if ($this->_getMode() == 'multi')
         {
             $addBtn = Html::tag("div",
                     Html::a("Добавить отмеченное", '#', ['class' => 'btn btn-primary btn-sm sx-controll-btn-select'])
                     /*Html::a("Открыть все разделы", UrlHelper::construct("cms/admin-tree/index")->set('setting-open-all', 'true'), ['class' => 'btn btn-primary btn-sm']) .
-                    Html::a("Закрыть все разделы", UrlHelper::construct("cms/admin-tree/index"), ['class' => 'btn btn-primary btn-sm'])*/
+                    Html::a("Закрыть все разделы", UrlHelper::construct("cms/admin-tree/index"), ['class' => 'btn btn-primary btn-sm'])
                 , ['class' => "sx-container-controlls col-md-2"]);
-        }
+        }*/
 
         return Html::tag('div',
 
@@ -265,7 +266,10 @@ class Tree
                 $controllElement = Html::checkbox('tree_id', $isSelected, [
                     'value'     => $model->id,
                     'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
-                    'onclick'   => 'location.href="' . $link . '"'
+                    'onclick'   => new JsExpression(<<<JS
+        sx.Tree.select("{$model->id}", "{$link}"); return false;
+JS
+)
                 ]);
 
 
@@ -286,7 +290,10 @@ class Tree
                 $controllElement = Html::radio('tree_id', $isSelected, [
                     'value'     => $model->id,
                     'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
-                    'onclick'   => 'location.href="' . $link . '"'
+                    'onclick'   => new JsExpression(<<<JS
+        sx.Tree.select("{$model->id}", "{$link}"); return false;
+JS
+)
                 ]);
 
             } else
@@ -385,16 +392,12 @@ HTML
 
         Asset::register($this->getView());
         $this->getView()->registerJs(<<<JS
-        $(window).resize(function()
-        {
-            console.log('resize');
-        });
 
         (function(window, sx, $, _)
         {
-            sx.createNamespace('classes.app', sx);
+            sx.createNamespace('classes', sx);
 
-            sx.classes.app.Tree = sx.classes.Component.extend({
+            sx.classes.Tree = sx.classes.Component.extend({
 
                 _init: function()
                 {
@@ -402,7 +405,6 @@ HTML
                     if (sx.Window.openerWidget())
                     {
                         this._parentWidget = sx.Window.openerWidget();
-
                     }
                 },
 
@@ -521,11 +523,33 @@ HTML
                     });
                 },
 
-                _onWindowReady: function()
-                {}
+                select: function(id, link)
+                {
+                    var selected = [];
+                    $("input[type='checkbox']:checked").each(function()
+                    {
+                        selected.push($(this).val());
+                    })
+
+                    this.trigger("select", {
+                        'selected': selected,
+                        'select': id
+                    });
+
+                    _.delay(function()
+                    {
+                        $(".sx-tree").append()
+                        $("<a>", {
+                            'href':link,
+                            'style':'display:none;'
+                        }).append("test").appendTo($(".sx-tree")).click();
+
+                        //window.location.href = link;
+                    }, 100);
+                }
             });
 
-            sx.app.Tree = new sx.classes.app.Tree({$options});
+            sx.Tree = new sx.classes.Tree({$options});
 
         })(window, sx, sx.$, sx._);
 JS
