@@ -32,7 +32,9 @@ class CmsController extends Controller
 
     public function actionInstall()
     {
-        echo '11';die;
-        return \Yii::$app->cms->moduleCms()->getDescriptor();
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
+
+        return $this->render('install', [
+        ]);
     }
 }
