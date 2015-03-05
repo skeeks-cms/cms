@@ -70,6 +70,8 @@ class AdminInfoblockController extends AdminModelEditorSmartController
                     'rules' =>
                     [
                         "label" => "Правила показа",
+                        "method"        => "post",
+                        "request"       => "ajax",
                         "rules" =>
                         [
                             [
@@ -80,6 +82,21 @@ class AdminInfoblockController extends AdminModelEditorSmartController
                 ]
             ]
         ]);
+    }
+
+
+    public function actionRules()
+    {
+        if (\Yii::$app->request->isAjax)
+        {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+
+            return [
+                'message' => 'Еще не реализовно',
+                'success' => false,
+            ];
+
+        }
     }
 
     public function actionConfig()

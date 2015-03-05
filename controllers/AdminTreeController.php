@@ -59,7 +59,7 @@ class AdminTreeController extends AdminModelEditorSmartController
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
+        $behaviors =  ArrayHelper::merge(parent::behaviors(), [
 
             self::BEHAVIOR_ACTION_MANAGER =>
             [
@@ -75,9 +75,14 @@ class AdminTreeController extends AdminModelEditorSmartController
                             ]
                         ]
                     ],
+
                 ]
             ]
         ]);
+
+        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['create']);
+
+        return $behaviors;
     }
 
     public function actionNewChildren()
