@@ -23,7 +23,25 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
         <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a>
         <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-globe"></i> Загрузить по ссылке http://</a>
         <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;"class="btn btn-default btn-sm"><i class="glyphicon glyphicon-folder-open"></i> Добавить из файлового менеджера</a>
-        <div class="sx-progress-bar"></div>
+
+        <div class="sx-progress-bar-file" style="display: none;">
+            <span style="vertical-align:middle;">Загрузка файла: <span class="sx-uploaded-file-name"></span></span>
+            <div>
+                <div class="progress progress-striped active">
+                    <div class="progress-bar progress-bar-success"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sx-progress-bar" style="display: none;">
+            <span style="vertical-align:middle;">Загрузка файлов (<span class="sx-uploadedFiles"></span> / <span class="sx-allFiles"></span>)</span>
+            <div>
+                <div class="progress progress-striped active">
+                    <div class="progress-bar progress-bar-success"></div>
+                </div>
+            </div>
+        </div>
+
         <p></p>
     </div>
     <? if ($groupsObjects = $groups->getComponents()) : ?>
@@ -204,9 +222,7 @@ $clientOptionsString = \yii\helpers\Json::encode($clientOptions);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
-
-
-    sx.FileMangager = new sx.classes.files.Manager('#sx-file-manager', {$clientOptionsString});
+    sx.FileManager = new sx.classes.DefaultFileManager('#sx-file-manager', {$clientOptionsString});
 })(sx, sx.$, sx._);
 JS
 );

@@ -62,8 +62,8 @@ class StaticBlock extends Core
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'] = ['code', 'name'];
-        $scenarios['update'] = ['code', 'name'];
+        $scenarios['create'] = ['code', 'name', 'value', 'multiValue', 'description'];
+        $scenarios['update'] = ['code', 'name', 'value', 'multiValue', 'description'];
 
         return $scenarios;
     }

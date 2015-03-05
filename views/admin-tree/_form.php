@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
 <?= $form->field($model, 'tree_ids')->widget(
     \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
     [
-
+        'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
     ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
 ?>
 

@@ -142,6 +142,4 @@
         menu: {}
     });
 
-    console.log(sx.app);
-
 })(sx, sx.$, sx._);

@@ -34,7 +34,16 @@ class SelectTree extends InputWidget
      */
     public $clientOptions = [];
 
-    public $mode = 'multi';
+
+    public $attributeSingle     = 'tree_id';
+    public $attributeMulti      = 'tree_ids';
+
+
+    const MOD_COMBO     = 'combo';
+    const MOD_SINGLE    = 'single';
+    const MOD_MULTI     = 'multi';
+
+    public $mode        = self::MOD_COMBO;
 
 
     /**
@@ -58,14 +67,35 @@ class SelectTree extends InputWidget
         {
             $this->_initAndValidate();
 
-            $valueArray     = Html::getAttributeValue($this->model, $this->attribute);
-            $trees          = Tree::find()->where(['id' => $valueArray])->all();
+            $valueArray         = [];
+            $trees              = [];
+            $valueSingle        = "";
 
-            $select = Html::activeListBox($this->model, $this->attribute, [], [
-                'multiple' => true,
-                'class' => 'sx-controll-element',
-                'style' => 'display: none;'
-            ]);
+            $select = "";
+            $singleInput = "";
+
+
+            if (in_array($this->mode ,[self::MOD_COMBO, self::MOD_MULTI]))
+            {
+                $valueArray         = Html::getAttributeValue($this->model, $this->attribute);
+                $select = Html::activeListBox($this->model, $this->attribute, ['16' => "16"], [
+                    'multiple' => true,
+                    'class' => 'sx-controll-element',
+                    'style' => 'display: none;'
+                ]);
+                $trees          = Tree::find()->where(['id' => $valueArray])->all();
+
+            }
+
+            if (in_array($this->mode ,[self::MOD_COMBO, self::MOD_SINGLE]))
+            {
+                $singleInput = Html::activeInput("hidden", $this->model, $this->attributeSingle, [
+                    'class' => 'sx-single'
+                ]);
+                $valueSingle        = Html::getAttributeValue($this->model, $this->attributeSingle);
+            }
+
+
 
             $src = UrlHelper::construct('/cms/admin-tree')
                             ->set('mode', $this->mode)
@@ -75,16 +105,26 @@ class SelectTree extends InputWidget
                             ->enableAdmin()->toString();
 
             $id = "sx-id-" . Yii::$app->security->generateRandomString(6);
+
+            $selected = [];
+            foreach ($trees as $tree)
+            {
+                $selected[] = $tree->id;
+            }
+
             return $this->render('widget', [
                 'widget'            => $this,
                 'id'                => $id,
                 'select'            => $select,
                 'src'               => $src,
+                'valueSingle'       => $valueSingle,
+                'singleInput'       => $singleInput,
                 'clientOptions'     => Json::encode(
                     [
                         'src'       => $src,
                         'name'      => $id,
-                        'selected'  => $trees
+                        'selected'  => $selected,
+                        'valueSingle'  => $valueSingle
                     ]
                 )
 

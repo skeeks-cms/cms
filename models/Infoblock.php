@@ -63,8 +63,8 @@ class Infoblock extends Core
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'] = ['code', 'name'];
-        $scenarios['update'] = ['code', 'name'];
+        $scenarios['create'] = ['code', 'name', 'description', 'widget'];
+        $scenarios['update'] = ['code', 'name', 'description', 'widget'];
 
         return $scenarios;
     }
@@ -75,7 +75,7 @@ class Infoblock extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['name'], 'required'],
+            [['name', 'widget'], 'required'],
             [['description', 'widget', 'rules', 'template'], 'string'],
             [['code'], 'unique'],
             [['code'], 'validateCode'],

@@ -65,9 +65,11 @@ class StorageImages extends InputWidget
                 'mode' => "sx-onlyUpload"
             ])
                 ->enableAdmin()
-                ->setSystem([
+                /*->setSystem([
                     Module::SYSTEM_QUERY_NO_ACTIONS_MODEL => 'true'
-                ])
+                ])*/
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                 ->toString();
 
             if ($this->model->isNewRecord)

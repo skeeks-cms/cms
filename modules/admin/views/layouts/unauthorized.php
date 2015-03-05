@@ -21,8 +21,6 @@ use skeeks\cms\helpers\UrlHelper;
 
 AdminAsset::register($this);
 
-$sidebarHidden = \Yii::$app->user->getIsGuest();
-
 $urlBg = \Yii::$app->assetManager->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/bg/582738_www.Gde-Fon.com.jpg');
 
 $this->registerCss(<<<CSS
@@ -151,7 +149,7 @@ JS
     <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
     <?php $this->head() ?>
 </head>
-<body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?>">
+<body>
 
 
 
@@ -164,24 +162,8 @@ JS
     <ul class="nav navbar-nav navbar-right visible-md visible-lg">
         <!--<li><span class="timer"><i class="icon-clock"></i> <span id="clock"></span></span></li>-->
         <li class="dropdown visible-md visible-lg"></li>
-        <? if (!Yii::$app->user->isGuest): ?>
-        <li class="dropdown visible-md visible-lg">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-settings"></i><!--<span class="badge">!</span>--></a>
-            <ul class="dropdown-menu">
-                <li class="dropdown-menu-header text-center">
-                    <strong><?= Yii::$app->user->identity->username ?></strong>
-                </li>
-                <li><a href="<?= UrlHelper::construct("cms/admin-profile")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
-                <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
-                <li class="divider"></li>
-                <li>
-                    <?= Html::a('<i class="fa fa-lock"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
-                </li>
-            </ul>
-        </li>
-        <? else: ?>
+
             <a href="/">Перейти на сайт &rarr;</a>
-        <? endif; ?>
     </ul>
 </div>
 
