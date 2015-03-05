@@ -25,11 +25,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         ])->hint('От выбранного типа публикации может зависеть, то, как она будет отображаться.');
     ?>
 
-    <?= $form->field($model, 'tree_id')->label('Главный раздел сайта')->widget(
+    <?/*= $form->field($model, 'tree_id')->label('Главный раздел сайта')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
             'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions()
         ])->hint('Главный раздел сайта, к которму привязана публикация');
-    ?>
+    */?>
 
 
     <?= $form->field($model, 'tree_ids')->label('Разделы сайта')->widget(

@@ -319,9 +319,10 @@ JS
 
                 $controllElement = Html::radio('tree_id', false, [
                                     'value'     => $model->id,
+                                    'class'     => 'sx-readio',
                                     'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
                                     'onclick'   => new JsExpression(<<<JS
-                        sx.Tree.selectSingle("{$model->id}"); return false;
+                        sx.Tree.selectSingle("{$model->id}");
 JS
                 )
                     ]);
@@ -599,7 +600,18 @@ HTML
                     this.trigger("selectSingle", {
                         'id': id
                     });
-                }
+                },
+
+                setSingle: function(id)
+                {
+                    var Jelement = $(".sx-tree .sx-readio[value='" + id + "']");
+                    if (!Jelement.is(":checked"))
+                    {
+                        Jelement.click();
+                    };
+                },
+
+
             });
 
             sx.Tree = new sx.classes.Tree({$options});
