@@ -1,12 +1,9 @@
 <?php
 /**
- * TreeFixed
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 31.12.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 06.03.2015
  */
 namespace skeeks\cms\widgets\treeFixed;
 
@@ -14,6 +11,7 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\models\Tree;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class TreeFixed
@@ -28,8 +26,24 @@ class TreeFixed extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
     public $treeMenuId          = null;
     public $statuses            = [];
     public $statusesAdults      = [];
-    public $limit               = 0;
+    public $limit               = 100;
     public $orderBy             = null;
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['limit'], 'integer'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'template' => 'Шаблон'
+        ]);
+    }
+
+
 
     /**
      * Подготовка данных для шаблона

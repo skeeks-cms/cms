@@ -50,6 +50,9 @@ class AdminTreeController extends AdminModelEditorSmartController
         $this->_modelShowAttribute      = "name";
         $this->_modelClassName          = Tree::className();
 
+        $this->modelValidate = true;
+        $this->enableScenarios = true;
+
         parent::init();
     }
 

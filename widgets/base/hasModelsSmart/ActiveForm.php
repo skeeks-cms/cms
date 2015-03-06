@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\widgets\base\hasModelsSmart;
+use skeeks\cms\base\Widget;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -18,10 +19,11 @@ use yii\helpers\ArrayHelper;
  */
 class ActiveForm extends \skeeks\cms\widgets\base\hasTemplate\ActiveForm
 {
-    public function standartElements($model, \skeeks\cms\models\WidgetConfig $widgetConfig)
+    public function standartElements(Widget $model)
     {
-        $widget = new $widgetConfig->widget;
+        $widget = $model;
         $entity  = new $widget->modelClassName;
+
         /**
          * @var $entity ActiveRecord;
          */

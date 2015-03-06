@@ -21,38 +21,6 @@ class WidgetDescriptor
     public $description = "";
     public $templates   = [];
 
-    protected function _ensure()
-    {}
-
-    /**
-     * @param $config
-     * @return Widget|null
-     */
-    public function createWidget($config)
-    {
-        $widgetClass = $this->id;
-        $widget = $widgetClass::begin($config);
-        if ($widget)
-        {
-            return $widget;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array $data
-     * @return string
-     */
-    public function renderForm($data = [])
-    {
-        $class = $this->id;
-        $class = new \ReflectionClass($class);
-
-        return \Yii::$app->getView()->renderFile(dirname($class->getFileName()) . DIRECTORY_SEPARATOR . '_form.php', $data);
-    }
-
-
     /**
      * @var ModelActionViews
      */

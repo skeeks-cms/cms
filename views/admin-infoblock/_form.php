@@ -12,9 +12,9 @@ use skeeks\cms\models\Tree;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-<?= $form->field($model, 'code')->textInput(['maxlength' => 255])->label('Уникальный код блока') ?>
-<?= $form->field($model, 'description')->textarea()->label('Описание') ?>
+<?= $form->field($model, 'name')->textInput(['maxlength' => 255])->hint('Небольшое название инфоблока (используется только для удобства поиска)') ?>
+<?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint('Уникальный код, для того чтобы можно было обратиться к этому инфоблоку использую его') ?>
+<?= $form->field($model, 'description')->textarea()->hint('Небольшое описание для себя, для понимания где он будет показываться и зачем вообще нужен') ?>
 
 <?= $form->field($model, 'widget')->label('Виджет')->widget(
     \skeeks\widget\chosen\Chosen::className(), [

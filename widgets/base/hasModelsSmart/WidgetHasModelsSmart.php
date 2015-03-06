@@ -19,6 +19,7 @@ use skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class WidgetHasModelsSmart
@@ -39,6 +40,21 @@ class WidgetHasModelsSmart extends WidgetHasModels
      */
     public $applySearchParams       = 1;
 
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['createdBy', 'updatedBy'], 'safe'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'createdBy' => 'Авторы',
+            'updatedBy' => 'Полседние обновившие'
+        ]);
+    }
 
     /**
      * Подготовка данных для шаблона

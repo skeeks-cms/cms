@@ -20,7 +20,7 @@ $tree = new \skeeks\cms\models\Tree();
 <?php $form = ActiveForm::begin(); ?>
 
 
-<?= $form->standartElements($model, $model); ?>
+<?= $form->standartElements($model); ?>
 
 
 
@@ -50,7 +50,7 @@ $tree = new \skeeks\cms\models\Tree();
         ]);
     ?>
 
-    <?= $form->field($model, 'statusesAdult')->label('Возрсатные статусы')->widget(
+    <?= $form->field($model, 'statusesAdults')->label('Возрсатные статусы')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
             'items' => $tree->getPossibleAdultStatuses(),
             'multiple' => true,

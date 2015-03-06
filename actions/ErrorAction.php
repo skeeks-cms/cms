@@ -32,6 +32,8 @@ class ErrorAction extends \yii\web\ErrorAction
      */
     public function run()
     {
+
+
         if (($exception = Yii::$app->getErrorHandler()->exception) === null) {
             return '';
         }

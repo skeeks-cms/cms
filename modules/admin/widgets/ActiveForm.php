@@ -28,6 +28,9 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
      */
     public $usePjax = true;
 
+    /**
+     * @var bool
+     */
     public $enableAjaxValidation = true;
     /**
      * @var array

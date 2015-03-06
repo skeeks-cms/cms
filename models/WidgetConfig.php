@@ -31,12 +31,14 @@ class WidgetConfig extends Model
         $this->config   = array_merge($defaultConfig, $this->config);
     }
 
+
     /**
      * @param string $name
      * @return mixed|null
      */
     public function __get($name)
     {
+
         if (isset($this->config[$name]))
         {
             return $this->config[$name];

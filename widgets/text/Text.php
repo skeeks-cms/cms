@@ -12,6 +12,7 @@ namespace skeeks\cms\widgets\text;
 
 use skeeks\cms\base\Widget;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Text
@@ -23,6 +24,20 @@ class Text extends Widget
      * @var null|string
      */
     public $text = null;
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['text'], 'string'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'text'                         => 'Произвольный текст',
+        ]);
+    }
 
     /**
      * @return string

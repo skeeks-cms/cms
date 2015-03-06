@@ -50,6 +50,7 @@ use yii\filters\VerbFilter;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 /**
@@ -483,21 +484,51 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     {
         $model = $this->getModel();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save(false))
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            if (!\Yii::$app->request->isAjax)
+            //$model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            //return ActiveForm::validate($model);
+            return [];
+        }
+
+        if (\Yii::$app->request->isAjax)
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
             {
-                return $this->redirectRefresh();
+                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                //return $this->redirectRefresh();
+                //return $this->redirectRefresh();
+                //print_r(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString() . '&asdasdasd');die;
+
+
+            } else
+            {
+                //if (\Yii::$app->request->isPost)
+                //{
+                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                //}
             }
 
         } else
         {
-            if (\Yii::$app->request->isPost)
+            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                if (!\Yii::$app->request->isAjax)
+                {
+                    return $this->redirectRefresh();
+                }
+
+            } else
+            {
+                if (\Yii::$app->request->isPost)
+                {
+                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                }
             }
         }
+
 
         return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/descriptions.php", [
             "model" => $this->getModel()

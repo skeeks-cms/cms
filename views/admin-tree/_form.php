@@ -2,11 +2,10 @@
 
 use skeeks\cms\models\Tree;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
-/* @var $form yii\widgets\ActiveForm */
 ?>
 
 
@@ -16,6 +15,16 @@ use yii\widgets\ActiveForm;
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
+
+
+<?= Html::checkbox("isLink", $model->isLink(), [
+    'value'     => '1',
+    'label'     => 'Этот раздел является ссылкой',
+    'class'     => 'smartCheck',
+    'id'        => 'isLink',
+]); ?>
+
+<div data-listen="isLink" data-show="0" class="sx-hide">
 <?= $form->field($model, 'type')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
@@ -45,14 +54,73 @@ use yii\widgets\ActiveForm;
             'multiple' => true
     ])->hint('Вы можете выбрать один или несколько меню, в которых будет показываться этот раздел');
 ?>
-
-<?= $form->field($model, 'priority')->label("Приоритет")->hint("Вы можете оставить это поле пустым, оно будет влиять на порядок в некоторых случаях")->textInput([
+<!--
+--><?/*= $form->field($model, 'priority')->label("Приоритет")->hint("Вы можете оставить это поле пустым, оно будет влиять на порядок в некоторых случаях")->textInput([
     'maxlength' => 255
-]) ?>
-<?= $form->field($model, 'redirect')->textInput(['maxlength' => 500])->label('Редиррект') ?>
-
-
-<div class="form-group">
-    <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+]) */?>
 </div>
+
+<div data-listen="isLink" data-show="1" class="sx-hide">
+<?= $form->field($model, 'redirect', [
+
+])->textInput(['maxlength' => 500])->label('Редиррект') ?>
+</div>
+
+<?= $form->buttonsCreateOrUpdate($model); ?>
+
+<? $this->registerJs(<<<JS
+    (function(sx, $, _)
+    {
+        sx.createNamespace('classes', sx);
+
+        sx.classes.SmartCheck = sx.classes.Component.extend({
+
+            _init: function()
+            {},
+
+            _onDomReady: function()
+            {
+                var self = this;
+
+                this.JsmartCheck = $('.smartCheck');
+
+                self.updateInstance($(this.JsmartCheck));
+
+                this.JsmartCheck.on("change", function()
+                {
+                    self.updateInstance($(this));
+                });
+            },
+
+            updateInstance: function(JsmartCheck)
+            {
+                if (!JsmartCheck instanceof jQuery)
+                {
+                    throw new Error('1');
+                }
+
+                var id  = JsmartCheck.attr('id');
+                var val = Number(JsmartCheck.is(":checked"));
+
+                if (!id)
+                {
+                    return false;
+                }
+
+                if (val == 0)
+                {
+                    $('#tree-redirect').val('');
+                }
+
+                $('[data-listen="' + id + '"]').hide();
+                $('[data-listen="' + id + '"][data-show="' + val + '"]').show();
+
+            },
+        });
+
+        new sx.classes.SmartCheck();
+    })(sx, sx.$, sx._);
+JS
+);
+?>
 <?php ActiveForm::end(); ?>

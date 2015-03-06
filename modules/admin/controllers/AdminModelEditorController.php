@@ -147,7 +147,11 @@ class AdminModelEditorController extends AdminController
                 $this->setCurrentModel($this->createCurrentModel());
             }
 
-            $this->getCurrentModel()->scenario = $e->action->id;
+            $scenarios = $this->getCurrentModel()->scenarios();
+            if (isset($scenarios[$e->action->id]))
+            {
+                $this->getCurrentModel()->scenario = $e->action->id;
+            }
         }
     }
 

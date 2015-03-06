@@ -68,8 +68,8 @@ class Publication extends PageAdvanced
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'] = ['name', 'tree_id', 'tree_ids'];
-        $scenarios['update'] = ['name', 'tree_id', 'tree_ids'];
+        $scenarios['create'] = ['name', 'tree_id', 'tree_ids', 'type'];
+        $scenarios['update'] = ['name', 'tree_id', 'tree_ids', 'type'];
 
         return $scenarios;
     }

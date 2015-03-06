@@ -31,8 +31,6 @@ $tree = new \skeeks\cms\models\Tree();
 ?>
 
 
-<?= $form->field($model, 'limit')->label('Количество')->textInput(); ?>
-
 <?= $form->field($model, 'statuses')->label("Статусы")->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleStatuses(),
@@ -40,7 +38,16 @@ $tree = new \skeeks\cms\models\Tree();
     ]);
 ?>
 
-<?= $form->field($model, 'statusesAdult')->label("Возрастной статус")->widget(
+
+<?= $form->field($model, 'treeMenuIds')->widget(
+    \skeeks\widget\chosen\Chosen::className(), [
+        'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\TreeMenu::find()->all(), 'id', 'name'),
+        'multiple' => true,
+    ]);
+?>
+
+
+<?= $form->field($model, 'statusesAdults')->label("Возрастной статус")->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleAdultStatuses(),
         'multiple' => true,

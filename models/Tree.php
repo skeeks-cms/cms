@@ -110,6 +110,17 @@ class Tree extends PageAdvanced
         ]);
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = ['name', 'type', 'tree_ids', 'redirect', 'tree_menu_ids'];
+        $scenarios['update'] = ['name', 'type', 'tree_ids', 'redirect', 'tree_menu_ids'];
+
+        return $scenarios;
+    }
+
+
     public function createAbsoluteUrl()
     {
         return $this->createUrl();
@@ -120,6 +131,14 @@ class Tree extends PageAdvanced
      */
     public function createUrl()
     {
+        if ($this->isLink())
+        {
+            if ($this->redirect)
+            {
+                return $this->redirect;
+            }
+        }
+
         $sites = Site::getAllKeyTreeId();
         $site = '';
         if ($this->isRoot())
@@ -191,6 +210,16 @@ class Tree extends PageAdvanced
     }
 
 
+
+    /**
+     * Эта страница является ссылкой?
+     *
+     * @return bool
+     */
+    public function isLink()
+    {
+        return (bool) ($this->redirect);
+    }
 
 
     /**

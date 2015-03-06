@@ -18,6 +18,7 @@ use skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class WidgetHasModels
@@ -36,6 +37,27 @@ class WidgetHasModels extends WidgetHasTemplate
 
     public $limit                   = 0;
     public $pageParam               = 'page';
+
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['defaultSortField', 'defaultSort', 'pageParam'], 'string'],
+            [['defaultPageSize', 'usePaging', 'limit'], 'integer'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'defaultSortField'      => 'По какому полю сортировать',
+            'defaultSort'           => 'Направление сортировки',
+            'defaultPageSize'       => 'Количество записей на странице',
+            'usePaging'             => 'Включить/Выключить постраничную навигацию',
+            'limit'                 => 'Сколько всего записей выбирать',
+            'pageParam'             => 'Название параметра при постраничной навигации'
+        ]);
+    }
 
     /**
      * @return string
