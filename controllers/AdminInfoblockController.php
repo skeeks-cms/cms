@@ -20,11 +20,13 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 use skeeks\cms\widgets\text\Text;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\helpers\ArrayHelper;
+use yii\web\Response;
 
 /**
  *
@@ -97,36 +99,66 @@ class AdminInfoblockController extends AdminModelEditorSmartController
             ];
 
         }
+
+
+
+
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+
+
     }
 
     public function actionConfig()
     {
-        $widgetConfig = new WidgetConfig([
-            'widget'    => $this->getCurrentModel()->getWidgetClassName(),
-            'config'    => $this->getCurrentModel()->getWidgetConfig()
-        ]);
+        $infoblock  = $this->getCurrentModel();
+        $widget     = $infoblock->widget();
 
-        if (\Yii::$app->request->isPost)
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
-            if ($data = \Yii::$app->request->post('WidgetConfig'))
+            $widget->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($widget);
+        }
+
+        if (\Yii::$app->request->isAjax)
+        {
+            if ($widget->load(\Yii::$app->request->post()))
             {
-                $this->getCurrentModel()->setMultiConfig($data);
+                $this->getCurrentModel()->setMultiConfig($widget->attributes);
                 $this->getCurrentModel()->save(false);
 
-                $widgetConfig = new WidgetConfig([
-                    'widget'    => $this->getCurrentModel()->getWidgetClassName(),
-                    'config'    => $this->getCurrentModel()->getWidgetConfig()
-                ]);
-
                 \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+
+            } else
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
+
+        } else
+        {
+            if (\Yii::$app->request->isPost)
+            {
+                if ($widget->load(\Yii::$app->request->post()))
+                {
+                    $this->getCurrentModel()->setMultiConfig($widget->attributes);
+                    $this->getCurrentModel()->save(false);
+
+                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                }
             }
         }
 
+
+
         return $this->render('config', [
-            'model' => $widgetConfig,
-            'form' => $this->getCurrentModel()->getRegisterdWidgetModel()->renderForm([
-                'model' => $widgetConfig
-            ])
+            'model' => $widget,
         ]);
     }
 }

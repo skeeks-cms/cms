@@ -113,7 +113,6 @@ abstract class PageAdvanced extends Page
         return array_merge(parent::rules(), [
             [['description_short', 'description_full'], 'string'],
             [["users_subscribers", "users_votes_up", "users_votes_down"], 'safe'],
-            [["images", "files", "image_cover", "image"], 'safe'],
             [['count_comment', 'count_subscribe', 'count_vote', 'status', 'status_adult'], 'integer'],
         ]);
     }

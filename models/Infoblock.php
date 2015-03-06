@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\base\Widget;
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
@@ -83,9 +84,10 @@ class Infoblock extends Core
         ]);
     }
 
+
     public function validateCode($attribute)
     {
-        if(!preg_match('/^[a-z]{1}[a-z0-1]{2,11}$/', $this->$attribute))
+        if(!preg_match('/^[a-z]{1}[a-z0-1-]{2,20}$/', $this->$attribute))
         {
             $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример block1.');
         }
@@ -98,20 +100,10 @@ class Infoblock extends Core
     public function attributeLabels()
     {
         return  array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'name' => Yii::t('app', 'Name'),
-            'code' => Yii::t('app', 'Code'),
-            'description' => Yii::t('app', 'Description'),
-            'widget' => Yii::t('app', 'Widget'),
-            'config' => Yii::t('app', 'Config'),
-            'rules' => Yii::t('app', 'Rules'),
-            'template' => Yii::t('app', 'Template'),
-            'priority' => Yii::t('app', 'Priority'),
-            'status' => Yii::t('app', 'Status'),
-            'image' => Yii::t('app', 'Image'),
-            'image_cover' => Yii::t('app', 'Image Cover'),
-            'images' => Yii::t('app', 'Images'),
-            'files' => Yii::t('app', 'Files'),
+            'name'              => 'Название инфоблока',
+            'widget'            => 'Виджет',
+            'description'       => 'Описание инфоблока',
+            'code'              => 'Уникальный код блока',
         ]);
     }
 
@@ -180,18 +172,11 @@ class Infoblock extends Core
     /**
      * @return array
      */
-    public function getWidgetRules()
+    public function getDisplayRules()
     {
         return (array) $this->rules;
     }
 
-    /**
-     * @return string
-     */
-    public function getWidgetTemplate()
-    {
-        return (string) $this->template;
-    }
 
 
     /**
@@ -201,22 +186,64 @@ class Infoblock extends Core
     public function run($config = [])
     {
         $result = "";
-        if (!$this->isAllow() || !$model = $this->getRegisterdWidgetModel())
+        if (!$this->isAllow())
         {
             return $result;
         }
 
-        $config = array_merge($this->multiConfig, $config);
-        $widget = $model->createWidget($config);
+        if (!$widget = $this->widget())
+        {
+            return $result;
+        }
 
         return $widget->run();
     }
 
+
+
     /**
-     * @return null|WidgetDescriptor
+     * @var Widget
      */
-    public function getRegisterdWidgetModel()
+    protected $_loadedWidget = null;
+
+    /**
+     *
+     *
+     * @return Widget
+     */
+    public function widget()
     {
-        return \Yii::$app->registeredWidgets->getDescriptor($this->getWidgetClassName());
+        if ($this->_loadedWidget === null)
+        {
+            $this->_loadedWidget = $this->loadWidget();
+        }
+
+        return $this->_loadedWidget;
+    }
+
+    /**
+     * Создание объкта виджета (пустого)
+     *
+     * @return Widget
+     */
+    public function createWidget()
+    {
+        $widgetClass    = $this->getWidgetClassName();
+        $widget         = new $widgetClass();
+
+        return $widget;
+    }
+
+    /**
+     * Загрузить виджет с текущими данными
+     *
+     * @return Widget
+     */
+    public function loadWidget($safeOnly = true)
+    {
+        $widget = $this->createWidget();
+        $widget->setAttributes($this->getMultiConfig(), $safeOnly);
+
+        return $widget;
     }
 }

@@ -1,12 +1,9 @@
 <?php
 /**
- * TreeChildrens
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 24.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 06.03.2015
  */
 namespace skeeks\cms\widgets\treeChildrens;
 
@@ -14,6 +11,7 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\models\Tree;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class TreeChildrens
@@ -28,8 +26,27 @@ class TreeChildrens extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTempla
     public $types               = [];
     public $statuses            = [];
     public $statusesAdults      = [];
-    public $limit               = 0;
-    public $orderBy             = null;
+    public $treeMenuIds         = [];
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            ['pid', 'required'],
+            ['pid', 'integer'],
+            [['types', 'statuses', 'statusesAdults', 'treeMenuIds'], 'safe']
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'pid'               => 'Родительский раздел',
+            'types'             => 'Типы страниц',
+            'statuses'          => 'Статусы',
+            'statusesAdults'    => 'Приватные статусы',
+            'treeMenuIds'       => 'Метки',
+        ]);
+    }
 
     /**
      * Подготовка данных для шаблона
@@ -38,18 +55,20 @@ class TreeChildrens extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTempla
     public function bind()
     {
         $find = Tree::find();
+        $find->orderBy(["priority" => SORT_DESC]);
 
         if ($this->pid)
         {
             $find->andWhere(['pid' => $this->pid]);
         }
 
-        if ($this->limit)
+        if ($this->treeMenuIds)
         {
-            $find->limit($this->limit);
+            foreach ($this->treeMenuIds as $id)
+            {
+                $find->andWhere("FIND_IN_SET('" . $id . "', tree_menu_ids)");
+            }
         }
-
-        $find->orderBy(["priority" => SORT_DESC]);
 
         if ($this->statuses)
         {

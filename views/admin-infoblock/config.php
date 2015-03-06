@@ -9,7 +9,8 @@
  * @since 1.0.0
  */
 /* @var $this yii\web\View */
+/* @var $model \skeeks\cms\base\Widget */
 ?>
 
-<?= $form; ?>
+<?= $model->renderConfigForm(); ?>
 <?= $this->render('_about'); ?>

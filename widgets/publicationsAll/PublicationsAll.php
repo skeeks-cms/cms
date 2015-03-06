@@ -19,6 +19,7 @@ use skeeks\cms\widgets\base\hasModelsSmart\WidgetHasModelsSmart;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
 use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Publications
@@ -35,7 +36,27 @@ class PublicationsAll extends WidgetHasModelsSmart
     public $types                   = [];
     public $statuses                = [];
     public $statusesAdults          = [];
-    public $useCurrentTree          = true;
+    public $useCurrentTree          = 0;
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['title'], 'string'],
+            [['types', 'statuses', 'statusesAdults', 'useCurrentTree'], 'safe'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'title'                         => 'Название виджета',
+            'types'                         => 'Типы публикаций',
+            'statuses'                      => 'Статусы',
+            'statusesAdults'                => 'Статусы приватности',
+            'useCurrentTree'                => 'Добавлять условия выбора записей, страницы где находится этот виджет',
+        ]);
+    }
+
 
     /**
      * Подготовка данных для шаблона

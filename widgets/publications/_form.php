@@ -15,7 +15,6 @@ use skeeks\cms\widgets\base\hasTemplate\ActiveForm;
 $tree = new \skeeks\cms\models\Tree();
 
 /* @var $this yii\web\View */
-/* @var $form yii\widgets\ActiveForm */
 /* @var $model \skeeks\cms\models\WidgetConfig */
 
 ?>
@@ -54,16 +53,14 @@ $tree = new \skeeks\cms\models\Tree();
     ]);
 ?>
 
-<?= $form->field($model, 'statusesAdult')->widget(
+<?= $form->field($model, 'statusesAdults')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleAdultStatuses(),
         'multiple' => true,
     ]);
 ?>
 
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
+<?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
 

@@ -57,6 +57,10 @@ form.sx-form-admin
     padding: 0px;
 }
 
+.main {
+    padding: 0px;
+}
+
 
 CSS
 );

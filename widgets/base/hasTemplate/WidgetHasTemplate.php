@@ -15,6 +15,7 @@ use skeeks\cms\base\Widget;
 use skeeks\sx\Entity;
 use Yii;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class WidgetHasTemplate
@@ -38,6 +39,21 @@ abstract class WidgetHasTemplate extends Widget
         parent::init();
         $this->_data = new Entity();
     }
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            ['template', 'string']
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'template' => 'Шаблон'
+        ]);
+    }
+
 
     /**
      * Формирование данных для шаблона

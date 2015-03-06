@@ -42,7 +42,7 @@ $tree = new \skeeks\cms\models\Tree();
     ]);
 ?>
 
-<?= $form->field($model, 'statusesAdult')->label('Записи с какими возрастным статусами разрешны к показу?')->widget(
+<?= $form->field($model, 'statusesAdults')->label('Записи с какими возрастным статусами разрешны к показу?')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
         'items' => $tree->getPossibleAdultStatuses(),
         'multiple' => true,

@@ -52,9 +52,12 @@ class Module extends CmsModule
     {
         parent::init();
 
-        if (!$this->noImage)
+        if ($this->requestIsAdmin())
         {
-            $this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
+            if (!$this->noImage)
+            {
+                $this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
+            }
         }
     }
 

@@ -9,15 +9,12 @@
  * @since 1.0.0
  */
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $form yii\widgets\ActiveForm */
 ?>
 <?php $form = ActiveForm::begin(); ?>
 <?= $form->field($model, 'text')->textarea(); ?>
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-</div>
+<?= $form->buttonsCreateOrUpdate($model) ?>
 <?php ActiveForm::end(); ?>
 
