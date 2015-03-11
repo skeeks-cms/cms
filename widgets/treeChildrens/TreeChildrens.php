@@ -27,12 +27,14 @@ class TreeChildrens extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTempla
     public $statuses            = [];
     public $statusesAdults      = [];
     public $treeMenuIds         = [];
+    public $title               = "";
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
             ['pid', 'required'],
             ['pid', 'integer'],
+            ['title', 'string'],
             [['types', 'statuses', 'statusesAdults', 'treeMenuIds'], 'safe']
         ]);
     }
@@ -45,6 +47,7 @@ class TreeChildrens extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTempla
             'statuses'          => 'Статусы',
             'statusesAdults'    => 'Приватные статусы',
             'treeMenuIds'       => 'Метки',
+            'title'             => 'Заголовок',
         ]);
     }
 
