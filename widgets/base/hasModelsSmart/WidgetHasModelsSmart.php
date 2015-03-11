@@ -44,7 +44,7 @@ class WidgetHasModelsSmart extends WidgetHasModels
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['createdBy', 'updatedBy'], 'safe'],
+            [['createdBy', 'updatedBy', 'applySearchParams'], 'safe'],
         ]);
     }
 
