@@ -112,11 +112,7 @@ class AdminTreeController extends AdminModelEditorSmartController
             else
             {
                 $childTree = new Tree();
-
-                if(!$parent)
-                {
-                    $parent = $childTree->find()->where(['id' => $post["pid"]])->one();
-                }
+                $parent = Tree::find()->where(['id' => $post["pid"]])->one();
 
                 $childTree->load($post);
 
