@@ -30,9 +30,6 @@ use common\models\User;
     'gridViewOptions'   => [
         'columns' => [
             //['class' => 'yii\grid\SerialColumn'],
-
-
-
             'value',
             'approved',
 
@@ -50,8 +47,6 @@ use common\models\User;
                 'format' => 'html',
                 'label' => 'Основной'
             ],
-
-
         ],
     ],
 ]); ?>

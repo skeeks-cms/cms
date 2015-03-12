@@ -77,6 +77,7 @@ class RelatedModelsGrid extends Widget
 
         $pjaxId = "sx-table-" . md5(time() . rand(1, 100));
         $gridOptions = ArrayHelper::merge([
+            /*'filterModel'   => $search,*/
             'PjaxOptions' => [
                 'id' => $pjaxId
             ],
@@ -99,7 +100,7 @@ class RelatedModelsGrid extends Widget
             'createUrl'     => $createUrl,
             'controller'    => $controller,
             'gridOptions'   => $gridOptions,
-            'pjaxId'        => $pjaxId
+            'pjaxId'        => $pjaxId,
         ]);
     }
 }

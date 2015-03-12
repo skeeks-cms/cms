@@ -170,6 +170,15 @@ $config =
             'class' => '\skeeks\cms\modules\admin\Module'
         ],
 
+        'gii' =>
+        [
+            'class' => 'yii\gii\Module',
+        ],
+        'debug' =>
+        [
+            'class' => 'yii\debug\Module',
+        ],
+
         'cms' =>
         [
             'class'                         => '\skeeks\cms\Module',
