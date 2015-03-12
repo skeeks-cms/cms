@@ -29,6 +29,8 @@ class StorageImages extends InputWidget
      */
     public $clientOptions = [];
 
+    public $mode = "combo";
+
     /**
      * Берем поведения модели
      *
@@ -63,6 +65,12 @@ class StorageImages extends InputWidget
                 'id' => $this->model->id,
                 'group' => "images",
                 'mode' => "sx-onlyUpload"
+            ]);
+
+            $uploaderUrlImage = \skeeks\cms\helpers\UrlHelper::construct(\Yii::$app->controller->module->id . '/' . \Yii::$app->controller->id . '/files', [
+                'id' => $this->model->id,
+                'group' => "image",
+                'mode' => "sx-onlyUpload"
             ])
                 ->enableAdmin()
                 /*->setSystem([
@@ -81,6 +89,7 @@ class StorageImages extends InputWidget
             echo $this->render('storage-images', [
                 'model' => $this->model,
                 'widget' => $this,
+                'uploaderUrlImage' => $uploaderUrlImage,
                 'uploaderUrl' => $uploaderUrl
             ]);
 
