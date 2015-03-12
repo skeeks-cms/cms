@@ -66,6 +66,13 @@ class AdminModelEditorController extends AdminController
     protected $_modelClassName  = null;
 
     /**
+     * @return string
+     */
+    public function getModelClassName()
+    {
+        return $this->_modelClassName;
+    }
+    /**
      * Опционально
      * @var null|string
      */
