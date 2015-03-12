@@ -103,7 +103,6 @@ JS;
         );
     }
 
-
     public function fieldSet($name)
     {
         return <<<HTML

@@ -87,9 +87,6 @@ abstract class PageAdvanced extends Page
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'image' => Yii::t('app', 'Image'),
-            'image_cover' => Yii::t('app', 'Image Cover'),
-            'images' => Yii::t('app', 'Images'),
             'files' => Yii::t('app', 'Files'),
             'count_comment' => Yii::t('app', 'Count Comment'),
             'count_subscribe' => Yii::t('app', 'Count Subscribe'),

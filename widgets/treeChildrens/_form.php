@@ -23,36 +23,42 @@ $tree = new \skeeks\cms\models\Tree();
 <?= $form->templateElement($model); ?>
 
 
+<?= $form->fieldSet('Общие настройки'); ?>
 
-<?= $form->field($model, 'pid')->label("Родительский раздел")->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions()
-    ]);
-?>
+    <?= $form->field($model, 'title')->textInput() ?>
 
-
-<?= $form->field($model, 'statuses')->label("Статусы")->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-        'items' => $tree->getPossibleStatuses(),
-        'multiple' => true,
-    ]);
-?>
+    <?= $form->field($model, 'pid')->label("Родительский раздел")->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+                'items' => \skeeks\cms\models\helpers\Tree::getAllMultiOptions()
+        ]);
+    ?>
 
 
-<?= $form->field($model, 'treeMenuIds')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-        'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\TreeMenu::find()->all(), 'id', 'name'),
-        'multiple' => true,
-    ]);
-?>
+    <?= $form->field($model, 'statuses')->label("Статусы")->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items' => $tree->getPossibleStatuses(),
+            'multiple' => true,
+        ]);
+    ?>
 
 
-<?= $form->field($model, 'statusesAdults')->label("Возрастной статус")->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-        'items' => $tree->getPossibleAdultStatuses(),
-        'multiple' => true,
-    ]);
-?>
+    <?= $form->field($model, 'treeMenuIds')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\TreeMenu::find()->all(), 'id', 'name'),
+            'multiple' => true,
+        ]);
+    ?>
+
+
+    <?= $form->field($model, 'statusesAdults')->label("Возрастной статус")->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items' => $tree->getPossibleAdultStatuses(),
+            'multiple' => true,
+        ]);
+    ?>
+
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 

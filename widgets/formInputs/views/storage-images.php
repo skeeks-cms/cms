@@ -6,7 +6,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 02.03.2015
  */
-/* @var $widget \skeeks\cms\widgets\formInputs\MainStorageFile */
+/* @var $widget \skeeks\cms\widgets\formInputs\StorageImages */
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\Publication */
 
@@ -124,7 +124,8 @@ CSS
     <? endif; ?>
 
     <div class="sx-controlls">
-        <a href="#" onclick="sx.InputImagesWidget.openUploader(); return false;" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-download-alt"></i> Загрузить</a>
+        <a href="#" onclick="sx.InputImagesWidget.openUploaderImage(); return false;" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-download-alt"></i> Загрузить главное изображение</a>
+        <a href="#" onclick="sx.InputImagesWidget.openUploader(); return false;" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-download-alt"></i> Загрузить изображения</a>
     </div>
 </div>
 
@@ -141,8 +142,14 @@ CSS
             {
                 var self = this;
                 this.uploaderWindow = new sx.classes.Window(this.get('uploaderUrl'));
+                this.uploaderWindowImage = new sx.classes.Window(this.get('uploaderUrlImage'));
 
                 this.uploaderWindow.bind('close', function()
+                {
+                    self.reload();
+                });
+
+                this.uploaderWindowImage.bind('close', function()
                 {
                     self.reload();
                 });
@@ -161,6 +168,11 @@ CSS
                 this.uploaderWindow.open();
             },
 
+            openUploaderImage: function()
+            {
+                this.uploaderWindowImage.open();
+            },
+
             _onDomReady: function()
             {},
 
@@ -169,6 +181,7 @@ CSS
         });
 
         sx.InputImagesWidget = new sx.classes.InputImagesWidget({
+            'uploaderUrlImage' : '{$uploaderUrlImage}',
             'uploaderUrl' : '{$uploaderUrl}'
         });
 

@@ -11,6 +11,7 @@
 namespace skeeks\cms\modules\admin\components;
 use skeeks\cms\App;
 use skeeks\cms\base\Component;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Menu
@@ -55,6 +56,23 @@ class Menu
     public function getAllowData()
     {
         $groups = [];
+
+        foreach (\Yii::$app->extensions as $code => $data)
+        {
+            if ($data['alias'])
+            {
+                foreach ($data['alias'] as $code => $path)
+                {
+                    $adminMenuFile = $path . '/config/admin/menu.php';
+                    if (file_exists($adminMenuFile))
+                    {
+                        $menuGroups = (array) include_once $adminMenuFile;
+                        $this->groups = ArrayHelper::merge($this->groups, $menuGroups);
+                    }
+
+                }
+            }
+        }
 
         foreach ($this->groups as $groupCode => $groupData)
         {

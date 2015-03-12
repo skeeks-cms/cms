@@ -100,7 +100,6 @@ $config =
         'adminMenu' =>
         [
             'class' => '\skeeks\cms\modules\admin\components\Menu',
-            'groups' => include_once 'admin-menu.php'
         ],
 
         'registeredLayouts' =>
