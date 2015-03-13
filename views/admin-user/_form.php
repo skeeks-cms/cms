@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
@@ -15,8 +15,11 @@ use common\models\User;
 
 <?= $form->fieldSet('Общая ниформация')?>
 
-    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
+
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
+    <?= $form->field($model, 'name')->textInput(); ?>
+
+
     <?= $form->field($model, 'email')->textInput(); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
@@ -51,11 +54,19 @@ use common\models\User;
     ],
 ]); ?>
 
-    <?= $form->field($model, 'name')->textInput(); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Дополнительно')?>
     <?= $form->field($model, 'city')->textInput(); ?>
     <?= $form->field($model, 'address')->textInput(); ?>
     <?= $form->field($model, 'info')->textarea(); ?>
     <?= $form->field($model, 'status_of_life')->textarea(); ?>
 <?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Фото')?>
+    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
