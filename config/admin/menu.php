@@ -162,7 +162,7 @@ return
 
     'dev' =>
     [
-        'label'     => 'Система',
+        'label'     => 'Для разработчиков',
         'priority'  => 0,
         'enabled'   => true,
 
@@ -195,6 +195,11 @@ return
             [
                 "label"     => "Ssh console",
                 "url"       => ["admin/ssh"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
+            ],
+            [
+                "label"     => "Генератор кода gii",
+                "url"       => ["admin/gii"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
             ],
         ]
