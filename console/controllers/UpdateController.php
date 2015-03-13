@@ -125,6 +125,13 @@ class UpdateController extends Controller
                 foreach ($data['alias'] as $code => $path)
                 {
                     $migrationsPath = $path . '/migrations';
+
+                    if (PHP_OS === 'Windows')
+                    {
+                        $migrationsPath = str_replace("/", "\\", $migrationsPath);
+                    }
+
+
                     if (is_dir($migrationsPath))
                     {
                         $cmd = "php yii migrate --migrationPath=" . $migrationsPath . '  --interactive=0' ;
