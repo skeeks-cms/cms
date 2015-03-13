@@ -126,7 +126,8 @@ class UpdateController extends Controller
                 {
                     $migrationsPath = $path . '/migrations';
 
-                    if (PHP_OS === 'Windows')
+
+                    if (PHP_OS == 'Windows')
                     {
                         $migrationsPath = str_replace("/", "\\", $migrationsPath);
                     }
