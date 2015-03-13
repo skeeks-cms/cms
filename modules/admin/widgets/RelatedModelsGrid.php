@@ -75,12 +75,13 @@ class RelatedModelsGrid extends Widget
         $search = new \skeeks\cms\models\Search($controller->getModelClassName());
         $search->getDataProvider()->query->where($rerlation);
 
-        $pjaxId = "sx-table-" . md5(time() . rand(1, 100));
+        $pjaxId = "sx-table-" . md5($this->label . $this->hint . $this->parentModel->className());
         $gridOptions = ArrayHelper::merge([
             /*'filterModel'   => $search,*/
             'PjaxOptions' => [
                 'id' => $pjaxId
             ],
+            "usePjax" => true,
             'dataProvider'  => $search->getDataProvider(),
             'layout' => "\n{items}\n{pager}",
             'columns' => [

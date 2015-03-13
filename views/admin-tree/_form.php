@@ -2,7 +2,7 @@
 
 use skeeks\cms\models\Tree;
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
@@ -11,38 +11,40 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
-
-<?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
 
+<?= $form->fieldSet('Основное'); ?>
 
-<?= Html::checkbox("isLink", $model->isLink(), [
-    'value'     => '1',
-    'label'     => 'Этот раздел является ссылкой',
-    'class'     => 'smartCheck',
-    'id'        => 'isLink',
-]); ?>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
-<div data-listen="isLink" data-show="0" class="sx-hide">
-<?= $form->field($model, 'type')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 \Yii::$app->registeredModels->getDescriptor($model)->getTypes()->getComponents(),
-                 "id",
-                 "name"
-             ),
-    ])->label('Тип раздела')->hint('От выбранного типа раздела может зависеть, то, как она будет отображаться.');
-?>
+    <?= Html::checkbox("isLink", $model->isLink(), [
+        'value'     => '1',
+        'label'     => 'Этот раздел является ссылкой',
+        'class'     => 'smartCheck',
+        'id'        => 'isLink',
+    ]); ?>
 
+    <div data-listen="isLink" data-show="0" class="sx-hide">
+        <?= $form->field($model, 'type')->widget(
+            \skeeks\widget\chosen\Chosen::className(), [
+                    'items' => \yii\helpers\ArrayHelper::map(
+                         \Yii::$app->registeredModels->getDescriptor($model)->getTypes()->getComponents(),
+                         "id",
+                         "name"
+                     ),
+            ])->label('Тип раздела')->hint('От выбранного типа раздела может зависеть, то, как она будет отображаться.');
+        ?>
+    </div>
 
+    <div data-listen="isLink" data-show="1" class="sx-hide">
+    <?= $form->field($model, 'redirect', [
 
-<?= $form->field($model, 'tree_ids')->widget(
-    \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-    [
-        'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
-    ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
-?>
+    ])->textInput(['maxlength' => 500])->label('Редиррект') ?>
+    </div>
+
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Дополнительные разделы') ?>
 
 <?= $form->field($model, 'tree_menu_ids')->label('Меню')->widget(
     \skeeks\widget\chosen\Chosen::className(), [
@@ -54,17 +56,63 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
             'multiple' => true
     ])->hint('Вы можете выбрать один или несколько меню, в которых будет показываться этот раздел');
 ?>
-<!--
---><?/*= $form->field($model, 'priority')->label("Приоритет")->hint("Вы можете оставить это поле пустым, оно будет влиять на порядок в некоторых случаях")->textInput([
-    'maxlength' => 255
-]) */?>
+
+<div data-listen="isLink" data-show="0" class="sx-hide">
+
+    <?= $form->field($model, 'tree_ids')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+        [
+            'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
+        ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
+    ?>
+
 </div>
 
-<div data-listen="isLink" data-show="1" class="sx-hide">
-<?= $form->field($model, 'redirect', [
 
-])->textInput(['maxlength' => 500])->label('Редиррект') ?>
+
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Изображения'); ?>
+    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Описание'); ?>
+
+<div data-listen="isLink" data-show="0" class="sx-hide">
+
+    <?= $form->field($model, 'description_full')->widget(
+        //\skeeks\widget\ckeditor\CKEditor::className()
+        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className()
+        , [
+            'options' => ['rows' => 20],
+            'preset' => 'full',
+            'callbackImages' => $model,
+            'clientOptions' =>
+            [
+                'extraPlugins'      => 'imageselect',
+                'toolbarGroups'     =>
+                [
+                    ['name' => 'imageselect']
+                ]
+            ]
+    ]) ?>
+
+    <?= $form->field($model, 'description_short')->widget(\skeeks\widget\ckeditor\CKEditor::className(), [
+        'options' => ['rows' => 6],
+        'preset' => 'full',
+        'clientOptions' =>
+        [
+            'extraPlugins'      => 'imageselect',
+            'toolbarGroups'     =>
+            [
+                ['name' => 'imageselect']
+            ]
+        ]
+    ]) ?>
+
 </div>
+<?= $form->fieldSetEnd() ?>
+
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 

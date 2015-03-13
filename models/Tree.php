@@ -98,6 +98,8 @@ class Tree extends PageAdvanced
         ]);
     }
 
+    public $multiPageOptions;
+
     /**
      * @inheritdoc
      */
@@ -114,8 +116,8 @@ class Tree extends PageAdvanced
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'] = ['name', 'type', 'tree_ids', 'redirect', 'tree_menu_ids'];
-        $scenarios['update'] = ['name', 'type', 'tree_ids', 'redirect', 'tree_menu_ids'];
+        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
+        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
 
         return $scenarios;
     }
