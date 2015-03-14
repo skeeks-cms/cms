@@ -71,7 +71,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             [
                 "actions" =>
                 [
-                    'descriptions' =>
+                    /*'descriptions' =>
                     [
                         "label"     => "Описание",
                         "icon"     => "glyphicon glyphicon-paperclip",
@@ -82,11 +82,11 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                                 "behaviors" => HasDescriptionsBehavior::className()
                             ]
                         ]
-                    ],
+                    ],*/
 
                     'files' =>
                     [
-                        "label"     => "Файлы хранилища",
+                        "label"     => "Файлы",
                         "icon"     => "glyphicon glyphicon-cloud",
                         "rules"     =>
                         [
@@ -112,7 +112,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'page-options' =>
                     [
-                        "label"     => "Дополнительные свойства",
+                        "label"     => "Свойства страницы",
                         'icon'      => 'glyphicon glyphicon-plus-sign',
                         "rules"     =>
                         [
@@ -145,7 +145,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                         ]
                     ],
 
-                    'social' =>
+                    /*'social' =>
                     [
                         "label"     => "Социальные данные",
                         'icon'      => 'glyphicon glyphicon-thumbs-up',
@@ -161,7 +161,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                                 "useOr" => true
                             ]
                         ]
-                    ],
+                    ],*/
 
                 ]
             ]

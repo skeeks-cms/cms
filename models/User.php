@@ -25,6 +25,7 @@ use yii\base\ErrorException;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\validators\EmailValidator;
 use yii\web\IdentityInterface;
 
@@ -185,8 +186,20 @@ class User
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['create'] = ['username', 'email'];
-        $scenarios['update'] = ['username', 'email'];
+
+        $scenario = $scenarios[self::SCENARIO_DEFAULT];
+
+        foreach ($scenario as $key => $code)
+        {
+            if (in_array($code, ['auth_key', 'password_hash']))
+            {
+                unset($scenario[$key]);
+            }
+        }
+
+        $scenarios['create'] = $scenario;
+        $scenarios['update'] = $scenario;
+
         return $scenarios;
     }
 

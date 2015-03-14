@@ -325,3 +325,8 @@ body.sidebar-hidden footer.sx-admin-footer
 /* update scrollbar offset if both scrolls are visible */
 .scrollbar-macosx > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_size { left: -11px; }
 .scrollbar-macosx > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_size { top: -11px; }
+
+
+
+
+

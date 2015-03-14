@@ -11,12 +11,13 @@
 namespace skeeks\cms\widgets\base\hasTemplate;
 use skeeks\cms\base\Widget;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormStyled;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab;
 
 /**
  * Class ActiveForm
  * @package skeeks\cms\widgets\widgetHasTemplate
  */
-class ActiveForm extends ActiveFormStyled
+class ActiveForm extends ActiveFormUseTab
 {
     /**
      * @param $model

@@ -103,7 +103,7 @@ JS;
         );
     }
 
-    public function fieldSet($name)
+    public function fieldSet($name, $options = [])
     {
         return <<<HTML
         <div class="sx-form-fieldset">

@@ -8,10 +8,15 @@
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\modules\admin\widgets\RelatedModelsGrid */
 /* @var $controller \skeeks\cms\modules\admin\controllers\AdminModelEditorController */
-
+use \skeeks\cms\modules\admin\widgets\Pjax;
 $controller = \Yii::$app->createController($widget->controllerRoute)[0];
 
 ?>
+
+<?/* Pjax::begin([
+    'id' => $pjaxId,
+]); */?>
+
 <? if ($widget->label) : ?>
     <label><?= $widget->label; ?></label>
 <? endif;?>
@@ -62,3 +67,5 @@ JS
     ?>
 
 </div>
+
+<?/* Pjax::end(); */?>

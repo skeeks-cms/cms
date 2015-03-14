@@ -68,7 +68,7 @@ class AdminTreeController extends AdminModelEditorSmartController
             [
                 "actions" =>
                 [
-                    'new-children' =>
+                    /*'new-children' =>
                     [
                         "label" => "Управление подразделами",
                         "rules" =>
@@ -77,7 +77,7 @@ class AdminTreeController extends AdminModelEditorSmartController
                                 "class" => HasModel::className()
                             ]
                         ]
-                    ],
+                    ],*/
 
                 ]
             ]
