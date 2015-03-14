@@ -41,6 +41,9 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
         $this->_modelShowAttribute      = "src";
         $this->_modelClassName          = StorageFile::className();
 
+        $this->modelValidate = true;
+        $this->enableScenarios = true;
+
         parent::init();
     }
 
@@ -100,6 +103,21 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                         ]
                     ],
 
+                    'delete-tmp-dir' =>
+                    [
+                        "label"     => "Удалить временные файлы",
+                        "icon"     => "glyphicon glyphicon-folder-open",
+                        "method"        => "post",
+                        "request"       => "ajax",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasDescriptionsBehavior::className()
+                            ]
+                        ]
+                    ],
+
                 ]
             ]
         ]);
@@ -109,6 +127,25 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
         return $behaviors;
     }
 
+    public function actionDeleteTmpDir()
+    {
+        if (\Yii::$app->request->isAjax)
+        {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            $success = false;
+
+            /**
+             * @var StorageFile $file
+             */
+            $file = $this->getCurrentModel();
+            $file->deleteTmpDir();
+
+            return [
+                'message' => "Временные файлы удалены",
+                'success' => true,
+            ];
+        }
+    }
     public function actionAddToImages()
     {
         if (\Yii::$app->request->isAjax)

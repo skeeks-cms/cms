@@ -33,6 +33,7 @@ class TreeFixed extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
     {
         return ArrayHelper::merge(parent::rules(), [
             [['limit'], 'integer'],
+            [['types', 'treeMenuId', 'statuses', 'statusesAdults', 'limit', 'orderBy'], 'safe'],
         ]);
     }
 

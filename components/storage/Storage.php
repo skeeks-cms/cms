@@ -111,6 +111,19 @@ class Storage extends CollectionComponents
         $data["size"]       = $tmpfile->size()->getBytes();
         $data["extension"]  = $tmpfile->getExtension();
 
+
+        //Елси это изображение
+        if ($tmpfile->getType() == 'image')
+        {
+            if (extension_loaded('gd'))
+            {
+                list($width, $height, $type, $attr) = getimagesize($tmpfile->toString());
+                $data["image_height"]       = $height;
+                $data["image_width"]        = $width;
+            }
+
+        }
+
         if ($cluster = $this->getCluster($clusterId))
         {
             if ($newFileSrc = $cluster->upload($tmpfile))

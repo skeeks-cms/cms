@@ -15,6 +15,7 @@ use skeeks\cms\models\Publication;
 use skeeks\cms\models\Tree;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Breadcrumbs
@@ -26,6 +27,14 @@ class Breadcrumbs extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
      * @var null|string
      */
     public $title                   = '';
+
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['title'], 'string'],
+        ]);
+    }
 
     /**
      * Подготовка данных для шаблона

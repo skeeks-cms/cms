@@ -15,6 +15,7 @@ use skeeks\cms\actions\LogoutAction;
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\forms\LoginForm;
+use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -75,7 +76,7 @@ class AuthController extends Controller
             return $this->goHome();
         }
 
-        $model = new LoginForm();
+        $model = new LoginFormUsernameOrEmail();
         if ($model->load(\Yii::$app->request->post()) && $model->login())
         {
             if ($ref = UrlHelper::getCurrent()->getRef())

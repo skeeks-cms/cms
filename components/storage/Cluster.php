@@ -25,6 +25,7 @@ use \skeeks\sx\Dir;
 abstract class Cluster extends ComponentModel
 {
     public $publicBaseUrl; //   http://c1.s.skeeks.com/uploads/
+    public $rootBasePath;  //   /var/www/sites/test.ru/frontend/web/uploads/
 
     /**
      * @var integer the level of sub-directories to store uploaded files. Defaults to 1.
@@ -34,7 +35,6 @@ abstract class Cluster extends ComponentModel
      */
     public $directoryLevel = 3;
 
-
     /**
      * @return array
      */
@@ -43,35 +43,71 @@ abstract class Cluster extends ComponentModel
         return $this->id;
     }
 
+
+
     /**
      * @param $file
      * @return string $clusterFileUniqSrc
      */
-    public function upload(File $file)
-    {
-        $clusterFileSrc = $this->_upload($file);
-        return $clusterFileSrc;
-    }
-
-    abstract protected function _upload(File $file);
-
-    public function update($clusterFileUniqSrc, $file)
-    {}
-
-    public function delete($clusterFileUniqSrc)
-    {
-        return $this->_delete($clusterFileUniqSrc);
-    }
-    abstract protected function _delete($clusterFileUniqSrc);
+    abstract public function upload(File $file);
 
 
     /**
+     * @param $clusterFileUniqSrc
+     * @param $file
+     * @return mixed
+     */
+    abstract public function update($clusterFileUniqSrc, $file);
+
+    /**
+     * @param $clusterFileUniqSrc
+     * @return mixed
+     */
+    abstract public function delete($clusterFileUniqSrc);
+
+
+    /**
+     * Удаление папки с преьвюшками
+     *
+     * @param $clusterFileUniqSrc
+     * @return mixed
+     */
+    abstract public function deleteTmpDir($clusterFileUniqSrc);
+
+    /**
+     * Путь до папки с временными файлами превью например
+     *
+     * @param $clusterFileUniqSrc
+     * @return string
+     */
+    public function rootTmpDir($clusterFileUniqSrc)
+    {
+        $file = new File($this->getRootSrc($clusterFileUniqSrc));
+        return $file->getDirName() . "/" . $file->getFileName();
+    }
+
+
+    /**
+     * Полный публичный путь до файла.
+     *
      * @param $clusterFileSrc
      * @return string
      */
-    public function getPublicSrc($clusterFileSrc)
+    public function getRootSrc($clusterFileUniqSrc)
     {
-        return $this->publicBaseUrl . DIRECTORY_SEPARATOR . $clusterFileSrc;
+        return $this->rootBasePath . DIRECTORY_SEPARATOR . $clusterFileUniqSrc;
+    }
+
+    /**
+     * Полный публичный путь до файла.
+     * Например /uploads/all/f4/df/sadfsd/sdfsdfsd/asdasd.jpg
+     *
+     * @param $clusterFileSrc
+     * @return string
+     */
+    public function getPublicSrc($clusterFileUniqSrc)
+    {
+        return $this->publicBaseUrl . DIRECTORY_SEPARATOR . $clusterFileUniqSrc;
     }
 
 

@@ -23,6 +23,7 @@ use Yii;
             <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii</button>
             <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii help cms/update</button>
             <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii cms/update</button>
+            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii cms/update/all --interactive=0</button>
         </div>
         <?= Html::tag('div',
             Html::submitButton("Выполнить команду", ['class' => 'btn btn-primary']),

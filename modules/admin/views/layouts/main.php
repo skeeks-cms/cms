@@ -189,7 +189,6 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         <i class="glyphicon glyphicon-menu-right"></i>
     </a>
 
-
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
