@@ -11,6 +11,7 @@
 namespace skeeks\cms\models;
 use skeeks\cms\base\db\ActiveRecord;
 
+use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
@@ -47,9 +48,6 @@ use yii\base\Event;
  * @property integer $status
  * @property string $description_short
  * @property string $description_full
- * @property string $meta_title
- * @property string $meta_description
- * @property string $meta_keywords
  * @property integer $image_height
  * @property integer $image_width
  * @property integer $count_comment
@@ -79,6 +77,8 @@ class StorageFile extends Core
         return '{{%cms_storage_file}}';
     }
 
+    public $multiPageOptions;
+
     /**
      * @inheritdoc
      */
@@ -88,14 +88,24 @@ class StorageFile extends Core
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             [['src'], 'required'],
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'status', 'image_height', 'image_width', 'count_comment', 'count_subscribe', 'count_vote', 'result_vote', 'published_at'], 'integer'],
-            [['description_short', 'description_full', 'meta_description', 'meta_keywords', 'users_subscribers', 'users_votes_up', 'users_votes_down'], 'string'],
-            [['src', 'cluster_file', 'original_name', 'name', 'meta_title', 'linked_to_model', 'linked_to_value'], 'string', 'max' => 255],
+            [['description_short', 'description_full', 'users_subscribers', 'users_votes_up', 'users_votes_down'], 'string'],
+            [['src', 'cluster_file', 'original_name', 'name', 'linked_to_model', 'linked_to_value'], 'string', 'max' => 255],
             [['cluster_id', 'type', 'mime_type', 'extension'], 'string', 'max' => 16],
             [['name_to_save'], 'string', 'max' => 32],
             [['src'], 'unique'],
             [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => 'The combination of Cluster ID and Cluster Src has already been taken.'],
             [['page_options', 'multiPageOptions'], 'safe'],
         ]);
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
+        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
+
+        return $scenarios;
     }
 
     /**
@@ -112,21 +122,18 @@ class StorageFile extends Core
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'size' => Yii::t('app', 'Size'),
+            'size' => Yii::t('app', 'Размер файла'),
             'type' => Yii::t('app', 'Type'),
-            'mime_type' => Yii::t('app', 'Mime Type'),
-            'extension' => Yii::t('app', 'Extension'),
-            'original_name' => Yii::t('app', 'Original Name'),
-            'name_to_save' => Yii::t('app', 'Name To Save'),
+            'mime_type' => Yii::t('app', 'Internet Media Type'),
+            'extension' => Yii::t('app', 'Расширение'),
+            'original_name' => Yii::t('app', 'Оригинальное название файла'),
+            'name_to_save' => Yii::t('app', 'Название при скачивании'),
             'name' => Yii::t('app', 'Name'),
             'status' => Yii::t('app', 'Status'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
-            'meta_title' => Yii::t('app', 'Meta Title'),
-            'meta_description' => Yii::t('app', 'Meta Description'),
-            'meta_keywords' => Yii::t('app', 'Meta Keywords'),
-            'image_height' => Yii::t('app', 'Image Height'),
-            'image_width' => Yii::t('app', 'Image Width'),
+            'image_height' => Yii::t('app', 'Высота изображения'),
+            'image_width' => Yii::t('app', 'Ширина изображения'),
             'count_comment' => Yii::t('app', 'Count Comment'),
             'count_subscribe' => Yii::t('app', 'Count Subscribe'),
             'users_subscribers' => Yii::t('app', 'Users Subscribers'),
@@ -268,4 +275,47 @@ class StorageFile extends Core
             return false;
         }
     }
+
+    /**
+     * @return \skeeks\cms\components\storage\Cluster
+     */
+    public function cluster()
+    {
+        return \Yii::$app->storage->getCluster($this->cluster_id);
+    }
+
+    /**
+     * TODO: Переписать нормально
+     * Обновление информации о файле
+     *
+     * @return $this
+     */
+    public function updateFileInfo()
+    {
+        $src = $this->src;
+
+        if ($this->cluster() instanceof ClusterLocal)
+        {
+            if (!\Yii::$app->request->hostInfo)
+            {
+                return $this;
+            }
+
+            $src = \Yii::$app->request->hostInfo . $this->src;
+        }
+        //Елси это изображение
+        if ($this->isImage())
+        {
+            if (extension_loaded('gd'))
+            {
+                list($width, $height, $type, $attr) = getimagesize($src);
+                $this->image_height       = $height;
+                $this->image_width        = $width;
+            }
+        }
+
+        $this->save();
+        return $this;
+    }
+
 }

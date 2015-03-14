@@ -34,7 +34,6 @@ abstract class Cluster extends ComponentModel
      */
     public $directoryLevel = 3;
 
-
     /**
      * @return array
      */

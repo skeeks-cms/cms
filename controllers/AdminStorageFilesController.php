@@ -41,6 +41,9 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
         $this->_modelShowAttribute      = "src";
         $this->_modelClassName          = StorageFile::className();
 
+        $this->modelValidate = true;
+        $this->enableScenarios = true;
+
         parent::init();
     }
 
