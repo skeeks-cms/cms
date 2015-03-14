@@ -15,6 +15,7 @@ use skeeks\cms\models\Publication;
 use skeeks\cms\models\Tree;
 use skeeks\cms\widgets\WidgetHasTemplate;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Publications
@@ -32,6 +33,15 @@ class Publications extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplat
     public $statusesAdults          = [];
     public $limit                   = 0;
     public $orderBy                 = null;
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['title'], 'string'],
+            [['tree_ids', 'types', 'statuses', 'statusesAdults', 'limit', 'orderBy'], 'safe'],
+        ]);
+    }
+
 
     /**
      * Подготовка данных для шаблона
