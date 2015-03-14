@@ -66,8 +66,6 @@ class Menu
                     $adminMenuFile = $path . '/config/admin/menu.php';
                     if (file_exists($adminMenuFile))
                     {
-                                                var_dump($adminMenuFile);
-
                         $menuGroups = (array) include_once $adminMenuFile;
                         $this->groups = ArrayHelper::merge($this->groups, $menuGroups);
                     }
