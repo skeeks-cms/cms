@@ -22,15 +22,16 @@ use \skeeks\sx\Dir;
  */
 class ClusterLocal extends Cluster
 {
-    public $rootBasePath;  //   /var/www/sites/test.ru/frontend/web/uploads/
+
 
     /**
-     * Добавление
+     * Добавление файла в кластер
+     *
      * @param File $tmpFile
      * @return string
      * @throws Exception
      */
-    protected function _upload(File $tmpFile)
+    public function upload(File $tmpFile)
     {
         $clusterFileName     =  $this->_generateClusterFileName($tmpFile);
 
@@ -59,19 +60,33 @@ class ClusterLocal extends Cluster
     }
 
     /**
+     * Удаление файла
+     *
      * @param $clusterFileSrc
      * @return bool
      * @throws Exception
      */
-    protected function _delete($clusterFileSrc)
+    public function delete($clusterFileUniqSrc)
     {
-        $file = new File($this->rootBasePath . DIRECTORY_SEPARATOR . $clusterFileSrc);
+        $file = new File($this->getRootSrc($clusterFileUniqSrc));
         if ($file->isExist())
         {
             $file->remove();
         }
 
-        $dir = new Dir($file->getDirName() . "/" . $file->getFileName());
+        return true;
+    }
+
+
+    /**
+     * Удаление временной папки
+     *
+     * @param $clusterFileUniqSrc
+     * @return bool|mixed
+     */
+    public function deleteTmpDir($clusterFileUniqSrc)
+    {
+        $dir = new Dir($this->rootTmpDir($clusterFileUniqSrc));
         if ($dir->isExist())
         {
             $dir->remove();
@@ -81,9 +96,8 @@ class ClusterLocal extends Cluster
     }
 
 
-
-
-
+    public function update($clusterFileUniqSrc, $file)
+    {}
 
 
 }

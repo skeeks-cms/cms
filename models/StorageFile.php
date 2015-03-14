@@ -240,8 +240,9 @@ class StorageFile extends Core
         //Сначала удалить файл
         try
         {
-            $storage = Yii::$app->storage;
-            $cluster = $storage->getCluster($this->cluster_id);
+            $cluster = $this->cluster();
+
+            $cluster->deleteTmpDir($this->cluster_file);
             $cluster->delete($this->cluster_file);
 
         } catch (\common\components\storage\Exception $e)
@@ -250,6 +251,17 @@ class StorageFile extends Core
         }
 
         return parent::delete();
+    }
+
+    /**
+     * @return $this
+     */
+    public function deleteTmpDir()
+    {
+        $cluster = $this->cluster();
+        $cluster->deleteTmpDir($this->cluster_file);
+
+        return $this;
     }
 
     /**
