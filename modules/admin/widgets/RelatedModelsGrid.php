@@ -46,6 +46,11 @@ class RelatedModelsGrid extends Widget
     public $relation  = [];
 
     /**
+     * @var array
+     */
+    public $sort = [];
+
+    /**
      * @var Родительская модель к которой будут строиться привязанные сущьности
      */
     public $parentModel  = null;
@@ -74,6 +79,11 @@ class RelatedModelsGrid extends Widget
 
         $search = new \skeeks\cms\models\Search($controller->getModelClassName());
         $search->getDataProvider()->query->where($rerlation);
+
+        if (isset($this->sort['defaultOrder']))
+        {
+            $search->getDataProvider()->sort->defaultOrder = $this->sort['defaultOrder'];
+        }
 
         $pjaxId = "sx-table-" . md5($this->label . $this->hint . $this->parentModel->className());
         $gridOptions = ArrayHelper::merge([

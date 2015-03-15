@@ -36,7 +36,8 @@
         "kartik-v/yii2-datecontrol": "*",
         "kartik-v/yii2-widget-datepicker": "*",
         "kartik-v/yii2-widget-datetimepicker": "*",
-        "mihaildev/yii2-elfinder": "*"
+        "mihaildev/yii2-elfinder": "*",
+        "bower-asset/fancybox": "*"
     },
     "minimum-stability": "dev",
     "autoload": {
