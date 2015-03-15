@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\modules\admin\assets;
+use skeeks\cms\assets\FancyboxAssets;
 use skeeks\cms\base\AssetBundle;
 
 
@@ -30,6 +31,7 @@ class AdminAsset extends AssetBundle
         'js/classes/OldNav.js',
         'js/classes/Menu.js',
         'js/classes/Iframe.js',
+        'js/classes/Window.js',
         'js/app.js',
     ];
     public $depends = [
@@ -41,6 +43,7 @@ class AdminAsset extends AssetBundle
         '\skeeks\sx\assets\ComponentAjaxLoader',
         '\skeeks\cms\modules\admin\assets\JqueryScrollbarAsset',
         '\skeeks\cms\modules\admin\assets\ThemeRealAdminAsset',
+        '\skeeks\cms\assets\FancyboxAssets'
     ];
 }
 

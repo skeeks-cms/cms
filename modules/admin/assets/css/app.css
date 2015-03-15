@@ -95,6 +95,7 @@ body.sidebar-hidden footer.sx-admin-footer
     body.empty
     {
         min-height: 100%;
+        background: white;
     }
 
     body.empty .sx-panel-content
@@ -522,6 +523,11 @@ div#jGrowl
     }
 
     body.sidebar-hidden .sx-main-menu-toggle-opened
+    {
+        display: none;
+    }
+
+    body.empty.sidebar-hidden .sx-sidebar
     {
         display: none;
     }

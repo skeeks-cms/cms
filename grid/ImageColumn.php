@@ -27,6 +27,7 @@ class ImageColumn extends ImageColumnData
         {
             $src = \Yii::$app->cms->moduleAdmin()->noImage;
         }
-        return "<img src='" . $src . "' style='width: " . $this->maxWidth . "px;' />";
+
+        return "<a href='" . $src . "' class='sx-fancybox'><img src='" . $src . "' style='width: " . $this->maxWidth . "px;' /></a>";
     }
 }
