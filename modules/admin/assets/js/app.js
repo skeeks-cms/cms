@@ -86,6 +86,8 @@
             {
                 $(".sx-panel").fadeIn();
             }, 100);
+
+            $('.sx-fancybox').fancybox();
         },
 
         /**

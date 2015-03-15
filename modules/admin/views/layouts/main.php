@@ -206,7 +206,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                                 <ul class="nav nav-sidebar">
                                     <? foreach ($itemsGroup as $itemData) : ?>
                                         <? if (\yii\helpers\ArrayHelper::getValue($itemData, 'enabled' , true) === true) : ?>
-                                            <li <?= strpos('-' . \Yii::$app->controller->route, $itemData["url"][0]) ? 'class="active"' : '' ?>>
+                                            <li <?= strpos('-' . \Yii::$app->controller->route . '/', $itemData["url"][0] . '/') ? 'class="active"' : '' ?>>
                                                 <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#" class="sx-test">
                                                     <? if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : ?>
                                                         <? list($assetClassName, $localPath) = $imgData; ?>
