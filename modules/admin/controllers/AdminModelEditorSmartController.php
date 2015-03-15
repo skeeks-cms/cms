@@ -169,6 +169,41 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     }
 
 
+    /**
+     * @return array
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionSortablePriority()
+    {
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost)
+        {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+
+            if ($keys = \Yii::$app->request->post('keys'))
+            {
+                $counter = count($keys);
+
+                foreach ($keys as $key)
+                {
+                    $priority = $counter * 1000;
+                    $model = $this->_findModel($key);
+                    if ($model)
+                    {
+                        $model->priority = $priority;
+                        $model->save(false);
+                    }
+
+                    $counter = $counter - 1;
+                }
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Изминения сохранены',
+            ];
+        }
+    }
+
 
     /**
      * @return string|\yii\web\Response

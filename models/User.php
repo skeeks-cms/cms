@@ -22,6 +22,7 @@ use skeeks\cms\validators\user\UserEmailValidator;
 use skeeks\sx\validate\Validate;
 use Yii;
 use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\BaseActiveRecord;
@@ -73,12 +74,22 @@ class User
 
     const ROLE_USER = 10;
 
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
         return '{{%cms_user}}';
+    }
+
+    /**
+     * Логины которые нельзя удалять, и нельзя менять
+     * @return array
+     */
+    static public function getProtectedUsernames()
+    {
+        return ['root', 'admin'];
     }
 
     /**
@@ -93,7 +104,30 @@ class User
 
         $this->on(BaseActiveRecord::EVENT_AFTER_INSERT,    [$this, "checkDataAfterSave"]);
         $this->on(BaseActiveRecord::EVENT_AFTER_UPDATE,    [$this, "checkDataAfterSave"]);
+
+        $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
     }
+
+    /**
+     * @throws Exception
+     */
+    public function checkDataBeforeDelete()
+    {
+        if (in_array($this->username, static::getProtectedUsernames()))
+        {
+            throw new Exception('Этого пользователя нельзя удалить');
+        }
+
+        if ($this->id == \Yii::$app->cms->getAuthUser()->id)
+        {
+            throw new Exception('Нельзя удалять самого себя');
+        }
+
+        /*$userEmail = UserEmail::find()->where(['value' => $this->email])->one();
+        $userEmail->user_id = null;
+        $userEmail->save();*/
+    }
+
 
     public function checkDataAfterSave()
     {
@@ -578,4 +612,5 @@ class User
 
         return null;
     }
+
 }
