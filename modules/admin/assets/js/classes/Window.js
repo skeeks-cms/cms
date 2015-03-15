@@ -41,6 +41,15 @@
                     'href' : self._src,
                     'data-fancybox-type' : 'iframe',
                 }).appendTo('body').fancybox({
+                    'iframe' : {
+                        scrolling : 'auto',
+                        preload   : true
+                    },
+                    'height' : 'html',
+                    'type' : 'iframe',
+                    'fitToView' : true,
+                    'autoSize' : true,
+                    'autoHeight' : true,
                     'afterClose' : function()
                     {
                         self.trigger('close');

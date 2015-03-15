@@ -166,10 +166,15 @@ form.sx-form-admin
 /**
 * Доработка панелей
 */
+body.empty .sx-panel
+{
+    box-shadow: none;
+    margin-bottom: 60px;
+}
+
 .sx-panel
 {
     box-shadow: 1px 7px 16px rgba(0, 0, 0, 0.42);
-    //display: none;
     margin-bottom: 60px;
 }
 
