@@ -24,6 +24,7 @@ class RelatedModelsGrid extends Widget
      * @var string действие добавления связанной модели
      */
     public $controllerCreateAction  = 'create';
+    public $controllerSortableAction  = 'sortable-priority';
 
     /**
      * @var string название
@@ -77,6 +78,10 @@ class RelatedModelsGrid extends Widget
                 ->enableAdmin()->toString();
 
 
+        $sortableUrl = \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->controllerSortableAction)
+                ->enableAdmin()->toString();
+
+
         $search = new \skeeks\cms\models\Search($controller->getModelClassName());
         $search->getDataProvider()->query->where($rerlation);
 
@@ -92,6 +97,9 @@ class RelatedModelsGrid extends Widget
                 'id' => $pjaxId
             ],
             "usePjax" => true,
+            "sortableOptions" => [
+                'backend' => $sortableUrl
+            ],
             'dataProvider'  => $search->getDataProvider(),
             'layout' => "\n{items}\n{pager}",
             'columns' => [

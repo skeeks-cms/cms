@@ -231,6 +231,24 @@ class AdminModelEditorController extends AdminController
     protected $_currentModel = null;
 
     /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function loadModels()
+    {
+        $result = [];
+
+        if ($keys = (array) \Yii::$app->request->post('keys'))
+        {
+            foreach ($keys as $key)
+            {
+                $result[$key] = $this->_findModel($key);
+            }
+        }
+
+        return $result;
+    }
+    /**
      * @return $this
      * @throws Exception
      * @throws NotFoundHttpException
