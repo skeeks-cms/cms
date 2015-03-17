@@ -113,7 +113,8 @@ class Imaging extends Component
      */
     static public function getExtension($filePath)
     {
-        $extension                  = end(explode(".", $filePath));
+        $parts = explode(".", $filePath);
+        $extension                  = end($parts);
 
         if (!$extension)
         {
