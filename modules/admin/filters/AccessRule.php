@@ -61,7 +61,7 @@ class AccessRule extends \yii\filters\AccessRule
                     }
                 }
             }
-        } else if ($action->controller instanceof AdminController)
+        } /*else if ($action->controller instanceof AdminController)
         {
 
             //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
@@ -75,7 +75,25 @@ class AccessRule extends \yii\filters\AccessRule
                 }
 
             }
+        }*/
+
+        if ($action->controller instanceof AdminController)
+        {
+            //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
+            $acttionPermissionName = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId());
+
+            if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
+            {
+
+
+                if (!\Yii::$app->user->can($permission->name))
+                {
+                    return false;
+                }
+            }
         }
+
+
 
         return parent::allows($action, $user, $request);
     }

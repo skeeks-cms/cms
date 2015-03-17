@@ -48,14 +48,14 @@ class Menu
         ]*/
     ];
 
+    public $isLoaded = false;
 
-    /**
-        Получение только доступного меню
-     * @return array
-     */
-    public function getAllowData()
+    public function getData()
     {
-        $groups = [];
+        if ($this->isLoaded)
+        {
+            return (array) $this->groups;
+        }
 
         foreach (\Yii::$app->extensions as $code => $data)
         {
@@ -69,19 +69,38 @@ class Menu
                         $menuGroups = (array) include_once $adminMenuFile;
                         $this->groups = ArrayHelper::merge($this->groups, $menuGroups);
                     }
-
                 }
             }
         }
 
-        foreach ($this->groups as $groupCode => $groupData)
+        $this->isLoaded = true;
+        return (array) $this->groups;
+    }
+
+    /**
+        Получение только доступного меню
+     * @return array
+     */
+    public function getAllowData()
+    {
+        foreach ($this->getData() as $groupCode => $groupData)
         {
             if ($groupData['items'])
             {
                 $items = [];
                 foreach ($groupData['items'] as $itemCode => $itemData)
                 {
-                    $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($itemData['url'][0]);
+                    /**
+                     * @var $controller \yii\web\Controller
+                     */
+                    list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
+
+                    if (!$controller)
+                    {
+                        continue;
+                    }
+
+                    $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
                     if ($permission = \Yii::$app->authManager->getPermission($permissionCode))
                     {
                         if (\Yii::$app->user->can($permission->name))

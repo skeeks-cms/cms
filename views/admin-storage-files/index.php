@@ -38,12 +38,19 @@ use skeeks\cms\modules\admin\widgets\GridView;
                 if ($model->isImage())
                 {
                     \Yii::$app->view->registerCss(<<<CSS
-    .sx-img-small {
-        max-height: 50px;
-    }
+.sx-img-small {
+    max-height: 50px;
+}
 CSS
 );
-                    return \yii\helpers\Html::img($model->src, [
+
+                    $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+                        'w'    => $width,
+                        'h'    => $height,
+                        'm'    => $mode,
+                    ]));
+
+                    return \yii\helpers\Html::img($smallImage, [
                         'width' => '50',
                         'class' => 'sx-img-small'
                     ]);

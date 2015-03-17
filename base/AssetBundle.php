@@ -20,7 +20,7 @@ class AssetBundle extends \yii\web\AssetBundle
     {
         parent::init();
 
-        foreach ($this->js as $key => $js)
+        /*foreach ($this->js as $key => $js)
         {
             $this->js[$key] = $js . "?" . \Yii::$app->cms->getStaticKey();
         }
@@ -28,6 +28,6 @@ class AssetBundle extends \yii\web\AssetBundle
         foreach ($this->css as $key => $css)
         {
             $this->css[$key] = $css . "?" . \Yii::$app->cms->getStaticKey();
-        }
+        }*/
     }
 }

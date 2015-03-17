@@ -71,6 +71,12 @@ $config =
             'class' => '\skeeks\cms\rbac\DbManager',
             //'defaultRoles' => ['user'],
         ],
+
+        //Админское меню
+        'adminMenu' =>
+        [
+            'class' => '\skeeks\cms\modules\admin\components\Menu',
+        ],
     ],
 
 

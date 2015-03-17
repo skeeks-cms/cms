@@ -57,8 +57,8 @@ abstract class AdminController extends Controller
 
             'access' =>
             [
-                'class' => AccessControl::className(),
-                'ruleConfig' => ['class' => AccessRule::className()],
+                'class'         => AccessControl::className(),
+                'ruleConfig'    => ['class' => AccessRule::className()],
 
                 'rules' =>
                 [
