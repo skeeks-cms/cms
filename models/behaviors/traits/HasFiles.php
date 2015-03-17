@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\models\behaviors\traits;
 
+use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\models\helpers\ModelFilesGroups;
 use skeeks\cms\models\StorageFile;
 use yii\db\ActiveQuery;
@@ -19,11 +20,12 @@ use yii\db\ActiveQuery;
  * @method ActiveQuery          findFiles()
  * @method StorageFile[]        getFiles()
  *
- * @method bool                 hasMainImage()      Есть ли изображение с меткой image
- * @method string               getMainImageSrc()   Получение первого изображения с меткой image
- * @method array                getMainImagesSrc()  Получение всех изображений с меткой image
- * @method array                getImagesSrc()      Получить src[] изображений из группы images
- * @method array                getFilesSrc()       Получить src[] изображений из группы files
+ * @method bool                 hasMainImage()              Есть ли изображение с меткой image
+ * @method string               getMainImageSrc()           Получение первого изображения с меткой image
+ * @method string               getPreviewMainImageSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)    Получить стандартную превьюшку (используем для админки например)
+ * @method array                getMainImagesSrc()          Получение всех изображений с меткой image
+ * @method array                getImagesSrc()              Получить src[] изображений из группы images
+ * @method array                getFilesSrc()               Получить src[] изображений из группы files
  *
  *
  * Class HasFiles

@@ -131,7 +131,13 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 CSS
 );
 
-                        return \yii\helpers\Html::img($model->src, [
+                        $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+                            'w'    => $width,
+                            'h'    => $height,
+                            'm'    => $mode,
+                        ]));
+
+                        return \yii\helpers\Html::img($smallImage, [
                             'width' => '50',
                             'class' => 'sx-img-small'
                         ]);
