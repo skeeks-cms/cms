@@ -39,6 +39,8 @@ class ImagingController extends Controller
      */
     public function actionProcess()
     {
+        ini_set("memory_limit","512M");
+
         $imaging                        = \Yii::$app->imaging;
         if (!$imaging)
         {

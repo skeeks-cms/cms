@@ -11,6 +11,7 @@ return
     'cms' =>
     [
         'label'     => 'Основное',
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
 
         'items' =>
         [
@@ -71,6 +72,8 @@ return
         'priority'  => 0,
         'enabled'   => true,
 
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png'],
+
         'items' =>
         [
             [
@@ -116,6 +119,8 @@ return
         'label' => 'Файловое хранилище',
         'enabled' => true,
 
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+
         'items' =>
         [
             [
@@ -137,6 +142,8 @@ return
         'label'     => 'Социальные элементы',
         'priority'  => 0,
         'enabled'   => true,
+
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/votes.png'],
 
         'items' =>
         [
@@ -165,6 +172,8 @@ return
         'label'     => 'Для разработчиков',
         'priority'  => 0,
         'enabled'   => true,
+
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
 
         'items' =>
         [

@@ -25,7 +25,7 @@ $idSmartFrame = $id . "-smart-frame";
             <small>Квадратик — доболнительный раздел (можно отметить несколько дополнительных разделов)</small>
         <? endif; ?>
     </p>
-    <iframe src="<?= $src; ?>" width="100%;" height="200px;" id="sx-test"></iframe>
+    <iframe data-src="<?= $src; ?>" width="100%;" height="200px;" id="sx-test"></iframe>
     <div class="sx-selected">
         <?= $select; ?>
         <?= $singleInput; ?>
@@ -38,10 +38,11 @@ $idSmartFrame = $id . "-smart-frame";
 {
     sx.createNamespace('classes.app', sx);
 
-    sx.classes.app.TreeSelect = sx.classes.Widget.extend({
+    sx.classes.app.TreeSelect = sx.classes.Component.extend({
 
         _init: function()
         {
+
             var self = this;
 
             this.Iframe = new sx.classes.Iframe('sx-test', {
@@ -64,22 +65,24 @@ $idSmartFrame = $id . "-smart-frame";
                     });
                 }
             });
+        },
 
+        /**
+         * @returns {*|HTMLElement}
+         */
+        getWrapper: function()
+        {
+            return $('#' + this.get('id'));
         },
 
         _onDomReady: function()
         {
             var self = this;
 
-            this._containerSelected     = $('.sx-selected ul',              this.getWrapper());
-            this._containerControlls    = $('.sx-controlls',                this.getWrapper());
-            this._controllElement       = $('.sx-controll-element',         this.getWrapper());
-            this._btnCreateWindow       = $('.sx-controll-window-create',   this.getWrapper());
             this.JsingleInput           = $('input.sx-single',              this.getWrapper());
 
             if (this.get('selected'))
             {
-                console.log(this.get('selected'));
                 this.addTrees(this.get('selected'));
             }
 
@@ -90,6 +93,12 @@ $idSmartFrame = $id . "-smart-frame";
                     self.Iframe.sx.Tree.setSingle(self.JsingleInput.val());
                 }
             });
+
+            _.delay(function()
+            {
+                $('#sx-test').attr('src', $('#sx-test').data('src'));
+            }, 200);
+
         },
 
 
@@ -97,19 +106,23 @@ $idSmartFrame = $id . "-smart-frame";
         {
             var self = this;
 
-            self._controllElement.empty();
+            this.getWrapper().find('.sx-controll-element').empty();
 
             _.each(data, function(value, key)
             {
-                self._controllElement.append('<option value="' + value + '" selected="selected">name</option>')
-            })
+                self.getWrapper().find('.sx-controll-element').append(
+                    $("<option>", {
+                        'value' : value,
+                        'selected' : 'selected'
+                    }).text('text')
+                );
+            });
+
         },
 
-        _onWindowReady: function()
-        {}
     });
 
-    new sx.classes.app.TreeSelect('#{$id}', {$clientOptions});
+    new sx.classes.app.TreeSelect({$clientOptions});
 })(sx, sx.$, sx._);
 
 JS

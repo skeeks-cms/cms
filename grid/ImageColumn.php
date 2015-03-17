@@ -22,12 +22,14 @@ class ImageColumn extends ImageColumnData
      */
     protected function renderDataCellContent($model, $key, $index)
     {
-        $src = $model->getMainImageSrc();
+        $originalSrc = $model->getMainImageSrc();
+        $src = $model->getPreviewMainImageSrc();
         if (!$src)
         {
             $src = \Yii::$app->cms->moduleAdmin()->noImage;
+            $originalSrc = $src;
         }
 
-        return "<a href='" . $src . "' class='sx-fancybox'><img src='" . $src . "' style='width: " . $this->maxWidth . "px;' /></a>";
+        return "<a href='" . $originalSrc . "' class='sx-fancybox'><img src='" . $src . "' style='width: " . $this->maxWidth . "px;' /></a>";
     }
 }

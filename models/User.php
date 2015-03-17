@@ -601,16 +601,7 @@ class User
      */
     public function getAvatarSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
     {
-        if ($this->hasMainImage())
-        {
-            return \Yii::$app->imaging->getImagingUrl($this->getMainImageSrc(), new \skeeks\cms\components\imaging\filters\Thumbnail([
-                'w'    => $width,
-                'h'    => $height,
-                'm'    => $mode,
-            ]));
-        }
-
-        return null;
+        return $this->getPreviewMainImageSrc($width, $height, $mode);
     }
 
 }

@@ -90,6 +90,15 @@ class AdminPermissionController extends AdminModelEditorController
                         "rules"         => NoModel::className()
                     ],
 
+                    "update-data" =>
+                    [
+                        "label"         => "Обновить привилегии",
+                        "icon"          => "glyphicon glyphicon-plus",
+                        "rules"         => NoModel::className(),
+                        "method"        => "post",
+                        "request"       => "ajax",
+                    ],
+
 
 
 
@@ -115,6 +124,49 @@ class AdminPermissionController extends AdminModelEditorController
             ]
         ]);
     }
+
+    public function actionUpdateData()
+    {
+        $auth = Yii::$app->authManager;
+
+        foreach (\Yii::$app->adminMenu->getData() as $group)
+        {
+            foreach ($group['items'] as $itemData)
+            {
+
+                /**
+                 * @var $controller \yii\web\Controller
+                 */
+                list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
+
+
+                if ($controller)
+                {
+                    if ($controller instanceof AdminController)
+                    {
+                        $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
+
+                        //Привилегия доступу к админке
+                        if (!$adminAccess = $auth->getPermission($permissionCode))
+                        {
+                            $adminAccess = $auth->createPermission($permissionCode);
+                            $adminAccess->description = 'Администрирование | ' . $controller->getLabel();
+                            $auth->add($adminAccess);
+
+                            if ($root = $auth->getRole('root'))
+                            {
+                                $auth->addChild($root, $adminAccess);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+
     /**
      * Lists all AuthItem models.
      * @return mixed

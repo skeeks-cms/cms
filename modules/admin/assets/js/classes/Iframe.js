@@ -62,6 +62,9 @@
 
             if (this.parentIframe)
             {
+                //Сообщим родительскому окну что мы построены
+                this.parentIframe.trigger('domReady', this);
+
                 /**
                  * Если родительский фрейм настроен так что будет слушать высоту текущего окна
                  * Вешаем таймер и постоянно сообщаем новую высоту
@@ -212,6 +215,12 @@
 
             sx.IframeManager.registerIframe(this);
 
+            this.bind("domReady", function(e, childIframeManager)
+            {
+                self.ready = true;
+                self.trigger('ready', this);
+            });
+
             this.bind("initChildIframe", function(e, childIframeManager)
             {
                 self.childIframeManager = childIframeManager;
@@ -221,10 +230,8 @@
                 {
                     self.setHeight(newHeight);
                 });
-
-                self.ready = true;
-                self.trigger('ready', this);
             });
+
         },
 
         /**

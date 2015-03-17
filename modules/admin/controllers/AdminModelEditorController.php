@@ -53,7 +53,7 @@ class AdminModelEditorController extends AdminController
     /**
      * @var string
      */
-    public $defaultActionModel      = "view";
+    public $defaultActionModel      = "update";
     protected $_modelShowAttribute  = "id";
     public $modelPkAttribute        = "id";
     public $modelValidate           = false;

@@ -17,15 +17,7 @@
         _init: function()
         {
             this.getCookieManager().setNamespace('admin-menu');
-            /*this.bind('open', function()
-            {
 
-            });
-
-            this.bind('close', function()
-            {
-
-            });*/
         },
 
         _onDomReady: function()
@@ -44,6 +36,11 @@
             {
                 this.close();
             }
+
+            $('.sidebar-menu').on('click', function()
+            {
+                sx.notify.info('Скоро можно будет открывать и закрывать этот блок');
+            });
         },
 
         /**

@@ -46,15 +46,27 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Дополнительные разделы') ?>
 
-<?= $form->field($model, 'tree_menu_ids')->label('Меню')->widget(
-    \skeeks\widget\chosen\Chosen::className(), [
+
+
+<?= $form->field($model, 'tree_menu_ids')->label('Метки')->widget(
+    \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
+        'items' => \yii\helpers\ArrayHelper::map(
+             \skeeks\cms\models\TreeMenu::find()->all(),
+             "id",
+             "name"
+         ),
+        'multiple' => true,
+        'controllerRoute' => 'cms/admin-tree-menu',
+    ]
+    /*\skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\TreeMenu::find()->all(),
                  "id",
                  "name"
              ),
             'multiple' => true
-    ])->hint('Вы можете выбрать один или несколько меню, в которых будет показываться этот раздел');
+    ]*/
+    )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
 ?>
 
 <div data-listen="isLink" data-show="0" class="sx-hide">

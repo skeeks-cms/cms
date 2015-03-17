@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\models\behaviors;
 
+use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\storage\Exception;
 use skeeks\cms\models\behaviors\events\AfterUnLinkedModel;
 use skeeks\cms\models\helpers\ModelFilesGroups;
@@ -413,6 +414,25 @@ class HasFiles extends HasLinkedModels
     }
 
 
+    /**
+     * @param int $width
+     * @param int $height
+     * @param $mode
+     * @return mixed|null|string
+     */
+    public function getPreviewMainImageSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
+    {
+        if ($this->hasMainImage())
+        {
+            return \Yii::$app->imaging->getImagingUrl($this->getMainImageSrc(), new \skeeks\cms\components\imaging\filters\Thumbnail([
+                'w'    => $width,
+                'h'    => $height,
+                'm'    => $mode,
+            ]));
+        }
+
+        return null;
+    }
 
 
 

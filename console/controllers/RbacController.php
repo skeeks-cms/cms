@@ -28,7 +28,7 @@ class RbacController extends Controller
     {
         $this
             ->_initBaseData()
-            //->_initAdminData()
+            //->_initAdminDataNew()
             ->_initRootUser()
         ;
     }
@@ -50,6 +50,48 @@ class RbacController extends Controller
                 $aManager->assign($aManager->getRole('root'), $root->primaryKey);
             }
 
+        }
+
+        return $this;
+    }
+
+
+    protected function _initAdminDataNew()
+    {
+        $auth = Yii::$app->authManager;
+
+        foreach (\Yii::$app->adminMenu->getData() as $group)
+        {
+            foreach ($group['items'] as $itemData)
+            {
+
+                /**
+                 * @var $controller \yii\web\Controller
+                 */
+                list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
+
+
+                if ($controller)
+                {
+                    if ($controller instanceof AdminController)
+                    {
+                        $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
+
+                        //Привилегия доступу к админке
+                        if (!$adminAccess = $auth->getPermission($permissionCode))
+                        {
+                            $adminAccess = $auth->createPermission($permissionCode);
+                            $adminAccess->description = 'Администрирование | ' . $controller->getLabel();
+                            $auth->add($adminAccess);
+
+                            if ($root = $auth->getRole('root'))
+                            {
+                                $auth->addChild($root, $adminAccess);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return $this;
@@ -179,16 +221,6 @@ class RbacController extends Controller
             $auth->addChild($manager, $adminAccess);
         }
 
-        if (!$managerAdvansed = $auth->getRole('managerAdvansed'))
-        {
-            //Менеджер который может управлять всеми данными
-            $managerAdvansed = $auth->createRole('managerAdvansed');
-            $managerAdvansed->description = 'Менеджер расширенный (все записи)';
-            $auth->add($managerAdvansed);
-            $auth->addChild($managerAdvansed, $manager);
-            $auth->addChild($managerAdvansed, $adminAccess);
-        }
-
         if (!$admin = $auth->getRole('admin'))
         {
             //Админ обладает расширенными возможностями
@@ -197,7 +229,6 @@ class RbacController extends Controller
             $auth->add($admin);
             $auth->addChild($admin, $user);
             $auth->addChild($admin, $manager);
-            $auth->addChild($admin, $managerAdvansed);
             $auth->addChild($admin, $adminAccess);
         }
 
@@ -210,7 +241,6 @@ class RbacController extends Controller
             $auth->addChild($root, $user);
             $auth->addChild($root, $manager);
             $auth->addChild($root, $admin);
-            $auth->addChild($root, $managerAdvansed);
             $auth->addChild($root, $adminAccess);
         }
 

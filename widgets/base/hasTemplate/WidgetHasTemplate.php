@@ -83,13 +83,21 @@ abstract class WidgetHasTemplate extends Widget
             $template = $this->getDescriptor()->getTemplatesObject()->getComponent($this->template);
             if ($template)
             {
-                if ($template->baseDir)
+                try
                 {
-                    $result = $this->renderFile($template->baseDir . DIRECTORY_SEPARATOR . $this->template . '.php', $this->_data->toArray());
-                } else
+                    if ($template->baseDir)
+                    {
+                        $result = $this->renderFile($template->baseDir . DIRECTORY_SEPARATOR . $this->template . '.php', $this->_data->toArray());
+                    } else
+                    {
+                        $result = $this->render($this->template, $this->_data->toArray());
+                    }
+                } catch (\Exception $e)
                 {
-                    $result = $this->render($this->template, $this->_data->toArray());
+                    ob_end_clean();
+                    return 'Ошибка инфоблока: ' . $e->getMessage();
                 }
+
             } else
             {
                 $result = $this->render($this->template, $this->_data->toArray());

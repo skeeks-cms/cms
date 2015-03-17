@@ -104,7 +104,9 @@ class SelectTree extends InputWidget
                             ->setSystemParam(Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                             ->enableAdmin()->toString();
 
-            $id = "sx-id-" . Yii::$app->security->generateRandomString(6);
+            $id = "sx-id-" . md5(serialize([
+                    $this->clientOptions, $this->mode, $this->attributeMulti, $this->attributeSingle
+                ]));
 
             $selected = [];
             foreach ($trees as $tree)
@@ -123,6 +125,7 @@ class SelectTree extends InputWidget
                     [
                         'src'       => $src,
                         'name'      => $id,
+                        'id'        => $id,
                         'selected'  => $selected,
                         'valueSingle'  => $valueSingle
                     ]

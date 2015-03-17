@@ -197,8 +197,15 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
                     <? if (\yii\helpers\ArrayHelper::getValue($groupData, 'enabled' , true) === true) : ?>
                         <div class="sidebar-menu" id="sx-admin-menu-<?= $keyGroup; ?>">
-                            <div class="sx-head">
-                                <i class="icon icon-arrow-up" style=""></i>
+                            <div class="sx-head" title="<?= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); ?>">
+                                <? if ($imgData = \yii\helpers\ArrayHelper::getValue($groupData, 'img', [])) : ?>
+                                    <? list($assetClassName, $localPath) = $imgData; ?>
+                                    <span class="sx-icon">
+                                        <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); ?>" />
+                                    </span>
+                                <? else : ?>
+                                    <i class="icon icon-arrow-up" style=""></i>
+                                <? endif; ?>
                                 <?= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); ?>
                             </div>
 

@@ -291,14 +291,20 @@ body.empty .sx-panel
         width: 240px;
         border: 1px solid #20a8d8;
         margin-bottom: 0px;
-        margin-top: 20px;
+        margin-top: 10px;
         overflow: hidden;
         background: white;
         box-shadow: 1px 5px 9px rgba(0, 0, 0, 0.42);
     }
 
+        .sx-sidebar .sidebar-menu:hover
+        {
+            box-shadow: 1px 5px 9px rgba(32, 168, 216, 0.69)
+        }
+
         .sx-sidebar .sidebar-menu .sx-head
         {
+            cursor: pointer;
             background: #5dc3e7;
             color: white;
             //font-weight: bold;
@@ -316,6 +322,17 @@ body.empty .sx-panel
                 padding-top: 3px;
                 padding-right: 5px;
             }
+            .sx-sidebar .sidebar-menu .sx-head .sx-icon
+            {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+                .sx-sidebar .sidebar-menu .sx-head .sx-icon img
+                {
+                    max-width: 20px;
+                    max-height: 16px;
+                }
 
         .sidebar ul.nav.nav-sidebar li a i
         {
