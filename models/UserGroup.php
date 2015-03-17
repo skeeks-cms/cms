@@ -15,6 +15,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
 use Yii;
+use yii\db\BaseActiveRecord;
 
 /**
  * Class Publication
@@ -32,6 +33,39 @@ class UserGroup extends Core
         return '{{%cms_user_group}}';
     }
 
+    /**
+     * Логины которые нельзя удалять, и нельзя менять
+     * @return array
+     */
+    static public function getProtectedGroups()
+    {
+        return ['root', 'admin', 'manager', 'user'];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public function checkDataBeforeDelete()
+    {
+        if (in_array($this->groupname, static::getProtectedGroups()))
+        {
+            throw new Exception('Эту группу нельзя удалить');
+        }
+
+    }
+
 
     /**
      * @inheritdoc
@@ -42,20 +76,6 @@ class UserGroup extends Core
             HasFiles::className() =>
             [
                 "class"  => HasFiles::className(),
-                "groups" =>
-                [
-                    "image" =>
-                    [
-                        'name'      => 'Главное изображение',
-                        'config'    =>
-                        [
-                            HasFiles::MAX_SIZE            => 1*2048, //1Mb
-                            HasFiles::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                            HasFiles::MAX_COUNT_FILES     => 1,
-                            HasFiles::ACCEPT_MIME_TYPE    => "image/*",
-                        ]
-                    ],
-                ]
             ],
         ]);
     }

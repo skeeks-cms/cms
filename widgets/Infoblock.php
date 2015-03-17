@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\widgets;
 use skeeks\cms\base\Widget;
+use yii\helpers\Html;
 
 /**
  * Class Infoblock
@@ -90,6 +91,9 @@ class Infoblock extends Widget
             self::$regsteredBlocks[$this->id] = $result;
         }
 
+        /*return Html::tag('div', $result, [
+            'style' => 'border: 1px solid red;'
+        ]);*/
         return $result;
     }
 }
