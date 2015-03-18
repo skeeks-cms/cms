@@ -58,6 +58,8 @@ abstract class CollectionComponents extends Component
                         }
 
                         $data['id'] = $id;
+
+                        //$this->_components[$id] = \Yii::createObject($class, $data);
                         $this->_components[$id] = new $class($data);
                     }
                 }

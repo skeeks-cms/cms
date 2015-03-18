@@ -33,9 +33,15 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
      */
     public $enableAjaxValidation = true;
     /**
+     * TODO:: Is depricated
      * @var array
      */
     public $PjaxOptions = [];
+
+    /**
+     * @var array
+     */
+    public $pjaxOptions = [];
 
     /**
      * Initializes the widget.
@@ -43,6 +49,8 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
      */
     public function init()
     {
+        $this->pjaxOptions = ArrayHelper::merge($this->pjaxOptions, $this->PjaxOptions);
+
         $this->options = ArrayHelper::merge($this->options, [
             'class' => 'sx-form-admin'
         ]);
@@ -51,7 +59,7 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
         {
             Pjax::begin(ArrayHelper::merge([
                 'id' => 'sx-pjax-form-' . $this->id,
-            ], $this->PjaxOptions));
+            ], $this->pjaxOptions));
 
             $this->options = ArrayHelper::merge($this->options, [
                 'data-pjax' => true
@@ -65,16 +73,6 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 
     public function run()
     {
-        /*$js = <<<JS
-        // get the form id and set the event
-        $('#{$this->id}').on('beforeSubmit', function(e) {
-           alert('111');
-        }).on('submit', function(e){
-            alert('222');
-        });
-JS;
-        $this->view->registerJs($js);*/
-
         parent::run();
 
         if ($this->usePjax)
