@@ -14,7 +14,7 @@ $config =
 [
     'id' => 'skeeks-cms-app',
     'language' => 'ru',
-    'bootstrap' => ['cms', 'log'],
+    'bootstrap' => ['cms', 'log', 'controlToolbar'],
 
     'components' => [
 
@@ -24,6 +24,10 @@ $config =
             'enableAutoLogin' => true,
         ],
 
+
+        'controlToolbar' => [
+            'class' => 'skeeks\cms\components\ControlToolbar',
+        ],
 
         'storage' => [
             'class' => 'skeeks\cms\components\Storage',
