@@ -14,7 +14,7 @@ $config =
 [
     'id' => 'skeeks-cms-app',
     'language' => 'ru',
-    'bootstrap' => ['cms', 'log', 'controlToolbar'],
+    'bootstrap' => ['cms', 'log', 'cmsToolbar'],
 
     'components' => [
 
@@ -25,8 +25,9 @@ $config =
         ],
 
 
-        'controlToolbar' => [
-            'class' => 'skeeks\cms\components\ControlToolbar',
+        'cmsToolbar' =>
+        [
+            'class' => 'skeeks\cms\components\CmsToolbar',
         ],
 
         'storage' => [
