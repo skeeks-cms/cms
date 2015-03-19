@@ -27,6 +27,7 @@ use skeeks\cms\components\RegisteredWidgets;
 use skeeks\cms\components\SeoGenerator;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\components\TreeTypes;
+use skeeks\cms\mail\Mailer;
 use skeeks\cms\modules\admin\components\Menu;
 
 /**
@@ -44,6 +45,7 @@ use skeeks\cms\modules\admin\components\Menu;
  * @property SeoGenerator                   $seoGenerator
  * @property Breadcrumbs                    $breadcrumbs
  * @property ControlToolbar                 $controlToolbar
+ * @property Mailer                         $mailer
  *
  * Class Application
  * @package yii\web

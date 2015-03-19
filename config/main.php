@@ -12,7 +12,9 @@
 
 $config =
 [
-    'id' => 'skeeks-cms-app',
+    'id'            => 'skeeks-cms-app',
+    "name"          => "SkeekS CMS",
+    'vendorPath'    => VENDOR_DIR,
     'language' => 'ru',
     'bootstrap' => ['cms', 'log', 'cmsToolbar'],
 
@@ -22,6 +24,12 @@ $config =
             'class'         => '\yii\web\User',
             'identityClass' => 'skeeks\cms\models\User',
             'enableAutoLogin' => true,
+        ],
+
+
+        'mailer' => [
+            'class' => 'skeeks\cms\mail\Mailer',
+            'viewPath' => '@skeeks/cms/mail/',
         ],
 
 
