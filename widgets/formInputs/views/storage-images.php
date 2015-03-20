@@ -67,7 +67,9 @@ CSS
         <? if ($model->hasMainImage()) : ?>
             <div class="sx-main-image">
                 <? $mainImage = $model->getFilesGroups()->getComponent('image')->findFiles()->one()?>
-                <img src="<?= $mainImage->src; ?>" />
+                <a href="<?= $mainImage->src; ?>" class="sx-fancybox">
+                    <img src="<?= \Yii::$app->imaging->getImagingUrl($mainImage->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
+                </a>
                 <div class="sx-controlls">
                     <?
                         $controllerTmp = clone $controller;
@@ -99,7 +101,9 @@ CSS
 
                 <? foreach($images as $imageFile) : ?>
                     <div class="sx-image">
-                        <img src="<?= $imageFile->src; ?>" />
+                        <a href="<?= $imageFile->src; ?>" class="sx-fancybox">
+                            <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
+                        </a>
                         <div class="sx-controlls">
                             <?
                             $controllerTmp = clone $controller;
