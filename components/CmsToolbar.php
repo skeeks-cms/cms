@@ -138,7 +138,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         $clientOptions = [
             'container-id'                  => 'skeeks-cms-toolbar',
             'container-min-id'              => 'skeeks-cms-toolbar-min',
-            'backend-url-triggerEditMode'   => Url::to('cms/toolbar/trigger-edit-mode')
+            'backend-url-triggerEditMode'   => UrlHelper::construct('cms/toolbar/trigger-edit-mode')->toString()
         ];
 
         //echo '<div id="skeeks-cms-toolbar" style="display:none"></div>';
