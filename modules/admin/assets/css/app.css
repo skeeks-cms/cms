@@ -24,13 +24,15 @@ iframe{
 }
 
 .main {
-    padding: 70px 30px 40px 280px;
+    /*padding: 70px 30px 40px 280px;*/
+    padding: 60px 0px 40px 270px;
     background: none;
 }
 
 body.sidebar-hidden .main
 {
-    padding: 70px 30px 40px 30px;
+    /*padding: 70px 30px 40px 30px;*/
+    padding: 60px 0px 40px 26px;
 }
 
 .navbar-brand:hover i

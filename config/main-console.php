@@ -13,6 +13,10 @@
 
 $config =
 [
+    'id'            => 'skeeks-cms-app',
+    "name"          => "SkeekS CMS",
+    'vendorPath'    => VENDOR_DIR,
+
     'components' => [
 
         'storage' => [
@@ -84,7 +88,7 @@ $config =
 
         'cms' =>
         [
-            'class' => '\skeeks\cms\ConsoleModule',
+            'class' => 'skeeks\cms\ConsoleModule',
         ],
     ],
 ];

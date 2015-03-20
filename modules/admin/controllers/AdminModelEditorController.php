@@ -58,6 +58,7 @@ class AdminModelEditorController extends AdminController
     public $modelPkAttribute        = "id";
     public $modelValidate           = false;
     public $enableScenarios         = false;
+    public $gridColumns             = ['name'];
 
     /**
      * обязателено указывать!
@@ -485,11 +486,33 @@ class AdminModelEditorController extends AdminController
                 'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
                 'controller'    => $this
             ],
-
-            'name',
         ];
 
-        return $columns;
+        /**
+         * @var ActiveRecord $model
+         */
+        $modelClassName = $this->getModelClassName();
+        $model = new $modelClassName();
+
+        $gridColumns = [];
+        if ((array) $this->gridColumns)
+        {
+            foreach ($this->gridColumns as $data)
+            {
+                if (is_string($data))
+                {
+                    if ($model->hasAttribute($data))
+                    {
+                        $gridColumns[] = $data;
+                    }
+                } else
+                {
+                    $gridColumns[] = $data;
+                }
+            }
+        }
+
+        return ArrayHelper::merge($columns, $gridColumns);
     }
     /**
      * @return string

@@ -12,9 +12,11 @@
 
 $config =
 [
-    'id' => 'skeeks-cms-app',
+    'id'            => 'skeeks-cms-app',
+    "name"          => "SkeekS CMS",
+    'vendorPath'    => VENDOR_DIR,
     'language' => 'ru',
-    'bootstrap' => ['cms', 'log', 'controlToolbar'],
+    'bootstrap' => ['cms', 'log', 'cmsToolbar'],
 
     'components' => [
 
@@ -25,8 +27,15 @@ $config =
         ],
 
 
-        'controlToolbar' => [
-            'class' => 'skeeks\cms\components\ControlToolbar',
+        'mailer' => [
+            'class' => 'skeeks\cms\mail\Mailer',
+            'viewPath' => '@skeeks/cms/mail/',
+        ],
+
+
+        'cmsToolbar' =>
+        [
+            'class' => 'skeeks\cms\components\CmsToolbar',
         ],
 
         'storage' => [

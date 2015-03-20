@@ -8,7 +8,11 @@ use yii\helpers\Html;
 $resetLink = \skeeks\cms\helpers\UrlHelper::construct('admin/auth/reset-password', ['token' => $user->password_reset_token])->enableAbsolute()->enableAdmin();
 ?>
 
-Привет, <?= Html::encode($user->username) ?>,
-Перейдите по ссылке ниже, чтобы сбросить пароль:
+<h1 style="color:#1D5800;font-size:32px;font-weight:normal;margin-bottom:13px;margin-top:20px;">
+    Напоминание пароля на <?= \Yii::$app->name ?>
+</h1>
 
-<?= Html::a(Html::encode($resetLink), $resetLink) ?>
+<p style="font:Arial,Helvetica,sans-serif;">
+    Здравствуйте!<br><br>Был получен запрос на смену пароля на сайте <?= Html::a(\Yii::$app->name, \yii\helpers\Url::home(true)) ?>.<br>
+    <?= Html::a("Проследуйте по ссылке", $resetLink) ?> и мы вам пришлем новый пароль.<br>Если вы не запрашивали смену пароля, просто проигнорируйте это письмо.
+</p>

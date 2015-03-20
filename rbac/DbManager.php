@@ -39,11 +39,12 @@ use yii\caching\TagDependency;
  * @author Misbahul D Munir <misbahuldmunir@gmail.com>
  * @since 1.0
  */
-class DbManager extends \yii\rbac\DbManager
+class DbManager extends CmsManager
 {
     const PART_ITEMS    = 'sx.items';
     const PART_CHILDREN = 'sx.children';
     const PART_RULES    = 'sx.rules';
+
 
     /**
      * @var boolean Enable caching
