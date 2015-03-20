@@ -20,11 +20,11 @@ use skeeks\cms\components\ModelTypes;
  */
 class ModelDescriptor extends ComponentModel
 {
-    public $modelClass          = null;
-    public $types               = [];
-    public $actionViews         = [];
-    public $adminController     = null;
-    public $behaviors           = [];
+    public $modelClass              = null;
+    public $types                   = [];
+    public $actionViews             = [];
+    public $adminControllerRoute    = null;
+    public $behaviors               = [];
 
     /**
      * @var ModelActionViews|null
@@ -64,4 +64,5 @@ class ModelDescriptor extends ComponentModel
 
         return $this->_types;
     }
+
 }
