@@ -40,7 +40,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     const EDIT_MODE     = 'edit';
     const NO_EDIT_MODE  = 'no-edit';
 
-    public $mode = self::EDIT_MODE;
+    public $mode = self::NO_EDIT_MODE;
 
 
     public function init()
