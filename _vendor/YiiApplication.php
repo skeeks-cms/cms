@@ -13,6 +13,7 @@ namespace yii\web;
 
 use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
+use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ControlToolbar;
 use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\Imaging;
@@ -44,7 +45,7 @@ use skeeks\cms\modules\admin\components\Menu;
  * @property Imaging                        $imaging
  * @property SeoGenerator                   $seoGenerator
  * @property Breadcrumbs                    $breadcrumbs
- * @property ControlToolbar                 $controlToolbar
+ * @property CmsToolbar                     $cmsToolbar
  * @property Mailer                         $mailer
  *
  * Class Application

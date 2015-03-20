@@ -191,3 +191,12 @@
     right: 31px;
     top: 4px;
 }
+
+
+
+
+.skeeks-cms-toolbar-edit-mode:hover
+{
+    border: 1px solid red;
+    outline: none;
+}

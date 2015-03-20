@@ -12,6 +12,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\web\Application;
 use yii\web\View;
 
@@ -33,12 +34,61 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public $allowedIPs = ['*'];
 
 
-    /**
-     * @inheritdoc
-     */
+    public $infoblocks = [];
+
+
+    const EDIT_MODE     = 'edit';
+    const NO_EDIT_MODE  = 'no-edit';
+
+    public $mode = self::EDIT_MODE;
+
+
     public function init()
     {
         parent::init();
+
+        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
+        {
+            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+        }
+
+    }
+    public function enableEditMode()
+    {
+        \Yii::$app->getSession()->set('skeeks-cms-toolbar-mode', self::EDIT_MODE);
+        $this->mode = self::EDIT_MODE;
+        return $this;
+    }
+
+    public function disableEditMode()
+    {
+        \Yii::$app->getSession()->set('skeeks-cms-toolbar-mode', self::NO_EDIT_MODE);
+        $this->mode = self::NO_EDIT_MODE;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function triggerEditMode()
+    {
+        if ($this->isEditMode())
+        {
+            $this->disableEditMode();
+        } else
+        {
+            $this->enableEditMode();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEditMode()
+    {
+        return (bool) ($this->mode == self::EDIT_MODE);
     }
 
     /**
@@ -63,115 +113,33 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             return;
         }
 
-        $version = \Yii::$app->cms->moduleCms()->getDescriptor()->getVersion();
-        $homePage = \Yii::$app->cms->moduleCms()->getDescriptor()->homepage;
-
-        $adminUrl = UrlHelper::construct('')->enableAdmin()->toString();
-        $src = \Yii::$app->cms->getAuthUser()->getAvatarSrc();
-        $username = \Yii::$app->cms->getAuthUser()->username;
-        $logoSrc = \Yii::$app->cms->logo();
-        $profileEditUrl = UrlHelper::construct('cms/admin-profile/update')->enableAdmin();
-
-        $actionEdit = '';
-
-
+        $editModel = null;
+        $urlEditModel = "";
+        $urlUserEdit = UrlHelper::construct('cms/admin-profile/update')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
         if (is_subclass_of(\Yii::$app->controller->action, ViewModelAction::className()))
         {
-            if ($model = \Yii::$app->controller->action->getModel())
+            if ($editModel = \Yii::$app->controller->action->getModel())
             {
-
-                if ($descriptor = \Yii::$app->registeredModels->getDescriptor($model->className()))
+                if ($descriptor = \Yii::$app->registeredModels->getDescriptor($editModel->className()))
                 {
                     if ($descriptor->adminControllerRoute)
                     {
-                        $urlEdit = UrlHelper::construct($descriptor->adminControllerRoute . '/update', ['id' => $model->id])->enableAdmin()
+                        $urlEditModel = UrlHelper::construct($descriptor->adminControllerRoute . '/update', ['id' => $editModel->id])->enableAdmin()
                             ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                             //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                             ;
-
-                        \Yii::$app->view->registerJs(<<<JS
-    sx.classes.ModelEdit = sx.classes.Component.extend({
-
-        _init: function()
-        {
-            this.window = new sx.classes.Window(this.get('update-url'));
-            this.window.bind('close', function()
-            {
-                //sx.notify.info('Страница сейчас будет перезагружена');
-
-                _.defer(function()
-                {
-                     window.location.reload();
-                });
-            });
-
-            this.window.open();
-        },
-
-        _onDomReady: function()
-        {},
-
-        _onWindowReady: function()
-        {}
-    });
-JS
-);
-                        $actionEdit = <<<HTML
-                        <div class="skeeks-cms-toolbar-block">
-                            <a href="{$urlEdit}" onclick="new sx.classes.ModelEdit({'update-url' : '{$urlEdit}'}); return false;" title="Редактировать">
-                                 <span class="label">Редактировать</span>
-                            </a>
-                        </div>
-HTML;
                     }
 
                 }
             }
-
-
         }
 
 
         $clientOptions = [
-            'logo-src'          => \Yii::$app->cms->logo(),
-            'cms-version'       => $version,
-            'cms-link'          => $homePage,
-            'container-id'      => 'skeeks-cms-toolbar',
-            'container-min-id'  => 'skeeks-cms-toolbar-min',
+            'container-id'                  => 'skeeks-cms-toolbar',
+            'container-min-id'              => 'skeeks-cms-toolbar-min',
+            'backend-url-triggerEditMode'   => Url::to('cms/toolbar/trigger-edit-mode')
         ];
-
-        $clientOptionsJson = Json::encode($clientOptions);
-
-
-
-        echo <<<HTML
-
-        <div id="skeeks-cms-toolbar" class="skeeks-cms-toolbar-top hidden-print">
-            <div class="skeeks-cms-toolbar-block title">
-                <a href="{$homePage}" title="Текущая версия SkeekS Cms {$version}" target="_blank">
-                    <img width="29" height="30" alt="" src="{$logoSrc}">
-                     <span class="label">{$version}</span>
-                </a>
-            </div>
-
-            <div class="skeeks-cms-toolbar-block">
-                <a href="{$adminUrl}" title="Перейти в панель администрирования"><span class="label label-info">Администрирование</span></a>
-            </div>
-
-            <div class="skeeks-cms-toolbar-block">
-                <a href="{$profileEditUrl}" title="Это вы, перейти к редактированию свох данных"><img height="30" src="{$src}" style="margin-left: 5px;"/> <span class="label label-info">{$username}</span></a>
-            </div>
-            {$actionEdit}
-            <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.close(); return false;">›</span>
-        </div>
-
-        <div id="skeeks-cms-toolbar-min">
-            <a href="#" onclick="sx.Toolbar.open(); return false;" title="Открыть панель управления SkeekS Cms" id="skeeks-cms-toolbar-logo">
-                <img width="29" height="30" alt="" src="{$logoSrc}">
-            </a>
-            <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.open(); return false;">‹</span>
-        </div>
-HTML;
 
         //echo '<div id="skeeks-cms-toolbar" style="display:none"></div>';
 
@@ -179,13 +147,12 @@ HTML;
         $view = $event->sender;
         CmsToolbarAssets::register($view);
 
-        $view->registerJs(<<<JS
-        (function(sx, $, _)
-        {
-            sx.Toolbar = new sx.classes.SkeeksToolbar({$clientOptionsJson});
-        })(sx, sx.$, sx._);
-JS
-);
+        echo $view->render('@skeeks/cms/views/cms-toolbar', [
+            'clientOptions'     => $clientOptions,
+            'urlEditModel'      => $urlEditModel,
+            'editModel'         => $editModel,
+            'urlUserEdit'         => $urlUserEdit
+        ]);
     }
 
     /**
