@@ -74,7 +74,12 @@
 
                 _.defer(function()
                 {
-                     window.location.reload();
+                    sx.block('body');
+                    _.delay(function()
+                    {
+                        window.location.reload();
+                    }, 100);
+
                 });
             });
 
