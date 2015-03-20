@@ -6,6 +6,7 @@
  * @date 19.03.2015
  */
 namespace skeeks\cms\components;
+use skeeks\cms\actions\ViewModelAction;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\rbac\CmsManager;
@@ -69,6 +70,67 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         $src = \Yii::$app->cms->getAuthUser()->getAvatarSrc();
         $username = \Yii::$app->cms->getAuthUser()->username;
         $logoSrc = \Yii::$app->cms->logo();
+        $profileEditUrl = UrlHelper::construct('cms/admin-profile/update')->enableAdmin();
+
+        $actionEdit = '';
+
+
+        if (is_subclass_of(\Yii::$app->controller->action, ViewModelAction::className()))
+        {
+            if ($model = \Yii::$app->controller->action->getModel())
+            {
+
+                if ($descriptor = \Yii::$app->registeredModels->getDescriptor($model->className()))
+                {
+                    if ($descriptor->adminControllerRoute)
+                    {
+                        $urlEdit = UrlHelper::construct($descriptor->adminControllerRoute . '/update', ['id' => $model->id])->enableAdmin()
+                            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                            //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                            ;
+
+                        \Yii::$app->view->registerJs(<<<JS
+    sx.classes.ModelEdit = sx.classes.Component.extend({
+
+        _init: function()
+        {
+            this.window = new sx.classes.Window(this.get('update-url'));
+            this.window.bind('close', function()
+            {
+                //sx.notify.info('Страница сейчас будет перезагружена');
+
+                _.defer(function()
+                {
+                     window.location.reload();
+                });
+            });
+
+            this.window.open();
+        },
+
+        _onDomReady: function()
+        {},
+
+        _onWindowReady: function()
+        {}
+    });
+JS
+);
+                        $actionEdit = <<<HTML
+                        <div class="skeeks-cms-toolbar-block">
+                            <a href="{$urlEdit}" onclick="new sx.classes.ModelEdit({'update-url' : '{$urlEdit}'}); return false;" title="Редактировать">
+                                 <span class="label">Редактировать</span>
+                            </a>
+                        </div>
+HTML;
+                    }
+
+                }
+            }
+
+
+        }
+
 
         $clientOptions = [
             'logo-src'          => \Yii::$app->cms->logo(),
@@ -79,6 +141,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         ];
 
         $clientOptionsJson = Json::encode($clientOptions);
+
 
 
         echo <<<HTML
@@ -96,9 +159,9 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             </div>
 
             <div class="skeeks-cms-toolbar-block">
-                <a href="{$adminUrl}" title="Перейти в панель администрирования"><img height="30" src="{$src}"/><span class="label label-info">{$username}</span></a>
+                <a href="{$profileEditUrl}" title="Это вы, перейти к редактированию свох данных"><img height="30" src="{$src}" style="margin-left: 5px;"/> <span class="label label-info">{$username}</span></a>
             </div>
-
+            {$actionEdit}
             <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.close(); return false;">›</span>
         </div>
 
