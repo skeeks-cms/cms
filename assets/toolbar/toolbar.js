@@ -9,9 +9,6 @@
 {
     sx.createNamespace('classes.toolbar', sx);
 
-
-
-
     /**
      * Базовый тулбар контейнер
      */
