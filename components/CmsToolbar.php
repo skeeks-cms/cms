@@ -8,6 +8,7 @@
 namespace skeeks\cms\components;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
 use yii\helpers\Json;
 use yii\web\Application;
@@ -130,7 +131,7 @@ JS
      */
     protected function checkAccess()
     {
-        if (\Yii::$app->user->can('cms.admin-access'))
+        if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS) && \Yii::$app->user->can(CmsManager::PERMISSION_CONTROLL_PANEL))
         {
             if (!\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
             {

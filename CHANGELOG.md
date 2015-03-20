@@ -3,6 +3,8 @@ Updates to the development of the project
 
 1.0.6
 -----------------
+  * Доработка системы прав доступа
+  * Depricated Static Blocks (использовать инфоблоки)
   * Переписана отправка email глобальный layout + helper
   * Начало разработки skeeks cms toolbar (для удобного управления в сайтовой части)
   * Обновление левого меню

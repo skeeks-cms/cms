@@ -21,6 +21,7 @@ use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\modules\admin\filters\AccessRule;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
@@ -64,7 +65,7 @@ abstract class AdminController extends Controller
                 [
                     [
                         'allow' => true,
-                        'roles' => ['cms.admin-access'],
+                        'roles' => [CmsManager::PERMISSION_ADMIN_ACCESS],
                     ],
                 ],
             ],
