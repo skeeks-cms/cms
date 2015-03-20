@@ -559,7 +559,12 @@ class AdminModelEditorController extends AdminController
                 //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', \Yii::$app->request->referrer);
 
                 //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
-                \Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
+                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
+
+                return $this->redirect(
+                    UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
+                );
+
             } else
             {
                 return $this->redirect(
