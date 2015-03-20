@@ -21,7 +21,7 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 <div id="sx-file-manager" class="<?= $mode; ?>">
     <div class="sx-upload-sources">
         <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a>
-        <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-globe"></i> Загрузить по ссылке http://</a>
+        <a href="#" id="source-remoteUpload" class="btn btn-primary btn-sm source-remoteUpload"><i class="glyphicon glyphicon-globe"></i> Загрузить по ссылке http://</a>
         <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;"class="btn btn-default btn-sm"><i class="glyphicon glyphicon-folder-open"></i> Добавить из файлового менеджера</a>
 
         <div class="sx-progress-bar-file" style="display: none;">

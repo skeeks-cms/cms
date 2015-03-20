@@ -199,49 +199,53 @@
         {
             var self = this;
 
-            //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
-            //По нажатию кнопки начало загрузки.
+            $(".source-remoteUpload").click(function(){
+                var link = prompt("Введите URL");
 
-            //1) считаем сколько всего пользователь указал ссылок (это делается на js)
-            this.httpLinks = [];
+                //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
+                //По нажатию кнопки начало загрузки.
 
-            self.queue      = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
-            self.inProcess  = true;                     //Загрузчик в работе
+                //1) считаем сколько всего пользователь указал ссылок (это делается на js)
+                this.httpLinks = [link];
 
-            self.triggerStartUpload({
-                'queueLength' : _.size(this.httpLinks), //сообщаем сколько файлов к загрузке всего
-            });
+                self.queue      = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
+                self.inProcess  = true;                     //Загрузчик в работе
 
-            //Берем каждую, и обрабатываем по очереди.
-            _.each(this.httpLinks, function(link, key)
-            {
-                //Кидаем событие, начало работы с файлом
-                self.triggerStartUploadFile({
-                    'name'          : link,      //ссылка к загрузке
-                    'additional'    : {},  //дополнительная информация
+                self.triggerStartUpload({
+                    'queueLength' : _.size(this.httpLinks) //сообщаем сколько файлов к загрузке всего
                 });
 
-                //Формируем ajax объект
-                var ajax = sx.ajax.preparePostQuery('тут наш бэкенд', {
-                    'link': link
-                });
-
-                ajax.onComplete(function(e, data)
+                //Берем каждую, и обрабатываем по очереди.
+                _.each(this.httpLinks, function(link, key)
                 {
-                    self.triggerCompleteUploadFile({
-                        'response' : data,
+                    //Кидаем событие, начало работы с файлом
+                    self.triggerStartUploadFile({
+                        'name'          : link,      //ссылка к загрузке
+                        'additional'    : {}  //дополнительная информация
                     });
 
-                    self.queue = self.queue - 1;
+                    //Формируем ajax объект
+                    var ajax = sx.ajax.preparePostQuery('/~sx/cms/storage-files/upload', {
+                        'link': link
+                    });
 
-                    if (self.queue == 0)
+                    ajax.onComplete(function(e, data)
                     {
-                        self.inProcess  = false;
-                        self.triggerCompleteUpload({});
-                    }
-                });
+                        self.triggerCompleteUploadFile({
+                            'response' : data
+                        });
 
-                ajax.execute();
+                        self.queue = self.queue - 1;
+
+                        if (self.queue == 0)
+                        {
+                            self.inProcess  = false;
+                            self.triggerCompleteUpload({});
+                        }
+                    });
+
+                    ajax.execute();
+                });
             });
         }
     });
