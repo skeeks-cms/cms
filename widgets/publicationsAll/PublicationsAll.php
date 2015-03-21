@@ -29,6 +29,13 @@ class PublicationsAll extends WidgetHasModelsSmart
 {
     public $modelClassName          = '\skeeks\cms\models\Publication';
 
+    static public function getDescriptorConfig()
+    {
+        return ArrayHelper::merge(parent::getDescriptorConfig(), [
+            'name' => 'Список публикаций ( + постраничная навигация)'
+        ]);
+    }
+
     /**
      * @var null|string
      */

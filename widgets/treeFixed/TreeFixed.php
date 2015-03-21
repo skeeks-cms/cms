@@ -19,6 +19,14 @@ use yii\helpers\ArrayHelper;
  */
 class TreeFixed extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
+    static public function getDescriptorConfig()
+    {
+        return ArrayHelper::merge(parent::getDescriptorConfig(), [
+            'name'          => 'Виджет фиксированного меню',
+            'description'   => 'Вывбор страниц из дерева разделов, с определенными парамтерами',
+        ]);
+    }
+
     /**
      * @var null|string
      */

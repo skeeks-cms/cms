@@ -23,6 +23,14 @@ use yii\helpers\ArrayHelper;
  */
 class Publications extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
+    static public function getDescriptorConfig()
+    {
+        return ArrayHelper::merge(parent::getDescriptorConfig(), [
+            'name'          => 'Виджет публикаций, без постраничной навигации',
+            'description'   => 'В настройках виджета указывается родительский элемент дерева разделов, и виджет находит дочерние.',
+        ]);
+    }
+
     /**
      * @var null|string
      */

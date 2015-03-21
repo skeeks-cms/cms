@@ -23,7 +23,6 @@
 
             this.onWindowReadyBlocker   = null;
 
-
             this.readyWindowTrigger = false;
             var self = this;
             //Если window не будет готово через 200 мс, покажем загрузку.

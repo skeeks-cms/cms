@@ -11,88 +11,15 @@
 
 return
 [
-    'skeeks\cms\widgets\text\Text' =>
-    [
-        'name'          => 'Текст',
-        'description'   => 'Виджет просто выводит текст',
-        'templates'     =>
-        [
-            'default' =>
-            [
-                'name' => 'Шаблон по умолчанию'
-            ]
-        ],
-    ],
-
-    'skeeks\cms\widgets\treeChildrens\TreeChildrens' =>
-    [
-        'name'          => 'Дерево разделов (вывод дочерних разделов)',
-        'description'   => 'Виджет выводит нужные одразделы',
-
-        'templates'     =>
-        [
-            'default' =>
-            [
-                'name' => 'Шаблон по умолчанию'
-            ]
-        ],
-    ],
-
-    'skeeks\cms\widgets\publications\Publications' =>
-    [
-        'name'          => 'Виджет публикаций',
-        'description'   => 'Виджет выводит нужные одразделы',
-
-        'templates'     =>
-        [
-            'default' =>
-            [
-                'name' => 'Шаблон по умолчанию'
-            ]
-        ],
-    ],
-
-
-    'skeeks\cms\widgets\publicationsAll\PublicationsAll' =>
-    [
-        'name'          => 'Виджет вывода всех публикаций',
-        'description'   => 'Виджет вывода всех публикаций',
-
-        'templates'     =>
-        [
-            'default' =>
-            [
-                'name' => 'Шаблон по умолчанию'
-            ]
-        ],
-    ],
-
-    'skeeks\cms\widgets\treeFixed\TreeFixed' =>
-    [
-        'name'          => 'Виджет фиксированного меню',
-        'description'   => 'Виджет фиксированного меню',
-
-        'templates'     =>
-        [
-            'default' =>
-            [
-                'name' => 'Шаблон по умолчанию'
-            ]
-        ],
-    ],
-
+    'skeeks\cms\widgets\text\Text' => [],
+    'skeeks\cms\widgets\treeChildrens\TreeChildrens' => [],
+    'skeeks\cms\widgets\publications\Publications' => [],
+    'skeeks\cms\widgets\publicationsAll\PublicationsAll' => [],
+    'skeeks\cms\widgets\treeFixed\TreeFixed' => [],
     'skeeks\cms\widgets\breadcrumbs\Breadcrumbs' =>
     [
-        'name'          => 'Хлебные крошки',
-        'description'   => 'Виджет фиксированного меню',
-
         'templates'     =>
         [
-            'default' =>
-            [
-                'name' => 'Шаблон по умолчанию'
-            ],
-
             'project' =>
             [
                 'name'      => 'Проект',

@@ -28,6 +28,19 @@ abstract class WidgetHasTemplate extends Widget
      */
     public $template                 = 'default';
 
+    public function getDescriptorConfig()
+    {
+        return ArrayHelper::merge(parent::getDescriptorConfig(), [
+            'templates' =>
+            [
+                'default' =>
+                [
+                    'name' => 'Базовый шаблон'
+                ]
+            ]
+        ]);
+    }
+
     /**
      * @var Entity
      */
