@@ -355,6 +355,7 @@ class RbacController extends Controller
         }
 
         $description = ArrayHelper::getValue($config, 'description');
+        $ruleName = ArrayHelper::getValue($config, 'ruleName', '');
 
         if ($role = \Yii::$app->authManager->getPermission($name))
         {
@@ -363,7 +364,17 @@ class RbacController extends Controller
 
         //Менеджер который может управлять только своими данными
         $role = \Yii::$app->authManager->createPermission($name);
-        $role->description = $description;
+
+        if ($description)
+        {
+            $role->description  = $description;
+        }
+
+        if ($ruleName)
+        {
+            $role->ruleName     = $ruleName;
+        }
+
 
         if (\Yii::$app->authManager->add($role))
         {
