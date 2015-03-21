@@ -14,7 +14,9 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 /* @var $this yii\web\View */
 ?>
 <?php $form = ActiveForm::begin(); ?>
-<?= $form->field($model, 'text')->textarea(); ?>
+<?= $form->field($model, 'text')->textarea([
+    'rows' => '15'
+]); ?>
 <?= $form->buttonsCreateOrUpdate($model) ?>
 <?php ActiveForm::end(); ?>
 
