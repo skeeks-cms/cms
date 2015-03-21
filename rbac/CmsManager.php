@@ -27,7 +27,15 @@ class CmsManager extends \yii\rbac\DbManager
     /**
      * Редактирование служебных данных (наприме id и url и т.д.)
      */
-    const PERMISSION_ALLOW_EDIT_SYSTEM       = 'cms.allow-edit-system';
+    const PERMISSION_ALLOW_MODEL_CREATE                 = 'cms.model-create';
+
+    const PERMISSION_ALLOW_MODEL_UPDATE                 = 'cms.model-update';
+    const PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED        = 'cms.model-update-advanced';
+    const PERMISSION_ALLOW_MODEL_DELETE                 = 'cms.model-delete';
+
+    const PERMISSION_ALLOW_MODEL_UPDATE_OWN                 = 'cms.model-update-own';
+    const PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED_OWN        = 'cms.model-update-advanced-own';
+    const PERMISSION_ALLOW_MODEL_DELETE_OWN                 = 'cms.model-delete-own';
 
 
     const ROLE_ROOT     = 'root';

@@ -39,7 +39,11 @@ return [
                 [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_EDIT_SYSTEM,
+
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
                 ],
             ]
         ],
@@ -62,6 +66,10 @@ return [
                 [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
                 ],
             ]
         ],
@@ -83,6 +91,10 @@ return [
                 [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
                 ],
             ]
         ],
@@ -104,10 +116,65 @@ return [
             'description'   => 'Доступ к панеле управления сайтом'
         ],
 
+
+
         [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_EDIT_SYSTEM,
-            'description'   => 'Управление служебныеми данными',
-        ]
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
+            'description'   => 'Возможность создания записей'
+        ],
+
+
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
+            'description'   => 'Обновление данных записей',
+        ],
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
+            'description'   => 'Обновление данных своих записей',
+            'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
+            'child'         =>
+            [
+                'permissions' =>
+                [
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
+                ],
+            ]
+        ],
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
+            'description'   => 'Обновление дополнительных данных записей',
+        ],
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED_OWN,
+            'description'   => 'Обновление дополнительных данных своих записей',
+            'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
+            'child'         =>
+            [
+                'permissions' =>
+                [
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
+                ],
+            ]
+        ],
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
+            'description'   => 'Удаление записей',
+        ],
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
+            'description'   => 'Удаление своих записей',
+            'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
+            'child'         =>
+            [
+                'permissions' =>
+                [
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
+                ],
+            ]
+        ],
     ],
 
 

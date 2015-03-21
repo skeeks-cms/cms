@@ -16,6 +16,7 @@ use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\Action;
@@ -40,19 +41,53 @@ class AccessRule extends \yii\filters\AccessRule
      */
     public function allows($action, $user, $request)
     {
-
         if ($action->controller instanceof AdminModelEditorController)
         {
+
             if ($action->controller->getCurrentModel())
             {
-
                 if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $action->controller->getCurrentModel())->isValid())
                 {
-                    $acttionPermissionNameOwn = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId() . '/' . $action->id);
-
-
-                    if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionNameOwn))
+                    if ($action->id == 'delete')
                     {
+                        if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_DELETE))
+                        {
+                            if (!\Yii::$app->user->can($permission->name, [
+                                'model' => $action->controller->getCurrentModel()
+                            ])) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if ($action->id == 'system')
+                    {
+                        if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED))
+                        {
+                            if (!\Yii::$app->user->can($permission->name, [
+                                'model' => $action->controller->getCurrentModel()
+                            ])) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
+                    {
+                        if (!\Yii::$app->user->can($permission->name, [
+                            'model' => $action->controller->getCurrentModel()
+                        ])) {
+                            return false;
+                        }
+                    }
+                }
+            } else
+            {
+                if ($action->id == 'create')
+                {
+                    if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_CREATE))
+                    {
+
                         if (!\Yii::$app->user->can($permission->name, [
                             'model' => $action->controller->getCurrentModel()
                         ])) {
@@ -84,7 +119,6 @@ class AccessRule extends \yii\filters\AccessRule
 
             if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
             {
-
 
                 if (!\Yii::$app->user->can($permission->name))
                 {
