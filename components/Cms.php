@@ -50,6 +50,7 @@ class Cms extends \yii\base\Component
             if (!\Yii::$app->request->isAjax)
             {
                 \Yii::$app->seoGenerator->generateBeforeOutputPage($e->sender);
+                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', 'SkeekS Site Manager');
             }
         });
     }
