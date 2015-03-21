@@ -31,7 +31,7 @@ class Widget extends \yii\base\Model implements ViewContextInterface
         return \Yii::$app->registeredWidgets->getComponent($this->className());
     }
 
-    public function getDescriptorConfig()
+    static public function getDescriptorConfig()
     {
         return [];
     }
