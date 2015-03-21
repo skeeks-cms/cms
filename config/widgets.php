@@ -53,19 +53,7 @@ return
     ],
 
 
-    'skeeks\cms\widgets\publicationsAll\PublicationsAll' =>
-    [
-        'name'          => 'Виджет вывода всех публикаций',
-        'description'   => 'Виджет вывода всех публикаций',
-
-        'templates'     =>
-        [
-            'default' =>
-            [
-                'name' => 'Шаблон по умолчанию'
-            ]
-        ],
-    ],
+    'skeeks\cms\widgets\publicationsAll\PublicationsAll' => [],
 
     'skeeks\cms\widgets\treeFixed\TreeFixed' =>
     [
