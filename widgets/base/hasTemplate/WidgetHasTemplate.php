@@ -28,7 +28,7 @@ abstract class WidgetHasTemplate extends Widget
      */
     public $template                 = 'default';
 
-    public function getDescriptorConfig()
+    static public function getDescriptorConfig()
     {
         return ArrayHelper::merge(parent::getDescriptorConfig(), [
             'templates' =>
