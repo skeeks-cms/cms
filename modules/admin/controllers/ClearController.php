@@ -93,10 +93,10 @@ class ClearController extends AdminController
                 'dir'       => new Dir(\Yii::getAlias('@runtime/logs'), false)
             ],
 
-            [
+            /*[
                 'label'     => 'Временные js и css файлы (текущий сайт)',
                 'dir'       => new Dir(\Yii::getAlias('@app/web/assets'), false)
-            ]
+            ]*/
 
         ];
 
