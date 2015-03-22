@@ -29,4 +29,3 @@ use skeeks\cms\models\Tree;
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
-<?= $this->render('_about'); ?>

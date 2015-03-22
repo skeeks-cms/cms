@@ -225,22 +225,20 @@ class Cms extends \yii\base\Component
      * @param array $options
      * @return string
      */
-    public function widgetInfoblock($id, $config = [], $options = [])
+    public function widgetInfoblock($id, $options = [], $config = [])
     {
         return $this->infoblock($id, $config, $options);
     }
 
     /**
      * @param $id
-     * @param array $config
-     * @param array $options
+     * @param array $configInfoblock    Опции инфоблока
      * @return string
      */
-    public function infoblock($id, $config = [], $options = [])
+    public function infoblock($id, $configInfoblock = [])
     {
-        return Infoblock::widget(ArrayHelper::merge($options, [
+        return Infoblock::widget(ArrayHelper::merge($configInfoblock, [
             'id'        => $id,
-            'config'    => $config
         ]));
     }
 

@@ -35,7 +35,8 @@ abstract class WidgetHasTemplate extends Widget
             [
                 'default' =>
                 [
-                    'name' => 'Базовый шаблон'
+                    'name' => 'Базовый шаблон',
+                    'baseDir' => ['@app/views/widgets']
                 ]
             ]
         ]);

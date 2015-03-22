@@ -1,42 +1,51 @@
 <?php
 /**
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 06.03.2015
+ */
+/**
+ * @var \skeeks\cms\models\Publication[] $models
+ * @var \skeeks\cms\widgets\publications\Publications $widget
+ * @var yii\data\Pagination $pages
+ */
+?>
+
+
+<?php
+/**
  * default
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
- * @date 08.12.2014
+ * @date 02.02.2015
  * @since 1.0.0
  */
-
-/**
- * //TODO: menu-top-contacts - add to last element
- *
- * @var \skeeks\cms\models\Tree[] $models
- * @var \skeeks\cms\widgets\treeChildrens\TreeChildrens $widget
- */
+/* @var $this yii\web\View */
+/* @var $dataProvider \yii\data\ActiveDataProvider */
+/* @var $widget \skeeks\cms\widgets\publicationsAll\PublicationsAll */
+/* @var $search \skeeks\cms\models\Search */
 ?>
+<?/* foreach ($dataProvider->getModels() as $model) : */?><!--
+    <?/*= $this->render('_one', ['model' => $model])*/?>
+--><?/* endforeach; */?>
+<? if ($widget->title): ?>
+    <h2><?= $widget->title ?></h2>
+<? endif; ?>
 
-<? if ($models) : ?>
-    <ul id="top-menu" class="wrapper-inner">
-    <? $count = 0; ?>
-    <? foreach ($models as $count => $model) : ?>
-        <?
-            $count ++;
-            $active = '';
-        ?>
-        <? if (\Yii::$app->request->getAbsoluteUrl() == $model->getPageUrl())
-        {
-            $active = 'active';
-        }?>
-        <li id="menu-top-catalog" class='<?= $active ?><?= $count == 1 ? ' first' : ''; ?>'>
-            <? if ($active) : ?>
-                <span><?= $model->name; ?></span>
-            <? else : ?>
-                <a href="<?= $model->getPageUrl(); ?>" title="<?= $model->name; ?>"><?= $model->name; ?></a>
-            <? endif; ?>
+<?/* \skeeks\cms\modules\admin\widgets\Pjax::begin([
+    'id' => 'sx-pjax-tree',
+]);*/?>
 
-        </li>
-    <? endforeach; ?>
-    </ul>
-<? endif;?>
+<ul class="unstyled">
+<? echo \yii\widgets\ListView::widget([
+    'dataProvider'      => $dataProvider,
+    'itemView'          => '_one',
+    'emptyText'          => '',
+    'layout'            => "<p>{summary}</p>{pager}\n{items}\n{pager}"
+])?>
+</ul>
+
+<?/* \skeeks\cms\modules\admin\widgets\Pjax::end(); */?>
