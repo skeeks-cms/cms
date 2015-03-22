@@ -87,7 +87,7 @@ class Infoblock extends Core
 
     public function validateCode($attribute)
     {
-        if(!preg_match('/^[a-z]{1}[a-z0-1-]{2,20}$/', $this->$attribute))
+        if(!preg_match('/^[a-z]{1}[a-z0-9-]{2,20}$/', $this->$attribute))
         {
             $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример block1.');
         }
