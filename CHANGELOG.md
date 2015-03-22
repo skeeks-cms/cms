@@ -3,6 +3,7 @@ Updates to the development of the project
 
 1.0.8
 -----------------
+  * Added asset fancybox plugin thumbs
   * Новый виджет списка разделов дерева
 
 1.0.7
