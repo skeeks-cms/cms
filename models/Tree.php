@@ -89,12 +89,13 @@ class Tree extends PageAdvanced
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'type'              => Yii::t('app', 'Tree type'),
+            'type'              => Yii::t('app', 'Тип'),
             'pid_main'          => Yii::t('app', 'Pid main'),
             'page_options'      => Yii::t('app', 'Page Options'),
             'tree_ids'          => Yii::t('app', 'Связан с разделами'),
             'redirect'          => Yii::t('app', 'Redirect'),
-            'tree_menu_ids'      => Yii::t('app', 'Позиции меню'),
+            'tree_menu_ids'     => Yii::t('app', 'Позиции меню'),
+            'priority'          => Yii::t('app', 'Приоритет'),
         ]);
     }
 

@@ -16,6 +16,7 @@ return
     'skeeks\cms\widgets\publications\Publications' => [],
     'skeeks\cms\widgets\publicationsAll\PublicationsAll' => [],
     'skeeks\cms\widgets\treeFixed\TreeFixed' => [],
+    'skeeks\cms\widgets\treeList\TreeList' => [],
     'skeeks\cms\widgets\breadcrumbs\Breadcrumbs' =>
     [
         'templates'     =>
