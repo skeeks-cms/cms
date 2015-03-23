@@ -43,11 +43,13 @@ class TreeList extends WidgetHasModelsSmart
     public $statusesAdults          = [];
     public $useCurrentTree          = 0;
 
+    public $treeMenuIds             = [];
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
             [['title'], 'string'],
-            [['types', 'statuses', 'statusesAdults', 'useCurrentTree', 'enableSubTree'], 'safe'],
+            [['types', 'statuses', 'statusesAdults', 'useCurrentTree', 'enableSubTree', 'treeMenuIds'], 'safe'],
         ]);
     }
 
@@ -60,6 +62,7 @@ class TreeList extends WidgetHasModelsSmart
             'statusesAdults'                => 'Статусы приватности',
             'useCurrentTree'                => 'Добавлять условия выбора записей, страницы где находится этот виджет',
             'enableSubTree'                 => 'Искать во вложенных разделах',
+            'treeMenuIds'                   => 'Метки',
         ]);
     }
 
@@ -104,6 +107,16 @@ class TreeList extends WidgetHasModelsSmart
                 }
             }
         }
+
+
+        if ($this->treeMenuIds)
+        {
+            foreach ($this->treeMenuIds as $menuId)
+            {
+                $find->andWhere("FIND_IN_SET('" . $menuId . "', tree_menu_ids)");
+            }
+        }
+
 
 
         if ($this->statuses)

@@ -38,7 +38,16 @@ class Infoblock extends Widget
     public $refetch = false;
 
 
+    /**
+     * @var array виджет который отработает по умолчанию
+     */
     public $widget = [];
+
+    /**
+     * Шаблон, верстка блока по умолчанию, которая задумана верстальщиком
+     * @var string
+     */
+    public $defaultContent = '';
 
 
 

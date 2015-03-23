@@ -43,6 +43,13 @@ $tree = new \skeeks\cms\models\Tree();
         ]);
     ?>
 
+<?= $form->field($model, 'treeMenuIds')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+            'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\TreeMenu::find()->all(), 'id', 'name'),
+            'multiple' => true,
+        ]);
+    ?>
+
 <?= $form->field($model, 'types')->label('Типы')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
             'items'   => \yii\helpers\ArrayHelper::map(
