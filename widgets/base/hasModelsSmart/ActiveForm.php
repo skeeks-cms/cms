@@ -72,6 +72,15 @@ class ActiveForm extends \skeeks\cms\widgets\base\hasTemplate\ActiveForm
 
             echo $this->field($model, 'defaultPageSize')->label('Количество записей на странице')->textInput();
             echo $this->field($model, 'pageParam')->label('Название параметра')->textInput();
+
+            echo $this->field($model, 'enablePjaxPagination')->widget(
+                \skeeks\widget\chosen\Chosen::className(), [
+                    'items'   => [
+                        '0' => 'нет',
+                        '1' => 'да',
+                    ],
+                ]);
+                ;
         echo $this->fieldSetEnd();
 
     }
