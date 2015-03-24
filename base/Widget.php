@@ -15,6 +15,8 @@ namespace skeeks\cms\base;
 use Yii;
 use ReflectionClass;
 use yii\base\ViewContextInterface;
+use yii\helpers\Html;
+use yii\helpers\Json;
 
 /**
  * Class Widget
@@ -37,14 +39,63 @@ class Widget extends \yii\base\Model implements ViewContextInterface
     }
 
     /**
+     * TODO: переписать или дописать, когда будет время
      *
-     * @param array $data
+     * @param array $protectedParams Параметры которые disabled
      * @return string
      */
-    public function renderConfigForm()
+    public function renderConfigForm($protectedParams = [])
     {
+        $protectedParamsResult = [];
+        if ($protectedParams)
+        {
+            foreach ($protectedParams as $protectedParam)
+            {
+                $protectedParamsResult[$protectedParam] = Html::getInputId($this, $protectedParam);
+            }
+        }
+
+        $options = Json::encode([
+            'params' => $protectedParamsResult,
+        ]);
+
+        \Yii::$app->view->registerJs(<<<JS
+        (function(sx, $, _)
+        {
+            sx.classes.ProtectedParams = sx.classes.Component.extend({
+
+                _init: function()
+                {},
+
+                _onDomReady: function()
+                {
+                    var self = this;
+                    $(document).on('pjax:complete', function() {
+                        self.update();
+                    });
+
+                    self.update();
+                },
+
+                update: function()
+                {
+                    _.each(this.get('params'), function(id, value)
+                    {
+                        $(".field-" + id).hide();
+                    });
+                },
+
+                _onWindowReady: function()
+                {}
+            });
+
+            new sx.classes.ProtectedParams($options);
+        })(sx, sx.$, sx._);
+JS
+);
         return \Yii::$app->getView()->renderFile($this->configFormFile(), [
-            'model' => $this
+            'model'             => $this,
+            'protectedParams'   => $protectedParams
         ]);
     }
 

@@ -158,7 +158,8 @@ class AdminInfoblockController extends AdminModelEditorSmartController
 
 
         return $this->render('config', [
-            'model' => $widget,
+            'model'     => $widget,
+            'infoblock' => $infoblock,
         ]);
     }
 }

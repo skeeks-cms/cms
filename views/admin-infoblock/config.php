@@ -10,6 +10,7 @@
  */
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\base\Widget */
+/* @var $infoblock \skeeks\cms\models\Infoblock */
 ?>
 
-<?= $model->renderConfigForm(); ?>
+<?= $model->renderConfigForm((array) $infoblock->protected_widget_params); ?>

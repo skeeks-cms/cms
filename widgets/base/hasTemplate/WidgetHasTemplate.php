@@ -72,7 +72,7 @@ abstract class WidgetHasTemplate extends Widget
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'template' => 'Шаблон',
-            'viewFile' => 'Файл шаблона'
+            'viewFile' => 'Путь к файлу отображения'
         ]);
     }
 
