@@ -19,6 +19,8 @@ use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Class AuthController
@@ -71,12 +73,24 @@ class AuthController extends Controller
 
     public function actionLogin()
     {
+        \Yii::$app->breadcrumbs->append([
+            'name' => 'Авторизация'
+        ]);
+
         if (!\Yii::$app->user->isGuest)
         {
             return $this->goHome();
         }
 
         $model = new LoginFormUsernameOrEmail();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if ($model->load(\Yii::$app->request->post()) && $model->login())
         {
             if ($ref = UrlHelper::getCurrent()->getRef())
@@ -93,6 +107,9 @@ class AuthController extends Controller
             ]);
         }
     }
+
+
+
     public function actionRegister()
     {
         if (!\Yii::$app->user->isGuest)
