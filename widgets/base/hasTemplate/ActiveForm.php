@@ -12,6 +12,8 @@ namespace skeeks\cms\widgets\base\hasTemplate;
 use skeeks\cms\base\Widget;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormStyled;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab;
+use yii\helpers\Html;
+use yii\helpers\Json;
 
 /**
  * Class ActiveForm
@@ -26,6 +28,8 @@ class ActiveForm extends ActiveFormUseTab
     {
         echo $this->fieldSet('Настройки отображения');
 
+        echo $this->field($model, 'viewFile')->textInput()->hint('Вы можете указать путь к файлу шаблона принудительно');
+
         echo $this->field($model, 'template')->label('Шаблон')->widget(
             \skeeks\widget\chosen\Chosen::className(),
             [
@@ -36,6 +40,48 @@ class ActiveForm extends ActiveFormUseTab
                  ),
             ]
         );
+
+        $options = Json::encode([
+            'id-viewFile' => Html::getInputId($model, 'viewFile'),
+            'id-template' => Html::getInputId($model, 'template')
+        ]);
+
+        $this->view->registerJs(<<<JS
+        (function(sx, $, _)
+        {
+            sx.classes.FormViewElement = sx.classes.Component.extend({
+
+                _init: function()
+                {},
+
+                _onDomReady: function()
+                {
+                    var self = this;
+                    $("#" + this.get('id-viewFile')).on('keyup', function()
+                    {
+                        self.update();
+                    });
+
+                    this.update();
+                },
+
+                update: function()
+                {
+                    if ($("#" + this.get('id-viewFile')).val())
+                    {
+                        $(".field-" + this.get('id-template')).hide();
+                    }
+                },
+
+                _onWindowReady: function()
+                {}
+            });
+
+            new sx.classes.FormViewElement($options);
+        })(sx, sx.$, sx._);
+JS
+);
+
         echo $this->fieldSetEnd();
     }
 }

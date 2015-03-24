@@ -288,9 +288,10 @@ JS
 
                 $controllElement = Html::radio('tree_id', $isSelected, [
                     'value'     => $model->id,
+                    'class'     => 'sx-readio',
                     'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
                     'onclick'   => new JsExpression(<<<JS
-        sx.Tree.select("{$model->id}", "{$link}"); return false;
+        sx.Tree.selectSingle("{$model->id}");
 JS
 )
                 ]);
@@ -604,6 +605,7 @@ HTML
 
                 setSingle: function(id)
                 {
+                    console.log('setSingle' + id);
                     var Jelement = $(".sx-tree .sx-readio[value='" + id + "']");
                     if (!Jelement.is(":checked"))
                     {

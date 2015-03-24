@@ -42,6 +42,7 @@ class TreeList extends WidgetHasModelsSmart
     public $statuses                = [];
     public $statusesAdults          = [];
     public $useCurrentTree          = 0;
+    public $mainTreeId              = 0;
 
     public $treeMenuIds             = [];
 
@@ -49,7 +50,7 @@ class TreeList extends WidgetHasModelsSmart
     {
         return ArrayHelper::merge(parent::rules(), [
             [['title'], 'string'],
-            [['types', 'statuses', 'statusesAdults', 'useCurrentTree', 'enableSubTree', 'treeMenuIds'], 'safe'],
+            [['types', 'statuses', 'statusesAdults', 'useCurrentTree', 'enableSubTree', 'treeMenuIds', 'mainTreeId'], 'safe'],
         ]);
     }
 
@@ -63,6 +64,7 @@ class TreeList extends WidgetHasModelsSmart
             'useCurrentTree'                => 'Добавлять условия выбора записей, страницы где находится этот виджет',
             'enableSubTree'                 => 'Искать во вложенных разделах',
             'treeMenuIds'                   => 'Метки',
+            'mainTreeId'                    => 'Родительский раздел',
         ]);
     }
 
@@ -98,7 +100,6 @@ class TreeList extends WidgetHasModelsSmart
                             }
                         }
                     }
-
                 }
 
                 foreach ($ids as $id)
@@ -108,6 +109,11 @@ class TreeList extends WidgetHasModelsSmart
             }
         }
 
+
+        if ($this->mainTreeId)
+        {
+            $find->andWhere("(pid = '{$this->mainTreeId}')");
+        }
 
         if ($this->treeMenuIds)
         {

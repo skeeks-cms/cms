@@ -16,13 +16,30 @@ use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\behaviors\HasStatus;
 use Yii;
 
 /**
- * @property $config
+ * This is the model class for table "{{%cms_infoblock}}".
  *
- * Class Publication
- * @package skeeks\cms\models
+ * @property integer $id
+ * @property integer $created_by
+ * @property integer $updated_by
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property string $name
+ * @property string $code
+ * @property string $description
+ * @property string $widget
+ * @property string $config
+ * @property string $rules
+ * @property string $template
+ * @property integer $priority
+ * @property integer $status
+ * @property string $files
+ * @property integer $protected_widget
+ * @property integer $auto_created
+ * @property string $protected_widget_params
  */
 class Infoblock extends Core
 {
@@ -49,7 +66,7 @@ class Infoblock extends Core
 
             [
                 "class"  => behaviors\Serialize::className(),
-                'fields' => ['rules']
+                'fields' => ['rules', 'protected_widget_params']
             ],
 
             behaviors\HasFiles::className() =>
@@ -57,15 +74,67 @@ class Infoblock extends Core
                 "class"     => behaviors\HasFiles::className(),
                 "groups"    => [],
             ],
+
+            behaviors\HasStatus::className() =>
+            [
+                "class"     => behaviors\HasStatus::className(),
+                "possibleStatuses"    => [
+                    HasStatus::STATUS_ACTIVE    => 'Включен',
+                    HasStatus::STATUS_INACTIVE  => 'Выключен'
+                ],
+            ],
         ]);
+    }
+
+    /**
+     * Установка атрибутов по объекту виджета инфоблока
+     *
+     * @param \skeeks\cms\widgets\Infoblock $widgetInfoblock
+     * @return $this
+     */
+    public function setAttributesByWidgetInfoblock(\skeeks\cms\widgets\Infoblock $widgetInfoblock)
+    {
+        if ($widgetInfoblock->name)
+        {
+            $this->name = $widgetInfoblock->name;
+        }
+
+        if ($widgetInfoblock->description)
+        {
+            $this->description = $widgetInfoblock->description;
+        }
+
+        if ($widgetInfoblock->id)
+        {
+            $this->code = $widgetInfoblock->id;
+        }
+
+        if ($widgetInfoblock->protectedWidget)
+        {
+            $this->protected_widget = (int) $widgetInfoblock->protectedWidget;
+        }
+
+        if ($widgetInfoblock->protectedWidgetParams)
+        {
+            $this->protected_widget_params = (array) $widgetInfoblock->protectedWidgetParams;
+        }
+
+        if ($widgetInfoblock->getWidgetClassName())
+        {
+            $this->widget = $widgetInfoblock->getWidgetClassName();
+        }
+
+        return $this;
     }
 
     public function scenarios()
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'] = ['code', 'name', 'description', 'widget'];
-        $scenarios['update'] = ['code', 'name', 'description', 'widget'];
+        $scenarios[self::SCENARIO_DEFAULT];
+
+        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
+        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
 
         return $scenarios;
     }
@@ -76,11 +145,33 @@ class Infoblock extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['name', 'widget'], 'required'],
+            [['widget'], 'required'],
+            ['name', 'default', 'value' => function(Infoblock $model, $attribute)
+            {
+                $name = '';
+
+                if ($model->widget)
+                {
+                    $name = (string) $this->widget;
+                }
+
+                if ($model->code)
+                {
+                    $name = (string) $this->code;
+                }
+
+                if ($model->id)
+                {
+                    $name = $name . ' #' . (string) $this->id;
+                }
+
+                return (string) $name;
+            }],
             [['description', 'widget', 'rules', 'template'], 'string'],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
-            [["images", "files", "image_cover", "image", 'config', 'multiConfig'], 'safe'],
+            [['protected_widget', 'auto_created'], 'integer'],
+            [['config', 'multiConfig', 'protected_widget_params'], 'safe'],
         ]);
     }
 
@@ -100,10 +191,13 @@ class Infoblock extends Core
     public function attributeLabels()
     {
         return  array_merge(parent::attributeLabels(), [
-            'name'              => 'Название инфоблока',
-            'widget'            => 'Виджет',
-            'description'       => 'Описание инфоблока',
-            'code'              => 'Уникальный код блока',
+            'name'                      => 'Название инфоблока',
+            'widget'                    => 'Виджет',
+            'description'               => 'Описание инфоблока',
+            'code'                      => 'Уникальный код блока',
+            'protected_widget_params'   => 'Параметры виджета которые нельзя менять',
+            'auto_created'              => 'Автоматически созданный инфоблок',
+            'protected_widget'          => 'Разрешено ли менять виджет инфоблока',
         ]);
     }
 
