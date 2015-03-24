@@ -97,7 +97,7 @@ abstract class ViewModelAction extends Action
             }
         }
 
-        if (Yii::$app->getRequest()->getIsAjax())
+        if (Yii::$app->getRequest()->getIsAjax() && !\Yii::$app->request->isPjax)
         {
             return "test: test";
         } else

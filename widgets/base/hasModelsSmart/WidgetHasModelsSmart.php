@@ -31,6 +31,7 @@ class WidgetHasModelsSmart extends WidgetHasModels
     public $defaultSort             = SORT_DESC;
 
     public $defaultPageSize         = 10;
+    public $enablePjaxPagination    = 0;
 
     public $createdBy               = [];
     public $updatedBy               = [];
@@ -44,15 +45,16 @@ class WidgetHasModelsSmart extends WidgetHasModels
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['createdBy', 'updatedBy', 'applySearchParams'], 'safe'],
+            [['createdBy', 'updatedBy', 'applySearchParams', 'enablePjaxPagination'], 'safe'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'createdBy' => 'Авторы',
-            'updatedBy' => 'Полседние обновившие'
+            'createdBy'                 => 'Авторы',
+            'updatedBy'                 => 'Полседние обновившие',
+            'enablePjaxPagination'      => 'Включить ajax навигацию'
         ]);
     }
 
