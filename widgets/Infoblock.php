@@ -1,13 +1,11 @@
 <?php
 /**
- * Infoblock
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 10.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 24.03.2015
  */
+
 namespace skeeks\cms\widgets;
 use skeeks\cms\base\Widget;
 use skeeks\cms\helpers\UrlHelper;
@@ -23,13 +21,24 @@ class Infoblock extends Widget
     /**
      * @var int|string
      */
-    public $id = null;
+    public $id              = null;
+
 
     /**
-     * Дополнительные настройки
-     * @var array
+     * @var null соль используется для получения уникального id для базы данных
      */
-    public $config = [];
+    public $sold            = null;
+
+    /**
+     * @var string название
+     */
+    public $name            = '';
+
+    /**
+     * @var string описание
+     */
+    public $description     = '';
+
 
     /**
      * Делать новый запрос в базу обязательно, или использовать сохраненное ранее значение
@@ -37,17 +46,11 @@ class Infoblock extends Widget
      */
     public $refetch = false;
 
-
     /**
      * @var array виджет который отработает по умолчанию
+     * Задается обычно для yii, название класса и массив настроек
      */
     public $widget = [];
-
-    /**
-     * Шаблон, верстка блока по умолчанию, которая задумана верстальщиком
-     * @var string
-     */
-    public $defaultContent = '';
 
 
 
@@ -71,6 +74,19 @@ class Infoblock extends Widget
         }
     }
 
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->id)
+        {
+            if (isset($this->widget['class']))
+            {
+                $this->id = md5($this->sold . $this->widget['class']);
+            }
+        }
+    }
+
     /**
      * @return string
      */
@@ -87,7 +103,7 @@ class Infoblock extends Widget
 
         if ($result === false || $this->refetch)
         {
-
+            //Поиск конфига в базе данных
             if (is_string($this->id))
             {
                 $modelInfoblock = \skeeks\cms\models\Infoblock::fetchByCode($this->id);
@@ -96,6 +112,7 @@ class Infoblock extends Widget
                 $modelInfoblock = \skeeks\cms\models\Infoblock::fetchById($this->id);
             }
 
+            //В базе на эту тему ничего не найдено
             if (!$modelInfoblock)
             {
                 if ($this->widget)
@@ -111,17 +128,43 @@ class Infoblock extends Widget
                         $result = "{$classWidget} должен быть наследован от " . Widget::className();
                     }
 
-
                     $data = $this->widget;
                     unset($data['class']);
-
 
                     $result = $classWidget::widget((array) $data);
                 }
 
             } else
             {
-                $result = $modelInfoblock->run($this->config);
+                //Правила показа
+                if (!$modelInfoblock->isAllow())
+                {
+                    return $result;
+                }
+
+                //Данные виджета по умолчанию
+                $defaultConfig          = [];
+                $defaultWdigetClassName = '';
+                if ($this->widget)
+                {
+                    $defaultWdigetClassName = ArrayHelper::getValue((array) $this->widget, 'class');
+                    $defaultConfig          = (array) $this->widget;
+                    if (isset($defaultConfig['class']))
+                    {
+                        unset($defaultConfig['class']);
+                    }
+                }
+
+                $config = $modelInfoblock->getMultiConfig();
+                if ($modelInfoblock->getWidgetClassName() == $defaultWdigetClassName)
+                {
+                    $config = ArrayHelper::merge($config, $defaultConfig);
+                }
+
+                $widget = $modelInfoblock->createWidget();
+                $widget->setAttributes($config, $safeOnly);
+
+                $result = $widget->run();
             }
 
             self::$regsteredBlocks[$this->id] = $result;

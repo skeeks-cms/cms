@@ -90,6 +90,7 @@ $idSmartFrame = $id . "-smart-frame";
             {
                 if (self.Iframe.sx.Tree)
                 {
+                    console.log(self.JsingleInput.val());
                     self.Iframe.sx.Tree.setSingle(self.JsingleInput.val());
                 }
             });

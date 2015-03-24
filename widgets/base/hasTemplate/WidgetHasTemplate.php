@@ -15,6 +15,7 @@ use skeeks\cms\base\Widget;
 use skeeks\sx\Entity;
 use Yii;
 use yii\base\Exception;
+use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -27,6 +28,11 @@ abstract class WidgetHasTemplate extends Widget
      * @var null|string
      */
     public $template                 = 'default';
+
+    /**
+     * @var null
+     */
+    public $viewFile                 = null;
 
     static public function getDescriptorConfig()
     {
@@ -57,14 +63,16 @@ abstract class WidgetHasTemplate extends Widget
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            ['template', 'string']
+            ['template', 'string'],
+            ['viewFile', 'string']
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'template' => 'Шаблон'
+            'template' => 'Шаблон',
+            'viewFile' => 'Файл шаблона'
         ]);
     }
 
@@ -94,6 +102,25 @@ abstract class WidgetHasTemplate extends Widget
         $result = '';
         try
         {
+            /**
+             * Если задан файл шаблона для которого передаются данные, то просто рендерим его.
+             */
+            if ($this->viewFile)
+            {
+                try
+                {
+                    return $this->render($this->viewFile, $this->_data->toArray());
+                } catch (InvalidParamException $e)
+                {
+                    return 'Шаблон не найден: ' . $this->viewFile;
+                }
+
+            }
+
+            /**
+             * Если прямой файл не задан, читаем декскрптор виджета, смотрим доступные шаблоны.
+             * Ищем и ренерим его.
+             */
             $template = $this->getDescriptor()->getTemplatesObject()->getComponent($this->template);
             if ($template)
             {
@@ -147,7 +174,8 @@ abstract class WidgetHasTemplate extends Widget
             }
         } catch (\Exception $e)
         {
-            $result = '';
+            ob_end_clean();
+            return 'Ошибка виджета: ' . $e->getMessage();
         }
 
         return $result;

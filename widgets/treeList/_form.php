@@ -43,6 +43,15 @@ $tree = new \skeeks\cms\models\Tree();
         ]);
     ?>
 
+<?= $form->field($model, 'mainTreeId')->widget(
+    \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+    [
+        'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_SINGLE,
+        'attributeSingle' => 'mainTreeId'
+    ]
+);
+?>
+
 <?= $form->field($model, 'treeMenuIds')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\TreeMenu::find()->all(), 'id', 'name'),
