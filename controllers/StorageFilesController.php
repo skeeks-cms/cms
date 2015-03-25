@@ -185,7 +185,7 @@ class StorageFilesController extends Controller
         $post = Yii::$app->request->post();
         $get = Yii::$app->getRequest();
 
-        if ($get->get("linked_to_model") && $get->get("linked_to_value"))
+        if ($get->get("linked_to_model") && $get->get("linked_to_value") && $post['link'])
         {
             $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
 
