@@ -17,7 +17,7 @@ use \Yii;
 
 <div class="sx-widget-ssh-console">
     <? $form = ActiveForm::begin([
-        'usePjax' => false
+        'usePjax' => true
     ]) ?>
 
         <?= $form->field($model, 'to')->textInput([
@@ -37,7 +37,8 @@ use \Yii;
 
         <?= $form->field($model, 'content')->textarea([
             'placeholder' => 'Тело сообщения',
-            'value' => 'Тестовое письмо'
+            'value' => 'Тестовое письмо',
+            'rows' => 8
         ]); ?>
 
         <?= Html::tag('div',
