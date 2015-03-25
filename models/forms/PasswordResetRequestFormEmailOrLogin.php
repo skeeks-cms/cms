@@ -20,6 +20,12 @@ class PasswordResetRequestFormEmailOrLogin extends Model
     public $identifier;
 
     /**
+     * На какой контроллер формировать ссылку на сброс пароля, админский или сайтовый.
+     * @var bool
+     */
+    public $isAdmin = true;
+
+    /**
      * @inheritdoc
      */
     public function rules()
@@ -34,6 +40,16 @@ class PasswordResetRequestFormEmailOrLogin extends Model
                 'filter' => ['status' => $identityClassName::STATUS_ACTIVE],
                 'message' => 'There is no user with such email.'
             ],*/
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        return [
+            'identifier'    => 'Логин или Email',
         ];
     }
 
@@ -60,19 +76,30 @@ class PasswordResetRequestFormEmailOrLogin extends Model
         $user = $identityClassName::findByUsernameOrEmail($this->identifier);
         //$user = $identityClassName::
 
-        if ($user) {
-            if (!$identityClassName::isPasswordResetTokenValid($user->password_reset_token)) {
+        if ($user)
+        {
+            if (!$identityClassName::isPasswordResetTokenValid($user->password_reset_token))
+            {
                 $user->generatePasswordResetToken();
             }
 
-            if ($user->save()) {
+            if ($user->save())
+            {
+                if ($this->isAdmin)
+                {
+                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('admin/auth/reset-password', ['token' => $user->password_reset_token])->enableAbsolute()->enableAdmin();
+                } else
+                {
+                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('cms/auth/reset-password', ['token' => $user->password_reset_token])->enableAbsolute();
+                }
 
-                \Yii::$app->mailer->setViewPath(\Yii::$app->cms->moduleCms()->basePath . '/mail');
-
-                return \Yii::$app->mailer->compose('passwordResetToken', ['user' => $user])
+                return \Yii::$app->mailer->compose('@skeeks/cms/mail/passwordResetToken', [
+                        'user'      => $user,
+                        'resetLink' => $resetLink
+                    ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
                     ->setTo($user->email)
-                    ->setSubject('Сброс пароля для ' . \Yii::$app->name)
+                    ->setSubject('Запрос на смену пароля для ' . \Yii::$app->name)
                     ->send();
             }
         }

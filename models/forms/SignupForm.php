@@ -16,13 +16,40 @@ use Yii;
 
 /**
  * Class SignupForm
- * @package skeeks\module\cms\user\model
+ * @package skeeks\cms\models\forms
  */
 class SignupForm extends Model
 {
     public $username;
     public $email;
     public $password;
+
+    /**
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        return [
+            'username'      => 'Логин',
+            'email'         => 'Email',
+            'password'      => 'Пароль',
+        ];
+    }
+
+    public function scenarios()
+    {
+        $scenarions = parent::scenarios();
+
+        $scenarions['fullInfo'] = [
+            'username', 'email', 'password'
+        ];
+
+        $scenarions['onlyEmail'] = [
+            'email'
+        ];
+
+        return $scenarions;
+    }
 
     /**
      * @inheritdoc
@@ -32,13 +59,13 @@ class SignupForm extends Model
         return [
             ['username', 'filter', 'filter' => 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
+            ['username', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => 'Этот логин уже занят другим пользователем.'],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
+            ['email', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => 'Этот Email уже занят другим пользователем.'],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
@@ -52,13 +79,17 @@ class SignupForm extends Model
      */
     public function signup()
     {
-        if ($this->validate()) {
-            $user = new User();
-            $user->username = $this->username;
-            $user->email = $this->email;
+        if ($this->validate())
+        {
+            $userClassName          = \Yii::$app->cms->getUserClassName();
+
+            $user                   = new $userClassName();
+            $user->username         = $this->username;
+            $user->email            = $this->email;
             $user->setPassword($this->password);
             $user->generateAuthKey();
             $user->save();
+
             return $user;
         }
 

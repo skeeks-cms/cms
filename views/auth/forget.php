@@ -6,13 +6,13 @@
  * @date 25.03.2015
  */
 /* @var $this yii\web\View */
-/* @var $model \skeeks\cms\models\forms\SignupForm */
+/* @var $model \skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin */
 
 use yii\helpers\Html;
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 use \skeeks\cms\helpers\UrlHelper;
 
-$this->title = 'Регистрация';
+$this->title = 'Запрос на восстановление пароля';
 \Yii::$app->breadcrumbs->createBase()->append($this->title);
 ?>
 <div class="row">
@@ -24,18 +24,17 @@ $this->title = 'Регистрация';
                 <div class="col-lg-6">
 
                     <?php $form = ActiveForm::begin([
-                        'validationUrl' => UrlHelper::construct('cms/auth/register')->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME)->toString()
+                        'validationUrl' => UrlHelper::construct('cms/auth/forget')->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME)->toString()
                     ]); ?>
-                        <?= $form->field($model, 'username') ?>
-                        <?= $form->field($model, 'email') ?>
-                        <?= $form->field($model, 'password')->passwordInput() ?>
+                        <?= $form->field($model, 'identifier') ?>
 
                         <div class="form-group">
-                            <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> Зарегистрироваться", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                            <?= Html::submitButton("Отправить", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                         </div>
 
                     <?php ActiveForm::end(); ?>
-                    <?= Html::a('Авторизация', UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?>
+                    <?= Html::a('Авторизация', UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?> |
+                    <?= Html::a('Регистрация', UrlHelper::constructCurrent()->setRoute('cms/auth/register')->toString()) ?>
                 </div>
 
                 <div class="col-lg-3">

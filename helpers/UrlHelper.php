@@ -124,11 +124,21 @@ class UrlHelper
     }
 
     /**
+     * @param $key
+     * @return bool
+     */
+    public function issetSystemParam($key)
+    {
+        $systemData = (array) $this->get(self::SYSTEM_CMS_NAME, []);
+        return (bool) isset($systemData[$key]);
+    }
+
+    /**
      * @param string $key
      * @param $value
      * @return $this
      */
-    public function setSystemParam($key, $value)
+    public function setSystemParam($key, $value = '')
     {
         $systemData = $this->getSystem();
         $systemData[$key] = $value;
