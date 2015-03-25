@@ -13,4 +13,3 @@
 ?>
 
 <?= $model->renderConfigForm(); ?>
-<?= $this->render('_about'); ?>

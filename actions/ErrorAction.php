@@ -17,6 +17,7 @@ use Yii;
 use yii\base\Action;
 use yii\base\Exception;
 use yii\base\UserException;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
@@ -72,6 +73,7 @@ class ErrorAction extends \yii\web\ErrorAction
             if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
             {
                 $this->controller->layout = \Yii::$app->cms->moduleAdmin()->layout;
+                return $this->controller->output(nl2br(Html::encode($message)));
 
                 return $this->controller->render($this->view ?: $this->id, [
                     'name' => $name,

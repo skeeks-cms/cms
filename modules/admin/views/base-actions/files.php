@@ -131,16 +131,12 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 CSS
 );
 
-                        $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
-                            'w'    => $width,
-                            'h'    => $height,
-                            'm'    => $mode,
-                        ]));
+                        $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
 
-                        return \yii\helpers\Html::img($smallImage, [
+                        return "<a href='{$model->src}' class='sx-fancybox'>" . \yii\helpers\Html::img($smallImage, [
                             'width' => '50',
                             'class' => 'sx-img-small'
-                        ]);
+                        ]) . '</a>';
                     }
 
                     return \yii\helpers\Html::tag('span', $model->extension, ['class' => 'label label-primary', 'style' => 'font-size: 18px;']);

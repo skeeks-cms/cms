@@ -15,6 +15,7 @@ use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\web\Application;
 use yii\widgets\InputWidget;
 use Yii;
 
@@ -61,13 +62,22 @@ class StorageImages extends InputWidget
             $groupMainImage = $this->model->getFilesGroups()->getComponent('image');
             $groupImages = $this->model->getFilesGroups()->getComponent('images');
 
-            $uploaderUrl = \skeeks\cms\helpers\UrlHelper::construct(\Yii::$app->controller->module->id . '/' . \Yii::$app->controller->id . '/files', [
+
+            $moduleUrl = \Yii::$app->controller->module instanceof Application ? '' : \Yii::$app->controller->module->id . '/';
+
+            $uploaderUrl = \skeeks\cms\helpers\UrlHelper::construct($moduleUrl . \Yii::$app->controller->id . '/files', [
                 'id' => $this->model->id,
                 'group' => "images",
                 'mode' => "sx-onlyUpload"
-            ]);
+            ])
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+            ;
 
-            $uploaderUrlImage = \skeeks\cms\helpers\UrlHelper::construct(\Yii::$app->controller->module->id . '/' . \Yii::$app->controller->id . '/files', [
+
+
+
+            $uploaderUrlImage = \skeeks\cms\helpers\UrlHelper::construct( $moduleUrl . \Yii::$app->controller->id . '/files', [
                 'id' => $this->model->id,
                 'group' => "image",
                 'mode' => "sx-onlyUpload"

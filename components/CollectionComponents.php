@@ -59,14 +59,36 @@ abstract class CollectionComponents extends Component
 
                         $data['id'] = $id;
 
+                        /*if ($id)
+                        {
+                            if (class_exists($id))
+                            {
+                                //if (method_exists($id, 'getDescriptorConfig'))
+                               // {
+                                    //$defaultData = $id::getDescriptorConfig();
+                                    //$data = ArrayHelper::merge($defaultData, $data);
+                               // }
+                            }
+                        }*/
+
                         //$this->_components[$id] = \Yii::createObject($class, $data);
-                        $this->_components[$id] = new $class($data);
+                        $this->_components[$id] = $this->createConponent($class, $data);
                     }
                 }
             }
         }
 
         return $this->_components;
+    }
+
+    /**
+     * @param $class
+     * @param $data
+     * @return mixed
+     */
+    public function createConponent($class, $data)
+    {
+        return new $class($data);
     }
 
     /**

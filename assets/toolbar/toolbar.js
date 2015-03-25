@@ -48,6 +48,49 @@
     });
 
 
+    /**
+     *
+     */
+    sx.classes.toolbar.Dialog = sx.classes.Component.extend({
+
+        construct: function (url, opts)
+        {
+            var self = this;
+            opts = opts || {};
+            this.url = url;
+            //this.parent.construct(opts);
+            this.applyParentMethod(sx.classes.Component, 'construct', [opts]); // TODO: make a workaround for magic parent calling
+        },
+
+        _init: function()
+        {
+            this.window = new sx.classes.Window(this.url);
+            this.window.bind('close', function()
+            {
+                //sx.notify.info('Страница сейчас будет перезагружена');
+
+                _.defer(function()
+                {
+                    sx.block('body');
+                    _.delay(function()
+                    {
+                        window.location.reload();
+                    }, 100);
+
+                });
+            });
+
+            this.window.open();
+        },
+
+        _onDomReady: function()
+        {},
+
+        _onWindowReady: function()
+        {}
+    });
+
+
 
     sx.classes.SkeeksToolbar = sx.classes.Component.extend({
 
@@ -73,6 +116,12 @@
                     self.close();
                 }
             });
+
+            $('body').on('click', '.skeeks-cms-toolbar-edit-mode', function()
+            {
+                new sx.classes.toolbar.Dialog($(this).data('config-url'));
+                return false;
+            });
         },
 
         open: function()
@@ -89,6 +138,23 @@
             this.Full.hide();
 
             this.getCookieManager().set('container', 'closed');
+        },
+
+        triggerEditMode: function()
+        {
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-url-triggerEditMode'));
+
+            new sx.classes.AjaxHandlerNotify(ajax);
+            new sx.classes.AjaxHandlerBlocker(ajax, {
+                'wrapper' : 'body'
+            })
+
+            ajax.bind('complete', function(e)
+            {
+                window.location.reload();
+            });
+
+            ajax.execute();
         }
     });
 

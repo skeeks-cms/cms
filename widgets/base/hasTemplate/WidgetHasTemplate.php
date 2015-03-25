@@ -28,6 +28,20 @@ abstract class WidgetHasTemplate extends Widget
      */
     public $template                 = 'default';
 
+    static public function getDescriptorConfig()
+    {
+        return ArrayHelper::merge(parent::getDescriptorConfig(), [
+            'templates' =>
+            [
+                'default' =>
+                [
+                    'name' => 'Базовый шаблон',
+                    'baseDir' => ['@app/views/widgets']
+                ]
+            ]
+        ]);
+    }
+
     /**
      * @var Entity
      */
@@ -85,17 +99,46 @@ abstract class WidgetHasTemplate extends Widget
             {
                 try
                 {
+                    $result = '';
+                    $isRendered = false;
+
                     if ($template->baseDir)
                     {
-                        $result = $this->renderFile($template->baseDir . DIRECTORY_SEPARATOR . $this->template . '.php', $this->_data->toArray());
-                    } else
+                        $possibleBaseDirs = [];
+
+                        if (is_string($template->baseDir))
+                        {
+                            $possibleBaseDirs = [$template->baseDir];
+                        } else if (is_array($template->baseDir))
+                        {
+                            $possibleBaseDirs = $template->baseDir;
+                        }
+
+                        if ($possibleBaseDirs)
+                        {
+                            foreach ($possibleBaseDirs as $baseDir)
+                            {
+                                $fileTemplate = $baseDir . DIRECTORY_SEPARATOR . $this->template . '.php';
+                                if (file_exists(\Yii::getAlias($fileTemplate)))
+                                {
+                                    $result = $this->renderFile($fileTemplate, $this->_data->toArray());
+                                    $isRendered = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if ($isRendered === false)
                     {
                         $result = $this->render($this->template, $this->_data->toArray());
                     }
+
+
                 } catch (\Exception $e)
                 {
                     ob_end_clean();
-                    return 'Ошибка инфоблока: ' . $e->getMessage();
+                    return 'Ошибка виджета: ' . $e->getMessage();
                 }
 
             } else

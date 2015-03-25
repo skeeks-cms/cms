@@ -20,6 +20,13 @@ use yii\helpers\ArrayHelper;
  */
 class Text extends Widget
 {
+    static public function getDescriptorConfig()
+    {
+        return ArrayHelper::merge(parent::getDescriptorConfig(), [
+            'name' => 'Статичный блок'
+        ]);
+    }
+
     /**
      * @var null|string
      */

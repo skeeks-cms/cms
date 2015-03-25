@@ -34,11 +34,11 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
             ],
 
-            [
+            /*[
                 "label"     => 'Статические блоки',
                 "url"       => ["cms/admin-static-block"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.conct.png']
-            ],
+            ],*/
 
             [
                 "label"     => "Инфоблоки",

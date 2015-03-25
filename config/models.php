@@ -12,8 +12,9 @@ return
 [
     'publication' =>
     [
-        'modelClass'                 => 'skeeks\cms\models\Publication',
-        'name'                      => 'Публикация',
+        'modelClass'                    => 'skeeks\cms\models\Publication',
+        'name'                          => 'Публикация',
+        'adminControllerRoute'          => 'cms/admin-publication',
 
         'types'                 =>
         [
@@ -33,6 +34,7 @@ return
     [
         'modelClass'                    => 'skeeks\cms\models\Tree',
         'name'                          => 'Страница',
+        'adminControllerRoute'          => 'cms/admin-tree',
 
         /*'types'                 =>
         [

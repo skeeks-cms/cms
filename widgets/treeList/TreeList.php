@@ -1,14 +1,11 @@
 <?php
 /**
- * Publications
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 08.12.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 22.03.2015
  */
-namespace skeeks\cms\widgets\publicationsAll;
+namespace skeeks\cms\widgets\treeList;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\models\Publication;
@@ -22,23 +19,24 @@ use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class Publications
- * @package skeeks\cms\widgets\PublicationsAll
+ * Class TreeList
+ * @package skeeks\cms\widgets\publicationsAll
  */
-class PublicationsAll extends WidgetHasModelsSmart
+class TreeList extends WidgetHasModelsSmart
 {
-    public $modelClassName          = '\skeeks\cms\models\Publication';
+    public $modelClassName          = '\skeeks\cms\models\Tree';
 
     static public function getDescriptorConfig()
     {
         return ArrayHelper::merge(parent::getDescriptorConfig(), [
-            'name' => 'Список публикаций ( + постраничная навигация)'
+            'name' => 'Список разделов ( + постраничная навигация)'
         ]);
     }
 
     /**
      * @var null|string
      */
+    public $enableSubTree           = 1;
     public $title                   = '';
     public $types                   = [];
     public $statuses                = [];
@@ -49,7 +47,7 @@ class PublicationsAll extends WidgetHasModelsSmart
     {
         return ArrayHelper::merge(parent::rules(), [
             [['title'], 'string'],
-            [['types', 'statuses', 'statusesAdults', 'useCurrentTree'], 'safe'],
+            [['types', 'statuses', 'statusesAdults', 'useCurrentTree', 'enableSubTree'], 'safe'],
         ]);
     }
 
@@ -61,6 +59,7 @@ class PublicationsAll extends WidgetHasModelsSmart
             'statuses'                      => 'Статусы',
             'statusesAdults'                => 'Статусы приватности',
             'useCurrentTree'                => 'Добавлять условия выбора записей, страницы где находится этот виджет',
+            'enableSubTree'                 => 'Искать во вложенных разделах',
         ]);
     }
 
@@ -83,20 +82,25 @@ class PublicationsAll extends WidgetHasModelsSmart
             if ($tree)
             {
                 $ids[] = $tree->id;
-                if ($tree->hasChildrens())
+
+                if ($this->enableSubTree)
                 {
-                    if ($childrens = $tree->fetchChildrens())
+                    if ($tree->hasChildrens())
                     {
-                        foreach ($childrens as $chidren)
+                        if ($childrens = $tree->fetchChildrens())
                         {
-                            $ids[] = $chidren->id;
+                            foreach ($childrens as $chidren)
+                            {
+                                $ids[] = $chidren->id;
+                            }
                         }
                     }
+
                 }
 
                 foreach ($ids as $id)
                 {
-                    $find->orWhere("(FIND_IN_SET ('{$id}', tree_ids) or tree_id = '{$id}')");
+                    $find->orWhere("(pid = '{$id}')");
                 }
             }
         }
@@ -133,33 +137,4 @@ class PublicationsAll extends WidgetHasModelsSmart
     }
 
 
-
-
-    /**
-     * @return array|null|Tree
-     */
-    public function fetchFirstTree()
-    {
-        if ($id = $this->getFirstTreeId())
-        {
-            return Tree::find()->where(['id' => $id])->one();
-        } else
-        {
-            return null;
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getFirstTreeId()
-    {
-        if ($this->tree_ids)
-        {
-            return (int) array_shift($this->tree_ids);
-        } else
-        {
-            return 0;
-        }
-    }
 }

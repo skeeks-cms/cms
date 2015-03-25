@@ -14,6 +14,7 @@ namespace skeeks\cms\grid;
 
 use skeeks\cms\models\User;
 use yii\grid\DataColumn;
+use yii\helpers\Html;
 
 /**
  * Class UserColumnData
@@ -31,10 +32,18 @@ class UserColumnData extends DataColumn
 
         if ($user)
         {
-            return $user->getDisplayName();
+            if (!$srcImage = $user->getAvatarSrc())
+            {
+                $srcImage = \Yii::$app->cms->moduleAdmin()->noImage;
+            }
+
+            return Html::img($srcImage, [
+                'width' => 25,
+                'style' => 'margin-right: 5px;'
+            ]) . $user->getDisplayName();
         } else
         {
-            return "";
+            return null;
         }
     }
 }

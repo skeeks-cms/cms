@@ -6,10 +6,13 @@
  * @date 19.03.2015
  */
 namespace skeeks\cms\components;
+use skeeks\cms\actions\ViewModelAction;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\web\Application;
 use yii\web\View;
 
@@ -31,12 +34,61 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public $allowedIPs = ['*'];
 
 
-    /**
-     * @inheritdoc
-     */
+    public $infoblocks = [];
+
+
+    const EDIT_MODE     = 'edit';
+    const NO_EDIT_MODE  = 'no-edit';
+
+    public $mode = self::NO_EDIT_MODE;
+
+
     public function init()
     {
         parent::init();
+
+        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
+        {
+            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+        }
+
+    }
+    public function enableEditMode()
+    {
+        \Yii::$app->getSession()->set('skeeks-cms-toolbar-mode', self::EDIT_MODE);
+        $this->mode = self::EDIT_MODE;
+        return $this;
+    }
+
+    public function disableEditMode()
+    {
+        \Yii::$app->getSession()->set('skeeks-cms-toolbar-mode', self::NO_EDIT_MODE);
+        $this->mode = self::NO_EDIT_MODE;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function triggerEditMode()
+    {
+        if ($this->isEditMode())
+        {
+            $this->disableEditMode();
+        } else
+        {
+            $this->enableEditMode();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEditMode()
+    {
+        return (bool) ($this->mode == self::EDIT_MODE);
     }
 
     /**
@@ -61,53 +113,33 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             return;
         }
 
-        $version = \Yii::$app->cms->moduleCms()->getDescriptor()->getVersion();
-        $homePage = \Yii::$app->cms->moduleCms()->getDescriptor()->homepage;
+        $editModel = null;
+        $urlEditModel = "";
+        $urlUserEdit = UrlHelper::construct('cms/admin-profile/update')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+        if (is_subclass_of(\Yii::$app->controller->action, ViewModelAction::className()))
+        {
+            if ($editModel = \Yii::$app->controller->action->getModel())
+            {
+                if ($descriptor = \Yii::$app->registeredModels->getDescriptor($editModel->className()))
+                {
+                    if ($descriptor->adminControllerRoute)
+                    {
+                        $urlEditModel = UrlHelper::construct($descriptor->adminControllerRoute . '/update', ['id' => $editModel->id])->enableAdmin()
+                            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                            //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                            ;
+                    }
 
-        $adminUrl = UrlHelper::construct('')->enableAdmin()->toString();
-        $src = \Yii::$app->cms->getAuthUser()->getAvatarSrc();
-        $username = \Yii::$app->cms->getAuthUser()->username;
-        $logoSrc = \Yii::$app->cms->logo();
+                }
+            }
+        }
+
 
         $clientOptions = [
-            'logo-src'          => \Yii::$app->cms->logo(),
-            'cms-version'       => $version,
-            'cms-link'          => $homePage,
-            'container-id'      => 'skeeks-cms-toolbar',
-            'container-min-id'  => 'skeeks-cms-toolbar-min',
+            'container-id'                  => 'skeeks-cms-toolbar',
+            'container-min-id'              => 'skeeks-cms-toolbar-min',
+            'backend-url-triggerEditMode'   => UrlHelper::construct('cms/toolbar/trigger-edit-mode')->toString()
         ];
-
-        $clientOptionsJson = Json::encode($clientOptions);
-
-
-        echo <<<HTML
-
-        <div id="skeeks-cms-toolbar" class="skeeks-cms-toolbar-top hidden-print">
-            <div class="skeeks-cms-toolbar-block title">
-                <a href="{$homePage}" title="Текущая версия SkeekS Cms {$version}" target="_blank">
-                    <img width="29" height="30" alt="" src="{$logoSrc}">
-                     <span class="label">{$version}</span>
-                </a>
-            </div>
-
-            <div class="skeeks-cms-toolbar-block">
-                <a href="{$adminUrl}" title="Перейти в панель администрирования"><span class="label label-info">Администрирование</span></a>
-            </div>
-
-            <div class="skeeks-cms-toolbar-block">
-                <a href="{$adminUrl}" title="Перейти в панель администрирования"><img height="30" src="{$src}"/><span class="label label-info">{$username}</span></a>
-            </div>
-
-            <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.close(); return false;">›</span>
-        </div>
-
-        <div id="skeeks-cms-toolbar-min">
-            <a href="#" onclick="sx.Toolbar.open(); return false;" title="Открыть панель управления SkeekS Cms" id="skeeks-cms-toolbar-logo">
-                <img width="29" height="30" alt="" src="{$logoSrc}">
-            </a>
-            <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.open(); return false;">‹</span>
-        </div>
-HTML;
 
         //echo '<div id="skeeks-cms-toolbar" style="display:none"></div>';
 
@@ -115,13 +147,12 @@ HTML;
         $view = $event->sender;
         CmsToolbarAssets::register($view);
 
-        $view->registerJs(<<<JS
-        (function(sx, $, _)
-        {
-            sx.Toolbar = new sx.classes.SkeeksToolbar({$clientOptionsJson});
-        })(sx, sx.$, sx._);
-JS
-);
+        echo $view->render('@skeeks/cms/views/cms-toolbar', [
+            'clientOptions'     => $clientOptions,
+            'urlEditModel'      => $urlEditModel,
+            'editModel'         => $editModel,
+            'urlUserEdit'         => $urlUserEdit
+        ]);
     }
 
     /**
@@ -130,7 +161,7 @@ JS
      */
     protected function checkAccess()
     {
-        if (\Yii::$app->user->can('cms.admin-access'))
+        if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS) && \Yii::$app->user->can(CmsManager::PERMISSION_CONTROLL_PANEL))
         {
             if (!\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
             {

@@ -14,6 +14,7 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\WidgetDescriptor;
+use skeeks\cms\widgets\text\Text;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -60,4 +61,30 @@ class RegisteredWidgets extends CollectionComponents
     {
         return $this->getComponent($classNameWiget);
     }
+
+    /**
+     * @param $class
+     * @param $data
+     * @return mixed
+     */
+    public function createConponent($class, $data)
+    {
+        if ($className = ArrayHelper::getValue($data, 'id'))
+        {
+            $defaultConfig = [];
+
+            if (class_exists($className))
+            {
+                if (method_exists($className, 'getDescriptorConfig'))
+                {
+                    $defaultConfig = $className::getDescriptorConfig();
+                }
+            }
+
+            $data = ArrayHelper::merge($defaultConfig, $data);
+        }
+
+        return parent::createConponent($class, $data);
+    }
+
 }

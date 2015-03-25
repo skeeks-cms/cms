@@ -23,6 +23,14 @@ use yii\helpers\ArrayHelper;
  */
 class Breadcrumbs extends \skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate
 {
+    static public function getDescriptorConfig()
+    {
+        return ArrayHelper::merge(parent::getDescriptorConfig(), [
+            'name'          => 'Хлебные крошки',
+            'description'   => 'Хлебные крошки',
+        ]);
+    }
+
     /**
      * @var null|string
      */

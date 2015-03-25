@@ -10,6 +10,8 @@
  */
 namespace skeeks\cms\widgets;
 use skeeks\cms\base\Widget;
+use skeeks\cms\helpers\UrlHelper;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /**
@@ -34,6 +36,10 @@ class Infoblock extends Widget
      * @var bool
      */
     public $refetch = false;
+
+
+    public $widget = [];
+
 
 
     /**
@@ -83,12 +89,45 @@ class Infoblock extends Widget
 
             if (!$modelInfoblock)
             {
-                $result = '';
-                return $result;
+                if ($this->widget)
+                {
+                    $classWidget = ArrayHelper::getValue((array) $this->widget, 'class');
+                    if (!$classWidget)
+                    {
+                        $result = 'Нет обязательного атрибута class widget';
+                    }
+
+                    if (!is_subclass_of($classWidget, Widget::className()))
+                    {
+                        $result = "{$classWidget} должен быть наследован от " . Widget::className();
+                    }
+
+
+                    $data = $this->widget;
+                    unset($data['class']);
+
+
+                    $result = $classWidget::widget((array) $data);
+                }
+
+            } else
+            {
+                $result = $modelInfoblock->run($this->config);
             }
 
-            $result = $modelInfoblock->run($this->config);
             self::$regsteredBlocks[$this->id] = $result;
+        }
+
+        if (\Yii::$app->cmsToolbar->isEditMode())
+        {
+            return Html::tag('div', $result, [
+                'class' => 'skeeks-cms-toolbar-edit-mode',
+                'data' => [
+                    'id' => $modelInfoblock->id,
+                    'config-url' => UrlHelper::construct('cms/admin-infoblock/config', ['id' => $modelInfoblock->id])->enableAdmin()
+                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                ]
+            ]);
         }
 
         /*return Html::tag('div', $result, [
