@@ -200,52 +200,53 @@
             var self = this;
 
             $(".source-remoteUpload").click(function(){
-                var link = prompt("Введите URL");
-
                 //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
                 //По нажатию кнопки начало загрузки.
+                var link = prompt("Введите URL");
 
-                //1) считаем сколько всего пользователь указал ссылок (это делается на js)
-                this.httpLinks = [link];
-
-                self.queue      = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
-                self.inProcess  = true;                     //Загрузчик в работе
-
-                self.triggerStartUpload({
-                    'queueLength' : _.size(this.httpLinks) //сообщаем сколько файлов к загрузке всего
-                });
-
-                //Берем каждую, и обрабатываем по очереди.
-                _.each(this.httpLinks, function(link, key)
+                if(link)
                 {
-                    //Кидаем событие, начало работы с файлом
-                    self.triggerStartUploadFile({
-                        'name'          : link,      //ссылка к загрузке
-                        'additional'    : {}  //дополнительная информация
+                    //1) считаем сколько всего пользователь указал ссылок (это делается на js)
+                    this.httpLinks = [link];
+
+                    self.queue = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
+                    self.inProcess = true;                     //Загрузчик в работе
+
+                    self.triggerStartUpload({
+                        'queueLength': _.size(this.httpLinks) //сообщаем сколько файлов к загрузке всего
                     });
 
-                    //Формируем ajax объект
-                    var ajax = sx.ajax.preparePostQuery('/~sx/cms/storage-files/upload', {
-                        'link': link
-                    });
-
-                    ajax.onComplete(function(e, data)
-                    {
-                        self.triggerCompleteUploadFile({
-                            'response' : data
+                    //Берем каждую, и обрабатываем по очереди.
+                    _.each(this.httpLinks, function (link, key) {
+                        //Кидаем событие, начало работы с файлом
+                        self.triggerStartUploadFile({
+                            'name': link,      //ссылка к загрузке
+                            'additional': {}  //дополнительная информация
                         });
 
-                        self.queue = self.queue - 1;
+                        //Формируем ajax объект
+                        var post_url = self.getManager()._opts.remoteUploadBase;
 
-                        if (self.queue == 0)
-                        {
-                            self.inProcess  = false;
-                            self.triggerCompleteUpload({});
-                        }
+                        var ajax = sx.ajax.preparePostQuery(post_url, {
+                            'link': link
+                        });
+
+                        ajax.onComplete(function (e, data) {
+                            self.triggerCompleteUploadFile({
+                                'response': data
+                            });
+
+                            self.queue = self.queue - 1;
+
+                            if (self.queue == 0) {
+                                self.inProcess = false;
+                                self.triggerCompleteUpload({});
+                            }
+                        });
+
+                        ajax.execute();
                     });
-
-                    ajax.execute();
-                });
+                }
             });
         }
     });

@@ -172,4 +172,41 @@ class StorageFilesController extends Controller
 
         return $response;
     }
+
+    public function actionRemoteUpload()
+    {
+        $response =
+            [
+                'success' => false
+            ];
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $post = Yii::$app->request->post();
+        $get = Yii::$app->getRequest();
+
+        if ($get->get("linked_to_model") && $get->get("linked_to_value"))
+        {
+            $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
+
+            if (!$model = $ref->findModel()) {
+                throw new Exception("Не найдена сущность, к которой добавляется файл");
+            }
+
+            $storageFile = Yii::$app->storage->upload($post['link'], array_merge(
+                [
+                    "name"          => isset($model->name) ? $model->name : "",
+                    "original_name" => basename($post['link'])
+                ]
+            ));
+
+            $storageFile->linkToModel($model);
+
+            $response["success"]  = true;
+            $response["file"]     = $storageFile;
+            return $response;
+        }
+
+        return $response;
+    }
 }
