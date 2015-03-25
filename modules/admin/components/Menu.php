@@ -74,6 +74,7 @@ class Menu
         }
 
         $this->isLoaded = true;
+
         return (array) $this->groups;
     }
 

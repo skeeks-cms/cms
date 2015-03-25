@@ -410,9 +410,9 @@ class User
         return $this->name ? $this->name : $this->username;
     }
 
-    public function getPageUrl()
+    public function getPageUrl($action = 'view')
     {
-        return \Yii::$app->urlManager->createUrl(["cms/user/view", "username" => $this->username]);
+        return \Yii::$app->urlManager->createUrl(["cms/user/" . $action, "username" => $this->username]);
     }
 
     /**
