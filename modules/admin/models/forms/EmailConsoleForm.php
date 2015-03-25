@@ -62,7 +62,7 @@ class EmailConsoleForm extends Model
             ])
             ->setFrom([$this->from => \Yii::$app->name])
             ->setTo($this->to)
-            ->setSubject($this->subject . \Yii::$app->name);
+            ->setSubject($this->subject . ' ' . \Yii::$app->name);
 
             return $message->send();
         } else

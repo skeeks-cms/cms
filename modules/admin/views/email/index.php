@@ -12,7 +12,7 @@
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 use \yii\helpers\Html;
 
-use Yii;
+use \Yii;
 ?>
 
 <div class="sx-widget-ssh-console">
@@ -21,8 +21,8 @@ use Yii;
     ]) ?>
 
         <?= $form->field($model, 'to')->textInput([
-            'placeholder' => 'email',
-
+            'placeholder'   => 'email',
+            'value'         => \Yii::$app->cms->getAuthUser()->email,
         ]); ?>
 
         <?= $form->field($model, 'from')->textInput([
@@ -45,11 +45,36 @@ use Yii;
             ['class' => 'form-group']
         ); ?>
 
-        <div class="sx-result-container">
-            <pre id="sx-result">
-<?= $result; ?>
-            </pre>
-        </div>
+        <? if ($result) : ?>
+            <h2>Результат отправки: </h2>
+                    <div class="sx-result-container">
+                        <pre id="sx-result">
+<p><?= $result; ?></p>
+                        </pre>
+                    </div>
+        <? endif; ?>
+
+
+
+    <h2>Конфигурация cms компонента отправки email: </h2>
+    <div class="sx-result-config">
+        <pre id="sx-result">
+<p>Mail component: <?= \Yii::$app->mailer->className(); ?></p>
+<p>Транспорт: <?= (new \ReflectionObject(\Yii::$app->mailer->transport))->getName(); ?></p>
+<p>Транспорт запущен: <?= (int) \Yii::$app->mailer->transport->isStarted(); ?></p>
+<p>Mailer viewPath: <?= \Yii::$app->mailer->viewPath; ?></p>
+<p>Mailer messageClass: <?= \Yii::$app->mailer->messageClass; ?></p>
+        </pre>
+    </div>
+
+
+    <h2>Конфигурация php отправки email: </h2>
+    <div class="sx-result-config">
+        <pre id="sx-result">
+<p>Sendmail Path: <?= ini_get('sendmail_path') ?></p>
+<p>Sendmail From: <?= ini_get('sendmail_from') ?></p>
+        </pre>
+    </div>
     <? ActiveForm::end() ?>
 </div>
 

@@ -70,19 +70,21 @@ class EmailController extends AdminController
         }
 
         $result     = "";
-        $command    = "";
 
         if ($model->load(\Yii::$app->request->post()) && $model->execute())
         {
-            $result = "Отправлено";
+            $result         = "Отправлено";
         } else
         {
-            $result = "Не отправлено";
+            if (\Yii::$app->request->post())
+            {
+                $result         = "Не отправлено";
+            }
         }
 
         return $this->render('index', [
             'model'     => $model,
-            'result'    => $result
+            'result'    => $result,
         ]);
     }
 
