@@ -42,6 +42,16 @@ class UserController extends Controller
         ]);
     }
 
+    public function actionProfile()
+    {
+        if (\Yii::$app->user->isGuest)
+        {
+            return $this->goHome();
+        }
+
+        return $this->redirect(\Yii::$app->cms->getAuthUser()->getPageUrl());
+    }
+
     /**
      * @param $username
      * @return array
