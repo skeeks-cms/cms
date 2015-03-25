@@ -47,9 +47,18 @@ class Breadcrumbs extends \skeeks\cms\base\Component
      * @param array $data
      * @return $this
      */
-    public function append($data = [])
+    public function append($data)
     {
-        $this->parts[] = $data;
+        if (is_array($data))
+        {
+            $this->parts[] = $data;
+        } else if (is_string($data))
+        {
+            $this->parts[] = [
+                'name' => $data
+            ];
+        }
+
         return $this;
     }
 
@@ -72,6 +81,15 @@ class Breadcrumbs extends \skeeks\cms\base\Component
                 ],
             ]);
         }
+
+        return $this;
+    }
+
+    public function createBase($baseData = ['name' => 'Главная', 'url' => '/'])
+    {
+        $this->parts = [];
+
+        $this->append($baseData);
 
         return $this;
     }

@@ -62,7 +62,13 @@ class Controller extends YiiWebController
             return $this->output($test);
         } catch (InvalidParamException $e)
         {
-            return parent::render($view, $params);
+            try
+            {
+                return parent::render($view, $params);
+            } catch (InvalidParamException $e)
+            {
+                return $this->output($e->getMessage());
+            }
         }
     }
 

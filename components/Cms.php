@@ -100,6 +100,29 @@ class Cms extends \yii\base\Component
         return $userClassName::find();
     }
 
+    /**
+     * @return User
+     * @throws Exception
+     */
+    public function getUserClassName()
+    {
+        /**
+         * @var $userClassName User
+         */
+        $userClassName = \Yii::$app->user->identityClass;
+
+        if (!class_exists($userClassName))
+        {
+            throw new Exception("Не правильно сконфигурирован компонент user, класс пользователя не найден");
+        }
+
+        if (!is_subclass_of($userClassName, User::className()))
+        {
+            throw new Exception("Пользовательский класс должен быть наследован от базового skeeks cms класса: " . User::className());
+        }
+
+        return $userClassName;
+    }
 
 
     /**

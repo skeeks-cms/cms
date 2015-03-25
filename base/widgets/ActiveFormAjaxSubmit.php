@@ -24,10 +24,8 @@ class ActiveFormAjaxSubmit extends ActiveForm
         parent::__construct($config);
     }
 
-    public function run()
+    public function registerJs()
     {
-        parent::run();
-
         $this->view->registerJs(<<<JS
 
         $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
@@ -71,6 +69,16 @@ class ActiveFormAjaxSubmit extends ActiveForm
                         });
 
                         sx.notify.success(response.message);
+
+                        if (response.redirect)
+                        {
+                            _.delay(function()
+                            {
+                                window.location.href = response.redirect;
+                            }, 200);
+
+                        }
+
                     } else
                     {
                         sx.notify.error(response.message);
@@ -82,9 +90,13 @@ class ActiveFormAjaxSubmit extends ActiveForm
             return false;
         });
 
-
 JS
 );
+    }
+    public function run()
+    {
+        parent::run();
+        $this->registerJs();
     }
 
 }
