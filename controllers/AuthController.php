@@ -19,6 +19,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
+use skeeks\cms\models\forms\SignupForm;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -183,6 +184,11 @@ class AuthController extends Controller
 
 
 
+
+    /**
+     * Восстановлеине пароля
+     * @return string|Response
+     */
     public function actionRegister()
     {
         if (!\Yii::$app->user->isGuest)
@@ -190,22 +196,45 @@ class AuthController extends Controller
             return $this->goHome();
         }
 
-        $model = new LoginForm();
-        if ($model->load(\Yii::$app->request->post()) && $model->login())
+        $rr         = new RequestResponse();
+        $model      = new SignupForm();
+
+        //Запрос на валидацию ajax формы
+        if ($rr->isRequestOnValidateAjaxForm())
         {
-            if ($ref = UrlHelper::getCurrent()->getRef())
+            return $rr->ajaxValidateForm($model);
+        }
+        //Запрос ajax post
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->signup())
             {
-                return $this->redirect($ref);
+                $rr->success = true;
+                $rr->message = 'Вы успешно зарегистрированны';
             } else
             {
-                return $this->goBack();
+                $rr->message = 'Не удалось зарегистрироваться';
             }
 
-        } else {
-            return $this->render('register', [
-                'model' => $model,
-            ]);
+            return (array) $rr;
+
+        } else if (\Yii::$app->request->isPost)
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->sendEmail())
+            {
+                if ($ref = UrlHelper::getCurrent()->getRef())
+                {
+                    return $this->redirect($ref);
+                } else
+                {
+                    return $this->goBack();
+                }
+            }
         }
+
+        return $this->render('register', [
+            'model' => $model,
+        ]);
     }
 
 
