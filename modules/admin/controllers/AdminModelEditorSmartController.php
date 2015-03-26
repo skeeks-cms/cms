@@ -242,6 +242,8 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         $clientOptions['simpleUpload'] = $this->_getSourceSimpleUploadOptions($group);
         $clientOptions['simpleUploadBase'] = $this->_getSourceSimpleUploadOptions()['url'];
 
+        $clientOptions['remoteUpload'] = $this->_getSourceRemoteUploadOptions($group);
+        $clientOptions['remoteUploadBase'] = $this->_getSourceRemoteUploadOptions()['url'];
 
         return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
             "model"             => $this->getModel(),
@@ -285,6 +287,58 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             "multiplie"          => true,
 
         ];
+
+        //Опции которые вычисляются из поведения моедли
+        $fromBehaviorOptions = [];
+        /*$config = $this->_modelAttributeConfig;
+        if (isset($config[HasFiles::MAX_SIZE]))
+        {
+            $fromBehaviorOptions["maxSize"] = $config[HasFiles::MAX_SIZE];
+        }
+
+        if (isset($config[HasFiles::ALLOWED_EXTENSIONS]))
+        {
+            $fromBehaviorOptions["allowedExtensions"] = $config[HasFiles::ALLOWED_EXTENSIONS];
+        }
+
+        if (isset($config[HasFiles::ACCEPT_MIME_TYPE]))
+        {
+            $fromBehaviorOptions["accept"] = $config[HasFiles::ACCEPT_MIME_TYPE];
+        }*/
+
+
+        return array_merge($fromBehaviorOptions, $mainOptions);
+    }
+
+    private function _getSourceRemoteUploadOptions($group = '')
+    {
+        $urlData = [
+            "cms/storage-files/remote-upload",
+            "linked_to_model"   => $this->getModel()->getRef()->getCode(),
+            "linked_to_value"   => $this->getModel()->getRef()->getValue(),
+        ];
+
+
+        if ($group)
+        {
+            $urlData["group"] = $group;
+        }
+
+        $backendRemoteUpload = \Yii::$app->urlManager->createUrl($urlData);
+
+
+        //Опции которые перетирать нельзя
+        $mainOptions =
+            [
+                "url"               => $backendRemoteUpload,
+                "name"              => "imgfile", //TODO: хардкод
+                "hoverClass"        => 'btn-hover',
+                "focusClass"        => 'active',
+                "disabledClass"     => 'disabled',
+                "responseType"      => 'json',
+                "multiplie"          => true,
+
+            ];
 
         //Опции которые вычисляются из поведения моедли
         $fromBehaviorOptions = [];

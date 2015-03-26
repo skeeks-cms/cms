@@ -1,0 +1,32 @@
+table.table
+{
+    border:none;
+	border-top:1px solid #adbdca;
+	border-spacing:0;
+	width:100%;
+}
+
+    table.table thead tr th
+    {
+        background-image: -webkit-linear-gradient(top, rgba(93, 195, 231, 0.76), #5dc3e7);
+        background-image: -moz-linear-gradient(top, rgba(93, 195, 231, 0.76), #5dc3e7);
+        background-image: -ms-linear-gradient(top, rgba(93, 195, 231, 0.76), #5dc3e7);
+        background-image: -o-linear-gradient(top, rgba(93, 195, 231, 0.76), #5dc3e7);
+        background-image: linear-gradient(top, rgba(93, 195, 231, 0.76), #5dc3e7);
+        /**background-color:#5dc3e7;**/
+        border:1px solid;
+        border-color:#d9e0e4 #89979d #919b9d #ebeef0;
+        font-weight:bold;
+        color: #ffffff;
+        /**text-shadow:0 1px rgba(255,255,255,0.7);**/
+        height:21px;
+        vertical-align:middle;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 1)
+        /*padding:6px 0 4px 0;*/
+    }
+
+    table.table thead tr th a
+    {
+        color: #ffffff;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+    }

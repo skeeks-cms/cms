@@ -93,14 +93,16 @@ class PasswordResetRequestFormEmailOrLogin extends Model
                     $resetLink = \skeeks\cms\helpers\UrlHelper::construct('cms/auth/reset-password', ['token' => $user->password_reset_token])->enableAbsolute();
                 }
 
-                return \Yii::$app->mailer->compose('@skeeks/cms/mail/passwordResetToken', [
+
+                $message = \Yii::$app->mailer->compose('@skeeks/cms/mail/passwordResetToken', [
                         'user'      => $user,
                         'resetLink' => $resetLink
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
                     ->setTo($user->email)
-                    ->setSubject('Запрос на смену пароля для ' . \Yii::$app->name)
-                    ->send();
+                    ->setSubject('Запрос на смену пароля для ' . \Yii::$app->name);
+
+                return $message->send();
             }
         }
 

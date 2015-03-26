@@ -31,10 +31,31 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
         'name',
         'code',
-        'description',
-        'widget',
+        //'description',
 
-        ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+        [
+            'value'     => function(\skeeks\cms\models\Infoblock $model)
+            {
+                return \Yii::$app->registeredWidgets->getComponent($model->widget)->name;
+            },
+
+            'attribute' => 'widget',
+            'filter' => \yii\helpers\ArrayHelper::map(\Yii::$app->registeredWidgets->getComponents(), 'id', 'name'),
+        ],
+
+        [
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute' => 'protected_widget',
+        ],
+
+        [
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute' => 'auto_created',
+        ],
+
+
+
+        //['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
         //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],

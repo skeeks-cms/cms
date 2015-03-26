@@ -19,6 +19,7 @@ use yii\grid\DataColumn;
 class DateTimeColumnData extends DataColumn
 {
     public $filter      = false;
+
     /**
      * @inheritdoc
      */

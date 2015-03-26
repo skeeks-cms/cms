@@ -47,7 +47,7 @@ class Cms extends \yii\base\Component
          * */
         \Yii::$app->view->on(View::EVENT_END_PAGE, function(Event $e)
         {
-            if (!\Yii::$app->request->isAjax)
+            if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
             {
                 \Yii::$app->seoGenerator->generateBeforeOutputPage($e->sender);
                 \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', 'SkeekS Site Manager');

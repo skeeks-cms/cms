@@ -14,7 +14,9 @@ use skeeks\cms\modules\admin\widgets\GridView;
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$dataProvider->query->orderBy('id DESC');
+$dataProvider->sort->defaultOrder = [
+    'id' => 'DESC'
+];
 ?>
 
 <?= GridView::widget([

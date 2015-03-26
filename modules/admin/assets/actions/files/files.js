@@ -199,49 +199,52 @@
         {
             var self = this;
 
-            //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
-            //По нажатию кнопки начало загрузки.
+            $(".source-remoteUpload").click(function(){
+                //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
+                //По нажатию кнопки начало загрузки.
+                var link = prompt("Введите URL");
 
-            //1) считаем сколько всего пользователь указал ссылок (это делается на js)
-            this.httpLinks = [];
-
-            self.queue      = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
-            self.inProcess  = true;                     //Загрузчик в работе
-
-            self.triggerStartUpload({
-                'queueLength' : _.size(this.httpLinks), //сообщаем сколько файлов к загрузке всего
-            });
-
-            //Берем каждую, и обрабатываем по очереди.
-            _.each(this.httpLinks, function(link, key)
-            {
-                //Кидаем событие, начало работы с файлом
-                self.triggerStartUploadFile({
-                    'name'          : link,      //ссылка к загрузке
-                    'additional'    : {},  //дополнительная информация
-                });
-
-                //Формируем ajax объект
-                var ajax = sx.ajax.preparePostQuery('тут наш бэкенд', {
-                    'link': link
-                });
-
-                ajax.onComplete(function(e, data)
+                if (link)
                 {
-                    self.triggerCompleteUploadFile({
-                        'response' : data,
+                    //1) считаем сколько всего пользователь указал ссылок (это делается на js)
+                    this.httpLinks = [link];
+
+                    self.queue = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
+                    self.inProcess = true;                     //Загрузчик в работе
+
+                    self.triggerStartUpload({
+                        'queueLength': _.size(this.httpLinks) //сообщаем сколько файлов к загрузке всего
                     });
 
-                    self.queue = self.queue - 1;
+                    //Берем каждую, и обрабатываем по очереди.
+                    _.each(this.httpLinks, function (link, key) {
+                        //Кидаем событие, начало работы с файлом
+                        self.triggerStartUploadFile({
+                            'name': link,      //ссылка к загрузке
+                            'additional': {}  //дополнительная информация
+                        });
 
-                    if (self.queue == 0)
-                    {
-                        self.inProcess  = false;
-                        self.triggerCompleteUpload({});
-                    }
-                });
 
-                ajax.execute();
+                        var ajax = sx.ajax.preparePostQuery(self.get('url'), {
+                            'link': link
+                        });
+
+                        ajax.onComplete(function (e, data) {
+                            self.triggerCompleteUploadFile({
+                                'response': data
+                            });
+
+                            self.queue = self.queue - 1;
+
+                            if (self.queue == 0) {
+                                self.inProcess = false;
+                                self.triggerCompleteUpload({});
+                            }
+                        });
+
+                        ajax.execute();
+                    });
+                }
             });
         }
     });
@@ -619,7 +622,7 @@
                 )
 
                 .registerSource(
-                    new sx.classes.files.sources.RemoteUpload(this)
+                    new sx.classes.files.sources.RemoteUpload(this, this.get("remoteUpload")) //В этот источник передаем настройки из backend-a
                 )
 
                 .registerSource(
