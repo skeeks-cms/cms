@@ -82,6 +82,28 @@ abstract class AdminController extends Controller
     }
 
 
+    /*public function output($output)
+    {
+        return parent::render('@skeeks/cms/modules/admin/views/base-actions/_base-admin-actions', [
+            'content' => $output,
+        ]);
+    }
+
+    /**
+     * @param string $view
+     * @param array $params
+     * @return string
+     *
+    public function render($view, $params = [])
+    {
+        return parent::render('@skeeks/cms/modules/admin/views/base-actions/_base-admin-actions', [
+            'viewF' => $view,
+            'paramsFile' => $params,
+            'contextFile' => $this,
+        ]);
+    }*/
+
+
     /**
      * @return string
      */

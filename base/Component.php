@@ -14,4 +14,20 @@ use yii\base\Model;
  * @package skeeks\cms\base
  */
 class Component extends Model
-{}
+{
+    public function init()
+    {
+        parent::init();
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function configFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . '_form.php';
+    }
+}
