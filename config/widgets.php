@@ -28,7 +28,7 @@ return
             ]
         ],
     ],
-
+/*
     'skeeks\cms\widgets\base\hasModels\WidgetHasModels' =>
     [
         'name'          => 'Универсальный виджет списка моделей + постраничая навигация',
@@ -41,5 +41,5 @@ return
                 'name' => 'Шаблон по умолчанию'
             ],
         ],
-    ],
+    ],*/
 ];
