@@ -21,6 +21,7 @@ $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]])
 <?= GridView::widget([
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
+
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
 

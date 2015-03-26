@@ -13,7 +13,9 @@
 namespace skeeks\cms\grid;
 
 use skeeks\cms\models\User;
+use skeeks\widget\chosen\Chosen;
 use yii\grid\DataColumn;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /**
@@ -22,6 +24,25 @@ use yii\helpers\Html;
  */
 class UserColumnData extends DataColumn
 {
+    public function init()
+    {
+        parent::init();
+
+        $this->filter = ArrayHelper::map(
+            \Yii::$app->cms->findUser()->all(),
+            'id',
+            'name'
+        );
+        /*
+        $this->filter = Chosen::begin([
+            'model' => $this->m
+            'items' => ArrayHelper::map(
+                \Yii::$app->cms->findUser()->all(),
+                'id',
+                'name'
+            )
+        ])->run();*/
+    }
     /**
      * @inheritdoc
      */

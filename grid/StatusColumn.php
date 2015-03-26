@@ -19,9 +19,22 @@ use yii\grid\DataColumn;
  */
 class StatusColumn extends DataColumn
 {
-    public $filter = true;
     public $format = 'html';
     public $attribute = 'status';
+
+
+    public function init()
+    {
+        parent::init();
+
+        $model = $this->grid->filterModel;
+
+        if ($model)
+        {
+            $this->filter = $model->getPossibleStatuses();
+        }
+    }
+
     /**
      * @inheritdoc
      */
