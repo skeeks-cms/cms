@@ -58,8 +58,8 @@ class Controller extends YiiWebController
 
         try
         {
-            $test = $this->getView()->render($this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view, $params, $this);
-            return $this->output($test);
+            $view = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
+            return parent::render($view, $params);
         } catch (InvalidParamException $e)
         {
             try
