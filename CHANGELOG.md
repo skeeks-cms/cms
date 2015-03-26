@@ -3,6 +3,7 @@ Updates to the development of the project
 
 1.1.1
 -----------------
+  * Доработка файлового storage менеджера, новый источник загрузки (по ссылке http)
   * Механизм тестирования отправки email уведомлений с сайта.
   * Регистрация в сайтовой части
   * Удобный хелпер skeeks\cms\helpers\RequestResponse

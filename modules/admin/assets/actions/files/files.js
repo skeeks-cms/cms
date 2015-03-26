@@ -204,7 +204,7 @@
                 //По нажатию кнопки начало загрузки.
                 var link = prompt("Введите URL");
 
-                if(link)
+                if (link)
                 {
                     //1) считаем сколько всего пользователь указал ссылок (это делается на js)
                     this.httpLinks = [link];
@@ -224,10 +224,8 @@
                             'additional': {}  //дополнительная информация
                         });
 
-                        //Формируем ajax объект
-                        var post_url = self.getManager()._opts.remoteUploadBase;
 
-                        var ajax = sx.ajax.preparePostQuery(post_url, {
+                        var ajax = sx.ajax.preparePostQuery(self.get('url'), {
                             'link': link
                         });
 
@@ -624,7 +622,7 @@
                 )
 
                 .registerSource(
-                    new sx.classes.files.sources.RemoteUpload(this)
+                    new sx.classes.files.sources.RemoteUpload(this, this.get("remoteUpload")) //В этот источник передаем настройки из backend-a
                 )
 
                 .registerSource(
