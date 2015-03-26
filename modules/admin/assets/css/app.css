@@ -194,9 +194,14 @@ body.empty .sx-panel
             color: #ffffff;
         }
 
+        .sx-panel .breadcrumb li
+        {
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
+        }
         .sx-panel .breadcrumb li a
         {
             color: #ffffff;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
         }
 
     .sx-panel .sx-nav
@@ -309,9 +314,7 @@ body.empty .sx-panel
             cursor: pointer;
             background: #5dc3e7;
             color: white;
-            //font-weight: bold;
             text-transform: uppercase;
-            //text-align: center;
             padding: 5px 0px;
         }
 
@@ -360,7 +363,7 @@ body.empty .sx-panel
         .sidebar ul.nav.nav-sidebar li.active, .sidebar ul.nav.nav-sidebar li:hover, .sidebar ul.nav.nav-sidebar li.opened
         {
             background: rgba(93, 195, 231, 0.3);
-            //color: white;
+            color: black;
             border-left: 3px solid #20a8d8;
         }
 
@@ -586,4 +589,15 @@ div#jGrowl
     border-bottom: 1px solid #ddd;
     padding: 10px;
     border-right: 1px solid #ddd;
+}
+
+
+
+
+
+.sidebar ul.nav.nav-sidebar li a.active,
+.sidebar ul.nav.nav-sidebar li a:hover,
+.sidebar ul.nav.nav-sidebar li a:focus {
+    background: transparent;
+    color: black
 }

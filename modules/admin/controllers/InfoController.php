@@ -57,6 +57,11 @@ class InfoController extends AdminController
         ]);
     }
 
+    public function actionPhp()
+    {
+         phpinfo();
+         die;
+    }
     public function actionIndex()
     {
         return $this->render('index', [
@@ -74,6 +79,9 @@ class InfoController extends AdminController
                 'xdebug' => extension_loaded('xdebug'),
                 'apc' => extension_loaded('apc'),
                 'memcache' => extension_loaded('memcache'),
+                'xcache' => extension_loaded('xcache'),
+                'imagick' => extension_loaded('imagick'),
+                'gd' => extension_loaded('gd'),
             ],
             'extensions' => $this->getExtensions(),
 

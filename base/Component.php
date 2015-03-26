@@ -1,17 +1,12 @@
 <?php
 /**
- * Component
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 10.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 26.03.2015
  */
-
 namespace skeeks\cms\base;
 use yii\base\Component as YiiComponent;
-
 /**
  * Class Component
  * @package skeeks\cms\base
