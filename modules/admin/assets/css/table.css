@@ -28,5 +28,5 @@ table.table
     table.table thead tr th a
     {
         color: #ffffff;
-        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 1);
     }

@@ -407,5 +407,6 @@ $fileContent .= '];';
         }
 
         return $this;
+
     }
 }

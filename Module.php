@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms;
 use skeeks\cms\modules\admin\components\UrlRule;
+use yii\base\BootstrapInterface;
 use yii\base\Event;
 use yii\web\Application;
 use yii\web\View;
@@ -18,13 +19,18 @@ use yii\web\View;
  * Class Module
  * @package skeeks\cms
  */
-class Module extends base\Module
+class Module extends base\Module implements BootstrapInterface
 {
     public $noImage         = "http://vk.com/images/deactivated_100.gif";
     public $adminEmail      = "semenov@skeeks.com";
     public $supportEmail    = "support@skeeks.com";
 
     public $controllerNamespace = 'skeeks\cms\controllers';
+
+    public function bootstrap($app)
+    {
+
+    }
 
     /**
      * Используем свой layout
@@ -37,7 +43,7 @@ class Module extends base\Module
     protected function _descriptor()
     {
         return array_merge(parent::_descriptor(), [
-            "version"               => "1.1.1",
+            "version"               => "1.1.2-dev",
 
             "name"          => "SkeekS cms",
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",

@@ -247,9 +247,10 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 <div class="main">
 
-<?php /*\yii\widgets\Pjax::begin([
+<?php /*\skeeks\cms\modules\admin\widgets\Pjax::begin([
     'id' => 'sx-pjax-global',
-    'linkSelector' => 'body a',
+    'formSelector' => 'body',
+    'linkSelector' => '.sidebar-menu li a',
 ]); */?>
 
     <div class="col-lg-12">
@@ -285,7 +286,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
     </div><!-- End .col-lg-12  -->
 
-    <?php /*\yii\widgets\Pjax::end(); */?>
+    <?php /*\skeeks\cms\modules\admin\widgets\Pjax::end(); */?>
 
 </div>
 

@@ -7,9 +7,11 @@
  */
 namespace skeeks\cms\base;
 use yii\base\Component as YiiComponent;
+use yii\base\Model;
+
 /**
  * Class Component
  * @package skeeks\cms\base
  */
-class Component extends YiiComponent
+class Component extends Model
 {}
