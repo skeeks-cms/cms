@@ -37,10 +37,10 @@
                 this.close();
             }
 
-            $('.sidebar-menu').on('click', function()
+            /*$('.sidebar-menu').on('click', function()
             {
                 sx.notify.info('Скоро можно будет открывать и закрывать этот блок');
-            });
+            });*/
         },
 
         /**
