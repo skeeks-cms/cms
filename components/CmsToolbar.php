@@ -42,6 +42,17 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
     public $mode = self::NO_EDIT_MODE;
 
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function getDescriptorConfig()
+    {
+        return
+        [
+            'name'          => 'Панель управления сайтом',
+        ];
+    }
 
     public function init()
     {

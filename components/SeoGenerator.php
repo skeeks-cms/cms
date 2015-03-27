@@ -52,6 +52,17 @@ class SeoGenerator extends Component
         //"strong"    =>  2,
     ];
 
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function getDescriptorConfig()
+    {
+        return
+        [
+            'name'          => 'Seo компонент',
+        ];
+    }
 
     private static $_huck = 'Z2VuZXJhdG9y';
 
