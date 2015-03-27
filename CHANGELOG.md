@@ -3,6 +3,7 @@ Updates to the development of the project
 
 1.1.2
 -----------------
+  * Оптимизация CollectionComponents
 
 1.1.1
 -----------------

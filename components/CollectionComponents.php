@@ -1,12 +1,9 @@
 <?php
 /**
- * CollectionComponents
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 11.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 27.03.2015
  */
 namespace skeeks\cms\components;
 
@@ -32,13 +29,14 @@ abstract class CollectionComponents extends Component
     }
 
     protected $_components = null;
+    protected $_allLoaded = null;
 
     /**
      * @return Component[]
      */
     public function getComponents()
     {
-        if ($this->_components === null)
+        if ($this->_allLoaded === null)
         {
             $this->_components = [];
 
@@ -46,39 +44,40 @@ abstract class CollectionComponents extends Component
             {
                 foreach ($this->components as $id => $data)
                 {
-                    $class = $this->componentClassName;
-
-                    if (ArrayHelper::getValue($data, 'enabled', true) === true)
-                    {
-                        $newClass = ArrayHelper::getValue($data, 'class', false);
-                        if ($newClass !== false)
-                        {
-                            $class = $newClass;
-                            unset($data['class']);
-                        }
-
-                        $data['id'] = $id;
-
-                        /*if ($id)
-                        {
-                            if (class_exists($id))
-                            {
-                                //if (method_exists($id, 'getDescriptorConfig'))
-                               // {
-                                    //$defaultData = $id::getDescriptorConfig();
-                                    //$data = ArrayHelper::merge($defaultData, $data);
-                               // }
-                            }
-                        }*/
-
-                        //$this->_components[$id] = \Yii::createObject($class, $data);
-                        $this->_components[$id] = $this->createConponent($class, $data);
-                    }
+                    $this->_createByConfig($id, $data);
                 }
             }
+
+            $this->_allLoaded = true;
         }
 
         return $this->_components;
+    }
+
+    private function _createByConfig($id, $data)
+    {
+        if (isset($this->_components[$id]))
+        {
+            return $this->_components[$id];
+        }
+
+        $class = $this->componentClassName;
+
+        if (ArrayHelper::getValue($data, 'enabled', true) === true)
+        {
+            $newClass = ArrayHelper::getValue($data, 'class', false);
+
+            if ($newClass !== false)
+            {
+                $class = $newClass;
+                unset($data['class']);
+            }
+
+            $data['id'] = $id;
+            $this->_components[$id] = $this->createConponent($class, $data);
+        }
+
+        return $this->_components[$id];
     }
 
     /**
@@ -97,8 +96,9 @@ abstract class CollectionComponents extends Component
      */
     public function getComponent($id)
     {
-        $components = $this->getComponents();
-        return ArrayHelper::getValue($components, $id);
+        $componentsData = $this->components;
+        $data           = ArrayHelper::getValue($componentsData, $id);
+        return $this->_createByConfig($id, $data);
     }
 
     /**

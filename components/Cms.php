@@ -1,12 +1,9 @@
 <?php
 /**
- * Cms
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 24.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 27.03.2015
  */
 namespace skeeks\cms\components;
 
@@ -33,10 +30,21 @@ use yii\web\View;
  * Class Cms
  * @package skeeks\cms\components
  */
-class Cms extends \yii\base\Component
+class Cms extends \skeeks\cms\base\Component
 {
+    /**
+     * @var string
+     */
+    public $adminEmail          = 'admin@skeeks.com';
+
+    /**
+     * @var string
+     */
+    public $noImageUrl          = 'http://vk.com/images/deactivated_100.gif';
+
 
     public $staticKeySold = '';
+
 
     public function init()
     {
@@ -53,6 +61,23 @@ class Cms extends \yii\base\Component
                 \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', 'SkeekS Site Manager');
             }
         });
+    }
+
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['adminEmail', 'noImageUrl'], 'string'],
+            [['adminEmail'], 'email'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'adminEmail'        => 'Основной Email Администратора сайта',
+            'mainTreeId'        => 'Родительский раздел',
+        ]);
     }
 
     /**

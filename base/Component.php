@@ -30,4 +30,13 @@ class Component extends Model
         $class = new \ReflectionClass($this->className());
         return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . '_form.php';
     }
+
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function getDescriptorConfig()
+    {
+        return [];
+    }
 }
