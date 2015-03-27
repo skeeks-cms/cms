@@ -98,9 +98,9 @@ class PasswordResetRequestFormEmailOrLogin extends Model
                         'user'      => $user,
                         'resetLink' => $resetLink
                     ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
-                    ->setSubject('Запрос на смену пароля для ' . \Yii::$app->name);
+                    ->setSubject('Запрос на смену пароля для ' . \Yii::$app->cms->appName);
 
                 return $message->send();
             }

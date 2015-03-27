@@ -70,7 +70,7 @@ class InfoController extends AdminController
             'yiiVersion' => \Yii::getVersion(),
             'application' => [
                 'yii' => \Yii::getVersion(),
-                'name' => \Yii::$app->name,
+                'name' => \Yii::$app->cms->appName,
                 'env' => YII_ENV,
                 'debug' => YII_DEBUG,
             ],

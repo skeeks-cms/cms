@@ -8,6 +8,7 @@
 namespace skeeks\cms\base;
 use skeeks\cms\models\Settings;
 use yii\base\Component as YiiComponent;
+use yii\base\Exception;
 use yii\base\Model;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -123,15 +124,23 @@ JS
      */
     public function loadDefaultSettings()
     {
-        /**
-         * @var $settings Settings
-         */
-        $settings = $this->fetchDefaultSettings();
 
-        if ($settings)
+        try
         {
-            $values = (array) $settings->getMultiFieldValue('value');
-            $this->setAttributes($values);
+            /**
+             * @var $settings Settings
+             */
+            $settings = $this->fetchDefaultSettings();
+
+            if ($settings)
+            {
+                $values = (array) $settings->getMultiFieldValue('value');
+                $this->setAttributes($values);
+            }
+
+        } catch (\Exception $e)
+        {
+            \Yii::error('Cms component error load defaul settings: ' . $e->getMessage());
         }
 
         return $this;
@@ -148,10 +157,10 @@ JS
             $settings = new Settings([
                 'component' => $this->className()
             ]);
-
-            $settings->setCurrentLang(null);
-            $settings->setCurrentSite(null);
         }
+
+        $settings->setCurrentLang(null);
+        $settings->setCurrentSite(null);
 
         if ($this->_currentLang)
         {
@@ -162,8 +171,6 @@ JS
         {
             $settings->setCurrentSite($this->_currentSite);
         }
-
-
 
         $settings->setMultiFieldValue('value', $this->attributes);
 
@@ -225,7 +232,13 @@ JS
      */
     public function fetchDefaultSettings()
     {
-        return Settings::find()->where(['component' => $this->className()])->one();
+        //return Settings::find()->where(['component' => $this->className()])->one();
+
+        $dependency = new \yii\caching\DbDependency(['sql' => 'SELECT MAX(updated_at) FROM ' . Settings::tableName()]);
+
+        return Settings::getDb()->cache(function ($db) {
+            return Settings::find()->where(['component' => $this->className()])->one();
+        }, 3600*3, $dependency);
     }
 
 

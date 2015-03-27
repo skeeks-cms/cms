@@ -264,9 +264,9 @@ class AuthController extends Controller
                         'user'      => $user,
                         'password'  => $password
                     ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
-                    ->setSubject('Новый пароль для ' . \Yii::$app->name)
+                    ->setSubject('Новый пароль для ' . \Yii::$app->cms->appName)
                     ->send();
 
                 $rr->success = true;

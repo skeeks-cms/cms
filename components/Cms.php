@@ -43,6 +43,11 @@ class Cms extends \skeeks\cms\base\Component
     public $notifyAdminEmails           = 'admin@skeeks.com';
 
     /**
+     * @var string
+     */
+    public $appName;
+
+    /**
      * @var string Это изображение показывается в тех случаях, когда не найдено основное.
      */
     public $noImageUrl          = 'http://vk.com/images/deactivated_100.gif';
@@ -58,7 +63,7 @@ class Cms extends \skeeks\cms\base\Component
     {
         return
         [
-            'name'          => 'Основной модуль SkeekS CMS',
+            'name'          => 'Основной модуль CMS',
         ];
     }
 
@@ -77,6 +82,11 @@ class Cms extends \skeeks\cms\base\Component
     {
         parent::init();
 
+        if (!$this->appName)
+        {
+            $this->appName = \Yii::$app->name;
+        }
+
         /**
          * Генерация SEO метатегов.
          * */
@@ -94,7 +104,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName'], 'string'],
             [['adminEmail'], 'email'],
         ]);
     }
@@ -105,6 +115,7 @@ class Cms extends \skeeks\cms\base\Component
             'adminEmail'                => 'Основной Email Администратора сайта',
             'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
+            'appName'                   => 'Название проекта',
         ]);
     }
 
@@ -254,26 +265,6 @@ class Cms extends \skeeks\cms\base\Component
         return \Yii::$app->getModule("cms");
     }
 
-
-
-    /**
-     * @var IdentityMap
-     */
-    protected $_entityMap = null;
-    /**
-     * @return IdentityMap
-     */
-    public function getEntityMap()
-    {
-        if (null === $this->_entityMap)
-        {
-            $this->_entityMap = new IdentityMap();
-        }
-
-        return $this->_entityMap;
-    }
-
-
     /**
      *
      * TODO: is depricated (Не используется с версии 1.0.6) Реализуется через статический инфоблок.
@@ -307,6 +298,8 @@ class Cms extends \skeeks\cms\base\Component
     }
 
     /**
+     * TODO: is depricated (Не используется с версии 1.1.2) Использовать метод \skeeks\cms\widgets\Infoblock
+     *
      * @param $id
      * @param array $configInfoblock    Опции инфоблока
      * @return string
