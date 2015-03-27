@@ -314,8 +314,10 @@ body.empty .sx-panel
             cursor: pointer;
             background: #5dc3e7;
             color: white;
-            text-transform: uppercase;
+            /*text-transform: uppercase;*/
+            font-weight: bold;
             padding: 5px 0px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
         }
 
             .sx-sidebar .sidebar-menu .sx-head .icon
@@ -600,4 +602,10 @@ div#jGrowl
 .sidebar ul.nav.nav-sidebar li a:focus {
     background: transparent;
     color: black
+}
+
+.panel .panel-heading h2, .panel .panel-heading h3
+{
+    font-weight: bold;
+    text-transform: none;
 }
