@@ -3,6 +3,7 @@ Updates to the development of the project
 
 1.1.2
 -----------------
+  * skeeks\cms\base\Component - теперь умеет подгружать настройки из базы, для любого сайта и языка (Серьезное изменение!)
   * Оптимизация CollectionComponents
 
 1.1.1

@@ -27,7 +27,7 @@ use yii\web\UploadedFile;
  * Class CollectionComponents
  * @package skeeks\cms\components
  */
-class CurrentSite extends \skeeks\cms\base\Component
+class CurrentSite extends Component
 {
     /**
      * @var Site

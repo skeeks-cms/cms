@@ -278,34 +278,7 @@ class AdminModelEditorController extends AdminController
         return $this;
     }
 
-    /**
-     * @param Model $model
-     * @return $this
-     */
-    protected function _setLangAndSite(Model $model)
-    {
-        try
-        {
-            if ($site = \Yii::$app->cms->moduleAdmin()->getCurrentSite())
-            {
-                $model->setCurrentSite($site);
-            } else
-            {
-                $model->setCurrentSite(null);
-            }
 
-            if ($lang = \Yii::$app->cms->moduleAdmin()->getCurrentLang())
-            {
-                $model->setCurrentLang($lang);
-            } else
-            {
-                $model->setCurrentLang(null);
-            }
-        } catch (\Exception $e)
-        {}
-
-        return $this;
-    }
 
     /**
      * TODO: use $this->getModel();

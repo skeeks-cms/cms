@@ -33,18 +33,45 @@ use yii\web\View;
 class Cms extends \skeeks\cms\base\Component
 {
     /**
-     * @var string
+     * @var string E-Mail администратора сайта (отправитель по умолчанию).
      */
-    public $adminEmail          = 'admin@skeeks.com';
+    public $adminEmail                  = 'admin@skeeks.com';
 
     /**
-     * @var string
+     * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
+     */
+    public $notifyAdminEmails           = 'admin@skeeks.com';
+
+    /**
+     * @var string Это изображение показывается в тех случаях, когда не найдено основное.
      */
     public $noImageUrl          = 'http://vk.com/images/deactivated_100.gif';
 
 
     public $staticKeySold = '';
 
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function getDescriptorConfig()
+    {
+        return
+        [
+            'name'          => 'Основной модуль SkeekS CMS',
+        ];
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function configFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_form.php';
+    }
 
     public function init()
     {
@@ -67,7 +94,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails'], 'string'],
             [['adminEmail'], 'email'],
         ]);
     }
@@ -75,8 +102,9 @@ class Cms extends \skeeks\cms\base\Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'adminEmail'        => 'Основной Email Администратора сайта',
-            'mainTreeId'        => 'Родительский раздел',
+            'adminEmail'                => 'Основной Email Администратора сайта',
+            'notifyAdminEmails'         => 'Email адреса уведомлений',
+            'noImageUrl'                => 'Изображение заглушка',
         ]);
     }
 

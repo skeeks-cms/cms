@@ -31,7 +31,7 @@ use yii\web\View;
  * Class Cms
  * @package skeeks\cms\components
  */
-class Breadcrumbs extends \skeeks\cms\base\Component
+class Breadcrumbs extends Component
 {
     /**
      * @var array
