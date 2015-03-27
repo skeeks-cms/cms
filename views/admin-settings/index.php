@@ -21,7 +21,7 @@
     \skeeks\widget\chosen\Chosen::widget([
         'name' => 'component',
         'items' => $loadedForSelect,
-        'value' => \Yii::$app->request->get('component')
+        'value' => $component->className()
     ])
     ?>
 </form>

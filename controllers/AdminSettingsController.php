@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\controllers;
 use skeeks\cms\base\Component;
+use skeeks\cms\components\Cms;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -29,6 +30,7 @@ class AdminSettingsController extends AdminController
         $loadedComponents = [];
         $loadedForSelect = [];
         $component = '';
+        $componentSelect = Cms::className();
 
         foreach (\Yii::$app->getComponents(true) as $id => $data)
         {
@@ -48,10 +50,12 @@ class AdminSettingsController extends AdminController
             }
         }
 
-        if ($componentSelect = \Yii::$app->request->get("component"))
+        if (\Yii::$app->request->get("component"))
         {
-            $component = ArrayHelper::getValue($loadedComponents, $componentSelect);
+            $componentSelect = \Yii::$app->request->get("component");
         }
+
+        $component = ArrayHelper::getValue($loadedComponents, $componentSelect);
 
         if ($component && $component instanceof Component)
         {
