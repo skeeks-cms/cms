@@ -129,6 +129,22 @@ class CanBeLinkedToModel extends \skeeks\cms\base\behaviors\ActiveRecord
 
         return false;
     }
+
+    /**
+     * @return $this
+     */
+    public function deleteLink()
+    {
+        if ($this->isLinked())
+        {
+            $this->owner->linked_to_model = null;
+            $this->owner->linked_to_value = null;
+            $this->owner->save(false);
+        }
+
+        return $this;
+    }
+
     /**
      *
      * Найти модель к которой привязана текущая модель.

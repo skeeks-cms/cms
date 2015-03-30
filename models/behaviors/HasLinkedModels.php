@@ -29,7 +29,7 @@ class HasLinkedModels extends \skeeks\cms\base\behaviors\ActiveRecord
     const MODE_CASCADE      = "cascade";
     const MODE_SET_NULL     = "setnull";
 
-    public $mode                    = "restrict";
+    public $mode                    = "cascade";
     public $restrictMessageError    = "Невозможно удалить запись, для начала необходимо удалить все связанные.";
 
     public $canBeLinkedModels = [];
@@ -76,13 +76,12 @@ class HasLinkedModels extends \skeeks\cms\base\behaviors\ActiveRecord
 
                 if ($this->mode == static::MODE_SET_NULL)
                 {
-                    //TODO: реализовать
-                    throw new Exception("Реализовать");
-
                     foreach ($models as $model)
                     {
-
+                        $model->deleteLink();
                     }
+
+                    return $this;
                 }
 
                 foreach ($models as $model)
@@ -92,6 +91,8 @@ class HasLinkedModels extends \skeeks\cms\base\behaviors\ActiveRecord
                         throw new Exception("Не получилось удалить " . $className . " - " . $model->id);
                     }
                 }
+
+                return $this;
             }
         }
     }
