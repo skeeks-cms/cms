@@ -23,7 +23,8 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
     </div>
 
     <div class="skeeks-cms-toolbar-block">
-        <a href="<?= $urlUserEdit; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlUserEdit; ?>'); return false;" title="Это вы, перейти к редактированию свох данных"><img height="30" src="<?= \Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" style="margin-left: 5px;"/> <span class="label label-info"><?= \Yii::$app->cms->getAuthUser()->getDisplayName(); ?></span></a>
+        <a href="<?= $urlUserEdit; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlUserEdit; ?>'); return false;" title="Это вы, перейти к редактированию свох данных">
+            <img height="30" src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->cms->getAuthUser()->getAvatarSrc()); ?>" style="margin-left: 5px;"/> <span class="label label-info"><?= \Yii::$app->cms->getAuthUser()->getDisplayName(); ?></span></a>
     </div>
 
     <? if ($urlEditModel && $editModel) : ?>

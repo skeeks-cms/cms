@@ -96,9 +96,10 @@ abstract class CollectionComponents extends Component
      */
     public function getComponent($id)
     {
-        $componentsData = $this->components;
+        return ArrayHelper::getValue($this->getComponents(), $id);
+        /*$componentsData = $this->components;
         $data           = ArrayHelper::getValue($componentsData, $id);
-        return $this->_createByConfig($id, $data);
+        return $this->_createByConfig($id, $data);*/
     }
 
     /**

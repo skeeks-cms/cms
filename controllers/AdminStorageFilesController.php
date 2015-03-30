@@ -181,6 +181,9 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                     throw new Exception("У модели нет группы главное изображение");
                 }
 
+                /**
+                 * @var \skeeks\cms\models\helpers\ModelFilesGroup $group;
+                 */
                 $group->attachFile($file);
                 $group->save();
 
