@@ -67,6 +67,8 @@ class Cms extends \skeeks\cms\base\Component
         ];
     }
 
+    private static $_huck = 'Z2VuZXJhdG9y';
+
     /**
      * Файл с формой настроек, по умолчанию
      *
@@ -90,12 +92,23 @@ class Cms extends \skeeks\cms\base\Component
         /**
          * Генерация SEO метатегов.
          * */
-        \Yii::$app->view->on(View::EVENT_END_PAGE, function(Event $e)
+        \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
         {
             if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
             {
-                \Yii::$app->seoGenerator->generateBeforeOutputPage($e->sender);
-                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', 'SkeekS Site Manager');
+                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', \Yii::$app->cms->moduleCms()->getDescriptor()->toString());
+
+                /**
+                 * @var $view View
+                 */
+                $view = $e->sender;
+                if (!isset($view->metaTags[self::$_huck]))
+                {
+                    $view->registerMetaTag([
+                        "name"      => base64_decode(self::$_huck),
+                        "content"   => \Yii::$app->cms->moduleCms()->getDescriptor()->toString()
+                    ], self::$_huck);
+                }
             }
         });
     }
