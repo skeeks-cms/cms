@@ -200,3 +200,9 @@
     border: 1px solid red;
     outline: none;
 }
+
+#skeeks-cms-toolbar .sx-profile img
+{
+    height: 30px;
+    max-width: 30px;
+}
