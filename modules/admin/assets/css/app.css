@@ -609,3 +609,34 @@ div#jGrowl
     font-weight: bold;
     text-transform: none;
 }
+
+
+/**
+* new styles
+**/
+
+.sx-border
+{
+    border: 1px solid rgba(32, 168, 216, 0.23);
+}
+
+.sx-m-10
+{
+    margin: 10px;
+}
+
+.sx-mt-10
+{
+    margin-top: 10px;
+}
+.sx-mb-10
+{
+    margin-bottom: 10px;
+}
+
+.sx-p-10
+{
+    padding: 10px;
+}
+
+

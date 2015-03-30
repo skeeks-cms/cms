@@ -24,6 +24,8 @@ class RequestResponse extends Model
 
     public $success = false;
     public $message = 'Ошибка';
+    public $data    = [];
+
     public $redirect;
 
     public function init()
