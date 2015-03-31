@@ -10,15 +10,25 @@
 use Yii;
 ?>
 
+<? if (ENABLE_MODULES_CONF) : ?>
+    <? if (file_exists(AUTO_GENERATED_MODULES_FILE)) : ?>
+
+    <? endif; ?>
+<? endif; ?>
+
 <?php
+
 echo $this->render('table', [
     'caption' => 'Конфигурация приложения',
     'values' => [
-        'Skeeks CMS Version' => \Yii::$app->cms->moduleCms()->getDescriptor()->getVersion(),
+        \Yii::$app->cms->moduleCms()->getName() => \Yii::$app->cms->moduleCms()->getDescriptor()->getVersion(),
         'Yii Version' => $application['yii'],
         'Application Name' => $application['name'],
         'Environment' => $application['env'],
         'Debug Mode' => $application['debug'] ? 'Yes' : 'No',
+        'Режим автогенерации путей к модулям CMS' => ENABLE_MODULES_CONF ? 'Yes' : 'No',
+        'Автоматически сгенерированный файл с путями модулей cms' => AUTO_GENERATED_MODULES_FILE . " " . (file_exists(AUTO_GENERATED_MODULES_FILE) ? "Существует" : "Не сгенерирован"),
+        'Папка с файлом путей к модулям' => dirname(AUTO_GENERATED_MODULES_FILE) . " " . (is_readable(dirname(AUTO_GENERATED_MODULES_FILE)) ? "Доступна для записи" : "Не доступна для записи"),
     ],
 ]);
 ?>
