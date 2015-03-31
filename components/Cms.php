@@ -1,12 +1,9 @@
 <?php
 /**
- * Cms
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 24.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 27.03.2015
  */
 namespace skeeks\cms\components;
 
@@ -33,26 +30,106 @@ use yii\web\View;
  * Class Cms
  * @package skeeks\cms\components
  */
-class Cms extends \yii\base\Component
+class Cms extends \skeeks\cms\base\Component
 {
+    /**
+     * @var string E-Mail администратора сайта (отправитель по умолчанию).
+     */
+    public $adminEmail                  = 'admin@skeeks.com';
+
+    /**
+     * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
+     */
+    public $notifyAdminEmails           = 'admin@skeeks.com';
+
+    /**
+     * @var string
+     */
+    public $appName;
+
+    /**
+     * @var string Это изображение показывается в тех случаях, когда не найдено основное.
+     */
+    public $noImageUrl          = 'http://vk.com/images/deactivated_100.gif';
+
 
     public $staticKeySold = '';
+
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function getDescriptorConfig()
+    {
+        return
+        [
+            'name'          => 'Основной модуль CMS',
+        ];
+    }
+
+    private static $_huck = 'Z2VuZXJhdG9y';
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function configFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_form.php';
+    }
 
     public function init()
     {
         parent::init();
 
+        if (!$this->appName)
+        {
+            $this->appName = \Yii::$app->name;
+        }
+
         /**
          * Генерация SEO метатегов.
          * */
-        \Yii::$app->view->on(View::EVENT_END_PAGE, function(Event $e)
+        \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
         {
             if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
             {
-                \Yii::$app->seoGenerator->generateBeforeOutputPage($e->sender);
-                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', 'SkeekS Site Manager');
+                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', \Yii::$app->cms->moduleCms()->getDescriptor()->toString());
+
+                /**
+                 * @var $view View
+                 */
+                $view = $e->sender;
+                if (!isset($view->metaTags[self::$_huck]))
+                {
+                    $view->registerMetaTag([
+                        "name"      => base64_decode(self::$_huck),
+                        "content"   => \Yii::$app->cms->moduleCms()->getDescriptor()->toString()
+                    ], self::$_huck);
+                }
             }
         });
+    }
+
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName'], 'string'],
+            [['adminEmail'], 'email'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'adminEmail'                => 'Основной Email Администратора сайта',
+            'notifyAdminEmails'         => 'Email адреса уведомлений',
+            'noImageUrl'                => 'Изображение заглушка',
+            'appName'                   => 'Название проекта',
+        ]);
     }
 
     /**
@@ -201,26 +278,6 @@ class Cms extends \yii\base\Component
         return \Yii::$app->getModule("cms");
     }
 
-
-
-    /**
-     * @var IdentityMap
-     */
-    protected $_entityMap = null;
-    /**
-     * @return IdentityMap
-     */
-    public function getEntityMap()
-    {
-        if (null === $this->_entityMap)
-        {
-            $this->_entityMap = new IdentityMap();
-        }
-
-        return $this->_entityMap;
-    }
-
-
     /**
      *
      * TODO: is depricated (Не используется с версии 1.0.6) Реализуется через статический инфоблок.
@@ -254,6 +311,8 @@ class Cms extends \yii\base\Component
     }
 
     /**
+     * TODO: is depricated (Не используется с версии 1.1.2) Использовать метод \skeeks\cms\widgets\Infoblock
+     *
      * @param $id
      * @param array $configInfoblock    Опции инфоблока
      * @return string

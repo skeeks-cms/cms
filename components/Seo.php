@@ -1,23 +1,36 @@
 <?php
 /**
- * SeoGenerator
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 19.12.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 30.03.2015
  */
-
 namespace skeeks\cms\components;
-
 use skeeks\cms\base\Component;
 
+use skeeks\cms\base\components\Descriptor;
+use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\base\Module;
+use skeeks\cms\models\Site;
+use skeeks\cms\models\StorageFile;
+use skeeks\cms\models\Tree;
+use skeeks\cms\models\TreeType;
+use skeeks\cms\models\User;
+use skeeks\cms\widgets\Infoblock;
+use skeeks\cms\widgets\StaticBlock;
+use skeeks\sx\File;
+use skeeks\sx\models\IdentityMap;
+use Yii;
+use yii\base\Event;
+use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
+use yii\web\View;
+
 /**
- * Class SeoGenerator
+ * Class Seo
  * @package skeeks\cms\components
  */
-class SeoGenerator extends Component
+class Seo extends Component
 {
     /**
      *
@@ -38,6 +51,11 @@ class SeoGenerator extends Component
     public $keywordsStopWords = [];
 
     /**
+     * @var bool
+     */
+    public $enableKeywordsGenerator = true;
+
+    /**
      * @var array
      */
     public $keywordsPriority =
@@ -52,8 +70,65 @@ class SeoGenerator extends Component
         //"strong"    =>  2,
     ];
 
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function getDescriptorConfig()
+    {
+        return
+        [
+            'name'          => 'Seo компонент',
+        ];
+    }
 
-    private static $_huck = 'Z2VuZXJhdG9y';
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['enableKeywordsGenerator', 'minKeywordLenth', 'maxKeywordsLength'], 'integer'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'enableKeywordsGenerator'                => 'Автоматическая генерация ключевых слов',
+            'minKeywordLenth'                        => 'Минимальная длина ключевого слова',
+            'maxKeywordsLength'                      => 'Длинна ключевых слов',
+        ]);
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function configFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'seo/_form.php';
+    }
+
+
+
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->enableKeywordsGenerator)
+        {
+            return $this;
+        }
+
+        /**
+         * Генерация SEO метатегов.
+         * */
+        \Yii::$app->view->on(View::EVENT_END_PAGE, function (Event $e) {
+            if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
+                $this->generateBeforeOutputPage($e->sender);
+            }
+        });
+    }
 
 
     public function generateBeforeOutputPage(\yii\web\View $view)
@@ -68,18 +143,7 @@ class SeoGenerator extends Component
             ], 'keywords');
         }
 
-        if (!isset($view->metaTags[self::$_huck]))
-        {
-            $view->registerMetaTag([
-                "name"      => base64_decode(self::$_huck),
-                "content"   => \Yii::$app->cms->moduleCms()->getDescriptor()->toString()
-            ], self::$_huck);
-        }
-
-        $content = str_replace('</title>', "</title>" . PHP_EOL . "<!-- " . \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright() . " -->", $content);
-
         \Yii::$app->response->content = $content;
-
     }
 
     /**

@@ -127,9 +127,9 @@ class AuthController extends AdminController
                 \Yii::$app->mailer->setViewPath(\Yii::$app->cms->moduleCms()->basePath . '/mail');
 
                 \Yii::$app->mailer->compose('newPassword', ['user' => $user, 'password' => $password])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
-                    ->setSubject('Новый пароль для ' . \Yii::$app->name)
+                    ->setSubject('Новый пароль для ' . \Yii::$app->cms->appName)
                     ->send();
 
                 $message = 'Новый пароль отправлен на ваш e-mail';

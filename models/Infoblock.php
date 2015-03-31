@@ -220,6 +220,27 @@ class Infoblock extends Core
         return static::find()->where(['code' => (string) $code])->one();
     }
 
+
+    static public function getByCode($code)
+    {
+        return static::find()->where(['code' => (string) $code])->one();
+
+        /*$dependency = new \yii\caching\DbDependency(['sql' => 'SELECT MAX(updated_at) FROM ' . static::tableName()]);
+
+        $cache = Infoblock::getDb()->cache(function ($db) {
+            return Infoblock::find()->where(['code' => (string) $code])->one();
+        }, 100);*/
+
+
+
+    }
+
+    static public function getById($id)
+    {
+
+        return static::find()->where(['id' => (int) $id])->one();
+    }
+
     /**
      * @return bool
      */

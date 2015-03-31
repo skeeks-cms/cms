@@ -195,8 +195,17 @@ CSS
             ],*/
 
             //'name_to_save',
-            'mime_type',
-            'extension',
+
+            [
+                'attribute' => 'mime_type',
+                'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->all(), 'mime_type', 'mime_type'),
+            ],
+
+            [
+                'attribute' => 'extension',
+                'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->all(), 'extension', 'extension'),
+            ],
+
 
             [
                 'class' => \skeeks\cms\grid\FileSizeColumnData::className(),

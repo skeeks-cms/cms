@@ -26,6 +26,7 @@ use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
 use yii\base\InlineAction;
+use yii\base\Model;
 use yii\behaviors\BlameableBehavior;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
@@ -80,6 +81,28 @@ abstract class AdminController extends Controller
         $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
         $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
     }
+
+
+    /*public function output($output)
+    {
+        return parent::render('@skeeks/cms/modules/admin/views/base-actions/_base-admin-actions', [
+            'content' => $output,
+        ]);
+    }
+
+    /**
+     * @param string $view
+     * @param array $params
+     * @return string
+     *
+    public function render($view, $params = [])
+    {
+        return parent::render('@skeeks/cms/modules/admin/views/base-actions/_base-admin-actions', [
+            'viewF' => $view,
+            'paramsFile' => $params,
+            'contextFile' => $this,
+        ]);
+    }*/
 
 
     /**
@@ -225,5 +248,36 @@ abstract class AdminController extends Controller
     public function redirectRefresh()
     {
         return $this->redirect(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString());
+    }
+
+
+
+    /**
+     * @param Model $model
+     * @return $this
+     */
+    protected function _setLangAndSite(Model $model)
+    {
+        try
+        {
+            if ($site = \Yii::$app->cms->moduleAdmin()->getCurrentSite())
+            {
+                $model->setCurrentSite($site);
+            } else
+            {
+                $model->setCurrentSite(null);
+            }
+
+            if ($lang = \Yii::$app->cms->moduleAdmin()->getCurrentLang())
+            {
+                $model->setCurrentLang($lang);
+            } else
+            {
+                $model->setCurrentLang(null);
+            }
+        } catch (\Exception $e)
+        {}
+
+        return $this;
     }
 }

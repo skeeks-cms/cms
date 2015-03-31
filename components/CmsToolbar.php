@@ -11,6 +11,7 @@ use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -40,7 +41,32 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     const EDIT_MODE     = 'edit';
     const NO_EDIT_MODE  = 'no-edit';
 
-    public $mode = self::NO_EDIT_MODE;
+    public $mode        = self::NO_EDIT_MODE;
+    public $enabled     = 1;
+
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function getDescriptorConfig()
+    {
+        return
+        [
+            'name'          => 'Панель инструментов публичного раздела',
+        ];
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function configFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cmsToolbar/_form.php';
+    }
+
 
 
     public function init()
@@ -53,6 +79,25 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         }
 
     }
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['mode'], 'string'],
+            [['enabled'], 'integer'],
+        ]);
+    }
+
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'enabled'             => 'Активность панели управления',
+            'mode'                => 'Режим редактирования',
+        ]);
+    }
+
+
+
     public function enableEditMode()
     {
         \Yii::$app->getSession()->set('skeeks-cms-toolbar-mode', self::EDIT_MODE);
@@ -96,10 +141,13 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
      */
     public function bootstrap($app)
     {
-        // delay attaching event handler to the view component after it is fully configured
-        $app->on(Application::EVENT_BEFORE_REQUEST, function () use ($app) {
-            $app->getView()->on(View::EVENT_END_BODY, [$this, 'renderToolbar']);
-        });
+        if ($this->enabled)
+        {
+            // delay attaching event handler to the view component after it is fully configured
+            $app->on(Application::EVENT_BEFORE_REQUEST, function () use ($app) {
+                $app->getView()->on(View::EVENT_END_BODY, [$this, 'renderToolbar']);
+            });
+        }
     }
 
     /**

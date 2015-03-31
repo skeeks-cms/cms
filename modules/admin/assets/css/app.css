@@ -314,8 +314,10 @@ body.empty .sx-panel
             cursor: pointer;
             background: #5dc3e7;
             color: white;
-            text-transform: uppercase;
+            /*text-transform: uppercase;*/
+            font-weight: bold;
             padding: 5px 0px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
         }
 
             .sx-sidebar .sidebar-menu .sx-head .icon
@@ -601,3 +603,40 @@ div#jGrowl
     background: transparent;
     color: black
 }
+
+.panel .panel-heading h2, .panel .panel-heading h3
+{
+    font-weight: bold;
+    text-transform: none;
+}
+
+
+/**
+* new styles
+**/
+
+.sx-border
+{
+    border: 1px solid rgba(32, 168, 216, 0.23);
+}
+
+.sx-m-10
+{
+    margin: 10px;
+}
+
+.sx-mt-10
+{
+    margin-top: 10px;
+}
+.sx-mb-10
+{
+    margin-bottom: 10px;
+}
+
+.sx-p-10
+{
+    padding: 10px;
+}
+
+

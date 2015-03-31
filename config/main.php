@@ -15,8 +15,8 @@ $config =
     'id'            => 'skeeks-cms-app',
     "name"          => "SkeekS CMS",
     'vendorPath'    => VENDOR_DIR,
-    'language' => 'ru',
-    'bootstrap' => ['cms', 'log', 'cmsToolbar'],
+    'language'      => 'ru',
+    'bootstrap'     => ['cms', 'log', 'cmsToolbar', 'seo'],
 
     'components' => [
 
@@ -129,9 +129,9 @@ $config =
             ]*/
         ],
 
-        'seoGenerator' =>
+        'seo' =>
         [
-            'class' => '\skeeks\cms\components\SeoGenerator'
+            'class' => '\skeeks\cms\components\Seo'
         ],
 
         //Глобальные опции страниц

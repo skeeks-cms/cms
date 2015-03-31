@@ -45,7 +45,7 @@ class Module extends base\Module implements BootstrapInterface
         return array_merge(parent::_descriptor(), [
             "version"               => "1.1.2-dev",
 
-            "name"          => "SkeekS cms",
+            "name"          => "SkeekS CMS",
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
         ]);
     }

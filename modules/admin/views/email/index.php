@@ -27,7 +27,7 @@ use \Yii;
 
         <?= $form->field($model, 'from')->textInput([
             'placeholder' => 'email',
-            'value' => \Yii::$app->params['adminEmail']
+            'value' => \Yii::$app->cms->adminEmail
         ]); ?>
 
         <?= $form->field($model, 'subject')->textInput([

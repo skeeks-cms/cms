@@ -30,6 +30,8 @@ class ImageColumn extends ImageColumnData
             $originalSrc = $src;
         }
 
-        return "<a href='" . $originalSrc . "' class='sx-fancybox'><img src='" . $src . "' style='width: " . $this->maxWidth . "px;' /></a>";
+        return "<a href='" . $originalSrc . "' class='sx-fancybox' title='Увеличить'>
+                    <img src='" . $src . "' style='width: " . $this->maxWidth . "px;' />
+                </a>";
     }
 }

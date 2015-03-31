@@ -11,7 +11,7 @@ if (!$resetLink)
 ?>
 
 <?= Html::beginTag('h1'); ?>
-    Напоминание пароля на <?= \Yii::$app->name ?>
+    Напоминание пароля на <?= \Yii::$app->cms->appName ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>

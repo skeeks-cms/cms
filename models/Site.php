@@ -89,8 +89,8 @@ class Site extends Core
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
+        $scenarios['create'] = ['host_name', 'description', 'name'];
+        $scenarios['update'] = ['host_name', 'description', 'name'];
 
         return $scenarios;
     }

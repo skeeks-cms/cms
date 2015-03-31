@@ -60,9 +60,9 @@ class EmailConsoleForm extends Model
             $message = \Yii::$app->mailer->compose('@skeeks/cms/mail/text', [
                 'content'      => $this->content,
             ])
-            ->setFrom([$this->from => \Yii::$app->name])
+            ->setFrom([$this->from => \Yii::$app->cms->appName])
             ->setTo($this->to)
-            ->setSubject($this->subject . ' ' . \Yii::$app->name);
+            ->setSubject($this->subject . ' ' . \Yii::$app->cms->appName);
 
             return $message->send();
         } else

@@ -110,11 +110,13 @@ class ClearController extends AdminController
                     if ($dir->isExist())
                     {
                         $dir->clear();
-                        \Yii::$app->getSession()->setFlash('success', 'Кэш успешно очищен');
+
                     }
                 }
             }
 
+            \Yii::$app->getSession()->setFlash('success', 'Кэш успешно очищен');
+            \Yii::$app->cache->flush();
             \Yii::$app->cms->generateModulesConfigFile();
         }
 

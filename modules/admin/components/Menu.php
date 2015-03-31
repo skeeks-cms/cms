@@ -10,7 +10,7 @@
  */
 namespace skeeks\cms\modules\admin\components;
 use skeeks\cms\App;
-use skeeks\cms\base\Component;
+use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
 /**

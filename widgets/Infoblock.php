@@ -126,10 +126,10 @@ class Infoblock extends Widget
             //Поиск конфига в базе данных
             if (is_string($this->id))
             {
-                $modelInfoblock = \skeeks\cms\models\Infoblock::fetchByCode($this->id);
+                $modelInfoblock = \skeeks\cms\models\Infoblock::getByCode($this->id);
             } else if (is_int($this->id))
             {
-                $modelInfoblock = \skeeks\cms\models\Infoblock::fetchById($this->id);
+                $modelInfoblock = \skeeks\cms\models\Infoblock::getById($this->id);
             }
 
             //В базе на эту тему ничего не найдено

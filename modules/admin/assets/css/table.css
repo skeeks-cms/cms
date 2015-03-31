@@ -30,3 +30,15 @@ table.table
         color: #ffffff;
         text-shadow: 1px 1px 5px rgba(0, 0, 0, 1);
     }
+
+        table.table a.sx-fancybox img
+        {
+            border: 2px solid silver;
+        }
+
+        table.table a.sx-fancybox img:hover
+        {
+            border: 2px solid #5dc3e7;
+            box-shadow: 1px 1px 14px rgba(32, 168, 216, 0.69);
+        }
+
