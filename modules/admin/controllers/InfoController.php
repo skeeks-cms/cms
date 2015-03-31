@@ -14,6 +14,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\sx\Dir;
+use skeeks\sx\File;
 use yii\data\ArrayDataProvider;
 use yii\filters\VerbFilter;
 use yii\grid\GridView;
@@ -84,7 +85,6 @@ class InfoController extends AdminController
                 'gd' => extension_loaded('gd'),
             ],
             'extensions' => $this->getExtensions(),
-
         ]);
     }
 

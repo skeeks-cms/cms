@@ -18,11 +18,6 @@ use skeeks\cms\base\components\Descriptor;
 abstract class Module extends \yii\base\Module
 {
     /**
-     * @var string название модуля
-     */
-    public $name = "";
-
-    /**
      * @return array
      */
     protected function _descriptor()
@@ -98,7 +93,17 @@ abstract class Module extends \yii\base\Module
      */
     public function getName()
     {
-        return $this->name ? $this->name : $this->getDescriptor()->name;
+        return $this->getDescriptor()->name;
+    }
+
+    /**
+     * Версия
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return (string) $this->getDescriptor()->getVersion();
     }
 
 

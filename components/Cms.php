@@ -89,6 +89,13 @@ class Cms extends \skeeks\cms\base\Component
             $this->appName = \Yii::$app->name;
         }
 
+        //TODO: доработать
+        if (!file_exists(AUTO_GENERATED_MODULES_FILE))
+        {
+            $this->generateModulesConfigFile();
+        }
+
+
         /**
          * Генерация SEO метатегов.
          * */
@@ -208,7 +215,7 @@ class Cms extends \skeeks\cms\base\Component
      * При этом происходит загрузка всех зарегистрированных модулей приложения, это не очень оптимально.
      * Используется для админки, только если срабатывает роут админки, в сайтовой части данной неоптимальности нет.
      *
-     * @return array
+     * @return Module[]
      */
     static public function getModules()
     {
@@ -416,9 +423,10 @@ class Cms extends \skeeks\cms\base\Component
 
         return $config;
     }
+
     /**
      * Пройтись по всем расширениям уставноленным в проект, и сгенерировать конфиг файл.
-     * @return $this
+     * @return bool
      */
     public function generateModulesConfigFile()
     {
@@ -465,7 +473,8 @@ $fileContent .= '];';
             $file->write($fileContent);
         }
 
-        return $this;
+        $file = new File(AUTO_GENERATED_MODULES_FILE);
+        return $file->isExist();
 
     }
 }
