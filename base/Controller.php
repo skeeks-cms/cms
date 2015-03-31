@@ -13,6 +13,7 @@ namespace skeeks\cms\base;
 use skeeks\cms\App;
 use yii\base\Exception;
 use yii\base\InvalidParamException;
+use yii\web\Application;
 use yii\web\Controller as YiiWebController;
 
 /**
@@ -58,8 +59,14 @@ class Controller extends YiiWebController
 
         try
         {
-            $view = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
-            return parent::render($view, $params);
+            if (!$this->module instanceof Application)
+            {
+                $view = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
+                return parent::render($view, $params);
+            } else
+            {
+                return parent::render($view, $params);
+            }
         } catch (InvalidParamException $e)
         {
             try
