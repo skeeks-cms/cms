@@ -16,15 +16,15 @@ use Yii;
     <table class="table table-condensed table-bordered table-striped table-hover" style="table-layout: fixed;">
         <thead>
             <tr>
-                <th style="width: 200px;">Название</th>
+                <th>Название</th>
                 <th>Значение</th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($values as $name => $value): ?>
             <tr>
-                <th style="width: 200px;"><?= Html::encode($name) ?></th>
-                <td style="overflow:auto"><?= Html::encode($value) ?></td>
+                <th><?= Html::encode($name) ?></th>
+                <td style="overflow:auto"><?= $value ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

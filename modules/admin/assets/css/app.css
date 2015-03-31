@@ -60,7 +60,8 @@ footer.sx-admin-footer
     width: 100%;
     background: white;
     border-top: 1px solid #d1d4d7;
-    color: #d1d4d7;
+    /*color: #d1d4d7;*/
+    color: #474747;
     height: 40px;
 
     padding: 0 20px 0px 20px;
@@ -71,7 +72,10 @@ footer.sx-admin-footer
     font-size: 10px;
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.17), 1px -5px 9px rgba(0, 0, 0, 0.17);
 }
-
+footer.sx-admin-footer a
+{
+    color: #474747;
+}
 
 body.sidebar-hidden footer.sx-admin-footer
 {
