@@ -64,6 +64,7 @@ class InfoController extends AdminController
     }
     public function actionIndex()
     {
+
         return $this->render('index', [
 
             'phpVersion' => PHP_VERSION,
@@ -84,7 +85,6 @@ class InfoController extends AdminController
                 'gd' => extension_loaded('gd'),
             ],
             'extensions' => $this->getExtensions(),
-
         ]);
     }
 

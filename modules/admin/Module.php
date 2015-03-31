@@ -41,7 +41,7 @@ class Module extends CmsModule
     protected function _descriptor()
     {
         return array_merge(parent::_descriptor(), [
-            "name"          => "Админка cms",
+            "name"          => \Yii::$app->cms->moduleCms()->getName() . " — система администрирования ",
             "description"   => "Модуль входит в состав модуля cms, содержит все необходимые элементы для админки",
         ]);
     }
@@ -59,6 +59,16 @@ class Module extends CmsModule
                 $this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
             }
         }
+    }
+
+    /**
+     * Версия
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return (string) \Yii::$app->cms->moduleCms()->getVersion();
     }
 
 

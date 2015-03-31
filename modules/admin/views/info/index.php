@@ -21,6 +21,29 @@ echo $this->render('table', [
         'Debug Mode' => $application['debug'] ? 'Yes' : 'No',
     ],
 ]);
+?>
+<h3>Установленные модули</h3>
+<?
+echo \skeeks\cms\modules\admin\widgets\GridView::widget([
+    'dataProvider' => new \yii\data\ArrayDataProvider([
+        'allModels' => \Yii::$app->cms->getModules(),
+    ]),
+    'layout'    => "{items}",
+    'columns' => [
+
+        //['class' => 'yii\grid\SerialColumn'],
+
+        [
+            'attribute' => 'name',
+            'label'     => 'Название модуля'
+        ],
+
+        [
+            'attribute' => 'version',
+            'label'     => 'Версия модуля'
+        ],
+    ]
+]);
 
 if (!empty($extensions)) {
     echo $this->render('table', [
