@@ -6,6 +6,7 @@
  * @date 30.03.2015
  */
 namespace skeeks\cms\helpers;
+use skeeks\cms\components\imaging\Filter;
 
 /**
  * Class Request
@@ -13,6 +14,13 @@ namespace skeeks\cms\helpers;
  */
 class Image
 {
+    /**
+     * @return string
+     */
+    static public function getCapSrc()
+    {
+        return (string) \Yii::$app->cms->noImageUrl;
+    }
     /**
      *
      * Путь до картинки, если же нет пути, то путь к заглушке.
@@ -30,9 +38,28 @@ class Image
 
         if (!$capSrc)
         {
-            $capSrc = \Yii::$app->cms->noImageUrl;
+            $capSrc = static::getCapSrc();
         }
 
         return (string) $capSrc;
+    }
+
+    /**
+     * @param string $originalSrc
+     * @param Filter $filter
+     * @param string $nameForSave
+     * @param null $capSrc
+     * @return string
+     */
+    static public function thumbnailUrlOnRequest($originalSrc = '', Filter $filter, $nameForSave = '', $capSrc = null)
+    {
+        if ($originalSrc)
+        {
+            return \Yii::$app->imaging->thumbnailUrlOnRequest($originalSrc, $filter, $nameForSave = '');
+
+        } else
+        {
+            return static::getCapSrc();
+        }
     }
 }

@@ -38,15 +38,9 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <? if (!$sidebarHidden): ?>
 
     <ul class="nav navbar-nav navbar-actions navbar-left">
-
-
-        <li class="visible-md visible-lg">
+        <li class="visible-md visible-lg visible-sm visible-xs">
             <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]); ?>" data-sx-widget="tooltip-b" data-original-title="На главную страницу админки"><i class="glyphicon glyphicon-home"></i></a>
         </li>
-        <!--<li class="visible-md visible-lg"><a href="#" id="main-menu-toggle" class="main-menu-toggle" data-sx-widget="tooltip-b" data-original-title="Открыть/закрыть левое меню"><i class="fa fa-bars"></i></a></li>
-        --><li class="visible-xs visible-sm"><a href="#" id="sidebar-menu"><i class="fa fa-bars"></i></a></li>
-
-
     </ul>
 
     <? endif; ?>
@@ -61,13 +55,13 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         </li>
     </ul>-->
 
-    <ul class="nav navbar-nav navbar-right visible-md visible-lg">
+    <ul class="nav navbar-nav navbar-right visible-md visible-lg visible-sm visible-xs sx-top-nav-menu">
         <!--<li><span class="timer"><i class="icon-clock"></i> <span id="clock"></span></span></li>-->
         <li class="dropdown visible-md visible-lg"></li>
         <? if (!Yii::$app->user->isGuest): ?>
 
             <? if ($sites = \skeeks\cms\models\Site::getAll()) : ?>
-                <li>
+                <li class="sx-left-border dropdown visible-md visible-lg">
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         <?= \Yii::$app->cms->moduleAdmin()->getCurrentSite() ? \Yii::$app->cms->moduleAdmin()->getCurrentSite()->host_name : 'Сайт'?> <span class="caret"></span>
@@ -95,7 +89,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
             <? endif; ?>
 
             <? if ($langs = \Yii::$app->langs->getComponents()) : ?>
-                <li>
+                <li class="sx-left-border dropdown visible-md visible-lg">
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         <?= \Yii::$app->cms->moduleAdmin()->getCurrentLang() ? \Yii::$app->cms->moduleAdmin()->getCurrentLang()->name . ' (' . \Yii::$app->cms->moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'?> <span class="caret"></span>
@@ -120,11 +114,15 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 
 
-        <li class="dropdown visible-md visible-lg">
-            <a href="/" style="width: auto;" target="_blank" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть (новая вкладка)"><i class="glyphicon glyphicon-globe"></i></a>
+        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+            <a href="/" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
         </li>
 
-        <li class="dropdown">
+        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+            <a href="<?= UrlHelper::construct('cms/admin-settings')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Настройки проекта"><i class="glyphicon glyphicon-cog"></i></a>
+        </li>
+
+        <li class="dropdown sx-left-border">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="Ваш профиль">
                 <? if (Yii::$app->cms->getAuthUser()->hasMainImage()) : ?>
                     <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>

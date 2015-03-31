@@ -22,6 +22,10 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
         <a href="<?= UrlHelper::construct('')->enableAdmin()->toString(); ?>" title="Перейти в панель администрирования"><span class="label label-info">Администрирование</span></a>
     </div>
 
+    <div class="skeeks-cms-toolbar-block">
+        <a onclick="new sx.classes.toolbar.Dialog('<?= $urlSettings; ?>'); return false;" href="<?= $urlSettings; ?>" title="Управление настройками проекта"><span class="label label-info">Настройки проекта</span></a>
+    </div>
+
     <div class="skeeks-cms-toolbar-block sx-profile">
         <a href="<?= $urlUserEdit; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlUserEdit; ?>'); return false;" title="Это вы, перейти к редактированию свох данных">
             <img height="30" src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->cms->getAuthUser()->getAvatarSrc()); ?>" style="margin-left: 5px;"/> <span class="label label-info"><?= \Yii::$app->cms->getAuthUser()->getDisplayName(); ?></span></a>
@@ -30,7 +34,7 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
     <? if ($urlEditModel && $editModel) : ?>
     <div class="skeeks-cms-toolbar-block">
         <a href="<?= $urlEditModel; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlEditModel; ?>'); return false;" title="Редактировать">
-             <span class="label">Редактировать</span>
+             <span class="label">Редактировать страницу</span>
         </a>
     </div>
     <? endif; ?>

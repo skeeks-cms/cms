@@ -640,3 +640,16 @@ div#jGrowl
 }
 
 
+
+
+/**
+* sx-top-nav-menu
+**/
+.navbar .navbar-nav.navbar-right:last-child
+{
+    border: none;
+}
+    .navbar .sx-left-border
+    {
+        border-left: 1px solid #d1d4d7;
+    }
