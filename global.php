@@ -52,5 +52,10 @@ defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", 
 
 //Включить в конфиги, мерж конфигов всех модулей
 defined('ENABLE_MODULES_CONF') or define('ENABLE_MODULES_CONF', true);
+/**
+ * Глобальный файл где задается настройка окружения.
+ * Если файла не будет создано, то окружение будет считано функцией getenv() или по другому прниципу
+ */
+defined('APP_ENV_GLOBAL_FILE') or define('APP_ENV_GLOBAL_FILE', ROOT_DIR . '/global.php');
 //Определение всех неопределенных необходимых констант
 require(SKEEKS_DIR . '/config/global.php');
