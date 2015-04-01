@@ -89,6 +89,69 @@ class InfoController extends AdminController
     }
 
     /**
+     * Перегенерация файла модулей.
+     * @return \yii\web\Response
+     */
+    public function actionUpdateModulesFile()
+    {
+        if (\Yii::$app->cms->generateModulesConfigFile())
+        {
+            \Yii::$app->session->setFlash('success', 'Файл автоматических путей к модулям успешно обновлен');
+        } else
+        {
+            \Yii::$app->session->setFlash('error', 'Файл автоматических путей к модулям не обновлен');
+        }
+
+        return $this->redirect(\Yii::$app->request->getReferrer());
+    }
+
+    /**
+     * Перегенерация файла модулей.
+     * @return \yii\web\Response
+     */
+    public function actionWriteEnvGlobalFile()
+    {
+        $env = (string) \Yii::$app->request->get('env');
+        if (!$env)
+        {
+            \Yii::$app->session->setFlash('error', 'Не указано окружение для записи');
+            return $this->redirect(\Yii::$app->request->getReferrer());
+        }
+
+        $content =<<<PHP
+<?php
+defined('YII_ENV') or define('YII_ENV', '{$env}');
+PHP;
+
+        $file = new File(APP_ENV_GLOBAL_FILE);
+        if ($file->write($content))
+        {
+            \Yii::$app->session->setFlash('success', 'Файл успешно создан и записан');
+        } else
+        {
+            \Yii::$app->session->setFlash('error', 'Не удалось записать файл');
+        }
+
+        return $this->redirect(\Yii::$app->request->getReferrer());
+    }
+
+    public function actionRemoveEnvGlobalFile()
+    {
+        $file = new File(APP_ENV_GLOBAL_FILE);
+        if ($file->remove())
+        {
+            \Yii::$app->session->setFlash('success', 'Файл успешно удален');
+        } else
+        {
+            \Yii::$app->session->setFlash('error', 'Не удалось удалить файл');
+        }
+
+        return $this->redirect(\Yii::$app->request->getReferrer());
+    }
+
+
+
+    /**
      * Returns data about extensions
      *
      * @return array

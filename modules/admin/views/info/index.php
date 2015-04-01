@@ -10,6 +10,23 @@
 
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use Yii;
+
+$autoModulesFile = (file_exists(AUTO_GENERATED_MODULES_FILE) ? "Да" : "Нет") . " <a class='btn btn-xs btn-default' title='" . AUTO_GENERATED_MODULES_FILE . "'>i</a>
+<a class='btn btn-xs btn-primary' title='" . AUTO_GENERATED_MODULES_FILE . "' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/update-modules-file')->enableAdmin()->toString() . "'>Обновить</a>
+";
+
+$autoEnvFile = '';
+if (file_exists(APP_ENV_GLOBAL_FILE))
+{
+    $autoEnvFile = 'Да ';
+    $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/remove-env-global-file')->enableAdmin()->toString() . "'>Удалить</a>  ";
+} else
+{
+    $autoEnvFile = 'Нет ';
+}
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'dev'])->enableAdmin()->toString() . "'>Записать dev</a>  ";
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'prod'])->enableAdmin()->toString() . "'>Записать prod</a>";
+
 ?>
 <? $form = ActiveForm::begin(); ?>
 
@@ -20,11 +37,15 @@ use Yii;
             \Yii::$app->cms->moduleCms()->getName() => \Yii::$app->cms->moduleCms()->getDescriptor()->getVersion(),
             'Yii Version' => $application['yii'],
             'Название проекта' => $application['name'] . " (<a href='" . \skeeks\cms\helpers\UrlHelper::construct('cms/admin-settings')->enableAdmin()->toString() . "'>изменить</a>)",
-            'Окружение (env)' => $application['env'],
-            'Режим разработки (debug)' => $application['debug'] ? 'Да' : 'Нет',
-            'Режим автогенерации путей к модулям CMS' => ENABLE_MODULES_CONF ? 'Да' : 'Нет',
-            'Автоматически сгенерированный файл с путями модулей cms' => (file_exists(AUTO_GENERATED_MODULES_FILE) ? "Да" : "Нет") . " <a title='" . AUTO_GENERATED_MODULES_FILE . "'>i</a",
-            'Папка с файлом путей к модулям' => (is_readable(dirname(AUTO_GENERATED_MODULES_FILE)) ? "Да" : "Не доступна для записи") . " <a title='" . dirname(AUTO_GENERATED_MODULES_FILE) . "'>i</a",
+            'Окружение (YII_ENV)' => $application['env'],
+            'Режим разработки (YII_DEBUG)' => $application['debug'] ? 'Да' : 'Нет',
+            'Режим автогенерации путей к модулям CMS (ENABLE_MODULES_CONF)' => ENABLE_MODULES_CONF ? 'Да' : 'Нет',
+            'Автоматически сгенерированный файл с путями модулей cms (AUTO_GENERATED_MODULES_FILE)' => $autoModulesFile,
+            'Папка с файлом путей к модулям' => (is_readable(dirname(AUTO_GENERATED_MODULES_FILE)) ? "Да" : "Не доступна для записи") . " <a class='btn btn-xs btn-default' title='" . dirname(AUTO_GENERATED_MODULES_FILE) . "'>i</a>",
+            'Проверяются переменные окружения (GETENV_POSSIBLE_NAMES)' => GETENV_POSSIBLE_NAMES,
+            'Проверяются переменные окружения (APP_ENV_GLOBAL_FILE)' => $autoEnvFile . " <a class='btn btn-xs btn-default' title='" . APP_ENV_GLOBAL_FILE . "'>i</a>"
+
+            ,
         ],
     ]);
     ?>

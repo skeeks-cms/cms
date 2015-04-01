@@ -14,7 +14,7 @@
  */
 
 //Проверка файла который создается скриптом в момент установки проекта, если он создан, то прочитаются его настройки.
-$globalFileInited = ROOT_DIR . '/global.php';
+$globalFileInited = APP_ENV_GLOBAL_FILE;
 if (file_exists($globalFileInited))
 {
     require $globalFileInited;
