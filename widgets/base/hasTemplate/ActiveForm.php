@@ -30,16 +30,23 @@ class ActiveForm extends ActiveFormUseTab
 
         echo $this->field($model, 'viewFile')->textInput()->hint('Вы можете указать путь к файлу шаблона принудительно');
 
-        echo $this->field($model, 'template')->label('Шаблон')->widget(
-            \skeeks\widget\chosen\Chosen::className(),
-            [
-                'items' => \yii\helpers\ArrayHelper::map(
-                     $model->getDescriptor()->getTemplatesObject()->getComponents(),
-                     "id",
-                     "name"
-                 ),
-            ]
-        );
+        if ($model->getDescriptor())
+        {
+            if ($model->getDescriptor()->getTemplatesObject())
+            {
+                echo $this->field($model, 'template')->label('Шаблон')->widget(
+                    \skeeks\widget\chosen\Chosen::className(),
+                    [
+                        'items' => \yii\helpers\ArrayHelper::map(
+                             $model->getDescriptor()->getTemplatesObject()->getComponents(),
+                             "id",
+                             "name"
+                         ),
+                    ]
+                );
+            }
+        }
+
 
         $options = Json::encode([
             'id-viewFile' => Html::getInputId($model, 'viewFile'),

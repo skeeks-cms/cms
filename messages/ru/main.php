@@ -29,5 +29,6 @@ return
     "Seo Page Name"         =>  "Название для url (SEO)",
 
     "Count Comment"         =>  "Количество комментариев",
+    "Priority"              =>  "Сортировка",
 
 ];
