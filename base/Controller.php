@@ -61,8 +61,8 @@ class Controller extends YiiWebController
         {
             if (!$this->module instanceof Application)
             {
-                $view = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
-                return parent::render($view, $params);
+                $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
+                return parent::render($viewApp, $params);
             } else
             {
                 return parent::render($view, $params);
