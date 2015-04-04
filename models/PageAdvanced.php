@@ -55,11 +55,11 @@ use Yii;
  */
 abstract class PageAdvanced extends Page
 {
-    use THasComments;
-    use THasSubscribes;
-    use THasVotes;
+    //use THasComments;
+    //use THasSubscribes;
+    //use THasVotes;
     use THasFiles;
-    use HasDescriptionsTrait;
+    //use HasDescriptionsTrait;
 
     /**
      * @inheritdoc
@@ -68,11 +68,11 @@ abstract class PageAdvanced extends Page
     {
         return array_merge(parent::behaviors(), [
 
-            HasComments::className(),
-            HasSubscribes::className(),
-            HasVotes::className(),
-            HasDescriptionsBehavior::className(),
-            HasAdultStatus::className() => HasAdultStatus::className(),
+            //HasComments::className(),
+            //HasSubscribes::className(),
+            //HasVotes::className(),
+            //HasDescriptionsBehavior::className(),
+            //HasAdultStatus::className() => HasAdultStatus::className(),
             HasStatus::className() => HasStatus::className(),
             behaviors\HasFiles::className() =>
             [
