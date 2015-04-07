@@ -157,7 +157,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
      */
     public function renderToolbar($event)
     {
-        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax()) {
+        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax() || !$this->enabled) {
             return;
         }
 
