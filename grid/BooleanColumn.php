@@ -74,10 +74,10 @@ class BooleanColumn extends DataColumn
         }
         $this->filter = [true => $this->trueLabel, false => $this->falseLabel];
         if (empty($this->trueIcon)) {
-            $this->trueIcon = '<span class="glyphicon glyphicon-ok text-success"></span>';
+            $this->trueIcon = '<span class="glyphicon glyphicon-ok text-success" title="' . $this->trueLabel . '"></span>';
         }
         if (empty($this->falseIcon)) {
-            $this->falseIcon = '<span class="glyphicon glyphicon-remove text-danger"></span>';
+            $this->falseIcon = '<span class="glyphicon glyphicon-remove text-danger" title="' . $this->falseLabel . '"></span>';
         }
         parent::init();
     }

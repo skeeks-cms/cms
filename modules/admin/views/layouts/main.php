@@ -176,6 +176,8 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 </div>
 
 <? if (!$sidebarHidden): ?>
+
+<?/* if ($this->beginCache('test', ['variations' => [Yii::$app->language, \Yii::$app->cms->getAuthUser()->id]])) : */?>
 <!-- start: Main Menu -->
 <div class="sidebar sx-sidebar">
 
@@ -238,6 +240,8 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         </div>
     </div>
 </div>
+<?/*= $this->endCache();*/?>
+<?/* endif; */?>
 <!-- end: Main Menu -->
 <? endif; ?>
 

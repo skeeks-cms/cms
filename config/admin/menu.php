@@ -141,7 +141,7 @@ return
         ]
     ],
 
-    'social' =>
+    /*'social' =>
     [
         'label'     => 'Социальные элементы',
         'priority'  => 0,
@@ -168,7 +168,7 @@ return
                 "url"       => ["cms/admin-subscribe/index"],
             ],
         ]
-    ],
+    ],*/
 
 
     'dev' =>

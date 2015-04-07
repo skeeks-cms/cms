@@ -6,6 +6,8 @@
  * @date 02.04.2015
  */
 namespace skeeks\cms\models\behaviors;
+use yii\helpers\ArrayHelper;
+
 /**
  * Class HasStatusBoolean
  * @package skeeks\cms\models\behaviors
@@ -39,8 +41,11 @@ class HasStatusBoolean extends \skeeks\cms\base\behaviors\ActiveRecord
         return (int) $this->owner->{$this->field};
     }
 
+    /**
+     * @return string
+     */
     public function getStatusText()
     {
-        return ArrayHelper::getValue($this->getPossibleStatuses(), $this->getStatus());
+        return (string) ArrayHelper::getValue($this->getPossibleStatuses(), $this->getStatus());
     }
 }
