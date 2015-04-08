@@ -77,6 +77,19 @@ class RequestResponse extends Model
     }
 
     /**
+     * @return bool
+     */
+    public function isRequestPjaxPost()
+    {
+        if (\Yii::$app->request->isPjax && \Yii::$app->request->isPost)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param Model $model
      * @return array
      */
