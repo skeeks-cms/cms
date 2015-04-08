@@ -65,9 +65,9 @@ use yii\base\Event;
  */
 class StorageFile extends Core
 {
-    use behaviors\traits\HasComments;
-    use behaviors\traits\HasSubscribes;
-    use behaviors\traits\HasVotes;
+    //use behaviors\traits\HasComments;
+    //use behaviors\traits\HasSubscribes;
+    //use behaviors\traits\HasVotes;
 
     /**
      * @inheritdoc
@@ -164,14 +164,14 @@ class StorageFile extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            behaviors\HasComments::className(),
+            //behaviors\HasComments::className(),
             behaviors\HasStatus::className() => behaviors\HasStatus::className(),
-            behaviors\HasAdultStatus::className() => behaviors\HasAdultStatus::className(),
-            behaviors\HasSubscribes::className(),
-            behaviors\HasVotes::className(),
+            //behaviors\HasAdultStatus::className() => behaviors\HasAdultStatus::className(),
+            //behaviors\HasSubscribes::className(),
+            //behaviors\HasVotes::className(),
             CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
             HasPageOptions::className() => HasPageOptions::className(),
-            HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className(),
+            //HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className(),
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className()
         ]);
     }
