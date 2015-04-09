@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models\behaviors;
 
+use skeeks\modules\cms\catalog\models\Product;
 use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
 
 use yii\db\BaseActiveRecord;
@@ -29,6 +30,7 @@ class SeoPageName extends AttributeBehavior
      */
     public $generatedAttribute  = 'seo_page_name';
     public $fromAttribute       = 'name';
+    public $uniqeue             = true;
 
     /**
      * @var
@@ -62,12 +64,30 @@ class SeoPageName extends AttributeBehavior
             $filter = new FilterSeoPageName();
             if ($this->owner->{$this->generatedAttribute})
             {
-                return $filter->filter($this->owner->{$this->generatedAttribute});
+                $seoPageName = $filter->filter($this->owner->{$this->generatedAttribute});
             } else
             {
-                return $filter->filter($this->owner->{$this->fromAttribute});
+                $seoPageName = $filter->filter($this->owner->{$this->fromAttribute});
             }
 
+
+            //Нужно чтобы поле было уникальным
+            if ($this->uniqeue)
+            {
+
+                //Значит неуникально
+                if ($founded = $this->owner->find()->where([$this->generatedAttribute => $seoPageName])->one())
+                {
+                    if ($last = $this->owner->find()->orderBy('id DESC')->one())
+                    {
+                        $seoPageName = $seoPageName . '-' . $last->id;
+                        return $filter->filter($seoPageName);
+                    }
+                }
+
+            }
+
+            return $seoPageName;
         } else
         {
             return call_user_func($this->value, $event);
