@@ -49,7 +49,14 @@ abstract class Core extends ActiveRecord
                     }
                 },
             ],
-            TimestampBehavior::className(),
+            TimestampBehavior::className() =>
+            [
+                'class' => TimestampBehavior::className(),
+                /*'value' => function()
+                {
+                    return date('U');
+                },*/
+            ]
         ]);
     }
 
