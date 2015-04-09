@@ -112,7 +112,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'page-options' =>
                     [
-                        "label"     => "Свойства страницы",
+                        "label"     => "Свойства",
                         'icon'      => 'glyphicon glyphicon-plus-sign',
                         "rules"     =>
                         [

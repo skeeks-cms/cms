@@ -14,6 +14,10 @@ use skeeks\cms\modules\admin\widgets\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
+$dataProvider->sort->defaultOrder = [
+    'created_at' => SORT_DESC
+];
 ?>
 
 <?= GridView::widget([
@@ -76,8 +80,6 @@ use skeeks\cms\modules\admin\widgets\GridView;
             'attribute' => 'cluster_id',
         ],
 
-        'name_to_save',
-
         [
             'attribute' => 'mime_type',
             'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->all(), 'mime_type', 'mime_type'),
@@ -92,7 +94,10 @@ use skeeks\cms\modules\admin\widgets\GridView;
             'class' => \skeeks\cms\grid\FileSizeColumnData::className(),
             'attribute' => 'size'
         ],
-        ['class' => \skeeks\cms\grid\LinkedToType::className()],
+        [
+            'class' => \skeeks\cms\grid\LinkedToType::className(),
+            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->all(), 'linked_to_model', 'linked_to_model'),
+        ],
         ['class' => \skeeks\cms\grid\LinkedToModel::className()],
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],

@@ -110,6 +110,15 @@ abstract class Cluster extends ComponentModel
         return $this->publicBaseUrl . DIRECTORY_SEPARATOR . $clusterFileUniqSrc;
     }
 
+    /**
+     * @param $clusterFileUniqSrc
+     * @return string
+     */
+    public function getAbsoluteUrl($clusterFileUniqSrc)
+    {
+        return $this->getPublicSrc($clusterFileUniqSrc);
+    }
+
 
     /**
      *

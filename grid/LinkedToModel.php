@@ -30,7 +30,7 @@ class LinkedToModel extends DataColumn
         {
             if (isset($linkedModel->name))
             {
-                return $linkedModel->name;
+                return $linkedModel->name . " [$linkedModel->primaryKey]";
             }
 
             return $linkedModel->primaryKey;
