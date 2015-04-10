@@ -112,7 +112,7 @@ abstract class WidgetHasTemplate extends Widget
                     return $this->render($this->viewFile, $this->_data->toArray());
                 } catch (InvalidParamException $e)
                 {
-                    return 'Шаблон не найден: ' . $this->viewFile;
+                    return 'Ошибка виджета: ' . $this->viewFile . " - " . $e->getMessage();
                 }
 
             }

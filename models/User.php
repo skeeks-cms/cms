@@ -410,9 +410,15 @@ class User
         return $this->name ? $this->name : $this->username;
     }
 
-    public function getPageUrl($action = 'view')
+    public function getPageUrl($action = 'view', $params = [])
     {
-        return \Yii::$app->urlManager->createUrl(["cms/user/" . $action, "username" => $this->username]);
+
+        $params = ArrayHelper::merge([
+            "cms/user/" . $action,
+            "username" => $this->username
+        ], $params);
+
+        return \Yii::$app->urlManager->createUrl($params);
     }
 
     /**
