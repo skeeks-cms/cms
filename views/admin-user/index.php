@@ -34,7 +34,25 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function(\skeeks\cms\models\User $model)
+            {
+                $result = [];
+
+                if ($roles = \Yii::$app->authManager->getRolesByUser($model->id))
+                {
+                    foreach ($roles as $role)
+                    {
+                        $result[] = $role->name;
+                    }
+                }
+
+                return implode(', ', $result);
+            },
+            'format' => 'html',
+        ],
 
     ],
 ]); ?>
