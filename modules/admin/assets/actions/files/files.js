@@ -495,7 +495,27 @@
 
         _init: function()
         {
+            var self = this;
+
             this.sources = [];
+
+            if (this.get('completeUpload'))
+            {
+                self.bind('completeUpload', function(e, data)
+                {
+                    var callback = self.get('completeUpload');
+                    callback(data);
+                });
+            }
+
+            if (this.get('completeUploadFile'))
+            {
+                self.bind('completeUploadFile', function(e, data)
+                {
+                    var callback = self.get('completeUploadFile');
+                    callback(data);
+                });
+            }
         },
 
         /**
@@ -562,7 +582,6 @@
             return this;
         },
 
-
         _onDomReady: function()
         {
             this._initSelectForm();
@@ -613,6 +632,8 @@
 
         _init: function()
         {
+            this.applyParentMethod(sx.classes.files._Manager, '_init', []); // TODO: make a workaround for magic parent calling
+
             this
 
                 .registerSource(
@@ -630,11 +651,14 @@
                 )
             ;
 
-
             this.bind('completeUpload', function(e, data)
             {
                 sx.notify.success('Файлы успешно загружены');
-                $.pjax.reload('#sx-table-files', {});
+                if ($('#sx-table-files')[0])
+                {
+                    $.pjax.reload('#sx-table-files', {});
+                }
+
             });
 
             this.bind('startUpload', function(e, data)
@@ -643,8 +667,8 @@
             });
 
 
-            this.AllUploadProgress = new sx.classes.files.AllUploadProgress(this, ".sx-progress-bar");
-            this.OneFileUploadProgress = new sx.classes.files.OneFileUploadProgress(this, ".sx-progress-bar-file");
+            this.AllUploadProgress      = new sx.classes.files.AllUploadProgress(this, ".sx-progress-bar");
+            this.OneFileUploadProgress  = new sx.classes.files.OneFileUploadProgress(this, ".sx-progress-bar-file");
         }
 
     });

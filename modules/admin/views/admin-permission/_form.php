@@ -15,16 +15,33 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 2])->label('Описание') ?>
 
-    <?/*=
-    $form->field($model, 'ruleName')->widget('yii\jui\AutoComplete', [
-        'options' => [
-            'class' => 'form-control',
-        ],
-        'clientOptions' => [
-            'source' => array_keys(Yii::$app->authManager->getRules()),
-        ]
-    ])
+    <?/*= $form->field($model, 'ruleName')->widget(
+        'yii\jui\AutoComplete',
+        [
+            'options' => [
+                'class' => 'form-control',
+            ],
+            'clientOptions' => [
+                'source' => array_keys(Yii::$app->authManager->getRules()),
+            ]
+        ])
     */?>
+
+    <?= $form->field($model, 'ruleName')->widget(
+        \skeeks\widget\chosen\Chosen::className(),
+        [
+            'items' => \yii\helpers\ArrayHelper::map(
+                Yii::$app->authManager->getRules(),
+                'name', 'name'
+            )
+            /*'options' => [
+                'class' => 'form-control',
+            ],
+            'clientOptions' => [
+                'source' => array_keys(Yii::$app->authManager->getRules()),
+            ]*/
+        ])
+    ?>
 
     <?= $form->field($model, 'data')->textarea(['rows' => 6, 'readonly' => 'readonly'])->label('Данные') ?>
 

@@ -77,6 +77,14 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
         'name',
         'description',
+        [
+            'attribute' => 'ruleName',
+            /*'filter'    => \yii\helpers\ArrayHelper::map(
+                \Yii::$app->cms->findUser()->all(),
+                'id',
+                'name'
+            )*/
+        ]
 
         //['class' => \skeeks\cms\grid\LinkedToType::className()],
         //['class' => \skeeks\cms\grid\LinkedToModel::className()],

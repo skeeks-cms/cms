@@ -23,6 +23,9 @@ use yii\behaviors\BlameableBehavior;
  * @property integer $created_at
  * @property integer $updated_at
  *
+ * @property User $createdBy
+ * @property User $updatedBy
+ *
  * Class Core
  * @package skeeks\cms\base\models
  */
