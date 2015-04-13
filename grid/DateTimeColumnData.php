@@ -26,6 +26,6 @@ class DateTimeColumnData extends DataColumn
     protected function renderDataCellContent($model, $key, $index)
     {
         $timestamp = $model->{$this->attribute};
-        return \Yii::$app->formatter->asDatetime($timestamp, "short") . "<br /><small>" . \Yii::$app->formatter->asRelativeTime($timestamp) . "</small>";
+        return \Yii::$app->formatter->asDatetime($timestamp) . "<br /><small>" . \Yii::$app->formatter->asRelativeTime($timestamp) . "</small>";
     }
 }

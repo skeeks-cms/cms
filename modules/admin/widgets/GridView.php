@@ -49,7 +49,8 @@ class GridView extends \yii\grid\GridView
      */
     public function run()
     {
-        if ($this->usePjax) {
+        if ($this->usePjax)
+        {
             $this->pjax = Pjax::begin(ArrayHelper::merge([
                 'id' => 'sx-pjax-grid-' . $this->id,
             ], $this->PjaxOptions));
