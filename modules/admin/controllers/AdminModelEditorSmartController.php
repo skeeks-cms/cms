@@ -497,6 +497,13 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
         $model = $this->getModel();
 
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');

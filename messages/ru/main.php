@@ -24,7 +24,7 @@ return
     "Created At"            =>  "Время создания",
     "Updated At"            =>  "Время последнего обновления",
     "Name"                  =>  "Название",
-    "Description Short"     =>  "Коноткое описание",
+    "Description Short"     =>  "Короткое описание",
     "Description Full"      =>  "Описание",
     "Seo Page Name"         =>  "Название для url (SEO)",
 
