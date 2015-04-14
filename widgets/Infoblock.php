@@ -167,8 +167,11 @@ class Infoblock extends Widget
                     $config = $this->getResultWidgetConfig($modelInfoblock);
                 }
 
+                /**
+                 * @var $widget Widget
+                 */
                 $widget = $modelInfoblock->createWidget();
-                $widget->setAttributes($config, $safeOnly);
+                $widget->setAttributes($config, false);
 
                 $result = $widget->run();
             }
@@ -233,15 +236,29 @@ class Infoblock extends Widget
         $configSaved        = $modelInfoblock->getMultiConfig();
         $configDefault      = $this->getWidgetParams();
         $configProtected    = [];
-        foreach ((array) $modelInfoblock->protected_widget_params as $paramCode)
+
+        if (is_array($this->protectedWidgetParams))
         {
-            if (isset($configDefault[$paramCode]))
+            foreach ((array) $this->protectedWidgetParams as $paramCode)
             {
-                $configProtected[$paramCode] = $configDefault[$paramCode];
+                if (isset($configDefault[$paramCode]))
+                {
+                    $configProtected[$paramCode] = $configDefault[$paramCode];
+                }
+            }
+        } else if (is_bool($this->protectedWidgetParams))
+        {
+            if ($this->protectedWidgetParams === true)
+            {
+                $configProtected = $configDefault;
             }
         }
 
-        return ArrayHelper::merge($configSaved, $configProtected);
+        //foreach ((array) $modelInfoblock->protected_widget_params as $paramCode)
+
+
+        $cofing = ArrayHelper::merge($configSaved, $configProtected);
+        return $cofing;
     }
     /**
      * Название класса виджета
