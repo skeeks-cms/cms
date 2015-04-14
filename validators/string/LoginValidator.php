@@ -28,7 +28,7 @@ class LoginValidator
      */
     public function validate($string)
     {
-        if (!preg_match('/^[a-z]{1}[a-z0-1]{2,11}$/', $string))
+        if (!preg_match('/^[a-z]{1}[a-z0-9]{2,11}$/', $string))
         {
             return $this->_bad('Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример demo1.');
         }

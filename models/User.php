@@ -140,7 +140,6 @@ class User
                 $email->user_id     = $this->id;
                 $email->save();
             }
-
         }
     }
 
@@ -163,6 +162,9 @@ class User
             {
                 throw new ErrorException("Email не удалось добавить");
             };
+        } else
+        {
+            $this->email = null;
         }
     }
 
@@ -189,6 +191,9 @@ class User
                 }
 
             }
+        } else
+        {
+            $this->email = null;
         }
     }
 
@@ -255,7 +260,7 @@ class User
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
 
-            [['email'], 'required'],
+            //[['email'], 'required'],
             [['email'], 'unique'],
             [['email'], 'email'],
             [['email'], 'validateEmails'],
