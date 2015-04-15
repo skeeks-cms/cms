@@ -176,8 +176,11 @@ class Infoblock extends Widget
 
                     /*print_r($config);
                     echo $defaultWdigetClassName;*/
-                    $result = $defaultWdigetClassName::widget($config);
+                    //$result = $defaultWdigetClassName::widget($config);
+                    $widget = $modelInfoblock->createWidget();
+                    $widget->setAttributes($config);
 
+                    $result = $widget->run();
                 } else
                 {
                     $config = $modelInfoblock->getMultiConfig();
@@ -185,7 +188,7 @@ class Infoblock extends Widget
                      * @var $widget Widget
                      */
                     $widget = $modelInfoblock->createWidget();
-                    $widget->setAttributes($config, false);
+                    $widget->setAttributes($config);
 
                     $result = $widget->run();
                 }
