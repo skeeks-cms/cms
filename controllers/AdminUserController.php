@@ -44,7 +44,7 @@ class AdminUserController extends AdminModelEditorSmartController
         $this->_modelShowAttribute      = "username";
 
         $this->_modelClassName          = User::className();
-        $this->_modelSearchClassName    = UserSearch::className();
+        //$this->_modelSearchClassName    = UserSearch::className();
 
         $this->modelValidate = true;
 

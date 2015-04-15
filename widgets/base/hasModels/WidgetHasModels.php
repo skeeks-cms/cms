@@ -42,8 +42,8 @@ class WidgetHasModels extends WidgetHasTemplate
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['defaultSortField', 'defaultSort', 'pageParam'], 'string'],
-            [['defaultPageSize', 'usePaging', 'limit'], 'integer'],
+            [['defaultSortField', 'pageParam'], 'string'],
+            [['defaultPageSize', 'usePaging', 'limit', 'defaultSort'], 'integer'],
         ]);
     }
 
@@ -125,7 +125,7 @@ class WidgetHasModels extends WidgetHasTemplate
     public function bind()
     {
         $this->buildSearch();
-        $this->_data->search->search(\Yii::$app->request->queryParams);
+        $this->getSearch()->search(\Yii::$app->request->queryParams);
         return $this;
     }
 

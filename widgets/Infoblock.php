@@ -159,21 +159,38 @@ class Infoblock extends Widget
                     {
                         unset($defaultConfig['class']);
                     }
-                }
 
-                $config = $modelInfoblock->getMultiConfig();
-                if ($modelInfoblock->getWidgetClassName() == $defaultWdigetClassName)
-                {
+                    /*$config = $modelInfoblock->getMultiConfig();
+                    if ($modelInfoblock->getWidgetClassName() == $defaultWdigetClassName)
+                    {
+                        $config = $this->getResultWidgetConfig($modelInfoblock);
+                    }*/
+
                     $config = $this->getResultWidgetConfig($modelInfoblock);
+
+                    /**
+                     * @var $widget Widget
+                     */
+                    /*$widget = $modelInfoblock->createWidget();
+                    $widget->setAttributes($config, false);*/
+
+                    /*print_r($config);
+                    echo $defaultWdigetClassName;*/
+                    $result = $defaultWdigetClassName::widget($config);
+
+                } else
+                {
+                    $config = $modelInfoblock->getMultiConfig();
+                    /**
+                     * @var $widget Widget
+                     */
+                    $widget = $modelInfoblock->createWidget();
+                    $widget->setAttributes($config, false);
+
+                    $result = $widget->run();
                 }
 
-                /**
-                 * @var $widget Widget
-                 */
-                $widget = $modelInfoblock->createWidget();
-                $widget->setAttributes($config, false);
 
-                $result = $widget->run();
             }
 
             self::$regsteredBlocks[$this->id] = $result;
@@ -233,32 +250,50 @@ class Infoblock extends Widget
      */
     public function getResultWidgetConfig(\skeeks\cms\models\Infoblock $modelInfoblock)
     {
-        $configSaved        = $modelInfoblock->getMultiConfig();
-        $configDefault      = $this->getWidgetParams();
+        $configSaved        = (array) $modelInfoblock->getMultiConfig();
         $configProtected    = [];
+
+        if ($configProtected = $this->protectedWidgetParams())
+        {
+            return ArrayHelper::merge($configSaved, $configProtected);
+        } else
+        {
+            return $configSaved;
+        }
+    }
+
+    /**
+     * Параметры закрые от редактирования
+     * @return array
+     */
+    public function protectedWidgetParams()
+    {
+        if (!$configProtected = $this->getWidgetParams())
+        {
+            return [];
+        }
 
         if (is_array($this->protectedWidgetParams))
         {
-            foreach ((array) $this->protectedWidgetParams as $paramCode)
+            foreach ($this->protectedWidgetParams as $paramCode)
             {
                 if (isset($configDefault[$paramCode]))
                 {
                     $configProtected[$paramCode] = $configDefault[$paramCode];
                 }
             }
+
+            return $configProtected;
+
         } else if (is_bool($this->protectedWidgetParams))
         {
             if ($this->protectedWidgetParams === true)
             {
-                $configProtected = $configDefault;
+                return $configProtected;
             }
         }
 
-        //foreach ((array) $modelInfoblock->protected_widget_params as $paramCode)
-
-
-        $cofing = ArrayHelper::merge($configSaved, $configProtected);
-        return $cofing;
+        return [];
     }
     /**
      * Название класса виджета
