@@ -117,6 +117,7 @@ abstract class Core extends ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id'         => Yii::t('app', 'ID'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
