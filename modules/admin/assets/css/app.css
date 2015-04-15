@@ -13,6 +13,13 @@ body
     font-size: 12px;
 }
 
+.sx-header-logo .navbar-brand
+{
+    padding: 0px;
+    padding-left: 10px;
+    padding-top: 4px;
+}
+
 iframe{
     border: 0px;
 }

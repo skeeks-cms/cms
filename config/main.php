@@ -134,6 +134,11 @@ $config =
             'class' => '\skeeks\cms\components\Seo'
         ],
 
+        'admin' =>
+        [
+            'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
+        ],
+
         //Глобальные опции страниц
         'pageOptions' =>
         [
