@@ -190,6 +190,61 @@ class Tree extends PageAdvanced
         return null;
     }
 
+    /**
+     *
+     * Массив id дочерних разделов
+     *
+     * @return array
+     */
+    public function fetchChildrensIds()
+    {
+        $ids = [];
+
+        if ($this->hasChildrens())
+        {
+            if ($childrens = $this->fetchChildrens())
+            {
+                foreach ($childrens as $chidren)
+                {
+                    $ids[] = $chidren->id;
+                }
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     *
+     * Массив id дочерних разделов включая id их подразделов
+     *
+     * @return array
+     */
+    public function fetchChildrensAllIds()
+    {
+        $ids = [];
+
+        if ($this->hasChildrens())
+        {
+            if ($childrens = $this->fetchChildrensAll())
+            {
+                foreach ($childrens as $chidren)
+                {
+                    $ids[] = $chidren->id;
+                }
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @return $this[];
+     */
+    public function fetchChildrensAll()
+    {
+        return $this->findChildrensAll()->all();
+    }
 
     /**
      * @return $this[];

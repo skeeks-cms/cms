@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models\forms;
 
+use skeeks\cms\models\User;
 use yii\base\Model;
 use Yii;
 
@@ -20,6 +21,9 @@ use Yii;
  */
 class SignupForm extends Model
 {
+    const SCENARION_FULLINFO    = 'fullInfo';
+    const SCENARION_ONLYEMAIL   = 'onlyEmail';
+
     public $username;
     public $email;
     public $password;
@@ -40,11 +44,11 @@ class SignupForm extends Model
     {
         $scenarions = parent::scenarios();
 
-        $scenarions['fullInfo'] = [
+        $scenarions[self::SCENARION_FULLINFO] = [
             'username', 'email', 'password'
         ];
 
-        $scenarions['onlyEmail'] = [
+        $scenarions[self::SCENARION_ONLYEMAIL] = [
             'email'
         ];
 
@@ -81,18 +85,79 @@ class SignupForm extends Model
     {
         if ($this->validate())
         {
+            /**
+             * @var User $user
+             */
             $userClassName          = \Yii::$app->cms->getUserClassName();
-
             $user                   = new $userClassName();
-            $user->username         = $this->username;
-            $user->email            = $this->email;
-            $user->setPassword($this->password);
-            $user->generateAuthKey();
-            $user->save();
 
-            return $user;
+            if ($this->scenario == self::SCENARION_FULLINFO)
+            {
+                $user->username         = $this->username;
+                $user->email            = $this->email;
+                $user->setPassword($this->password);
+                $user->generateAuthKey();
+                $user->save();
+
+                return $user;
+
+            } else if ($this->scenario == self::SCENARION_ONLYEMAIL)
+            {
+                $password = \Yii::$app->security->generateRandomString(6);
+                $user->email            = $this->email;
+                $user->generateUsername();
+                $user->setPassword($password);
+                $user->generateAuthKey();
+                $user->save();
+
+                if ($user)
+                {
+                    \Yii::$app->mailer->compose('registerByEmail', [
+                            'user'      => $user,
+                            'password'  => $password
+                        ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setTo($user->email)
+                        ->setSubject('Регистрация на сайте ' . \Yii::$app->cms->appName)
+                        ->send();
+                }
+
+                return $user;
+            }
+
         }
 
+
         return null;
+    }
+
+    /**
+     * Sends an email with a link, for resetting the password.
+     *
+     * @return boolean whether the email was send
+     */
+    public function sendEmail()
+    {
+        /* @var $user User */
+        $user = User::findOne([
+            'status' => User::STATUS_ACTIVE,
+            'email' => $this->email,
+        ]);
+
+        if ($user) {
+            if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
+                $user->generatePasswordResetToken();
+            }
+
+            if ($user->save()) {
+                return \Yii::$app->mailer->compose('passwordResetToken', ['user' => $user])
+                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
+                    ->setTo($this->email)
+                    ->setSubject('Password reset for ' . \Yii::$app->cms->appName)
+                    ->send();
+            }
+        }
+
+        return false;
     }
 }

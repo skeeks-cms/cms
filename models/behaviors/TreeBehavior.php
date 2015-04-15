@@ -222,6 +222,19 @@ class TreeBehavior extends ActiveRecordBehavior
 	}
 
     /**
+     * Найти непосредственных детей ноды
+     * @return ActiveQuery
+     */
+	public function findChildrensAll()
+	{
+        $pidString = implode('/', $this->owner->getPids()) . "/" . $this->owner->primaryKey;
+
+		return $this->owner->find()
+            ->andWhere(['like', $this->pidsAttrName, $pidString . '%', false])
+            ->orderBy(["priority" => SORT_DESC]);
+	}
+
+    /**
      *
      * Корневые разделы дерева.
      *

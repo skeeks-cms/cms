@@ -106,6 +106,7 @@ class User
         $this->on(BaseActiveRecord::EVENT_AFTER_UPDATE,    [$this, "checkDataAfterSave"]);
 
         $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
+        $this->on(BaseActiveRecord::EVENT_AFTER_DELETE,    [$this, "checkDataAfterDelete"]);
     }
 
     /**
@@ -122,6 +123,25 @@ class User
         {
             throw new Exception('Нельзя удалять самого себя');
         }
+
+        /*$userEmail = UserEmail::find()->where(['value' => $this->email])->one();
+        $userEmail->user_id = null;
+        $userEmail->save();*/
+    }
+    /**
+     * @throws Exception
+     */
+    public function checkDataAfterDelete()
+    {
+        $userEmails = UserEmail::find()->where(['user_id' => $this->id])->all();
+        if ($userEmails)
+        {
+            foreach ($userEmails as $userEmail)
+            {
+                $userEmail->delete();
+            }
+        }
+
 
         /*$userEmail = UserEmail::find()->where(['value' => $this->email])->one();
         $userEmail->user_id = null;
@@ -563,6 +583,18 @@ class User
     public function setPassword($password)
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+    }
+
+    /**
+     * Генерация логина пользователя
+     * @return $this
+     */
+    public function generateUsername()
+    {
+        $userLast = static::find()->orderBy("id DESC")->one();
+        $this->username = "id" . ($userLast->id + 1);
+
+        return $this;
     }
 
     /**
