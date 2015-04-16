@@ -11,6 +11,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
 use Yii;
@@ -116,31 +117,62 @@ class UserController extends Controller
         $data = $this->_user($username);
 
         $modelForm = new PasswordChangeForm([
-            'user' => $model
+            'user' => $data['model']
         ]);
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestOnValidateAjaxForm())
         {
-            $modelForm->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return \skeeks\cms\modules\admin\widgets\ActiveForm::validate($modelForm);
+            return $rr->ajaxValidateForm($modelForm);
         }
 
-
-        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
+        if ($rr->isRequestAjaxPost())
         {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(['change-password', 'id' => $model->id]);
-        } else
-        {
-            if (\Yii::$app->request->isPost)
+            if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
+                $rr->success = true;
+                $rr->message = 'Пароль успешно изменен';
+            } else
+            {
+                $rr->message = 'Не удалось изменить пароль';
             }
 
-            return $this->output(\Yii::$app->cms->moduleCms()->renderFile('admin-user/_form-change-password.php', [
-                'model' => $modelForm
-            ]));
+            return $rr;
+        }
+
+        return $this->render($this->action->id, $data);
+    }
+
+
+    /**
+     * @param $username
+     * @return string
+     */
+    public function actionEditInfo($username)
+    {
+        $data = $this->_user($username);
+        $model = $data['model'];
+
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestOnValidateAjaxForm())
+        {
+            return $rr->ajaxValidateForm($model);
+        }
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->save())
+            {
+                $rr->success = true;
+                $rr->message = 'Данные успешно сохранены';
+            } else
+            {
+                $rr->message = 'Не получилось сохранить данные';
+            }
+
+            return $rr;
         }
 
         return $this->render($this->action->id, $data);

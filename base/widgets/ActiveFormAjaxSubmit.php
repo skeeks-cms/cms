@@ -24,74 +24,78 @@ class ActiveFormAjaxSubmit extends ActiveForm
         parent::__construct($config);
     }
 
+    public $afterValidateCallback = "";
+
     public function registerJs()
     {
-        $this->view->registerJs(<<<JS
+        $afterValidateCallback = $this->afterValidateCallback;
+        if ($afterValidateCallback)
+        {
+            $this->view->registerJs(<<<JS
 
-        $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
-            return false;
-        });
+                    $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
+                        return false;
+                    });
 
-        $('#{$this->id}').on('afterValidate', function (event, messages) {
+                    $('#{$this->id}').on('afterValidate', function (event, messages) {
 
-            if (event.result === false)
-            {
-                sx.notify.error('Проверьте заполненные поля в форме');
-                return false;
-            }
-
-            var Jform = $(this);
-            var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
-
-            new sx.classes.AjaxHandlerBlocker(ajax, {
-                'wrapper': '#' + $(this).attr('id')
-            });
-            //new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
-            new sx.classes.AjaxHandlerNotifyErrors(ajax, {
-                'error': "Не удалось отправить форму",
-            }); //отключение глобального загрузчика
-
-            ajax.onError(function(e, data)
-                {
-
-                })
-                .onSuccess(function(e, data)
-                {
-                    var response = data.response;
-                    if (response.success == true)
-                    {
-                        $('input, select, textarea', Jform).each(function(i,s)
+                        if (event.result === false)
                         {
-                            if ($(this).attr('name') != '_csrf' && $(this).attr('name') != 'sx-auto-form')
-                            {
-                                $(this).val('');
-                            }
-                        });
-
-                        sx.notify.success(response.message);
-
-                        if (response.redirect)
-                        {
-                            _.delay(function()
-                            {
-                                window.location.href = response.redirect;
-                            }, 200);
-
+                            sx.notify.error('Проверьте заполненные поля в форме');
+                            return false;
                         }
 
-                    } else
-                    {
-                        sx.notify.error(response.message);
-                    }
+                        var Jform = $(this);
+                        var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
 
-                })
-                .execute();
 
-            return false;
-        });
+                        var callback = $afterValidateCallback;
+
+                        //TODO: добавить проверки
+                        callback(Jform, ajax);
+
+                        ajax.execute();
+
+                        return false;
+                    });
 
 JS
 );
+
+
+        } else
+        {
+            $this->view->registerJs(<<<JS
+
+                    $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
+                        return false;
+                    });
+
+                    $('#{$this->id}').on('afterValidate', function (event, messages) {
+
+                        if (event.result === false)
+                        {
+                            sx.notify.error('Проверьте заполненные поля в форме');
+                            return false;
+                        }
+
+                        var Jform = $(this);
+                        var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
+
+                        var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                            'blockerSelector' : '#' + $(this).attr('id'),
+                            'enableBlocker' : true,
+                        });
+
+                        ajax.execute();
+
+                        return false;
+                    });
+
+JS
+);
+        }
+
     }
     public function run()
     {
