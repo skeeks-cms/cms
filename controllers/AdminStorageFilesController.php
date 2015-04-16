@@ -67,8 +67,7 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                         "rules"     =>
                         [
                             [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasDescriptionsBehavior::className()
+                                "class"     => HasModelBehaviors::className()
                             ]
                         ]
                     ],

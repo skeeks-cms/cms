@@ -89,7 +89,7 @@ class ClusterLocal extends Cluster
      */
     public function deleteTmpDir($clusterFileUniqSrc)
     {
-        $dir = new Dir($this->rootTmpDir($clusterFileUniqSrc));
+        $dir = new Dir($this->rootTmpDir($clusterFileUniqSrc), false);
         if ($dir->isExist())
         {
             $dir->remove();

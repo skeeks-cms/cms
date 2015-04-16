@@ -202,6 +202,26 @@ class StorageFilesController extends Controller
 
             $storageFile->linkToModel($model);
 
+            if ($group = \Yii::$app->request->post("group"))
+            {
+
+                /**
+                 *
+                 * @var \skeeks\cms\models\helpers\ModelFilesGroup $group
+                 */
+                $group = $model->getFilesGroups()->getComponent($group);
+                if ($group)
+                {
+                    try
+                    {
+                        $group->attachFile($storageFile)->save();
+                    } catch (\yii\base\Exception $e)
+                    {
+                        $response["msgError"]  = $e->getMessage();
+                    }
+                }
+            }
+
             $response["success"]  = true;
             $response["file"]     = $storageFile;
             return $response;
