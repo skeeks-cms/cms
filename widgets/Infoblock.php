@@ -11,6 +11,7 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\helpers\UrlHelper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Json;
 
 /**
  * Class Infoblock
@@ -23,12 +24,6 @@ class Infoblock extends Widget
      */
     public $id              = null;
 
-
-    /**
-     * @var null соль используется для получения уникального id для базы данных
-     */
-    public $sold            = null;
-
     /**
      * @var string название
      */
@@ -40,14 +35,9 @@ class Infoblock extends Widget
     public $description     = '';
 
     /**
-     * @var bool Запрет на смену виджета. То есть если в коде был вызван инфоблок и в него был передан виджет, то через базу данных нельзя изменить виджет, можно только изменить параметры.
-     */
-    public $protectedWidget         = false;
-
-    /**
      * @var array массив названий параметров, которые нельзя менять в данном виджете через админку.
      */
-    public $protectedWidgetParams   = [];
+    public $protectedWidgetParams   = false;
 
     /**
      * @var bool Включен по умолчанию, можно не удалять код из шаблона а просто его отключить.
@@ -56,10 +46,10 @@ class Infoblock extends Widget
 
 
     /**
-     * Делать новый запрос в базу обязательно, или использовать сохраненное ранее значение
+     * Пересобирать ли инфоблок заново, если у них совпадают ID
      * @var bool
      */
-    public $refetch = false;
+    public $refetch = true;
 
     /**
      * @var array виджет который отработает по умолчанию
@@ -68,231 +58,300 @@ class Infoblock extends Widget
     public $widget = [];
 
 
+    /**
+     * @var \skeeks\cms\models\Infoblock
+     */
+    public $modelInfoblock = null;
 
     /**
+     * @var string
+     */
+    public $result = null;
+
+    /**
+     * Вызываемые инфоблоки в этом сценарии
      * @var array
      */
-    static public $regsteredBlocks = [];
+    static public $regstered    = [];
 
     /**
-     * @param $code
-     * @return bool|string
+     * @var int
      */
-    public function getRegistered($code)
-    {
-        if (isset(self::$regsteredBlocks[$code]))
-        {
-            return self::$regsteredBlocks[$code];
-        } else
-        {
-            return false;
-        }
-    }
+    static public $counter      = 0;
 
-    public function init()
-    {
-        parent::init();
 
-        if (!$this->id)
-        {
-            if (isset($this->widget['class']))
-            {
-                $this->id = md5($this->sold . $this->widget['class']);
-            }
-        }
-    }
 
+
+    /**
+     * TODO: depricated 1.1.3 Если виджет передан в коде вызова инфоблока то тако инфоблоку уже с протектед виджетом.
+     * @var bool Запрет на смену виджета. То есть если в коде был вызван инфоблок и в него был передан виджет, то через базу данных нельзя изменить виджет, можно только изменить параметры.
+     */
+    public $protectedWidget         = false;
+
+
+    /**
+     * @var string
+     */
+    protected $_token;
     /**
      * @return string
      */
     public function run()
     {
-        $result = "";
-
-        if ($this->enabled === false)
-        {
-            return '';
-        }
-
+        //Валидация целостности данных инфоблока
+        //Не указан id
         if (!$this->id)
         {
-            return '';
+            \Yii::error('Не указан ID инфоблока: ' . Json::encode((array) $this->attributes));
+            return "";
         }
 
-        $result = $this->getRegistered($this->id);
+        $this->_token = 'Инфоблок: ' . $this->id;
 
-        if ($result === false || $this->refetch)
+        \Yii::beginProfile($this->_token);
+            $result = $this->_run();
+        \Yii::endProfile($this->_token);
+
+        return $result;
+
+    }
+
+    /**
+     * @return string
+     */
+    protected function _run()
+    {
+        //Инфоблок выключен
+        if ($this->enabled === false)
         {
-            //Поиск конфига в базе данных
-            if (is_string($this->id))
-            {
-                $modelInfoblock = \skeeks\cms\models\Infoblock::getByCode($this->id);
-            } else if (is_int($this->id))
-            {
-                $modelInfoblock = \skeeks\cms\models\Infoblock::getById($this->id);
-            }
-
-            //В базе на эту тему ничего не найдено
-            if (!$modelInfoblock)
-            {
-                if ($classWidget = $this->getWidgetClassName())
-                {
-                    $result = $classWidget::widget($this->getWidgetParams());
-                }
-
-            } else
-            {
-                //Правила показа
-                if (!$modelInfoblock->isAllow())
-                {
-                    return $result;
-                }
-
-                //Данные виджета по умолчанию
-                $defaultConfig          = [];
-                $defaultWdigetClassName = '';
-                if ($this->widget)
-                {
-                    $defaultWdigetClassName = ArrayHelper::getValue((array) $this->widget, 'class');
-                    $defaultConfig          = (array) $this->widget;
-                    if (isset($defaultConfig['class']))
-                    {
-                        unset($defaultConfig['class']);
-                    }
-
-                    /*$config = $modelInfoblock->getMultiConfig();
-                    if ($modelInfoblock->getWidgetClassName() == $defaultWdigetClassName)
-                    {
-                        $config = $this->getResultWidgetConfig($modelInfoblock);
-                    }*/
-
-                    $config = $this->getResultWidgetConfig($modelInfoblock);
-
-                    /**
-                     * @var $widget Widget
-                     */
-                    /*$widget = $modelInfoblock->createWidget();
-                    $widget->setAttributes($config, false);*/
-
-                    /*print_r($config);
-                    echo $defaultWdigetClassName;*/
-                    //$result = $defaultWdigetClassName::widget($config);
-                    $widget = $modelInfoblock->createWidget();
-                    $widget->setAttributes($config);
-
-                    $result = $widget->run();
-                } else
-                {
-                    $config = $modelInfoblock->getMultiConfig();
-                    /**
-                     * @var $widget Widget
-                     */
-                    $widget = $modelInfoblock->createWidget();
-                    $widget->setAttributes($config);
-
-                    $result = $widget->run();
-                }
-
-
-            }
-
-            self::$regsteredBlocks[$this->id] = $result;
+            \Yii::info($this->_token . ' отключен в коде');
+            return "";
         }
+
+        //Блок с таким ID уже вызывался, и сказано что при повторном вызове его не нужно пересобирать
+        if (isset(self::$regstered[$this->id]) && $this->refetch === false)
+        {
+            \Yii::info($this->_token . ' повторный вызов (результат взят из предыдущего вызова)');
+
+            $block          = self::$regstered[$this->id];
+            $this->result   = $block->result;
+
+            return $this->_renderResult();
+        } else if (isset(self::$regstered[$this->id]) && $this->refetch === true)
+        {
+            \Yii::warning($this->_token . ' повторный вызов (результат заново отрендерен)');
+        }
+
+        //Регистрация в стек вызовов
+        self::$regstered[$this->id] = $this;
+        //Запрос в базу на проверку есть ли данные по инфоблоку.
+        $this->_initModel();
+
+        //Проверка правил показа
+        if (!$this->isAllow())
+        {
+            \Yii::info($this->_token . ' не разрешено показывать');
+            return $this->_renderResult();
+        }
+
+        //Название класса виджета который необходимо запускать.
+        if (!$widgetClassName = $this->getWidgetClassName())
+        {
+            \Yii::error($this->_token . ' не определен, не задан, или задан неправильно класс исполняемого виджета');
+            return $this->_renderResult();
+        }
+
+
+        $widget = new $widgetClassName();
+        $widget->setAttributes($this->getResultWidgetParams(), false);
+
+        $this->result = $widget->run();
+
+        return $this->_renderResult();
+    }
+
+    /**
+     * Проверка разрешено ли выполнять инфоблок, для текущей страницы, для текущего юзера и т.д..
+     * @return bool
+     */
+    public function isAllow()
+    {
+        //Правила показа
+        /*if (!$this->modelInfoblock->isAllow())
+        {
+            return $result;
+        }*/
+        return true;
+    }
+
+    /**
+     * Поиск и установка модели инфоблока.
+     * @return $this
+     */
+    protected function _initModel()
+    {
+        $modelInfoblock = $this->fetchModel();
+        if ($modelInfoblock)
+        {
+            $this->modelInfoblock = $modelInfoblock;
+        }
+
+        return $this;
+    }
+    /**
+     *
+     * Запрос на получение модели из базы данных для текущего инфоблока
+     *
+     * @return \skeeks\cms\models\Infoblock
+     */
+    public function fetchModel()
+    {
+        $modelInfoblock = null;
+
+        \Yii::info($this->_token . ' запрос в базу за для проверки настроек');
+
+        if (is_string($this->id))
+        {
+            $modelInfoblock = \skeeks\cms\models\Infoblock::getByCode($this->id);
+        } else if (is_int($this->id))
+        {
+            $modelInfoblock = \skeeks\cms\models\Infoblock::getById($this->id);
+        }
+
+        return $modelInfoblock;
+    }
+
+    /**
+     * Вывод результата
+     * Регистрация его.
+     *
+     * @param string $result
+     * @param \skeeks\cms\models\Infoblock|null $modelInfoblock
+     * @return string
+     */
+    protected function _renderResult()
+    {
+        self::$counter = self::$counter + 1;
 
         if (\Yii::$app->cmsToolbar->isEditMode())
         {
-            if (!$modelInfoblock)
+            if (!$this->modelInfoblock)
             {
-                $modelInfoblock = new \skeeks\cms\models\Infoblock();
-                $modelInfoblock->setAttributesByWidgetInfoblock($this);
-                $modelInfoblock->auto_created = 1;
-                if (!$modelInfoblock->save(true))
-                {
-                    return 'Ошибка сохраненеия данных в базу';
-                }
+                $widgetParamsForSave = $this->getResultWidgetParams();
 
-                $modelInfoblock->setCurrentSite(null);
-                $modelInfoblock->setCurrentLang(null);
-                $modelInfoblock->setMultiConfig($this->getWidgetParams());
-                $modelInfoblock->save(false);
+                $this->modelInfoblock = new \skeeks\cms\models\Infoblock();
+                $this->modelInfoblock->setAttributesByWidgetInfoblock($this);
+                $this->modelInfoblock->auto_created = 1;
 
-            } else
-            {
-                $modelInfoblock->setAttributesByWidgetInfoblock($this);
-                if (!$modelInfoblock->save(true))
+                if (!$this->modelInfoblock->save(true))
                 {
                     return 'Ошибка сохранения данных в базу';
                 }
 
-                $resultConfig = $this->getResultWidgetConfig($modelInfoblock);
 
-                $modelInfoblock->setCurrentSite(null);
-                $modelInfoblock->setCurrentLang(null);
-                $modelInfoblock->setMultiConfig($resultConfig);
-                $modelInfoblock->save(false);
+                $this->modelInfoblock->setCurrentSite(null);
+                $this->modelInfoblock->setCurrentLang(null);
+                $this->modelInfoblock->setMultiConfig($widgetParamsForSave);
+                $this->modelInfoblock->save(false);
+
+            } else
+            {
+                $this->modelInfoblock->setAttributesByWidgetInfoblock($this);
+                if (!$this->modelInfoblock->save(true))
+                {
+                    return 'Ошибка сохранения данных в базу';
+                }
+
+                $this->modelInfoblock->setCurrentSite(null);
+                $this->modelInfoblock->setCurrentLang(null);
+                $this->modelInfoblock->setMultiConfig($this->getResultWidgetParams());
+                $this->modelInfoblock->save(false);
             }
 
 
-            return Html::tag('div', $result, [
+            $pre = Html::tag('pre', Json::encode($this->getResultWidgetParams()), [
+                'style' => 'display: none;'
+            ]);
+
+            $id = 'sx-infoblock-' . self::$counter;
+
+            $this->getView()->registerJs(<<<JS
+new sx.classes.Infoblock({'id' : '{$id}'});
+JS
+);
+            return Html::tag('div', $pre . (string) $this->result, [
                 'class' => 'skeeks-cms-toolbar-edit-mode',
+                'id'    => $id,
                 'data' => [
-                    'id' => $modelInfoblock->id,
-                    'config-url' => UrlHelper::construct('cms/admin-infoblock/config', ['id' => $modelInfoblock->id])->enableAdmin()
+                    'counter' => self::$counter,
+                    'id' => $this->modelInfoblock->id,
+                    'config-url' => UrlHelper::construct('cms/admin-infoblock/config', ['id' => $this->modelInfoblock->id])->enableAdmin()
                         ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                 ]
             ]);
         }
 
-        return $result;
+        return (string) $this->result;
     }
 
 
     /**
-     * @param \skeeks\cms\models\Infoblock $modelInfoblock
+     * Результирующие параметры для виджета, с учетом перекрытия закрытых параметров.
      * @return array
      */
-    public function getResultWidgetConfig(\skeeks\cms\models\Infoblock $modelInfoblock)
+    public function getResultWidgetParams()
     {
-        $configSaved        = (array) $modelInfoblock->getMultiConfig();
-        $configProtected    = [];
-
-        if ($configProtected = $this->protectedWidgetParams())
+        //Есть ли модель инфоблока
+        if ($this->modelInfoblock)
         {
-            return ArrayHelper::merge($configSaved, $configProtected);
+            $configSaved        = (array) $this->modelInfoblock->getMultiConfig();
+
+            if ($configProtected = $this->protectedWidgetParams())
+            {
+                return array_merge($configSaved, $configProtected);
+            } else
+            {
+                return $configSaved;
+            }
         } else
         {
-            return $configSaved;
+            return $this->getCallingWidgetParams();
         }
     }
 
     /**
-     * Параметры закрые от редактирования
+     * Параметры закрые от редактирования, а при мерже они важнее.
+     *
      * @return array
      */
     public function protectedWidgetParams()
     {
-        if (!$configProtected = $this->getWidgetParams())
+        //Если параметров переданных в коде нет, то и закрытых параметров так же нет.
+        if (!$callingParams = $this->getCallingWidgetParams())
         {
             return [];
         }
 
+        //Можно указать массив ключей закрытых параметров
         if (is_array($this->protectedWidgetParams))
         {
+            $configProtected = [];
+
             foreach ($this->protectedWidgetParams as $paramCode)
             {
-                if (isset($configDefault[$paramCode]))
+                if (isset($callingParams[$paramCode]))
                 {
-                    $configProtected[$paramCode] = $configDefault[$paramCode];
+                    $configProtected[$paramCode] = $callingParams[$paramCode];
                 }
             }
 
             return $configProtected;
 
-        } else if (is_bool($this->protectedWidgetParams))
+        } else if (is_bool($this->protectedWidgetParams)) //сказать что все параметры переданные в коде важные и нередактируемые через админку
         {
             if ($this->protectedWidgetParams === true)
             {
-                return $configProtected;
+                return $callingParams;
             }
         }
 
@@ -304,30 +363,66 @@ class Infoblock extends Widget
      */
     public function getWidgetClassName()
     {
+        //Проверяем те данные которые указал разработчик в коде
         if ($this->widget)
         {
             $classWidget = (string) ArrayHelper::getValue((array) $this->widget, 'class');
+
             if (!$classWidget)
             {
                 return false;
             }
 
+            if (!class_exists($classWidget))
+            {
+                \Yii::info($this->_token . " $classWidget не найден класс исполняемого виджета ");
+                return false;
+            }
+
             if (!is_subclass_of($classWidget, Widget::className()))
             {
+                \Yii::info($this->_token . " $classWidget класс исполняемого виджета должен быть наследован от " . Widget::className());
                 return false;
             }
 
             return $classWidget;
         }
 
+        //Проверяем то что указано в настройках в базе
+        if ($this->modelInfoblock)
+        {
+            if ($classWidget = $this->modelInfoblock->getWidgetClassName())
+            {
+                if (!$classWidget)
+                {
+                    return false;
+                }
+
+                if (!class_exists($classWidget))
+                {
+                    \Yii::info($this->_token . " $classWidget не найден класс исполняемого виджета ");
+                    return false;
+                }
+
+                if (!is_subclass_of($classWidget, Widget::className()))
+                {
+                    \Yii::info($this->_token . " $classWidget класс исполняемого виджета должен быть наследован от " . Widget::className());
+                    return false;
+                }
+
+                return $classWidget;
+            }
+        }
+
         return false;
     }
 
     /**
-     * Параметры выиджета
+     * Параметры выиджета заданные в коде при вызове инфоблока
+     *
      * @return array
      */
-    public function getWidgetParams()
+    public function getCallingWidgetParams()
     {
         $result = [];
 

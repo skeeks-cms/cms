@@ -103,7 +103,7 @@ class WidgetHasModels extends WidgetHasTemplate
         if ($this->defaultSortField)
         {
             $dataProvider->getSort()->defaultOrder = [
-                $this->defaultSortField => $this->defaultSort
+                $this->defaultSortField => (int) $this->defaultSort
             ];
         }
 

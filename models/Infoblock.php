@@ -109,16 +109,12 @@ class Infoblock extends Core
             $this->code = $widgetInfoblock->id;
         }
 
-        if ($widgetInfoblock->protectedWidget)
+        if ($widgetInfoblock->widget)
         {
-            $this->protected_widget = (int) $widgetInfoblock->protectedWidget;
+            $this->protected_widget = (int) $widgetInfoblock->widget;
         }
 
-        if ($widgetInfoblock->protectedWidgetParams)
-        {
-
-            $this->protected_widget_params = (array) array_keys($widgetInfoblock->protectedWidgetParams());
-        }
+        $this->protected_widget_params = (array) array_keys($widgetInfoblock->protectedWidgetParams());
 
         if ($widgetInfoblock->getWidgetClassName())
         {

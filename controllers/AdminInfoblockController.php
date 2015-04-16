@@ -127,6 +127,7 @@ class AdminInfoblockController extends AdminModelEditorSmartController
             return ActiveForm::validate($widget);
         }
 
+
         if (\Yii::$app->request->isAjax)
         {
             if ($widget->load(\Yii::$app->request->post()))
