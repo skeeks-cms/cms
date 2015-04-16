@@ -165,7 +165,7 @@
                                 .css('height', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
-                                .css('zIndex', '990')
+                                .css('zIndex', '9990')
                                 .css('background', 'red')
                                 .appendTo(this.jBorder);
 
@@ -174,7 +174,7 @@
                                 .css('width', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
-                                .css('zIndex', '990')
+                                .css('zIndex', '9990')
                                 .css('background', 'red')
                                 .appendTo(this.jBorder);
 
@@ -184,7 +184,7 @@
                                 .css('height', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
-                                .css('zIndex', '990')
+                                .css('zIndex', '9990')
                                 .css('background', 'red')
                                 .appendTo(this.jBorder);
 
@@ -193,7 +193,7 @@
                                 .css('width', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
-                                .css('zIndex', '990')
+                                .css('zIndex', '9990')
                                 .css('background', 'red')
                                 .appendTo(this.jBorder);
 
