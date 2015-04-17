@@ -357,7 +357,9 @@
         _onWindowReady: function()
         {
             var self        = this;
-            this.buttons    = this.get('buttons');
+            this.buttons    = this.get('buttons', [
+                document.getElementById('source-simpleUpload')
+            ]);
 
             this.uploaderObj = new ss.SimpleUpload(_.extend(this.get("options"), {
                 queue: true,
