@@ -111,7 +111,7 @@ HTML;
 
         ];
 
-        $result['simpleUpload'] = $mainOptions;
+        $result['simpleUpload']['options'] = $mainOptions;
 
         return $result;
     }
