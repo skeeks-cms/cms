@@ -15,6 +15,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Основное'); ?>
 
+    <?= $form->field($model, 'image')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'image',
+        ]
+    )->label('Главное изображение'); ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
     <?= Html::checkbox("isLink", $model->isLink(), [
@@ -85,8 +92,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd() ?>
 
 <?= $form->fieldSet('Изображения'); ?>
-    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
-<?= $form->fieldSetEnd() ?>
+    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
+    <?= $form->field($model, 'images')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'images',
+        ]
+    )->label('Изображения');; ?>
+<?= $form->fieldSetEnd()?>
 
 <?= $form->fieldSet('Описание'); ?>
 

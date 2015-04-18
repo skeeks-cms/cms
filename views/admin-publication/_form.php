@@ -12,6 +12,13 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?php $form = ActiveForm::begin(); ?>
 
 <?= $form->fieldSet('Основное'); ?>
+    <?= $form->field($model, 'image')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'image',
+        ]
+    )->label('Главное изображение'); ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
     <?= $form->field($model, 'type')->label('Тип публикации')->widget(
@@ -37,7 +44,13 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd()?>
 
 <?= $form->fieldSet('Изображения'); ?>
-    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
+    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
+    <?= $form->field($model, 'images')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'images',
+        ]
+    )->label('Изображения');; ?>
 <?= $form->fieldSetEnd()?>
 
 

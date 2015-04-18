@@ -6,10 +6,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 02.03.2015
  */
-/* @var $widget \skeeks\cms\widgets\formInputs\StorageImages */
+/* @var $widget \skeeks\cms\modules\admin\widgets\formInputs\StorageImages */
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\Publication */
-
 $controller = \Yii::$app->createController('cms/admin-storage-files')[0];
 ?>
 <?
@@ -39,7 +38,6 @@ $controller = \Yii::$app->createController('cms/admin-storage-files')[0];
         float: left;
         margin-right: 15px;
         margin-bottom: 15px;
-        height: 150px;
     }
 
     .sx-fromWidget-storageImages .sx-group-images img
@@ -57,48 +55,17 @@ CSS
 );
 ?>
 
-<? \skeeks\cms\modules\admin\widgets\Pjax::begin([
-    'id' => 'pjax-storage-images-widget',
-    'blockPjaxContainer' => true,
-]);?>
+
 <div class="sx-fromWidget-storageImages">
-    <div class="sx-group-mainImage">
-        <label>Главное изображение</label>
-        <? if ($model->hasMainImage()) : ?>
-            <div class="sx-main-image">
-                <? $mainImage = $model->getFilesGroups()->getComponent('image')->findFiles()->one()?>
-                <a href="<?= $mainImage->src; ?>" class="sx-fancybox">
-                    <img src="<?= \Yii::$app->imaging->getImagingUrl($mainImage->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
-                </a>
-                <div class="sx-controlls">
-                    <?
-                        $controllerTmp = clone $controller;
-                        $controllerTmp->setModel($mainImage);
+    <? \skeeks\cms\modules\admin\widgets\Pjax::begin([
+        'id' => 'pjax-storage-images-widget-' . $widget->id,
+        'blockPjaxContainer' => true,
+    ]);?>
 
-                        echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
-                            "controller"            => $controllerTmp,
-                            "isOpenNewWindow"       => true,
-                            "clientOptions"         =>
-                            [
-                                'pjax-id' => 'pjax-storage-images-widget'
-                            ],
-                        ]);
 
-                        ?>
-                </div>
-            </div>
-        <? else: ?>
-            <div class="sx-main-image">
-                <img src="<?= \Yii::$app->cms->moduleAdmin()->noImage; ?>" />
-            </div>
-        <? endif; ?>
-    </div>
-
-    <? if ($images = $model->getFilesGroups()->getComponent('images')->fetchFiles()) : ?>
     <div class="sx-group-images">
-        <label>Все изображения</label>
         <div class="row col-md-12">
-
+            <? if ($images = $model->getFilesGroups()->getComponent($widget->fileGroup)->fetchFiles()) : ?>
                 <? foreach($images as $imageFile) : ?>
                     <div class="sx-image">
                         <a href="<?= $imageFile->src; ?>" class="sx-fancybox">
@@ -114,84 +81,34 @@ CSS
                                 "isOpenNewWindow"       => true,
                                 "clientOptions"         =>
                                 [
-                                    'pjax-id' => 'pjax-storage-images-widget'
+                                    'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
                                 ],
                             ]);
-
                             ?>
-                            <!--<a href="#" class="btn btn-default btn-xs" title="Сделать главным"><i class="glyphicon glyphicon-asterisk"></i></a>-->
                         </div>
                     </div>
                 <? endforeach; ?>
+            <? endif; ?>
         </div>
     </div>
-    <? endif; ?>
+
+    <? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
 
     <div class="sx-controlls">
-        <a href="#" onclick="sx.InputImagesWidget.openUploaderImage(); return false;" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-download-alt"></i> Загрузить главное изображение</a>
-        <a href="#" onclick="sx.InputImagesWidget.openUploader(); return false;" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-download-alt"></i> Загрузить изображения</a>
+        <?= \skeeks\cms\widgets\StorageFileManager::widget([
+            'model'     => $model,
+            'fileGroup' => $widget->fileGroup,
+            'clientOptions' =>
+            [
+                'completeUploadFile' => new \yii\web\JsExpression(<<<JS
+                function(data)
+                {
+                    $.pjax.reload('#pjax-storage-images-widget-{$widget->id}', {});
+                }
+JS
+)
+            ],
+        ]); ?>
     </div>
 </div>
 
-
-<?
-    $this->registerJs(<<<JS
-    (function(sx, $, _)
-    {
-        sx.createNamespace('classes', sx);
-
-        sx.classes.InputImagesWidget = sx.classes.Component.extend({
-
-            _init: function()
-            {
-                var self = this;
-                this.uploaderWindow = new sx.classes.Window(this.get('uploaderUrl'));
-                this.uploaderWindowImage = new sx.classes.Window(this.get('uploaderUrlImage'));
-
-                this.uploaderWindow.bind('close', function()
-                {
-                    self.reload();
-                });
-
-                this.uploaderWindowImage.bind('close', function()
-                {
-                    self.reload();
-                });
-            },
-
-            reload: function()
-            {
-                this.onDomReady(function()
-                {
-                    $.pjax.reload('#pjax-storage-images-widget', {});
-                });
-            },
-
-            openUploader: function()
-            {
-                this.uploaderWindow.open();
-            },
-
-            openUploaderImage: function()
-            {
-                this.uploaderWindowImage.open();
-            },
-
-            _onDomReady: function()
-            {},
-
-            _onWindowReady: function()
-            {}
-        });
-
-        sx.InputImagesWidget = new sx.classes.InputImagesWidget({
-            'uploaderUrlImage' : '{$uploaderUrlImage}',
-            'uploaderUrl' : '{$uploaderUrl}'
-        });
-
-    })(sx, sx.$, sx._);
-JS
-    );
-?>
-
-<? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>

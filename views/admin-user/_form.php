@@ -16,6 +16,13 @@ use common\models\User;
 <?= $form->fieldSet('Общая ниформация')?>
 
 
+    <?= $form->field($model, 'image')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'image',
+        ]
+    )->label('Фото'); ?>
+
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
 
@@ -64,8 +71,14 @@ use common\models\User;
     <?= $form->field($model, 'status_of_life')->textarea(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Фото')?>
-    <?= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); ?>
+<?= $form->fieldSet('Фотоальбом')?>
+    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
+    <?= $form->field($model, 'images')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'images',
+        ]
+    )->label('Фото');; ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

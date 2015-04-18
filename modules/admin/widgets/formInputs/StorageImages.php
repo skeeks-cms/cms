@@ -31,6 +31,11 @@ class StorageImages extends InputWidget
     public $clientOptions = [];
 
     /**
+     * @var string
+     */
+    public $fileGroup = "";
+
+    /**
      * Берем поведения модели
      *
      */
@@ -57,18 +62,16 @@ class StorageImages extends InputWidget
         {
             $this->_initAndValidate();
 
-            $groupMainImage = $this->model->getFilesGroups()->getComponent('image');
-            $groupImages = $this->model->getFilesGroups()->getComponent('images');
-
             if ($this->model->isNewRecord)
             {
-                echo "";
+                echo "<br />Файлы можно добавлять после сохранения этой записи";
                 return;
             }
 
             echo $this->render('storage-images', [
                 'model' => $this->model,
                 'widget' => $this,
+                'fileGroup' => $this->fileGroup,
             ]);
 
         } catch (Exception $e)

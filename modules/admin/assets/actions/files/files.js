@@ -357,6 +357,7 @@
         _onWindowReady: function()
         {
             var self        = this;
+
             this.buttons    = this.get('buttons', [
                 document.getElementById('source-simpleUpload')
             ]);
@@ -455,6 +456,12 @@
                     }
                 }
             }));
+
+
+            if (self.uploaderObj)
+            {
+                self.uploaderObj.setData(self.getManager().getCommonData());
+            }
         },
 
     });
@@ -655,8 +662,8 @@
             this.SourceRemoteUpload = new sx.classes.files.sources.RemoteUpload(this, this.get("remoteUpload"));
             this.SourceFileManagerUpload = new sx.classes.files.sources.FileManagerUpload(this);
 
-            this.AllUploadProgress      = new sx.classes.files.AllUploadProgress(this,      ".sx-progress-bar");
-            this.OneFileUploadProgress  = new sx.classes.files.OneFileUploadProgress(this,  ".sx-progress-bar-file");
+            this.AllUploadProgress      = new sx.classes.files.AllUploadProgress(this,      this.get('allUploadProgressSelector', ".sx-progress-bar"));
+            this.OneFileUploadProgress  = new sx.classes.files.OneFileUploadProgress(this,  this.get('oneFileUploadProgressSelector', ".sx-progress-bar-file"));
 
             this.bind('error', function(e, data)
             {
@@ -675,6 +682,48 @@
                     sx.notify.info('Начало загрузки: ' + data.queueLength + ' (файлов)');
                 }
             });
+        },
+    });
+
+    /**
+     *
+     */
+    sx.classes.CustomFileManager = sx.classes.DefaultFileManager.extend({
+
+        _init: function()
+        {
+            //События на кнопки для simpleupload
+            if (this.get('simpleUploadButtons', []))
+            {
+                var buttons = [];
+                _.each(this.get('simpleUploadButtons', []), function(value, key)
+                {
+                    buttons.push(document.getElementById(value))
+                });
+
+                this.set('simpleUpload', _.extend(
+                    this.get('simpleUpload', {}),
+                    {
+                        'buttons' : buttons
+                    }
+
+                ));
+            }
+
+            this.applyParentMethod(sx.classes.DefaultFileManager, '_init', []); // TODO: make a workaround for magic parent calling
+        },
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            if (this.get('remoteUploadButtonSelector', ".source-remoteUpload"))
+            {
+                $( this.get('remoteUploadButtonSelector', ".source-remoteUpload") ).on('click', function()
+                {
+                    self.SourceRemoteUpload.run();
+                });
+            }
         },
     });
 

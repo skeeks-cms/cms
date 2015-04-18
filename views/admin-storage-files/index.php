@@ -20,10 +20,27 @@ $dataProvider->sort->defaultOrder = [
 ];
 ?>
 
+<?= \skeeks\cms\widgets\StorageFileManager::widget([
+    'clientOptions' =>
+    [
+        'completeUploadFile' => new \yii\web\JsExpression(<<<JS
+        function(data)
+        {
+            $.pjax.reload('#sx-storage-files', {});
+        }
+JS
+)
+    ],
+]); ?>
+<p></p>
 <?= GridView::widget([
 
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
+
+    'PjaxOptions' => [
+        'id' => 'sx-storage-files'
+    ],
 
     'columns' => [
 
