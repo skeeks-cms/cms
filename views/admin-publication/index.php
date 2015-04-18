@@ -73,44 +73,12 @@ $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]])
             'class'     => \yii\grid\DataColumn::className(),
             'value'     => function($model)
             {
-                \Yii::$app->view->registerJs(<<<JS
-(function(sx, $, _)
-{
-    sx.classes.NoPjaxLink = sx.classes.Component.extend({
 
-        _init: function()
-        {
-            var self = this;
-            self.go();
-        },
-
-        go: function()
-        {
-            location.href = this.get('href');
-            return this;
-            var Jlink = $("<a>", {
-                'href': this.get('href'),
-                'target': this.get('target'),
-                'id': 'sx-test'
-            }).text('link');
-            Jlink.appendTo("body");
-
-            Jlink.click();
-
-            return false;
-        },
-    });
-})(sx, sx.$, sx._);
-JS
-);
-                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-eye-open"></i>', $model->getPageUrl(), [
-                    'class' => 'btn btn-xs btn-default',
-                    'title' => 'Смотреть на сайте',
-                    'onclick' => new \yii\web\JsExpression(<<<JS
-                        new sx.classes.NoPjaxLink({'href':'{$model->getPageUrl()}','target':'_blank'});
-                        return false;
-JS
-                    )
+                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->getPageUrl(), [
+                    'target' => '_blank',
+                    'title' => 'Посмотреть на сайте (Откроется в новом окне)',
+                    'data-pjax' => '0',
+                    'class' => 'btn btn-default btn-sm'
                 ]);
 
             },
