@@ -203,7 +203,7 @@ $config =
             'class'                         => '\skeeks\cms\Module',
 
             'controllerMap' => [
-                'elfinder-user-files' =>
+                /*'elfinder-user-files' =>
                 [
                     'class' => 'skeeks\cms\controllers\ElfinderController',
                     'access' => ['@'], //глобальный доступ к фаил менеджеру @ - для авторизорованных , ? - для гостей , чтоб открыть всем ['@', '?']
@@ -216,7 +216,7 @@ $config =
                             'name'  => 'Личные файлы'
                         ],
                     ]
-                ],
+                ],*/
 
                 'elfinder' =>
                 [

@@ -116,19 +116,16 @@ return [
             'description'   => 'Доступ к панеле управления сайтом'
         ],
 
-
-
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
             'description'   => 'Возможность создания записей'
         ],
 
-
-
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
             'description'   => 'Обновление данных записей',
         ],
+
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
             'description'   => 'Обновление данных своих записей',
@@ -146,6 +143,7 @@ return [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
             'description'   => 'Обновление дополнительных данных записей',
         ],
+
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED_OWN,
             'description'   => 'Обновление дополнительных данных своих записей',
@@ -163,6 +161,7 @@ return [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
             'description'   => 'Удаление записей',
         ],
+
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
             'description'   => 'Удаление своих записей',
@@ -174,6 +173,21 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
                 ],
             ]
+        ],
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+            'description'   => 'Доступ к личным файлам'
+        ],
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+            'description'   => 'Доступ к общим публичным файлам'
+        ],
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
+            'description'   => 'Доступ к ко всем файлам'
         ],
     ],
 
