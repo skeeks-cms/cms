@@ -23,6 +23,8 @@ use yii\rbac\Item;
 use Yii;
 use yii\web\Response;
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
 /**
  * AuthItemController implements the CRUD actions for AuthItem model.
  */
@@ -202,10 +204,10 @@ class AdminPermissionController extends AdminModelEditorController
             if (in_array($name, $children)) {
                 continue;
             }
-            $avaliable[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name;
+            $avaliable[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name . ' — ' . $role->description;;
         }
         foreach ($authManager->getChildren($id) as $name => $child) {
-            $assigned[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name;
+            $assigned[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name . ' — ' . $child->description;;
         }
         $avaliable = array_filter($avaliable);
         $assigned = array_filter($assigned);
@@ -220,6 +222,14 @@ class AdminPermissionController extends AdminModelEditorController
     {
         $model = new AuthItem(null);
         $model->type = Item::TYPE_PERMISSION;
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if ($model->load(Yii::$app->getRequest()->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->name]);
         } else {
@@ -238,9 +248,25 @@ class AdminPermissionController extends AdminModelEditorController
         $id = $model->name;
 
         $model = $this->findModel($id);
-        if ($model->load(Yii::$app->getRequest()->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->name]);
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
         }
+
+        if (\Yii::$app->request->isAjax)
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->save())
+            {
+                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            } else
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
+        }
+
         return $this->render('update', ['model' => $model,]);
     }
     /**

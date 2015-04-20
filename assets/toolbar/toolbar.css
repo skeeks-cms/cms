@@ -195,10 +195,30 @@
 
 
 
+.skeeks-cms-toolbar-edit-mode
+{
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-size: 100%;
+      font: inherit;
+      vertical-align: baseline;
+      outline: none;
+}
+
+
+.skeeks-cms-toolbar-edit-mode:before
+{
+      display: table;
+      content: " ";
+}
+
+
+
 .skeeks-cms-toolbar-edit-mode:hover
 {
-    border: 1px solid red;
-    outline: none;
+    //border: 1px solid red;
+    //outline: none;
 }
 
 #skeeks-cms-toolbar .sx-profile img

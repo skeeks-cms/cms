@@ -103,71 +103,75 @@ class StorageFilesController extends Controller
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $request = Yii::$app->getRequest();
-        if ($request->get("linked_to_model") && $request->get("linked_to_value"))
+
+
+        $dir = \skeeks\sx\Dir::runtimeTmp();
+
+        $uploader = new \skeeks\widget\simpleajaxuploader\backend\FileUpload("imgfile");
+        $file = $dir->newFile()->setExtension($uploader->getExtension());
+
+        $originalName = $uploader->getFileName();
+
+        $uploader->newFileName = $file->getBaseName();
+        $result = $uploader->handleUpload($dir->getPath() . DIRECTORY_SEPARATOR);
+
+        if (!$result)
         {
+            $response["msg"] = $uploader->getErrorMsg();
+            return $result;
 
-            $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
+        } else {
 
-            /**
-             * @var \common\models\Game $model
-             */
-            if (!$model = $ref->findModel())
-            {
-                throw new Exception("Не найдена сущьность к которой обавляется файл");
-            }
+            $storageFile = Yii::$app->storage->upload($file, array_merge(
+                [
+                    "name" => "",
+                    "original_name" => $originalName
+                ]
+            ));
 
-            $dir = \skeeks\sx\Dir::runtimeTmp();
+            //Если указана универсальная модель привязки файла
+            if ($request->get("linked_to_model") && $request->get("linked_to_value")) {
 
-            $uploader = new \skeeks\widget\simpleajaxuploader\backend\FileUpload("imgfile");
-            $file = $dir->newFile()->setExtension($uploader->getExtension());
+                $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
 
-            $originalName = $uploader->getFileName();
-
-            $uploader->newFileName = $file->getBaseName();
-            $result = $uploader->handleUpload($dir->getPath() . DIRECTORY_SEPARATOR);
-
-            if (!$result)
-            {
-                $response["msg"] = $uploader->getErrorMsg();
-                return $result;
-
-            } else
-            {
-
-                $storageFile = Yii::$app->storage->upload($file, array_merge(
-                    [
-                        "name"          => isset($model->name) ? $model->name : "",
-                        "original_name" => $originalName
-                    ]
-                ));
-
-                $storageFile->linkToModel($model);
-
-                if ($group = $request->get("group"))
-                {
-
-                    /**
-                     *
-                     * @var \skeeks\cms\models\helpers\ModelFilesGroup $group
-                     */
-                    $group = $model->getFilesGroups()->getComponent($group);
-                    if ($group)
-                    {
-                        try
-                        {
-                            $group->attachFile($storageFile)->save();
-                        } catch (\yii\base\Exception $e)
-                        {
-                            $response["msgError"]  = $e->getMessage();
-                        }
-                    }
+                /**
+                 * @var \common\models\Game $model
+                 */
+                if (!$model = $ref->findModel()) {
+                    throw new Exception("Не найдена сущьность к которой обавляется файл");
                 }
 
-
-                $response["success"]  = true;
-                $response["file"]     = $storageFile;
-                return $response;
+                $storageFile->linkToModel($model);
+                $storageFile->name = $model->name;
             }
+
+            if ($request->get('modelData') && is_array($request->get('modelData')))
+            {
+                $storageFile->setAttributes($request->get('modelData'));
+            }
+
+            $storageFile->save(false);
+
+            if ($group = $request->get("group")) {
+
+                /**
+                 *
+                 * @var \skeeks\cms\models\helpers\ModelFilesGroup $group
+                 */
+                $group = $model->getFilesGroups()->getComponent($group);
+                if ($group) {
+                    try {
+                        $group->attachFile($storageFile)->save();
+                    } catch (\yii\base\Exception $e) {
+                        $response["msgError"] = $e->getMessage();
+                    }
+                }
+            }
+
+
+            $response["success"] = true;
+            $response["file"] = $storageFile;
+            return $response;
         }
 
         return $response;
@@ -185,22 +189,59 @@ class StorageFilesController extends Controller
         $post = Yii::$app->request->post();
         $get = Yii::$app->getRequest();
 
-        if ($get->get("linked_to_model") && $get->get("linked_to_value") && $post['link'])
+        $request = Yii::$app->getRequest();
+
+        if (\Yii::$app->request->post('link'))
         {
-            $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
-
-            if (!$model = $ref->findModel()) {
-                throw new Exception("Не найдена сущность, к которой добавляется файл");
-            }
-
-            $storageFile = Yii::$app->storage->upload($post['link'], array_merge(
+            $storageFile = Yii::$app->storage->upload(\Yii::$app->request->post('link'), array_merge(
                 [
                     "name"          => isset($model->name) ? $model->name : "",
                     "original_name" => basename($post['link'])
                 ]
             ));
 
-            $storageFile->linkToModel($model);
+            //Если указана универсальная модель привязки файла
+            if ($request->get("linked_to_model") && $request->get("linked_to_value")) {
+
+                $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
+
+                /**
+                 * @var \common\models\Game $model
+                 */
+                if (!$model = $ref->findModel()) {
+                    throw new Exception("Не найдена сущьность к которой обавляется файл");
+                }
+
+                $storageFile->linkToModel($model);
+                $storageFile->name = $model->name;
+            }
+
+            if ($request->post('modelData') && is_array($request->post('modelData')))
+            {
+                $storageFile->setAttributes($request->post('modelData'));
+            }
+
+            $storageFile->save(false);
+
+
+            if ($group = \Yii::$app->request->post("group"))
+            {
+                /**
+                 *
+                 * @var \skeeks\cms\models\helpers\ModelFilesGroup $group
+                 */
+                $group = $model->getFilesGroups()->getComponent($group);
+                if ($group)
+                {
+                    try
+                    {
+                        $group->attachFile($storageFile)->save();
+                    } catch (\yii\base\Exception $e)
+                    {
+                        $response["msgError"]  = $e->getMessage();
+                    }
+                }
+            }
 
             $response["success"]  = true;
             $response["file"]     = $storageFile;

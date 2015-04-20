@@ -143,7 +143,7 @@ class UpdateController extends Controller
             }
         }
 
-        $this->systemCmdRoot("php yii migrate");
+        $this->systemCmdRoot("php yii migrate --interactive=0");
     }
 
     /**

@@ -23,6 +23,9 @@ use yii\filters\VerbFilter;
 use yii\rbac\Item;
 use Yii;
 use yii\helpers\Html;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
+
 /**
  * AuthItemController implements the CRUD actions for AuthItem model.
  */
@@ -152,19 +155,19 @@ class AdminRoleController extends AdminModelEditorController
             if (in_array($name, $children)) {
                 continue;
             }
-            $avaliable['Roles'][$name] = $name;
+            $avaliable['Roles'][$name] = $name . ' — ' . $role->description;
         }
         foreach ($authManager->getPermissions() as $name => $role) {
             if (in_array($name, $children)) {
                 continue;
             }
-            $avaliable[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name;
+            $avaliable[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name  . ' — ' . $role->description;
         }
         foreach ($authManager->getChildren($id) as $name => $child) {
             if ($child->type == Item::TYPE_ROLE) {
-                $assigned['Roles'][$name] = $name;
+                $assigned['Roles'][$name] = $name  . ' — ' . $child->description;
             } else {
-                $assigned[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name;
+                $assigned[$name[0] === '/' ? 'Routes' : 'Permission'][$name] = $name  . ' — ' . $child->description;
             }
         }
         $avaliable = array_filter($avaliable);
@@ -180,6 +183,15 @@ class AdminRoleController extends AdminModelEditorController
     {
         $model = new AuthItem(null);
         $model->type = Item::TYPE_ROLE;
+
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
         if ($model->load(Yii::$app->getRequest()->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->name]);
         } else {
@@ -199,9 +211,24 @@ class AdminRoleController extends AdminModelEditorController
 
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->getRequest()->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->name]);
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
         }
+
+        if (\Yii::$app->request->isAjax)
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->save())
+            {
+                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            } else
+            {
+                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+            }
+        }
+
         return $this->render('update', ['model' => $model,]);
     }
     /**

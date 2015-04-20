@@ -38,6 +38,11 @@ class CmsManager extends \yii\rbac\DbManager
     const PERMISSION_ALLOW_MODEL_DELETE_OWN                 = 'cms.model-delete-own';
 
 
+    const PERMISSION_ELFINDER_USER_FILES                    = 'cms.elfinder-user-files';
+    const PERMISSION_ELFINDER_COMMON_PUBLIC_FILES           = 'cms.elfinder-common-public-files';
+    const PERMISSION_ELFINDER_ADDITIONAL_FILES              = 'cms.elfinder-additional-files';
+
+
     const ROLE_ROOT     = 'root';
     const ROLE_ADMIN    = 'admin';
     const ROLE_MANGER   = 'manager';

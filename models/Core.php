@@ -23,6 +23,9 @@ use yii\behaviors\BlameableBehavior;
  * @property integer $created_at
  * @property integer $updated_at
  *
+ * @property User $createdBy
+ * @property User $updatedBy
+ *
  * Class Core
  * @package skeeks\cms\base\models
  */
@@ -49,7 +52,14 @@ abstract class Core extends ActiveRecord
                     }
                 },
             ],
-            TimestampBehavior::className(),
+            TimestampBehavior::className() =>
+            [
+                'class' => TimestampBehavior::className(),
+                /*'value' => function()
+                {
+                    return date('U');
+                },*/
+            ]
         ]);
     }
 
@@ -107,6 +117,7 @@ abstract class Core extends ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id'         => Yii::t('app', 'ID'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),

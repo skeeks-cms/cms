@@ -30,6 +30,8 @@
          */
         construct: function(Manager, opts)
         {
+            var self = this;
+
             if (! (Manager instanceof sx.classes.files._Manager))
             {
                 throw new Error('Не передан менеджер загрузки');
@@ -37,6 +39,7 @@
 
             opts = opts || {};
             opts['manager'] = Manager;
+            opts['id']      = "sx-" + self.strRand();
 
             //В процессе выполнения?
             this.inProcess  = false;
@@ -72,11 +75,73 @@
                 });
             });
 
+            this._initManagerEvents();
             this._afterInit();
+        },
+
+        _initManagerEvents: function()
+        {
+            var self = this;
+
+            this.bind("error", function(e, message)
+            {
+                self.getManager().trigger("error", message);
+            });
+
+            this.bind("completeUpload", function(e, data)
+            {
+                self.getManager().trigger('completeUpload', data);
+            });
+
+            this.bind("startUpload", function(e, data)
+            {
+                //queueLength
+                self.getManager().trigger('startUpload', data);
+            });
+
+            this.bind("startUploadFile", function(e, data)
+            {
+                //queueLength
+                self.getManager().trigger('startUploadFile', data);
+            });
+
+            this.bind("completeUploadFile", function(e, data)
+            {
+                //queueLength
+                self.getManager().trigger('completeUploadFile', data);
+            });
+
+            this.bind("onProgressFile", function(e, data)
+            {
+                //queueLength
+                self.getManager().trigger('onProgressFile', data);
+            });
+
+            this.bind("onProgress", function(e, data)
+            {
+                //queueLength
+                self.getManager().trigger('onProgress', data);
+            });
         },
 
         _afterInit: function()
         {},
+
+        /**
+         * Рандомная строка
+         * @returns {string}
+         */
+        strRand: function()
+        {
+            var result       = '';
+            var words        = '0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+            var max_position = words.length - 1;
+                for( i = 0; i < 6; ++i ) {
+                    position = Math.floor ( Math.random() * max_position );
+                    result = result + words.substring(position, position + 1);
+                }
+            return result;
+        },
 
         /**
          * Начало выполнения загрузки файлов
@@ -156,12 +221,9 @@
          * @param msg
          * @returns {sx.classes.files.sources.Base}
          */
-        triggerError: function(msg)
+        triggerError: function(data)
         {
-            this.trigger("error", {
-                'msg': msg
-            });
-
+            this.trigger("error", data);
             return this;
         },
 
@@ -195,57 +257,57 @@
      */
     sx.classes.files.sources.RemoteUpload = sx.classes.files._Source.extend({
 
-        _init: function()
+        run: function()
         {
             var self = this;
+            //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
+            //По нажатию кнопки начало загрузки.
+            var link = prompt("Введите URL файла начиная с http://");
 
-            $(".source-remoteUpload").click(function(){
-                //По клику на кнопку, загрузить по http, рисуем textarea, предлагаем ввести пользователю ссылки на изображения, которые хотим скачать, резделив их через запятую или с новой строки.
-                //По нажатию кнопки начало загрузки.
-                var link = prompt("Введите URL");
+            if (link)
+            {
+                //1) считаем сколько всего пользователь указал ссылок (это делается на js)
+                this.httpLinks = [link];
 
-                if (link)
-                {
-                    //1) считаем сколько всего пользователь указал ссылок (это делается на js)
-                    this.httpLinks = [link];
+                self.queue = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
+                self.inProcess = true;                     //Загрузчик в работе
 
-                    self.queue = _.size(this.httpLinks);   //В очереди к загрузки осталось столько то файлов
-                    self.inProcess = true;                     //Загрузчик в работе
+                self.triggerStartUpload({
+                    'queueLength': _.size(this.httpLinks) //сообщаем сколько файлов к загрузке всего
+                });
 
-                    self.triggerStartUpload({
-                        'queueLength': _.size(this.httpLinks) //сообщаем сколько файлов к загрузке всего
+                //Берем каждую, и обрабатываем по очереди.
+                _.each(this.httpLinks, function (link, key) {
+                    //Кидаем событие, начало работы с файлом
+                    self.triggerStartUploadFile({
+                        'name': link,      //ссылка к загрузке
+                        'additional': {}  //дополнительная информация
                     });
 
-                    //Берем каждую, и обрабатываем по очереди.
-                    _.each(this.httpLinks, function (link, key) {
-                        //Кидаем событие, начало работы с файлом
-                        self.triggerStartUploadFile({
-                            'name': link,      //ссылка к загрузке
-                            'additional': {}  //дополнительная информация
-                        });
-
-
-                        var ajax = sx.ajax.preparePostQuery(self.get('url'), {
-                            'link': link
-                        });
-
-                        ajax.onComplete(function (e, data) {
-                            self.triggerCompleteUploadFile({
-                                'response': data
-                            });
-
-                            self.queue = self.queue - 1;
-
-                            if (self.queue == 0) {
-                                self.inProcess = false;
-                                self.triggerCompleteUpload({});
-                            }
-                        });
-
-                        ajax.execute();
+                    var ajaxData = _.extend(self.getManager().getCommonData(), {
+                        'link': link
                     });
-                }
-            });
+
+                    var ajax = sx.ajax.preparePostQuery(self.get('url'), ajaxData);
+
+                    ajax.onComplete(function (e, data)
+                    {
+                        self.triggerCompleteUploadFile({
+                            'response': data
+                        });
+
+                        self.queue = self.queue - 1;
+
+                        if (self.queue == 0)
+                        {
+                            self.inProcess = false;
+                            self.triggerCompleteUpload({});
+                        }
+                    });
+
+                    ajax.execute();
+                });
+            }
         }
     });
 
@@ -270,37 +332,53 @@
 
             this.uploaderObj = null;
 
-            this.getManager().bind("changeGroup", function(e, data)
+            this.getManager().bind("changeData", function(e, data)
             {
                 if (self.uploaderObj)
                 {
-                    self.uploaderObj.setData(data);
+                    self.uploaderObj.setData(self.getManager().getCommonData());
                 }
             });
+
+            if (self.uploaderObj)
+            {
+                self.uploaderObj.setData(self.getManager().getCommonData());
+            }
+        },
+
+        _onDomReady: function()
+        {
+            /*this.jControllButton = $("<div>", {
+                'id' : this.get('id'),
+                'style':'display: none;'
+            }).append("test").appendTo($("body"));*/
         },
 
         _onWindowReady: function()
         {
-            var self    = this;
+            var self        = this;
 
-            var button = document.getElementById(
-                $(".source-simpleUpload", this.getManager().getWrapper()).attr("id")
-            );
+            this.buttons    = this.get('buttons', [
+                document.getElementById('source-simpleUpload')
+            ]);
 
             this.uploaderObj = new ss.SimpleUpload(_.extend(this.get("options"), {
                 queue: true,
                 debug: false,
                 maxUploads: 1,
                 multiple: true,
-                button: button,
+                button: this.buttons,
                 onExtError: function(filename, extension)
                 {
-                    self.trigger("error", "is not a permitted file type.");
-                    self.trigger("error", filename + " тип файла не разрешен к загрузке");
+                    self.triggerError({
+                        'message' : filename + " тип файла не разрешен к загрузке"
+                    });
                 },
                 onSizeError: function(filename, fileSize)
                 {
-                    self.trigger("error", filename + " слишком большой, допустимо не более " + Number(self.get("options").maxSize) + " Kb");
+                    self.triggerError({
+                        'message' : filename + " слишком большой, допустимо не более " + Number(self.get("options").maxSize) + " Kb"
+                    });
                 },
 
                 onProgress: function(pct)
@@ -308,6 +386,35 @@
                     self.triggerOnProgressFile({
                         'pct': pct
                     });
+                },
+
+                onError: function( filename, type, status, statusText, response, uploadBtn )
+                {
+                    if (status = 413)
+                    {
+                        self.triggerError({
+                            'message' : 'Не удалось загрузить файл. Слишком большой.'
+                        });
+                    } else
+                    {
+                        self.triggerError({
+                            'message' : 'Ошибка загрузки файла. Код ошибки: ' + status + " " + statusText
+                        });
+                    }
+
+                    self.triggerCompleteUploadFile({
+                        'name' : filename,
+                        'response' : response,
+                    });
+
+                    self.queue      = this._queue.length;
+
+                    if (this._queue.length == 0)
+                    {
+                        self.inProcess  = false;
+                        self.triggerCompleteUpload({});
+                    }
+
                 },
 
                 onSubmit: function(filename, ext)
@@ -347,31 +454,15 @@
                         self.inProcess  = false;
                         self.triggerCompleteUpload({});
                     }
-
-                    /*if (!response)
-                    {
-                        self.trigger("error", "Не удалось загрузить файл");
-                    }
-
-                    if (response.success === true)
-                    {
-                        self.triggerCompleteUploadFile(response.file);
-
-                    } else
-                    {
-                          if (response.msg)
-                          {
-                                self.trigger("error", response.msg);
-                          } else
-                          {
-                                self.trigger("error", "Не удалось загрузить файл");
-                          }
-                    }*/
                 }
             }));
+
+
+            if (self.uploaderObj)
+            {
+                self.uploaderObj.setData(self.getManager().getCommonData());
+            }
         },
-
-
 
     });
 
@@ -495,111 +586,63 @@
 
         _init: function()
         {
+            var self = this;
+
             this.sources = [];
+
+            if (this.get('completeUpload'))
+            {
+                self.bind('completeUpload', function(e, data)
+                {
+                    var callback = self.get('completeUpload');
+                    callback(data);
+                });
+            }
+
+            if (this.get('completeUploadFile'))
+            {
+                self.bind('completeUploadFile', function(e, data)
+                {
+                    var callback = self.get('completeUploadFile');
+                    callback(data);
+                });
+            }
         },
 
         /**
-         *
-         * @param Source
+         * Общие данные передаваемые в каждый источник
+         * Например в какую группу загружать файлы
+         * @returns {*}
+         */
+        getCommonData: function()
+        {
+            return this.get('commonData', {});
+        },
+
+        /**
+         * @param data
          * @returns {sx.classes.files._Manager}
          */
-        registerSource: function(Source)
+        setCommonData: function(data)
         {
-            var self = this;
-
-            if (!Source instanceof sx.classes.files._Source)
-            {
-                throw new Error("Source instanceof sx.classes.files._Source");
-            }
-
-            if (!this.sources)
-            {
-                this.sources = [];
-            }
-
-            this.sources.push(Source);
-
-            Source.bind("error", function(e, message)
-            {
-                sx.notify.error(message);
-            });
-
-            Source.bind("completeUpload", function(e, data)
-            {
-                self.trigger('completeUpload', data);
-            });
-
-            Source.bind("startUpload", function(e, data)
-            {
-                //queueLength
-                self.trigger('startUpload', data);
-            });
-
-            Source.bind("startUploadFile", function(e, data)
-            {
-                //queueLength
-                self.trigger('startUploadFile', data);
-            });
-
-            Source.bind("completeUploadFile", function(e, data)
-            {
-                //queueLength
-                self.trigger('completeUploadFile', data);
-            });
-
-            Source.bind("onProgressFile", function(e, data)
-            {
-                //queueLength
-                self.trigger('onProgressFile', data);
-            });
-
-            Source.bind("onProgress", function(e, data)
-            {
-                //queueLength
-                self.trigger('onProgress', data);
-            });
+            this.set('commonData', data);
+            this.trigger('changeData');
 
             return this;
-        },
-
-
-        _onDomReady: function()
-        {
-            this._initSelectForm();
         },
 
         /**
-        *
-        * @returns {sx.classes.FileManager}
-        * @private
-        */
-        _initSelectForm: function()
+         * @param data
+         * @returns {sx.classes.files._Manager}
+         */
+        mergeCommonData: function(data)
         {
-            var self = this;
-            this.JselectType        = $('.sx-select-group', this.getWrapper());
-            this.JselectTypeForm    = $('form', this.JselectType);
-
-            this.getWrapper().on("change", ".sx-select-group select", function()
-            {
-                self.trigger("changeGroup", {'group': $(this).val()});
-
-                $(this).closest("form").submit();
-
-                _.delay(function()
-                {
-                    $.pjax.reload('#sx-table-files', {});
-                }, 500);
-                return false;
-            });
-
-            return this;
+            var newData = _.extend(this.get('commonData', {}), data);
+            return this.setCommonData(newData);
         },
-
-
-        _onWindowReady: function()
-        {}
     });
 
+    sx.classes.files.Manager = sx.classes.files._Manager.extend({});
 
     /**
      * Стандартная сборка файлового менеджера
@@ -609,44 +652,79 @@
      * RemoteUpload         //Загрузка по http://
      * FileManagerUpload    //Выбор файлов из файлового менеджера
      */
-    sx.classes.DefaultFileManager = sx.classes.files._Manager.extend({
+    sx.classes.DefaultFileManager = sx.classes.files.Manager.extend({
 
         _init: function()
         {
-            this
+            this.applyParentMethod(sx.classes.files._Manager, '_init', []); // TODO: make a workaround for magic parent calling
 
-                .registerSource(
-                    new sx.classes.files.sources.SimpleUpload(this, {
-                        "options" : this.get("simpleUpload"),
-                    })
-                )
+            this.SourceSimpleUpload = new sx.classes.files.sources.SimpleUpload(this, this.get("simpleUpload"));
+            this.SourceRemoteUpload = new sx.classes.files.sources.RemoteUpload(this, this.get("remoteUpload"));
+            this.SourceFileManagerUpload = new sx.classes.files.sources.FileManagerUpload(this);
 
-                .registerSource(
-                    new sx.classes.files.sources.RemoteUpload(this, this.get("remoteUpload")) //В этот источник передаем настройки из backend-a
-                )
+            this.AllUploadProgress      = new sx.classes.files.AllUploadProgress(this,      this.get('allUploadProgressSelector', ".sx-progress-bar"));
+            this.OneFileUploadProgress  = new sx.classes.files.OneFileUploadProgress(this,  this.get('oneFileUploadProgressSelector', ".sx-progress-bar-file"));
 
-                .registerSource(
-                    new sx.classes.files.sources.FileManagerUpload(this)
-                )
-            ;
-
+            this.bind('error', function(e, data)
+            {
+                sx.notify.error(data.message);
+            });
 
             this.bind('completeUpload', function(e, data)
             {
-                sx.notify.success('Файлы успешно загружены');
-                $.pjax.reload('#sx-table-files', {});
+                sx.notify.success('Загрузка завершена');
             });
 
             this.bind('startUpload', function(e, data)
             {
-                sx.notify.info('Начало загрузки: ' + data.queueLength + ' (файлов)');
+                if (data.queueLength > 2)
+                {
+                    sx.notify.info('Начало загрузки: ' + data.queueLength + ' (файлов)');
+                }
             });
+        },
+    });
 
+    /**
+     *
+     */
+    sx.classes.CustomFileManager = sx.classes.DefaultFileManager.extend({
 
-            this.AllUploadProgress = new sx.classes.files.AllUploadProgress(this, ".sx-progress-bar");
-            this.OneFileUploadProgress = new sx.classes.files.OneFileUploadProgress(this, ".sx-progress-bar-file");
-        }
+        _init: function()
+        {
+            //События на кнопки для simpleupload
+            if (this.get('simpleUploadButtons', []))
+            {
+                var buttons = [];
+                _.each(this.get('simpleUploadButtons', []), function(value, key)
+                {
+                    buttons.push(document.getElementById(value))
+                });
 
+                this.set('simpleUpload', _.extend(
+                    this.get('simpleUpload', {}),
+                    {
+                        'buttons' : buttons
+                    }
+
+                ));
+            }
+
+            this.applyParentMethod(sx.classes.DefaultFileManager, '_init', []); // TODO: make a workaround for magic parent calling
+        },
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            if (this.get('remoteUploadButtonSelector', ".source-remoteUpload"))
+            {
+                $( this.get('remoteUploadButtonSelector', ".source-remoteUpload") ).on('click', function()
+                {
+                    self.SourceRemoteUpload.run();
+                });
+            }
+        },
     });
 
 

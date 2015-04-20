@@ -67,8 +67,7 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                         "rules"     =>
                         [
                             [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasDescriptionsBehavior::className()
+                                "class"     => HasModelBehaviors::className()
                             ]
                         ]
                     ],
@@ -83,7 +82,6 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                         [
                             [
                                 "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasDescriptionsBehavior::className()
                             ]
                         ]
                     ],
@@ -98,7 +96,6 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                         [
                             [
                                 "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasDescriptionsBehavior::className()
                             ]
                         ]
                     ],
@@ -113,7 +110,19 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                         [
                             [
                                 "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasDescriptionsBehavior::className()
+                            ]
+                        ]
+                    ],
+
+                    'download' =>
+                    [
+                        "label"     => "Скачать",
+                        "icon"      => "glyphicon glyphicon-circle-arrow-down",
+                        "method"        => "post",
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
                             ]
                         ]
                     ],
@@ -125,6 +134,25 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
         unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['create']);
 
         return $behaviors;
+    }
+
+    public function actionDownload()
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $success = false;
+
+        /**
+         * @var StorageFile $file
+         */
+        $file = $this->getCurrentModel();
+        $file->src;
+
+
+        header('Content-type: ' . $file->mime_type);
+        header('Content-Disposition: attachment; filename="' . $file->cluster_file . '"');
+        echo file_get_contents($file->cluster()->getAbsoluteUrl($file->cluster_file));
+        die;
+
     }
 
     public function actionDeleteTmpDir()

@@ -39,6 +39,8 @@ class TreeUrlRule
         }
     }
 
+    static public $models = [];
+
     /**
      * @param \yii\web\UrlManager $manager
      * @param string $route
@@ -55,7 +57,12 @@ class TreeUrlRule
                 return false;
             }
 
-            $tree = Tree::findOne(['id' => $id]);
+            if (!$tree = ArrayHelper::getValue(self::$models, $id))
+            {
+                $tree = Tree::findOne(['id' => $id]);
+                self::$models[$id] = $tree;
+            }
+
             if (!$tree)
             {
                 return false;

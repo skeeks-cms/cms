@@ -15,6 +15,8 @@ use skeeks\cms\components\CollectionComponents;
 use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
+use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 use yii\helpers\BaseUrl;
 
@@ -94,23 +96,73 @@ class Storage extends CollectionComponents
                 throw new Exception("Не удалось скачать файл");
             }
 
-            $tmpfile->setExtension(pathinfo($file, PATHINFO_EXTENSION));
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+            if ($pos = strpos($extension, "?"));
+            {
+                $extension = substr($extension, 0, $pos);
+            }
+
+            if ($extension)
+            {
+                $tmpfile->setExtension($extension);
+            }
 
             $is_file_saved = file_put_contents($tmpfile, $file_content);
 
-            if (!$is_file_saved) {
+            if (!$is_file_saved)
+            {
                 throw new Exception("Не удалось сохранить файл");
             }
+
+            //Если в ссылке нет расширения
+            if (!$extension)
+            {
+                $tmpfile = new File($tmpfile->getPath());
+
+                try
+                {
+                    $mimeType = FileHelper::getMimeType($tmpfile->getPath(), null, false);
+                } catch (InvalidConfigException $e)
+                {
+                    throw new Exception("Не удалось пределить расширение файла: " . $e->getMessage());
+                }
+
+                if (!$mimeType)
+                {
+                    throw new Exception("Не удалось пределить расширение файла");
+                }
+
+                $extensions = FileHelper::getExtensionsByMimeType($mimeType);
+                if ($extensions)
+                {
+                    if (in_array("jpg", $extensions))
+                    {
+                        $extension = 'jpg';
+                    } else if (in_array("png", $extensions))
+                    {
+                        $extension = 'png';
+                    } else
+                    {
+                        $extension = $extensions[0];
+                    }
+
+                    $newFile = new File($tmpfile->getPath());
+                    $newFile->setExtension($extension);
+
+                    $tmpfile = $tmpfile->copy($newFile);
+                }
+            }
+
         } else
         {
             throw new Exception("Файл должен быть определен как \yii\web\UploadedFile или \skeeks\sx\File или string");
         }
 
+
         $data["type"]       = $tmpfile->getType();
         $data["mime_type"]  = $tmpfile->getMimeType();
         $data["size"]       = $tmpfile->size()->getBytes();
         $data["extension"]  = $tmpfile->getExtension();
-
 
         //Елси это изображение
         if ($tmpfile->getType() == 'image')

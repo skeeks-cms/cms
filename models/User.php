@@ -106,6 +106,7 @@ class User
         $this->on(BaseActiveRecord::EVENT_AFTER_UPDATE,    [$this, "checkDataAfterSave"]);
 
         $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
+        $this->on(BaseActiveRecord::EVENT_AFTER_DELETE,    [$this, "checkDataAfterDelete"]);
     }
 
     /**
@@ -127,6 +128,25 @@ class User
         $userEmail->user_id = null;
         $userEmail->save();*/
     }
+    /**
+     * @throws Exception
+     */
+    public function checkDataAfterDelete()
+    {
+        $userEmails = UserEmail::find()->where(['user_id' => $this->id])->all();
+        if ($userEmails)
+        {
+            foreach ($userEmails as $userEmail)
+            {
+                $userEmail->delete();
+            }
+        }
+
+
+        /*$userEmail = UserEmail::find()->where(['value' => $this->email])->one();
+        $userEmail->user_id = null;
+        $userEmail->save();*/
+    }
 
 
     public function checkDataAfterSave()
@@ -140,7 +160,6 @@ class User
                 $email->user_id     = $this->id;
                 $email->save();
             }
-
         }
     }
 
@@ -163,6 +182,9 @@ class User
             {
                 throw new ErrorException("Email не удалось добавить");
             };
+        } else
+        {
+            $this->email = null;
         }
     }
 
@@ -189,6 +211,9 @@ class User
                 }
 
             }
+        } else
+        {
+            $this->email = null;
         }
     }
 
@@ -255,7 +280,7 @@ class User
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
 
-            [['email'], 'required'],
+            //[['email'], 'required'],
             [['email'], 'unique'],
             [['email'], 'email'],
             [['email'], 'validateEmails'],
@@ -410,9 +435,15 @@ class User
         return $this->name ? $this->name : $this->username;
     }
 
-    public function getPageUrl($action = 'view')
+    public function getPageUrl($action = 'view', $params = [])
     {
-        return \Yii::$app->urlManager->createUrl(["cms/user/" . $action, "username" => $this->username]);
+
+        $params = ArrayHelper::merge([
+            "cms/user/" . $action,
+            "username" => $this->username
+        ], $params);
+
+        return \Yii::$app->urlManager->createUrl($params);
     }
 
     /**
@@ -552,6 +583,18 @@ class User
     public function setPassword($password)
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+    }
+
+    /**
+     * Генерация логина пользователя
+     * @return $this
+     */
+    public function generateUsername()
+    {
+        $userLast = static::find()->orderBy("id DESC")->one();
+        $this->username = "id" . ($userLast->id + 1);
+
+        return $this;
     }
 
     /**

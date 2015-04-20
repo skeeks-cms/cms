@@ -65,9 +65,9 @@ use yii\base\Event;
  */
 class StorageFile extends Core
 {
-    use behaviors\traits\HasComments;
-    use behaviors\traits\HasSubscribes;
-    use behaviors\traits\HasVotes;
+    //use behaviors\traits\HasComments;
+    //use behaviors\traits\HasSubscribes;
+    //use behaviors\traits\HasVotes;
 
     /**
      * @inheritdoc
@@ -116,7 +116,7 @@ class StorageFile extends Core
         return array_merge(parent::attributeLabels(), [
             'id' => Yii::t('app', 'ID'),
             'src' => Yii::t('app', 'Src'),
-            'cluster_id' => Yii::t('app', 'Cluster ID'),
+            'cluster_id' => Yii::t('app', 'Хранилище'),
             'cluster_file' => Yii::t('app', 'Cluster File'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
@@ -124,7 +124,7 @@ class StorageFile extends Core
             'updated_at' => Yii::t('app', 'Updated At'),
             'size' => Yii::t('app', 'Размер файла'),
             'type' => Yii::t('app', 'Type'),
-            'mime_type' => Yii::t('app', 'Internet Media Type'),
+            'mime_type' => Yii::t('app', 'Тип файла'),
             'extension' => Yii::t('app', 'Расширение'),
             'original_name' => Yii::t('app', 'Оригинальное название файла'),
             'name_to_save' => Yii::t('app', 'Название при скачивании'),
@@ -141,7 +141,7 @@ class StorageFile extends Core
             'result_vote' => Yii::t('app', 'Result Vote'),
             'users_votes_up' => Yii::t('app', 'Users Votes Up'),
             'users_votes_down' => Yii::t('app', 'Users Votes Down'),
-            'linked_to_model' => Yii::t('app', 'Linked To Model'),
+            'linked_to_model' => Yii::t('app', 'Привязка'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
             'page_options'  => Yii::t('app', 'Дополнительные свойства'),
             'published_at'  => Yii::t('app', 'Дата публикации'),
@@ -164,14 +164,14 @@ class StorageFile extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            behaviors\HasComments::className(),
+            //behaviors\HasComments::className(),
             behaviors\HasStatus::className() => behaviors\HasStatus::className(),
-            behaviors\HasAdultStatus::className() => behaviors\HasAdultStatus::className(),
-            behaviors\HasSubscribes::className(),
-            behaviors\HasVotes::className(),
+            //behaviors\HasAdultStatus::className() => behaviors\HasAdultStatus::className(),
+            //behaviors\HasSubscribes::className(),
+            //behaviors\HasVotes::className(),
             CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
             HasPageOptions::className() => HasPageOptions::className(),
-            HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className(),
+            //HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className(),
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className()
         ]);
     }

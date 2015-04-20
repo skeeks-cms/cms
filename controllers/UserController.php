@@ -11,6 +11,8 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
 use Yii;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -104,6 +106,76 @@ class UserController extends Controller
     {
         $data = $this->_user($username);
         return $this->render('view', $data);
+    }
+
+    /**
+     * @param $username
+     * @return string
+     */
+    public function actionChangePassword($username)
+    {
+        $data = $this->_user($username);
+
+        $modelForm = new PasswordChangeForm([
+            'user' => $data['model']
+        ]);
+
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestOnValidateAjaxForm())
+        {
+            return $rr->ajaxValidateForm($modelForm);
+        }
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
+            {
+                $rr->success = true;
+                $rr->message = 'Пароль успешно изменен';
+            } else
+            {
+                $rr->message = 'Не удалось изменить пароль';
+            }
+
+            return $rr;
+        }
+
+        return $this->render($this->action->id, $data);
+    }
+
+
+    /**
+     * @param $username
+     * @return string
+     */
+    public function actionEditInfo($username)
+    {
+        $data = $this->_user($username);
+        $model = $data['model'];
+
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestOnValidateAjaxForm())
+        {
+            return $rr->ajaxValidateForm($model);
+        }
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->save())
+            {
+                $rr->success = true;
+                $rr->message = 'Данные успешно сохранены';
+            } else
+            {
+                $rr->message = 'Не получилось сохранить данные';
+            }
+
+            return $rr;
+        }
+
+        return $this->render($this->action->id, $data);
     }
 
 }

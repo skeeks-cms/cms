@@ -11,6 +11,9 @@ use skeeks\cms\helpers\UrlHelper;
 /* @var $content string */
 
 AdminAsset::register($this);
+\Yii::$app->admin->registerAsset($this);
+
+
 
 $sidebarHidden = \Yii::$app->user->getIsGuest();
 
@@ -289,8 +292,10 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 <footer class="sx-admin-footer">
     <div class="row">
         <div class="col-sm-5">
-            <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
-             | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
+            <div class="sx-footer-copyright">
+                <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
+                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
+            </div>
         </div><!--/.col-->
         <div class="col-sm-7 text-right">
 

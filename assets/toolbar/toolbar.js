@@ -92,6 +92,117 @@
 
 
 
+    sx.classes.Infoblock = sx.classes.Component.extend({
+
+        _init: function()
+        {},
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            this.jWrapper = $('#' + this.get('id'));
+            this._createBorder();
+
+            this.jWrapper.hover(
+                function ()
+                {
+                    self._adjast();
+                    self.jBorder.show();
+                },
+                function ()
+                {
+                    self.jBorder.hide();
+                }
+            );
+        },
+
+        _adjast : function()
+        {
+            var height  = this.jWrapper.height();
+            var width   = this.jWrapper.width();
+            var top     = this.jWrapper.offset().top;
+            var left    = this.jWrapper.offset().left;
+
+            if (height == 0)
+            {
+                height = 10;
+            }
+
+            this.jBorderTop
+                .css('top', top)
+                .css('left', left)
+                .css('width', width)
+            ;
+
+            this.jBorderRight
+                .css('top', top)
+                .css('left', left + width)
+                .css('height', height)
+            ;
+
+            this.jBorderBottom
+                .css('top', top + height)
+                .css('left', left)
+                .css('width', width)
+            ;
+
+            this.jBorderLeft
+                .css('top', top)
+                .css('left', left)
+                .css('height', height)
+            ;
+        },
+
+        _createBorder: function()
+        {
+            this.jBorder = $("<div>", {
+                'style' : 'display: none; height: 0px; width: 0px;'
+            }).appendTo($('body'));
+
+            this.jBorderTop = $('<div>')
+                                .css('position', 'absolute')
+                                .css('height', '1px')
+                                .css('fontSize', '1px')
+                                .css('overflow', 'hidden')
+                                .css('zIndex', '9990')
+                                .css('background', 'red')
+                                .appendTo(this.jBorder);
+
+            this.jBorderRight = $('<div>')
+                                .css('position', 'absolute')
+                                .css('width', '1px')
+                                .css('fontSize', '1px')
+                                .css('overflow', 'hidden')
+                                .css('zIndex', '9990')
+                                .css('background', 'red')
+                                .appendTo(this.jBorder);
+
+
+            this.jBorderBottom = $('<div>')
+                                .css('position', 'absolute')
+                                .css('height', '1px')
+                                .css('fontSize', '1px')
+                                .css('overflow', 'hidden')
+                                .css('zIndex', '9990')
+                                .css('background', 'red')
+                                .appendTo(this.jBorder);
+
+            this.jBorderLeft = $('<div>')
+                                .css('position', 'absolute')
+                                .css('width', '1px')
+                                .css('fontSize', '1px')
+                                .css('overflow', 'hidden')
+                                .css('zIndex', '9990')
+                                .css('background', 'red')
+                                .appendTo(this.jBorder);
+
+        },
+
+        _onWindowReady: function()
+        {}
+    });
+
     sx.classes.SkeeksToolbar = sx.classes.Component.extend({
 
         _init: function()
@@ -122,7 +233,11 @@
                 new sx.classes.toolbar.Dialog($(this).data('config-url'));
                 return false;
             });
+
+
         },
+
+
 
         open: function()
         {
@@ -157,5 +272,7 @@
             ajax.execute();
         }
     });
+
+
 
 })(sx, sx.$, sx._);

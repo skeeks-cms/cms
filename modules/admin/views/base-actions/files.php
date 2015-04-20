@@ -20,9 +20,18 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 ?>
 <div id="sx-file-manager" class="<?= $mode; ?>">
     <div class="sx-upload-sources">
-        <a href="#" id="source-simpleUpload" class="btn btn-primary btn-sm source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a>
-        <a href="#" id="source-remoteUpload" class="btn btn-primary btn-sm source-remoteUpload"><i class="glyphicon glyphicon-globe"></i> Загрузить по ссылке http://</a>
-        <a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;"class="btn btn-default btn-sm"><i class="glyphicon glyphicon-folder-open"></i> Добавить из файлового менеджера</a>
+        <div class="btn-group">
+          <button type="button" id="source-simpleUpload-main" class="btn btn-primary source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить</button>
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#" id="source-simpleUpload" ><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a></li>
+            <li><a href="#" id="source-remoteUpload" class="source-remoteUpload" ><i class="glyphicon glyphicon-globe "></i> Загрузить по ссылке http://</a></li>
+            <li><a href="#" onclick="sx.notify.info('Будет реализованно позже'); return false;"><i class="glyphicon glyphicon-folder-open"></i> Добавить из файлового менеджера</a></li>
+          </ul>
+        </div>
 
         <div class="sx-progress-bar-file" style="display: none;">
             <span style="vertical-align:middle;">Загрузка файла: <span class="sx-uploaded-file-name"></span></span>
@@ -233,7 +242,78 @@ $clientOptionsString = \yii\helpers\Json::encode($clientOptions);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
-    sx.FileManager = new sx.classes.DefaultFileManager('#sx-file-manager', {$clientOptionsString});
+    sx.classes.AdminFileManager = sx.classes.DefaultFileManager.extend({
+
+        _init: function()
+        {
+            this.set('simpleUpload', _.extend(
+                this.get('simpleUpload', {}),
+                {
+                    'buttons' : [
+                        document.getElementById('source-simpleUpload'),
+                        document.getElementById('source-simpleUpload-main'),
+                    ]
+                }
+
+            ));
+
+            this.applyParentMethod(sx.classes.DefaultFileManager, '_init', []); // TODO: make a workaround for magic parent calling
+
+            this.bind('completeUpload', function(e, data)
+            {
+                if ($('#sx-table-files')[0])
+                {
+                    $.pjax.reload('#sx-table-files', {});
+                }
+            });
+
+
+
+        },
+
+        _onDomReady: function()
+        {
+            var self = this;
+            this._initSelectForm();
+
+            $(".source-remoteUpload").on('click', function()
+            {
+                self.SourceRemoteUpload.run();
+            });
+        },
+
+        /**
+        *
+        * @returns {sx.classes.FileManager}
+        * @private
+        */
+        _initSelectForm: function()
+        {
+            var self = this;
+            this.JselectType        = $('.sx-select-group', this.getWrapper());
+            this.JselectTypeForm    = $('form', this.JselectType);
+
+            this.getWrapper().on("change", ".sx-select-group select", function()
+            {
+                var data = {'group': $(this).val()};
+
+                self.mergeCommonData(data);
+
+                $(this).closest("form").submit();
+
+                _.delay(function()
+                {
+                    $.pjax.reload('#sx-table-files', {});
+                }, 500);
+                return false;
+            });
+
+            return this;
+        },
+    });
+
+    new sx.classes.AdminFileManager('#sx-file-manager', {$clientOptionsString});
+
 })(sx, sx.$, sx._);
 JS
 );
@@ -250,7 +330,7 @@ $this->registerCss(<<<CSS
 
 .sx-onlyUpload .sx-files-table
 {
-    display: none;
+    /*display: none;*/
 }
 CSS
 );

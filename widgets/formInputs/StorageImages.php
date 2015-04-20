@@ -70,6 +70,7 @@ class StorageImages extends InputWidget
                 'group' => "images",
                 'mode' => "sx-onlyUpload"
             ])
+                ->enableAdmin()
                 ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                 ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
             ;

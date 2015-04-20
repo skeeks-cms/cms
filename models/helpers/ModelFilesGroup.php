@@ -122,6 +122,20 @@ class ModelFilesGroup extends ComponentModel
     }
 
     /**
+     * Привязка одного файла
+     *
+     * @param StorageFile $file
+     * @return $this
+     */
+    public function setFile(StorageFile $file)
+    {
+        $this->items    = [];
+        $this->items[]  = $file->src;
+
+        $this->behavior->setInstanceFilesFromGroup();
+        return $this;
+    }
+    /**
      *
      * Можно добавляь файл в группу, только если файл уже привязан к моделе
      *
@@ -130,6 +144,12 @@ class ModelFilesGroup extends ComponentModel
      */
     public function attachFile(StorageFile $file)
     {
+        //Если в группе может быть только 1 файл, то делаем просто его установку убрав другой файл.
+        if ($this->getConfigMaxCountFiles() == 1)
+        {
+            return $this->setFile($file);
+        }
+
         $this->canBeAttachedFile($file);
 
         if ($files = $this->fetchFiles())

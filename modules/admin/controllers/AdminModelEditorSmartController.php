@@ -112,7 +112,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
                     'page-options' =>
                     [
-                        "label"     => "Свойства страницы",
+                        "label"     => "Свойства",
                         'icon'      => 'glyphicon glyphicon-plus-sign',
                         "rules"     =>
                         [
@@ -245,6 +245,10 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         $clientOptions['remoteUpload'] = $this->_getSourceRemoteUploadOptions($group);
         $clientOptions['remoteUploadBase'] = $this->_getSourceRemoteUploadOptions()['url'];
 
+        $clientOptions['commonData'] = [
+            'group' => $group
+        ];
+
         return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/files.php", [
             "model"             => $this->getModel(),
             'searchModel'       => $searchModel,
@@ -280,8 +284,8 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         [
             "url"               => $backendSimpleUpload,
             "name"              => "imgfile", //TODO: хардкод
-            "hoverClass"        => 'btn-hover',
-            "focusClass"        => 'active',
+            "hoverClass"        => '',
+            "focusClass"        => '',
             "disabledClass"     => 'disabled',
             "responseType"      => 'json',
             "multiplie"          => true,
@@ -307,7 +311,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         }*/
 
 
-        return array_merge($fromBehaviorOptions, $mainOptions);
+        return ['options' => array_merge($fromBehaviorOptions, $mainOptions)];
     }
 
     private function _getSourceRemoteUploadOptions($group = '')
@@ -496,6 +500,13 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
 
 
         $model = $this->getModel();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
 
         if ($model->load(\Yii::$app->request->post()) && $model->save(false))
         {

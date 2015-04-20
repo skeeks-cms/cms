@@ -367,7 +367,7 @@ JS
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
                              $model->createAbsoluteUrl(),
-                             ["target" => "_blank", "class" => "btn btn-xs show-at-site", "title" => "Показать на сайте"]
+                             ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-xs show-at-site", "title" => "Показать на сайте"]
                     );
 
             return Html::tag("li",
@@ -393,7 +393,7 @@ JS
 
                                     Html::tag("div",
                                         <<<HTML
-                                        <a href="#" class="btn btn-xs add-tree-child" title="Создать подраздел" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
+                                        <a href="#" class="btn-tree-node-controll btn btn-default btn-xs add-tree-child" title="Создать подраздел" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
 HTML
                                     ,
                                         [
@@ -633,6 +633,7 @@ JS
     padding-left: 0px;
 }
 
+
     .sx-tree ul li.sx-tree-node
     {
         list-style-type: none;
@@ -671,8 +672,13 @@ JS
             color: #000000;
             background: white;
             padding: 2px 4px;
+            margin-top: 2px;
         }
 
+.btn-tree-node-controll
+{
+    font-size: 8px;
+}
 
     .sx-tree ul li.sx-tree-node .sx-controll-node
     {

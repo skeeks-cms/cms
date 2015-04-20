@@ -20,6 +20,7 @@ use skeeks\cms\helpers\UrlHelper;
 /* @var $content string */
 
 AdminAsset::register($this);
+\Yii::$app->admin->registerAsset($this);
 
 $urlBg = \Yii::$app->assetManager->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/bg/582738_www.Gde-Fon.com.jpg');
 
@@ -159,8 +160,8 @@ JS
 
 <?php $this->beginBody() ?>
 <div class="navbar" role="navigation">
-    <div class="navbar-header">
-        <?= Html::a('<i class="fa fa-lightbulb-o"></i> <span>SkeekS Cms</span>', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
+    <div class="navbar-header sx-header-logo">
+        <?= Html::a("<span><img src='" . \Yii::$app->cms->logo() . "' /> " . \Yii::$app->cms->moduleCms()->getDescriptor()->name . "</span>", \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
     </div>
 
     <ul class="nav navbar-nav navbar-right visible-md visible-lg">
@@ -181,8 +182,10 @@ JS
 <footer class="sx-admin-footer">
     <div class="row">
         <div class="col-sm-5">
+            <div class="sx-footer-copyright">
             <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
              | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
+            </div><!--/.col-->
         </div><!--/.col-->
         <div class="col-sm-7 text-right">
 

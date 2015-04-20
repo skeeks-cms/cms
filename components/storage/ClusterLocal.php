@@ -22,7 +22,10 @@ use \skeeks\sx\Dir;
  */
 class ClusterLocal extends Cluster
 {
-
+    /**
+     * @var bool
+     */
+    public $publicBaseUrlIsAbsolute = false;
 
     /**
      * Добавление файла в кластер
@@ -86,7 +89,7 @@ class ClusterLocal extends Cluster
      */
     public function deleteTmpDir($clusterFileUniqSrc)
     {
-        $dir = new Dir($this->rootTmpDir($clusterFileUniqSrc));
+        $dir = new Dir($this->rootTmpDir($clusterFileUniqSrc), false);
         if ($dir->isExist())
         {
             $dir->remove();
@@ -98,6 +101,22 @@ class ClusterLocal extends Cluster
 
     public function update($clusterFileUniqSrc, $file)
     {}
+
+    /**
+     * @param $clusterFileUniqSrc
+     * @return string
+     */
+    public function getAbsoluteUrl($clusterFileUniqSrc)
+    {
+        if ($this->publicBaseUrlIsAbsolute)
+        {
+            return $this->getPublicSrc($clusterFileUniqSrc);
+        } else
+        {
+            return \Yii::$app->request->hostInfo . $this->getPublicSrc($clusterFileUniqSrc);
+        }
+
+    }
 
 
 }

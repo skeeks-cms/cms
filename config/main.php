@@ -134,6 +134,11 @@ $config =
             'class' => '\skeeks\cms\components\Seo'
         ],
 
+        'admin' =>
+        [
+            'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
+        ],
+
         //Глобальные опции страниц
         'pageOptions' =>
         [
@@ -198,7 +203,7 @@ $config =
             'class'                         => '\skeeks\cms\Module',
 
             'controllerMap' => [
-                'elfinder-user-files' =>
+                /*'elfinder-user-files' =>
                 [
                     'class' => 'skeeks\cms\controllers\ElfinderController',
                     'access' => ['@'], //глобальный доступ к фаил менеджеру @ - для авторизорованных , ? - для гостей , чтоб открыть всем ['@', '?']
@@ -211,61 +216,19 @@ $config =
                             'name'  => 'Личные файлы'
                         ],
                     ]
-                ],
+                ],*/
 
-                'elfinder' =>
+                /*'elfinder' =>
                 [
                     'class' => 'skeeks\cms\controllers\ElfinderController',
                     'access' => ['@'], //глобальный доступ к фаил менеджеру @ - для авторизорованных , ? - для гостей , чтоб открыть всем ['@', '?']
                     'disabledCommands' => ['netmount'], //отключение ненужных команд https://github.com/Studio-42/elFinder/wiki/Client-configuration-options#commands
                     'roots' => [
 
-                        [
-                            'baseUrl'   =>'@web',
-                            'basePath'  =>'@webroot',
-                            'path'      => '/',
-                            'name'      => 'Корень (robots.txt тут)'
-                        ],
 
-
-                        [
-                            'path'  => 'uploads/inbox',
-                            'name'  => 'Общие расшаренные файлы'
-                        ],
-
-                        [
-                            'class' => 'mihaildev\elfinder\UserPath',
-                            'path'  => 'uploads/users/{id}',
-                            'name'  => 'Личные файлы'
-                        ],
-
-
-
-                        [
-                            'basePath'  => '@frontend',
-                            'path'      => 'views',
-                            'name'      => 'frontend/views'
-                        ],
-                        [
-                            'basePath'  => '@frontend',
-                            'path'      => 'runtime',
-                            'name'      => 'frontend/runtime'
-                        ],
-
-                        [
-                            'basePath'  => '@console',
-                            'path'      => 'runtime',
-                            'name'      => 'console/runtime'
-                        ],
-
-                        [
-                            'basePath'  =>'@webroot',
-                            'path'      => 'assets',
-                            'name'      => 'Временные js и css'
-                        ],
 
                     ]
-                ]
+                ]*/
             ],
         ],
 

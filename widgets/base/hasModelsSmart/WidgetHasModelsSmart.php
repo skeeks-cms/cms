@@ -27,9 +27,6 @@ use yii\helpers\ArrayHelper;
  */
 class WidgetHasModelsSmart extends WidgetHasModels
 {
-    public $defaultSortField        = 'id';
-    public $defaultSort             = SORT_DESC;
-
     public $defaultPageSize         = 10;
     public $enablePjaxPagination    = 0;
 

@@ -17,6 +17,7 @@ use skeeks\widget\chosen\Chosen;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\jui\AutoComplete;
 
 /**
  * Class UserColumnData
@@ -33,6 +34,35 @@ class UserColumnData extends DataColumn
             'id',
             'name'
         );
+
+
+        /*$model = $this->grid->filterModel;
+        $this->filter = Chosen::widget([
+            'attribute' => $this->attribute,
+            'model' => $model,
+            'name' => Html::getInputName($model, $this->attribute),
+            'items' => ArrayHelper::map(
+                \Yii::$app->cms->findUser()->all(),
+                'id',
+                'name'
+            )
+        ]);*/
+
+        /*$model = $this->grid->filterModel;
+        $this->filter = AutoComplete::widget([
+            'attribute' => $this->attribute,
+            'model' => $model,
+            'name' => Html::getInputName($model, $this->attribute),
+            'clientOptions' => [
+                'source' => \Yii::$app->cms->findUser()->select(['id as value', 'name as label'])->all(),
+            ],
+            /*'items' => ArrayHelper::map(
+                \Yii::$app->cms->findUser()->all(),
+                'id',
+                'name'
+            )
+        ]);*/
+
         /*
         $this->filter = Chosen::begin([
             'model' => $this->m
@@ -67,4 +97,6 @@ class UserColumnData extends DataColumn
             return null;
         }
     }
+
+
 }

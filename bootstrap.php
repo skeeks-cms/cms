@@ -51,6 +51,8 @@ $config->cache      = CONFIG_CACHE;
 $config->name       = 'config_' . APP_TYPE;
 
 $config->appendDependency(Yii::getVersion());
+$config->appendDependency(YII_ENV);
+$config->appendDependency(PHP_VERSION); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(filemtime(COMMON_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(filemtime(APP_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(APP_DIR); //кэш будет сбрасываться при редактировании файла с общим конфигом

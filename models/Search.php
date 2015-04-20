@@ -113,10 +113,10 @@ class Search extends ActiveRecord
             {
                 if ($column->phpType == "integer")
                 {
-                    $query->andFilterWhere([$column->name => $this->_loadedModel->{$column->name}]);
+                    $query->andFilterWhere([$this->getLoadedModel()->tableName() . '.' . $column->name => $this->_loadedModel->{$column->name}]);
                 } else if ($column->phpType == "string")
                 {
-                    $query->andFilterWhere(['like', $column->name, $this->_loadedModel->{$column->name}]);
+                    $query->andFilterWhere(['like', $this->getLoadedModel()->tableName() . '.' . $column->name, $this->_loadedModel->{$column->name}]);
                 }
             }
         }
