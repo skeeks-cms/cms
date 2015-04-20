@@ -44,6 +44,9 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
                 ],
             ]
         ],
@@ -70,6 +73,8 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
                 ],
             ]
         ],
@@ -95,13 +100,22 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
+
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
                 ],
             ]
         ],
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_USER,
-            'description'   => 'Пользователь'
+            'description'   => 'Пользователь',
+
+            //Есть доступ к системе администрирования
+            'permissions' =>
+            [
+                \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+            ],
         ]
     ],
 
@@ -187,7 +201,7 @@ return [
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
-            'description'   => 'Доступ к ко всем файлам'
+            'description'   => 'Доступ ко всем файлам'
         ],
     ],
 
