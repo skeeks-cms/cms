@@ -1,12 +1,9 @@
 <?php
 /**
- * Search
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 06.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 20.04.2015
  */
 namespace skeeks\cms\models;
 
