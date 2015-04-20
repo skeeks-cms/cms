@@ -276,7 +276,7 @@ class Infoblock extends Widget
             $id = 'sx-infoblock-' . self::$counter;
 
             $this->getView()->registerJs(<<<JS
-new sx.classes.Infoblock({'id' : '{$id}'});
+new sx.classes.toolbar.Infoblock({'id' : '{$id}'});
 JS
 );
             return Html::tag('div', $pre . (string) $this->result, [

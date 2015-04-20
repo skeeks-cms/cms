@@ -12,20 +12,17 @@ use skeeks\cms\base\AssetBundle;
  * Class CmsToolbarAssets
  * @package skeeks\cms\assets
  */
-class CmsToolbarAssets extends AssetBundle
+class CmsToolbarFancyboxAsset extends CmsToolbarAsset
 {
-    public $sourcePath = '@skeeks/cms/assets';
-
-    public $css = [
-        'toolbar/toolbar.css',
-    ];
+    public $css = [];
 
     public $js =
     [
-        'toolbar/toolbar.js',
+        'toolbar/classes/window-fancybox.js',
     ];
 
     public $depends = [
-        '\skeeks\sx\assets\Core',
+        '\skeeks\cms\assets\FancyboxAssets',
+        '\skeeks\cms\assets\CmsToolbarAsset',
     ];
 }
