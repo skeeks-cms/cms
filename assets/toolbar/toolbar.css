@@ -221,8 +221,14 @@
     //outline: none;
 }
 
-#skeeks-cms-toolbar .sx-profile img
+#skeeks-cms-toolbar .sx-profile a img
 {
     height: 30px;
     max-width: 30px;
+    margin-left: 5px;
+    border: 1px solid #c0c0c0;
+}
+#skeeks-cms-toolbar .sx-profile a:hover img
+{
+    border: 1px solid #20a8d8;
 }
