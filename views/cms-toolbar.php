@@ -31,9 +31,11 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
             <img src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->cms->getAuthUser()->getAvatarSrc()); ?>"/>
             <span class="label label-info"><?= \Yii::$app->cms->getAuthUser()->getDisplayName(); ?></span>
         </a>
-        <a href="<?= $urlEditModel; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlEditModel; ?>'); return false;" title="Выход">
+        <!--<a href="<?/*= $urlEditModel; */?>" onclick="new sx.classes.toolbar.Dialog('<?/*= $urlEditModel; */?>'); return false;" title="Выход">
              <span class="label">Выход</span>
-        </a>
+        </a>-->
+        <?= \yii\helpers\Html::a('<span class="label">Выход</span>', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+
     </div>
 
     <? if ($urlEditModel && $editModel) : ?>
