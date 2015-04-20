@@ -664,3 +664,12 @@ div#jGrowl
     {
         border-left: 1px solid #d1d4d7;
     }
+
+
+
+
+
+.datetimepicker th.switch
+{
+    display: table-cell;
+}
