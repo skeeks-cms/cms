@@ -19,12 +19,17 @@ use skeeks\cms\widgets\base\hasModelsSmart\ActiveForm;
     <?= $form->field($model, 'enabled')->widget(
         \skeeks\widget\chosen\Chosen::className(),
         [
-            'items' => [
-                1 => 'Включена',
-                0 => 'Выключена'
-            ]
+            'items' => \Yii::$app->formatter->booleanFormat
         ]
     )->hint('Этот параметр отключает/включает панель для всех пользователей сайта, независимо от их прав и возможностей'); ?>
+
+
+    <?= $form->field($model, 'enableFancyboxWindow')->widget(
+        \skeeks\widget\chosen\Chosen::className(),
+        [
+            'items' => \Yii::$app->formatter->booleanFormat
+        ]
+    )->hint('Диалоговые окна в сайтовой части будут более красивые, однако это может портить верстку (но это происходит крайне редко)'); ?>
 
     <?= $form->field($model, 'mode')->widget(
         \skeeks\widget\chosen\Chosen::className(),
@@ -35,6 +40,8 @@ use skeeks\cms\widgets\base\hasModelsSmart\ActiveForm;
             ]
         ]
     )->hint('Режим редактирования сайта по умолчаню, изначально.'); ?>
+
+    <?= $form->field($model, 'infoblockEditBorderColor')->textInput()->hint('Цвет рамки вокруг инфоблоков в режиме редактирования'); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

@@ -7,7 +7,9 @@
  */
 namespace skeeks\cms\components;
 use skeeks\cms\actions\ViewModelAction;
+use skeeks\cms\assets\CmsToolbarAsset;
 use skeeks\cms\assets\CmsToolbarAssets;
+use skeeks\cms\assets\CmsToolbarFancyboxAsset;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
@@ -41,8 +43,11 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     const EDIT_MODE     = 'edit';
     const NO_EDIT_MODE  = 'no-edit';
 
-    public $mode        = self::NO_EDIT_MODE;
-    public $enabled     = 1;
+    public $mode                            = self::NO_EDIT_MODE;
+    public $enabled                         = 1;
+    public $enableFancyboxWindow            = 1;
+
+    public $infoblockEditBorderColor             = "red";
 
     /**
      * Можно задать название и описание компонента
@@ -83,16 +88,18 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['mode'], 'string'],
-            [['enabled'], 'integer'],
+            [['mode', 'infoblockEditBorderColor'], 'string'],
+            [['enabled', 'enableFancyboxWindow'], 'integer'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'enabled'             => 'Активность панели управления',
-            'mode'                => 'Режим редактирования',
+            'enabled'               => 'Активность панели управления',
+            'mode'                  => 'Режим редактирования',
+            'enableFancyboxWindow'  => 'Включить диалоговые онка панели (Fancybox)',
+            'infoblockEditBorderColor'   => 'Цвет рамки вокруг инфоблока',
         ]);
     }
 
@@ -184,6 +191,12 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
 
         $clientOptions = [
+            'infoblockSettings'             => [
+                'border' =>
+                [
+                    'color' => $this->infoblockEditBorderColor
+                ]
+            ],
             'container-id'                  => 'skeeks-cms-toolbar',
             'container-min-id'              => 'skeeks-cms-toolbar-min',
             'backend-url-triggerEditMode'   => UrlHelper::construct('cms/toolbar/trigger-edit-mode')->toString()
@@ -193,7 +206,12 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
         /* @var $view View */
         $view = $event->sender;
-        CmsToolbarAssets::register($view);
+        CmsToolbarAsset::register($view);
+
+        if ($this->enableFancyboxWindow)
+        {
+            CmsToolbarFancyboxAsset::register($view);
+        }
 
         echo $view->render('@skeeks/cms/views/cms-toolbar', [
             'clientOptions'     => $clientOptions,
