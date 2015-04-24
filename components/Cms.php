@@ -477,4 +477,13 @@ $fileContent .= '];';
         return $file->isExist();
 
     }
+
+
+    /**
+     * @return array
+     */
+    public function notifyAdminEmails()
+    {
+        return explode(",", $this->notifyAdminEmails);
+    }
 }

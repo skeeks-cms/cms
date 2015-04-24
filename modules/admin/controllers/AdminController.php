@@ -80,6 +80,7 @@ abstract class AdminController extends Controller
         $this->_ensure();
         $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
         $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
+        $this->on(self::EVENT_AFTER_ACTION, [$this, "_afterAction"]);
     }
 
 
@@ -147,6 +148,10 @@ abstract class AdminController extends Controller
         return $currentAction;
     }
 
+    protected function _afterAction(ActionEvent $e)
+    {
+
+    }
 
     /**
      * @param ActionEvent $e
