@@ -28,6 +28,11 @@ class Pjax extends \yii\widgets\Pjax
      */
     public $blockContainer          = '';
 
+    /**
+     * @var int
+     */
+    public $timeout = 5000;
+
 
     /**
      * Registers the needed JavaScript.
