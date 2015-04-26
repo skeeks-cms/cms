@@ -173,11 +173,11 @@ return
 
     'dev' =>
     [
-        'label'     => 'Для разработчиков',
+        'label'     => 'Инструменты',
         'priority'  => 0,
         'enabled'   => true,
 
-        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/tools.png'],
 
         'items' =>
         [
