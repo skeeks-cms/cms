@@ -132,7 +132,7 @@ abstract class Module extends \yii\base\Module
                         $component = new $className();
                         if (is_subclass_of($component, CheckComponent::className()))
                         {
-                            $result[] = $component;
+                            $result[$component->className()] = $component;
                         }
                     }
                 }
