@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\base;
 use skeeks\cms\base\components\Descriptor;
+use skeeks\sx\Dir;
 
 /**
  * Class Module
@@ -17,6 +18,14 @@ use skeeks\cms\base\components\Descriptor;
  */
 abstract class Module extends \yii\base\Module
 {
+    const CHECKS_DIR_NAME = "checks";
+    /**
+     * namespace проверок
+     * skeeks\cms\checks - например, если не будет задан, то будет сформирован опираясь на значение controllerNamespace
+     * @var null
+     */
+    public $checkNamespace = null;
+
     /**
      * @return array
      */
@@ -86,6 +95,53 @@ abstract class Module extends \yii\base\Module
     }
 
 
+    public function init()
+    {
+        parent::init();
+
+        if ($this->controllerNamespace && !$this->checkNamespace)
+        {
+            $data = explode('\\', $this->controllerNamespace);
+            if (count($data) > 1)
+            {
+                unset($data[count($data)-1]);
+                $data[] = static::CHECKS_DIR_NAME;
+                $this->checkNamespace = implode("\\", $data);
+            }
+        }
+    }
+
+    /**
+     * @return CheckComponent[]
+     */
+    public function loadChecksComponents()
+    {
+        $result = [];
+
+        $dir = new Dir($this->basePath . "/" . static::CHECKS_DIR_NAME);
+        if ($dir->isExist())
+        {
+            if ($files = $dir->findFiles())
+            {
+                foreach ($files as $file)
+                {
+                    $className = $this->checkNamespace . "\\" . $file->getFileName();
+
+                    if (class_exists($className))
+                    {
+                        $component = new $className();
+                        if (is_subclass_of($component, CheckComponent::className()))
+                        {
+                            $result[] = $component;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * Название модуля
      *
@@ -108,6 +164,9 @@ abstract class Module extends \yii\base\Module
 
 
     /**
+     *
+     * TODO: is depricated (начиная с версии 1.1.5)
+     * Использовать: \Yii::$app->view->render("@skeeks/cms/views/test")
      *
      * Берет файл относительно views модуля и рендерит его
      *
