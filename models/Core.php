@@ -131,7 +131,7 @@ abstract class Core extends ActiveRecord
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'id'], 'integer'],
         ];
     }
 }

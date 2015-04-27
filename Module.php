@@ -21,10 +21,6 @@ use yii\web\View;
  */
 class Module extends base\Module implements BootstrapInterface
 {
-    public $noImage         = "http://vk.com/images/deactivated_100.gif";
-    public $adminEmail      = "semenov@skeeks.com";
-    public $supportEmail    = "support@skeeks.com";
-
     public $controllerNamespace = 'skeeks\cms\controllers';
 
     public function bootstrap($app)
