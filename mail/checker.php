@@ -12,4 +12,5 @@ use skeeks\cms\mail\helpers\Html;
 
 <?= Html::beginTag('p'); ?>
     Здравствуйте!<br><br>Отправка произведена с сайта <?= Html::a(\Yii::$app->name, \yii\helpers\Url::home(true)) ?>.<br>
+    Это письмо можно просто удалить.
 <?= Html::endTag('p'); ?>

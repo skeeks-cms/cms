@@ -52,6 +52,9 @@ HTML;
 			if (!function_exists($func))
             {
                 $this->addError($desc);
+            } else
+            {
+                $this->addSuccess($desc);
             }
 		}
 

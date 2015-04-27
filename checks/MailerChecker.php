@@ -51,11 +51,11 @@ HTML;
 
 		list($usec0, $sec0) = explode(" ", microtime());
 		$val = \Yii::$app->mailer
-            ->compose()
-            ->setTextBody($body)
-            ->setTo("semenov@skeeks.com")
-            ->setSubject("Skeeks site checker")
-            ->send()
+            ->compose("@skeeks/cms/mail/checker")
+            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
+            ->setTo("hosting_test@skeeks.com")
+            ->setSubject('Skeeks site checker ' . \Yii::$app->cms->appName)
+            ->send();
         ;
 		list($usec1, $sec1) = explode(" ", microtime());
 		$time = round($sec1 + $usec1 - $sec0 - $usec0, 2);

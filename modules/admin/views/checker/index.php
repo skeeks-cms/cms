@@ -8,12 +8,25 @@
 /* @var $this yii\web\View */
 
 $allCkecks = [];
+
+$this->registerCss(<<<CSS
+.sx-first-column
+{
+    width: 30%;
+}
+
+.sx-last-column
+{
+    width: 50px;
+}
+CSS
+);
 ?>
 <h2>Полное тестирование системы</h2>
 <p>
     Полная проверка системы помогает найти причины проблем в работе сайта и избежать появление ошибок в дальнейшем. Справка по каждому тесту поможет устранить причину ошибки.
 </p>
-<div class="sx-box sx-p-10 sx-bg-primary">
+<div class="sx-box sx-p-10 sx-bg-primary sx-checker">
     <p>
         <a href="#" class="btn btn-primary sx-controll-start"><i class="glyphicon glyphicon-play"></i> Начать тестирование</a>
         <a href="#" class="btn btn-default sx-controll-stop"><i class="glyphicon glyphicon-stop"></i> Остановить</a>
@@ -115,7 +128,6 @@ $optionsJsJson = \yii\helpers\Json::encode($optionsJs);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
-
     sx.classes.CheckerProgressBar = sx.classes.tasks.ProgressBar.extend({
 
         _init: function()
@@ -304,6 +316,9 @@ $this->registerJs(<<<JS
         _onDomReady: function()
         {
             var self = this;
+
+            $(".sx-checker table tr td:first").addClass('sx-first-column');
+            $(".sx-checker table tr td:last").addClass('sx-last-column');
 
             this.jControllStart = $(".sx-controll-start");
             this.jControllStop = $(".sx-controll-stop");
