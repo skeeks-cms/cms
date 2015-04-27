@@ -314,8 +314,11 @@ $this->registerJs(<<<JS
         {
             var self = this;
 
-            $(".sx-checker table tr td:first").addClass('sx-first-column');
-            $(".sx-checker table tr td:last").addClass('sx-last-column');
+            $(".sx-checker table").each(function()
+            {
+                $(this).find("tr td:first").addClass('sx-first-column');
+                $(this).find("tr td:last").addClass('sx-last-column');
+            });
 
             this.jControllStart = $(".sx-controll-start");
             this.jControllStop = $(".sx-controll-stop");
