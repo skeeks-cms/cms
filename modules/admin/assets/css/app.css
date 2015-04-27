@@ -673,3 +673,23 @@ div#jGrowl
 {
     display: table-cell;
 }
+
+
+
+
+
+
+.sx-box
+{
+    border: 1px solid rgba(32, 168, 216, 0.23);
+}
+
+.sx-p-10
+{
+    padding: 10px;
+}
+
+.sx-bg-primary
+{
+    background: #f5f9f9;
+}

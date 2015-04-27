@@ -21,10 +21,6 @@ use yii\web\View;
  */
 class Module extends base\Module implements BootstrapInterface
 {
-    public $noImage         = "http://vk.com/images/deactivated_100.gif";
-    public $adminEmail      = "semenov@skeeks.com";
-    public $supportEmail    = "support@skeeks.com";
-
     public $controllerNamespace = 'skeeks\cms\controllers';
 
     public function bootstrap($app)
@@ -41,7 +37,7 @@ class Module extends base\Module implements BootstrapInterface
     protected function _descriptor()
     {
         return array_merge(parent::_descriptor(), [
-            "version"               => "1.1.4",
+            "version"               => "1.1.6",
 
             "name"          => "SkeekS CMS",
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
