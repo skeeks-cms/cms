@@ -33,10 +33,17 @@ abstract class CheckComponent extends \yii\base\Component
     public $errorText           = "Не все модули установлены";
     public $warningText         = "Какое то некритичное замечание";
 
-    public $result              = self::RESULT_ERROR;
-    public $errorMessages       = [];
-    public $successMessages       = [];
-    public $warningMessages       = [];
+    public $result                  = self::RESULT_SUCCESS;
+
+    public $errorMessages           = [];
+    public $successMessages         = [];
+    public $warningMessages         = [];
+
+    /**
+     * @var int процент выполненности задания, длинные задачи можно делать в несколько запросов.
+     */
+    public $ptc                     = 100;
+    public $lastValue               = null;
 
     abstract public function run();
 

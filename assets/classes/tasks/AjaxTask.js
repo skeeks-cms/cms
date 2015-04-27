@@ -27,13 +27,14 @@
             this.applyParentMethod(sx.classes.Component, 'construct', [opts]); // TODO: make a workaround for magic parent calling
         },
 
-        execute: function()
+        _init: function()
+        {
+            this._initQuery();
+        },
+
+        _initQuery: function()
         {
             var self = this;
-
-            this.trigger("beforeExecute", {
-                'task' : this
-            });
 
             this.get("ajaxQuery").onComplete(function(e, data)
             {
@@ -41,6 +42,17 @@
                     'task'      : self,
                     'result'    : data
                 });
+            });
+
+            return this;
+        },
+
+        execute: function()
+        {
+            var self = this;
+
+            this.trigger("beforeExecute", {
+                'task' : this
             });
 
             this.get("ajaxQuery").execute();

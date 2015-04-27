@@ -96,7 +96,9 @@
          */
         getExecutedPtc: function()
         {
-            return (100 * this.executed() / this.total());
+            //return round(100 * this.executed() / this.total());
+            var n = Number(100 * this.executed() / this.total());
+            return n.toFixed(1);
         },
 
         /**
@@ -104,7 +106,8 @@
          */
         getQuequePtc: function()
         {
-            return (100 * this.queque() / this.total());
+            var n = Number(100 * this.queque() / this.total());
+            return n.toFixed(1);
         },
 
         /**

@@ -56,7 +56,7 @@ $allCkecks = [];
                             $resultId = str_replace("\\", '-', $model->className());
 
                             $result = \yii\helpers\Html::tag("div", "-", [
-                                'class' => '',
+                                'class' => 'sx-result-container',
                                 'id'    => $resultId,
                             ]);
 
@@ -79,7 +79,7 @@ $allCkecks = [];
                                 'style' => 'display: none;',
                             ]);
 
-                            return \yii\helpers\Html::a("<i class='glyphicon glyphicon-exclamation-sign'></i>", "#" . $infoId, [
+                            return \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#" . $infoId, [
                                 'class' => 'btn btn-default sx-fancybox'
                             ]) . $infoWrapper;
                         },
@@ -103,7 +103,13 @@ foreach ($allCkecks as $key => $check)
     $data['id']         = str_replace("\\", "-", $check->className());
     $checksAll[$key] = $data;
 }
-$allCkecksJson = \yii\helpers\Json::encode($checksAll);
+
+$optionsJs = [
+    'checks' => $checksAll,
+    'backend' => \skeeks\cms\helpers\UrlHelper::construct('admin/checker/check-test')->enableAdmin()->toString(),
+];
+
+$optionsJsJson = \yii\helpers\Json::encode($optionsJs);
 
 
 $this->registerJs(<<<JS
@@ -131,6 +137,68 @@ $this->registerJs(<<<JS
      */
     sx.classes.CheckerTask = sx.classes.tasks.AjaxTask.extend({
 
+        _initQuery: function()
+        {
+            var self = this;
+
+            this.get("ajaxQuery").onSuccess(function(e, data)
+            {
+                if (data.response.success)
+                {
+                    var checkerData = data.response.data
+
+                    //Тест еще не завершен нужно сделать еще один запрос.
+                    if (checkerData.lastValue)
+                    {
+                        self.get("ajaxQuery").mergeData({
+                            'lastValue' : checkerData.lastValue
+                        });
+
+                        self.trigger("update", {
+                            'task'      : self,
+                            'data'      : checkerData
+                        });
+
+                        self.get("ajaxQuery").execute();
+
+                    } else
+                    {
+                        self.trigger("complete", {
+                            'task'      : self,
+                            'result'    : data
+                        });
+                    }
+                } else
+                {
+                    self.trigger("complete", {
+                        'task'      : self,
+                        'result'    : data
+                    });
+                }
+            });
+
+            this.get("ajaxQuery").onError(function(e, data)
+            {
+                self.trigger("complete", {
+                    'task'      : self,
+                    'result'    : data
+                });
+            });
+
+            return this;
+        },
+
+        execute: function()
+        {
+            var self = this;
+
+            this.trigger("beforeExecute", {
+                'task' : this
+            });
+
+            this.get("ajaxQuery").execute();
+        }
+
     });
 
     sx.classes.Checker = sx.classes.Component.extend({
@@ -144,7 +212,7 @@ $this->registerJs(<<<JS
         {
             this.TaskManager = new sx.classes.tasks.Manager({
                 'tasks' : [],
-                'delayQueque' : 3000
+                'delayQueque' : 200
             });
 
             this.ProgressBar = new sx.classes.CheckerProgressBar(this.TaskManager, "#sx-progress-tasks");
@@ -156,15 +224,20 @@ $this->registerJs(<<<JS
         */
         resetTaskManager: function()
         {
+            var self = this;
             var tasks = [];
 
             _.each(this.get('checks'), function(value, key)
             {
-                var ajaxQuery = sx.ajax.preparePostQuery("/", {
+                var ajaxQuery = sx.ajax.preparePostQuery(self.get('backend'), {
                     'className' : value.className
                 });
 
-                var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {});
+                var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                    'allowResponseErrorMessage' : false,
+                    'allowResponseSuccessMessage' : false,
+                    'ajaxExecuteErrorAllowMessage' : false,
+                });
 
                 var jResultContainer = $("#" + value.id);
 
@@ -175,12 +248,49 @@ $this->registerJs(<<<JS
 
                 ajaxQuery.bind("success", function(e, data)
                 {
-                    jResultContainer.empty().append('Хорошо');
+                    var response = data.response;
+                    if (response.success === true)
+                    {
+                        if (response.data.result == 'success')
+                        {
+                            jResultContainer.empty().append('<span class="label label-success"><i class="glyphicon glyphicon-ok"></i> ' + response.data.successText + '</span>');
+
+                            if (_.size(response.data.successMessages) > 0)
+                            {
+                                jResultContainer.append("<hr>");
+                                var jUl = $("<ul>").appendTo(jResultContainer);
+                                _.each(response.data.successMessages, function(value, key)
+                                {
+                                    jUl.append('<li> ' + value + '</li>');
+                                });
+                            }
+
+                        } else if (response.data.result == 'error')
+                        {
+                            jResultContainer.empty().append('<span class="label label-danger"><i class="glyphicon glyphicon-sign"></i> ' + response.data.errorText + '</span>');
+
+                            if (response.data.errorMessages)
+                            {
+                                jResultContainer.append("<hr>");
+                                var jUl = $("<ul>").appendTo(jResultContainer);
+                                _.each(response.data.errorMessages, function(value, key)
+                                {
+                                    jUl.append('<li> ' + value + '</li>');
+                                });
+                            }
+                        } else if (response.data.result == 'warning')
+                        {
+                            jResultContainer.empty().append('<span class="label label-warning"><i class="glyphicon glyphicon-sign"></i> ' + response.data.warningText + '</span>');
+                        }
+                    } else
+                    {
+                        jResultContainer.empty().append('<span class="label label-danger"><i class="glyphicon glyphicon-ban-circle"></i> ' + response.data.errorText + '</span>');
+                    }
                 });
 
                 ajaxQuery.bind("error", function(e, response)
                 {
-                    jResultContainer.empty().append('Ошибка выполнения запроса');
+                    jResultContainer.empty().append('<span class="label label-danger"><i class="glyphicon glyphicon-ban-circle"></i> Ошибка выполнения запроса</span>');
                 });
 
                 tasks.push(new sx.classes.CheckerTask(ajaxQuery, value));
@@ -219,6 +329,7 @@ $this->registerJs(<<<JS
 
         start: function()
         {
+            $(".sx-result-container").empty().append(" - ");
             this.resetTaskManager();
             this.TaskManager.start();
             return this;
@@ -231,9 +342,7 @@ $this->registerJs(<<<JS
         },
     });
 
-    sx.Checker = new sx.classes.Checker({
-        'checks' : $allCkecksJson
-    });
+    sx.Checker = new sx.classes.Checker($optionsJsJson);
 
 })(sx, sx.$, sx._);
 JS

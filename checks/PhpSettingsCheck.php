@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\checks;
 use skeeks\cms\base\CheckComponent;
+use skeeks\sx\String;
 
 /**
  * Class PhpSettingsCheck
@@ -24,8 +25,8 @@ class PhpSettingsCheck extends CheckComponent
 </p>
 HTML;
 ;
-        $this->errorText    = "Настройки правильные";
-        $this->successText  = "Настройки неправильные";
+        $this->errorText    = "Настройки неправильные";
+        $this->successText  = "Настройки правильные";
 
         parent::init();
     }
@@ -62,7 +63,7 @@ HTML;
 
 			if ($cur != $val)
             {
-                $curS = $cur ? htmlspecialcharsbx($cur) : 'off';
+                $curS = $cur ? htmlspecialchars($cur) : 'off';
                 $valS = $val ? 'on' : 'off';
 
                 $this->addError("Параметр {$param} = {$curS}, требуется {$valS}");
@@ -72,7 +73,7 @@ HTML;
 		$param = 'default_socket_timeout';
 		if (($cur = ini_get($param)) < 60)
         {
-            $cur = htmlspecialcharsbx($cur);
+            $cur = htmlspecialchars($cur);
             $this->addError("Параметр {$param} = {$cur}, требуется 60");
         }
 
