@@ -44,7 +44,7 @@
                     {
                         self._go();
                     }
-                }).show();
+                });
             } else
             {
                 return this._go();
