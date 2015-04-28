@@ -66,7 +66,7 @@
             .appendTo(this.jDialogs());
 
             this.jFooter = $("<div>", {'class' : 'modal-footer'}).append(
-                '<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>'
+                '<button type="button" class="btn btn-default" data-dismiss="modal">' + self.get('closeBtnText', 'Закрыть') + '</button>'
             );
 
             this.jWrapper()
@@ -129,7 +129,6 @@
 
     });
 
-
     sx.classes.modal.Prompt    = sx.classes.modal._Prompt.extend({
 
         _init: function()
@@ -172,11 +171,12 @@
             var jSubmit = $("<button>", {
                 'class': "btn btn-primary",
                 'type': "button"
-            }).append(this.get('submitText', "Отправить"));
+            }).append(this.get('submitBtnText', "Отправить"));
 
             var Dialog = new sx.classes.modal.Dialog({
                 'title' : this.get("text"),
-                'content' : jForm.append(jInput)
+                'content' : jForm.append(jInput),
+                'closeBtnText' : this.get('closeBtnText', 'Отмена'),
             });
 
             Dialog.bind('afterHide', function(e, data)
@@ -216,6 +216,51 @@
             this.trigger("closed", this);
 
             return this;*/
+        },
+    });
+
+    sx.classes.modal.Confirm    = sx.classes.modal._Confirm.extend({
+
+        _init: function()
+        {
+            this.applyParentMethod(sx.classes.modal._Confirm, '_init', []);
+
+        },
+
+        /**
+         * @returns {sx.classes.modal._Confirm}
+         */
+        show: function()
+        {
+            var self = this;
+
+            var jSubmit = $("<button>", {
+                'class': "btn btn-primary",
+                'type': "button"
+            }).append(this.get('submitText', "Да"));
+
+            var Dialog = new sx.classes.modal.Dialog({
+                'title' : this.get("title", "Подтвердите ваше дейсвтие."),
+                'content' : this.get("text"),
+                'closeBtnText' : this.get('closeBtnText', 'Отмена'),
+            });
+
+            Dialog.bind('afterHide', function(e, data)
+            {
+                self.trigger("no", self);
+            });
+
+            jSubmit.on("click", function()
+            {
+                Dialog.hide();
+                self.trigger("yes", self);
+                return false;
+            });
+
+            Dialog.jFooter.prepend(jSubmit);
+            Dialog.show();
+
+            return this;
         },
     });
 
