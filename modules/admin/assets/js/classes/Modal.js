@@ -69,6 +69,19 @@
                 '<button type="button" class="btn btn-default" data-dismiss="modal">' + self.get('closeBtnText', 'Закрыть') + '</button>'
             );
 
+            var content = this.get('content');
+            //Если в контенте указан #sx-id
+            if (content && !(content instanceof jQuery) )
+            {
+                if (sx.helpers.String.substr(content, 0, 1) == '#')
+                {
+                    if ($(content)[0])
+                    {
+                        content = $(content).html();
+                    }
+                }
+            }
+
             this.jWrapper()
                 .append(
                     $("<div>", {'class' : 'modal-dialog'}).append(
@@ -81,7 +94,7 @@
                             )
                             .append(
                                 $("<div>", {'class' : 'modal-body'}).append(
-                                    this.get('content')
+                                    content
                                 )
                             )
                             .append(this.jFooter)
