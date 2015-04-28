@@ -83,18 +83,15 @@ CSS
                         'class'     => \yii\grid\DataColumn::className(),
                         'value'     => function(\skeeks\cms\base\CheckComponent $model)
                         {
-                            $infoId = str_replace("\\", '-', $model->className()) ."-info";
-                            $info = \yii\helpers\Html::tag("div", $model->description, [
-                                'class' => '',
-                                'id'    => $infoId,
-                            ]);
-                            $infoWrapper = \yii\helpers\Html::tag("div", $info, [
-                                'style' => 'display: none;',
+                            $optionsJson = \yii\helpers\Json::encode([
+                                'title' => $model->name,
+                                'content' => $model->description,
                             ]);
 
                             return \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#" . $infoId, [
-                                'class' => 'btn btn-default sx-fancybox'
-                            ]) . $infoWrapper;
+                                'class' => 'btn btn-default',
+                                'onclick' => "sx.dialog({$optionsJson}); return false;"
+                            ]);
                         },
                         'format' => 'raw'
                     ],
@@ -317,8 +314,11 @@ $this->registerJs(<<<JS
         {
             var self = this;
 
-            $(".sx-checker table tr td:first").addClass('sx-first-column');
-            $(".sx-checker table tr td:last").addClass('sx-last-column');
+            $(".sx-checker table").each(function()
+            {
+                $(this).find("tr td:first").addClass('sx-first-column');
+                $(this).find("tr td:last").addClass('sx-last-column');
+            });
 
             this.jControllStart = $(".sx-controll-start");
             this.jControllStop = $(".sx-controll-stop");

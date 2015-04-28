@@ -514,50 +514,51 @@ HTML
 
                     $('.add-tree-child').on('click', function()
                     {
-                        var child_name = prompt("Введите название элемента");
+                        var jNode = $(this);
+                        sx.prompt("Введите название нового раздела", {
+                            'yes' : function(e, result)
+                            {
+                                var blocker = sx.block(jNode);
 
-                        if (child_name != null)
-                        {
-                            var blocker = sx.block($(this));
+                                var ajax = sx.ajax.preparePostQuery(
+                                        "new-children",
+                                        {
+                                            "pid" : jNode.data('id'),
+                                            "Tree" : {"name" : result},
+                                            "no_redirect": true
+                                        }
+                                );
 
-                            var ajax = sx.ajax.preparePostQuery(
-                                    "new-children",
+                                new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+
+                                new sx.classes.AjaxHandlerNotify(ajax, {
+                                    'error': "Не удалось добавить новый раздел",
+                                    'success': "Новый раздел добавлен"
+                                }); //отключение глобального загрузчика
+
+                                ajax.onError(function(e, data)
+                                {
+                                    $.pjax.reload('#sx-pjax-tree', {});
+                                    /*sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                    _.delay(function()
                                     {
-                                        "pid" : $(this).data('id'),
-                                        "Tree" : {"name" : child_name},
-                                        "no_redirect": true
-                                    }
-                            );
-
-                            new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
-
-                            new sx.classes.AjaxHandlerNotify(ajax, {
-                                'error': "Не удалось добавить новый раздел",
-                                'success': "Новый раздел добавлен"
-                            }); //отключение глобального загрузчика
-
-                            ajax.onError(function(e, data)
-                            {
-                                $.pjax.reload('#sx-pjax-tree', {});
-                                /*sx.notify.info("Подождите сейчас страница будет перезагружена");
-                                _.delay(function()
+                                        window.location.reload();
+                                    }, 2000);*/
+                                })
+                                .onSuccess(function(e, data)
                                 {
-                                    window.location.reload();
-                                }, 2000);*/
-                            })
-                            .onSuccess(function(e, data)
-                            {
-                                blocker.unblock();
+                                    blocker.unblock();
 
-                                $.pjax.reload('#sx-pjax-tree', {});
-                                /*sx.notify.info("Подождите сейчас страница будет перезагружена");
-                                _.delay(function()
-                                {
-                                    window.location.reload();
-                                }, 2000);*/
-                            })
-                            .execute();
-                        }
+                                    $.pjax.reload('#sx-pjax-tree', {});
+                                    /*sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                    _.delay(function()
+                                    {
+                                        window.location.reload();
+                                    }, 2000);*/
+                                })
+                                .execute();
+                            }
+                        });
 
                         return false;
                     });

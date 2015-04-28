@@ -33,6 +33,7 @@ class AdminAsset extends AssetBundle
         'js/classes/Menu.js',
         'js/classes/Iframe.js',
         'js/classes/Window.js',
+        'js/classes/modal/Dialog.js',
         'js/app.js',
     ];
     public $depends = [
