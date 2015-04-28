@@ -62,5 +62,13 @@ HTML;
         {
             $this->addError("Поддержка ssl не настроена в php");
         }
+
+        if (!extension_loaded('fileinfo'))
+        {
+            $this->addError("Не установлено расширение fileinfo. Не будет работать загрузка файлов по ссылке (для тех файлов где не удается спарсить расширение файла в url, например https://im3-tub-ru.yandex.net/i?id=7bc5907fe7558cf8f2e97e7a760c6fdd&n=21)");
+        } else
+        {
+            $this->addSuccess("Расширение php fileinfo установлено");
+        }
     }
 }

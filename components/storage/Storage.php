@@ -97,7 +97,12 @@ class Storage extends CollectionComponents
             }
 
             $extension = pathinfo($file, PATHINFO_EXTENSION);
-            if ($pos = strpos($extension, "?"));
+            $pos = strpos($extension, "?");
+
+            if ($pos === false)
+            {
+
+            } else
             {
                 $extension = substr($extension, 0, $pos);
             }
