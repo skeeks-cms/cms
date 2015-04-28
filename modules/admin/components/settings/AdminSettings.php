@@ -7,6 +7,8 @@
  */
 namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
+use skeeks\cms\modules\admin\assets\AdminAsset;
+use yii\helpers\ArrayHelper;
 use yii\web\View;
 
 /**
@@ -17,6 +19,9 @@ class AdminSettings extends Component
 {
     public $asset;
 
+    public $enableCustomConfirm   = 1;
+    public $enableCustomPromt     = 1;
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -25,7 +30,7 @@ class AdminSettings extends Component
     {
         return
         [
-            'name'          => 'Настройки админ панели',
+            'name'                              => 'Настройки админ панели',
         ];
     }
 
@@ -33,13 +38,16 @@ class AdminSettings extends Component
     {
         return ArrayHelper::merge(parent::rules(), [
             [['asset'], 'string'],
+            [['enableCustomConfirm', 'enableCustomPromt'], 'integer'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'asset'                      => 'Дополнительные css и js админки',
+            'asset'                             => 'Дополнительные css и js админки',
+            'enableCustomConfirm'               => 'Включить стилизованные окошки подтверждения (confirm)',
+            'enableCustomPromt'                 => 'Включить стилизованные окошки вопрос с одним полем (promt)',
         ]);
     }
 
@@ -50,17 +58,32 @@ class AdminSettings extends Component
      */
     public function registerAsset(View $view)
     {
-        if (!$this->asset)
+        if ($this->asset)
         {
-            return $this;
+            if (class_exists($this->asset))
+            {
+                $className = $this->asset;
+                $className::register($view);
+            }
         }
 
-        if (class_exists($this->asset))
+        if ($this->enableCustomPromt)
         {
-            $className = $this->asset;
-            $className::register($view);
+            $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Promt.js');
+            \Yii::$app->view->registerJsFile($file,
+            [
+                'depends' => [AdminAsset::className()]
+            ]);
         }
 
+        if ($this->enableCustomConfirm)
+        {
+            $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Confirm.js');
+            \Yii::$app->view->registerJsFile($file,
+            [
+                'depends' => [AdminAsset::className()]
+            ]);
+        }
         return $this;
     }
 

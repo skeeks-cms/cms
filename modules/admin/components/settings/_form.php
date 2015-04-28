@@ -14,6 +14,8 @@ use skeeks\cms\widgets\base\hasModelsSmart\ActiveForm;
 <?php $form = ActiveForm::begin(); ?>
 
 <?= $form->fieldSet('Основное'); ?>
+    <?= $form->field($model, 'enableCustomConfirm')->radioList(\Yii::$app->formatter->booleanFormat) ?>
+    <?= $form->field($model, 'enableCustomPromt')->radioList(\Yii::$app->formatter->booleanFormat) ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
