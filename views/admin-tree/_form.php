@@ -106,34 +106,22 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <div data-listen="isLink" data-show="0" class="sx-hide">
 
     <?= $form->field($model, 'description_full')->widget(
-        //\skeeks\widget\ckeditor\CKEditor::className()
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className()
-        , [
-            'options' => ['rows' => 20],
-            'preset' => 'full',
-            'callbackImages' => $model,
-            'clientOptions' =>
-            [
-                'extraPlugins'      => 'imageselect',
-                'toolbarGroups'     =>
-                [
-                    ['name' => 'imageselect']
-                ]
-            ]
-    ]) ?>
-
-    <?= $form->field($model, 'description_short')->widget(\skeeks\widget\ckeditor\CKEditor::className(), [
-        'options' => ['rows' => 6],
-        'preset' => 'full',
-        'clientOptions' =>
+        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
         [
-            'extraPlugins'      => 'imageselect',
-            'toolbarGroups'     =>
-            [
-                ['name' => 'imageselect']
-            ]
-        ]
-    ]) ?>
+            'options'       => ['rows' => 20],
+            'preset'        => 'full',
+            'relatedModel'  => $model,
+        ])
+    ?>
+
+    <?= $form->field($model, 'description_short')->widget(
+        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+        [
+            'options'       => ['rows' => 6],
+            'preset'        => 'full',
+            'relatedModel'  => $model,
+        ])
+    ?>
 
 </div>
 <?= $form->fieldSetEnd() ?>

@@ -21,8 +21,8 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
 <div id="sx-file-manager" class="<?= $mode; ?>">
     <div class="sx-upload-sources">
         <div class="btn-group">
-          <button type="button" id="source-simpleUpload-main" class="btn btn-primary source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить</button>
-          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          <button type="button" id="source-simpleUpload-main" class="btn btn-default source-simpleUpload"><i class="glyphicon glyphicon-download-alt"></i> Загрузить</button>
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
           </button>
@@ -60,45 +60,57 @@ $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
          ]); ?>
 
             <label><i class="glyphicon glyphicon-tags"></i> Метки файлов:</label>
-
-            <?= \skeeks\widget\chosen\Chosen::widget([
-                    'name' => 'group',
-                    'value' => $group,
-                    'items' => \yii\helpers\ArrayHelper::map(
-                         $groupsObjects,
-                         "id",
-                         "name"
-                    ),
-                ]);
-            ?>
-            <? if ($group): ?>
-                <? $selectedGroup = $groups->getComponent($group);
+            <div class="row">
+                <div class="col-md-6">
+                <?= \skeeks\widget\chosen\Chosen::widget([
+                        'name' => 'group',
+                        'value' => $group,
+                        'items' => \yii\helpers\ArrayHelper::map(
+                             $groupsObjects,
+                             "id",
+                             "name"
+                        ),
+                    ]);
                 ?>
-                <p>
-                    <a href="#" data-sx-widget="tooltip" data-original-title="Показать/скрыть требования к файлам этой группы">Требования к файлам этой группы: </a>
+                </div>
+                <div class="col-md-6">
+                    <div id="sx-help-info" style="display: none;">
+                    Вы можете загружать файлы и привязывать их к определенным меткам.<br />
+                    От этого будет зависеть, в каком месте на сайте будет показываться этот файл.
                     <br />
-                    <? foreach($selectedGroup->config as $key => $val) : ?>
-                        <small><?= \skeeks\cms\models\behaviors\HasFiles::configLabels()[$key]; ?>:
-                            <? if (is_array($val)) : ?>
-                                <?= implode(", ", $val); ?>
-                            <? else:?>
-                                <? if ($key == \skeeks\cms\models\behaviors\HasFiles::MAX_SIZE) : ?>
-                                    <?= \Yii::$app->formatter->asShortSize($selectedGroup->getConfigMaxSize()); ?>
-                                <? else: ?>
-                                    <?= $val; ?>
-                                <? endif; ?>
+                    <br />
+                    Так же вы можете не присваивать файлам никаую метку. Это дополнительная, необязательная опция.
+                    <? if ($group): ?>
+                        <? $selectedGroup = $groups->getComponent($group);
+                        ?>
+                        <p>
+                            <h3>Требования к файлам с меткой (<?= $selectedGroup->name; ?>):</h3>
+                            <br />
+                            <? foreach($selectedGroup->config as $key => $val) : ?>
+                                <?= \skeeks\cms\models\behaviors\HasFiles::configLabels()[$key]; ?>:
+                                    <? if (is_array($val)) : ?>
+                                        <?= implode(", ", $val); ?>
+                                    <? else:?>
+                                        <? if ($key == \skeeks\cms\models\behaviors\HasFiles::MAX_SIZE) : ?>
+                                            <?= \Yii::$app->formatter->asShortSize($selectedGroup->getConfigMaxSize()); ?>
+                                        <? else: ?>
+                                            <?= $val; ?>
+                                        <? endif; ?>
 
-                            <? endif;?>
-                            </small>
-                        <br />
-                    <? endforeach; ?>
-                </p>
-            <? endif; ?>
-            <small>
-                Вы можете загружать файлы и привязывать их к определенным меткам.<br />
-                От этого будет зависеть, в каком месте на сайте будет показываться этот файл.
-            </small>
-            <?/* print_r();die; */?>
+                                    <? endif;?>
+                                <br />
+                            <? endforeach; ?>
+                        </p>
+                    <? endif; ?>
+                    </div>
+
+                    <?= \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#" . $infoId, [
+                        'class' => 'btn btn-default',
+                        'onclick' => "sx.dialog({'title': 'Справка', 'content': '#sx-help-info'}); return false;"
+                    ]); ?>
+                </div>
+            </div>
+
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
     </div>
     <? endif; ?>
