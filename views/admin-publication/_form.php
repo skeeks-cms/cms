@@ -33,7 +33,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd()?>
 
-<?= $form->fieldSet('Покзывать в разделах'); ?>
+<?= $form->fieldSet('Показывать в разделах'); ?>
     <?= $form->field($model, 'tree_ids')->label('Разделы сайта')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
