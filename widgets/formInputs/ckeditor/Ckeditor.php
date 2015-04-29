@@ -40,7 +40,7 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
         parent::initOptions();
 
         $additionalData = [];
-        if ($this->relatedModel)
+        if ($this->relatedModel && !$this->relatedModel->isNewRecord)
         {
             if (Validate::isValid(new HasBehavior(HasFiles::className()), $this->relatedModel))
             {
