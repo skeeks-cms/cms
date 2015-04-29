@@ -28,7 +28,7 @@
                 <? endif; ?>
             <? endif; ?>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-5">
             <ul class="statistics">
                 <li>
                     <i class="icon-pie-chart"></i>
