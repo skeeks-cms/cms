@@ -203,7 +203,7 @@ class Storage extends CollectionComponents
 
 
     /**
-     * @return array
+     * @return Cluster[]
      */
     public function getClusters()
     {

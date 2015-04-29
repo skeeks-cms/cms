@@ -166,4 +166,52 @@ abstract class Cluster extends ComponentModel
         $newName =  md5(microtime() . rand(0,100)) ;
         return $originalFileName->getExtension() ? $newName .  "." . $originalFileName->getExtension() : $newName;
     }
+
+
+
+
+    /**
+     * Свободное место на сервере
+     * @return float
+     */
+    public function getFreeSpace()
+    {
+        return 0;
+    }
+
+    /**
+     * Всего столько места.
+     * @return float
+     */
+    public function getTotalSpace()
+    {
+        return 0;
+    }
+
+    /**
+     * Занятое место
+     * @return float
+     */
+    public function getUsedSpace()
+    {
+        return (float) ($this->getTotalSpace() - $this->getFreeSpace());
+    }
+
+    /**
+     * Свободно процентов
+     * @return float
+     */
+    public function getFreeSpacePct()
+    {
+        return ($this->getFreeSpace() * 100) / $this->getTotalSpace();
+    }
+
+    /**
+     * Занято в процентах
+     * @return float
+     */
+    public function getUsedSpacePct()
+    {
+        return (float) (100 - $this->getFreeSpacePct());
+    }
 }
