@@ -258,10 +258,9 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
             <div class="panel-heading sx-no-icon">
                 <h2>
                     <?= Breadcrumbs::widget([
-                        'homeLink' => ['label' => \Yii::t("yii", "Home"), 'url' => [
-                            'admin/index',
-                            'namespace' => 'admin'
-                        ]],
+                        'homeLink' => ['label' => \Yii::t("yii", "Home"), 'url' =>
+                            UrlHelper::construct('admin/index')->enableAdmin()->toString()
+                        ],
                         'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
                     ]) ?>
                 </h2>
