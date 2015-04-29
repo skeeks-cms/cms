@@ -35,7 +35,7 @@ class AdminStorageController extends AdminController
     {
         $clusters = \Yii::$app->storage->getClusters();
 
-        return $this->output('В процессе разработки... Но в двух фразах можем сказать: все управление серверами происходит через конфиг проекта');
+        return $this->render($this->action->id);
     }
 
 }

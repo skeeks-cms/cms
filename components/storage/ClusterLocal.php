@@ -115,8 +115,23 @@ class ClusterLocal extends Cluster
         {
             return \Yii::$app->request->hostInfo . $this->getPublicSrc($clusterFileUniqSrc);
         }
-
     }
 
+    /**
+     * Свободное место на сервере
+     * @return float
+     */
+    public function getFreeSpace()
+    {
+        return (float) disk_free_space($this->rootBasePath);
+    }
 
+    /**
+     * Всего столько места.
+     * @return float
+     */
+    public function getTotalSpace()
+    {
+        return (float) disk_total_space($this->rootBasePath);
+    }
 }
