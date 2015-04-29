@@ -31,7 +31,7 @@ class Pjax extends \yii\widgets\Pjax
     /**
      * @var int
      */
-    public $timeout = 5000;
+    public $timeout = 10000;
 
 
     /**
