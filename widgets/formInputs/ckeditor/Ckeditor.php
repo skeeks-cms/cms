@@ -9,6 +9,9 @@ namespace skeeks\cms\widgets\formInputs\ckeditor;
 
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\HasFiles;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\sx\validate\Validate;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -36,8 +39,19 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
     {
         parent::initOptions();
 
-        $this->clientOptions['filebrowserImageBrowseUrl'] = UrlHelper::construct('cms/tools/select-file', ['test' => 'test'])
+        $additionalData = [];
+        if ($this->relatedModel)
+        {
+            if (Validate::isValid(new HasBehavior(HasFiles::className()), $this->relatedModel))
+            {
+                $additionalData = $this->relatedModel->getRef()->toArray();
+            }
+        }
+
+
+        $this->clientOptions['filebrowserImageBrowseUrl'] = UrlHelper::construct('cms/tools/select-file', $additionalData)
             ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-            ->enableAdmin()->toString();
+            ->enableAdmin()
+            ->toString();
     }
 }

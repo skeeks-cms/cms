@@ -47,7 +47,17 @@ JS
 );
 ?>
 
-<? $form = ActiveForm::begin(); ?>
+<? $form = ActiveForm::begin([
+    'usePjax' => false
+]); ?>
+
+<? if ($model) : ?>
+    <?= $form->fieldSet('Файлы привязанные к записи'); ?>
+        <?= \skeeks\cms\modules\admin\widgets\StorageFilesForModel::widget([
+            'model' => $model,
+        ]); ?>
+    <?= $form->fieldSetEnd(); ?>
+<? endif; ?>
 
 <?= $form->fieldSet('Файловый менеджер'); ?>
     <?
@@ -84,13 +94,18 @@ JS
                 'completeUploadFile' => new \yii\web\JsExpression(<<<JS
                 function(data)
                 {
-                    $.pjax.reload('#sx-storage-files', {});
+                    _.delay(function()
+                    {
+                        $.pjax.reload('#sx-storage-files', {});
+                    }, 500)
+
                 }
 JS
         )
             ],
         ]); ?>
         <p></p>
+        <? $dataProvider->pagination->defaultPageSize = 10; ?>
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
 
             'dataProvider'  => $dataProvider,
