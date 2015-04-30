@@ -52,6 +52,10 @@ HTML;
 
     public function init()
     {
+        $this->options = ArrayHelper::merge($this->options, [
+            'class' => 'sx-bg-primary'
+        ]);
+
         parent::init();
 
         echo<<<HTML

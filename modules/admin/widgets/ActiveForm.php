@@ -12,6 +12,7 @@ namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
+use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -51,9 +52,19 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
     {
         $this->pjaxOptions = ArrayHelper::merge($this->pjaxOptions, $this->PjaxOptions);
 
-        $this->options = ArrayHelper::merge($this->options, [
-            'class' => 'sx-form-admin'
-        ]);
+        if ($classes = ArrayHelper::getValue($this->options, 'class'))
+        {
+            $this->options = ArrayHelper::merge($this->options, [
+                'class' => $classes . ' sx-form-admin'
+            ]);
+        } else
+        {
+            $this->options = ArrayHelper::merge($this->options, [
+                'class' => 'sx-form-admin'
+            ]);
+        }
+
+
 
         if ($this->usePjax)
         {
@@ -118,5 +129,41 @@ HTML;
         </div>
 HTML;
 
+    }
+
+
+    /**
+     *
+     * Стилизованный селект админки
+     *
+     * @param $model
+     * @param $attribute
+     * @param $items
+     * @param array $config
+     * @param array $fieldOptions
+     * @return \skeeks\cms\base\widgets\ActiveField
+     */
+    public function fieldSelect($model, $attribute, $items, $config = [], $fieldOptions = [])
+    {
+        $config = ArrayHelper::merge(
+            $config,
+            [
+                'items'         => $items,
+                'allowDeselect' => false,
+            ]
+        );
+
+        foreach ($config as $key => $value)
+        {
+            if (property_exists(Chosen::className(), $key) === false)
+            {
+                unset($config[$key]);
+            }
+        }
+
+        return $this->field($model, $attribute, $fieldOptions)->widget(
+            Chosen::className(),
+            $config
+        );
     }
 }
