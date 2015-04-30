@@ -10,6 +10,12 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
+use skeeks\cms\base\propertyTypes\PropertyTypeElement;
+use skeeks\cms\base\propertyTypes\PropertyTypeFile;
+use skeeks\cms\base\propertyTypes\PropertyTypeList;
+use skeeks\cms\base\propertyTypes\PropertyTypeNumber;
+use skeeks\cms\base\propertyTypes\PropertyTypeString;
+use skeeks\cms\base\propertyTypes\PropertyTypeTree;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
@@ -52,13 +58,10 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $noImageUrl          = 'http://vk.com/images/deactivated_100.gif';
 
-
     /**
-     * TODO: is depricated (1.1.6)
-     * @var string
+     * @var array
      */
-    public $staticKeySold = '';
-
+    public $userPropertyTypes       = [];
 
 
     /**
@@ -479,5 +482,40 @@ $fileContent .= '];';
             "Y" => Yii::t('yii', 'No', [], \Yii::$app->formatter->locale),
             "N" => Yii::t('yii', 'Yes', [], \Yii::$app->formatter->locale)
         ];
+    }
+
+
+    /**
+     * Базовые типы свойств
+     * @return array
+     */
+    public function basePropertyTypes()
+    {
+        return [
+            PropertyTypeString::className()     => PropertyTypeString::$name,
+            PropertyTypeNumber::className()     => PropertyTypeNumber::$name,
+            PropertyTypeList::className()       => PropertyTypeList::$name,
+            PropertyTypeFile::className()       => PropertyTypeFile::$name,
+            PropertyTypeTree::className()       => PropertyTypeTree::$name,
+            PropertyTypeElement::className()    => PropertyTypeElement::$name,
+        ];
+    }
+
+    /**
+     * Пользовательские типы свойств.
+     * @return array
+     */
+    public function userPropertyTypes()
+    {
+        return (array) $this->userPropertyTypes;
+    }
+
+    /**
+     * Все типы свойств
+     * @return array
+     */
+    public function allPropertyTypes()
+    {
+        return array_merge($this->basePropertyTypes(), $this->userPropertyTypes());
     }
 }
