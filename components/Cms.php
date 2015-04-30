@@ -53,7 +53,13 @@ class Cms extends \skeeks\cms\base\Component
     public $noImageUrl          = 'http://vk.com/images/deactivated_100.gif';
 
 
+    /**
+     * TODO: is depricated (1.1.6)
+     * @var string
+     */
     public $staticKeySold = '';
+
+
 
     /**
      * Можно задать название и описание компонента
@@ -332,30 +338,6 @@ class Cms extends \skeeks\cms\base\Component
     }
 
 
-    private $_staticKey = null;
-    public function getStaticKey()
-    {
-        if ($this->_staticKey === null)
-        {
-            $fileConfigSold = '';
-            if (file_exists(AUTO_GENERATED_MODULES_FILE))
-            {
-                $fileConfigSold = filemtime((string) AUTO_GENERATED_MODULES_FILE);
-            }
-
-            $this->_staticKey = md5(implode('', [
-                (string) $this->moduleCms()->getDescriptor()->getVersion(),
-                $this->staticKeySold,
-                Yii::getVersion(),
-                'system-sold-4',
-                $fileConfigSold
-            ]));
-        }
-
-        return $this->_staticKey;
-    }
-
-
     /**
      * @var Tree
      */
@@ -485,5 +467,17 @@ $fileContent .= '];';
     public function notifyAdminEmails()
     {
         return explode(",", $this->notifyAdminEmails);
+    }
+
+    /**
+     * Да/нет
+     * @return array
+     */
+    public function booleanFormat()
+    {
+        return [
+            "Y" => Yii::t('yii', 'No', [], \Yii::$app->formatter->locale),
+            "N" => Yii::t('yii', 'Yes', [], \Yii::$app->formatter->locale)
+        ];
     }
 }
