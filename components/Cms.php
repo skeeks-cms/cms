@@ -38,6 +38,9 @@ use yii\web\View;
  */
 class Cms extends \skeeks\cms\base\Component
 {
+    const BOOL_Y = "Y";
+    const BOOL_N = "N";
+
     /**
      * @var string E-Mail администратора сайта (отправитель по умолчанию).
      */
@@ -479,8 +482,8 @@ $fileContent .= '];';
     public function booleanFormat()
     {
         return [
-            "Y" => Yii::t('yii', 'No', [], \Yii::$app->formatter->locale),
-            "N" => Yii::t('yii', 'Yes', [], \Yii::$app->formatter->locale)
+            self::BOOL_Y => Yii::t('yii', 'Yes', [], \Yii::$app->formatter->locale),
+            self::BOOL_N => Yii::t('yii', 'No', [], \Yii::$app->formatter->locale)
         ];
     }
 

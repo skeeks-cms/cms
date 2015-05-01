@@ -20,4 +20,6 @@ class HasProperties extends Behavior
      * @var Model the owner of this behavior
      */
     public $owner;
+
+
 }

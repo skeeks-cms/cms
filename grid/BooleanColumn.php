@@ -45,6 +45,13 @@ class BooleanColumn extends DataColumn
      * @var string label for the false value. Defaults to `Inactive`.
      */
     public $falseLabel;
+
+    /**
+     * @var null
+     */
+    public $falseValue  = false;
+    public $trueValue   = true;
+
     /**
      * @var string icon/indicator for the true value. If this is not set, it will use the value from `trueLabel`.
      * If GridView `bootstrap` property is set to true - it will default to [[GridView::ICON_ACTIVE]]
@@ -72,7 +79,7 @@ class BooleanColumn extends DataColumn
         if (empty($this->falseLabel)) {
             $this->falseLabel = \Yii::t('app', 'нет');
         }
-        $this->filter = [true => $this->trueLabel, false => $this->falseLabel];
+        $this->filter = [$this->trueValue => $this->trueLabel, $this->falseValue => $this->falseLabel];
         if (empty($this->trueIcon)) {
             $this->trueIcon = '<span class="glyphicon glyphicon-ok text-success" title="' . $this->trueLabel . '"></span>';
         }
@@ -81,15 +88,31 @@ class BooleanColumn extends DataColumn
         }
         parent::init();
     }
+
     /**
      * @inheritdoc
      */
     public function getDataCellValue($model, $key, $index)
     {
         $value = parent::getDataCellValue($model, $key, $index);
-        if ($value !== null) {
-            return $value ? $this->trueIcon : $this->falseIcon;
+
+        if ($this->trueValue !== true)
+        {
+            if ($value == $this->falseValue)
+            {
+                return $this->falseIcon;
+            } else
+            {
+                return $this->trueIcon;
+            }
+        } else
+        {
+            if ($value !== null)
+            {
+                return $value ? $this->trueIcon : $this->falseIcon;
+            }
+            return $this->showNullAsFalse ? $this->falseIcon : $value;
         }
-        return $this->showNullAsFalse ? $this->falseIcon : $value;
+
     }
 }
