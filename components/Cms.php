@@ -15,6 +15,8 @@ use skeeks\cms\base\propertyTypes\PropertyTypeFile;
 use skeeks\cms\base\propertyTypes\PropertyTypeList;
 use skeeks\cms\base\propertyTypes\PropertyTypeNumber;
 use skeeks\cms\base\propertyTypes\PropertyTypeString;
+use skeeks\cms\base\propertyTypes\PropertyTypeTextarea;
+use skeeks\cms\base\propertyTypes\PropertyTypeTextInput;
 use skeeks\cms\base\propertyTypes\PropertyTypeTree;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
@@ -495,12 +497,13 @@ $fileContent .= '];';
     public function basePropertyTypes()
     {
         return [
-            PropertyTypeString::className()     => PropertyTypeString::$name,
-            PropertyTypeNumber::className()     => PropertyTypeNumber::$name,
-            PropertyTypeList::className()       => PropertyTypeList::$name,
-            PropertyTypeFile::className()       => PropertyTypeFile::$name,
-            PropertyTypeTree::className()       => PropertyTypeTree::$name,
-            PropertyTypeElement::className()    => PropertyTypeElement::$name,
+            PropertyTypeTextarea::className()       => PropertyTypeTextarea::$name,
+            PropertyTypeTextInput::className()      => PropertyTypeTextInput::$name,
+            PropertyTypeNumber::className()         => PropertyTypeNumber::$name,
+            PropertyTypeList::className()           => PropertyTypeList::$name,
+            PropertyTypeFile::className()           => PropertyTypeFile::$name,
+            PropertyTypeTree::className()           => PropertyTypeTree::$name,
+            PropertyTypeElement::className()        => PropertyTypeElement::$name,
         ];
     }
 

@@ -22,11 +22,22 @@ abstract class PropertyType extends Component
     const CODE_TREE     = 'T';
     const CODE_ELEMENT  = 'E';
 
+    /**
+     * @var код типа свойства (логика приложения)
+     */
     public static $code;
+    /**
+     * @var Название свойства
+     */
     public static $name;
+    /**
+     * @var bool множественный выбор
+     */
+    public static $multiple = false;
+
 
     public function init()
     {
-        //Не загружаем настройки по умолчанию
+        //Не загружаем настройки по умолчанию (В родительском классе идет загрузка настроек из базы, тут этого не надо)
     }
 }

@@ -9,11 +9,12 @@ namespace skeeks\cms\base\propertyTypes;
 use skeeks\cms\base\PropertyType;
 
 /**
- * Class PropertyTypeString
+ * Class PropertyTypeTextInput
  * @package skeeks\cms\base\propertyTypes
  */
-class PropertyTypeString extends PropertyType
+class PropertyTypeTextInput extends PropertyTypeStandartElement
 {
-    static public $code = self::CODE_STRING;
-    static public $name = "Строка";
+    static public $code             = self::CODE_STRING;
+    static public $elementCode      = "textInput";
+    static public $name             = "Текстовая строка";
 }
