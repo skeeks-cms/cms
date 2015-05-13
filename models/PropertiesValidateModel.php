@@ -34,11 +34,11 @@ class PropertiesValidateModel extends Model
     {
         parent::init();
 
-        if ($fields = $this->modelWithProperties->getPropertiesAll())
+        if ($properties = $this->modelWithProperties->getPropertiesAll())
         {
-            foreach ($fields as $field)
+            foreach ($properties as $property)
             {
-                $this->_attributes[$field->id] = '';
+                $this->_attributes[$property->getFormAttribute()] = '';
             }
         }
     }
@@ -49,14 +49,14 @@ class PropertiesValidateModel extends Model
      */
     public function attributeValues()
     {
-        $result = parent::rules();
+        $result = [];
 
-        foreach ($this->modelWithProperties->getPropertiesAll() as $field)
+        foreach ($this->modelWithProperties->getPropertiesAll() as $property)
         {
-            if ($this->getAttribute($field->id))
-            {
-                $result[$field->id] = $this->getAttribute($field->id);
-            }
+            //if ($property->getAttribute($property->getFormAttribute()))
+            //{
+                $result[$property->getFormAttribute()] = $this->getAttribute($property->getFormAttribute());
+            //}
         }
 
         return $result;
@@ -73,10 +73,10 @@ class PropertiesValidateModel extends Model
     {
         $result = parent::rules();
 
-        foreach ($this->modelWithProperties->getPropertiesAll() as $field)
+        foreach ($this->modelWithProperties->getPropertiesAll() as $proeperty)
         {
-            //$result = ArrayHelper::merge($result, $field->rulesForActiveForm());
-            $result = ArrayHelper::merge($result, []);
+            //$result[] = $proeperty->rulesForActiveForm();
+            $result = ArrayHelper::merge($result, $proeperty->rulesForActiveForm());
         }
 
         return $result;
@@ -226,10 +226,15 @@ class PropertiesValidateModel extends Model
     {
         $result = [];
 
-        foreach ($this->modelForm->fields() as $field)
+        foreach ($this->modelWithProperties->getPropertiesAll() as $property)
+        {
+            $result[$property->getFormAttribute()] = $property->name;
+        }
+
+        /*foreach ($this->modelForm->fields() as $field)
         {
             $result[$field->attribute] = $field->normalName();
-        }
+        }*/
 
         return $result;
     }

@@ -35,7 +35,8 @@ class ActiveFormModelPropertyValues extends ActiveFormAjaxSubmit
     {
         parent::init();
 
-        echo \yii\helpers\Html::hiddenInput(Form::FROM_PARAM_ID_NAME, $this->modelWithProperties->id);
+        echo \yii\helpers\Html::hiddenInput("sx-model-value", $this->modelWithProperties->id);
+        echo \yii\helpers\Html::hiddenInput("sx-model", $this->modelWithProperties->className());
     }
 
 
