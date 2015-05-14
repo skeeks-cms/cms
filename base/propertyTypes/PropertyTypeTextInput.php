@@ -12,9 +12,19 @@ use skeeks\cms\base\PropertyType;
  * Class PropertyTypeTextInput
  * @package skeeks\cms\base\propertyTypes
  */
-class PropertyTypeTextInput extends PropertyTypeStandartElement
+class PropertyTypeTextInput extends PropertyType
 {
-    static public $code             = self::CODE_STRING;
-    static public $elementCode      = "textInput";
-    static public $name             = "Текстовая строка";
+    public $code             = self::CODE_STRING;
+    public $name             = "Текстовая строка";
+
+    /**
+     * @return \yii\widgets\ActiveField
+     */
+    public function renderForActiveForm()
+    {
+        $field = parent::renderForActiveForm();
+        $field->textInput($this->getActiveFormConfig());
+
+        return $field;
+    }
 }

@@ -12,9 +12,19 @@ use skeeks\cms\base\PropertyType;
  * Class PropertyTypeTextarea
  * @package skeeks\cms\base\propertyTypes
  */
-class PropertyTypeTextarea extends PropertyTypeStandartElement
+class PropertyTypeTextarea extends PropertyType
 {
-    static public $code             = self::CODE_STRING;
-    static public $elementCode      = "textarea";
-    static public $name             = "Текстовое поле";
+    public $code             = self::CODE_STRING;
+    public $name             = "Текстовое поле";
+
+    /**
+     * @return \yii\widgets\ActiveField
+     */
+    public function renderForActiveForm()
+    {
+        $field = parent::renderForActiveForm();
+        $field->textarea($this->getActiveFormConfig());
+
+        return $field;
+    }
 }

@@ -8,7 +8,9 @@
 namespace skeeks\cms\widgets;
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit;
 use skeeks\modules\cms\form\models\Form;
+use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class ActiveForm
@@ -40,61 +42,39 @@ class ActiveFormModelPropertyValues extends ActiveFormAjaxSubmit
     }
 
 
-    public function run()
+    /**
+     *
+     * TODO: Вынести в трейт, используется для админки
+     * Стилизованный селект админки
+     *
+     * @param $model
+     * @param $attribute
+     * @param $items
+     * @param array $config
+     * @param array $fieldOptions
+     * @return \skeeks\cms\base\widgets\ActiveField
+     */
+    public function fieldSelect($model, $attribute, $items, $config = [], $fieldOptions = [])
     {
-        parent::run();
+        $config = ArrayHelper::merge(
+            ['allowDeselect' => false],
+            $config,
+            [
+                'items'         => $items,
+            ]
+        );
 
-        $this->view->registerJs(<<<JS
+        foreach ($config as $key => $value)
+        {
+            if (property_exists(Chosen::className(), $key) === false)
+            {
+                unset($config[$key]);
+            }
+        }
 
-        $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
-            return false;
-        });
-
-        $('#{$this->id}').on('afterValidate', function (event, attribute, message) {
-
-            var Jform = $(this);
-            var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
-
-            new sx.classes.AjaxHandlerBlocker(ajax, {
-                'wrapper': '#' + $(this).attr('id')
-            });
-            //new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
-            new sx.classes.AjaxHandlerNotifyErrors(ajax, {
-                'error': "Не удалось отправить форму",
-            }); //отключение глобального загрузчика
-
-            ajax.onError(function(e, data)
-                {
-
-                })
-                .onSuccess(function(e, data)
-                {
-                    var response = data.response;
-                    if (response.success == true)
-                    {
-                        $('input, select, textarea', Jform).each(function(i,s)
-                        {
-                            if ($(this).attr('name') != '_csrf' && $(this).attr('name') != 'sx-auto-form')
-                            {
-                                $(this).val('');
-                            }
-                        });
-
-                        sx.notify.success(response.message);
-                    } else
-                    {
-                        sx.notify.error(response.message);
-                    }
-
-                })
-                .execute();
-
-            return false;
-        });
-
-
-JS
-);
+        return $this->field($model, $attribute, $fieldOptions)->widget(
+            Chosen::className(),
+            $config
+        );
     }
-
 }

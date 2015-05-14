@@ -38,7 +38,7 @@ class PropertiesValidateModel extends Model
         {
             foreach ($properties as $property)
             {
-                $this->_attributes[$property->getFormAttribute()] = '';
+                $this->_attributes[$property->getFormAttribute()] = $property->value($this->modelWithProperties);
             }
         }
     }
@@ -60,6 +60,19 @@ class PropertiesValidateModel extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * @return $this
+     */
+    public function save()
+    {
+        foreach ($this->modelWithProperties->getPropertiesAll() as $property)
+        {
+            $property->saveValue($this->modelWithProperties, $this->getAttribute($property->getFormAttribute()));
+        }
+
+        return $this;
     }
 
 
@@ -163,7 +176,7 @@ class PropertiesValidateModel extends Model
      */
     public function hasAttribute($name)
     {
-        return isset($this->_attributes[$name]) || in_array($name, $this->attributes());
+        return array_key_exists($name, $this->_attributes) || in_array($name, $this->attributes());
     }
 
     /**

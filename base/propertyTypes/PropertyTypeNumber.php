@@ -12,8 +12,8 @@ use skeeks\cms\base\PropertyType;
  * Class PropertyTypeNumber
  * @package skeeks\cms\base\propertyTypes
  */
-class PropertyTypeNumber extends PropertyType
+class PropertyTypeNumber extends PropertyTypeTextInput
 {
-    static public $code = self::CODE_NUMBER;
-    static public $name = "Число";
+    public $code                 = self::CODE_NUMBER;
+    public $name                 = "Число";
 }

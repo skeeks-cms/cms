@@ -14,6 +14,6 @@ use skeeks\cms\base\PropertyType;
  */
 class PropertyTypeElement extends PropertyType
 {
-    static public $code = self::CODE_ELEMENT;
-    static public $name = "Привязка к элементу";
+    public $code = self::CODE_ELEMENT;
+    public $name = "Привязка к элементу";
 }

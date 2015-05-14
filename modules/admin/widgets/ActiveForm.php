@@ -146,10 +146,10 @@ HTML;
     public function fieldSelect($model, $attribute, $items, $config = [], $fieldOptions = [])
     {
         $config = ArrayHelper::merge(
+            ['allowDeselect' => false],
             $config,
             [
                 'items'         => $items,
-                'allowDeselect' => false,
             ]
         );
 

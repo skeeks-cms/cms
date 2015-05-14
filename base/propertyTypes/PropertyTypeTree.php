@@ -14,6 +14,6 @@ use skeeks\cms\base\PropertyType;
  */
 class PropertyTypeTree extends PropertyType
 {
-    static public $code = self::CODE_TREE;
-    static public $name = "Привязка к разделу";
+    public $code = self::CODE_TREE;
+    public $name = "Привязка к разделу";
 }

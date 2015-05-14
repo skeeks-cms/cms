@@ -70,7 +70,10 @@ class ModelPropertiesController extends Controller
 
                 if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate())
                 {
-                    $validateModel->attributeValues();
+                    $validateModel->save();
+                    $response['success'] = true;
+                    $response['message'] = 'Успешно отправлена';
+
                     //Все проверки прошли, формируем модель отправленного сообщения и сохраняем ее
                     /*$modelFormSendMessage = new FormSendMessage();
 
@@ -118,6 +121,7 @@ class ModelPropertiesController extends Controller
                 $model = $modelForm->createPropertiesValidateModel();
 
                 $model->load(\Yii::$app->request->post());
+
                 \Yii::$app->response->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($model);
             }

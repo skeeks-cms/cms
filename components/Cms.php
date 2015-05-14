@@ -13,7 +13,11 @@ use skeeks\cms\base\Module;
 use skeeks\cms\base\propertyTypes\PropertyTypeElement;
 use skeeks\cms\base\propertyTypes\PropertyTypeFile;
 use skeeks\cms\base\propertyTypes\PropertyTypeList;
+use skeeks\cms\base\propertyTypes\PropertyTypeListMulti;
 use skeeks\cms\base\propertyTypes\PropertyTypeNumber;
+use skeeks\cms\base\propertyTypes\PropertyTypeRadioList;
+use skeeks\cms\base\propertyTypes\PropertyTypeSelect;
+use skeeks\cms\base\propertyTypes\PropertyTypeSelectMulti;
 use skeeks\cms\base\propertyTypes\PropertyTypeString;
 use skeeks\cms\base\propertyTypes\PropertyTypeTextarea;
 use skeeks\cms\base\propertyTypes\PropertyTypeTextInput;
@@ -497,13 +501,15 @@ $fileContent .= '];';
     public function basePropertyTypes()
     {
         return [
-            PropertyTypeTextarea::className()       => PropertyTypeTextarea::$name,
-            PropertyTypeTextInput::className()      => PropertyTypeTextInput::$name,
-            PropertyTypeNumber::className()         => PropertyTypeNumber::$name,
-            PropertyTypeList::className()           => PropertyTypeList::$name,
-            PropertyTypeFile::className()           => PropertyTypeFile::$name,
-            PropertyTypeTree::className()           => PropertyTypeTree::$name,
-            PropertyTypeElement::className()        => PropertyTypeElement::$name,
+            PropertyTypeTextarea::className()       => (new PropertyTypeTextarea)->name,
+            PropertyTypeTextInput::className()      => (new PropertyTypeTextInput)->name,
+            PropertyTypeNumber::className()         => (new PropertyTypeNumber)->name,
+            PropertyTypeSelect::className()         => (new PropertyTypeSelect)->name,
+            PropertyTypeSelectMulti::className()    => (new PropertyTypeSelectMulti)->name,
+            PropertyTypeRadioList::className()      => (new PropertyTypeRadioList)->name,
+            PropertyTypeFile::className()           => (new PropertyTypeFile)->name,
+            PropertyTypeTree::className()           => (new PropertyTypeTree)->name,
+            PropertyTypeElement::className()        => (new PropertyTypeElement)->name,
         ];
     }
 
