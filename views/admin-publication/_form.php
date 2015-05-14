@@ -23,17 +23,17 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
     <?= $form->field($model, 'type')->label('Тип публикации')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
-                'items' => \yii\helpers\ArrayHelper::map(
-                     \Yii::$app->registeredModels->getDescriptor($model)->getTypes()->getComponents(),
-                     "id",
-                     "name"
-                 ),
+        'items' => \yii\helpers\ArrayHelper::map(
+             \Yii::$app->registeredModels->getDescriptor($model)->getTypes()->getComponents(),
+             "id",
+             "name"
+         ),
         ])->hint('От выбранного типа публикации может зависеть, то, как она будет отображаться.');
     ?>
 
 <?= $form->fieldSetEnd()?>
 
-<?= $form->fieldSet('Покзывать в разделах'); ?>
+<?= $form->fieldSet('Показывать в разделах'); ?>
     <?= $form->field($model, 'tree_ids')->label('Разделы сайта')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [

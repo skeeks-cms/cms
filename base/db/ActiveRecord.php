@@ -13,6 +13,7 @@ namespace skeeks\cms\base\db;
 
 use skeeks\cms\models\behaviors\HasModelRef;
 //use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\query\CmsActiveQuery;
 use skeeks\sx\models\Ref;
 use \yii\db\ActiveRecord as YiiActiveRecord;
 
@@ -31,5 +32,13 @@ class ActiveRecord
     public function getDescriptor()
     {
         return \Yii::$app->registeredModels->getDescriptor($this->className());
+    }
+
+    /**
+     * @return CmsActiveQuery
+     */
+    public static function find()
+    {
+        return new CmsActiveQuery(get_called_class());
     }
 }

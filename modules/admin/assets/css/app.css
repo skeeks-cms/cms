@@ -176,6 +176,14 @@ form.sx-form-admin
         font-size: 11px;
     }
 
+        form.sx-form-admin .tab-content
+        {
+            background: #ffffff;
+        }
+
+
+
+
 /**
 * Доработка панелей
 */
