@@ -26,7 +26,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
      * @param array $fieldOptions
      * @return ActiveField the created ActiveField object
      */
-    public function fieldCheckboxBoolean($model, $attribute, $items = [] ,$enclosedByLabel = true, $fieldOptions = [])
+    public function fieldCheckboxBoolean($model, $attribute, $items = [], $enclosedByLabel = true, $fieldOptions = [])
     {
         if (!$items)
         {
@@ -34,6 +34,24 @@ class ActiveForm extends \yii\widgets\ActiveForm
         }
 
         return $this->field($model, $attribute, $fieldOptions)->checkbox($items, $enclosedByLabel);
+    }
+
+    /**
+     * @param $model
+     * @param $attribute
+     * @param array $items
+     * @param bool $enclosedByLabel
+     * @param array $fieldOptions
+     * @return ActiveField the created ActiveField object
+     */
+    public function fieldRadioListBoolean($model, $attribute, $items = [], $options = [], $fieldOptions = [])
+    {
+        if (!$items)
+        {
+            $items = \Yii::$app->cms->booleanFormat();
+        }
+
+        return $this->field($model, $attribute, $fieldOptions)->radioList($items, $options);
     }
 
     /**
