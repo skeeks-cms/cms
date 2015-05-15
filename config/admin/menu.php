@@ -8,6 +8,27 @@
 
 return
 [
+    /*function()
+    {
+        return
+        [
+            'content-block-1' =>
+            [
+                'label'     => 'Контент 1',
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
+
+                'items' =>
+                [
+                    [
+                        "label"     => "Сайты",
+                        "url"       => ["cms/admin-site"],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
+                    ],
+                ],
+            ]
+        ];
+    },*/
+
     'cms' =>
     [
         'label'     => 'Основное',
@@ -60,7 +81,7 @@ return
 
 
             [
-                "label"     => "Настройки",
+                "label"     => "Настройки модулей",
                 "url"       => ["cms/admin-settings"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
             ],
