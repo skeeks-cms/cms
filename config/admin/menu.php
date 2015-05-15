@@ -8,9 +8,41 @@
 
 return
 [
-    /*function()
+    function()
     {
-        return
+        $result = [];
+
+        if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->orderBy("priority DESC")->all())
+        {
+            /**
+             * @var $contentType \skeeks\cms\models\CmsContentType
+             */
+            foreach ($contentTypes as $contentType)
+            {
+                $data =
+                [
+                    'label' => $contentType->name,
+                    "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+                ];
+
+                if ($contents = $contentType->cmsContents)
+                {
+                    foreach ($contents as $content)
+                    {
+                        $data['items'][] =
+                        [
+                            'label' => $content->name,
+                            'url'   => ["cms/admin-cms-content-element", "content_id" => $content->id, "content_type" => $contentType->code],
+                        ];
+                    }
+                }
+
+                $result["content-block-" . $contentType->id] = $data;
+            }
+        }
+
+        return $result;
+        /*return
         [
             'content-block-1' =>
             [
@@ -26,8 +58,8 @@ return
                     ],
                 ],
             ]
-        ];
-    },*/
+        ];*/
+    },
 
     'cms' =>
     [
@@ -79,6 +111,11 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
 
+            [
+                "label"     => "Настройки контента",
+                "url"       => ["cms/admin-cms-content-type"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/content.png'],
+            ],
 
             [
                 "label"     => "Настройки модулей",
