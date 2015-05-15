@@ -84,9 +84,15 @@ class Menu
      */
     public function getAllowData()
     {
+        $groups = [];
+
         foreach ($this->getData() as $groupCode => $groupData)
         {
-            if ($groupData['items'])
+            if (is_callable($groupData))
+            {
+                $groups = ArrayHelper::merge($groups, $groupData());
+
+            } else if ($groupData['items'])
             {
                 $items = [];
                 foreach ($groupData['items'] as $itemCode => $itemData)
