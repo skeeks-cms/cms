@@ -14,6 +14,7 @@ namespace skeeks\cms\models;
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -50,6 +51,8 @@ use Yii;
  */
 class CmsContentElement extends Core
 {
+    use \skeeks\cms\models\behaviors\traits\HasFiles;
+
     /**
      * @inheritdoc
      */
@@ -65,6 +68,7 @@ class CmsContentElement extends Core
     {
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
+            HasFiles::className() => HasFiles::className(),
         ]);
     }
 

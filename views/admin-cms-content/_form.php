@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
@@ -11,7 +11,8 @@ use common\models\User;
 
 
 <?php $form = ActiveForm::begin(); ?>
-<?php  ?>
+
+<?= $form->fieldSet('Основное'); ?>
 
 <? if ($content_type = \Yii::$app->request->get('content_type')) : ?>
     <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
@@ -21,10 +22,27 @@ use common\models\User;
     </div>
 <? endif; ?>
 
+<?= $form->field($model, 'image')->widget(
+    \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+    [
+        'fileGroup' => 'image',
+    ]
+)->label('Изображение'); ?>
+
 <?= $form->field($model, 'name')->textInput(); ?>
 <?= $form->field($model, 'code')->textInput(); ?>
 <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>
 
+<?= $form->fieldRadioListBoolean($model, 'index_element'); ?>
+<?= $form->fieldRadioListBoolean($model, 'index_tree'); ?>
+
+<?= $form->field($model, 'trees_name')->textInput(); ?>
+<?= $form->field($model, 'tree_name')->textInput(); ?>
+
+<?= $form->field($model, 'elements_name')->textInput(); ?>
+<?= $form->field($model, 'element_name')->textInput(); ?>
+
+<?= $form->fieldSetEnd(); ?>
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

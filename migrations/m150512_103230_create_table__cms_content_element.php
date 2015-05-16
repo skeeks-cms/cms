@@ -101,7 +101,7 @@ class m150512_103230_create_table__cms_content_element extends Migration
 
         $this->addForeignKey(
             'cms_content_element_content_id', "{{%cms_content_element}}",
-            'content_id', '{{%cms_content}}', 'id', 'SET NULL', 'SET NULL'
+            'content_id', '{{%cms_content}}', 'id', 'RESTRICT', 'RESTRICT'
         );
     }
 

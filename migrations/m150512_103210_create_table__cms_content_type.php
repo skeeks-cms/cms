@@ -40,6 +40,8 @@ class m150512_103210_create_table__cms_content_type extends Migration
             'created_at'            => Schema::TYPE_INTEGER . ' NULL',
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
+            'files'                 => Schema::TYPE_TEXT. ' NULL',
+
             'priority'              => Schema::TYPE_INTEGER. "(11) NOT NULL DEFAULT '500'",
 
             'name'                  => Schema::TYPE_STRING. '(255) NOT NULL',
