@@ -46,5 +46,44 @@ use common\models\User;
     <?= $form->field($model, 'element_name')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
+<? if (!$model->isNewRecord) : ?>
+    <?= $form->fieldSet('Свойства элементов') ?>
+        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+            'label'             => "Свойства элементов",
+            'hint'              => "У каждого контента на сайте есть свой набор свойств, тут они и задаются",
+            'parentModel'       => $model,
+            'relation'          => [
+                'content_id' => 'id'
+            ],
+
+            'sort'              => [
+                'defaultOrder' =>
+                [
+                    'priority' => SORT_DESC
+                ]
+            ],
+
+            'controllerRoute'   => 'cms/admin-cms-content-property',
+            'gridViewOptions'   => [
+                'sortable' => true,
+                'columns' => [
+                    'name',
+
+
+                    [
+                        'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                        'attribute'     => 'active',
+                        'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
+                        'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y
+                    ],
+
+
+                    'code',
+                    'priority',
+                ],
+            ],
+        ]); ?>
+    <?= $form->fieldSetEnd(); ?>
+<? endif; ?>
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

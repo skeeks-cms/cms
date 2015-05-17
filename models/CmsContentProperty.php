@@ -12,6 +12,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
+use skeeks\cms\components\Cms;
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
@@ -130,15 +131,6 @@ class CmsContentProperty extends Core
         ]);
     }
 
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
-    }
 
     /**
      * @inheritdoc
