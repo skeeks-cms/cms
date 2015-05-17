@@ -50,6 +50,7 @@ use Yii;
  * @property User $createdBy
  * @property User $updatedBy
  * @property CmsContentElement[] $cmsContentElements
+ * @property CmsContentProperty[] $cmsContentProperties
  */
 class CmsContent extends Core
 {
@@ -187,5 +188,13 @@ class CmsContent extends Core
     public function getCmsContentElements()
     {
         return $this->hasMany(CmsContentElement::className(), ['content_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentProperties()
+    {
+        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id']);
     }
 }

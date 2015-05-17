@@ -21,6 +21,7 @@ use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\modules\cms\user\models\User;
 use Yii;
+use yii\web\ErrorHandler;
 
 /**
  * This is the model class for table "{{%cms_content_element}}".
@@ -48,6 +49,7 @@ use Yii;
  * @property User $createdBy
  * @property Tree $tree
  * @property User $updatedBy
+ * @property CmsContentElementProperty[] $cmsContentElementProperties
  */
 class CmsContentElement extends Core
 {
@@ -99,16 +101,6 @@ class CmsContentElement extends Core
         ]);
     }
 
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
-    }
-
     /**
      * @inheritdoc
      */
@@ -155,5 +147,53 @@ class CmsContentElement extends Core
     public function getUpdatedBy()
     {
         return $this->hasOne(User::className(), ['id' => 'updated_by']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElementProperties()
+    {
+        return $this->hasMany(CmsContentElementProperty::className(), ['element_id' => 'id']);
+    }
+
+
+
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getPropertiesAll()
+    {
+        return $this->content->cmsContentProperties;
+    }
+
+    /**
+     * @return string
+     */
+    public function renderPropertiesForm()
+    {
+        try
+        {
+            return \Yii::$app->view->render('@skeeks/modules/cms/catalog/views/blank-form', [
+                'modelWithProperties'   => $this,
+                'validateModel'         => $this->createPropertiesValidateModel()
+            ]);
+
+        } catch (\Exception $e)
+        {
+            ob_end_clean();
+            ErrorHandler::convertExceptionToError($e);
+            return 'Ошибка рендеринга формы: ' . $e->getMessage();
+        }
+    }
+
+    /**
+     * @return PropertiesValidateModel
+     */
+    public function createPropertiesValidateModel()
+    {
+        return new PropertiesValidateModel([
+            'modelWithProperties' => $this
+        ]);
     }
 }

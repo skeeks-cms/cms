@@ -81,3 +81,10 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
+
+
+
+<div class="sx-box sx-p-10 sx-mt-10">
+    <h2>Дополнительные свойства</h2>
+    <?= $model->renderPropertiesForm(); ?>
+</div>

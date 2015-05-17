@@ -85,7 +85,7 @@ class CmsContentPropertyEnum extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'priority'], 'integer'],
-            [['value', 'code'], 'required'],
+            [['value'], 'required'],
             [['value'], 'string', 'max' => 255],
             [['def'], 'string', 'max' => 1],
             [['code'], 'string', 'max' => 32],

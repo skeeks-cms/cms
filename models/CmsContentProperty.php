@@ -23,6 +23,7 @@ use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\db\BaseActiveRecord;
+use yii\widgets\ActiveForm;
 
 /**
  * This is the model class for table "{{%cms_content_property}}".
@@ -196,5 +197,152 @@ class CmsContentProperty extends Core
     {
         return $this->hasMany(CmsContentPropertyEnum::className(), ['property_id' => 'id']);
     }
+
+
+
+
+
+    /**
+     * @param ActiveForm $activeForm
+     * @param Model $model
+     * @return mixed
+     */
+    public function renderActiveForm(ActiveForm $activeForm, Model $model)
+    {
+        $elementClass   = $this->component;
+
+        /**
+         * @var $propertyType PropertyType
+         */
+        $propertyType = new $elementClass([
+            'model'         => $model,
+            'property'      => $this,
+            'activeForm'    => $activeForm,
+        ]);
+
+        return $propertyType->renderForActiveForm();
+    }
+
+
+    /**
+     * @return array
+     */
+    public function rulesForActiveForm()
+    {
+        $result = [];
+
+        $rules = [];
+
+        if ($this->is_required == Cms::BOOL_Y)
+        {
+            $rules = ['required'];
+        }
+
+        if ((array) $rules)
+        {
+            foreach ((array) $rules as $ruleCode)
+            {
+                $result[] = [[$this->getFormAttribute()], $ruleCode];
+            }
+        } else
+        {
+            $result[] = [[$this->getFormAttribute()], 'safe'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormAttribute()
+    {
+        return "property_" . $this->id;
+    }
+
+    /**
+     * @param $modelWhithProperties
+     * @return mixed
+     */
+    public function value($modelWhithProperties)
+    {
+        if ($this->multiple == "Y")
+        {
+            if ($values = $modelWhithProperties->findPropertyValue($this->id)->all())
+            {
+                return ArrayHelper::map($values, "id", "value");
+            } else
+            {
+                return [];
+            }
+        } else
+        {
+            if ($value = $modelWhithProperties->findPropertyValue($this->id)->one())
+            {
+                return $value->value;
+            } else
+            {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * @param $modelWhithProperties
+     * @param $value
+     * @return $this
+     */
+    public function saveValue($modelWhithProperties, $value)
+    {
+        if ($this->multiple == "Y")
+        {
+            $propertyValues = $modelWhithProperties->getPropertyValues()->where(['property_id' => $this->id])->all();
+            if ($propertyValues)
+            {
+                foreach ($propertyValues as $pv)
+                {
+                    $pv->delete();
+                }
+            }
+
+            $values = (array) $value;
+
+            if ($values)
+            {
+                foreach ($values as $key => $value)
+                {
+                    $productPropertyValue = new ProductPropertyMap([
+                        'product_id'    => $modelWhithProperties->id,
+                        'property_id'   => $this->id,
+                        'value'         => $value,
+                    ]);
+
+                    $productPropertyValue->save(false);
+                }
+            }
+
+        } else
+        {
+            /**
+             * @var $propertyValue ProductPropertyMap
+             */
+            if ($productPropertyValue = $modelWhithProperties->getPropertyValues()->where(['property_id' => $this->id])->one())
+            {
+                $productPropertyValue->value = $value;
+            } else
+            {
+                $productPropertyValue = new ProductPropertyMap([
+                    'product_id' => $modelWhithProperties->id,
+                    'property_id' => $this->id,
+                    'value' => $value,
+                ]);
+            }
+
+            $productPropertyValue->save();
+        }
+
+        return $this;
+    }
+
 
 }

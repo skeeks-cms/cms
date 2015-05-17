@@ -19,7 +19,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <? else: ?>
 
-    <?= $form->field($model, '$content_id')->label('Контент')->widget(
+    <?= $form->field($model, 'content_id')->label('Контент')->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\CmsContent::find()->all(),
@@ -93,6 +93,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd(); ?>
 <? endif; ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
 <?php ActiveForm::end(); ?>
