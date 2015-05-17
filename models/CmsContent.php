@@ -91,14 +91,14 @@ class CmsContent extends Core
             'description' => Yii::t('app', 'Description'),
             'files' => Yii::t('app', 'Files'),
             'content_type' => Yii::t('app', 'Content Type'),
-            'index_element' => Yii::t('app', 'Index Element'),
-            'index_tree' => Yii::t('app', 'Index Tree'),
-            'tree_chooser' => Yii::t('app', 'Tree Chooser'),
-            'list_mode' => Yii::t('app', 'List Mode'),
-            'trees_name' => Yii::t('app', 'Trees Name'),
-            'tree_name' => Yii::t('app', 'Tree Name'),
-            'elements_name' => Yii::t('app', 'Elements Name'),
-            'element_name' => Yii::t('app', 'Element Name'),
+            'index_element' => Yii::t('app', 'Индексировать элементы для модуля поиска'),
+            'index_tree' => Yii::t('app', 'Индексировать разделы для модуля поиска'),
+            'tree_chooser' => Yii::t('app', 'Интерфейс привязки элемента к разделам'),
+            'list_mode' => Yii::t('app', 'Режим просмотра разделов и элементов'),
+            'trees_name' => Yii::t('app', 'Разделы'),
+            'tree_name' => Yii::t('app', 'Раздел'),
+            'elements_name' => Yii::t('app', 'Элементы'),
+            'element_name' => Yii::t('app', 'Элемент'),
         ]);
     }
 
@@ -137,6 +137,22 @@ class CmsContent extends Core
             ['active', 'default', 'value' => function($model, $attribute)
             {
                 return "Y";
+            }],
+            ['trees_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Разделы";
+            }],
+            ['tree_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Раздел";
+            }],
+            ['elements_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Элементы";
+            }],
+            ['element_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Элемент";
             }],
         ]);
     }

@@ -16,6 +16,7 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\base\ActionEvent;
 
 /**
  * Class AdminCmsContentTypeController
@@ -25,7 +26,7 @@ class AdminCmsContentElementController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление элементами";
+        $this->_label                   = "Элементы";
         $this->_modelShowAttribute      = "name";
         $this->_modelClassName          = CmsContentElement::className();
 
@@ -33,7 +34,30 @@ class AdminCmsContentElementController extends AdminModelEditorSmartController
         $this->enableScenarios = true;
 
         parent::init();
+    }
 
+    public $content;
+
+    /**
+     * @param ActionEvent $e
+     */
+    protected function _beforeAction(ActionEvent $e)
+    {
+        if ($content_id = \Yii::$app->request->get('content_id'))
+        {
+            $this->content = CmsContent::findOne($content_id);
+        }
+
+        if ($this->content)
+        {
+            if ($this->content->elements_name)
+            {
+                $this->_label = $this->content->elements_name;
+            }
+
+        }
+
+        parent::_beforeAction($e);
     }
 
 }
