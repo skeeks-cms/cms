@@ -1,31 +1,21 @@
 <?php
 /**
- * Infoblock
+ * Модель значения связанного свойства.
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 09.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 18.05.2015
  */
+namespace skeeks\cms\relatedProperties\models;
 
-namespace skeeks\cms\models;
-
-use skeeks\cms\base\Widget;
-use skeeks\cms\components\registeredWidgets\Model;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
-use skeeks\modules\cms\user\models\User;
+use skeeks\cms\components\Cms;
+use skeeks\cms\models\Core;
 use Yii;
 use yii\db\BaseActiveRecord;
+use yii\widgets\ActiveForm;
 
 /**
- * This is the model class for table "{{%cms_content_property_enum}}".
- *
  * @property integer $id
  * @property integer $created_by
  * @property integer $updated_by
@@ -37,26 +27,10 @@ use yii\db\BaseActiveRecord;
  * @property string $code
  * @property integer $priority
  *
- * @property CmsContentProperty $property
+ * @property RelatedPropertyModel $property
  */
-class CmsContentPropertyEnum extends Core
+abstract class RelatedPropertyEnumModel extends Core
 {
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return '{{%cms_content_property_enum}}';
-    }
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(), []);
-    }
-
     /**
      * @inheritdoc
      */
@@ -89,7 +63,7 @@ class CmsContentPropertyEnum extends Core
             [['code'], 'string', 'max' => 32],
             ['code', 'default', 'value' => function($model, $attribute)
             {
-                return "sx_auto_" . md5(rand(1, 10) . time());
+                return md5(rand(1, 10) . time());
             }],
             ['priority', 'default', 'value' => function($model, $attribute)
             {
@@ -101,8 +75,8 @@ class CmsContentPropertyEnum extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProperty()
-    {
+    abstract public function getProperty();
+    /*{
         return $this->hasOne(CmsContentProperty::className(), ['id' => 'property_id']);
-    }
+    }*/
 }

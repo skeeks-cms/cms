@@ -47,8 +47,6 @@ use Yii;
  * @property string $element_name
  *
  * @property CmsContentType $contentType
- * @property User $createdBy
- * @property User $updatedBy
  * @property CmsContentElement[] $cmsContentElements
  * @property CmsContentProperty[] $cmsContentProperties
  */
@@ -103,16 +101,6 @@ class CmsContent extends Core
         ]);
     }
 
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
-    }
-
     /**
      * @inheritdoc
      */
@@ -129,7 +117,7 @@ class CmsContent extends Core
             [['trees_name', 'tree_name', 'elements_name', 'element_name'], 'string', 'max' => 100],
             ['code', 'default', 'value' => function($model, $attribute)
             {
-                return "sx_auto_" . md5(rand(1, 10) . time());
+                return md5(rand(1, 10) . time());
             }],
             ['priority', 'default', 'value' => function($model, $attribute)
             {
@@ -166,21 +154,6 @@ class CmsContent extends Core
         return $this->hasOne(CmsContentType::className(), ['code' => 'content_type']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery

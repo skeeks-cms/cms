@@ -1,21 +1,23 @@
 <?php
 /**
- *
  * Базовый тип свойства.
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010 SkeekS (СкикС)
- * @date 30.04.2015
+ * @date 18.05.2015
  */
-namespace skeeks\cms\base;
+
+namespace skeeks\cms\relatedProperties;
+use skeeks\cms\base\Component;
 use skeeks\cms\base\widgets\ActiveForm;
-use skeeks\modules\cms\catalog\models\ProductProperty;
+use skeeks\cms\relatedProperties\models\RelatedElementModel;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Model;
 
 /**
  * Class PropertyType
- * @package skeeks\cms\base
+ * @package skeeks\cms\relatedProperties
  */
 abstract class PropertyType extends Component
 {
@@ -40,11 +42,11 @@ abstract class PropertyType extends Component
     public $multiple    = false;
 
     /**
-     * @var Model
+     * @var RelatedElementModel
      */
     public $model;
     /**
-     * @var ProductProperty
+     * @var RelatedPropertyModel
      */
     public $property;
 
@@ -64,7 +66,7 @@ abstract class PropertyType extends Component
      */
     public function renderForActiveForm()
     {
-        $field = $this->activeForm->field($this->model, $this->property->getFormAttribute());
+        $field = $this->activeForm->field($this->model, $this->property->code);
 
         if (!$field)
         {

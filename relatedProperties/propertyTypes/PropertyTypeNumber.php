@@ -5,12 +5,10 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
-namespace skeeks\cms\base\propertyTypes;
-use skeeks\cms\base\PropertyType;
-
+namespace skeeks\cms\relatedProperties\propertyTypes;
 /**
  * Class PropertyTypeNumber
- * @package skeeks\cms\base\propertyTypes
+ * @package skeeks\cms\relatedProperties\propertyTypes
  */
 class PropertyTypeNumber extends PropertyTypeTextInput
 {

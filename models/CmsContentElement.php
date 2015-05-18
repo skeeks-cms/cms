@@ -17,8 +17,11 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
+use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\web\ErrorHandler;
@@ -45,15 +48,16 @@ use yii\web\ErrorHandler;
  * @property integer $show_counter
  * @property integer $show_counter_start
  *
- * @property CmsContent $content
- * @property User $createdBy
+ * @property CmsContent $cmsContent
  * @property Tree $tree
- * @property User $updatedBy
- * @property CmsContentElementProperty[] $cmsContentElementProperties
+
+ * @property CmsContentElementProperty[]    relatedElementProperties
+ * @property CmsContentProperty[]           relatedProperties
  */
-class CmsContentElement extends Core
+class CmsContentElement extends RelatedElementModel
 {
     use \skeeks\cms\models\behaviors\traits\HasFiles;
+    use HasRelatedPropertiesTrait;
 
     /**
      * @inheritdoc
@@ -71,6 +75,12 @@ class CmsContentElement extends Core
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
             HasFiles::className() => HasFiles::className(),
+            HasRelatedProperties::className() =>
+            [
+                'class'                             => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName'   => CmsContentElementProperty::className(),
+                'relatedPropertyClassName'          => CmsContentProperty::className(),
+            ],
         ]);
     }
 
@@ -120,17 +130,9 @@ class CmsContentElement extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getContent()
+    public function getCmsContent()
     {
         return $this->hasOne(CmsContent::className(), ['id' => 'content_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
     }
 
     /**
@@ -142,58 +144,13 @@ class CmsContentElement extends Core
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCmsContentElementProperties()
-    {
-        return $this->hasMany(CmsContentElementProperty::className(), ['element_id' => 'id']);
-    }
-
-
-
-    /**
+     *
+     * Все возможные свойства связанные с моделью
+     *
      * @return array|\yii\db\ActiveRecord[]
      */
-    public function getPropertiesAll()
+    public function getRelatedProperties()
     {
-        return $this->content->cmsContentProperties;
-    }
-
-    /**
-     * @return string
-     */
-    public function renderPropertiesForm()
-    {
-        try
-        {
-            return \Yii::$app->view->render('@skeeks/modules/cms/catalog/views/blank-form', [
-                'modelWithProperties'   => $this,
-                'validateModel'         => $this->createPropertiesValidateModel()
-            ]);
-
-        } catch (\Exception $e)
-        {
-            ob_end_clean();
-            ErrorHandler::convertExceptionToError($e);
-            return 'Ошибка рендеринга формы: ' . $e->getMessage();
-        }
-    }
-
-    /**
-     * @return PropertiesValidateModel
-     */
-    public function createPropertiesValidateModel()
-    {
-        return new PropertiesValidateModel([
-            'modelWithProperties' => $this
-        ]);
+        return $this->cmsContent->cmsContentProperties;
     }
 }

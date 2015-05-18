@@ -5,8 +5,8 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
-namespace skeeks\cms\base\propertyTypes;
-use skeeks\cms\base\PropertyType;
+namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\widget\chosen\Chosen;
 use yii\helpers\ArrayHelper;
 
@@ -32,8 +32,8 @@ class PropertyTypeSelectMulti extends PropertyType
     {
         $field = $this->activeForm->fieldSelectMulti(
             $this->model,
-            $this->property->getFormAttribute(),
-            ArrayHelper::map($this->property->productPropertyEnums, 'id', 'value'),
+            $this->property->code,
+            ArrayHelper::map($this->property->enums, 'id', 'value'),
             $this->getActiveFormConfig()
         );
 
