@@ -8,6 +8,7 @@
 
 return
 [
+
     function()
     {
         $result = [];
@@ -19,9 +20,9 @@ return
              */
             foreach ($contentTypes as $contentType)
             {
-                $data =
-                [
-                    'label' => $contentType->name,
+                $itemData = [
+                    'code'      => "content-block-" . $contentType->id,
+                    'label'     => $contentType->name,
                     "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
                 ];
 
@@ -29,7 +30,7 @@ return
                 {
                     foreach ($contents as $content)
                     {
-                        $data['items'][] =
+                        $itemData['items'][] =
                         [
                             'label' => $content->name,
                             'url'   => ["cms/admin-cms-content-element", "content_id" => $content->id, "content_type" => $contentType->code],
@@ -37,28 +38,11 @@ return
                     }
                 }
 
-                $result["content-block-" . $contentType->id] = $data;
+                $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
             }
         }
 
         return $result;
-        /*return
-        [
-            'content-block-1' =>
-            [
-                'label'     => 'Контент 1',
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
-
-                'items' =>
-                [
-                    [
-                        "label"     => "Сайты",
-                        "url"       => ["cms/admin-site"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
-                    ],
-                ],
-            ]
-        ];*/
     },
 
     'cms' =>
