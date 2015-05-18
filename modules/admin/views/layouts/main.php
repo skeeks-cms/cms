@@ -195,51 +195,87 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
-            <? if ($items = \Yii::$app->adminMenu->getAllowData()) : ?>
-                <? foreach ($items as $keyGroup => $groupData) : ?>
-
-                    <? if (\yii\helpers\ArrayHelper::getValue($groupData, 'enabled' , true) === true) : ?>
-                        <div class="sidebar-menu" id="sx-admin-menu-<?= $keyGroup; ?>">
-                            <div class="sx-head" title="<?= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); ?>">
-                                <? if ($imgData = \yii\helpers\ArrayHelper::getValue($groupData, 'img', [])) : ?>
-                                    <? list($assetClassName, $localPath) = $imgData; ?>
+            <? if ($items = \Yii::$app->adminMenu->getItems()) : ?>
+                <? foreach ($items as $adminMenuItem) : ?>
+                    <? if ($adminMenuItem->isAllowShow()) : ?>
+                        <div class="sidebar-menu" id="<?= $adminMenuItem->code; ?>">
+                            <div class="sx-head" title="<?= $adminMenuItem->label; ?>">
+                                <? if ($imgUrl = $adminMenuItem->getImgUrl()) : ?>
                                     <span class="sx-icon">
-                                        <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); ?>" />
+                                        <img src="<?= $imgUrl; ?>" />
                                     </span>
                                 <? else : ?>
                                     <i class="icon icon-arrow-up" style=""></i>
                                 <? endif; ?>
-                                <?= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); ?>
+                                <?= $adminMenuItem->label; ?>
                             </div>
 
-                            <? if ($itemsGroup = \yii\helpers\ArrayHelper::getValue($groupData, 'items', [])) : ?>
+                            <? if ($subAdminMenuItems = $adminMenuItem->items) : ?>
                                 <ul class="nav nav-sidebar">
-                                    <? foreach ($itemsGroup as $itemData) : ?>
-                                        <? if (\yii\helpers\ArrayHelper::getValue($itemData, 'enabled' , true) === true) : ?>
-                                            <li <?= strpos('-' . \Yii::$app->controller->route . '/', $itemData["url"][0] . '/') ? 'class="active"' : '' ?>>
-                                                <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#" class="sx-test">
-                                                    <? if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : ?>
-                                                        <? list($assetClassName, $localPath) = $imgData; ?>
-                                                        <span class="sx-icon">
-                                                            <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); ?>" />
-                                                        </span>
-                                                    <? else: ?>
-                                                        <span class="sx-icon">
-                                                            <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register($this), 'images/icons/ico_block.gif'); ?>" />
-                                                        </span>
-                                                    <? endif; ?>
-                                                    <span class="txt"><?= $itemData["label"]; ?></span>
-                                                </a>
-                                            </li>
-                                        <? endif; ?>
-                                    <? endforeach; ?>
+                                <? foreach ($subAdminMenuItems as $subAdminMenuItem) : ?>
+                                    <? if ($subAdminMenuItem->isAllowShow()) : ?>
+                                        <li <?= $subAdminMenuItem->isActive() ? 'class="active"' : '' ?>>
+                                            <a href="<?= $subAdminMenuItem->getUrl() ?>" title="<?= $subAdminMenuItem->label; ?>" class="sx-test">
+                                                <span class="sx-icon">
+                                                    <img src="<?= $subAdminMenuItem->getImgUrl(); ?>" />
+                                                </span>
+                                                <span class="txt"><?= $subAdminMenuItem->label; ?></span>
+                                            </a>
+                                        </li>
+                                    <? endif; ?>
+                                <? endforeach; ?>
                                 </ul>
                             <? endif; ?>
-
                         </div>
                     <? endif; ?>
                 <? endforeach; ?>
             <? endif; ?>
+
+            <?/* if ($items = \Yii::$app->adminMenu->getAllowData()) : */?><!--
+                <?/* foreach ($items as $keyGroup => $groupData) : */?>
+
+                    <?/* if (\yii\helpers\ArrayHelper::getValue($groupData, 'enabled' , true) === true) : */?>
+                        <div class="sidebar-menu" id="sx-admin-menu-<?/*= $keyGroup; */?>">
+                            <div class="sx-head" title="<?/*= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); */?>">
+                                <?/* if ($imgData = \yii\helpers\ArrayHelper::getValue($groupData, 'img', [])) : */?>
+                                    <?/* list($assetClassName, $localPath) = $imgData; */?>
+                                    <span class="sx-icon">
+                                        <img src="<?/*= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); */?>" />
+                                    </span>
+                                <?/* else : */?>
+                                    <i class="icon icon-arrow-up" style=""></i>
+                                <?/* endif; */?>
+                                <?/*= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); */?>
+                            </div>
+
+                            <?/* if ($itemsGroup = \yii\helpers\ArrayHelper::getValue($groupData, 'items', [])) : */?>
+                                <ul class="nav nav-sidebar">
+                                    <?/* foreach ($itemsGroup as $itemData) : */?>
+                                        <?/* if (\yii\helpers\ArrayHelper::getValue($itemData, 'enabled' , true) === true) : */?>
+                                            <li <?/*= strpos('-' . \Yii::$app->controller->route . '/', $itemData["url"][0] . '/') ? 'class="active"' : '' */?>>
+                                                <a href="<?/*= \Yii::$app->cms->moduleAdmin()->createUrl((array) $itemData["url"]) */?>" title="#" class="sx-test">
+                                                    <?/* if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : */?>
+                                                        <?/* list($assetClassName, $localPath) = $imgData; */?>
+                                                        <span class="sx-icon">
+                                                            <img src="<?/*= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); */?>" />
+                                                        </span>
+                                                    <?/* else: */?>
+                                                        <span class="sx-icon">
+                                                            <img src="<?/*= \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register($this), 'images/icons/ico_block.gif'); */?>" />
+                                                        </span>
+                                                    <?/* endif; */?>
+                                                    <span class="txt"><?/*= $itemData["label"]; */?></span>
+                                                </a>
+                                            </li>
+                                        <?/* endif; */?>
+                                    <?/* endforeach; */?>
+                                </ul>
+                            <?/* endif; */?>
+
+                        </div>
+                    <?/* endif; */?>
+                <?/* endforeach; */?>
+            --><?/* endif; */?>
         </div>
     </div>
 </div>

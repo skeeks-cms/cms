@@ -10,6 +10,8 @@
  */
 namespace skeeks\cms\modules\admin\components;
 use skeeks\cms\App;
+use skeeks\cms\modules\admin\helpers\AdminMenuItem;
+use skeeks\cms\modules\admin\helpers\MenuItem;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
@@ -129,5 +131,20 @@ class Menu
         }
 
         return $groups;
+    }
+
+    /**
+     * @return AdminMenuItem[]
+     */
+    public function getItems()
+    {
+        $result = [];
+
+        if ($data = $this->getData())
+        {
+            $result = AdminMenuItem::createItems($data);
+        }
+
+        return $result;
     }
 }
