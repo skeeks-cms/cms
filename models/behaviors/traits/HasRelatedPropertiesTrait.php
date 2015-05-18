@@ -18,6 +18,8 @@ use yii\db\ActiveRecord;
  * @method string renderRelatedPropertiesForm()
  * @method ActiveQuery findRelatedElementProperties($property_ids)
  * @method RelatedPropertiesModel getRelatedPropertiesModel()
+ * @method mixed getRelatedPropertyValue(RelatedPropertyModel $model)
+ * @method mixed saveRelatedPropertyValue(RelatedPropertyModel $model)
  *
  * @property RelatedElementPropertyModel[]    relatedElementProperties
  * @property RelatedPropertyModel[]           relatedProperties

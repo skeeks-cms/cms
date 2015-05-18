@@ -37,7 +37,7 @@ class RelatedPropertiesModel extends Model
         {
             foreach ($this->relatedElementModel->relatedProperties as $property)
             {
-                $this->_attributes[$property->code] = $property->value($this->relatedElementModel);
+                $this->_attributes[$property->code] = $this->relatedElementModel->getRelatedPropertyValue($property);
             }
         }
     }
@@ -64,7 +64,7 @@ class RelatedPropertiesModel extends Model
     {
         foreach ($this->relatedElementModel->relatedProperties as $property)
         {
-            $property->saveValue($this->relatedElementModel, $this->getAttribute($property->code));
+            $this->relatedElementModel->saveRelatedPropertyValue($property, $this->getAttribute($property->code));
         }
 
         return $this;

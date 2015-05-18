@@ -12,6 +12,7 @@ namespace skeeks\cms\models\behaviors;
 use skeeks\cms\base\behaviors\ActiveRecord;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 use yii\web\ErrorHandler;
 
 /**
@@ -92,7 +93,7 @@ class HasRelatedProperties extends ActiveRecord
     public function createRelatedPropertiesModel()
     {
         return new RelatedPropertiesModel([
-            'relatedElementModel' => $this
+            'relatedElementModel' => $this->owner
         ]);
     }
 
@@ -112,5 +113,92 @@ class HasRelatedProperties extends ActiveRecord
         }
 
         return $this->relatedPropertiesModel;
+    }
+
+
+
+    /**
+     * @param RelatedPropertyModel $property
+     * @return array|mixed|null
+     */
+    public function getRelatedPropertyValue($property)
+    {
+        if ($property->multiple == "Y")
+        {
+            if ($values = $this->findRelatedElementProperties($property->id)->all())
+            {
+                return ArrayHelper::map($values, "id", "value");
+            } else
+            {
+                return [];
+            }
+        } else
+        {
+            if ($value = $this->findRelatedElementProperties($property->id)->one())
+            {
+                return $value->value;
+            } else
+            {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * @param $property
+     * @param $value
+     * @return $this
+     * @throws \Exception
+     */
+    public function saveRelatedPropertyValue($property, $value)
+    {
+        if ($property->multiple == "Y")
+        {
+            $propertyValues = $this->findRelatedElementProperties($property->id)->all();
+            if ($propertyValues)
+            {
+                foreach ($propertyValues as $pv)
+                {
+                    $pv->delete();
+                }
+            }
+
+            $values = (array) $value;
+
+            if ($values)
+            {
+                foreach ($values as $key => $value)
+                {
+                    $className = $this->relatedElementPropertyClassName;
+                    $productPropertyValue = new $className([
+                        'element_id'    => $this->owner->id,
+                        'property_id'   => $property->id,
+                        'value'         => $value,
+                    ]);
+
+                    $productPropertyValue->save(false);
+                }
+            }
+
+        } else
+        {
+            if ($productPropertyValue = $this->findRelatedElementProperties($property->id)->one())
+            {
+                $productPropertyValue->value = $value;
+            } else
+            {
+                $className = $this->relatedElementPropertyClassName;
+
+                $productPropertyValue = new $className([
+                    'element_id'    => $this->owner->id,
+                    'property_id'   => $property->id,
+                    'value'         => $value,
+                ]);
+            }
+
+            $productPropertyValue->save();
+        }
+
+        return $this;
     }
 }

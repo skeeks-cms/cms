@@ -81,19 +81,20 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
-<? if ($model->relatedProperties) : ?>
-    <? foreach($model->relatedProperties as $relatedProperty) : ?>
-        <?= $relatedProperty->name; ?>
-    <? endforeach; ?>
-<? endif; ?>
+<?/* if ($model->relatedProperties) : */?><!--
+    <?/* foreach($model->relatedProperties as $relatedProperty) : */?>
+        <?/*= $relatedProperty->name; */?>
+    <?/* endforeach; */?>
+<?/* endif; */?>
 
-<? if ($model->relatedElementProperties) : ?>
-    <? foreach($model->relatedElementProperties as $relatedElementProperty) : ?>
-        <?= $relatedElementProperty->value; ?>
-    <? endforeach; ?>
-<? endif; ?>
-
+<?/* if ($model->relatedElementProperties) : */?>
+    <?/* foreach($model->relatedElementProperties as $relatedElementProperty) : */?>
+        <?/*= $relatedElementProperty->value; */?>
+    <?/* endforeach; */?>
+--><?/* endif; */?>
+<? if (!$model->isNewRecord && $model->relatedProperties) : ?>
 <div class="sx-box sx-p-10 sx-mt-10">
     <h2>Дополнительные свойства</h2>
     <?= $model->renderRelatedPropertiesForm(); ?>
 </div>
+<? endif; ?>

@@ -113,7 +113,7 @@ abstract class RelatedPropertyModel extends Core
             [['name'], 'required'],
             [['component_settings'], 'string'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
-            [['code'], 'string', 'max' => 32],
+            [['code'], 'string', 'max' => 64],
             [['active', 'property_type', 'list_type', 'multiple', 'with_description', 'searchable', 'filtrable', 'is_required', 'smart_filtrable'], 'string', 'max' => 1],
             [['code'], 'unique'],
             ['code', 'default', 'value' => function($model, $attribute)
@@ -199,7 +199,7 @@ abstract class RelatedPropertyModel extends Core
      * @param RelatedElementModel $relatedElementModel
      * @return mixed
      */
-    public function value($relatedElementModel)
+    /*public function value($relatedElementModel)
     {
         if ($this->multiple == "Y")
         {
@@ -220,14 +220,14 @@ abstract class RelatedPropertyModel extends Core
                 return null;
             }
         }
-    }
+    }*/
 
     /**
      * @param RelatedElementModel $relatedElementModel
      * @param $value
      * @return $this
      */
-    public function saveValue($relatedElementModel, $value)
+    /*public function saveValue($relatedElementModel, $value)
     {
         if ($this->multiple == "Y")
         {
@@ -246,8 +246,8 @@ abstract class RelatedPropertyModel extends Core
             {
                 foreach ($values as $key => $value)
                 {
-                    $productPropertyValue = new ProductPropertyMap([
-                        'product_id'    => $modelWhithProperties->id,
+                    $productPropertyValue = new RelatedPropertiesModel([
+                        'element_id'    => $modelWhithProperties->id,
                         'property_id'   => $this->id,
                         'value'         => $value,
                     ]);
@@ -260,16 +260,15 @@ abstract class RelatedPropertyModel extends Core
         {
             /**
              * @var $propertyValue ProductPropertyMap
-             */
             if ($productPropertyValue = $modelWhithProperties->getPropertyValues()->where(['property_id' => $this->id])->one())
             {
                 $productPropertyValue->value = $value;
             } else
             {
                 $productPropertyValue = new ProductPropertyMap([
-                    'product_id' => $modelWhithProperties->id,
-                    'property_id' => $this->id,
-                    'value' => $value,
+                    'product_id'    => $modelWhithProperties->id,
+                    'property_id'   => $this->id,
+                    'value'         => $value,
                 ]);
             }
 
@@ -277,5 +276,5 @@ abstract class RelatedPropertyModel extends Core
         }
 
         return $this;
-    }
+    }*/
 }

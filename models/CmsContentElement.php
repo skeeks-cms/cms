@@ -22,8 +22,11 @@ use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\user\models\User;
+use skeeks\sx\String;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\ErrorHandler;
 
 /**
@@ -83,6 +86,44 @@ class CmsContentElement extends RelatedElementModel
             ],
         ]);
     }
+
+    /*public function attributes()
+    {
+        $relatedAttributes = [];
+
+        if ($this->content_id)
+        {
+            if ($this->relatedProperties)
+            {
+                foreach ($this->relatedProperties as $key => $property)
+                {
+                    $relatedAttributes[] = "related" . String::ucfirst($property->code);
+                }
+            }
+        }
+
+        return array_merge(parent::attributes(), $relatedAttributes);
+    }
+
+
+    public function init()
+    {
+        $relatedAttributes = [];
+
+        if ($this->content_id)
+        {
+            if ($this->relatedProperties)
+            {
+                foreach ($this->relatedProperties as $key => $property)
+                {
+                    $this->_attribute["related" . String::ucfirst($property->code)] = $property->value($this);
+                }
+            }
+        }
+
+        parent::init();
+    }*/
+
 
     /**
      * @inheritdoc

@@ -33,7 +33,7 @@ class m150512_113230_create_table__cms_content_property extends Migration
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
             'name'                  => Schema::TYPE_STRING . '(255) NOT NULL',
-            'code'                  => Schema::TYPE_STRING . '(32) NULL',
+            'code'                  => Schema::TYPE_STRING . '(64) NULL',
 
             'content_id'            => Schema::TYPE_INTEGER . ' NULL',
 
