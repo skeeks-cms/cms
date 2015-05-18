@@ -19,8 +19,10 @@ use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
+use skeeks\cms\models\behaviors\HasTrees;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\behaviors\traits\HasTreesTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\user\models\User;
@@ -52,7 +54,7 @@ use yii\web\ErrorHandler;
  * @property integer $show_counter_start
  *
  * @property CmsContent $cmsContent
- * @property Tree $tree
+ * @property CmsTree $tree
 
  * @property CmsContentElementProperty[]    relatedElementProperties
  * @property CmsContentProperty[]           relatedProperties
@@ -61,6 +63,7 @@ class CmsContentElement extends RelatedElementModel
 {
     use \skeeks\cms\models\behaviors\traits\HasFiles;
     use HasRelatedPropertiesTrait;
+    use HasTreesTrait;
 
     /**
      * @inheritdoc
@@ -78,51 +81,21 @@ class CmsContentElement extends RelatedElementModel
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
             HasFiles::className() => HasFiles::className(),
+
             HasRelatedProperties::className() =>
             [
                 'class'                             => HasRelatedProperties::className(),
                 'relatedElementPropertyClassName'   => CmsContentElementProperty::className(),
                 'relatedPropertyClassName'          => CmsContentProperty::className(),
             ],
+
+            HasTrees::className() =>
+            [
+                'class'                             => HasTrees::className(),
+                'elementTreesClassName'             => CmsContentElementTree::className(),
+            ],
         ]);
     }
-
-    /*public function attributes()
-    {
-        $relatedAttributes = [];
-
-        if ($this->content_id)
-        {
-            if ($this->relatedProperties)
-            {
-                foreach ($this->relatedProperties as $key => $property)
-                {
-                    $relatedAttributes[] = "related" . String::ucfirst($property->code);
-                }
-            }
-        }
-
-        return array_merge(parent::attributes(), $relatedAttributes);
-    }
-
-
-    public function init()
-    {
-        $relatedAttributes = [];
-
-        if ($this->content_id)
-        {
-            if ($this->relatedProperties)
-            {
-                foreach ($this->relatedProperties as $key => $property)
-                {
-                    $this->_attribute["related" . String::ucfirst($property->code)] = $property->value($this);
-                }
-            }
-        }
-
-        parent::init();
-    }*/
 
 
     /**
@@ -163,8 +136,9 @@ class CmsContentElement extends RelatedElementModel
             [['description_short', 'description_full', 'files'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
-            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'The combination of Code and Content ID has already been taken.'],
-            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => 'The combination of Code and Tree ID has already been taken.']
+            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
+            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => 'Для данного раздела этот код уже занят.'],
+            [['treeIds'], 'safe'],
         ]);
     }
 
@@ -179,7 +153,7 @@ class CmsContentElement extends RelatedElementModel
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTree()
+    public function getCmsTree()
     {
         return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
     }
@@ -195,3 +169,44 @@ class CmsContentElement extends RelatedElementModel
         return $this->cmsContent->cmsContentProperties;
     }
 }
+
+
+
+
+
+    /*public function attributes()
+    {
+        $relatedAttributes = [];
+
+        if ($this->content_id)
+        {
+            if ($this->relatedProperties)
+            {
+                foreach ($this->relatedProperties as $key => $property)
+                {
+                    $relatedAttributes[] = "related" . String::ucfirst($property->code);
+                }
+            }
+        }
+
+        return array_merge(parent::attributes(), $relatedAttributes);
+    }
+
+
+    public function init()
+    {
+        $relatedAttributes = [];
+
+        if ($this->content_id)
+        {
+            if ($this->relatedProperties)
+            {
+                foreach ($this->relatedProperties as $key => $property)
+                {
+                    $this->_attribute["related" . String::ucfirst($property->code)] = $property->value($this);
+                }
+            }
+        }
+
+        parent::init();
+    }*/

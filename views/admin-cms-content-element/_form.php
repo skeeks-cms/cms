@@ -27,16 +27,17 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     )->label('Главное изображение'); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255]) ?>
 
 <?= $form->fieldSetEnd()?>
 
 <?= $form->fieldSet('Показывать в разделах'); ?>
-    <?/*= $form->field($model, 'tree_ids')->label('Разделы сайта')->widget(
+    <?= $form->field($model, 'treeIds')->label('Разделы сайта')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
-
+            "attributeMulti" => "treeIds"
         ])->hint('Укажите разделы сайт, где бы хотелось видеть эту публикацию');
-    */?>
+    ?>
 
 <?= $form->fieldSetEnd()?>
 
