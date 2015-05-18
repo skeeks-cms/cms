@@ -26,6 +26,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         ]
     )->label('Главное изображение'); ?>
 
+    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255]) ?>
 

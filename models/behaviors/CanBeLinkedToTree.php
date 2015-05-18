@@ -1,6 +1,6 @@
 <?php
 /**
- * TODO: is depricated
+ * TODO: is depricated (1.2.0)
  *
  * CanBeLinkedToTree
  *

@@ -1,5 +1,7 @@
 <?php
 /**
+ * TODO: is depricated (1.2.0)
+ *
  * HasDescriptionsBehavior
  *
  * @author Semenov Alexander <semenov@skeeks.com>

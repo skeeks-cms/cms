@@ -12,6 +12,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
+use skeeks\cms\components\Cms;
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
@@ -20,6 +21,7 @@ use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasTrees;
+use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasTreesTrait;
@@ -94,6 +96,12 @@ class CmsContentElement extends RelatedElementModel
                 'class'                             => HasTrees::className(),
                 'elementTreesClassName'             => CmsContentElementTree::className(),
             ],
+
+            SeoPageName::className() =>
+            [
+                'class'                             => SeoPageName::className(),
+                'generatedAttribute'                => 'code',
+            ]
         ]);
     }
 
@@ -139,6 +147,14 @@ class CmsContentElement extends RelatedElementModel
             [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
             [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => 'Для данного раздела этот код уже занят.'],
             [['treeIds'], 'safe'],
+            ['priority', 'default', 'value' => function($model, $attribute)
+            {
+                return 500;
+            }],
+            ['active', 'default', 'value' => function($model, $attribute)
+            {
+                return Cms::BOOL_Y;
+            }]
         ]);
     }
 
