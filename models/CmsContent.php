@@ -47,9 +47,8 @@ use Yii;
  * @property string $element_name
  *
  * @property CmsContentType $contentType
- * @property User $createdBy
- * @property User $updatedBy
  * @property CmsContentElement[] $cmsContentElements
+ * @property CmsContentProperty[] $cmsContentProperties
  */
 class CmsContent extends Core
 {
@@ -91,25 +90,15 @@ class CmsContent extends Core
             'description' => Yii::t('app', 'Description'),
             'files' => Yii::t('app', 'Files'),
             'content_type' => Yii::t('app', 'Content Type'),
-            'index_element' => Yii::t('app', 'Index Element'),
-            'index_tree' => Yii::t('app', 'Index Tree'),
-            'tree_chooser' => Yii::t('app', 'Tree Chooser'),
-            'list_mode' => Yii::t('app', 'List Mode'),
-            'trees_name' => Yii::t('app', 'Trees Name'),
-            'tree_name' => Yii::t('app', 'Tree Name'),
-            'elements_name' => Yii::t('app', 'Elements Name'),
-            'element_name' => Yii::t('app', 'Element Name'),
+            'index_element' => Yii::t('app', 'Индексировать элементы для модуля поиска'),
+            'index_tree' => Yii::t('app', 'Индексировать разделы для модуля поиска'),
+            'tree_chooser' => Yii::t('app', 'Интерфейс привязки элемента к разделам'),
+            'list_mode' => Yii::t('app', 'Режим просмотра разделов и элементов'),
+            'trees_name' => Yii::t('app', 'Разделы'),
+            'tree_name' => Yii::t('app', 'Раздел'),
+            'elements_name' => Yii::t('app', 'Элементы'),
+            'element_name' => Yii::t('app', 'Элемент'),
         ]);
-    }
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
     }
 
     /**
@@ -128,7 +117,7 @@ class CmsContent extends Core
             [['trees_name', 'tree_name', 'elements_name', 'element_name'], 'string', 'max' => 100],
             ['code', 'default', 'value' => function($model, $attribute)
             {
-                return "sx_auto_" . md5(rand(1, 10) . time());
+                return md5(rand(1, 10) . time());
             }],
             ['priority', 'default', 'value' => function($model, $attribute)
             {
@@ -137,6 +126,22 @@ class CmsContent extends Core
             ['active', 'default', 'value' => function($model, $attribute)
             {
                 return "Y";
+            }],
+            ['trees_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Разделы";
+            }],
+            ['tree_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Раздел";
+            }],
+            ['elements_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Элементы";
+            }],
+            ['element_name', 'default', 'value' => function($model, $attribute)
+            {
+                return "Элемент";
             }],
         ]);
     }
@@ -149,21 +154,6 @@ class CmsContent extends Core
         return $this->hasOne(CmsContentType::className(), ['code' => 'content_type']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -171,5 +161,13 @@ class CmsContent extends Core
     public function getCmsContentElements()
     {
         return $this->hasMany(CmsContentElement::className(), ['content_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentProperties()
+    {
+        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id']);
     }
 }

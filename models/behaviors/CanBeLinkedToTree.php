@@ -1,5 +1,7 @@
 <?php
 /**
+ * TODO: is depricated (1.2.0)
+ *
  * CanBeLinkedToTree
  *
  * @author Semenov Alexander <semenov@skeeks.com>

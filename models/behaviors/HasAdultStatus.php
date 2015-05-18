@@ -1,6 +1,6 @@
 <?php
 /**
- * HasAdultStatus
+ * TODO: is depricated (1.2.0)
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/

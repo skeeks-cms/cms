@@ -5,12 +5,12 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
-namespace skeeks\cms\base\propertyTypes;
-use skeeks\cms\base\PropertyType;
+namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\relatedProperties\PropertyType;
 
 /**
  * Class PropertyTypeElement
- * @package skeeks\cms\base\propertyTypes
+ * @package skeeks\cms\relatedProperties\propertyTypes
  */
 class PropertyTypeElement extends PropertyType
 {

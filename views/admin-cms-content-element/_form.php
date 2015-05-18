@@ -6,13 +6,14 @@ use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
-/* @var $model \yii\db\ActiveRecord */
+/* @var $model \skeeks\cms\models\CmsContentElement */
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
 
 <? if ($model->isNewRecord) : ?>
     <? if ($content_id = \Yii::$app->request->get("content_id")) : ?>
+        <? $model->content_id = $content_id; ?>
         <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
     <? endif; ?>
 <? endif; ?>
@@ -25,17 +26,19 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         ]
     )->label('Главное изображение'); ?>
 
+    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255]) ?>
 
 <?= $form->fieldSetEnd()?>
 
 <?= $form->fieldSet('Показывать в разделах'); ?>
-    <?/*= $form->field($model, 'tree_ids')->label('Разделы сайта')->widget(
+    <?= $form->field($model, 'treeIds')->label('Разделы сайта')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
-
+            "attributeMulti" => "treeIds"
         ])->hint('Укажите разделы сайт, где бы хотелось видеть эту публикацию');
-    */?>
+    ?>
 
 <?= $form->fieldSetEnd()?>
 
@@ -80,4 +83,24 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
+<?/* if ($model->relatedProperties) : */?><!--
+    <?/* foreach($model->relatedProperties as $relatedProperty) : */?>
+        <?/*= $relatedProperty->name; */?>
+    <?/* endforeach; */?>
+<?/* endif; */?>
 
+<?/* if ($model->relatedElementProperties) : */?>
+    <?/* foreach($model->relatedElementProperties as $relatedElementProperty) : */?>
+        <?/*= $relatedElementProperty->value; */?>
+    <?/* endforeach; */?>
+--><?/* endif; */?>
+<? if (!$model->isNewRecord && $model->relatedProperties) : ?>
+<div class="sx-box sx-mt-10">
+    <div class="sx-box-head sx-p-10">
+        <h2>Дополнительные свойства</h2>
+    </div>
+    <div class="sx-box-body sx-p-10">
+        <?= $model->renderRelatedPropertiesForm(); ?>
+    </div>
+</div>
+<? endif; ?>

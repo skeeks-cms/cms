@@ -12,15 +12,26 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
+use skeeks\cms\components\Cms;
 use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
+use skeeks\cms\models\behaviors\HasTrees;
+use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
+use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\behaviors\traits\HasTreesTrait;
+use skeeks\cms\relatedProperties\models\RelatedElementModel;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\user\models\User;
+use skeeks\sx\String;
 use Yii;
+use yii\helpers\ArrayHelper;
+use yii\web\ErrorHandler;
 
 /**
  * This is the model class for table "{{%cms_content_element}}".
@@ -44,14 +55,17 @@ use Yii;
  * @property integer $show_counter
  * @property integer $show_counter_start
  *
- * @property CmsContent $content
- * @property User $createdBy
- * @property Tree $tree
- * @property User $updatedBy
+ * @property CmsContent $cmsContent
+ * @property CmsTree $tree
+
+ * @property CmsContentElementProperty[]    relatedElementProperties
+ * @property CmsContentProperty[]           relatedProperties
  */
-class CmsContentElement extends Core
+class CmsContentElement extends RelatedElementModel
 {
     use \skeeks\cms\models\behaviors\traits\HasFiles;
+    use HasRelatedPropertiesTrait;
+    use HasTreesTrait;
 
     /**
      * @inheritdoc
@@ -69,8 +83,28 @@ class CmsContentElement extends Core
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
             HasFiles::className() => HasFiles::className(),
+
+            HasRelatedProperties::className() =>
+            [
+                'class'                             => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName'   => CmsContentElementProperty::className(),
+                'relatedPropertyClassName'          => CmsContentProperty::className(),
+            ],
+
+            HasTrees::className() =>
+            [
+                'class'                             => HasTrees::className(),
+                'elementTreesClassName'             => CmsContentElementTree::className(),
+            ],
+
+            SeoPageName::className() =>
+            [
+                'class'                             => SeoPageName::className(),
+                'generatedAttribute'                => 'code',
+            ]
         ]);
     }
+
 
     /**
      * @inheritdoc
@@ -99,16 +133,6 @@ class CmsContentElement extends Core
         ]);
     }
 
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
-    }
-
     /**
      * @inheritdoc
      */
@@ -120,15 +144,24 @@ class CmsContentElement extends Core
             [['description_short', 'description_full', 'files'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
-            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'The combination of Code and Content ID has already been taken.'],
-            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => 'The combination of Code and Tree ID has already been taken.']
+            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
+            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => 'Для данного раздела этот код уже занят.'],
+            [['treeIds'], 'safe'],
+            ['priority', 'default', 'value' => function($model, $attribute)
+            {
+                return 500;
+            }],
+            ['active', 'default', 'value' => function($model, $attribute)
+            {
+                return Cms::BOOL_Y;
+            }]
         ]);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getContent()
+    public function getCmsContent()
     {
         return $this->hasOne(CmsContent::className(), ['id' => 'content_id']);
     }
@@ -136,24 +169,60 @@ class CmsContentElement extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTree()
+    public function getCmsTree()
     {
         return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     *
+     * Все возможные свойства связанные с моделью
+     *
+     * @return array|\yii\db\ActiveRecord[]
      */
-    public function getUpdatedBy()
+    public function getRelatedProperties()
     {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
+        return $this->cmsContent->cmsContentProperties;
     }
 }
+
+
+
+
+
+    /*public function attributes()
+    {
+        $relatedAttributes = [];
+
+        if ($this->content_id)
+        {
+            if ($this->relatedProperties)
+            {
+                foreach ($this->relatedProperties as $key => $property)
+                {
+                    $relatedAttributes[] = "related" . String::ucfirst($property->code);
+                }
+            }
+        }
+
+        return array_merge(parent::attributes(), $relatedAttributes);
+    }
+
+
+    public function init()
+    {
+        $relatedAttributes = [];
+
+        if ($this->content_id)
+        {
+            if ($this->relatedProperties)
+            {
+                foreach ($this->relatedProperties as $key => $property)
+                {
+                    $this->_attribute["related" . String::ucfirst($property->code)] = $property->value($this);
+                }
+            }
+        }
+
+        parent::init();
+    }*/

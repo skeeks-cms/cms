@@ -5,14 +5,14 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
-namespace skeeks\cms\base\propertyTypes;
-use skeeks\cms\base\PropertyType;
+namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\widget\chosen\Chosen;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class PropertyTypeList
- * @package skeeks\cms\base\propertyTypes
+ * Class PropertyTypeRadioList
+ * @package skeeks\cms\relatedProperties\propertyTypes
  */
 class PropertyTypeRadioList extends PropertyType
 {
