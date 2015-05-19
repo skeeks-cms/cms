@@ -42,13 +42,6 @@ use Yii;
  * @property string $image_cover
  * @property string $images
  * @property string $files
- * @property integer $count_comment
- * @property integer $count_subscribe
- * @property string $users_subscribers
- * @property integer $count_vote
- * @property integer $result_vote
- * @property string $users_votes_up
- * @property string $users_votes_down
  *
  * Class PageAdvanced
  * @package skeeks\cms\base\models
@@ -88,13 +81,6 @@ abstract class PageAdvanced extends Page
     {
         return array_merge(parent::attributeLabels(), [
             'files' => Yii::t('app', 'Files'),
-            'count_comment' => Yii::t('app', 'Count Comment'),
-            'count_subscribe' => Yii::t('app', 'Count Subscribe'),
-            'users_subscribers' => Yii::t('app', 'Users Subscribers'),
-            'count_vote' => Yii::t('app', 'Count Vote'),
-            'result_vote' => Yii::t('app', 'Result Vote'),
-            'users_votes_up' => Yii::t('app', 'Users Votes Up'),
-            'users_votes_down' => Yii::t('app', 'Users Votes Down'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
             'status' => Yii::t('app', 'Status'),
@@ -109,8 +95,7 @@ abstract class PageAdvanced extends Page
     {
         return array_merge(parent::rules(), [
             [['description_short', 'description_full'], 'string'],
-            [["users_subscribers", "users_votes_up", "users_votes_down"], 'safe'],
-            [['count_comment', 'count_subscribe', 'count_vote', 'status', 'status_adult'], 'integer'],
+            [['status', 'status_adult'], 'integer'],
         ]);
     }
 }
