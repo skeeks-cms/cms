@@ -130,14 +130,6 @@ $config =
             'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
         ],
 
-        //Глобальные опции страниц
-        'pageOptions' =>
-        [
-            'class' => '\skeeks\cms\components\PageOptions',
-            'components' =>  include_once 'page-options.php'
-        ],
-
-
         //Языки проекта
         'langs' =>
         [

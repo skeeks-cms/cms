@@ -112,18 +112,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     ],
 
 
-                    'publications' =>
-                    [
-                        "label"     => "Публикации",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasPublications::className()
-                            ]
-                        ]
-                    ],
-
 
                     'system' =>
                     [
