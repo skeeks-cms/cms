@@ -90,6 +90,7 @@ class TreeBehavior extends ActiveRecordBehavior
             }
         }
     }
+
     public function beforeSaveNode(ModelEvent $event)
     {
         //Если не заполнено название, нужно сгенерить
