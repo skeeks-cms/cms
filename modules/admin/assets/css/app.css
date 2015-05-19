@@ -181,6 +181,13 @@ form.sx-form-admin
             background: #ffffff;
         }
 
+    form.sx-form-admin .sx-buttons-standart
+    {
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-bottom: 0px;
+        margin-top: 15px;
+    }
 
 
 

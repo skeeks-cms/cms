@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\widgets;
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit;
+use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\modules\cms\form\models\Form;
 use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
@@ -18,6 +19,8 @@ use yii\helpers\ArrayHelper;
  */
 class ActiveFormRelatedProperties extends ActiveFormAjaxSubmit
 {
+    use ActiveFormTrait;
+
     /**
      * @var Model
      */
@@ -39,42 +42,5 @@ class ActiveFormRelatedProperties extends ActiveFormAjaxSubmit
 
         echo \yii\helpers\Html::hiddenInput("sx-model-value",   $this->modelHasRelatedProperties->id);
         echo \yii\helpers\Html::hiddenInput("sx-model",         $this->modelHasRelatedProperties->className());
-    }
-
-
-    /**
-     *
-     * TODO: Вынести в трейт, используется для админки
-     * Стилизованный селект админки
-     *
-     * @param $model
-     * @param $attribute
-     * @param $items
-     * @param array $config
-     * @param array $fieldOptions
-     * @return \skeeks\cms\base\widgets\ActiveField
-     */
-    public function fieldSelect($model, $attribute, $items, $config = [], $fieldOptions = [])
-    {
-        $config = ArrayHelper::merge(
-            ['allowDeselect' => false],
-            $config,
-            [
-                'items'         => $items,
-            ]
-        );
-
-        foreach ($config as $key => $value)
-        {
-            if (property_exists(Chosen::className(), $key) === false)
-            {
-                unset($config[$key]);
-            }
-        }
-
-        return $this->field($model, $attribute, $fieldOptions)->widget(
-            Chosen::className(),
-            $config
-        );
     }
 }

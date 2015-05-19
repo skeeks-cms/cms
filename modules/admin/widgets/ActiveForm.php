@@ -10,6 +10,9 @@
  */
 namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
@@ -17,6 +20,8 @@ use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\Pjax;
+use yii\helpers\Json;
+use yii\helpers\Url;
 
 /**
  * Class ActiveForm
@@ -24,6 +29,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
  */
 class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 {
+    use ActiveFormTrait;
+
     /**
      * @var bool
      */
@@ -94,6 +101,7 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 
 
     /**
+     * TODO: is depricated (1.2) use buttonsStandart
      * @param Model $model
      * @return string
      */
@@ -106,56 +114,7 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
         {
             $submit = Html::submitButton("<i class=\"glyphicon glyphicon-saved\"></i> " .  \Yii::t('app', 'Update'), ['class' => 'btn btn-primary']);
         }*/
-
-        $id = $this->id . '-submit-btn';
-
-        $submit     = Html::submitButton("<i class=\"glyphicon glyphicon-save\"></i> " .  \Yii::t('app', 'Сохранить'), [
-            'class'         => 'btn btn-success',
-            'onclick'       => "new sx.classes.CmsActiveForm({
-                'input-id'  : '{$id}',
-                'value'     : 'save'
-            });",
-        ]);
-
-        $submit     .= ' ' . Html::submitButton("<i class=\"glyphicon glyphicon-ok\"></i> " .  \Yii::t('app', 'Применить'), [
-                'class' => 'btn btn-primary',
-                'onclick'       => "new sx.classes.CmsActiveForm({
-                    'input-id'  : '{$id}',
-                    'value'     : 'apply'
-                });",
-            ]);
-        $submit     .= ' ' . Html::submitButton("<i class=\"glyphicon glyphicon-remove\"></i> " .  \Yii::t('app', 'Отменить'), [
-                'class' => 'btn btn-danger pull-right',
-                'onclick'       => "new sx.classes.CmsActiveForm({
-                    'input-id'  : '{$id}',
-                    'value'     : 'close'
-                });",
-            ]);
-        $submit     .= Html::hiddenInput("submit-btn", 'apply', [
-            'id' => $id
-        ]);
-
-        \Yii::$app->view->registerJs(<<<JS
-    (function(sx, $, _)
-    {
-        sx.classes.CmsActiveForm = sx.classes.Component.extend({
-
-            _init: function()
-            {},
-
-            _onDomReady: function()
-            {
-                console.log(this);
-                $("#" + this.get('input-id')).val(this.get('value'));
-            }
-        });
-    })(sx, sx.$, sx._);
-JS
-);
-        return Html::tag('div',
-            $submit,
-            ['class' => 'form-group']
-        );
+        return $this->buttonsStandart($model);
     }
 
     public function fieldSet($name, $options = [])
@@ -178,38 +137,4 @@ HTML;
     }
 
 
-    /**
-     *
-     * Стилизованный селект админки
-     *
-     * @param $model
-     * @param $attribute
-     * @param $items
-     * @param array $config
-     * @param array $fieldOptions
-     * @return \skeeks\cms\base\widgets\ActiveField
-     */
-    public function fieldSelect($model, $attribute, $items, $config = [], $fieldOptions = [])
-    {
-        $config = ArrayHelper::merge(
-            ['allowDeselect' => false],
-            $config,
-            [
-                'items'         => $items,
-            ]
-        );
-
-        foreach ($config as $key => $value)
-        {
-            if (property_exists(Chosen::className(), $key) === false)
-            {
-                unset($config[$key]);
-            }
-        }
-
-        return $this->field($model, $attribute, $fieldOptions)->widget(
-            Chosen::className(),
-            $config
-        );
-    }
 }

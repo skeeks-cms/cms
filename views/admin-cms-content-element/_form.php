@@ -95,12 +95,5 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?/* endforeach; */?>
 --><?/* endif; */?>
 <? if (!$model->isNewRecord && $model->relatedProperties) : ?>
-<div class="sx-box sx-mt-10">
-    <div class="sx-box-head sx-p-10">
-        <h2>Дополнительные свойства</h2>
-    </div>
-    <div class="sx-box-body sx-p-10">
-        <?= $model->renderRelatedPropertiesForm(); ?>
-    </div>
-</div>
+
 <? endif; ?>
