@@ -66,19 +66,19 @@ abstract class ViewModelAction extends Action
             throw new HttpException(404);
         }
 
-        \Yii::$app->pageOptions->setValuesFromModel($this->_model);
+        /*\Yii::$app->pageOptions->setValuesFromModel($this->_model);
 
         if (!in_array($this->_model->status, [HasStatus::STATUS_ACTIVE, HasStatus::STATUS_INACTIVE]))
         {
             throw new HttpException(404);
-        }
+        }*/
 
 
         $this
-            ->_initMetaData()
-            ->_initTypes()
-            ->_initGlobalLayout()
-            ->_initActionView()
+            //->_initMetaData()
+            //->_initTypes()
+            //->_initGlobalLayout()
+            //->_initActionView()
         ;
 
 

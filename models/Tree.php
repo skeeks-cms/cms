@@ -120,6 +120,10 @@ class Tree extends Core
         return $this->createUrl();
     }
 
+    public function getPageUrl()
+    {
+        return $this->createUrl();
+    }
     /**
      * @return string
      */
