@@ -121,6 +121,12 @@ return
         'name'          => 'Инфоблок'
     ],
 
+    'cmsContentElement'   =>
+    [
+        'modelClass'    => 'skeeks\cms\models\CmsContentElement',
+        'name'          => 'Элемент контента'
+    ],
+
 
     'f-crop' =>
     [
