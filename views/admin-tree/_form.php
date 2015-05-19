@@ -22,6 +22,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ]
     )->label('Главное изображение'); ?>
 
+    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
     <?= Html::checkbox("isLink", $model->isLink(), [
@@ -76,16 +78,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
 ?>
 
-<div data-listen="isLink" data-show="0" class="sx-hide">
+<!--<div data-listen="isLink" data-show="0" class="sx-hide">
 
-    <?= $form->field($model, 'tree_ids')->widget(
+    <?/*= $form->field($model, 'tree_ids')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
             'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
         ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
-    ?>
+    */?>
 
-</div>
+</div>-->
 
 
 

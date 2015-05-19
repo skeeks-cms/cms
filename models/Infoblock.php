@@ -35,7 +35,6 @@ use Yii;
  * @property string $rules
  * @property string $template
  * @property integer $priority
- * @property integer $status
  * @property string $files
  * @property integer $protected_widget
  * @property integer $auto_created
@@ -73,15 +72,6 @@ class Infoblock extends Core
             [
                 "class"     => behaviors\HasFiles::className(),
                 "groups"    => [],
-            ],
-
-            behaviors\HasStatus::className() =>
-            [
-                "class"     => behaviors\HasStatus::className(),
-                "possibleStatuses"    => [
-                    HasStatus::STATUS_ACTIVE    => 'Включен',
-                    HasStatus::STATUS_INACTIVE  => 'Выключен'
-                ],
             ],
         ]);
     }

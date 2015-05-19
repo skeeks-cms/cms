@@ -28,7 +28,7 @@ class SeoPageName extends AttributeBehavior
      * @var string the attribute that will receive timestamp value
      * Set this property to false if you do not want to record the creation time.
      */
-    public $generatedAttribute  = 'seo_page_name';
+    public $generatedAttribute  = 'code';
     public $fromAttribute       = 'name';
     public $uniqeue             = true;
 
