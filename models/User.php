@@ -14,6 +14,7 @@ namespace skeeks\cms\models;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\base\db\ActiveRecord;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\user\UserEmail;
@@ -41,7 +42,6 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
- * @property integer $role
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
@@ -53,26 +53,16 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $image_cover
  * @property string $gender
  *
- * @property Comment[] $comments
- * @property Publication[] $publications
- * @property StorageFile[] $storageFiles
- * @property Subscribe[] $subscribes
- * @property StorageFile $imageCover
- * @property StorageFile $image0
  * @property UserAuthclient[] $userAuthclients
- * @property Vote[] $votes
  */
 class User
     extends ActiveRecord
     implements IdentityInterface
 {
-    use behaviors\traits\HasSubscribes;
     use behaviors\traits\HasFiles;
 
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
-
-    const ROLE_USER = 10;
 
 
     /**
@@ -226,7 +216,6 @@ class User
         return array_merge(parent::behaviors(), [
 
             TimestampBehavior::className(),
-            HasSubscribes::className(),
 
             behaviors\HasFiles::className() =>
             [
@@ -268,14 +257,10 @@ class User
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
-
-            ['role', 'default', 'value' => self::ROLE_USER],
-            ['role', 'in', 'range' => [self::ROLE_USER]],
+            ['active', 'default', 'value' => Cms::BOOL_Y],
 
             [['username', 'auth_key', 'password_hash'], 'required'],
-            [['role', 'status', 'created_at', 'updated_at', 'group_id'], 'integer'],
+            [['status', 'created_at', 'updated_at', 'group_id'], 'integer'],
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
@@ -332,8 +317,7 @@ class User
             'password_reset_token' => Yii::t('app', 'Password Reset Token'),
             'email' => Yii::t('app', 'Email'),
             'phone' => Yii::t('app', 'Телефон'),
-            'role' => Yii::t('app', 'Role'),
-            'status' => Yii::t('app', 'Status'),
+            'active' => Yii::t('app', 'Active'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
             'name' => Yii::t('app', 'Имя'),
@@ -451,7 +435,7 @@ class User
      */
     public static function findIdentity($id)
     {
-        return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['id' => $id, 'active' => Cms::BOOL_Y]);
     }
 
     /**
@@ -470,7 +454,7 @@ class User
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['username' => $username, 'active' => Cms::BOOL_Y]);
     }
 
     /**
@@ -481,7 +465,7 @@ class User
      */
     public static function findByEmail($email)
     {
-        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['email' => $email, 'active' => Cms::BOOL_Y]);
     }
 
 
