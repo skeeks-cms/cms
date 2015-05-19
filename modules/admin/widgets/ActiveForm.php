@@ -13,6 +13,7 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
+use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
 use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
@@ -29,7 +30,7 @@ use yii\helpers\Url;
  */
 class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 {
-    use ActiveFormTrait;
+    use AdminActiveFormTrait;
 
     /**
      * @var bool

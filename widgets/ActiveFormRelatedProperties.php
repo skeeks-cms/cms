@@ -6,20 +6,24 @@
  * @date 18.03.2015
  */
 namespace skeeks\cms\widgets;
-use skeeks\cms\base\widgets\ActiveFormAjaxSubmit;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
+use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
+use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
 use skeeks\modules\cms\form\models\Form;
 use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class ActiveForm
- * @package skeeks\modules\cms\form\widgets
+ * Class ActiveFormRelatedProperties
+ * @package skeeks\cms\widgets
  */
-class ActiveFormRelatedProperties extends ActiveFormAjaxSubmit
+class ActiveFormRelatedProperties extends ActiveForm
 {
-    use ActiveFormTrait;
+    use AdminActiveFormTrait;
+    use ActiveFormAjaxSubmitTrait;
+    public $afterValidateCallback = "";
 
     /**
      * @var Model

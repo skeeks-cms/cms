@@ -22,11 +22,12 @@ use yii\helpers\Json;
 use yii\helpers\Url;
 
 /**
- * Class ActiveFormTrait
+ * Class AdminActiveFormTrait
  * @package skeeks\cms\modules\admin\traits
  */
-trait ActiveFormTrait
+trait AdminActiveFormTrait
 {
+
     /**
      * @param Model $model
      * @return string
