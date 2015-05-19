@@ -125,9 +125,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                                     TimestampBehavior::className(),
                                     TimestampPublishedBehavior::className(),
                                     BlameableBehavior::className(),
-                                    HasAdultStatus::className(),
-                                    HasStatus::className(),
-                                    HasSeoPageUrl::className(),
                                 ],
                                 "useOr" => true
                             ]

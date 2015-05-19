@@ -377,7 +377,7 @@ JS
                             Html::tag("div",
                                 Html::a($model->name . ($additionalName ? ' (' . $additionalName . ')': ''), $currentLink),
                                 [
-                                    "class" => "sx-label-node level-" . $model->level . " status-" . $model->status
+                                    "class" => "sx-label-node level-" . $model->level . " status-" . $model->active
                                 ]
                             ) .
 
@@ -713,37 +713,13 @@ JS
         }
 
 /**
-* Запись скрыта
+* Запись неактивна
 **/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-20  > a
+        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > a
         {
             color: silver;
-        }
-/**
-* Запись будет удалена.
-**/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-0  > a
-        {
-            color: silver;
-            background: rgba(255, 0, 0, 0.14);
         }
 
-/**
-* На модерации
-**/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-30  > a
-        {
-            color: silver;
-            background: rgba(0, 255, 13, 0.14);
-        }
-/**
-* Черновик
-**/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-40  > a
-        {
-            color: silver;
-            background: rgba(255, 0, 0, 0.14);
-        }
 CSS
 );
     }

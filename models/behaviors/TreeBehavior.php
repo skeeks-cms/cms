@@ -42,7 +42,7 @@ class TreeBehavior extends ActiveRecordBehavior
     public $pidsAttrName        = "pids";
     public $levelAttrName       = "level";
     public $dirAttrName         = "dir";
-    public $pageAttrName        = "seo_page_name";
+    public $pageAttrName        = "code";
     public $nameAttrName        = "name";
     public $hasChildrenAttrName = "has_children";
 

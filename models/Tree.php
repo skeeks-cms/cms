@@ -11,7 +11,9 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
+use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
@@ -26,9 +28,10 @@ use yii\db\ActiveQuery;
  * Class Tree
  * @package skeeks\cms\models
  */
-class Tree extends PageAdvanced
+class Tree extends Core
 {
     use TreeBehaviorTrait;
+    use \skeeks\cms\models\behaviors\traits\HasFiles;
 
     /**
      * @inheritdoc
@@ -63,15 +66,12 @@ class Tree extends PageAdvanced
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $result = [];
-        foreach ($behaviors as $key => $behavior) {
-            if ($behavior != SeoPageName::className()) {
-                $result[$key] = $behavior;
-            }
-        }
 
+        $result = [];
+
+        $result[] = SeoPageName::className();
+        $result[] = HasFiles::className();
         $result[] = TreeBehavior::className();
-        $result[] = CanBeLinkedToTree::className();
         $result[] = [
             'class' => Implode::className(),
             "fields" =>  [
@@ -89,10 +89,11 @@ class Tree extends PageAdvanced
         return array_merge(parent::attributeLabels(), [
             'type'              => Yii::t('app', 'Тип'),
             'pid_main'          => Yii::t('app', 'Pid main'),
-            'tree_ids'          => Yii::t('app', 'Связан с разделами'),
             'redirect'          => Yii::t('app', 'Redirect'),
             'tree_menu_ids'     => Yii::t('app', 'Позиции меню'),
             'priority'          => Yii::t('app', 'Приоритет'),
+            'code'              => Yii::t('app', 'Код'),
+            'active'              => Yii::t('app', 'Active'),
         ]);
     }
 
@@ -103,9 +104,13 @@ class Tree extends PageAdvanced
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['type'], 'string'],
+            ['active', 'default', 'value' => Cms::BOOL_Y],
+            [['type', 'redirect'], 'string'],
             [['pid_main', 'priority'], 'integer'],
-            [['tree_ids', 'tree_menu_ids', 'redirect'], 'safe'],
+            [['tree_menu_ids'], 'safe'],
+            [['code'], 'string', 'max' => 64],
+            [['code'], 'unique'],
+            [['name'], 'string', 'max' => 255],
         ]);
     }
 
