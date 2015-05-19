@@ -8,8 +8,6 @@ use skeeks\cms\models\Tree;
 /* @var $model Tree */
 
 ?>
-
-
 <?php $form = ActiveForm::begin(); ?>
 
 <? if ($model->hasAttribute('name')) : ?>
@@ -20,6 +18,6 @@ use skeeks\cms\models\Tree;
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255]) ?>
 <? endif; ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 
 <?php ActiveForm::end(); ?>
