@@ -233,7 +233,8 @@ class AdminModelEditorController extends AdminController
         {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            $this->redirect($this->getIndexUrl());
+            //throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
 

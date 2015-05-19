@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
@@ -87,5 +88,18 @@ class AdminSettings extends Component
         return $this;
     }
 
+    /**
+     * layout пустой?
+     * @return bool
+     */
+    public function isEmptyLayout()
+    {
+        if (UrlHelper::constructCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
 }

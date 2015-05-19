@@ -22,6 +22,7 @@ use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMetaData;
 use skeeks\cms\models\behaviors\HasPageOptions;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasSeoPageUrl;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasSubscribes;
@@ -84,6 +85,20 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                         ]
                     ],*/
 
+                    'related-properties' =>
+                    [
+                        "label"     => "Дополнительные свойства",
+                        'icon'      => 'glyphicon glyphicon-plus-sign',
+                        "rules"     =>
+                        [
+                            [
+                                "class"     => HasModelBehaviors::className(),
+                                "behaviors" => HasRelatedProperties::className()
+                            ]
+                        ]
+                    ],
+
+
                     'files' =>
                     [
                         "label"     => "Файлы",
@@ -124,6 +139,9 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     ],
 
 
+
+
+
                     'system' =>
                     [
                         "label"     => "Служебные данные",
@@ -144,6 +162,8 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             ]
                         ]
                     ],
+
+
 
                     /*'social' =>
                     [
@@ -168,6 +188,13 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
         ]);
     }
 
+
+    public function actionRelatedProperties()
+    {
+        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/related-properties.php", [
+            "model"             => $this->getModel(),
+        ]));
+    }
 
     /**
      * @return array

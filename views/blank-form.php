@@ -21,9 +21,5 @@ use skeeks\cms\widgets\ActiveFormRelatedProperties as ActiveForm;
     <? endforeach; ?>
 <? endif; ?>
 
-<?= \yii\helpers\Html::button('Сохранить', [
-    'type'  => 'submit',
-    'class' => 'btn btn-primary'
-]); ?>
-
+<?= $form->buttonsStandart($modelHasRelatedProperties->getRelatedPropertiesModel()); ?>
 <?php ActiveForm::end(); ?>

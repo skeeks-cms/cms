@@ -36,26 +36,21 @@
 
             this.onDomReady(function()
             {
-                $("<a>", {
-                    'style' : 'display: none;',
-                    'href' : self._src,
-                    'data-fancybox-type' : 'iframe',
-                }).appendTo('body').fancybox({
-                    /*'iframe' : {
-                        scrolling : 'auto',
-                        preload   : true
-                    },*/
-                    //'height' : 'html',
-                    //'type' : 'iframe',
-                    //'fitToView' : true,
-                    //'autoSize' : true,
-                    //'autoHeight' : true,
+                var options = _.extend({
                     'afterClose' : function()
                     {
                         self.trigger('close');
                     },
-                    'width'		: '80%',
-                }).click();
+                    'height'	: '100%',
+                    'autoSize'  : false,
+                    'width'		: '100%'
+                }, self.toArray());
+
+                $("<a>", {
+                    'style' : 'display: none;',
+                    'href' : self._src,
+                    'data-fancybox-type' : 'iframe',
+                }).appendTo('body').fancybox(options).click();
             });
 
             /*this._openedWindow = window.open(this._src, this._name, paramsSting);
