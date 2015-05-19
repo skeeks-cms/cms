@@ -303,52 +303,6 @@ class Cms extends \skeeks\cms\base\Component
         return \Yii::$app->getModule("cms");
     }
 
-    /**
-     *
-     * TODO: is depricated (Не используется с версии 1.0.6) Реализуется через статический инфоблок.
-     * Виджет статический блок
-     *
-     * @param string $code
-     * @param string $defaultValue
-     * @param array $options
-     * @return string
-     */
-    public function widgetStaticBlock($code, $defaultValue = '', $options = [])
-    {
-        return StaticBlock::widget(ArrayHelper::merge($options, [
-            'code'      => (string) $code,
-            'default'   => (string) $defaultValue
-        ]));
-    }
-
-    /**
-     * TODO: is depricated (Не используется с версии 1.0.6) Использовать метод infoblock()
-     * Вызов инфоблока
-     *
-     * @param string|int $id
-     * @param array $config
-     * @param array $options
-     * @return string
-     */
-    public function widgetInfoblock($id, $options = [], $config = [])
-    {
-        return $this->infoblock($id, $config, $options);
-    }
-
-    /**
-     * TODO: is depricated (Не используется с версии 1.1.2) Использовать метод \skeeks\cms\widgets\Infoblock
-     *
-     * @param $id
-     * @param array $configInfoblock    Опции инфоблока
-     * @return string
-     */
-    public function infoblock($id, $configInfoblock = [])
-    {
-        return Infoblock::widget(ArrayHelper::merge($configInfoblock, [
-            'id'        => $id,
-        ]));
-    }
-
 
     /**
      * @var Tree
