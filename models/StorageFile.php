@@ -15,7 +15,6 @@ use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
-use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
 use skeeks\cms\validators\HasBehavior;
@@ -65,10 +64,6 @@ use yii\base\Event;
  */
 class StorageFile extends Core
 {
-    //use behaviors\traits\HasComments;
-    //use behaviors\traits\HasSubscribes;
-    //use behaviors\traits\HasVotes;
-
     /**
      * @inheritdoc
      */
@@ -76,8 +71,6 @@ class StorageFile extends Core
     {
         return '{{%cms_storage_file}}';
     }
-
-    public $multiPageOptions;
 
     /**
      * @inheritdoc
@@ -94,18 +87,7 @@ class StorageFile extends Core
             [['name_to_save'], 'string', 'max' => 32],
             [['src'], 'unique'],
             [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => 'The combination of Cluster ID and Cluster Src has already been taken.'],
-            [['page_options', 'multiPageOptions'], 'safe'],
         ]);
-    }
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
     }
 
     /**
@@ -143,7 +125,6 @@ class StorageFile extends Core
             'users_votes_down' => Yii::t('app', 'Users Votes Down'),
             'linked_to_model' => Yii::t('app', 'Привязка'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
-            'page_options'  => Yii::t('app', 'Дополнительные свойства'),
             'published_at'  => Yii::t('app', 'Дата публикации'),
         ]);
     }
@@ -164,14 +145,8 @@ class StorageFile extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            //behaviors\HasComments::className(),
             behaviors\HasStatus::className() => behaviors\HasStatus::className(),
-            //behaviors\HasAdultStatus::className() => behaviors\HasAdultStatus::className(),
-            //behaviors\HasSubscribes::className(),
-            //behaviors\HasVotes::className(),
             CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
-            HasPageOptions::className() => HasPageOptions::className(),
-            //HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className(),
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className()
         ]);
     }

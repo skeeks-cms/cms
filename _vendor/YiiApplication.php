@@ -18,7 +18,6 @@ use skeeks\cms\components\ControlToolbar;
 use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\Langs;
-use skeeks\cms\components\PageOptions;
 use skeeks\cms\components\PublicationTypes;
 use skeeks\cms\components\RegisteredActionViews;
 use skeeks\cms\components\RegisteredLayouts;
@@ -41,7 +40,6 @@ use skeeks\cms\modules\admin\components\settings\AdminSettings;
  * @property Menu                           $adminMenu
  * @property CurrentSite                    $currentSite
  * @property Langs                          $langs
- * @property PageOptions                    $pageOptions
  * @property Cms                            $cms
  * @property Imaging                        $imaging
  * @property Seo                            $seo

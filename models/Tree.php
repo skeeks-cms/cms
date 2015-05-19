@@ -12,7 +12,6 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
-use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
@@ -79,7 +78,6 @@ class Tree extends PageAdvanced
                 "tree_menu_ids"
             ]
         ];
-        $result[HasPageOptions::className()] = HasPageOptions::className();
         return $result;
     }
 
@@ -91,7 +89,6 @@ class Tree extends PageAdvanced
         return array_merge(parent::attributeLabels(), [
             'type'              => Yii::t('app', 'Тип'),
             'pid_main'          => Yii::t('app', 'Pid main'),
-            'page_options'      => Yii::t('app', 'Page Options'),
             'tree_ids'          => Yii::t('app', 'Связан с разделами'),
             'redirect'          => Yii::t('app', 'Redirect'),
             'tree_menu_ids'     => Yii::t('app', 'Позиции меню'),
@@ -99,7 +96,6 @@ class Tree extends PageAdvanced
         ]);
     }
 
-    public $multiPageOptions;
 
     /**
      * @inheritdoc
@@ -109,18 +105,8 @@ class Tree extends PageAdvanced
         return array_merge(parent::rules(), [
             [['type'], 'string'],
             [['pid_main', 'priority'], 'integer'],
-            [['page_options', 'multiPageOptions', 'tree_ids', 'tree_menu_ids', 'redirect'], 'safe'],
+            [['tree_ids', 'tree_menu_ids', 'redirect'], 'safe'],
         ]);
-    }
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
     }
 
 

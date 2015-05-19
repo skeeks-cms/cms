@@ -83,11 +83,11 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
             ],
 
-            [
+            /*[
                 "label"     => "Публикации",
                 "url"       => ["cms/admin-publication"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png']
-            ],
+            ],*/
 
             [
                 "label"     => "Файловый менеджер",
