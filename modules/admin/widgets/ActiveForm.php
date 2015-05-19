@@ -99,13 +99,59 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
      */
     public function buttonsCreateOrUpdate(Model $model)
     {
-        if (Validate::validate(new IsNewRecord(), $model)->isValid())
+        /*if (Validate::validate(new IsNewRecord(), $model)->isValid())
         {
             $submit = Html::submitButton("<i class=\"glyphicon glyphicon-saved\"></i> " . \Yii::t('app', 'Create'), ['class' => 'btn btn-success']);
         } else
         {
             $submit = Html::submitButton("<i class=\"glyphicon glyphicon-saved\"></i> " .  \Yii::t('app', 'Update'), ['class' => 'btn btn-primary']);
-        }
+        }*/
+
+        $id = $this->id . '-submit-btn';
+
+        $submit     = Html::submitButton("<i class=\"glyphicon glyphicon-save\"></i> " .  \Yii::t('app', 'Сохранить'), [
+            'class'         => 'btn btn-success',
+            'onclick'       => "new sx.classes.CmsActiveForm({
+                'input-id'  : '{$id}',
+                'value'     : 'save'
+            });",
+        ]);
+
+        $submit     .= ' ' . Html::submitButton("<i class=\"glyphicon glyphicon-ok\"></i> " .  \Yii::t('app', 'Применить'), [
+                'class' => 'btn btn-primary',
+                'onclick'       => "new sx.classes.CmsActiveForm({
+                    'input-id'  : '{$id}',
+                    'value'     : 'apply'
+                });",
+            ]);
+        $submit     .= ' ' . Html::submitButton("<i class=\"glyphicon glyphicon-remove\"></i> " .  \Yii::t('app', 'Отменить'), [
+                'class' => 'btn btn-danger pull-right',
+                'onclick'       => "new sx.classes.CmsActiveForm({
+                    'input-id'  : '{$id}',
+                    'value'     : 'close'
+                });",
+            ]);
+        $submit     .= Html::hiddenInput("submit-btn", 'apply', [
+            'id' => $id
+        ]);
+
+        \Yii::$app->view->registerJs(<<<JS
+    (function(sx, $, _)
+    {
+        sx.classes.CmsActiveForm = sx.classes.Component.extend({
+
+            _init: function()
+            {},
+
+            _onDomReady: function()
+            {
+                console.log(this);
+                $("#" + this.get('input-id')).val(this.get('value'));
+            }
+        });
+    })(sx, sx.$, sx._);
+JS
+);
         return Html::tag('div',
             $submit,
             ['class' => 'form-group']

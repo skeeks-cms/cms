@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
@@ -58,6 +59,16 @@ class AdminCmsContentElementController extends AdminModelEditorSmartController
         }
 
         parent::_beforeAction($e);
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndexUrl()
+    {
+        return UrlHelper::construct($this->id . '/' . $this->action->id, [
+            'content_id' => \Yii::$app->request->get('content_id')
+        ])->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
     }
 
 }
