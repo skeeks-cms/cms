@@ -80,8 +80,7 @@ $config =
                 ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //админка
 
                 '<_c:(profile)>'                        => 'cms/user/profile',
-                '<_c:(publication|user)>'               => 'cms/<_c>/index',
-                '<_c:(publication)>/<seo_page_name>'    => 'cms/<_c>/view',
+                '<_c:(user)>'                           => 'cms/<_c>/index',
                 '<_c:(user)>/<username>'                => 'cms/<_c>/view',
                 '<_c:(user)>/<username>/<action>'       => 'cms/<_c>/<action>',
 
@@ -119,14 +118,6 @@ $config =
         'registeredLayouts' =>
         [
             'class'         => '\skeeks\cms\components\RegisteredLayouts',
-            /*'components'    =>
-            [
-                'default' =>
-                [
-                    'name' => 'По умолчанию',
-                    'path' => '@app/views/layouts/main.php'
-                ]
-            ]*/
         ],
 
         'seo' =>

@@ -21,7 +21,6 @@ use skeeks\cms\models\behaviors\HasComments;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMetaData;
-use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasSeoPageUrl;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -124,22 +123,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             ]
                         ]
                     ],
-
-                    'page-options' =>
-                    [
-                        "label"     => "Свойства",
-                        'icon'      => 'glyphicon glyphicon-plus-sign',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasPageOptions::className()
-                            ]
-                        ]
-                    ],
-
-
-
 
 
                     'system' =>

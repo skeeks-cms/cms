@@ -11,7 +11,6 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
