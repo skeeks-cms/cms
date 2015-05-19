@@ -141,7 +141,8 @@ class CmsContentElement extends RelatedElementModel
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'published_at', 'published_to', 'priority', 'content_id', 'tree_id', 'show_counter', 'show_counter_start'], 'integer'],
             [['name'], 'required'],
-            [['description_short', 'description_full', 'files'], 'string'],
+            [['files'], 'safe'],
+            [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
             [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
