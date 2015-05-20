@@ -57,15 +57,9 @@ class Infoblock extends Core
     {
         return array_merge(parent::behaviors(), [
 
-            HasMultiLangAndSiteFields::className() =>
-            [
-                'class' => HasMultiLangAndSiteFields::className(),
-                'fields' => ['config']
-            ],
-
             [
                 "class"  => behaviors\Serialize::className(),
-                'fields' => ['rules', 'protected_widget_params']
+                'fields' => ['rules', 'protected_widget_params', 'config']
             ],
 
             behaviors\HasFiles::className() =>

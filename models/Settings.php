@@ -6,8 +6,7 @@
  * @date 27.03.2015
  */
 namespace skeeks\cms\models;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\traits\HasMultiLangAndSiteFieldsTrait;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 
 /**
  * Class Settings
@@ -15,7 +14,6 @@ use skeeks\cms\models\behaviors\traits\HasMultiLangAndSiteFieldsTrait;
  */
 class Settings extends Core
 {
-    use HasMultiLangAndSiteFieldsTrait;
     /**
      * @inheritdoc
      */
@@ -30,9 +28,9 @@ class Settings extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            HasMultiLangAndSiteFields::className() =>
+            HasJsonFieldsBehavior::className() =>
             [
-                'class'     => HasMultiLangAndSiteFields::className(),
+                'class'     => HasJsonFieldsBehavior::className(),
                 'fields'    => ['value']
             ]
         ]);
