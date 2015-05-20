@@ -74,30 +74,6 @@ class Site extends Core
     /**
      * @inheritdoc
      */
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(), [
-            [
-                "class"  => behaviors\Serialize::className(),
-                'fields' => ['params']
-            ],
-        ]);
-    }
-
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = ['host_name', 'description', 'name'];
-        $scenarios['update'] = ['host_name', 'description', 'name'];
-
-        return $scenarios;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return array_merge(parent::rules(), [
@@ -109,8 +85,6 @@ class Site extends Core
         ]);
     }
 
-
-
     public function validateHost($attribute)
     {
         if(!preg_match('/^[а-яa-z0-9.]{3,255}$/', $this->$attribute))
@@ -118,7 +92,6 @@ class Site extends Core
             $this->addError($attribute, 'Используйте только буквы в нижнем регистре и цифры. Пример site.ru (3-255 символов)');
         }
     }
-
 
     /**
      * @inheritdoc
@@ -134,7 +107,6 @@ class Site extends Core
             'cms_tree_id' => Yii::t('app', 'Tree Id'),
         ]);
     }
-
 
     /**
      * @return static[];

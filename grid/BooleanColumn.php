@@ -6,6 +6,7 @@
  * @date 26.03.2015
  */
 namespace skeeks\cms\grid;
+use skeeks\cms\components\Cms;
 use yii\grid\DataColumn;
 use yii\grid\GridView;
 
@@ -49,8 +50,8 @@ class BooleanColumn extends DataColumn
     /**
      * @var null
      */
-    public $falseValue  = false;
-    public $trueValue   = true;
+    public $falseValue  = Cms::BOOL_N;
+    public $trueValue   = Cms::BOOL_Y;
 
     /**
      * @var string icon/indicator for the true value. If this is not set, it will use the value from `trueLabel`.

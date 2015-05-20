@@ -91,10 +91,7 @@ class CmsContentPropertyEnum extends Core
             {
                 return "sx_auto_" . md5(rand(1, 10) . time());
             }],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
+            ['priority', 'default', 'value' => 500],
         ]);
     }
 

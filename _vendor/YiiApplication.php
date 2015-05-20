@@ -39,7 +39,6 @@ use skeeks\cms\modules\admin\components\settings\AdminSettings;
  * @property Storage                        $storage
  * @property Menu                           $adminMenu
  * @property CurrentSite                    $currentSite
- * @property Langs                          $langs
  * @property Cms                            $cms
  * @property Imaging                        $imaging
  * @property Seo                            $seo

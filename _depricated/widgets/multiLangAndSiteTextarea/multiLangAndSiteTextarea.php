@@ -84,7 +84,7 @@ class multiLangAndSiteTextarea extends InputWidget
             {
                 $this->model->setCurrentLang($this->lang);
                 $fieldName[] = '[' . $this->lang->id . ']';
-            }
+            }Т
 
             $value = $this->model->getMultiFieldValue($this->attribute);
 

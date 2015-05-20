@@ -22,15 +22,43 @@ use Yii;
 use yii\db\ActiveQuery;
 
 /**
+ * This is the model class for table "{{%cms_tree}}".
  *
+ * @property integer $id
+ * @property integer $created_by
+ * @property integer $updated_by
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property string $name
+ * @property string $description_short
+ * @property string $description_full
+ * @property string $files
+ * @property string $code
+ * @property integer $pid
+ * @property integer $pid_main
+ * @property string $pids
+ * @property integer $level
+ * @property string $dir
+ * @property integer $has_children
+ * @property integer $main_root
+ * @property integer $priority
  * @property string $type
- *
+ * @property integer $published_at
+ * @property string $redirect
+ * @property string $tree_menu_ids
+ * @property string $active
  * @property string $meta_title
  * @property string $meta_description
  * @property string $meta_keywords
+ * @property string $site_code
  *
- * Class Tree
- * @package skeeks\cms\models
+ * @property CmsContentElement[] $cmsContentElements
+ * @property CmsContentElementTree[] $cmsContentElementTrees
+ * @property CmsTree $p
+ * @property CmsTree[] $cmsTrees
+ * @property CmsSite $site
+ * @property CmsTree $pidMain
+ * @property CmsTree[] $cmsTrees0
  */
 class Tree extends Core
 {
@@ -120,6 +148,7 @@ class Tree extends Core
             [['name'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
+            [['site_code'], 'string', 'max' => 5],
         ]);
     }
 
@@ -146,7 +175,7 @@ class Tree extends Core
             }
         }
 
-        $sites = Site::getAllKeyTreeId();
+        //$sites = Site::getAllKeyTreeId();
         $site = '';
         if ($this->isRoot())
         {
@@ -162,6 +191,8 @@ class Tree extends Core
             }
 
         }
+
+        $site = null;
 
         if ($site)
         {
@@ -320,5 +351,32 @@ class Tree extends Core
     public function getImagesSrc()
     {
         return $this->getFilesGroups()->getComponent('images')->items;
+    }
+
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSite()
+    {
+        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElements()
+    {
+        return $this->hasMany(CmsContentElement::className(), ['tree_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElementTrees()
+    {
+        return $this->hasMany(CmsContentElementTree::className(), ['tree_id' => 'id']);
     }
 }

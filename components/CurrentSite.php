@@ -11,6 +11,7 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\TreeType;
@@ -30,7 +31,7 @@ use yii\web\UploadedFile;
 class CurrentSite extends Component
 {
     /**
-     * @var Site
+     * @var CmsSite
      */
     public $site = null;
 
@@ -46,8 +47,9 @@ class CurrentSite extends Component
 
         if ($this->site === null)
         {
-            $serverName = \Yii::$app->getRequest()->getServerName();
-            $sites = Site::getAllKeyHostName();
+            //$serverName = \Yii::$app->getRequest()->getServerName();
+            //$sites = Site::getAllKeyHostName();
+            $sites = [];
             if (!$sites)
             {
                 $this->site = false;
@@ -64,7 +66,7 @@ class CurrentSite extends Component
     }
 
     /**
-     * @return Site
+     * @return CmsSite
      */
     public function get()
     {
@@ -72,10 +74,10 @@ class CurrentSite extends Component
     }
 
     /**
-     * @param Site $site
+     * @param CmsSite $site
      * @return $this
      */
-    public function set(Site $site)
+    public function set(CmsSite $site)
     {
         $this->site = $site;
         return $this;

@@ -27,14 +27,17 @@ use skeeks\cms\modules\admin\widgets\GridView;
             'controller'    => $controller
         ],
 
-        'host_name',
         'name',
-        'description',
+        'code',
 
-        ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
+        [
+            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute'     => "active"
+        ],
 
-        ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
-        ['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+        [
+            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute'     => "def"
+        ],
     ],
 ]); ?>

@@ -91,8 +91,14 @@ return
 
             [
                 "label"     => "Сайты",
-                "url"       => ["cms/admin-site"],
+                "url"       => ["cms/admin-cms-site"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
+            ],
+
+            [
+                "label"     => "Языки",
+                "url"       => ["cms/admin-cms-lang"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/lang.png']
             ],
 
             [
