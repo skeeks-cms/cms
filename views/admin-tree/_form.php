@@ -125,8 +125,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ])
     ?>
 
+
 </div>
 <?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('SEO'); ?>
+    <?= $form->field($model, 'meta_title')->textarea(); ?>
+    <?= $form->field($model, 'meta_description')->textarea(); ?>
+    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
+<?= $form->fieldSetEnd() ?>
+
 
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

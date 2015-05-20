@@ -27,27 +27,6 @@ use \skeeks\cms\validators\HasBehavior;
 
 <? endif;?>
 
-<? if (Validate::validate( new HasBehavior(\skeeks\cms\models\behaviors\HasStatus::className()), $model)->isValid()) : ?>
-    <?= $form->field($model, 'status')->widget(
-        \skeeks\widget\chosen\Chosen::className(), [
-            'items' => $model->getPossibleStatuses(),
-        ]);
-    ?>
-<? endif;?>
-
-
-<? if (Validate::validate( new HasBehavior(\skeeks\cms\models\behaviors\HasAdultStatus::className()), $model)->isValid()) : ?>
-    <?= $form->field($model, 'status_adult')->widget(
-        \skeeks\widget\chosen\Chosen::className(), [
-            'items' => $model->getPossibleAdultStatuses(),
-        ]);
-    ?>
-<? endif;?>
-
-<? if (Validate::validate( new HasBehavior(\skeeks\cms\models\behaviors\HasSeoPageUrl::className()), $model)->isValid()) : ?>
-    Текущий адрес на сайте: <?= Html::a($model->createAbsoluteUrl(), $model->createAbsoluteUrl(), ["target" => "_blank", 'onclick' => 'window.location.href="' . $model->createAbsoluteUrl() . '"; return false;'])?>
-    <?= $form->field($model, $model->seoPageNameAttribute)->textInput(['maxlength' => 64]) ?>
-<? endif;?>
 
 <? if (Validate::validate( new HasBehavior(\yii\behaviors\TimestampBehavior::className()), $model)->isValid()) : ?>
     <?= $form->field($model, 'created_at')->widget(\kartik\datecontrol\DateControl::classname(), [

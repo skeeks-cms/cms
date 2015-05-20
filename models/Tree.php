@@ -25,6 +25,10 @@ use yii\db\ActiveQuery;
  *
  * @property string $type
  *
+ * @property string $meta_title
+ * @property string $meta_description
+ * @property string $meta_keywords
+ *
  * Class Tree
  * @package skeeks\cms\models
  */
@@ -94,6 +98,9 @@ class Tree extends Core
             'priority'          => Yii::t('app', 'Приоритет'),
             'code'              => Yii::t('app', 'Код'),
             'active'              => Yii::t('app', 'Active'),
+            'meta_title' => Yii::t('app', 'Meta Title'),
+            'meta_keywords' => Yii::t('app', 'Meta Keywords'),
+            'meta_description' => Yii::t('app', 'Meta Description'),
         ]);
     }
 
@@ -111,6 +118,8 @@ class Tree extends Core
             [['code'], 'string', 'max' => 64],
             [['code'], 'unique'],
             [['name'], 'string', 'max' => 255],
+            [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
+            [['meta_title'], 'string', 'max' => 500],
         ]);
     }
 
