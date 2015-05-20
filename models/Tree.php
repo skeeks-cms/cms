@@ -73,28 +73,6 @@ class Tree extends Core
         return '{{%cms_tree}}';
     }
 
-    /**
-     * @return static
-     */
-    static public function findCurrentRoot()
-    {
-        if ($site = \Yii::$app->currentSite->get())
-        {
-            return self::find()->where(['id' => $site->cms_tree_id])->one();
-        } else {
-            return self::findDefaultRoot();
-        }
-    }
-
-    /**
-     * Нода по умолчанию, задается для всех сайтов проекта.
-     * @return static
-     */
-    static public function findDefaultRoot()
-    {
-        return self::find()->where(['main_root' => 1])->one();
-    }
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -175,32 +153,13 @@ class Tree extends Core
             }
         }
 
-        //$sites = Site::getAllKeyTreeId();
-        $site = '';
-        if ($this->isRoot())
+        if ($this->site)
         {
-            if (isset($sites[$this->getPidMain()]))
+            if ($this->getDir())
             {
-                $site = $sites[$this->id];
-            }
-        } else
-        {
-            if (isset($sites[$this->getPidMain()]))
-            {
-                $site = $sites[$this->getPidMain()];
-            }
-
-        }
-
-        $site = null;
-
-        if ($site)
-        {
-            if ($this->getDir()) {
-
-                return $site->getBaseUrl() . DIRECTORY_SEPARATOR . $this->getDir() . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
+                return $this->site->getUrl() . DIRECTORY_SEPARATOR . $this->getDir() . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
             } else {
-                return $site->getBaseUrl();
+                return $this->site->getUrl();
             }
         } else {
             if ($this->getDir()) {

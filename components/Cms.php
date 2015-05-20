@@ -10,6 +10,8 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
+use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
@@ -39,7 +41,8 @@ use yii\web\UploadedFile;
 use yii\web\View;
 
 /**
- * Class Cms
+ * @property CmsSite                            $site
+ *
  * @package skeeks\cms\components
  */
 class Cms extends \skeeks\cms\base\Component
@@ -72,6 +75,40 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userPropertyTypes       = [];
 
+
+    /**
+     * @var CmsSite
+     */
+    protected $_site = null;
+
+    /**
+     * @return CmsSite
+     */
+    public function getSite()
+    {
+        if ($this->_site === null)
+        {
+            if (\Yii::$app instanceof \yii\console\Application)
+            {
+                $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
+            } else
+            {
+                $serverName = \Yii::$app->getRequest()->getServerName();
+                /**
+                 * @var CmsSiteDomain $cmsDomain
+                 */
+                if ($cmsDomain = CmsSiteDomain::find()->where(['domain' => $serverName])->one())
+                {
+                    $this->_site = $cmsDomain->cmsSite;
+                } else
+                {
+                    $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
+                }
+            }
+        }
+
+        return $this->_site;
+    }
 
     /**
      * Можно задать название и описание компонента
