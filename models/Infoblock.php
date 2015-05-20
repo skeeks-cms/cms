@@ -71,7 +71,6 @@ class Infoblock extends Core
             behaviors\HasFiles::className() =>
             [
                 "class"     => behaviors\HasFiles::className(),
-                "groups"    => [],
             ],
         ]);
     }
@@ -114,17 +113,6 @@ class Infoblock extends Core
         return $this;
     }
 
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios[self::SCENARIO_DEFAULT];
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
-    }
 
     /**
      * @inheritdoc
