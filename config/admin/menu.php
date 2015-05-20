@@ -45,10 +45,46 @@ return
         return $result;
     },
 
-    'cms' =>
+
+    'cms-contents' =>
     [
-        'label'     => 'Основное',
+        'label'     => 'Контент',
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
+
+        'items' =>
+        [
+
+            [
+                "label"     => "Разделы",
+                "url"       => ["cms/admin-tree"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
+            ],
+
+            [
+                "label"     => "Файловый менеджер",
+                "url"       => ["cms/admin-file-manager"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+            ],
+
+            [
+                "label"     => "Файлы в хранилище",
+                "url"       => ["cms/admin-storage-files/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+            ],
+
+            [
+                "label"     => "Инфоблоки",
+                "url"       => ["cms/admin-infoblock"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
+            ],
+
+        ]
+    ],
+
+    'cms-settings' =>
+    [
+        'label'     => 'Настройки продукта',
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
 
         'items' =>
         [
@@ -60,39 +96,15 @@ return
             ],
 
             [
-                "label"     => "Дерево разделов",
-                "url"       => ["cms/admin-tree"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
-            ],
-
-            [
                 "label"     => "Метки разделов",
                 "url"       => ["cms/admin-tree-menu"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
             ],
 
-            /*[
-                "label"     => 'Статические блоки',
-                "url"       => ["cms/admin-static-block"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.conct.png']
-            ],*/
-
             [
-                "label"     => "Инфоблоки",
-                "url"       => ["cms/admin-infoblock"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
-            ],
-
-            /*[
-                "label"     => "Публикации",
-                "url"       => ["cms/admin-publication"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png']
-            ],*/
-
-            [
-                "label"     => "Файловый менеджер",
-                "url"       => ["cms/admin-file-manager"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+                "label"     => "Сервера файлового хранилища",
+                "url"       => ["cms/admin-storage/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
             ],
 
             [
@@ -159,7 +171,7 @@ return
             ],*/
         ]
     ],
-
+/*
     'storage' =>
     [
         'label' => 'Файловое хранилище',
@@ -175,13 +187,9 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
             ],
 
-            [
-                "label"     => "Файлы в хранилище",
-                "url"       => ["cms/admin-storage-files/index"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
-            ],
+
         ]
-    ],
+    ],*/
 
     /*'social' =>
     [
