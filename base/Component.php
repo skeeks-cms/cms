@@ -233,12 +233,6 @@ JS
     public function fetchDefaultSettings()
     {
         return Settings::find()->where(['component' => $this->className()])->one();
-
-        /*$dependency = new \yii\caching\DbDependency(['sql' => 'SELECT MAX(updated_at) FROM ' . Settings::tableName()]);
-
-        return Settings::getDb()->cache(function ($db) {
-            return Settings::find()->where(['component' => $this->className()])->one();
-        }, 3600*3, $dependency);*/
     }
 
 

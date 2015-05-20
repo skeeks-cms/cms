@@ -76,6 +76,13 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd() ?>
 
 
+<?= $form->fieldSet('SEO'); ?>
+    <?= $form->field($model, 'meta_title')->textarea(); ?>
+    <?= $form->field($model, 'meta_description')->textarea(); ?>
+    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
+<?= $form->fieldSetEnd() ?>
+
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
 

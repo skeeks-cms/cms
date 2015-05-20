@@ -75,7 +75,7 @@ abstract class ViewModelAction extends Action
 
 
         $this
-            //->_initMetaData()
+            ->_initMetaData()
             //->_initTypes()
             //->_initGlobalLayout()
             //->_initActionView()
@@ -186,7 +186,7 @@ abstract class ViewModelAction extends Action
     {
         $model = $this->_model;
 
-        if ($title = \Yii::$app->pageOptions->getComponent('meta_title')->getValue()->value)
+        if ($title = $model->meta_title)
         {
             $this->controller->getView()->title = $title;
         } else
@@ -197,7 +197,7 @@ abstract class ViewModelAction extends Action
             }
         }
 
-        if ($meta_keywords = \Yii::$app->pageOptions->getComponent('meta_keywords')->getValue()->value)
+        if ($meta_keywords = $model->meta_keywords)
         {
             $this->controller->view->registerMetaTag([
                 "name"      => 'keywords',
@@ -205,19 +205,7 @@ abstract class ViewModelAction extends Action
             ], 'keywords');
         }
 
-        /*else
-        {
-            if (isset($model->name))
-            {
-                $this->controller->view->registerMetaTag([
-                    "name"      => 'keywords',
-                    "content"   => $model->name
-                ], 'keywords');
-            }
-        }*/
-
-
-        if ($meta_descripption = \Yii::$app->pageOptions->getComponent('meta_description')->getValue()->value)
+        if ($meta_descripption = $model->meta_description)
         {
             $this->controller->view->registerMetaTag([
                 "name"      => 'description',

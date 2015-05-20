@@ -51,6 +51,9 @@ use yii\web\ErrorHandler;
  * @property integer $tree_id
  * @property integer $show_counter
  * @property integer $show_counter_start
+ * @property string $meta_title
+ * @property string $meta_description
+ * @property string $meta_keywords
  *
  * @property CmsContent $cmsContent
  * @property CmsTree $tree
@@ -127,6 +130,9 @@ class CmsContentElement extends RelatedElementModel
             'tree_id' => Yii::t('app', 'Tree ID'),
             'show_counter' => Yii::t('app', 'Show Counter'),
             'show_counter_start' => Yii::t('app', 'Show Counter Start'),
+            'meta_title' => Yii::t('app', 'Meta Title'),
+            'meta_keywords' => Yii::t('app', 'Meta Keywords'),
+            'meta_description' => Yii::t('app', 'Meta Description'),
         ]);
     }
 
@@ -152,7 +158,9 @@ class CmsContentElement extends RelatedElementModel
             ['active', 'default', 'value' => function($model, $attribute)
             {
                 return Cms::BOOL_Y;
-            }]
+            }],
+            [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
+            [['meta_title'], 'string', 'max' => 500],
         ]);
     }
 
