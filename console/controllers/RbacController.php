@@ -586,31 +586,37 @@ class RbacController extends Controller
 
         foreach (\Yii::$app->adminMenu->getData() as $group)
         {
-            foreach ($group['items'] as $itemData)
+            if (is_array($itemData))
             {
 
-                /**
-                 * @var $controller \yii\web\Controller
-                 */
-                list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
-
-
-                if ($controller)
+                foreach ($group['items'] as $itemData)
                 {
-                    if ($controller instanceof AdminController)
-                    {
-                        $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
 
-                        //Привилегия доступу к админке
-                        if (!$adminAccess = $auth->getPermission($permissionCode))
+                        /**
+                         * @var $controller \yii\web\Controller
+                         */
+                        list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
+
+
+                        if ($controller)
                         {
-                            $adminAccess = $auth->createPermission($permissionCode);
-                            $adminAccess->description = 'Администрирование | ' . $controller->getLabel();
-                            $auth->add($adminAccess);
+                            if ($controller instanceof AdminController)
+                            {
+                                $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
+
+                                //Привилегия доступу к админке
+                                if (!$adminAccess = $auth->getPermission($permissionCode))
+                                {
+                                    $adminAccess = $auth->createPermission($permissionCode);
+                                    $adminAccess->description = 'Администрирование | ' . $controller->getLabel();
+                                    $auth->add($adminAccess);
+                                }
+                            }
                         }
-                    }
                 }
+
             }
+
         }
 
         return $this;

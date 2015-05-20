@@ -11,6 +11,8 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\App;
+use skeeks\cms\models\CmsLang;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Infoblock;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Site;
@@ -29,22 +31,20 @@ use skeeks\cms\models\searchs\User as UserSearch;
 use yii\helpers\ArrayHelper;
 
 /**
- *
- * @method Infoblock getCurrentModel()
- *
- * Class AdminUserController
+ * Class AdminCmsSiteController
  * @package skeeks\cms\controllers
  */
-class AdminSiteController extends AdminModelEditorSmartController
+class AdminCmsLangController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление сайтами";
-        $this->_modelShowAttribute      = "host_name";
-        $this->_modelClassName          = Site::className();
+        $this->_label                   = "Управление языками";
+        $this->_modelShowAttribute      = "name";
+        $this->_modelClassName          = CmsLang::className();
 
         $this->modelValidate = true;
         $this->enableScenarios = true;
+
         parent::init();
     }
 

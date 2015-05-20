@@ -151,14 +151,8 @@ class CmsContentElement extends RelatedElementModel
             [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
             [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => 'Для данного раздела этот код уже занят.'],
             [['treeIds'], 'safe'],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
-            ['active', 'default', 'value' => function($model, $attribute)
-            {
-                return Cms::BOOL_Y;
-            }],
+            ['priority', 'default', 'value' => 500],
+            ['active', 'default', 'value' => Cms::BOOL_Y],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
         ]);

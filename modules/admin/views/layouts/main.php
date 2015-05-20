@@ -63,57 +63,57 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         <li class="dropdown visible-md visible-lg"></li>
         <? if (!Yii::$app->user->isGuest): ?>
 
-            <? if ($sites = \skeeks\cms\models\Site::getAll()) : ?>
+            <?/* if ($sites = \skeeks\cms\models\Site::getAll()) : */?><!--
                 <li class="sx-left-border dropdown visible-md visible-lg">
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?= \Yii::$app->cms->moduleAdmin()->getCurrentSite() ? \Yii::$app->cms->moduleAdmin()->getCurrentSite()->host_name : 'Сайт'?> <span class="caret"></span>
+                        <?/*= \Yii::$app->cms->moduleAdmin()->getCurrentSite() ? \Yii::$app->cms->moduleAdmin()->getCurrentSite()->host_name : 'Сайт'*/?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                          <? if (\Yii::$app->cms->moduleAdmin()->getCurrentSite()) : ?>
+                          <?/* if (\Yii::$app->cms->moduleAdmin()->getCurrentSite()) : */?>
                               <li>
-                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', ''); ?>" data-method="post">
+                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', ''); */?>" data-method="post">
                                     Сбросить сайт
                                 </a>
                               </li>
-                          <? endif; ?>
+                          <?/* endif; */?>
 
-                        <? foreach ($sites as $site) : ?>
+                        <?/* foreach ($sites as $site) : */?>
                             <li>
-                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); ?>" data-method="post">
-                                    <?= $site->host_name; ?> (<?= $site->name; ?>)
+                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); */?>" data-method="post">
+                                    <?/*= $site->host_name; */?> (<?/*= $site->name; */?>)
                                 </a>
                             </li>
-                        <? endforeach; ?>
+                        <?/* endforeach; */?>
 
                       </ul>
                     </div>
                 </li>
-            <? endif; ?>
+            <?/* endif; */?>
 
-            <? if ($langs = \Yii::$app->langs->getComponents()) : ?>
+            <?/* if ($langs = \Yii::$app->langs->getComponents()) : */?>
                 <li class="sx-left-border dropdown visible-md visible-lg">
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?= \Yii::$app->cms->moduleAdmin()->getCurrentLang() ? \Yii::$app->cms->moduleAdmin()->getCurrentLang()->name . ' (' . \Yii::$app->cms->moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'?> <span class="caret"></span>
+                        <?/*= \Yii::$app->cms->moduleAdmin()->getCurrentLang() ? \Yii::$app->cms->moduleAdmin()->getCurrentLang()->name . ' (' . \Yii::$app->cms->moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'*/?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
 
-                          <? if (\Yii::$app->cms->moduleAdmin()->getCurrentLang()) : ?>
+                          <?/* if (\Yii::$app->cms->moduleAdmin()->getCurrentLang()) : */?>
                               <li>
-                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', ''); ?>" data-method="post">
+                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', ''); */?>" data-method="post">
                                     Сбросить язык
                                 </a>
                               </li>
-                          <? endif; ?>
+                          <?/* endif; */?>
 
-                        <? foreach ($langs as $lang) : ?>
-                            <li><a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', $lang->id); ?>" data-method="post"><?= $lang->name; ?> (<?= $lang->id; ?>)</a></li>
-                        <? endforeach; ?>
+                        <?/* foreach ($langs as $lang) : */?>
+                            <li><a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', $lang->id); */?>" data-method="post"><?/*= $lang->name; */?> (<?/*= $lang->id; */?>)</a></li>
+                        <?/* endforeach; */?>
                       </ul>
                     </div>
                 </li>
-            <? endif; ?>
+            --><?/* endif; */?>
 
 
 

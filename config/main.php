@@ -130,24 +130,6 @@ $config =
             'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
         ],
 
-        //Языки проекта
-        'langs' =>
-        [
-            'class' => '\skeeks\cms\components\Langs',
-            /*'components' =>
-            [
-                'ru' =>
-                [
-                    'name' => 'Русский'
-                ],
-
-                'en' =>
-                [
-                    'name' => 'Английский'
-                ],
-            ]*/
-        ],
-
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
