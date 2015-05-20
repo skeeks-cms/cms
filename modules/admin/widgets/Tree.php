@@ -347,21 +347,15 @@ JS
             }
 
 
-
-
-
-
-
+            /**
+             * @var $model \skeeks\cms\models\Tree
+             */
             $additionalName = '';
-            if ($model->main_root)
+            if ($model->level == 0)
             {
-                $additionalName = 'по умолчанию';
-            } else if ($model->level == 0)
-            {
-                $models = \skeeks\cms\models\Site::getAllKeyTreeId();
-                if (isset($models[$model->id]))
+                if ($model->site)
                 {
-                    $additionalName = $models[$model->id]->getName();
+                    $additionalName = $model->site->name;
                 }
             }
 

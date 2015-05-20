@@ -120,25 +120,17 @@ class TreeUrlRule
 
         if (!$normalizeDir) //главная страница
         {
-            $treeNode = Tree::findCurrentRoot();
-            if (!$treeNode)
-            {
-                return false;
-            }
+            $treeNode = Tree::find()->where([
+                "site_code"         => \Yii::$app->cms->site->code,
+                "level"             => 0,
+            ])->one();
 
         } else //второстепенная страница
         {
-            $treeRoot = Tree::findCurrentRoot();
-            if (!$treeRoot)
-            {
-                return false;
-            }
-
             $treeNode           = Tree::find()->where([
-                $treeRoot->dirAttrName      => $normalizeDir,
-                $treeRoot->pidMainAttrName  => $treeRoot->id,
+                (new Tree())->dirAttrName      => $normalizeDir,
+                "site_code"         => \Yii::$app->cms->site->code,
             ])->one();
-
         }
 
         if ($treeNode)

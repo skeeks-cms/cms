@@ -15,6 +15,7 @@ use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
+use skeeks\cms\models\Tree;
 use skeeks\cms\traits\ValidateRulesTrait;
 use skeeks\modules\cms\user\models\User;
 use Yii;
@@ -59,6 +60,7 @@ class CmsSite extends Core
     {
         parent::init();
 
+        $this->on(BaseActiveRecord::EVENT_AFTER_INSERT, [$this, 'createTreeAfterInsert']);
         $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'afterBeforeChecks']);
         $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'afterBeforeChecks']);
 
@@ -77,23 +79,20 @@ class CmsSite extends Core
         }
     }
 
-    /**
-     * @param Event $e
-     * @throws Exception
-     */
-    /*public function afterSaveChecks(Event $e)
+    public function createTreeAfterInsert(Event $e)
     {
         $tree = new Tree([
-            'name' => 'Главная страница',
+            'name'      => 'Главная страница',
+            'site_code' => $this->code,
         ]);
 
         if (!$tree->save(false))
         {
             throw new Exception('Не удалось создать раздел дерева');
         }
+    }
 
-        $this->cms_tree_id = $tree->id;
-    }*/
+
 
     /**
      * @inheritdoc
@@ -160,6 +159,20 @@ class CmsSite extends Core
     public function getCmsTrees()
     {
         return $this->hasMany(CmsTree::className(), ['site_code' => 'code']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        $serverName = \Yii::$app->request->hostInfo;
+        if ($this->server_name)
+        {
+            return 'http://' . $this->server_name;
+        }
+
+        return 'http://' . $serverName;
     }
 
 }

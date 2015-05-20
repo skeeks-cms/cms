@@ -93,8 +93,6 @@ $config =
             ]
         ],
 
-        'currentSite' => ['class' => 'skeeks\cms\components\CurrentSite'],
-
         'registeredModels' =>
         [
             'class' => 'skeeks\cms\components\RegisteredModels',
