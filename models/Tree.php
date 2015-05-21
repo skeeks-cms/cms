@@ -20,6 +20,7 @@ use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\db\BaseActiveRecord;
 
 /**
  * This is the model class for table "{{%cms_tree}}".
@@ -35,12 +36,10 @@ use yii\db\ActiveQuery;
  * @property string $files
  * @property string $code
  * @property integer $pid
- * @property integer $pid_main
  * @property string $pids
  * @property integer $level
  * @property string $dir
  * @property integer $has_children
- * @property integer $main_root
  * @property integer $priority
  * @property string $type
  * @property integer $published_at
@@ -52,13 +51,14 @@ use yii\db\ActiveQuery;
  * @property string $meta_keywords
  * @property string $site_code
  *
- * @property CmsContentElement[] $cmsContentElements
- * @property CmsContentElementTree[] $cmsContentElementTrees
- * @property CmsTree $p
- * @property CmsTree[] $cmsTrees
- * @property CmsSite $site
- * @property CmsTree $pidMain
- * @property CmsTree[] $cmsTrees0
+ * @property string $absoluteUrl
+ * @property string $url
+ *
+ * @property CmsContentElement[]        $cmsContentElements
+ * @property CmsContentElementTree[]    $cmsContentElementTrees
+ * @property CmsTree                    $parentTree
+ * @property CmsTree[]                  $parentTrees
+ * @property CmsSite                    $site
  */
 class Tree extends Core
 {
@@ -72,6 +72,7 @@ class Tree extends Core
     {
         return '{{%cms_tree}}';
     }
+
 
     public function behaviors()
     {
@@ -89,6 +90,22 @@ class Tree extends Core
             ]
         ];
         return $result;
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'checksBeforeSave']);
+        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'checksBeforeSave']);
+    }
+
+    public function checksBeforeSave($event)
+    {
+        if (!$this->site_code)
+        {
+            $this->site_code = $this->parentTree->site_code;
+        }
     }
 
     /**
@@ -131,19 +148,18 @@ class Tree extends Core
     }
 
 
-    public function createAbsoluteUrl()
-    {
-        return $this->createUrl();
-    }
-
-    public function getPageUrl()
-    {
-        return $this->createUrl();
-    }
     /**
      * @return string
      */
-    public function createUrl()
+    public function getAbsoluteUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
     {
         if ($this->isLink())
         {
@@ -167,7 +183,6 @@ class Tree extends Core
             } else {
                 return \Yii::$app->request->getHostInfo();
             }
-
         }
     }
 
@@ -185,77 +200,13 @@ class Tree extends Core
     }
 
     /**
-     *
-     * Массив id дочерних разделов
-     *
      * @return array
      */
-    public function fetchChildrensIds()
+    public function getParentTrees()
     {
-        $ids = [];
-
-        if ($this->hasChildrens())
+        if ($parents = $this->findParents())
         {
-            if ($childrens = $this->fetchChildrens())
-            {
-                foreach ($childrens as $chidren)
-                {
-                    $ids[] = $chidren->id;
-                }
-            }
-        }
-
-        return $ids;
-    }
-
-    /**
-     *
-     * Массив id дочерних разделов включая id их подразделов
-     *
-     * @return array
-     */
-    public function fetchChildrensAllIds()
-    {
-        $ids = [];
-
-        if ($this->hasChildrens())
-        {
-            if ($childrens = $this->fetchChildrensAll())
-            {
-                foreach ($childrens as $chidren)
-                {
-                    $ids[] = $chidren->id;
-                }
-            }
-        }
-
-        return $ids;
-    }
-
-    /**
-     * @return $this[];
-     */
-    public function fetchChildrensAll()
-    {
-        return $this->findChildrensAll()->all();
-    }
-
-    /**
-     * @return $this[];
-     */
-    public function fetchChildrens()
-    {
-        return $this->findChildrens()->all();
-    }
-
-    /**
-     * @return $this[];
-     */
-    public function fetchParents()
-    {
-        if ($this->findParents())
-        {
-            return $this->findParents()->all();
+            return $parents->all();
         }
 
         return [];
@@ -275,45 +226,12 @@ class Tree extends Core
 
 
     /**
-     * @return bool
+     * @return \yii\db\ActiveQuery
      */
-    public function hasMainImageSrc()
+    public function getParentTree()
     {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage->getFirstSrc())
-        {
-            return true;
-        } else
-        {
-            return false;
-        }
+        return $this->hasOne(static::className(), ['id' => 'pid']);
     }
-    /**
-     * @return string
-     */
-    public function getMainImageSrc()
-    {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage->getFirstSrc())
-        {
-            return $mainImage->getFirstSrc();
-        }
-
-        return \Yii::$app->params['noimage'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getImagesSrc()
-    {
-        return $this->getFilesGroups()->getComponent('images')->items;
-    }
-
-
-
 
     /**
      * @return \yii\db\ActiveQuery
