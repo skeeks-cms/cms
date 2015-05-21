@@ -360,7 +360,7 @@ JS
             }
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
-                             $model->createAbsoluteUrl(),
+                             $model->getAbsoluteUrl(),
                              ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-xs show-at-site", "title" => "Показать на сайте"]
                     );
 

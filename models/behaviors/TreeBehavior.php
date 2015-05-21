@@ -32,13 +32,12 @@ use yii\helpers\Json;
 use yii\validators\Validator;
 
 /**
- * Class HasVotes
+ * Class TreeBehavior
  * @package skeeks\cms\models\behaviors
  */
 class TreeBehavior extends ActiveRecordBehavior
 {
     public $pidAttrName         = "pid"; //Непосредственный родитель
-    public $pidMainAttrName     = "pid_main"; //Корневой родитель
     public $pidsAttrName        = "pids";
     public $levelAttrName       = "level";
     public $dirAttrName         = "dir";
@@ -102,19 +101,6 @@ class TreeBehavior extends ActiveRecordBehavior
         if (!$this->getSeoPageName())
         {
             $this->generateSeoPageName();
-        }
-
-        //Обновляем главного родителя
-        if ($this->getLevel() == 0)
-        {
-            $this->owner->{$this->pidMainAttrName} = null;
-        } else if ($this->getLevel() == 1)
-        {
-            $this->owner->{$this->pidMainAttrName} = $this->getPid();
-        } else
-        {
-            $pids = explode($this->delimetr, $this->owner->{$this->pidsAttrName});
-            $this->owner->{$this->pidMainAttrName} = array_shift($pids);
         }
     }
 
@@ -262,27 +248,24 @@ class TreeBehavior extends ActiveRecordBehavior
 
 
     /**
-     * @return array|bool|null|ActiveQuery
+     * @return array|null|ActiveQuery
      */
     public function findParents()
     {
         if ($this->owner->isNewRecord)
         {
-            return false;
+            return null;
         }
 
         if (!$this->hasParent() || $this->isRoot())
         {
-            return false;
+            return null;
         }
 
         $find = $this->owner->find()->orderBy([$this->levelAttrName => SORT_ASC]);
         if ($pids = $this->getPids())
         {
-            foreach ($pids as $pidId)
-            {
-                $find->orWhere([$this->owner->primaryKey()[0] => $pidId]);
-            }
+            $find->andWhere([$this->owner->primaryKey()[0] => $pids]);
         }
 
         return $find;
@@ -532,15 +515,6 @@ class TreeBehavior extends ActiveRecordBehavior
     {
         return (int) $this->owner->{$this->pidAttrName};
     }
-
-    /**
-     * @return int
-     */
-    public function getPidMain()
-    {
-        return (int) $this->owner->{$this->pidMainAttrName};
-    }
-
 
     /**
      * Пересчитывает приоритеты детей в соответствии со занчениями заданного поля

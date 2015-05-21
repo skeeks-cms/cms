@@ -166,13 +166,12 @@ class CmsSite extends Core
      */
     public function getUrl()
     {
-        $serverName = \Yii::$app->request->hostInfo;
         if ($this->server_name)
         {
-            return 'http://' . $this->server_name;
+            return '//' . $this->server_name;
         }
 
-        return 'http://' . $serverName;
+        return \Yii::$app->request->hostInfo;
     }
 
 }
