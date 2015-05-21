@@ -47,6 +47,28 @@ use yii\web\View;
  */
 class Cms extends \skeeks\cms\base\Component
 {
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function descriptorConfig()
+    {
+        return array_merge(parent::descriptorConfig(), [
+            'name'          => 'Основной модуль CMS',
+        ]);
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function getConfigFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_form.php';
+    }
+
     const BOOL_Y = "Y";
     const BOOL_N = "N";
 
@@ -110,30 +132,11 @@ class Cms extends \skeeks\cms\base\Component
         return $this->_site;
     }
 
-    /**
-     * Можно задать название и описание компонента
-     * @return array
-     */
-    static public function getDescriptorConfig()
-    {
-        return
-        [
-            'name'          => 'Основной модуль CMS',
-        ];
-    }
+
 
     private static $_huck = 'Z2VuZXJhdG9y';
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function configFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_form.php';
-    }
+
 
     public function init()
     {
@@ -290,25 +293,6 @@ class Cms extends \skeeks\cms\base\Component
         }
 
         return $result;
-    }
-
-
-    /**
-     * @var Descriptor
-     */
-    protected static $_descriptor = null;
-
-    /**
-     * @return Descriptor
-     */
-    static public function getDescriptor()
-    {
-        if (self::$_descriptor === null)
-        {
-             self::$_descriptor = new Descriptor((array) \Yii::$app->params["descriptor"]);
-        }
-
-        return self::$_descriptor;
     }
 
 

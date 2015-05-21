@@ -18,22 +18,22 @@ use yii\web\View;
  */
 class AdminSettings extends Component
 {
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function descriptorConfig()
+    {
+        return array_merge(parent::descriptorConfig(), [
+            'name'          => 'Настройки админ панели',
+        ]);
+    }
+
     public $asset;
 
     public $enableCustomConfirm   = 1;
     public $enableCustomPromt     = 1;
 
-    /**
-     * Можно задать название и описание компонента
-     * @return array
-     */
-    static public function getDescriptorConfig()
-    {
-        return
-        [
-            'name'                              => 'Настройки админ панели',
-        ];
-    }
 
     public function rules()
     {
