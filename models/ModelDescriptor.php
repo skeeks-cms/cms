@@ -10,7 +10,7 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Model;
+use yii\base\Model;
 use skeeks\cms\components\ModelActionViews;
 use skeeks\cms\components\ModelTypes;
 
