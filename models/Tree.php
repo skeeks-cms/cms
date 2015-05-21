@@ -115,7 +115,6 @@ class Tree extends Core
     {
         return array_merge(parent::attributeLabels(), [
             'type'              => Yii::t('app', 'Тип'),
-            'pid_main'          => Yii::t('app', 'Pid main'),
             'redirect'          => Yii::t('app', 'Redirect'),
             'tree_menu_ids'     => Yii::t('app', 'Позиции меню'),
             'priority'          => Yii::t('app', 'Приоритет'),
