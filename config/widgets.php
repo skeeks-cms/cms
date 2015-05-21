@@ -17,15 +17,5 @@ return
     'skeeks\cms\widgets\publicationsAll\PublicationsAll' => [],
     'skeeks\cms\widgets\treeFixed\TreeFixed' => [],
     'skeeks\cms\widgets\treeList\TreeList' => [],
-    'skeeks\cms\widgets\breadcrumbs\Breadcrumbs' =>
-    [
-        'templates'     =>
-        [
-            'project' =>
-            [
-                'name'      => 'Проект',
-                'baseDir'   => '@app/views/widgets/breadcrumbs'
-            ]
-        ],
-    ],
+    'skeeks\cms\widgets\breadcrumbs\Breadcrumbs' => []
 ];

@@ -34,16 +34,6 @@ class TreeMenu extends Core
         return '{{%cms_tree_menu}}';
     }
 
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-        $scenarios['create'] = ['name', 'description'];
-        $scenarios['update'] = ['name', 'description'];
-        return $scenarios;
-    }
-
-
     /**
      * @inheritdoc
      */

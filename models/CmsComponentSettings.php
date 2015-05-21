@@ -3,23 +3,22 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010 SkeekS (СкикС)
- * @date 27.03.2015
+ * @date 21.05.2015
  */
 namespace skeeks\cms\models;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
-
 /**
- * Class Settings
+ * Class CmsComponentSettings
  * @package skeeks\cms\models
  */
-class Settings extends Core
+class CmsComponentSettings extends Core
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%cms_settings}}';
+        return '{{%cms_component_settings}}';
     }
 
     /**

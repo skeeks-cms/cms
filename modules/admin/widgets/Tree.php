@@ -360,7 +360,7 @@ JS
             }
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
-                             $model->createAbsoluteUrl(),
+                             $model->getAbsoluteUrl(),
                              ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-xs show-at-site", "title" => "Показать на сайте"]
                     );
 
@@ -369,7 +369,7 @@ JS
                             $openCloseLink .
                             $controllElement .
                             Html::tag("div",
-                                Html::a($model->name . ($additionalName ? ' (' . $additionalName . ')': ''), $currentLink),
+                                Html::a($model->name . ($additionalName ? ' [' . $additionalName . ']': ''), $currentLink),
                                 [
                                     "class" => "sx-label-node level-" . $model->level . " status-" . $model->active
                                 ]

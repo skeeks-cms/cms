@@ -28,6 +28,7 @@ use skeeks\modules\cms\user\models\User;
 use skeeks\sx\String;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\ErrorHandler;
 
 /**
@@ -54,6 +55,9 @@ use yii\web\ErrorHandler;
  * @property string $meta_title
  * @property string $meta_description
  * @property string $meta_keywords
+ *
+ * @property string $absoluteUrl
+ * @property string $url
  *
  * @property CmsContent $cmsContent
  * @property CmsTree $tree
@@ -184,45 +188,27 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->cmsContent->cmsContentProperties;
     }
-}
 
 
 
 
 
-    /*public function attributes()
+    /**
+     * @return string
+     */
+    public function getAbsoluteUrl()
     {
-        $relatedAttributes = [];
-
-        if ($this->content_id)
-        {
-            if ($this->relatedProperties)
-            {
-                foreach ($this->relatedProperties as $key => $property)
-                {
-                    $relatedAttributes[] = "related" . String::ucfirst($property->code);
-                }
-            }
-        }
-
-        return array_merge(parent::attributes(), $relatedAttributes);
+        return $this->url;
     }
 
-
-    public function init()
+    /**
+     * @return string
+     */
+    public function getUrl()
     {
-        $relatedAttributes = [];
-
-        if ($this->content_id)
-        {
-            if ($this->relatedProperties)
-            {
-                foreach ($this->relatedProperties as $key => $property)
-                {
-                    $this->_attribute["related" . String::ucfirst($property->code)] = $property->value($this);
-                }
-            }
-        }
-
-        parent::init();
-    }*/
+        return Url::to('cms/content-element/view', [
+            'id'    => $this->id,
+            'code'  => $this->code,
+        ]);
+    }
+}

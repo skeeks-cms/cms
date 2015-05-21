@@ -29,9 +29,9 @@
 
 <? if ($component && $component->hasConfigFormFile()) : ?>
     <p>
-        <? if ($component->fetchDefaultSettings()) : ?>
+        <?/* if ($component->getDefaultSettings()) : */?><!--
             <button type="submit" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i> сбросить настройки по умолчанию</button>
-        <? endif; ?>
+        --><?/* endif; */?>
     </p>
     <?= $component->renderConfigForm(); ?>
 <? else: ?>

@@ -68,14 +68,14 @@ class Breadcrumbs extends Component
      */
     public function setPartsByTree(Tree $tree)
     {
-        $parents = $tree->fetchParents();
-        $parents[] = $tree;
+        $parents    = $tree->parentTrees;
+        $parents[]  = $tree;
 
         foreach ($parents as $tree)
         {
             $this->append([
                 'name'          => $tree->name,
-                'url'           => $tree->getPageUrl(),
+                'url'           => $tree->url,
                 'data'          => [
                     'model' => $tree
                 ],
