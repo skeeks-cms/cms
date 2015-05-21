@@ -369,7 +369,7 @@ JS
                             $openCloseLink .
                             $controllElement .
                             Html::tag("div",
-                                Html::a($model->name . ($additionalName ? ' (' . $additionalName . ')': ''), $currentLink),
+                                Html::a($model->name . ($additionalName ? ' [' . $additionalName . ']': ''), $currentLink),
                                 [
                                     "class" => "sx-label-node level-" . $model->level . " status-" . $model->active
                                 ]

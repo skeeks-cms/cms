@@ -11,7 +11,7 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Model;
+use yii\base\Model;
 
 class WidgetConfig extends Model
 {
