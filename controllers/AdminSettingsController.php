@@ -39,7 +39,7 @@ class AdminSettingsController extends AdminController
             {
                 $loadedComponents[$loadedComponent->className()]    = $loadedComponent;
 
-                if ($name = ArrayHelper::getValue($loadedComponent->getDescriptorConfig(), 'name'))
+                if ($name = $loadedComponent->descriptor->name)
                 {
                     $loadedForSelect[$loadedComponent->className()]     = $name;
                 } else

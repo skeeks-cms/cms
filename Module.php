@@ -34,9 +34,9 @@ class Module extends base\Module implements BootstrapInterface
     /**
      * @return array
      */
-    protected function _descriptor()
+    static public function descriptorConfig()
     {
-        return array_merge(parent::_descriptor(), [
+        return array_merge(parent::descriptorConfig(), [
             "version"               => "2.0.0-dev",
 
             "name"          => "SkeekS CMS",

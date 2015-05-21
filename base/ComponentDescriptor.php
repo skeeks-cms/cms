@@ -1,32 +1,27 @@
 <?php
 /**
- * Descriptor
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 29.10.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 21.05.2015
  */
-namespace skeeks\cms\base\components;
+namespace skeeks\cms\base;
 
-use \skeeks\sx\Entity;
-use \skeeks\sx\Version;
 use \yii\base\Component;
 
 /**
- * Class Descriptor
- * @package skeeks\cms\base\components
+ * Class ComponentDescriptor
+ * @package skeeks\cms\base
  */
-class Descriptor
+class ComponentDescriptor
     extends Component
 {
     public $version                 = "1.0.0";
     public $startDevelopmentDate    = "2010-01-01";
 
-    public $name            = "";
+    public $name            = "SkeekS CMS";
     public $description     = "";
-    public $keywords        = "";
+    public $keywords        = [];
     public $homepage        = "http://www.skeeks.com/";
     public $license         = "BSD-3-Clause";
 
@@ -63,50 +58,6 @@ class Descriptor
         ],
     ];
 
-    public $admin       =
-    [
-        "enabled"       => true,
-        "name"          => "",
-
-        "items"         =>
-        [
-            /*"user" =>
-                [
-                    "label"     => "Управление пользователями",
-                    "route"     => "cms/test-admin",
-                    "priority"  => 10,
-                ],
-
-            "user-group" =>
-                [
-                    "label"     => "Управление группами",
-                    "route"     => "cms/user-group-admin",
-                    "priority"  => 5,
-                ]*/
-        ]
-    ];
-
-
-
-    /**
-     * @var Version
-     */
-    protected $_version = null;
-
-
-    /**
-     * @return Version
-     */
-    public function getVersion()
-    {
-        if ($this->_version == null)
-        {
-            $this->_version = new Version($this->version);
-        }
-
-        return $this->_version;
-    }
-
 
     /**
      * @return string
@@ -138,7 +89,7 @@ class Descriptor
      */
     public function getPovered()
     {
-        return 'Разработка <a href="http://www.skeeks.com/" rel="external">SkeekS cms</a>';
+        return 'Разработка <a href="' . $this->homepage . '" rel="external">' . $this->name . '</a>';
     }
 
 }
