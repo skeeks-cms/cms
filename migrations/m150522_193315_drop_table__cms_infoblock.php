@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m220515_193315_drop_table__cms_infoblock extends Migration
+class m150522_193315_drop_table__cms_infoblock extends Migration
 {
     public function safeUp()
     {
@@ -17,7 +17,7 @@ class m220515_193315_drop_table__cms_infoblock extends Migration
 
     public function down()
     {
-        echo "m220515_193315_drop_table__cms_infoblock cannot be reverted.\n";
+        echo "m150522_193315_drop_table__cms_infoblock cannot be reverted.\n";
         return false;
     }
 }

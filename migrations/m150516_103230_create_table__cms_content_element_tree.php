@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m160512_103230_create_table__cms_content_element_tree extends Migration
+class m150516_103230_create_table__cms_content_element_tree extends Migration
 {
     public function up()
     {

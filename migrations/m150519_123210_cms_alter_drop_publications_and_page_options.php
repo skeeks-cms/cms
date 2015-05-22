@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m190515_123210_cms_alter_drop_publications_and_page_options extends Migration
+class m150519_123210_cms_alter_drop_publications_and_page_options extends Migration
 {
     public function safeUp()
     {
@@ -24,7 +24,7 @@ class m190515_123210_cms_alter_drop_publications_and_page_options extends Migrat
 
     public function down()
     {
-        echo "m190515_123210_cms_alter_drop_publications_and_page_options cannot be reverted.\n";
+        echo "m150519_123210_cms_alter_drop_publications_and_page_options cannot be reverted.\n";
         return false;
     }
 }

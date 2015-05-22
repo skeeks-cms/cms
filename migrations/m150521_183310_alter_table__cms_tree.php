@@ -8,16 +8,17 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m210515_193315_alter_table__cms_settings extends Migration
+class m150521_183310_alter_table__cms_tree extends Migration
 {
     public function safeUp()
     {
-        $this->renameTable("cms_settings", "cms_component_settings");
+
+        $this->execute("ALTER TABLE {{%cms_tree%}} DROP `main_root`;");
     }
 
     public function down()
     {
-        echo "m210515_193315_alter_table__cms_settings cannot be reverted.\n";
+        echo "m150521_183310_alter_table__cms_tree cannot be reverted.\n";
         return false;
     }
 }

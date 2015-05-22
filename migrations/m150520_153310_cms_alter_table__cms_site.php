@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m200515_153310_cms_alter_table__cms_site extends Migration
+class m150520_153310_cms_alter_table__cms_site extends Migration
 {
     public function safeUp()
     {
@@ -81,7 +81,7 @@ class m200515_153310_cms_alter_table__cms_site extends Migration
 
     public function down()
     {
-        echo "m200515_153210_cms_alter_meta_data cannot be reverted.\n";
+        echo "m150520_153310_cms_alter_table__cms_site cannot be reverted.\n";
         return false;
     }
 }

@@ -3,7 +3,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m200515_103210_cms_alter_user_data extends Migration
+class m150520_103210_cms_alter_user_data extends Migration
 {
     public function safeUp()
     {
@@ -19,7 +19,7 @@ class m200515_103210_cms_alter_user_data extends Migration
 
     public function down()
     {
-        echo "m200515_103210_cms_alter_user_data cannot be reverted.\n";
+        echo "m150520_103210_cms_alter_user_data cannot be reverted.\n";
         return false;
     }
 }

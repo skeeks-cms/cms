@@ -52,9 +52,7 @@ class CmsContentType extends Core
      */
     public function behaviors()
     {
-        return array_merge(parent::behaviors(), [
-            //TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
-        ]);
+        return array_merge(parent::behaviors(), []);
     }
 
     /**
@@ -72,16 +70,6 @@ class CmsContentType extends Core
             'name' => Yii::t('app', 'Name'),
             'code' => Yii::t('app', 'Code'),
         ]);
-    }
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
     }
 
     /**

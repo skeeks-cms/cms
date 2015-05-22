@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m200515_173310_create_table__cms_site_domain extends Migration
+class m150520_173310_create_table__cms_site_domain extends Migration
 {
     public function safeUp()
     {
@@ -67,7 +67,7 @@ class m200515_173310_create_table__cms_site_domain extends Migration
 
     public function down()
     {
-        echo "m200515_173310_create_table__cms_site_domain cannot be reverted.\n";
+        echo "m150520_173310_create_table__cms_site_domain cannot be reverted.\n";
         return false;
     }
 }
