@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m200515_143210_cms_alter_cms_tree extends Migration
+class m150520_143210_cms_alter_cms_tree extends Migration
 {
     public function safeUp()
     {
@@ -24,7 +24,7 @@ class m200515_143210_cms_alter_cms_tree extends Migration
 
     public function down()
     {
-        echo "m200515_143210_cms_alter_cms_tree cannot be reverted.\n";
+        echo "m150520_143210_cms_alter_cms_tree cannot be reverted.\n";
         return false;
     }
 }

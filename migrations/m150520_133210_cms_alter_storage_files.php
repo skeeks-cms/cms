@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m200515_133210_cms_alter_storage_files extends Migration
+class m150520_133210_cms_alter_storage_files extends Migration
 {
     public function safeUp()
     {
@@ -25,7 +25,7 @@ class m200515_133210_cms_alter_storage_files extends Migration
 
     public function down()
     {
-        echo "m200515_133210_cms_alter_storage_files cannot be reverted.\n";
+        echo "m150520_133210_cms_alter_storage_files cannot be reverted.\n";
         return false;
     }
 }

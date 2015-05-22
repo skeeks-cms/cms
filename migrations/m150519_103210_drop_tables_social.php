@@ -11,7 +11,7 @@ use yii\db\Migration;
 /**
  * Class m190515_103210_drop_tables_social
  */
-class m190515_103210_drop_tables_social extends Migration
+class m150519_103210_drop_tables_social extends Migration
 {
     public function up()
     {
@@ -42,7 +42,7 @@ class m190515_103210_drop_tables_social extends Migration
 
     public function down()
     {
-        echo "m190515_103210_drop_tables_social cannot be reverted.\n";
+        echo "m150519_103210_drop_tables_social cannot be reverted.\n";
         return false;
     }
 }

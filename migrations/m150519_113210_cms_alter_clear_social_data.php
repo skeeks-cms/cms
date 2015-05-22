@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m190515_113210_cms_alter_clear_social_data extends Migration
+class m150519_113210_cms_alter_clear_social_data extends Migration
 {
     public function safeUp()
     {
@@ -31,7 +31,7 @@ class m190515_113210_cms_alter_clear_social_data extends Migration
 
     public function down()
     {
-        echo "m190515_113210_cms_alter_clear_social_data cannot be reverted.\n";
+        echo "m150519_113210_cms_alter_clear_social_data cannot be reverted.\n";
         return false;
     }
 }

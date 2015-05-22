@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m200515_153305_cms_alter_table__cms_lang extends Migration
+class m150520_153305_cms_alter_table__cms_lang extends Migration
 {
     public function safeUp()
     {
@@ -72,7 +72,7 @@ class m200515_153305_cms_alter_table__cms_lang extends Migration
 
     public function down()
     {
-        echo "m200515_153305_cms_alter_table__cms_lang cannot be reverted.\n";
+        echo "m150520_153305_cms_alter_table__cms_lang cannot be reverted.\n";
         return false;
     }
 }

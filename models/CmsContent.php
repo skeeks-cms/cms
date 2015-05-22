@@ -118,30 +118,12 @@ class CmsContent extends Core
             {
                 return md5(rand(1, 10) . time());
             }],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
-            ['active', 'default', 'value' => function($model, $attribute)
-            {
-                return "Y";
-            }],
-            ['trees_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Разделы";
-            }],
-            ['tree_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Раздел";
-            }],
-            ['elements_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Элементы";
-            }],
-            ['element_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Элемент";
-            }],
+            ['priority', 'default', 'value'         => 500],
+            ['active', 'default', 'value'           => "Y"],
+            ['trees_name', 'default', 'value'       => "Разделы"],
+            ['tree_name', 'default', 'value'        => "Раздел"],
+            ['elements_name', 'default', 'value'    => "Элементы"],
+            ['element_name', 'default', 'value'     => "Элемент"],
         ]);
     }
 
