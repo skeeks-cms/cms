@@ -13,7 +13,6 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
-use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
