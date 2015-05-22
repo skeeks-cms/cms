@@ -39,9 +39,8 @@ class m150512_103220_create_table__cms_content extends Migration
             'created_at'            => Schema::TYPE_INTEGER . ' NULL',
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
-
             'name'                  => Schema::TYPE_STRING. '(255) NOT NULL',
-            'code'                  => Schema::TYPE_STRING. '(50) NULL',
+            'code'                  => Schema::TYPE_STRING. '(50) NOT NULL',
 
             'active'                => "CHAR(1) NOT NULL DEFAULT 'Y'",
 
@@ -51,19 +50,16 @@ class m150512_103220_create_table__cms_content extends Migration
 
             'files'                 => Schema::TYPE_TEXT. ' NULL',
 
-            'content_type'          => Schema::TYPE_STRING. '(32) NOT NULL',
+            'index_for_search'         => "CHAR(1) NOT NULL DEFAULT 'Y'", //Индексировать элементы для модуля поиска
 
-            'index_element'         => "CHAR(1) NOT NULL DEFAULT 'Y'", //Индексировать элементы для модуля поиска
-            'index_tree'            => "CHAR(1) NOT NULL DEFAULT 'N'", //Индексировать разделы для модуля поиска
+            'name_meny'         => Schema::TYPE_STRING. '(100) NULL',
+            'name_one'          => Schema::TYPE_STRING. '(100) NULL',
+
 
             'tree_chooser'          => "CHAR(1) NULL", //Интерфейс привязки элемента к разделам
             'list_mode'             => "CHAR(1) NULL", //Режим просмотра разделов и элементов
 
-            'trees_name'            => Schema::TYPE_STRING. '(100) NULL',
-            'tree_name'             => Schema::TYPE_STRING. '(100) NULL',
-
-            'elements_name'         => Schema::TYPE_STRING. '(100) NULL',
-            'element_name'          => Schema::TYPE_STRING. '(100) NULL',
+            'content_type'          => Schema::TYPE_STRING. '(32) NOT NULL',
 
         ], $tableOptions);
         
@@ -76,19 +72,20 @@ class m150512_103220_create_table__cms_content extends Migration
 
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(priority);");
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(name);");
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(code);");
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(content_type);");
+        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(active);");
+        $this->execute("ALTER TABLE {{%cms_content}} ADD UNIQUE(code);");
 
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(index_element);");
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(index_tree);");
+        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(index_for_search);");
+
+
+
+        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(name_meny);");
+        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(name_one);");
 
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(tree_chooser);");
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(list_mode);");
 
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(trees_name);");
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(tree_name);");
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(elements_name);");
-        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(element_name);");
+        $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(content_type);");
 
         
         $this->addForeignKey(

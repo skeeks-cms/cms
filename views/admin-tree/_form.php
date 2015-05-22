@@ -34,10 +34,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     ]); ?>
 
     <div data-listen="isLink" data-show="0" class="sx-hide">
-        <?= $form->field($model, 'type')->widget(
+        <?= $form->field($model, 'tree_type_id')->widget(
             \skeeks\widget\chosen\Chosen::className(), [
                     'items' => \yii\helpers\ArrayHelper::map(
-                         \Yii::$app->registeredModels->getDescriptor($model)->getTypes()->getComponents(),
+                         \skeeks\cms\models\CmsTreeType::find()->active()->all(),
                          "id",
                          "name"
                      ),

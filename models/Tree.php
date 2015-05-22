@@ -14,8 +14,10 @@ namespace skeeks\cms\models;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasFiles;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
+use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
@@ -41,7 +43,7 @@ use yii\db\BaseActiveRecord;
  * @property string $dir
  * @property integer $has_children
  * @property integer $priority
- * @property string $type
+ * @property string $tree_type_id
  * @property integer $published_at
  * @property string $redirect
  * @property string $tree_menu_ids
@@ -59,10 +61,13 @@ use yii\db\BaseActiveRecord;
  * @property CmsTree                    $parentTree
  * @property CmsTree[]                  $parentTrees
  * @property CmsSite                    $site
+ * @property CmsTreeType                $treeType
+ * @property CmsTreeProperty[]          $cmsTreeProperties
  */
 class Tree extends Core
 {
     use TreeBehaviorTrait;
+    use HasRelatedPropertiesTrait;
     use \skeeks\cms\models\behaviors\traits\HasFiles;
 
     /**
@@ -89,6 +94,14 @@ class Tree extends Core
                 "tree_menu_ids"
             ]
         ];
+
+        $result[HasRelatedProperties::className()] =
+        [
+            'class'                             => HasRelatedProperties::className(),
+            'relatedElementPropertyClassName'   => CmsTreeProperty::className(),
+            'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
+        ];
+
         return $result;
     }
 
@@ -104,7 +117,18 @@ class Tree extends Core
     {
         if (!$this->site_code)
         {
-            $this->site_code = $this->parentTree->site_code;
+            if ($this->parentTree)
+            {
+                $this->site_code = $this->parentTree->site_code;
+            }
+        }
+
+        if (!$this->tree_type_id)
+        {
+            if ($this->parentTree)
+            {
+                $this->tree_type_id = $this->parentTree->tree_type_id;
+            }
         }
     }
 
@@ -114,7 +138,7 @@ class Tree extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'type'              => Yii::t('app', 'Тип'),
+            'tree_type_id'              => Yii::t('app', 'Тип'),
             'redirect'          => Yii::t('app', 'Redirect'),
             'tree_menu_ids'     => Yii::t('app', 'Позиции меню'),
             'priority'          => Yii::t('app', 'Приоритет'),
@@ -134,8 +158,8 @@ class Tree extends Core
     {
         return array_merge(parent::rules(), [
             ['active', 'default', 'value' => Cms::BOOL_Y],
-            [['type', 'redirect'], 'string'],
-            [['pid_main', 'priority'], 'integer'],
+            [['redirect'], 'string'],
+            [['priority', 'tree_type_id'], 'integer'],
             [['tree_menu_ids'], 'safe'],
             [['code'], 'string', 'max' => 64],
             [['code'], 'unique'],
@@ -183,19 +207,6 @@ class Tree extends Core
                 return \Yii::$app->request->getHostInfo();
             }
         }
-    }
-
-    /**
-     * @return null|ModelType
-     */
-    public function getType()
-    {
-        if ($this->type)
-        {
-            return \Yii::$app->registeredModels->getDescriptor($this)->getTypes()->getComponent($this->type);
-        }
-
-        return null;
     }
 
     /**
@@ -255,4 +266,33 @@ class Tree extends Core
     {
         return $this->hasMany(CmsContentElementTree::className(), ['tree_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeProperties()
+    {
+        return $this->hasMany(CmsTreeProperty::className(), ['element_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTreeType()
+    {
+        return $this->hasOne(CmsTreeType::className(), ['id' => 'tree_type_id']);
+    }
+
+
+    /**
+     *
+     * Все возможные свойства связанные с моделью
+     *
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getRelatedProperties()
+    {
+        return $this->treeType->cmsTreeTypeProperties;
+    }
+
 }

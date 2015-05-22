@@ -24,18 +24,17 @@ use Yii;
 use yii\db\BaseActiveRecord;
 
 /**
- * This is the model class for table "{{%cms_content_property_enum}}".
- *
- * @property CmsContentProperty $property
+ * This is the model class for table "{{%cms_tree_type_property_enum}}".
+ * @property CmsTreeTypeProperty $property
  */
-class CmsContentPropertyEnum extends RelatedPropertyEnumModel
+class CmsTreeTypePropertyEnum extends RelatedPropertyEnumModel
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%cms_content_property_enum}}';
+        return '{{%cms_tree_type_property_enum}}';
     }
 
     /**
@@ -51,6 +50,6 @@ class CmsContentPropertyEnum extends RelatedPropertyEnumModel
      */
     public function getProperty()
     {
-        return $this->hasOne(CmsContentProperty::className(), ['id' => 'property_id']);
+        return $this->hasOne(CmsTreeTypeProperty::className(), ['id' => 'property_id']);
     }
 }

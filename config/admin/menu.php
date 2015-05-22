@@ -114,6 +114,12 @@ return
             ],
 
             [
+                "label"     => "Настройки разделов",
+                "url"       => ["cms/admin-cms-tree-type"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
+            ],
+
+            [
                 "label"     => "Настройки контента",
                 "url"       => ["cms/admin-cms-content-type"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/content.png'],
