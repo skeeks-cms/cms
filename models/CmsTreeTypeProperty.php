@@ -28,20 +28,20 @@ use yii\widgets\ActiveForm;
 /**
  * This is the model class for table "{{%cms_content_property}}".
  *
- * @property integer $content_id
+ * @property integer $tree_type_id
  *
- * @property CmsContent $cmsContent
- * @property CmsContentPropertyEnum[] $enums
- * @property CmsContentElementProperty[] $elementProperties
+ * @property CmsTreeType $treeType
+ * @property CmsTreeTypePropertyEnum[] $enums
+ * @property CmsTreeProperty[] $elementProperties
  */
-class CmsContentProperty extends RelatedPropertyModel
+class CmsTreeTypeProperty extends RelatedPropertyModel
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%cms_content_property}}';
+        return '{{%cms_tree_type_property}}';
     }
 
     /**
@@ -49,15 +49,7 @@ class CmsContentProperty extends RelatedPropertyModel
      */
     public function getElementProperties()
     {
-        return $this->hasMany(CmsContentElementProperty::className(), ['property_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCmsContent()
-    {
-        return $this->hasOne(CmsContent::className(), ['id' => 'content_id']);
+        return $this->hasMany(CmsTreeProperty::className(), ['property_id' => 'id']);
     }
 
     /**
@@ -65,14 +57,21 @@ class CmsContentProperty extends RelatedPropertyModel
      */
     public function getEnums()
     {
-        return $this->hasMany(CmsContentPropertyEnum::className(), ['property_id' => 'id']);
+        return $this->hasMany(CmsTreeTypePropertyEnum::className(), ['property_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTreeType()
+    {
+        return $this->hasOne(CmsTreeType::className(), ['id' => 'tree_type_id']);
+    }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'content_id' => Yii::t('app', 'Связь с контентом'),
+            'tree_type_id' => Yii::t('app', 'Связь с типом раздела'),
         ]);
     }
 
@@ -83,7 +82,7 @@ class CmsContentProperty extends RelatedPropertyModel
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['content_id'], 'integer'],
+            [['tree_type_id'], 'integer'],
         ]);
     }
 }

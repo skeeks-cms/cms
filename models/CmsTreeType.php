@@ -1,14 +1,10 @@
 <?php
 /**
- * Infoblock
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 09.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 22.05.2015
  */
-
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
@@ -23,7 +19,7 @@ use skeeks\modules\cms\user\models\User;
 use Yii;
 
 /**
- * This is the model class for table "{{%cms_content}}".
+ * This is the model class for table "{{%cms_tree_type}}".
  *
  * @property integer $id
  * @property integer $created_by
@@ -36,18 +32,14 @@ use Yii;
  * @property integer $priority
  * @property string $description
  * @property string $files
- * @property string $content_type
  * @property string $index_for_search
- * @property string $tree_chooser
- * @property string $list_mode
  * @property string $name_meny
  * @property string $name_one
  *
- * @property CmsContentType $contentType
- * @property CmsContentElement[] $cmsContentElements
- * @property CmsContentProperty[] $cmsContentProperties
+ * @property CmsTree[] $cmsTrees
+ * @property CmsTreeTypeProperty[] $cmsTreeTypeProperties
  */
-class CmsContent extends Core
+class CmsTreeType extends Core
 {
     use ValidateRulesTrait;
     use \skeeks\cms\models\behaviors\traits\HasFiles;
@@ -57,7 +49,7 @@ class CmsContent extends Core
      */
     public static function tableName()
     {
-        return '{{%cms_content}}';
+        return '{{%cms_tree_type}}';
     }
 
     /**
@@ -87,12 +79,9 @@ class CmsContent extends Core
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
             'files' => Yii::t('app', 'Files'),
-            'content_type' => Yii::t('app', 'Content Type'),
-            'index_for_search' => Yii::t('app', 'Индексировать для модуля поиска'),
-            'tree_chooser' => Yii::t('app', 'Интерфейс привязки элемента к разделам'),
-            'list_mode' => Yii::t('app', 'Режим просмотра разделов и элементов'),
-            'name_meny' => Yii::t('app', 'Название элементов (множественное число)'),
-            'name_one' => Yii::t('app', 'Название одного элемента'),
+            'index_for_search' => Yii::t('app', 'Index For Search'),
+            'name_meny' => Yii::t('app', 'Name Meny'),
+            'name_one' => Yii::t('app', 'Name One'),
         ]);
     }
 
@@ -103,44 +92,35 @@ class CmsContent extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
-            [['name', 'content_type', 'code'], 'required'],
+            [['name', 'code'], 'required'],
             [['description', 'files'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
+            [['active', 'index_for_search'], 'string', 'max' => 1],
+            [['name_meny', 'name_one'], 'string', 'max' => 100],
+            [['active'], 'unique'],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
-            [['active', 'index_for_search', 'tree_chooser', 'list_mode'], 'string', 'max' => 1],
-            [['content_type'], 'string', 'max' => 32],
-            [['name_meny', 'name_one'], 'string', 'max' => 100],
             ['priority', 'default', 'value'         => 500],
             ['active', 'default', 'value'           => "Y"],
-            ['name_meny', 'default', 'value'    => "Элементы"],
-            ['name_one', 'default', 'value'     => "Элемент"],
+            ['name_meny', 'default', 'value'        => "Разделы"],
+            ['name_one', 'default', 'value'         => "Раздел"],
         ]);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getContentType()
+    public function getCmsTrees()
     {
-        return $this->hasOne(CmsContentType::className(), ['code' => 'content_type']);
-    }
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCmsContentElements()
-    {
-        return $this->hasMany(CmsContentElement::className(), ['content_id' => 'id']);
+        return $this->hasMany(CmsTree::className(), ['tree_type_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCmsContentProperties()
+    public function getCmsTreeTypeProperties()
     {
-        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id']);
+        return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id']);
     }
 }

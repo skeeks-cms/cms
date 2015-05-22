@@ -14,14 +14,6 @@ use common\models\User;
 
 <?= $form->fieldSet('Основное'); ?>
 
-    <? if ($content_type = \Yii::$app->request->get('content_type')) : ?>
-        <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
-    <? else: ?>
-        <div style="display: none;">
-            <?= $form->fieldSelect($model, 'content_type', \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name')); ?>
-        </div>
-    <? endif; ?>
-
     <?= $form->field($model, 'image')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
         [
@@ -49,7 +41,7 @@ use common\models\User;
             'hint'              => "У каждого контента на сайте есть свой набор свойств, тут они и задаются",
             'parentModel'       => $model,
             'relation'          => [
-                'content_id' => 'id'
+                'tree_type_id' => 'id'
             ],
 
             'sort'              => [
@@ -59,7 +51,7 @@ use common\models\User;
                 ]
             ],
 
-            'controllerRoute'   => 'cms/admin-cms-content-property',
+            'controllerRoute'   => 'cms/admin-cms-tree-type-property',
             'gridViewOptions'   => [
                 'sortable' => true,
                 'columns' => [

@@ -83,7 +83,6 @@ abstract class RelatedPropertyModel extends Core
             'updated_at' => Yii::t('app', 'Updated At'),
             'name' => Yii::t('app', 'Name'),
             'code' => Yii::t('app', 'Code'),
-            'content_id' => Yii::t('app', 'Content ID'),
             'active' => Yii::t('app', 'Active'),
             'priority' => Yii::t('app', 'Priority'),
             'property_type' => Yii::t('app', 'Property Type'),
@@ -109,7 +108,7 @@ abstract class RelatedPropertyModel extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'content_id', 'priority', 'multiple_cnt', 'version'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'multiple_cnt', 'version'], 'integer'],
             [['name'], 'required'],
             [['component_settings'], 'string'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
