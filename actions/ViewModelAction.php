@@ -77,7 +77,6 @@ abstract class ViewModelAction extends Action
         $this
             ->_initMetaData()
             //->_initTypes()
-            //->_initGlobalLayout()
             //->_initActionView()
         ;
 
@@ -158,21 +157,6 @@ abstract class ViewModelAction extends Action
             }
         }
 
-
-        return $this;
-    }
-
-
-    /**
-     * Установка глобального layout-a
-     * @return $this
-     */
-    protected function _initGlobalLayout()
-    {
-        if ($value = \Yii::$app->pageOptions->getComponent('layout')->getValue()->value)
-        {
-            $this->controller->layout = $value;
-        }
 
         return $this;
     }

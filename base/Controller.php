@@ -26,8 +26,13 @@ class Controller extends YiiWebController
      * Использвается в методе render, для начала попробуем поискать шаблон в проекте, затем по умолчанию по правилам yii
      * @var string
      */
-    public $beforeRender = '@app/views/modules/';
+    public $beforeRender = '@template/modules/';
 
+    public function init()
+    {
+        $this->layout = '@template/layouts/default.php';
+        parent::init();
+    }
     /**
      *
      * Если не хочется рендерить шаблон текущего действия, можно воспользоваться этой функцией.

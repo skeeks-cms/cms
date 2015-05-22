@@ -97,6 +97,23 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userPropertyTypes       = [];
 
+    /**
+     * @var string шаблон
+     */
+    public $template        = "default";
+
+    /**
+     * @var array Возможные шаблоны сайта
+     */
+    public $templates       =
+    [
+        [
+            'name'      => 'Шаблон по умолчанию',
+            'code'      => 'default',
+            'path'      => '@app/templates/default',
+        ]
+    ];
+
 
     /**
      * @var CmsSite
@@ -153,7 +170,6 @@ class Cms extends \skeeks\cms\base\Component
             $this->generateModulesConfigFile();
         }
 
-
         /**
          * Генерация SEO метатегов.
          * */
@@ -176,13 +192,26 @@ class Cms extends \skeeks\cms\base\Component
                 }
             }
         });
+
+
+        //TODO:: future refactor;
+        $templatePath = "@app/templates/default";
+        foreach ($this->templates as $templateData)
+        {
+            if ($templateData['code'] == $this->template)
+            {
+                $templatePath = $templateData['path'];
+            }
+        }
+        \Yii::setAlias('template', \Yii::getAlias($templatePath));
     }
 
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template'], 'string'],
+            [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
         ]);
     }
@@ -194,6 +223,8 @@ class Cms extends \skeeks\cms\base\Component
             'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
+            'template'                  => 'Шаблон',
+            'templates'                 => 'Возможные шаблон',
         ]);
     }
 

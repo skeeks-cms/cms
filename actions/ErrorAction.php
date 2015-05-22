@@ -33,13 +33,13 @@ class ErrorAction extends \yii\web\ErrorAction
      */
     public function run()
     {
-
-
-        if (($exception = Yii::$app->getErrorHandler()->exception) === null) {
+        if (($exception = Yii::$app->getErrorHandler()->exception) === null)
+        {
             return '';
         }
 
-        if ($exception instanceof \HttpException) {
+        if ($exception instanceof \HttpException)
+        {
             $code = $exception->statusCode;
         } else {
             $code = $exception->getCode();
@@ -50,18 +50,22 @@ class ErrorAction extends \yii\web\ErrorAction
             return \Yii::$app->response->redirect(Url::toRoute('cms/install'));
         }
 
-        if ($exception instanceof Exception) {
+        if ($exception instanceof Exception)
+        {
             $name = $exception->getName();
-        } else {
+        } else
+        {
             $name = $this->defaultName ?: Yii::t('yii', 'Error');
         }
         if ($code) {
             $name .= " (#$code)";
         }
 
-        if ($exception instanceof UserException) {
+        if ($exception instanceof UserException)
+        {
             $message = $exception->getMessage();
-        } else {
+        } else
+        {
             $message = $this->defaultMessage ?: Yii::t('yii', 'An internal server error occurred.');
         }
 
