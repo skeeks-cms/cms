@@ -18,6 +18,10 @@ use skeeks\cms\base\ComponentDescriptor;
 trait HasComponentDescriptorTrait
 {
     /**
+     * @var ComponentDescriptor
+     */
+    protected $_descriptor = null;
+    /**
      * @var string
      */
     static public $descriptorClassName = 'skeeks\cms\base\ComponentDescriptor';

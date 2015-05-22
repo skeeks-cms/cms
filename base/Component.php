@@ -13,20 +13,15 @@ use yii\base\Model;
  * Class Component
  * @package skeeks\cms\base
  */
-class Component extends Model
+abstract class Component extends Model
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;
     //Может строить форму для своих данных.
     use HasComponentConfigFormTrait;
-    /**
-     * @var ComponentDescriptor
-     */
-    protected $_descriptor = null;
-
-    public function init()
+    /*public function init()
     {
         \Yii::trace('Cms component init: ' . $this->className());
         parent::init();
-    }
+    }*/
 }
