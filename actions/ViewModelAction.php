@@ -1,12 +1,9 @@
 <?php
 /**
- * ViewModelAction
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 20.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 24.05.2015
  */
 namespace skeeks\cms\actions;
 
@@ -16,13 +13,17 @@ use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\Tree;
 use Yii;
 use yii\base\Action;
+use yii\base\ActionEvent;
 use yii\base\Exception;
 use yii\base\Model;
 use yii\base\UserException;
+use yii\web\Controller;
 use yii\web\HttpException;
 
 /**
- * Class ErrorAction
+ * Стандартное действие для отображения одной сущьности, используется для панели редактирования в сайтовой части.
+ *
+ * Class ViewModelAction
  * @package skeeks\cms\actions
  */
 abstract class ViewModelAction extends Action
@@ -37,12 +38,18 @@ abstract class ViewModelAction extends Action
     /**
      * @var Model|null
      */
-    protected $_model = null;
+    public $model = null;
 
     /**
      * @var
      */
     public $callback;
+
+    /**
+     * @var bool включение/отключение стандартной обработки seo meta tags
+     */
+    public $enabledStandartMetaData = true;
+
 
     /**
      * Runs the action
@@ -51,7 +58,15 @@ abstract class ViewModelAction extends Action
      */
     public function run($model)
     {
-        $this->_model = $model;
+        /*$this->controller->on(Controller::EVENT_BEFORE_ACTION, function(ActionEvent $event)
+        {
+            if ($event->action == $this->id)
+            {
+
+            }
+        });*/
+
+        $this->model = $model;
         return $this->_go();
     }
 
@@ -60,31 +75,25 @@ abstract class ViewModelAction extends Action
      */
     protected function _go()
     {
-
-        if (!$this->_model)
+        if (!$this->model)
         {
             throw new HttpException(404);
         }
 
-        /*\Yii::$app->pageOptions->setValuesFromModel($this->_model);
-
-        if (!in_array($this->_model->status, [HasStatus::STATUS_ACTIVE, HasStatus::STATUS_INACTIVE]))
+        /*if (!in_array($this->_model->status, [HasStatus::STATUS_ACTIVE, HasStatus::STATUS_INACTIVE]))
         {
             throw new HttpException(404);
         }*/
 
-
-        $this
-            ->_initMetaData()
-            //->_initTypes()
-            //->_initActionView()
-        ;
-
-
+        if ($this->enabledStandartMetaData)
+        {
+            $this->initStandartMetaData();
+        }
 
         if ($this->callback)
         {
-            if (!is_callable($this->callback)) {
+            if (!is_callable($this->callback))
+            {
                 throw new InvalidConfigException('"' . get_class($this) . '::callback" should be a valid callback.');
             }
 
@@ -102,73 +111,18 @@ abstract class ViewModelAction extends Action
         } else
         {
             return $this->controller->render($this->view ?: $this->id, [
-                'model' => $this->_model
+                'model' => $this->model
             ]);
         }
     }
-
-
-    /**
-     * Установка глобального layout-a
-     * @return $this
-     */
-    protected function _initActionView()
-    {
-        if ($value = \Yii::$app->pageOptions->getComponent('action_view')->getValue()->value)
-        {
-            $this->view = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Установка глобального layout-a
-     * @return $this
-     */
-    protected function _initTypes()
-    {
-        if (!isset($this->_model->type))
-        {
-            return $this;
-        }
-
-        if (!$this->_model->type)
-        {
-            return $this;
-        }
-
-        if (!$type = \Yii::$app->registeredModels->getDescriptor($this->_model)->getTypes()->getComponent($this->_model->type))
-        {
-            return $this;
-        }
-
-
-        if ($layout = $type->getLayout())
-        {
-            $this->controller->layout = $layout->path;
-        }
-
-        if ($type->actionView)
-        {
-            if ($actionView = \Yii::$app->registeredModels->getDescriptor($this->_model)->getActionViews()->getComponent($type->actionView))
-            {
-                $this->view = $actionView->id;
-            }
-        }
-
-
-        return $this;
-    }
-
 
     /**
      * Установка метаданных страницы
      * @return $this
      */
-    protected function _initMetaData()
+    public function initStandartMetaData()
     {
-        $model = $this->_model;
+        $model = $this->model;
 
         if ($title = $model->meta_title)
         {
@@ -208,13 +162,5 @@ abstract class ViewModelAction extends Action
         }
 
         return $this;
-    }
-
-    /**
-     * @return null|Model
-     */
-    public function getModel()
-    {
-        return $this->_model;
     }
 }

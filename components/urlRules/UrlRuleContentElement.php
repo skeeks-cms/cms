@@ -1,26 +1,24 @@
 <?php
 /**
- * TreeUrlRule
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 09.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 24.05.2015
  */
-namespace skeeks\cms\components;
+namespace skeeks\cms\components\urlRules;
 use skeeks\cms\App;
 use skeeks\cms\filters\NormalizeDir;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /**
- * Class Storage
- * @package skeeks\cms\components
+ * Class UrlRuleContentElement
+ * @package skeeks\cms\components\urlRules
  */
-class TreeUrlRule
+class UrlRuleContentElement
     extends \yii\web\UrlRule
 {
     /**
@@ -49,7 +47,7 @@ class TreeUrlRule
      */
     public function createUrl($manager, $route, $params)
     {
-        if ($route == 'cms/tree/view')
+        if ($route == 'cms/content-element/view')
         {
             $id = (int) ArrayHelper::getValue($params, 'id');
             if (!$id)
@@ -57,23 +55,23 @@ class TreeUrlRule
                 return false;
             }
 
-            if (!$tree = ArrayHelper::getValue(self::$models, $id))
+            /**
+             * @var $contentElement CmsContentElement
+             */
+            if (!$contentElement = ArrayHelper::getValue(self::$models, $id))
             {
-                $tree = Tree::findOne(['id' => $id]);
-                self::$models[$id] = $tree;
+                $contentElement     = CmsContentElement::findOne(['id' => $id]);
+                self::$models[$id]  = $contentElement;
             }
 
-            if (!$tree)
+            if (!$contentElement)
             {
                 return false;
             }
 
-            $url = $tree->getPageUrl();
+            $url = DIRECTORY_SEPARATOR . $contentElement->id . '-' . $contentElement->code . ($this->useLastDelimetr ? DIRECTORY_SEPARATOR : "");
 
             unset($params['id']);
-            /*if ($url !== '') {
-                $url .= ($this->suffix === null ? $manager->suffix : $this->suffix);
-            }*/
 
             if (!empty($params) && ($query = http_build_query($params)) !== '') {
                 $url .= '?' . $query;
@@ -98,7 +96,7 @@ class TreeUrlRule
 
         if (!$pathInfo)
         {
-            return $this->_go();
+            return false;
         }
 
         //Если урл преобразован, редирректим по новой
@@ -108,43 +106,18 @@ class TreeUrlRule
             \Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
         }
 
-        return $this->_go($pathInfoNormal);
-    }
+        $pathInfo = "/" . $pathInfo;
 
-    protected function _go($normalizeDir = null)
-    {
-        if ($this->useLastDelimetr)
-        {
-            $normalizeDir = substr($normalizeDir, 0, (strlen($normalizeDir) - 1));
-        }
-
-        if (!$normalizeDir) //главная страница
-        {
-            $treeNode = Tree::find()->where([
-                "site_code"         => \Yii::$app->cms->site->code,
-                "level"             => 0,
-            ])->one();
-
-        } else //второстепенная страница
-        {
-            $treeNode           = Tree::find()->where([
-                (new Tree())->dirAttrName      => $normalizeDir,
-                "site_code"         => \Yii::$app->cms->site->code,
-            ])->one();
-        }
-
-        if ($treeNode)
-        {
-            \Yii::$app->cms->setCurrentTree($treeNode);
-
-            $params['id']        = $treeNode->id;
-            return ['cms/tree/view', $params];
-        } else
+        if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', $pathInfo, $matches))
         {
             return false;
         }
-    }
 
+        return ['cms/content-element/view', [
+            'id'    => $matches['id'],
+            'code'  => $matches['code']
+        ]];
+    }
 
     /**
      * Преобразование path, убираем лишние слэши, если надо добавляем последний слэш
@@ -164,4 +137,5 @@ class TreeUrlRule
             return $pathInfoNormal;
         }
     }
+
 }

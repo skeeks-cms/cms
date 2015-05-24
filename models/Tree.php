@@ -18,6 +18,7 @@ use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
@@ -67,6 +68,7 @@ use yii\db\BaseActiveRecord;
 class Tree extends Core
 {
     use TreeBehaviorTrait;
+    use HasUrlTrait;
     use HasRelatedPropertiesTrait;
     use \skeeks\cms\models\behaviors\traits\HasFiles;
 
@@ -170,14 +172,6 @@ class Tree extends Core
         ]);
     }
 
-
-    /**
-     * @return string
-     */
-    public function getAbsoluteUrl()
-    {
-        return $this->url;
-    }
 
     /**
      * @return string

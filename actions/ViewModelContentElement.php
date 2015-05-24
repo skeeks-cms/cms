@@ -1,30 +1,29 @@
 <?php
 /**
- * ViewModelActionTree
+ * ViewModelActionSeo
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
- * @date 16.01.2015
+ * @date 20.11.2014
  * @since 1.0.0
  */
 namespace skeeks\cms\actions;
 
 
-use skeeks\cms\models\Tree;
+use skeeks\cms\models\CmsContentElement;
 use Yii;
 
 /**
  * Class ViewModelActionSeo
  * @package skeeks\cms\actions
  */
-class ViewModelActionTree extends ViewModelAction
+class ViewModelContentElement extends ViewModelAction
 {
     /**
-     * @var Tree
+     * @var CmsContentElement
      */
     public $model;
-
 
     /**
      * @param $id
@@ -34,24 +33,14 @@ class ViewModelActionTree extends ViewModelAction
      */
     public function run($id)
     {
-        $this->model   = \Yii::$app->cms->getCurrentTree();
-
-        if (!$this->model)
-        {
-            $treeNode           = Tree::find()->where([
-                'id' => $id
-            ])->one();
-
-            \Yii::$app->cms->setCurrentTree($treeNode);
-            $this->model   = \Yii::$app->cms->getCurrentTree();
-        }
+        $this->model   = CmsContentElement::findOne(['id' => $id]);
 
         //Пробуем рендерить view для текущего типа страницы
         if ($this->model)
         {
-            if ($this->model->treeType)
+            if ($this->model->cmsContent)
             {
-                $this->view = $this->model->treeType->code;
+                $this->view = $this->model->cmsContent->code;
             }
         }
 
