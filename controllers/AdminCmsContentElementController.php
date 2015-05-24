@@ -51,9 +51,9 @@ class AdminCmsContentElementController extends AdminModelEditorSmartController
 
         if ($this->content)
         {
-            if ($this->content->elements_name)
+            if ($this->content->name_meny)
             {
-                $this->_label = $this->content->elements_name;
+                $this->_label = $this->content->name_meny;
             }
 
         }
