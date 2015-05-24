@@ -69,17 +69,33 @@ class UrlRuleContentElement
                 return false;
             }
 
-            $url = DIRECTORY_SEPARATOR . $contentElement->id . '-' . $contentElement->code . ($this->useLastDelimetr ? DIRECTORY_SEPARATOR : "");
+            $url = '';
 
-            unset($params['id']);
+            if ($contentElement->cmsTree)
+            {
+                $url = $contentElement->cmsTree->dir . DIRECTORY_SEPARATOR;
+            }
 
-            if (!empty($params) && ($query = http_build_query($params)) !== '') {
+            $url .= $contentElement->id . '-' . $contentElement->code . ($this->useLastDelimetr ? DIRECTORY_SEPARATOR : "");
+
+            if (isset($params['code']))
+            {
+                unset($params['code']);
+            };
+
+            if (isset($params['id']))
+            {
+                unset($params['id']);
+            };
+
+            if (!empty($params) && ($query = http_build_query($params)) !== '')
+            {
                 $url .= '?' . $query;
             }
 
             return $url;
-
         }
+
         return false;
     }
 
