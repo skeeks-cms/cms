@@ -21,6 +21,7 @@ use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasTreesTrait;
+use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\user\models\User;
@@ -59,7 +60,7 @@ use yii\web\ErrorHandler;
  * @property string $url
  *
  * @property CmsContent $cmsContent
- * @property CmsTree $tree
+ * @property CmsTree $cmsTree
 
  * @property CmsContentElementProperty[]    relatedElementProperties
  * @property CmsContentProperty[]           relatedProperties
@@ -69,6 +70,7 @@ class CmsContentElement extends RelatedElementModel
     use \skeeks\cms\models\behaviors\traits\HasFiles;
     use HasRelatedPropertiesTrait;
     use HasTreesTrait;
+    use HasUrlTrait;
 
     /**
      * @inheritdoc
@@ -188,17 +190,6 @@ class CmsContentElement extends RelatedElementModel
         return $this->cmsContent->cmsContentProperties;
     }
 
-
-
-
-
-    /**
-     * @return string
-     */
-    public function getAbsoluteUrl()
-    {
-        return $this->url;
-    }
 
     /**
      * @return string
