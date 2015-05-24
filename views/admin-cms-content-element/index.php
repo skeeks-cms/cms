@@ -88,6 +88,22 @@ if ($content_id = \Yii::$app->request->get('content_id'))
             },
             'format' => 'raw'
         ],*/
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function(\skeeks\cms\models\CmsContentElement $model)
+            {
+
+                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
+                    'target' => '_blank',
+                    'title' => 'Посмотреть на сайте (Откроется в новом окне)',
+                    'data-pjax' => '0',
+                    'class' => 'btn btn-default btn-sm'
+                ]);
+
+            },
+            'format' => 'raw'
+        ],
     ],
 ]); ?>
 
