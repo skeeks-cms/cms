@@ -3,6 +3,7 @@
 
 2.0 (unreleased)
 -----------------
+  * BreadcrumbsCmsWidget
   * В дереве показываются подсказки типов
   * Начало написания cms виджетов
   * Storage Files fix bugs
@@ -220,6 +221,7 @@
   * fixed forms
   * New form input widget yandex map
   * Correction layout admin
+
 
 1.0.0
 -----------------
