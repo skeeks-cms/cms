@@ -222,6 +222,7 @@
   * New form input widget yandex map
   * Correction layout admin
 
+
 1.0.0
 -----------------
   * сделана cms
