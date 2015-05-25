@@ -3,10 +3,10 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010 SkeekS (СкикС)
- * @date 24.03.2015
+ * @date 25.05.2015
  */
 
-namespace skeeks\cms\widgets\users\text;
+namespace skeeks\cms\cmsWidgets\text;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\helpers\UrlHelper;
@@ -15,10 +15,10 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 
 /**
- * Class TextWidget
- * @package skeeks\cms\widgets\users\text
+ * Class TextCmsWidget
+ * @package skeeks\cms\cmsWidgets\text
  */
-class TextWidget extends Widget
+class TextCmsWidget extends Widget
 {
     static public function descriptorConfig()
     {

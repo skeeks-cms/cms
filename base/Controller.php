@@ -69,6 +69,7 @@ class Controller extends YiiWebController
 
         try
         {
+            $viewApp = '';
             if (!$this->module instanceof Application)
             {
                 $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
@@ -79,7 +80,7 @@ class Controller extends YiiWebController
             }
         } catch (InvalidParamException $e)
         {
-            \Yii::warning('Шаблон не построен: ' . $view);
+            \Yii::warning('Шаблон не построен: ' . ($viewApp ? $viewApp : $view) . ' - ' . $e->getMessage());
 
             try
             {
