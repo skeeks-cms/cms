@@ -159,6 +159,7 @@ class Tree extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
+            [['description_short', 'description_full'], 'string'],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             [['redirect'], 'string'],
             [['priority', 'tree_type_id'], 'integer'],

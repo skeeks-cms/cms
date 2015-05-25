@@ -98,7 +98,6 @@ class CmsTreeType extends Core
             [['code'], 'string', 'max' => 50],
             [['active', 'index_for_search'], 'string', 'max' => 1],
             [['name_meny', 'name_one'], 'string', 'max' => 100],
-            [['active'], 'unique'],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
             ['priority', 'default', 'value'         => 500],
