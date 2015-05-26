@@ -3,6 +3,7 @@
 
 2.0 (unreleased)
 -----------------
+  * WidgetRenderable
   * BreadcrumbsCmsWidget
   * В дереве показываются подсказки типов
   * Начало написания cms виджетов

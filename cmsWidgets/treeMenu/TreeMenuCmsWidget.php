@@ -9,6 +9,7 @@
 namespace skeeks\cms\cmsWidgets\treeMenu;
 
 use skeeks\cms\base\Widget;
+use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Tree;
@@ -21,9 +22,8 @@ use yii\helpers\Json;
  * Class TreeMenuCmsWidget
  * @package skeeks\cms\cmsWidgets\treeMenu
  */
-class TreeMenuCmsWidget extends Widget
+class TreeMenuCmsWidget extends WidgetRenderable
 {
-    public $viewFile    = null;
     public $treePid     = null;
     public $active      = Cms::BOOL_Y;
     public $level       = null;
@@ -52,7 +52,6 @@ class TreeMenuCmsWidget extends Widget
     {
         return array_merge(parent::attributeLabels(),
         [
-            'viewFile'  => 'Файл-шаблон',
             'treePid'   => 'Родительский раздел',
             'active'    => 'Активность',
             'level'     => 'Уровень вложенности',
@@ -103,15 +102,7 @@ class TreeMenuCmsWidget extends Widget
             $this->activeQuery->orderBy([$this->orderBy => $this->order]);
         }
 
-        if ($this->viewFile)
-        {
-            return $this->render($this->viewFile, [
-                'widget' => $this
-            ]);
-        } else
-        {
-            return "Шаблон не найден";
-        }
+        return parent::_run();
     }
 
 }
