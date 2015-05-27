@@ -24,6 +24,12 @@ git checkout origin/release
 
 # запускаем полный процесс установки (php init help)
 php init install --autoremove --unlock
+
+# настройки подключения к базе mysql
+nano common/config/db.php
+
+# запуск миграции, и итоговой установки.
+php yii cms/update
 ~~~
 
 ### - Установка через composer (необходим доступ по ssh):
@@ -41,6 +47,12 @@ php composer.phar create-project skeeks/cms-app
 
 # запускаем полный процесс установки (php init help)
 php init install --autoremove --unlock
+
+# настройки подключения к базе mysql
+nano common/config/db.php
+
+# запуск миграции, и итоговой установки.
+php yii cms/update
 ~~~
 
 
@@ -81,4 +93,3 @@ php yii help cms/update
 php yii help cms/update/all
 php yii
 ~~~
-
