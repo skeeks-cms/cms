@@ -10,6 +10,7 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
@@ -36,6 +37,7 @@ use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\web\View;
@@ -133,16 +135,26 @@ class Cms extends \skeeks\cms\base\Component
             } else
             {
                 $serverName = \Yii::$app->getRequest()->getServerName();
-                /**
-                 * @var CmsSiteDomain $cmsDomain
-                 */
-                if ($cmsDomain = CmsSiteDomain::find()->where(['domain' => $serverName])->one())
+                try
                 {
-                    $this->_site = $cmsDomain->cmsSite;
-                } else
+                    /**
+                     * @var CmsSiteDomain $cmsDomain
+                     */
+                    if ($cmsDomain = CmsSiteDomain::find()->where(['domain' => $serverName])->one())
+                    {
+                        $this->_site = $cmsDomain->cmsSite;
+                    } else
+                    {
+                        $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
+                    }
+                } catch (Exception $e)
                 {
-                    $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
+                    if ($e->getCode() == 1045)
+                    {
+                        throw new NotConnectedToDbException;
+                    }
                 }
+
             }
         }
 

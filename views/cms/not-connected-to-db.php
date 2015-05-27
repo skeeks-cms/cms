@@ -105,7 +105,22 @@ JS
                 <div class="panel-content">
 
                     <div class="sx-act sx-act-reset-password">
-                        <?= $message; ?>
+                        Нет подключения к базе данных
+                        <? $connectToDbForm = new \skeeks\cms\models\forms\ConnectToDbForm(); ?>
+                        <? $form = ActiveForm::begin(); ?>
+                            <?= $form->field($connectToDbForm, 'host')->textInput(); ?>
+                            <?= $form->field($connectToDbForm, 'dbname')->textInput(); ?>
+                            <?= $form->field($connectToDbForm, 'username')->textInput(); ?>
+                            <?= $form->field($connectToDbForm, 'password')->passwordInput(); ?>
+                            <?= $form->field($connectToDbForm, 'charset')->textInput(); ?>
+                            <?= $form->fieldRadioListBoolean($connectToDbForm, 'enableSchemaCache'); ?>
+                            <?= $form->fieldInputInt($connectToDbForm, 'schemaCacheDuration'); ?>
+                            <div class="form-group sx-buttons-standart">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="glyphicon glyphicon-save"></i> Сохранить и продолжить
+                                </button>
+                            </div>
+                        <? ActiveForm::end(); ?>
                     </div>
 
                 </div>

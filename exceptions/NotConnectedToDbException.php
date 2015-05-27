@@ -10,8 +10,8 @@ namespace skeeks\cms\exceptions;
 use yii\base\UserException;
 
 /**
- * Class NotFoundDb
+ * Class NotConnectedToDbException
  * @package skeeks\cms\exceptions
  */
-class NotFoundDb extends UserException
+class NotConnectedToDbException extends UserException
 {}

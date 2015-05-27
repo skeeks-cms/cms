@@ -55,6 +55,6 @@ $config->appendDependency(YII_ENV);
 $config->appendDependency(PHP_VERSION); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(filemtime(COMMON_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(filemtime(APP_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
-$config->appendDependency(APP_DIR); //кэш будет сбрасываться при редактировании файла с общим конфигом
+$config->appendDependency(filemtime(COMMON_CONFIG_DIR . '/db.php')); //кэш будет сбрасываться при включении и отключении модульных конфигов
 //$config->appendDependency((int) ENABLE_MODULES_CONF); //кэш будет сбрасываться при включении и отключении модульных конфигов
 return $config;

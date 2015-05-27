@@ -12,7 +12,7 @@ namespace skeeks\cms\actions;
 
 
 use skeeks\cms\App;
-use skeeks\cms\exceptions\NotFoundDb;
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use Yii;
 use yii\base\Action;
 use yii\base\Exception;
@@ -45,7 +45,7 @@ class ErrorAction extends \yii\web\ErrorAction
             $code = $exception->getCode();
         }
 
-        if ($exception instanceof NotFoundDb)
+        if ($exception instanceof NotConnectedToDbException)
         {
             return \Yii::$app->response->redirect(Url::toRoute('cms/install'));
         }

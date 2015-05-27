@@ -7,9 +7,11 @@
  */
 namespace skeeks\cms\components\urlRules;
 use skeeks\cms\App;
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\filters\NormalizeDir;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
@@ -115,19 +117,29 @@ class UrlRuleTree
             $normalizeDir = substr($normalizeDir, 0, (strlen($normalizeDir) - 1));
         }
 
-        if (!$normalizeDir) //главная страница
-        {
-            $treeNode = Tree::find()->where([
-                "site_code"         => \Yii::$app->cms->site->code,
-                "level"             => 0,
-            ])->one();
 
-        } else //второстепенная страница
+        try
         {
-            $treeNode           = Tree::find()->where([
-                (new Tree())->dirAttrName      => $normalizeDir,
-                "site_code"         => \Yii::$app->cms->site->code,
-            ])->one();
+            if (!$normalizeDir) //главная страница
+            {
+                $treeNode = Tree::find()->where([
+                    "site_code"         => \Yii::$app->cms->site->code,
+                    "level"             => 0,
+                ])->one();
+
+            } else //второстепенная страница
+            {
+                $treeNode           = Tree::find()->where([
+                    (new Tree())->dirAttrName      => $normalizeDir,
+                    "site_code"         => \Yii::$app->cms->site->code,
+                ])->one();
+            }
+        } catch (Exception $e)
+        {
+            if ($e->getCode() == 1045)
+            {
+                throw new NotConnectedToDbException;
+            }
         }
 
         if ($treeNode)
