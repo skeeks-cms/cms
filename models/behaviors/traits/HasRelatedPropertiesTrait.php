@@ -23,6 +23,7 @@ use yii\db\ActiveRecord;
  *
  * @property RelatedElementPropertyModel[]    relatedElementProperties
  * @property RelatedPropertyModel[]           relatedProperties
+ * @property RelatedPropertiesModel           relatedPropertiesModel
  */
 trait HasRelatedPropertiesTrait
 {}

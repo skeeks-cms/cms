@@ -60,7 +60,7 @@ use yii\web\ErrorHandler;
  * @property string $url
  *
  * @property CmsContent $cmsContent
- * @property CmsTree $cmsTree
+ * @property Tree $cmsTree
 
  * @property CmsContentElementProperty[]    relatedElementProperties
  * @property CmsContentProperty[]           relatedProperties
