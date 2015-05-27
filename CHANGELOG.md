@@ -3,6 +3,7 @@
 
 2.0 (unreleased)
 -----------------
+  * СontentElementsCmsWidget
   * WidgetRenderable
   * BreadcrumbsCmsWidget
   * В дереве показываются подсказки типов
