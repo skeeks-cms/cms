@@ -13,6 +13,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\App;
 use skeeks\cms\base\Controller;
+use yii\db\Exception;
 
 /**
  * Class CmsController
@@ -32,9 +33,25 @@ class CmsController extends Controller
 
     public function actionInstall()
     {
+        \Yii::$app->cmsToolbar->enabled = false;
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
+        try
+        {
+            \Yii::$app->db->open();
+        } catch (Exception $e)
+        {
+            if ($e->getCode() == 1045)
+            {
+                return $this->render('not-connected-to-db', [
+                ]);
+            }
+        }
+
         return $this->render('install', [
+            'message' => $message
         ]);
     }
+
+
 }

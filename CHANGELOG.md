@@ -3,6 +3,8 @@
 
 2.0 (unreleased)
 -----------------
+  * Обновлен процесс уставноки
+  * Обновлен гайд по установке
   * СontentElementsCmsWidget
   * WidgetRenderable
   * BreadcrumbsCmsWidget
