@@ -31,6 +31,22 @@ class ConnectToDbForm extends Model
     public $schemaCacheDuration = 3600; //1 час
 
     /**
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        return [
+            'host'                  => 'Хост',
+            'dbname'                => 'Имя базы данных',
+            'username'              => 'Пользователь',
+            'password'              => 'Пароль',
+            'charset'               => 'Кодировка',
+            'enableSchemaCache'     => 'Включить кэширование схемы',
+            'schemaCacheDuration'   => 'Время кэша структуры (сек)',
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
