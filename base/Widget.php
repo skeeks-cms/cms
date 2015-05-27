@@ -54,8 +54,11 @@ JS
                 'data' =>
                 [
                     'id' => $this->getId(),
-                    'config-url' => UrlHelper::construct('cms/admin-infoblock/config', [
-                            'id' => $this->getId()]
+                    'config-url' => UrlHelper::construct('cms/admin-component-settings/index', [
+                            'id'                    => $this->getId(),
+                            'componentClassName'    => $this->className(),
+                            'attributes'            => $this->attributes
+                        ]
                         )->enableAdmin()
                         ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                 ]
