@@ -65,7 +65,7 @@ class UrlRuleTree
                 return false;
             }
 
-            $url = $tree->getPageUrl();
+            $url = $tree->url;
 
             unset($params['id']);
             /*if ($url !== '') {

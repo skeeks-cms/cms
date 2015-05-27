@@ -61,10 +61,6 @@ class User
 {
     use behaviors\traits\HasFiles;
 
-    const STATUS_DELETED = 0;
-    const STATUS_ACTIVE = 10;
-
-
     /**
      * @inheritdoc
      */
@@ -260,7 +256,7 @@ class User
             ['active', 'default', 'value' => Cms::BOOL_Y],
 
             [['username', 'auth_key', 'password_hash'], 'required'],
-            [['status', 'created_at', 'updated_at', 'group_id'], 'integer'],
+            [['created_at', 'updated_at', 'group_id'], 'integer'],
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
@@ -503,7 +499,7 @@ class User
 
         return static::findOne([
             'password_reset_token' => $token,
-            'status' => self::STATUS_ACTIVE,
+            'active' => Cms::BOOL_Y,
         ]);
     }
 
