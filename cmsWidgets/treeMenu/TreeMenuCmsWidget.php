@@ -28,10 +28,12 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public $active      = Cms::BOOL_Y;
     public $level       = null;
     public $label       = null;
-    public $site        = null;
+    public $site_codes  = [];
 
-    public $orderBy     = "priority";
-    public $order       = SORT_DESC;
+    public $orderBy                     = "priority";
+    public $order                       = SORT_DESC;
+
+    public $enabledCurrentTree          = Cms::BOOL_Y;
 
 
     /**
@@ -52,13 +54,14 @@ class TreeMenuCmsWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
         [
-            'treePid'   => 'Родительский раздел',
-            'active'    => 'Активность',
-            'level'     => 'Уровень вложенности',
-            'label'     => 'Заголовок',
-            'site'      => 'Разделы привязанные к сайту',
-            'orderBy'   => 'По какому параметру сортировать',
-            'order'     => 'Направление сортировки',
+            'treePid'               => 'Родительский раздел',
+            'active'                => 'Активность',
+            'level'                 => 'Уровень вложенности',
+            'label'                 => 'Заголовок',
+            'site_codes'            => 'Разделы привязанные к сайтам',
+            'orderBy'               => 'По какому параметру сортировать',
+            'order'                 => 'Направление сортировки',
+            'enabledCurrentTree'    => 'Учитывать текущий сайт',
         ]);
     }
 
@@ -67,9 +70,10 @@ class TreeMenuCmsWidget extends WidgetRenderable
         return ArrayHelper::merge(parent::rules(),
         [
             ['text', 'string'],
-            [['viewFile', 'label', 'active', 'site', 'orderBy'], 'string'],
+            [['viewFile', 'label', 'active', 'orderBy', 'enabledCurrentTree'], 'string'],
             [['treePid', 'level'], 'integer'],
             [['order'], 'integer'],
+            [['site_codes'], 'safe'],
         ]);
     }
 
@@ -92,9 +96,14 @@ class TreeMenuCmsWidget extends WidgetRenderable
             $this->activeQuery->andWhere(['active' => $this->active]);
         }
 
-        if ($this->site)
+        if ($this->site_codes)
         {
-            $this->activeQuery->andWhere(['site_code' => $this->site]);
+            $this->activeQuery->andWhere(['site_code' => $this->site_codes]);
+        }
+
+        if ($this->enabledCurrentTree == Cms::BOOL_Y && $currentSite = \Yii::$app->cms->site)
+        {
+            $this->activeQuery->andWhere(['site_code' => $currentSite->code]);
         }
 
         if ($this->orderBy)
