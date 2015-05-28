@@ -86,6 +86,16 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
         }
 
+        if (!$this->enabled)
+        {
+            return;
+        }
+
+        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
+        {
+            $this->enabled = false;
+        }
+
     }
 
     public function rules()
@@ -168,11 +178,6 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public function renderToolbar($event)
     {
         if (!$this->enabled)
-        {
-            return;
-        }
-
-        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
         {
             return;
         }

@@ -52,7 +52,7 @@ abstract class Widget extends Component implements ViewContextInterface
             $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
         }
 
-        if (\Yii::$app->cmsToolbar->isEditMode())
+        if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
         {
             $pre = Html::tag('pre', Json::encode($this->attributes), [
                 'style' => 'display: none;'

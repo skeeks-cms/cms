@@ -44,6 +44,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         <?= $form->field($model, 'label')->textInput(); ?>
     <?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet('Настройки кэширования'); ?>
+        <?= $form->fieldRadioListBoolean($model, 'enabledRunCache', \Yii::$app->cms->booleanFormat()); ?>
+        <?= $form->fieldInputInt($model, 'runCacheDuration'); ?>
+    <?= $form->fieldSetEnd(); ?>
+
 
 
 <?= $form->buttonsStandart($model) ?>

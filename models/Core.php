@@ -11,6 +11,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\User;
 use Yii;
 
@@ -18,6 +19,8 @@ use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
 
 /**
+ * @method string getTableCacheTag()
+ *
  * @property integer $created_by
  * @property integer $updated_by
  * @property integer $created_at
@@ -59,6 +62,12 @@ abstract class Core extends ActiveRecord
                 {
                     return date('U');
                 },*/
+            ],
+
+            HasTableCache::className() =>
+            [
+                'class' => HasTableCache::className(),
+                'cache' => \Yii::$app->cache
             ]
         ]);
     }
