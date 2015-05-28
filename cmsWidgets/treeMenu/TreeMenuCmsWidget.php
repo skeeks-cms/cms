@@ -90,12 +90,13 @@ class TreeMenuCmsWidget extends WidgetRenderable
         $dependency = new TagDependency([
             'tags'      =>
             [
-                (new Tree())->getTableCacheTag()
+                $this->className() . (string) $this->namespace,
+                (new Tree())->getTableCacheTag(),
             ],
         ]);
 
         $result = \Yii::$app->cache->get($key);
-        if ($result === false && $this->enabledRunCache == Cms::BOOL_N)
+        if ($result === false || $this->enabledRunCache == Cms::BOOL_N)
         {
             $this->activeQuery = Tree::find();
 

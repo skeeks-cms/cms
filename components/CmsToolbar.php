@@ -86,8 +86,9 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
         }
 
-        if (!$this->enabled)
+        if (!$this->enabled || \Yii::$app->user->isGuest)
         {
+            $this->enabled = false;
             return;
         }
 
