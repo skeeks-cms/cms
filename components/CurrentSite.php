@@ -24,6 +24,7 @@ class CurrentSite extends Component
      */
     protected $_site = null;
 
+    private $_serverName = null;
     /**
      * @return CmsSite
      */
@@ -36,7 +37,7 @@ class CurrentSite extends Component
                 $this->_site = CmsSite::find()->active()->andWhere(['def' => Cms::BOOL_Y])->one();
             } else
             {
-                $serverName = \Yii::$app->getRequest()->getServerName();
+                $this->_serverName = \Yii::$app->getRequest()->getServerName();
                 try
                 {
                     $dependencySiteDomain = new TagDependency([
@@ -48,7 +49,7 @@ class CurrentSite extends Component
 
 
                     $cmsDomain = CmsSiteDomain::getDb()->cache(function ($db) {
-                        return CmsSiteDomain::find()->where(['domain' => $serverName])->one();
+                        return CmsSiteDomain::find()->where(['domain' => $this->_serverName])->one();
                     }, null, $dependencySiteDomain);
 
                     /**
