@@ -15,6 +15,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
@@ -102,6 +103,12 @@ class Tree extends Core
             'class'                             => HasRelatedProperties::className(),
             'relatedElementPropertyClassName'   => CmsTreeProperty::className(),
             'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
+        ];
+
+        $result[HasTableCache::className()] =
+        [
+            'class' => HasTableCache::className(),
+            'cache' => \Yii::$app->cache
         ];
 
         return $result;
@@ -239,11 +246,12 @@ class Tree extends Core
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return CmsSite
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        //return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return CmsSite::getByCode($this->site_code);
     }
 
     /**
