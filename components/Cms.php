@@ -116,55 +116,15 @@ class Cms extends \skeeks\cms\base\Component
         ]
     ];
 
-
-    /**
-     * @var CmsSite
-     */
-    protected $_site = null;
-
     /**
      * @return CmsSite
      */
     public function getSite()
     {
-        if ($this->_site === null)
-        {
-            if (\Yii::$app instanceof \yii\console\Application)
-            {
-                $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
-            } else
-            {
-                $serverName = \Yii::$app->getRequest()->getServerName();
-                try
-                {
-                    /**
-                     * @var CmsSiteDomain $cmsDomain
-                     */
-                    if ($cmsDomain = CmsSiteDomain::find()->where(['domain' => $serverName])->one())
-                    {
-                        $this->_site = $cmsDomain->cmsSite;
-                    } else
-                    {
-                        $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
-                    }
-                } catch (Exception $e)
-                {
-                    if ($e->getCode() == 1045)
-                    {
-                        throw new NotConnectedToDbException;
-                    }
-                }
-
-            }
-        }
-
-        return $this->_site;
+        return \Yii::$app->currentSite->site;
     }
 
-
-
     private static $_huck = 'Z2VuZXJhdG9y';
-
 
 
     public function init()

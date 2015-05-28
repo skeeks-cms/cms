@@ -23,13 +23,30 @@ abstract class Widget extends Component implements ViewContextInterface
     use WidgetTrait;
 
     /**
+     * @var string
+     */
+    protected $_token;
+
+    public function init()
+    {
+        $this->_token = 'Виджет: ' . $this->id;
+
+        \Yii::beginProfile("Init: " . $this->_token);
+            $this->initSettings();
+        \Yii::endProfile("Init: " . $this->_token);
+    }
+
+    /**
      * @return string
      */
     public function run()
     {
         try
         {
-            $content = $this->_run();
+            \Yii::beginProfile("Run: " . $this->_token);
+                $content = $this->_run();
+            \Yii::endProfile("Run: " . $this->_token);
+
         } catch (\Exception $e)
         {
             $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
@@ -54,13 +71,7 @@ JS
                 'data' =>
                 [
                     'id' => $this->getId(),
-                    'config-url' => UrlHelper::construct('cms/admin-component-settings/index', [
-                            'id'                    => $this->getId(),
-                            'componentClassName'    => $this->className(),
-                            'attributes'            => $this->attributes
-                        ]
-                        )->enableAdmin()
-                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                    'config-url' => $this->getEditUrl()
                 ]
             ]);
         }

@@ -27,8 +27,8 @@ class AdminComponentSettingsController extends AdminController
 
     public function actionIndex()
     {
-        $componentClassName = \Yii::$app->request->get('componentClassName');
-        $attributes               = \Yii::$app->request->get('attributes');
+        $componentClassName         = \Yii::$app->request->get('componentClassName');
+        $attributes                 = \Yii::$app->request->get('attributes');
 
         $component = new $componentClassName($attributes);
         if ($component && $component instanceof Component)
