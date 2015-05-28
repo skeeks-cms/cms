@@ -139,6 +139,11 @@ $config =
         'breadcrumbs' =>
         [
             'class' => '\skeeks\cms\components\Breadcrumbs',
+        ],
+
+        'currentSite' =>
+        [
+            'class' => '\skeeks\cms\components\CurrentSite',
         ]
     ],
 

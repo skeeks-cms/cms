@@ -67,8 +67,8 @@ class TreeMenuCmsWidget extends WidgetRenderable
         return ArrayHelper::merge(parent::rules(),
         [
             ['text', 'string'],
-            [['viewFile', 'label', 'site', 'orderBy'], 'string'],
-            [['treePid', 'active', 'level'], 'integer'],
+            [['viewFile', 'label', 'active', 'site', 'orderBy'], 'string'],
+            [['treePid', 'level'], 'integer'],
             [['order'], 'integer'],
         ]);
     }
@@ -99,7 +99,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
 
         if ($this->orderBy)
         {
-            $this->activeQuery->orderBy([$this->orderBy => $this->order]);
+            $this->activeQuery->orderBy([$this->orderBy => (int) $this->order]);
         }
 
         return parent::_run();
