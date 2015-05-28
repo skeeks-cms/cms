@@ -11,6 +11,7 @@ use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\filters\NormalizeDir;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
+use yii\caching\TagDependency;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -120,18 +121,41 @@ class UrlRuleTree
 
         try
         {
+            $dependency = new TagDependency([
+                'tags'      =>
+                [
+                    (new Tree())->getTableCacheTag(),
+                ],
+            ]);
+
+
             if (!$normalizeDir) //главная страница
             {
-                $treeNode = Tree::find()->where([
+                $treeNode = Tree::getDb()->cache(function ($db) {
+                    return Tree::find()->where([
+                        "site_code"         => \Yii::$app->cms->site->code,
+                        "level"             => 0,
+                    ])->one();
+                }, null, $dependency);
+
+                /*$treeNode = Tree::find()->where([
                     "site_code"         => \Yii::$app->cms->site->code,
                     "level"             => 0,
-                ])->one();
+                ])->one();*/
+
 
             } else //второстепенная страница
             {
-                $treeNode           = Tree::find()->where([
-                    (new Tree())->dirAttrName      => $normalizeDir,
-                    "site_code"         => \Yii::$app->cms->site->code,
+                /*$treeNode = Tree::getDb()->cache(function ($db) {
+                    return Tree::find()->where([
+                        (new Tree())->dirAttrName       => $normalizeDir,
+                        "site_code"                     => \Yii::$app->cms->site->code,
+                    ])->one();
+                }, null, $dependency);*/
+
+                $treeNode = Tree::find()->where([
+                    (new Tree())->dirAttrName       => $normalizeDir,
+                    "site_code"                     => \Yii::$app->cms->site->code,
                 ])->one();
             }
         } catch (Exception $e)
