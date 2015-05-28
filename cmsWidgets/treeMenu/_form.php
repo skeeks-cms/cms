@@ -14,9 +14,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldSetEnd(); ?>
 
     <?= $form->fieldSet('Фильтрация'); ?>
+        <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTree', \Yii::$app->cms->booleanFormat())
+            ->hint('Если будет выбрано "да", то в выборку разделов добавиться условие фильтрации, разделов сайта, где вызван компонент'); ?>
         <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldInputInt($model, 'level'); ?>
-        <?= $form->fieldSelect($model, 'site', \yii\helpers\ArrayHelper::map(
+        <?= $form->fieldSelectMulti($model, 'site_codes', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\CmsSite::find()->active()->all(),
             'code',
             'name'

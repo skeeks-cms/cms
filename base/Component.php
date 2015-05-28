@@ -11,6 +11,8 @@ use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
+use yii\caching\TagDependency;
+
 /**
  * Class Component
  * @package skeeks\cms\base
@@ -56,27 +58,53 @@ abstract class Component extends Model
         return $this;
     }
 
+    public function getCacheKey()
+    {
+        return implode([
+            $this->className(),
+            $this->namespace,
+            \Yii::$app->currentSite->site->code,
+            \Yii::$app->user->getId()
+        ]);
+    }
+
     /**
      * @return array
      */
     public function getSettings()
     {
-        $settingsValues = $this->fetchDefaultSettings();
+        $key = $this->getCacheKey();
 
-        //Настройки для текущего сайта
-        if ($site = \Yii::$app->currentSite->site)
-        {
-            $settingsValues = array_merge($settingsValues,
-                $this->fetchDefaultSettingsBySite($site->code)
-            );
-        }
+        $dependency = new TagDependency([
+            'tags'      =>
+            [
+                $this->className(),
+                $this->className() . (string) $this->namespace
+            ],
+        ]);
 
-        //Настройки для текущего пользователя
-        if (!\Yii::$app->user->isGuest)
-        {
-            $settingsValues = array_merge($settingsValues,
-                $this->fetchDefaultSettingsByUser(\Yii::$app->user->identity->getId())
-            );
+        $settingsValues = \Yii::$app->cache->get($key);
+        if ($settingsValues === false) {
+
+            $settingsValues = $this->fetchDefaultSettings();
+
+            //Настройки для текущего сайта
+            if ($site = \Yii::$app->currentSite->site)
+            {
+                $settingsValues = array_merge($settingsValues,
+                    $this->fetchDefaultSettingsBySite($site->code)
+                );
+            }
+
+            //Настройки для текущего пользователя
+            if (!\Yii::$app->user->isGuest)
+            {
+                $settingsValues = array_merge($settingsValues,
+                    $this->fetchDefaultSettingsByUser(\Yii::$app->user->identity->getId())
+                );
+            }
+
+            \Yii::$app->cache->set($key, $settingsValues, 0, $dependency);
         }
 
         return $settingsValues;
@@ -90,6 +118,11 @@ abstract class Component extends Model
     {
         $settings           = CmsComponentSettings::createByComponent($this);
         $settings->value    = $this->attributes;
+
+        //\Yii::$app->cache->delete($this->getCacheKey());
+        TagDependency::invalidate(\Yii::$app->cache, [
+            $this->className() . (string) $this->namespace
+        ]);
 
         return $settings->save();
     }
