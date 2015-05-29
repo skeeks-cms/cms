@@ -106,7 +106,8 @@ return
     'cmsContentElement'   =>
     [
         'modelClass'    => 'skeeks\cms\models\CmsContentElement',
-        'name'          => 'Элемент контента'
+        'name'          => 'Элемент контента',
+        'adminControllerRoute'          => 'cms/admin-cms-content-element',
     ],
 
 
