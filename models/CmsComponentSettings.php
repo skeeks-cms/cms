@@ -127,13 +127,45 @@ class CmsComponentSettings extends Core
         return $query;
     }
 
+
+    /**
+     * @param Component $component
+     * @return \yii\db\ActiveQuery
+     */
+    static public function baseQuerySites($component)
+    {
+        $query = static::baseQuery($component)->andWhere([
+            'or',
+            ['!=', 'site_code', ""],
+            ['not', ['site_code' => null]],
+        ]);
+
+        return $query;
+    }
+
+    /**
+     * @param Component $component
+     * @return \yii\db\ActiveQuery
+     */
+    static public function baseQueryUsers($component)
+    {
+        $query = static::baseQuery($component)->andWhere([
+            'or',
+            ['!=', 'user_id', ""],
+            ['not', ['user_id' => null]],
+        ]);
+
+        return $query;
+    }
+
+
     /**
      * @param Component $component
      * @return static
      */
-    static public function createByComponent($component)
+    static public function createByComponentDefault($component)
     {
-        $settings      = static::fetchByComponent($component);
+        $settings      = static::fetchByComponentDefault($component);
 
         if (!$settings)
         {
@@ -153,21 +185,97 @@ class CmsComponentSettings extends Core
     }
 
     /**
+     * @param Component $component
+     * @param int $user_id
+     * @return static
+     */
+    static public function createByComponentUserId($component, $user_id)
+    {
+        $settings      = static::fetchByComponentUserId($component, $user_id);
+
+        if (!$settings)
+        {
+            $settings = new static([
+                'component' => $component->className(),
+                'user_id'   => $user_id
+            ]);
+
+            if ($component->namespace)
+            {
+                $settings->namespace = $component->namespace;
+            }
+
+            $settings->save();
+        }
+
+        return $settings;
+    }
+
+    /**
+     * @param Component $component
+     * @param string $site_code
+     * @return static
+     */
+    static public function createByComponentSiteCode($component, $site_code)
+    {
+        $settings      = static::fetchByComponentSiteCode($component, $site_code);
+
+        if (!$settings)
+        {
+            $settings = new static([
+                'component'     => $component->className(),
+                'site_code'     => $site_code
+            ]);
+
+            if ($component->namespace)
+            {
+                $settings->namespace = $component->namespace;
+            }
+
+            $settings->save();
+        }
+
+        return $settings;
+    }
+
+
+
+
+
+
+    /**
      * Получение настроек для компонента
      *
      * @param Component $component
      * @return static
      */
-    static public function fetchByComponent($component)
+    static public function fetchByComponentDefault($component)
     {
-        return static::baseQuery($component)->one();
+        return static::baseQuery($component)
+            ->andWhere([
+                'or',
+                ['site_code' => ""],
+                ['site_code' => null],
+            ])
+            ->andWhere([
+                'or',
+                ['lang_code' => ""],
+                ['lang_code' => null],
+            ])
+            ->andWhere([
+                'or',
+                ['user_id' => ""],
+                ['user_id' => null],
+            ])->one()
+        ;
     }
+
 
     /**
      * Получение настроек для компонента, и пользователя.
      *
-     * @param Component $component
-     * @param int $user_id
+     * @param Component $component  компонент с настройками
+     * @param int $user_id          id пользователя
      * @return static
      */
     static public function fetchByComponentUserId($component, $user_id)
@@ -176,14 +284,46 @@ class CmsComponentSettings extends Core
     }
 
     /**
-     * Получение настроек для компонента, и сайта.
+     * Получение настроек для компонента по коду сайта.
      *
-     * @param Component $component
-     * @param string $site_code
+     * @param Component $component  компонент с настройками
+     * @param string $site_code     код сайта
      * @return static
      */
     static public function fetchByComponentSiteCode($component, $site_code)
     {
         return static::baseQuery($component)->andWhere(['site_code' => (string) $site_code])->one();
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Получение настроек для компонента по коду сайта.
+     *
+     * @param Component $component компонент с настройками
+     * @param CmsSite $site код сайта
+     * @return static
+     */
+    static public function fetchByComponentSite($component, $site)
+    {
+        return static::fetchByComponentSiteCode($component, $site->code);
+    }
+
+    /**
+     * Получение настроек для компонента по коду сайта.
+     *
+     * @param Component $component компонент с настройками
+     * @param User $site код сайта
+     * @return static
+     */
+    static public function fetchByComponentUser($component, $user)
+    {
+        return static::fetchByComponentUserId($component, $user->id);
     }
 }
