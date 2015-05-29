@@ -1,19 +1,12 @@
 <?php
 /**
- * Это самый базовый контроллер админки, все контроллеры, сторонних модулей и приложения, должны быть дочерними от этого контроллера.
- *
- * 1) Закрываем путь всем неавторизованным пользователям
- * 2) Определяем layout админки
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 28.10.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 29.05.2015
  */
 namespace skeeks\cms\modules\admin\controllers;
 
-use skeeks\cms\App;
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
@@ -39,7 +32,9 @@ use yii\web\ForbiddenHttpException;
  */
 abstract class AdminController extends Controller
 {
-    public $beforeRender = null;
+    public $beforeRender    = null;
+
+    public $name           = 'Название контроллера';
 
     const BEHAVIOR_ACTION_MANAGER = "actionManager";
     /**
@@ -51,12 +46,6 @@ abstract class AdminController extends Controller
     {
         return
         [
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                'class'     => ActionManager::className(),
-                'actions'   => [],
-            ],
-
             'access' =>
             [
                 'class'         => AccessControl::className(),
@@ -70,6 +59,12 @@ abstract class AdminController extends Controller
                     ],
                 ],
             ],
+
+            self::BEHAVIOR_ACTION_MANAGER =>
+            [
+                'class'     => ActionManager::className(),
+                'actions'   => [],
+            ],
         ];
     }
 
@@ -77,33 +72,11 @@ abstract class AdminController extends Controller
     {
         parent::init();
 
-        $this->_ensure();
         $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
+
         $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
         $this->on(self::EVENT_AFTER_ACTION, [$this, "_afterAction"]);
     }
-
-
-    /*public function output($output)
-    {
-        return parent::render('@skeeks/cms/modules/admin/views/base-actions/_base-admin-actions', [
-            'content' => $output,
-        ]);
-    }
-
-    /**
-     * @param string $view
-     * @param array $params
-     * @return string
-     *
-    public function render($view, $params = [])
-    {
-        return parent::render('@skeeks/cms/modules/admin/views/base-actions/_base-admin-actions', [
-            'viewF' => $view,
-            'paramsFile' => $params,
-            'contextFile' => $this,
-        ]);
-    }*/
 
 
     /**
@@ -113,12 +86,6 @@ abstract class AdminController extends Controller
     {
         return $this->_label;
     }
-    /**
-     * Проверка целостности данных для работы контроллера
-     */
-    protected function _ensure()
-    {}
-
 
     /**
      * @return ActionManager
@@ -256,33 +223,4 @@ abstract class AdminController extends Controller
     }
 
 
-
-    /**
-     * @param Model $model
-     * @return $this
-     */
-    protected function _setLangAndSite(Model $model)
-    {
-        try
-        {
-            if ($site = \Yii::$app->cms->moduleAdmin()->getCurrentSite())
-            {
-                $model->setCurrentSite($site);
-            } else
-            {
-                $model->setCurrentSite(null);
-            }
-
-            if ($lang = \Yii::$app->cms->moduleAdmin()->getCurrentLang())
-            {
-                $model->setCurrentLang($lang);
-            } else
-            {
-                $model->setCurrentLang(null);
-            }
-        } catch (\Exception $e)
-        {}
-
-        return $this;
-    }
 }

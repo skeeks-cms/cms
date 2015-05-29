@@ -142,6 +142,22 @@ class AdminModelEditorController extends AdminController
     }
 
     /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return
+        [
+            'view' =>
+            [
+                'class'     => 'skeeks\cms\actions\ViewModelActionTree',
+                'view'      => 'default',
+                'callback'  =>  [$this, 'viewTree']
+            ],
+        ];
+    }
+
+    /**
      * @param ActionEvent $e
      */
     protected function _beforeAction(ActionEvent $e)
@@ -169,6 +185,8 @@ class AdminModelEditorController extends AdminController
     public function init()
     {
         parent::init();
+
+        $this->_ensure();
     }
 
     /**
@@ -185,8 +203,6 @@ class AdminModelEditorController extends AdminController
      */
     protected function _ensure()
     {
-        parent::_ensure();
-
         if ($this->_modelClassName === null)
         {
             throw new InvalidConfigException("Для AdminEntityEditor необходимо указать класс модели");
@@ -282,7 +298,6 @@ class AdminModelEditorController extends AdminController
         //    return $this;
         //}
 
-        $this->_setLangAndSite($this->_currentModel);
 
         return $this;
     }
@@ -311,8 +326,6 @@ class AdminModelEditorController extends AdminController
     {
         $modelClass = $this->_modelClassName;
         $model = new $modelClass();
-
-        $this->_setLangAndSite($model);
 
         return $model;
     }
