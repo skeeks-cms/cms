@@ -100,19 +100,19 @@ class HasRelatedProperties extends ActiveRecord
     /**
      * @var RelatedPropertiesModel
      */
-    public $relatedPropertiesModel = null;
+    public $_relatedPropertiesModel = null;
 
     /**
      * @return RelatedPropertiesModel
      */
     public function getRelatedPropertiesModel()
     {
-        if ($this->relatedPropertiesModel === null)
+        if ($this->_relatedPropertiesModel === null)
         {
-            $this->relatedPropertiesModel = $this->createRelatedPropertiesModel();
+            $this->_relatedPropertiesModel = $this->createRelatedPropertiesModel();
         }
 
-        return $this->relatedPropertiesModel;
+        return $this->_relatedPropertiesModel;
     }
 
 

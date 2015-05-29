@@ -72,11 +72,11 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
 
-            [
+            /*[
                 "label"     => "Инфоблоки",
                 "url"       => ["cms/admin-infoblock"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
-            ],
+            ],*/
 
         ]
     ],
@@ -111,6 +111,12 @@ return
                 "label"     => "Сервера файлового хранилища",
                 "url"       => ["cms/admin-storage/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
+            ],
+
+            [
+                "label"     => "Настройки разделов",
+                "url"       => ["cms/admin-cms-tree-type"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
             ],
 
             [

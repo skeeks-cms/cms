@@ -34,16 +34,12 @@ use common\models\User;
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'index_element'); ?>
-    <?= $form->fieldRadioListBoolean($model, 'index_tree'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Подписи'); ?>
-    <?= $form->field($model, 'trees_name')->textInput(); ?>
-    <?= $form->field($model, 'tree_name')->textInput(); ?>
-
-    <?= $form->field($model, 'elements_name')->textInput(); ?>
-    <?= $form->field($model, 'element_name')->textInput(); ?>
+    <?= $form->field($model, 'name_one')->textInput(); ?>
+    <?= $form->field($model, 'name_meny')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>

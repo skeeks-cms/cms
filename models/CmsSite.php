@@ -9,7 +9,6 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
-use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
@@ -21,6 +20,7 @@ use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\base\Event;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_site}}".
@@ -137,6 +137,22 @@ class CmsSite extends Core
         ]);
     }
 
+    static public $sites = [];
+
+    /**
+     * @param (string) $code
+     * @return static
+     */
+    static public function getByCode($code)
+    {
+        if (!array_key_exists($code, static::$sites))
+        {
+            static::$sites[$code] = static::find()->where(['code' => (string) $code])->active()->one();
+        }
+
+        return static::$sites[$code];
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -160,6 +176,7 @@ class CmsSite extends Core
     {
         return $this->hasMany(CmsTree::className(), ['site_code' => 'code']);
     }
+
 
     /**
      * @return string

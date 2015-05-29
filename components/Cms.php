@@ -10,6 +10,7 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
@@ -36,6 +37,7 @@ use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\web\View;
@@ -97,45 +99,32 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userPropertyTypes       = [];
 
+    /**
+     * @var string шаблон
+     */
+    public $template        = "default";
 
     /**
-     * @var CmsSite
+     * @var array Возможные шаблоны сайта
      */
-    protected $_site = null;
+    public $templates       =
+    [
+        [
+            'name'      => 'Шаблон по умолчанию',
+            'code'      => 'default',
+            'path'      => '@app/templates/default',
+        ]
+    ];
 
     /**
      * @return CmsSite
      */
     public function getSite()
     {
-        if ($this->_site === null)
-        {
-            if (\Yii::$app instanceof \yii\console\Application)
-            {
-                $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
-            } else
-            {
-                $serverName = \Yii::$app->getRequest()->getServerName();
-                /**
-                 * @var CmsSiteDomain $cmsDomain
-                 */
-                if ($cmsDomain = CmsSiteDomain::find()->where(['domain' => $serverName])->one())
-                {
-                    $this->_site = $cmsDomain->cmsSite;
-                } else
-                {
-                    $this->_site = CmsSite::find()->active()->andWhere(['def' => self::BOOL_Y])->one();
-                }
-            }
-        }
-
-        return $this->_site;
+        return \Yii::$app->currentSite->site;
     }
 
-
-
     private static $_huck = 'Z2VuZXJhdG9y';
-
 
 
     public function init()
@@ -152,7 +141,6 @@ class Cms extends \skeeks\cms\base\Component
         {
             $this->generateModulesConfigFile();
         }
-
 
         /**
          * Генерация SEO метатегов.
@@ -176,13 +164,26 @@ class Cms extends \skeeks\cms\base\Component
                 }
             }
         });
+
+
+        //TODO:: future refactor;
+        $templatePath = "@app/templates/default";
+        foreach ($this->templates as $templateData)
+        {
+            if ($templateData['code'] == $this->template)
+            {
+                $templatePath = $templateData['path'];
+            }
+        }
+        \Yii::setAlias('template', \Yii::getAlias($templatePath));
     }
 
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template'], 'string'],
+            [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
         ]);
     }
@@ -194,6 +195,8 @@ class Cms extends \skeeks\cms\base\Component
             'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
+            'template'                  => 'Шаблон',
+            'templates'                 => 'Возможные шаблон',
         ]);
     }
 

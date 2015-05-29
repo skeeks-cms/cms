@@ -10,7 +10,6 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
-use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
@@ -22,6 +21,7 @@ use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasTreesTrait;
+use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\user\models\User;
@@ -60,7 +60,7 @@ use yii\web\ErrorHandler;
  * @property string $url
  *
  * @property CmsContent $cmsContent
- * @property CmsTree $tree
+ * @property Tree $cmsTree
 
  * @property CmsContentElementProperty[]    relatedElementProperties
  * @property CmsContentProperty[]           relatedProperties
@@ -70,6 +70,7 @@ class CmsContentElement extends RelatedElementModel
     use \skeeks\cms\models\behaviors\traits\HasFiles;
     use HasRelatedPropertiesTrait;
     use HasTreesTrait;
+    use HasUrlTrait;
 
     /**
      * @inheritdoc
@@ -190,25 +191,14 @@ class CmsContentElement extends RelatedElementModel
     }
 
 
-
-
-
-    /**
-     * @return string
-     */
-    public function getAbsoluteUrl()
-    {
-        return $this->url;
-    }
-
     /**
      * @return string
      */
     public function getUrl()
     {
-        return Url::to('cms/content-element/view', [
+        return UrlHelper::construct('cms/content-element/view', [
             'id'    => $this->id,
             'code'  => $this->code,
-        ]);
+        ])->toString();
     }
 }

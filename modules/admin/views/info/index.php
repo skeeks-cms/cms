@@ -34,7 +34,7 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
     <?php
     echo $this->render('table', [
         'values' => [
-            \Yii::$app->cms->moduleCms()->getName() => \Yii::$app->cms->moduleCms()->getDescriptor()->getVersion(),
+            \Yii::$app->cms->moduleCms()->getName() => \Yii::$app->cms->moduleCms()->descriptor->version,
             'Yii Version' => $application['yii'],
             'Название проекта' => $application['name'] . " (<a href='" . \skeeks\cms\helpers\UrlHelper::construct('cms/admin-settings')->enableAdmin()->toString() . "'>изменить</a>)",
             'Окружение (YII_ENV)' => $application['env'],

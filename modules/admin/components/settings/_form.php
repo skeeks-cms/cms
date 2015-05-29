@@ -6,7 +6,7 @@
  * @date 27.03.2015
  */
 use yii\helpers\Html;
-use skeeks\cms\widgets\base\hasModelsSmart\ActiveForm;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\WidgetConfig */

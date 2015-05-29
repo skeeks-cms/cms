@@ -12,13 +12,13 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
-use skeeks\cms\components\registeredWidgets\Model;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
+use skeeks\cms\traits\ValidateRulesTrait;
 use skeeks\modules\cms\user\models\User;
 use Yii;
 
@@ -37,14 +37,11 @@ use Yii;
  * @property string $description
  * @property string $files
  * @property string $content_type
- * @property string $index_element
- * @property string $index_tree
+ * @property string $index_for_search
  * @property string $tree_chooser
  * @property string $list_mode
- * @property string $trees_name
- * @property string $tree_name
- * @property string $elements_name
- * @property string $element_name
+ * @property string $name_meny
+ * @property string $name_one
  *
  * @property CmsContentType $contentType
  * @property CmsContentElement[] $cmsContentElements
@@ -52,6 +49,7 @@ use Yii;
  */
 class CmsContent extends Core
 {
+    use ValidateRulesTrait;
     use \skeeks\cms\models\behaviors\traits\HasFiles;
 
     /**
@@ -90,14 +88,11 @@ class CmsContent extends Core
             'description' => Yii::t('app', 'Description'),
             'files' => Yii::t('app', 'Files'),
             'content_type' => Yii::t('app', 'Content Type'),
-            'index_element' => Yii::t('app', 'Индексировать элементы для модуля поиска'),
-            'index_tree' => Yii::t('app', 'Индексировать разделы для модуля поиска'),
+            'index_for_search' => Yii::t('app', 'Индексировать для модуля поиска'),
             'tree_chooser' => Yii::t('app', 'Интерфейс привязки элемента к разделам'),
             'list_mode' => Yii::t('app', 'Режим просмотра разделов и элементов'),
-            'trees_name' => Yii::t('app', 'Разделы'),
-            'tree_name' => Yii::t('app', 'Раздел'),
-            'elements_name' => Yii::t('app', 'Элементы'),
-            'element_name' => Yii::t('app', 'Элемент'),
+            'name_meny' => Yii::t('app', 'Название элементов (множественное число)'),
+            'name_one' => Yii::t('app', 'Название одного элемента'),
         ]);
     }
 
@@ -108,41 +103,19 @@ class CmsContent extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
-            [['name', 'content_type'], 'required'],
+            [['name', 'content_type', 'code'], 'required'],
             [['description', 'files'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
-            [['active', 'index_element', 'index_tree', 'tree_chooser', 'list_mode'], 'string', 'max' => 1],
+            [['code'], 'unique'],
+            [['code'], 'validateCode'],
+            [['active', 'index_for_search', 'tree_chooser', 'list_mode'], 'string', 'max' => 1],
             [['content_type'], 'string', 'max' => 32],
-            [['trees_name', 'tree_name', 'elements_name', 'element_name'], 'string', 'max' => 100],
-            ['code', 'default', 'value' => function($model, $attribute)
-            {
-                return md5(rand(1, 10) . time());
-            }],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
-            ['active', 'default', 'value' => function($model, $attribute)
-            {
-                return "Y";
-            }],
-            ['trees_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Разделы";
-            }],
-            ['tree_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Раздел";
-            }],
-            ['elements_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Элементы";
-            }],
-            ['element_name', 'default', 'value' => function($model, $attribute)
-            {
-                return "Элемент";
-            }],
+            [['name_meny', 'name_one'], 'string', 'max' => 100],
+            ['priority', 'default', 'value'         => 500],
+            ['active', 'default', 'value'           => "Y"],
+            ['name_meny', 'default', 'value'    => "Элементы"],
+            ['name_one', 'default', 'value'     => "Элемент"],
         ]);
     }
 

@@ -26,7 +26,17 @@ class Controller extends YiiWebController
      * Использвается в методе render, для начала попробуем поискать шаблон в проекте, затем по умолчанию по правилам yii
      * @var string
      */
-    public $beforeRender = '@app/views/modules/';
+    public $beforeRender    = '@template/modules/';
+
+    /**
+     * @var string
+     */
+    public $layout          = '@template/layouts/default.php';
+
+    public function init()
+    {
+        parent::init();
+    }
 
     /**
      *
@@ -59,6 +69,7 @@ class Controller extends YiiWebController
 
         try
         {
+            $viewApp = '';
             if (!$this->module instanceof Application)
             {
                 $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
@@ -69,6 +80,8 @@ class Controller extends YiiWebController
             }
         } catch (InvalidParamException $e)
         {
+            \Yii::warning('Шаблон не построен: ' . ($viewApp ? $viewApp : $view) . ' - ' . $e->getMessage());
+
             try
             {
                 return parent::render($view, $params);

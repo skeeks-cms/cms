@@ -11,8 +11,10 @@
 
 namespace skeeks\cms\rbac;
 
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use Yii;
 use yii\db\Connection;
+use yii\db\Exception;
 use yii\db\Query;
 use yii\di\Instance;
 use yii\rbac\Item;
@@ -591,15 +593,24 @@ class DbManager extends CmsManager
      */
     private function loadItems()
     {
-        $part = self::PART_ITEMS;
-        if ($this->_items === null && ($this->_items = $this->getFromCache($part)) === false) {
-            $query = (new Query)->from($this->itemTable);
+        try
+        {
+            $part = self::PART_ITEMS;
+            if ($this->_items === null && ($this->_items = $this->getFromCache($part)) === false) {
+                $query = (new Query)->from($this->itemTable);
 
-            $this->_items = [];
-            foreach ($query->all($this->db) as $row) {
-                $this->_items[$row['name']] = $this->populateItem($row);
+                $this->_items = [];
+                foreach ($query->all($this->db) as $row) {
+                    $this->_items[$row['name']] = $this->populateItem($row);
+                }
+                $this->saveToCache($part, $this->_items);
             }
-            $this->saveToCache($part, $this->_items);
+        } catch (Exception $e)
+        {
+            if ($e->getCode() == 1045)
+            {
+                throw new NotConnectedToDbException;
+            }
         }
     }
 

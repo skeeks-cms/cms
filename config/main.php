@@ -100,22 +100,10 @@ $config =
             'components' => include_once 'models.php'
         ],
 
-        //Зарегистрированные виджеты
-        'registeredWidgets' =>
-        [
-            'class' => 'skeeks\cms\components\RegisteredWidgets',
-            'components' => include_once 'widgets.php'
-        ],
-
         //Админское меню
         'adminMenu' =>
         [
             'class' => '\skeeks\cms\modules\admin\components\Menu',
-        ],
-
-        'registeredLayouts' =>
-        [
-            'class'         => '\skeeks\cms\components\RegisteredLayouts',
         ],
 
         'seo' =>
@@ -131,6 +119,16 @@ $config =
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
+
+            'template'                      => "default",
+            'templates'                     =>
+            [
+                [
+                    'name'      => 'Шаблон по умолчанию',
+                    'code'      => 'default',
+                    'path'      => '@app/templates/default',
+                ]
+            ],
         ],
 
         'imaging' =>
@@ -141,6 +139,11 @@ $config =
         'breadcrumbs' =>
         [
             'class' => '\skeeks\cms\components\Breadcrumbs',
+        ],
+
+        'currentSite' =>
+        [
+            'class' => '\skeeks\cms\components\CurrentSite',
         ]
     ],
 

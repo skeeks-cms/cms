@@ -118,12 +118,36 @@ class ClusterLocal extends Cluster
     }
 
     /**
+     * @return bool
+     */
+    public function existsRootPath()
+    {
+        if (is_dir($this->rootBasePath))
+        {
+            return true;
+        }
+
+        //Создать папку для файлов если ее нет
+        $dir = new Dir($this->rootBasePath);
+        if ($dir->make())
+        {
+            return true;
+        }
+
+        return false;
+    }
+    /**
      * Свободное место на сервере
      * @return float
      */
     public function getFreeSpace()
     {
-        return (float) disk_free_space($this->rootBasePath);
+        if ($this->existsRootPath())
+        {
+            return (float) disk_free_space($this->rootBasePath);
+        }
+
+        return (float) 0;
     }
 
     /**
@@ -132,6 +156,11 @@ class ClusterLocal extends Cluster
      */
     public function getTotalSpace()
     {
-        return (float) disk_total_space($this->rootBasePath);
+        if ($this->existsRootPath())
+        {
+            return (float) disk_total_space($this->rootBasePath);
+        }
+
+        return (float) 0;
     }
 }

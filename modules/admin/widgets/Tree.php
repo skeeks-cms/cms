@@ -373,7 +373,12 @@ JS
                                 [
                                     "class" => "sx-label-node level-" . $model->level . " status-" . $model->active
                                 ]
+
                             ) .
+
+                            ($model->treeType ? Html::tag("div", $model->treeType->name, [
+                                "class"     => "pull-left sx-tree-type",
+                            ]) : '') .
 
                             Html::tag("div",
                                     DropdownControllerActions::widget([
@@ -635,6 +640,19 @@ JS
         padding-left: 15px;
         margin: 2px 0px;
     }
+
+        .sx-tree ul li .sx-tree-type
+        {
+            display: none;
+            padding-top: 2px;
+            padding-left: 20px;
+            font-size: 11px;
+        }
+
+            .sx-tree ul li:hover>.row .sx-tree-type
+            {
+                display: block;
+            }
 
         .sx-tree ul li.sx-tree-node .sx-controll-act
         {

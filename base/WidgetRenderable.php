@@ -1,0 +1,55 @@
+<?php
+/**
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 26.05.2015
+ */
+
+namespace skeeks\cms\base;
+
+use skeeks\cms\base\Widget;
+use skeeks\cms\helpers\UrlHelper;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\helpers\Json;
+/**
+ * Class WidgetRenderable
+ * @package skeeks\cms\base
+ */
+class WidgetRenderable extends Widget
+{
+    /**
+     * @var null Файл в котором будет реднериться виджет
+     */
+    public $viewFile    = null;
+
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(),
+        [
+            'viewFile'  => 'Файл-шаблон',
+        ]);
+    }
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(),
+        [
+            [['viewFile'], 'string'],
+        ]);
+    }
+
+    protected function _run()
+    {
+        if ($this->viewFile)
+        {
+            return $this->render($this->viewFile, [
+                'widget' => $this
+            ]);
+        } else
+        {
+            return "Шаблон не найден";
+        }
+    }
+}

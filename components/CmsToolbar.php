@@ -86,6 +86,17 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
         }
 
+        if (!$this->enabled || \Yii::$app->user->isGuest)
+        {
+            $this->enabled = false;
+            return;
+        }
+
+        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
+        {
+            $this->enabled = false;
+        }
+
     }
 
     public function rules()
@@ -167,7 +178,8 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
      */
     public function renderToolbar($event)
     {
-        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax() || !$this->enabled) {
+        if (!$this->enabled)
+        {
             return;
         }
 
@@ -176,7 +188,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         $urlUserEdit = UrlHelper::construct('cms/admin-profile/update')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
         if (is_subclass_of(\Yii::$app->controller->action, ViewModelAction::className()))
         {
-            if ($editModel = \Yii::$app->controller->action->getModel())
+            if ($editModel = \Yii::$app->controller->action->model)
             {
                 if ($descriptor = \Yii::$app->registeredModels->getDescriptor($editModel->className()))
                 {

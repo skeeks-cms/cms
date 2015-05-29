@@ -70,7 +70,6 @@ $this->registerCss(<<<CSS
 CSS
 );
 
-$authLink = \skeeks\cms\helpers\UrlHelper::construct('admin/index')->enableAbsolute()->enableAdmin();
 
 $this->registerJs(<<<JS
     (function(sx, $, _)
@@ -78,19 +77,6 @@ $this->registerJs(<<<JS
         sx.createNamespace('classes', sx);
 
         sx.classes.Auth = sx.classes.Component.extend({
-
-            _init: function()
-            {
-                this.loader = new sx.classes.AjaxLoader();
-                this.blocker = new sx.classes.Blocker();
-            },
-
-            _onDomReady: function()
-            {
-                this.JloginContainer = $('.sx-act-login');
-                this.JSuccessLoginContainer = $('.sx-act-successLogin');
-                this.JForgetContainer = $('.sx-act-forget');
-            },
 
             _onWindowReady: function()
             {
@@ -119,7 +105,7 @@ JS
                 <div class="panel-content">
 
                     <div class="sx-act sx-act-reset-password">
-                        Установка
+                        <?= $message; ?>
                     </div>
 
                 </div>
