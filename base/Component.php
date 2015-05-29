@@ -8,6 +8,8 @@
 namespace skeeks\cms\base;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsComponentSettings;
+use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\User;
 use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
@@ -92,7 +94,7 @@ abstract class Component extends Model
             if ($site = \Yii::$app->currentSite->site)
             {
                 $settingsValues = array_merge($settingsValues,
-                    $this->fetchDefaultSettingsBySite($site->code)
+                    $this->fetchDefaultSettingsBySiteCode($site->code)
                 );
             }
 
@@ -100,7 +102,7 @@ abstract class Component extends Model
             if (!\Yii::$app->user->isGuest)
             {
                 $settingsValues = array_merge($settingsValues,
-                    $this->fetchDefaultSettingsByUser(\Yii::$app->user->identity->getId())
+                    $this->fetchDefaultSettingsByUserId(\Yii::$app->user->identity->getId())
                 );
             }
 
@@ -112,19 +114,102 @@ abstract class Component extends Model
 
 
     /**
+     * @param CmsSite $site
+     * @return $this
+     */
+    public function loadSettingsBySite($site)
+    {
+        $settings = $this->fetchDefaultSettingsBySiteCode($site->code);
+
+        if ($settings)
+        {
+            $this->attributes = $settings;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function loadDefaultSettings()
+    {
+        $settings = $this->fetchDefaultSettings();
+
+        if ($settings)
+        {
+            $this->attributes = $settings;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param User $site
+     * @return $this
+     */
+    public function loadSettingsByUser($user)
+    {
+        $settings = $this->fetchDefaultSettingsByUserId($user->id);
+
+        if ($settings)
+        {
+            $this->attributes = $settings;
+        }
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function saveDefaultSettings()
     {
-        $settings           = CmsComponentSettings::createByComponent($this);
+        $settings           = CmsComponentSettings::createByComponentDefault($this);
         $settings->value    = $this->attributes;
 
-        //\Yii::$app->cache->delete($this->getCacheKey());
+        $this->invalidateCache();
+
+        return $settings->save();
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveDefaultSettingsBySiteCode($site_code)
+    {
+        $settings           = CmsComponentSettings::createByComponentSiteCode($this, $site_code);
+        $settings->value    = $this->attributes;
+
+        $this->invalidateCache();
+
+        return $settings->save();
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveDefaultSettingsByUserId($user_id)
+    {
+        $settings           = CmsComponentSettings::createByComponentUserId($this, $user_id);
+        $settings->value    = $this->attributes;
+
+        $this->invalidateCache();
+
+        return $settings->save();
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function invalidateCache()
+    {
         TagDependency::invalidate(\Yii::$app->cache, [
             $this->className() . (string) $this->namespace
         ]);
 
-        return $settings->save();
+        return $this;
     }
 
 
@@ -136,7 +221,8 @@ abstract class Component extends Model
      */
     public function fetchDefaultSettings()
     {
-        $settings = CmsComponentSettings::fetchByComponent($this);
+        $settings = CmsComponentSettings::fetchByComponentDefault($this);
+
         if (!$settings)
         {
             return [];
@@ -150,7 +236,7 @@ abstract class Component extends Model
      * @param (string) $site_code
      * @return array
      */
-    public function fetchDefaultSettingsBySite($site_code)
+    public function fetchDefaultSettingsBySiteCode($site_code)
     {
         $settings = CmsComponentSettings::fetchByComponentSiteCode($this, (string) $site_code);
         if (!$settings)
@@ -167,7 +253,7 @@ abstract class Component extends Model
      * @param (int) $site_code
      * @return array
      */
-    public function fetchDefaultSettingsByUser($user_id)
+    public function fetchDefaultSettingsByUserId($user_id)
     {
         $settings = CmsComponentSettings::fetchByComponentUserId($this, (int) $user_id);
         if (!$settings)
