@@ -272,7 +272,7 @@ abstract class Component extends Model
         return UrlHelper::construct('cms/admin-component-settings/index', [
             'componentClassName'    => $this->className(),
             'attributes'            => $this->attributes,
-            'namespace'             => $this->namespace,
+            'componentNamespace'             => $this->namespace,
         ])
         ->enableAdmin()
         ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');

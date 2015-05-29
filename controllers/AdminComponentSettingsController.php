@@ -45,7 +45,17 @@ class AdminComponentSettingsController extends AdminController
         parent::_beforeAction($e);
 
         $componentClassName         = \Yii::$app->request->get('componentClassName');
-        $component                  = new $componentClassName();
+
+        $namespace                  = \Yii::$app->request->get('componentNamespace');
+        if ($namespace)
+        {
+            $component                  = new $componentClassName([
+                'namespace' => $namespace
+            ]);
+        } else
+        {
+            $component                  = new $componentClassName();
+        }
 
 
         if (!$component || !$component instanceof Component)
@@ -57,7 +67,6 @@ class AdminComponentSettingsController extends AdminController
         {
             throw new UserException("У компонента не задана форма для управления настройками");
         }
-
 
         $this->_component = $component;
 
