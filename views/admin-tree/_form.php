@@ -22,6 +22,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ]
     )->label('Главное изображение'); ?>
 
+    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
     <?= Html::checkbox("isLink", $model->isLink(), [
@@ -32,10 +34,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     ]); ?>
 
     <div data-listen="isLink" data-show="0" class="sx-hide">
-        <?= $form->field($model, 'type')->widget(
+        <?= $form->field($model, 'tree_type_id')->widget(
             \skeeks\widget\chosen\Chosen::className(), [
                     'items' => \yii\helpers\ArrayHelper::map(
-                         \Yii::$app->registeredModels->getDescriptor($model)->getTypes()->getComponents(),
+                         \skeeks\cms\models\CmsTreeType::find()->active()->all(),
                          "id",
                          "name"
                      ),
@@ -76,16 +78,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
 ?>
 
-<div data-listen="isLink" data-show="0" class="sx-hide">
+<!--<div data-listen="isLink" data-show="0" class="sx-hide">
 
-    <?= $form->field($model, 'tree_ids')->widget(
+    <?/*= $form->field($model, 'tree_ids')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
             'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
         ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
-    ?>
+    */?>
 
-</div>
+</div>-->
 
 
 
@@ -123,8 +125,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ])
     ?>
 
+
 </div>
 <?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('SEO'); ?>
+    <?= $form->field($model, 'meta_title')->textarea(); ?>
+    <?= $form->field($model, 'meta_description')->textarea(); ?>
+    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
+<?= $form->fieldSetEnd() ?>
+
 
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

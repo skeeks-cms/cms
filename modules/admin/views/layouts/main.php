@@ -29,7 +29,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
     <?php $this->head() ?>
 </head>
-<body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?> <?= UrlHelper::getCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT) ? "empty" : ""?>">
+<body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?> <?= \Yii::$app->admin->isEmptyLayout() ? "empty" : ""?>">
 
 
 <?php $this->beginBody() ?>
@@ -63,57 +63,57 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         <li class="dropdown visible-md visible-lg"></li>
         <? if (!Yii::$app->user->isGuest): ?>
 
-            <? if ($sites = \skeeks\cms\models\Site::getAll()) : ?>
+            <?/* if ($sites = \skeeks\cms\models\Site::getAll()) : */?><!--
                 <li class="sx-left-border dropdown visible-md visible-lg">
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?= \Yii::$app->cms->moduleAdmin()->getCurrentSite() ? \Yii::$app->cms->moduleAdmin()->getCurrentSite()->host_name : 'Сайт'?> <span class="caret"></span>
+                        <?/*= \Yii::$app->cms->moduleAdmin()->getCurrentSite() ? \Yii::$app->cms->moduleAdmin()->getCurrentSite()->host_name : 'Сайт'*/?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                          <? if (\Yii::$app->cms->moduleAdmin()->getCurrentSite()) : ?>
+                          <?/* if (\Yii::$app->cms->moduleAdmin()->getCurrentSite()) : */?>
                               <li>
-                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', ''); ?>" data-method="post">
+                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', ''); */?>" data-method="post">
                                     Сбросить сайт
                                 </a>
                               </li>
-                          <? endif; ?>
+                          <?/* endif; */?>
 
-                        <? foreach ($sites as $site) : ?>
+                        <?/* foreach ($sites as $site) : */?>
                             <li>
-                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); ?>" data-method="post">
-                                    <?= $site->host_name; ?> (<?= $site->name; ?>)
+                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); */?>" data-method="post">
+                                    <?/*= $site->host_name; */?> (<?/*= $site->name; */?>)
                                 </a>
                             </li>
-                        <? endforeach; ?>
+                        <?/* endforeach; */?>
 
                       </ul>
                     </div>
                 </li>
-            <? endif; ?>
+            <?/* endif; */?>
 
-            <? if ($langs = \Yii::$app->langs->getComponents()) : ?>
+            <?/* if ($langs = \Yii::$app->langs->getComponents()) : */?>
                 <li class="sx-left-border dropdown visible-md visible-lg">
                     <div class="btn-group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?= \Yii::$app->cms->moduleAdmin()->getCurrentLang() ? \Yii::$app->cms->moduleAdmin()->getCurrentLang()->name . ' (' . \Yii::$app->cms->moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'?> <span class="caret"></span>
+                        <?/*= \Yii::$app->cms->moduleAdmin()->getCurrentLang() ? \Yii::$app->cms->moduleAdmin()->getCurrentLang()->name . ' (' . \Yii::$app->cms->moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'*/?> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
 
-                          <? if (\Yii::$app->cms->moduleAdmin()->getCurrentLang()) : ?>
+                          <?/* if (\Yii::$app->cms->moduleAdmin()->getCurrentLang()) : */?>
                               <li>
-                                <a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', ''); ?>" data-method="post">
+                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', ''); */?>" data-method="post">
                                     Сбросить язык
                                 </a>
                               </li>
-                          <? endif; ?>
+                          <?/* endif; */?>
 
-                        <? foreach ($langs as $lang) : ?>
-                            <li><a href="<?= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', $lang->id); ?>" data-method="post"><?= $lang->name; ?> (<?= $lang->id; ?>)</a></li>
-                        <? endforeach; ?>
+                        <?/* foreach ($langs as $lang) : */?>
+                            <li><a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', $lang->id); */?>" data-method="post"><?/*= $lang->name; */?> (<?/*= $lang->id; */?>)</a></li>
+                        <?/* endforeach; */?>
                       </ul>
                     </div>
                 </li>
-            <? endif; ?>
+            --><?/* endif; */?>
 
 
 
@@ -195,51 +195,42 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
-            <? if ($items = \Yii::$app->adminMenu->getAllowData()) : ?>
-                <? foreach ($items as $keyGroup => $groupData) : ?>
-
-                    <? if (\yii\helpers\ArrayHelper::getValue($groupData, 'enabled' , true) === true) : ?>
-                        <div class="sidebar-menu" id="sx-admin-menu-<?= $keyGroup; ?>">
-                            <div class="sx-head" title="<?= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); ?>">
-                                <? if ($imgData = \yii\helpers\ArrayHelper::getValue($groupData, 'img', [])) : ?>
-                                    <? list($assetClassName, $localPath) = $imgData; ?>
+            <? if ($items = \Yii::$app->adminMenu->getItems()) : ?>
+                <? foreach ($items as $adminMenuItem) : ?>
+                    <? if ($adminMenuItem->isAllowShow()) : ?>
+                        <div class="sidebar-menu" id="<?= $adminMenuItem->code; ?>">
+                            <div class="sx-head" title="<?= $adminMenuItem->label; ?>">
+                                <? if ($imgUrl = $adminMenuItem->getImgUrl()) : ?>
                                     <span class="sx-icon">
-                                        <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); ?>" />
+                                        <img src="<?= $imgUrl; ?>" />
                                     </span>
                                 <? else : ?>
                                     <i class="icon icon-arrow-up" style=""></i>
                                 <? endif; ?>
-                                <?= \yii\helpers\ArrayHelper::getValue($groupData, 'label', 'Название не задано'); ?>
+                                <?= $adminMenuItem->label; ?>
                             </div>
 
-                            <? if ($itemsGroup = \yii\helpers\ArrayHelper::getValue($groupData, 'items', [])) : ?>
+                            <? if ($subAdminMenuItems = $adminMenuItem->items) : ?>
                                 <ul class="nav nav-sidebar">
-                                    <? foreach ($itemsGroup as $itemData) : ?>
-                                        <? if (\yii\helpers\ArrayHelper::getValue($itemData, 'enabled' , true) === true) : ?>
-                                            <li <?= strpos('-' . \Yii::$app->controller->route . '/', $itemData["url"][0] . '/') ? 'class="active"' : '' ?>>
-                                                <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl((array) $itemData["url"]) ?>" title="#" class="sx-test">
-                                                    <? if ($imgData = \yii\helpers\ArrayHelper::getValue($itemData, 'img', [])) : ?>
-                                                        <? list($assetClassName, $localPath) = $imgData; ?>
-                                                        <span class="sx-icon">
-                                                            <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register($this), $localPath); ?>" />
-                                                        </span>
-                                                    <? else: ?>
-                                                        <span class="sx-icon">
-                                                            <img src="<?= \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register($this), 'images/icons/ico_block.gif'); ?>" />
-                                                        </span>
-                                                    <? endif; ?>
-                                                    <span class="txt"><?= $itemData["label"]; ?></span>
-                                                </a>
-                                            </li>
-                                        <? endif; ?>
-                                    <? endforeach; ?>
+                                <? foreach ($subAdminMenuItems as $subAdminMenuItem) : ?>
+                                    <? if ($subAdminMenuItem->isAllowShow()) : ?>
+                                        <li <?= $subAdminMenuItem->isActive() ? 'class="active"' : '' ?>>
+                                            <a href="<?= $subAdminMenuItem->getUrl() ?>" title="<?= $subAdminMenuItem->label; ?>" class="sx-test">
+                                                <span class="sx-icon">
+                                                    <img src="<?= $subAdminMenuItem->getImgUrl(); ?>" />
+                                                </span>
+                                                <span class="txt"><?= $subAdminMenuItem->label; ?></span>
+                                            </a>
+                                        </li>
+                                    <? endif; ?>
+                                <? endforeach; ?>
                                 </ul>
                             <? endif; ?>
-
                         </div>
                     <? endif; ?>
                 <? endforeach; ?>
             <? endif; ?>
+
         </div>
     </div>
 </div>

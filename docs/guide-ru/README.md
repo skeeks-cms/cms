@@ -76,7 +76,6 @@ Cms Widget
 ----------
 * [Хранилище файлов storage](cms-component-storage.md)
 * Компонент registeredModels
-* Компонент registeredWidgets
 * Компонент registeredLayouts
 * Компонент adminMenu
 * Компонент seoGenerator

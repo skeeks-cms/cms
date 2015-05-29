@@ -8,48 +8,56 @@
 
 return
 [
-    'cms' =>
+
+    function()
+    {
+        $result = [];
+
+        if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->orderBy("priority DESC")->all())
+        {
+            /**
+             * @var $contentType \skeeks\cms\models\CmsContentType
+             */
+            foreach ($contentTypes as $contentType)
+            {
+                $itemData = [
+                    'code'      => "content-block-" . $contentType->id,
+                    'label'     => $contentType->name,
+                    "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+                ];
+
+                if ($contents = $contentType->cmsContents)
+                {
+                    foreach ($contents as $content)
+                    {
+                        $itemData['items'][] =
+                        [
+                            'label' => $content->name,
+                            'url'   => ["cms/admin-cms-content-element", "content_id" => $content->id, "content_type" => $contentType->code],
+                        ];
+                    }
+                }
+
+                $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
+            }
+        }
+
+        return $result;
+    },
+
+
+    'cms-contents' =>
     [
-        'label'     => 'Основное',
+        'label'     => 'Контент',
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
 
         'items' =>
         [
 
             [
-                "label"     => "Сайты",
-                "url"       => ["cms/admin-site"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
-            ],
-
-            [
-                "label"     => "Дерево разделов",
+                "label"     => "Разделы",
                 "url"       => ["cms/admin-tree"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
-            ],
-
-            [
-                "label"     => "Метки разделов",
-                "url"       => ["cms/admin-tree-menu"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
-            ],
-
-            /*[
-                "label"     => 'Статические блоки',
-                "url"       => ["cms/admin-static-block"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.conct.png']
-            ],*/
-
-            [
-                "label"     => "Инфоблоки",
-                "url"       => ["cms/admin-infoblock"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
-            ],
-
-            [
-                "label"     => "Публикации",
-                "url"       => ["cms/admin-publication"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png']
             ],
 
             [
@@ -58,9 +66,67 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
 
+            [
+                "label"     => "Файлы в хранилище",
+                "url"       => ["cms/admin-storage-files/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+            ],
+
+            /*[
+                "label"     => "Инфоблоки",
+                "url"       => ["cms/admin-infoblock"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
+            ],*/
+
+        ]
+    ],
+
+    'cms-settings' =>
+    [
+        'label'     => 'Настройки продукта',
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+
+        'items' =>
+        [
 
             [
-                "label"     => "Настройки",
+                "label"     => "Сайты",
+                "url"       => ["cms/admin-cms-site"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
+            ],
+
+            [
+                "label"     => "Языки",
+                "url"       => ["cms/admin-cms-lang"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/lang.png']
+            ],
+
+            [
+                "label"     => "Метки разделов",
+                "url"       => ["cms/admin-tree-menu"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
+            ],
+
+            [
+                "label"     => "Сервера файлового хранилища",
+                "url"       => ["cms/admin-storage/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
+            ],
+
+            [
+                "label"     => "Настройки разделов",
+                "url"       => ["cms/admin-cms-tree-type"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
+            ],
+
+            [
+                "label"     => "Настройки контента",
+                "url"       => ["cms/admin-cms-content-type"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/content.png'],
+            ],
+
+            [
+                "label"     => "Настройки модулей",
                 "url"       => ["cms/admin-settings"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
             ],
@@ -117,7 +183,7 @@ return
             ],*/
         ]
     ],
-
+/*
     'storage' =>
     [
         'label' => 'Файловое хранилище',
@@ -133,13 +199,9 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
             ],
 
-            [
-                "label"     => "Файлы в хранилище",
-                "url"       => ["cms/admin-storage-files/index"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
-            ],
+
         ]
-    ],
+    ],*/
 
     /*'social' =>
     [

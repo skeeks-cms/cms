@@ -11,7 +11,6 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
@@ -34,16 +33,6 @@ class TreeMenu extends Core
     {
         return '{{%cms_tree_menu}}';
     }
-
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-        $scenarios['create'] = ['name', 'description'];
-        $scenarios['update'] = ['name', 'description'];
-        return $scenarios;
-    }
-
 
     /**
      * @inheritdoc

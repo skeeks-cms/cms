@@ -25,7 +25,8 @@ return
     "Updated At"            =>  "Время последнего обновления",
     "Name"                  =>  "Название",
     "Description Short"     =>  "Короткое описание",
-    "Description Full"      =>  "Описание",
+    "Description Full"      =>  "Подробное описание",
+    "Description"           =>  "Описание",
     "Seo Page Name"         =>  "Название для url (SEO)",
 
     "Count Comment"         =>  "Количество комментариев",
@@ -37,7 +38,12 @@ return
     "Code"                  =>  "Код",
     "Hint"                  =>  "Подсказка",
     "Default Value"         =>  "Значение по умолчанию",
+    "Default"               =>  "По умолчанию",
+    "Lang"                  =>  "Язык",
 
     "Value"                 =>  "Значение",
+    "Server Name"           =>  "Имя сервера",
+    "Domain"                =>  "Доменное имя",
+    "Site"                  =>  "Сайт",
 
 ];

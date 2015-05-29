@@ -15,7 +15,6 @@ use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasFiles;
-use skeeks\cms\models\behaviors\HasPageOptions;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
 use skeeks\cms\validators\HasBehavior;
@@ -45,18 +44,10 @@ use yii\base\Event;
  * @property string $original_name
  * @property string $name_to_save
  * @property string $name
- * @property integer $status
  * @property string $description_short
  * @property string $description_full
  * @property integer $image_height
  * @property integer $image_width
- * @property integer $count_comment
- * @property integer $count_subscribe
- * @property string $users_subscribers
- * @property integer $count_vote
- * @property integer $result_vote
- * @property string $users_votes_up
- * @property string $users_votes_down
  * @property string $linked_to_model
  * @property string $linked_to_value
  *
@@ -65,10 +56,6 @@ use yii\base\Event;
  */
 class StorageFile extends Core
 {
-    //use behaviors\traits\HasComments;
-    //use behaviors\traits\HasSubscribes;
-    //use behaviors\traits\HasVotes;
-
     /**
      * @inheritdoc
      */
@@ -77,35 +64,21 @@ class StorageFile extends Core
         return '{{%cms_storage_file}}';
     }
 
-    public $multiPageOptions;
-
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return array_merge(parent::rules(), [
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
             [['src'], 'required'],
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'status', 'image_height', 'image_width', 'count_comment', 'count_subscribe', 'count_vote', 'result_vote', 'published_at'], 'integer'],
-            [['description_short', 'description_full', 'users_subscribers', 'users_votes_up', 'users_votes_down'], 'string'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width', 'published_at'], 'integer'],
+            [['description_short', 'description_full'], 'string'],
             [['src', 'cluster_file', 'original_name', 'name', 'linked_to_model', 'linked_to_value'], 'string', 'max' => 255],
             [['cluster_id', 'type', 'mime_type', 'extension'], 'string', 'max' => 16],
             [['name_to_save'], 'string', 'max' => 32],
             [['src'], 'unique'],
             [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => 'The combination of Cluster ID and Cluster Src has already been taken.'],
-            [['page_options', 'multiPageOptions'], 'safe'],
         ]);
-    }
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
     }
 
     /**
@@ -129,30 +102,16 @@ class StorageFile extends Core
             'original_name' => Yii::t('app', 'Оригинальное название файла'),
             'name_to_save' => Yii::t('app', 'Название при скачивании'),
             'name' => Yii::t('app', 'Name'),
-            'status' => Yii::t('app', 'Status'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
             'image_height' => Yii::t('app', 'Высота изображения'),
             'image_width' => Yii::t('app', 'Ширина изображения'),
-            'count_comment' => Yii::t('app', 'Count Comment'),
-            'count_subscribe' => Yii::t('app', 'Count Subscribe'),
-            'users_subscribers' => Yii::t('app', 'Users Subscribers'),
-            'count_vote' => Yii::t('app', 'Count Vote'),
-            'result_vote' => Yii::t('app', 'Result Vote'),
-            'users_votes_up' => Yii::t('app', 'Users Votes Up'),
-            'users_votes_down' => Yii::t('app', 'Users Votes Down'),
             'linked_to_model' => Yii::t('app', 'Привязка'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
-            'page_options'  => Yii::t('app', 'Дополнительные свойства'),
             'published_at'  => Yii::t('app', 'Дата публикации'),
         ]);
     }
 
-
-    //['status', 'default', 'value' => self::STATUS_ACTIVE],
-
-    const STATUS_DELETED = 0;
-    const STATUS_ACTIVE = 10;
 
     const TYPE_FILE     = "file";
     const TYPE_IMAGE    = "image";
@@ -164,14 +123,7 @@ class StorageFile extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            //behaviors\HasComments::className(),
-            behaviors\HasStatus::className() => behaviors\HasStatus::className(),
-            //behaviors\HasAdultStatus::className() => behaviors\HasAdultStatus::className(),
-            //behaviors\HasSubscribes::className(),
-            //behaviors\HasVotes::className(),
             CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
-            HasPageOptions::className() => HasPageOptions::className(),
-            //HasDescriptionsBehavior::className() => HasDescriptionsBehavior::className(),
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className()
         ]);
     }

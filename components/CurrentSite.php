@@ -1,83 +1,99 @@
 <?php
 /**
- * CurrentSite
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 17.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 27.03.2015
  */
 namespace skeeks\cms\components;
-
-use skeeks\cms\base\db\ActiveRecord;
-use skeeks\cms\models\Site;
-use skeeks\cms\models\StorageFile;
-use skeeks\cms\models\TreeType;
-use Yii;
+use skeeks\cms\exceptions\NotConnectedToDbException;
+use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsSiteDomain;
 use yii\base\Component;
-use yii\console\Application;
-use yii\helpers\ArrayHelper;
-use yii\web\UploadedFile;
+use yii\caching\TagDependency;
+use yii\db\Exception;
 
 /**
- * @method TreeType[]   getComponents()
- * @method TreeType     getComponent($id)
- *
- * Class CollectionComponents
+ * @property CmsSite                            $site
  * @package skeeks\cms\components
  */
 class CurrentSite extends Component
 {
     /**
-     * @var Site
+     * @var CmsSite
      */
-    public $site = null;
+    protected $_site = null;
 
-    public function init()
+    private $_serverName = null;
+    /**
+     * @return CmsSite
+     */
+    public function getSite()
     {
-        parent::init();
-
-        //TODO: Если это консольное приложение нужно предусмотреть этот момент
-        if (\Yii::$app instanceof \yii\console\Application)
+        if ($this->_site === null)
         {
-            $this->site = false;
-        }
-
-        if ($this->site === null)
-        {
-            $serverName = \Yii::$app->getRequest()->getServerName();
-            $sites = Site::getAllKeyHostName();
-            if (!$sites)
+            if (\Yii::$app instanceof \yii\console\Application)
             {
-                $this->site = false;
-            }
-
-            if (!isset($sites[$serverName]))
-            {
-                $this->site = false;
+                $this->_site = CmsSite::find()->active()->andWhere(['def' => Cms::BOOL_Y])->one();
             } else
             {
-                $this->site = $sites[$serverName];
+                $this->_serverName = \Yii::$app->getRequest()->getServerName();
+                try
+                {
+                    $dependencySiteDomain = new TagDependency([
+                        'tags'      =>
+                        [
+                            (new CmsSiteDomain())->getTableCacheTag(),
+                        ],
+                    ]);
+
+
+                    $cmsDomain = CmsSiteDomain::getDb()->cache(function ($db) {
+                        return CmsSiteDomain::find()->where(['domain' => $this->_serverName])->one();
+                    }, null, $dependencySiteDomain);
+
+                    /**
+                     * @var CmsSiteDomain $cmsDomain
+                     */
+                    if ($cmsDomain)
+                    {
+                        $this->_site = $cmsDomain->cmsSite;
+                    } else
+                    {
+
+                        $this->_site = CmsSiteDomain::getDb()->cache(function ($db) {
+                            return CmsSite::find()->active()->andWhere(['def' => Cms::BOOL_Y])->one();
+                        },
+                            null,
+                            new TagDependency([
+                                'tags'      =>
+                                [
+                                    (new CmsSite())->getTableCacheTag(),
+                                ],
+                            ])
+                        );
+                    }
+                } catch (Exception $e)
+                {
+                    if ($e->getCode() == 1045)
+                    {
+                        throw new NotConnectedToDbException;
+                    }
+                }
+
             }
         }
+
+        return $this->_site;
     }
 
     /**
-     * @return Site
-     */
-    public function get()
-    {
-        return $this->site;
-    }
-
-    /**
-     * @param Site $site
+     * @param CmsSite $site
      * @return $this
      */
-    public function set(Site $site)
+    public function set(CmsSite $site)
     {
-        $this->site = $site;
+        $this->_site = $site;
         return $this;
     }
 }

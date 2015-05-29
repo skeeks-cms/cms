@@ -25,18 +25,9 @@
     ])
     ?>
 </form>
+<iframe data-src="<?= $component->getEditUrl(); ?>" width="100%;" height="200px;" id="sx-test">
 
-
-<? if ($component && $component->hasConfigFormFile()) : ?>
-    <p>
-        <? if ($component->fetchDefaultSettings()) : ?>
-            <button type="submit" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i> сбросить настройки по умолчанию</button>
-        <? endif; ?>
-    </p>
-    <?= $component->renderConfigForm(); ?>
-<? else: ?>
-    <p>Нет доступных настроек</p>
-<? endif; ?>
+</iframe>
 
 <?
 $this->registerJs(<<<JS
@@ -45,7 +36,12 @@ $this->registerJs(<<<JS
     sx.classes.SelectorComponent = sx.classes.Component.extend({
 
         _init: function()
-        {},
+        {
+            this.Iframe = new sx.classes.Iframe('sx-test', {
+                'autoHeight'        : true,
+                'heightSelector'    : '.sx-panel-content'
+            });
+        },
 
         _onDomReady: function()
         {
@@ -53,6 +49,11 @@ $this->registerJs(<<<JS
             {
                 $("#selector-component").submit();
             });
+
+            _.delay(function()
+            {
+                $('#sx-test').attr('src', $('#sx-test').data('src'));
+            }, 200);
         },
 
         _onWindowReady: function()

@@ -125,10 +125,18 @@ class AdminTreeController extends AdminModelEditorSmartController
 
                 Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-                if($parent && $parent->processAddNode($childTree))
+                try
                 {
-                    $response['success'] = true;
+                    if ($parent && $parent->processAddNode($childTree))
+                    {
+                        $response['success'] = true;
+                    }
+                } catch (\Exception $e)
+                {
+                    $response['success'] = false;
+                    $response['message'] = $e->getMessage();
                 }
+
             }
 
             if(!$post["no_redirect"])

@@ -347,26 +347,20 @@ JS
             }
 
 
-
-
-
-
-
+            /**
+             * @var $model \skeeks\cms\models\Tree
+             */
             $additionalName = '';
-            if ($model->main_root)
+            if ($model->level == 0)
             {
-                $additionalName = 'по умолчанию';
-            } else if ($model->level == 0)
-            {
-                $models = \skeeks\cms\models\Site::getAllKeyTreeId();
-                if (isset($models[$model->id]))
+                if ($model->site)
                 {
-                    $additionalName = $models[$model->id]->getName();
+                    $additionalName = $model->site->name;
                 }
             }
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
-                             $model->createAbsoluteUrl(),
+                             $model->getAbsoluteUrl(),
                              ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-xs show-at-site", "title" => "Показать на сайте"]
                     );
 
@@ -375,11 +369,16 @@ JS
                             $openCloseLink .
                             $controllElement .
                             Html::tag("div",
-                                Html::a($model->name . ($additionalName ? ' (' . $additionalName . ')': ''), $currentLink),
+                                Html::a($model->name . ($additionalName ? ' [' . $additionalName . ']': ''), $currentLink),
                                 [
-                                    "class" => "sx-label-node level-" . $model->level . " status-" . $model->status
+                                    "class" => "sx-label-node level-" . $model->level . " status-" . $model->active
                                 ]
+
                             ) .
+
+                            ($model->treeType ? Html::tag("div", $model->treeType->name, [
+                                "class"     => "pull-left sx-tree-type",
+                            ]) : '') .
 
                             Html::tag("div",
                                     DropdownControllerActions::widget([
@@ -642,6 +641,19 @@ JS
         margin: 2px 0px;
     }
 
+        .sx-tree ul li .sx-tree-type
+        {
+            display: none;
+            padding-top: 2px;
+            padding-left: 20px;
+            font-size: 11px;
+        }
+
+            .sx-tree ul li:hover>.row .sx-tree-type
+            {
+                display: block;
+            }
+
         .sx-tree ul li.sx-tree-node .sx-controll-act
         {
             margin-left: 5px;
@@ -713,37 +725,13 @@ JS
         }
 
 /**
-* Запись скрыта
+* Запись неактивна
 **/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-20  > a
+        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > a
         {
             color: silver;
-        }
-/**
-* Запись будет удалена.
-**/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-0  > a
-        {
-            color: silver;
-            background: rgba(255, 0, 0, 0.14);
         }
 
-/**
-* На модерации
-**/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-30  > a
-        {
-            color: silver;
-            background: rgba(0, 255, 13, 0.14);
-        }
-/**
-* Черновик
-**/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-40  > a
-        {
-            color: silver;
-            background: rgba(255, 0, 0, 0.14);
-        }
 CSS
 );
     }

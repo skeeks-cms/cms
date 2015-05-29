@@ -39,7 +39,7 @@ class AdminSettingsController extends AdminController
             {
                 $loadedComponents[$loadedComponent->className()]    = $loadedComponent;
 
-                if ($name = ArrayHelper::getValue($loadedComponent->getDescriptorConfig(), 'name'))
+                if ($name = $loadedComponent->descriptor->name)
                 {
                     $loadedForSelect[$loadedComponent->className()]     = $name;
                 } else
@@ -71,7 +71,6 @@ class AdminSettingsController extends AdminController
             {
                 if ($component->load(\Yii::$app->request->post()))
                 {
-                    $this->_setLangAndSite($component);
                     if ($component->saveDefaultSettings())
                     {
                         \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
@@ -90,13 +89,7 @@ class AdminSettingsController extends AdminController
 
         if ($component)
         {
-            $defaultSettings = $component->fetchDefaultSettings();
-            if ($defaultSettings)
-            {
-                $this->_setLangAndSite($defaultSettings);
-                $values = $defaultSettings->getMultiFieldValue('value');
-                $component->setAttributes($values);
-            }
+
         }
 
 

@@ -6,114 +6,33 @@
  * @date 26.03.2015
  */
 namespace skeeks\cms\base;
-use skeeks\cms\models\Settings;
-use yii\base\Component as YiiComponent;
-use yii\base\Exception;
+use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsComponentSettings;
+use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\User;
+use skeeks\cms\traits\HasComponentConfigFormTrait;
+use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
-use yii\helpers\Html;
-use yii\helpers\Json;
+use yii\caching\TagDependency;
 
 /**
  * Class Component
  * @package skeeks\cms\base
  */
-class Component extends Model
+abstract class Component extends Model
 {
+    //Можно задавать описание компонента.
+    use HasComponentDescriptorTrait;
+    //Может строить форму для своих данных.
+    use HasComponentConfigFormTrait;
+
+    public $namespace = null;
+
     public function init()
     {
-        parent::init();
-
-        \Yii::trace('Cms component init: ' . $this->className());
-        $this->loadDefaultSettings();
-    }
-
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function configFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . '_form.php';
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasConfigFormFile()
-    {
-        return file_exists($this->configFormFile());
-    }
-
-    /**
-     * TODO: переписать или дописать, когда будет время
-     *
-     * @param array $protectedParams Параметры которые disabled
-     * @return string
-     */
-    public function renderConfigForm($protectedParams = [])
-    {
-        $protectedParamsResult = [];
-        if ($protectedParams)
-        {
-            foreach ($protectedParams as $protectedParam)
-            {
-                $protectedParamsResult[$protectedParam] = Html::getInputId($this, $protectedParam);
-            }
-        }
-
-        $options = Json::encode([
-            'params' => $protectedParamsResult,
-        ]);
-
-        \Yii::$app->view->registerJs(<<<JS
-        (function(sx, $, _)
-        {
-            sx.classes.ProtectedParams = sx.classes.Component.extend({
-
-                _init: function()
-                {},
-
-                _onDomReady: function()
-                {
-                    var self = this;
-                    $(document).on('pjax:complete', function() {
-                        self.update();
-                    });
-
-                    self.update();
-                },
-
-                update: function()
-                {
-                    _.each(this.get('params'), function(id, value)
-                    {
-                        $(".field-" + id).hide();
-                    });
-                },
-
-                _onWindowReady: function()
-                {}
-            });
-
-            new sx.classes.ProtectedParams($options);
-        })(sx, sx.$, sx._);
-JS
-);
-        return \Yii::$app->getView()->renderFile($this->configFormFile(), [
-            'model'             => $this,
-            'protectedParams'   => $protectedParams
-        ]);
-    }
-
-    /**
-     * Можно задать название и описание компонента
-     * @return array
-     */
-    static public function getDescriptorConfig()
-    {
-        return [];
+        \Yii::beginProfile("Init: " . $this->className());
+            $this->initSettings();
+        \Yii::endProfile("Init: " . $this->className());
     }
 
     /**
@@ -122,20 +41,15 @@ JS
      * TODO: переписать, чтобы настройки могли храниться не только в базе (пока так)
      * @return $this
      */
-    public function loadDefaultSettings()
+    public function initSettings()
     {
-
         try
         {
-            /**
-             * @var $settings Settings
-             */
-            $settings = $this->fetchDefaultSettings();
+            $settingsValues = $this->getSettings();
 
-            if ($settings)
+            if ($settingsValues)
             {
-                $values = (array) $settings->getMultiFieldValue('value');
-                $this->setAttributes($values);
+                $this->setAttributes($settingsValues);
             }
 
         } catch (\Exception $e)
@@ -146,100 +60,221 @@ JS
         return $this;
     }
 
+    public function getCacheKey()
+    {
+        return implode([
+            $this->className(),
+            $this->namespace,
+            \Yii::$app->currentSite->site->code,
+            \Yii::$app->user->getId()
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSettings()
+    {
+        $key = $this->getCacheKey();
+
+        $dependency = new TagDependency([
+            'tags'      =>
+            [
+                $this->className(),
+                $this->className() . (string) $this->namespace
+            ],
+        ]);
+
+        $settingsValues = \Yii::$app->cache->get($key);
+        if ($settingsValues === false) {
+
+            $settingsValues = $this->fetchDefaultSettings();
+
+            //Настройки для текущего сайта
+            if ($site = \Yii::$app->currentSite->site)
+            {
+                $settingsValues = array_merge($settingsValues,
+                    $this->fetchDefaultSettingsBySiteCode($site->code)
+                );
+            }
+
+            //Настройки для текущего пользователя
+            if (!\Yii::$app->user->isGuest)
+            {
+                $settingsValues = array_merge($settingsValues,
+                    $this->fetchDefaultSettingsByUserId(\Yii::$app->user->identity->getId())
+                );
+            }
+
+            \Yii::$app->cache->set($key, $settingsValues, 0, $dependency);
+        }
+
+        return $settingsValues;
+    }
+
+
+    /**
+     * @param CmsSite $site
+     * @return $this
+     */
+    public function loadSettingsBySite($site)
+    {
+        $settings = $this->fetchDefaultSettingsBySiteCode($site->code);
+
+        if ($settings)
+        {
+            $this->attributes = $settings;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function loadDefaultSettings()
+    {
+        $settings = $this->fetchDefaultSettings();
+
+        if ($settings)
+        {
+            $this->attributes = $settings;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param User $site
+     * @return $this
+     */
+    public function loadSettingsByUser($user)
+    {
+        $settings = $this->fetchDefaultSettingsByUserId($user->id);
+
+        if ($settings)
+        {
+            $this->attributes = $settings;
+        }
+
+        return $this;
+    }
+
     /**
      * @return bool
      */
     public function saveDefaultSettings()
     {
-        $settings = $this->fetchDefaultSettings();
-        if (!$settings)
-        {
-            $settings = new Settings([
-                'component' => $this->className()
-            ]);
-        }
+        $settings           = CmsComponentSettings::createByComponentDefault($this);
+        $settings->value    = $this->attributes;
 
-        $settings->setCurrentLang(null);
-        $settings->setCurrentSite(null);
+        $this->invalidateCache();
 
-        if ($this->_currentLang)
-        {
-            $settings->setCurrentLang($this->_currentLang);
-        }
+        return $settings->save();
+    }
 
-        if ($this->_currentSite)
-        {
-            $settings->setCurrentSite($this->_currentSite);
-        }
+    /**
+     * @return bool
+     */
+    public function saveDefaultSettingsBySiteCode($site_code)
+    {
+        $settings           = CmsComponentSettings::createByComponentSiteCode($this, $site_code);
+        $settings->value    = $this->attributes;
 
-        $settings->setMultiFieldValue('value', $this->attributes);
+        $this->invalidateCache();
 
-        return $settings->save(false);
+        return $settings->save();
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveDefaultSettingsByUserId($user_id)
+    {
+        $settings           = CmsComponentSettings::createByComponentUserId($this, $user_id);
+        $settings->value    = $this->attributes;
+
+        $this->invalidateCache();
+
+        return $settings->save();
     }
 
 
-
-
     /**
-     * @var null|Site|int|string
-     */
-    protected $_currentSite = null;
-
-    /**
-     * @var null|Lang|string
-     */
-    protected $_currentLang = null;
-
-
-    /**
-     * @param Site|int|string $site
      * @return $this
      */
-    public function setCurrentSite($site)
+    public function invalidateCache()
     {
-        $this->_currentSite = $site;
-        return $this;
-    }
-    /**
-     * @param Lang|string $lang
-     * @return $this
-     */
-    public function setCurrentLang($lang)
-    {
-        $this->_currentLang = $lang;
+        TagDependency::invalidate(\Yii::$app->cache, [
+            $this->className() . (string) $this->namespace
+        ]);
+
         return $this;
     }
 
 
-
     /**
-     * Сбросить настройки по умаолчанию
-     * @return Settings
-     */
-    public function resetDefaultSettings()
-    {
-        if ($defaultSettings = $this->fetchDefaultSettings())
-        {
-            return $defaultSettings->delete();
-        }
-
-        return true;
-    }
-
-    /**
-     * Спарсить настройки по умолчанию
-     * @return Settings
+     *
+     * Настройки по умолчанию
+     *
+     * @return array
      */
     public function fetchDefaultSettings()
     {
-        return Settings::find()->where(['component' => $this->className()])->one();
+        $settings = CmsComponentSettings::fetchByComponentDefault($this);
 
-        /*$dependency = new \yii\caching\DbDependency(['sql' => 'SELECT MAX(updated_at) FROM ' . Settings::tableName()]);
+        if (!$settings)
+        {
+            return [];
+        }
 
-        return Settings::getDb()->cache(function ($db) {
-            return Settings::find()->where(['component' => $this->className()])->one();
-        }, 3600*3, $dependency);*/
+        return (array) $settings->value;
+    }
+
+    /**
+     * Настройки для сайта
+     * @param (string) $site_code
+     * @return array
+     */
+    public function fetchDefaultSettingsBySiteCode($site_code)
+    {
+        $settings = CmsComponentSettings::fetchByComponentSiteCode($this, (string) $site_code);
+        if (!$settings)
+        {
+            return [];
+        }
+
+        return (array) $settings->value;
     }
 
 
+    /**
+     * Настройки для пользователя
+     * @param (int) $site_code
+     * @return array
+     */
+    public function fetchDefaultSettingsByUserId($user_id)
+    {
+        $settings = CmsComponentSettings::fetchByComponentUserId($this, (int) $user_id);
+        if (!$settings)
+        {
+            return [];
+        }
+
+        return (array) $settings->value;
+    }
+
+    /**
+     * @return $this
+     */
+    public function getEditUrl()
+    {
+        return UrlHelper::construct('cms/admin-component-settings/index', [
+            'componentClassName'    => $this->className(),
+            'attributes'            => $this->attributes,
+            'componentNamespace'             => $this->namespace,
+        ])
+        ->enableAdmin()
+        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+    }
 }

@@ -181,6 +181,13 @@ form.sx-form-admin
             background: #ffffff;
         }
 
+    form.sx-form-admin .sx-buttons-standart
+    {
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-bottom: 0px;
+        margin-top: 15px;
+    }
 
 
 
@@ -686,15 +693,44 @@ div#jGrowl
 
 
 
-
 .sx-box
 {
     border: 1px solid rgba(32, 168, 216, 0.23);
 }
 
+    .sx-box .sx-box-head
+    {
+        border-bottom: 1px solid rgba(32, 168, 216, 0.23);
+    }
+
+        .sx-box .sx-box-head h2
+        {
+            padding: 0px;
+            margin: 0px;
+        }
+
+    .sx-box .sx-box-body
+    {}
+
 .sx-p-10
 {
     padding: 10px;
+}
+.sx-pt-10
+{
+    padding-top: 10px;
+}
+.sx-pl-10
+{
+    padding-left: 10px;
+}
+.sx-pr-10
+{
+    padding-right: 10px;
+}
+.sx-pb-10
+{
+    padding-bottom: 10px;
 }
 
 .sx-bg-primary

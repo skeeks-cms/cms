@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\base;
 use skeeks\cms\base\components\Descriptor;
+use skeeks\cms\traits\HasComponentDescriptorTrait;
 use skeeks\sx\Dir;
 
 /**
@@ -18,6 +19,13 @@ use skeeks\sx\Dir;
  */
 abstract class Module extends \yii\base\Module
 {
+    use HasComponentDescriptorTrait;
+    /**
+     * @var ComponentDescriptor
+     */
+    protected $_descriptor = null;
+
+
     const CHECKS_DIR_NAME = "checks";
     /**
      * namespace проверок
@@ -25,74 +33,6 @@ abstract class Module extends \yii\base\Module
      * @var null
      */
     public $checkNamespace = null;
-
-    /**
-     * @return array
-     */
-    protected function _descriptor()
-    {
-        return
-        [
-            "version"               => "1.0.0",
-
-            "name"                  => "Module Skeeks Cms",
-            "description"           => "",
-            "keywords"              => "skeeks, cms",
-
-            "homepage"              => "http://www.skeeks.com/",
-            "license"               => "BSD-3-Clause",
-
-            "support"               =>
-            [
-                "issues"    =>  "http://www.skeeks.com/",
-                "wiki"      =>  "http://cms.skeeks.com/wiki/",
-                "source"    =>  "http://git.skeeks.com/skeeks/yii2-app"
-            ],
-
-            "companies"   =>
-            [
-                [
-                    "name"      =>  "SkeekS",
-                    "emails"    => ["info@skeeks.com", "support@skeeks.com"],
-                    "phones"    => ["+7 (495) 722-28-73"],
-                    "sites"     => ["skeeks.com"]
-                ]
-            ],
-
-            "authors"    =>
-            [
-                [
-                    "name"      => "Semenov Alexander",
-                    "emails"    => ["semenov@skeeks.com"],
-                    "phones"    => ["+7 (495) 722-28-73"]
-                ],
-
-                [
-                    "name"      => "Semenov Alexander",
-                    "emails"    => ["semenov@skeeks.com"],
-                    "phones"    => ["+7 (495) 722-28-73"]
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @var Descriptor
-     */
-    protected $_descriptor = null;
-
-    /**
-     * @return Descriptor
-     */
-    public function getDescriptor()
-    {
-        if ($this->_descriptor === null)
-        {
-            $this->_descriptor = new Descriptor($this->_descriptor());
-        }
-
-        return $this->_descriptor;
-    }
 
 
     public function init()
@@ -159,7 +99,7 @@ abstract class Module extends \yii\base\Module
      */
     public function getVersion()
     {
-        return (string) $this->getDescriptor()->getVersion();
+        return (string) $this->getDescriptor()->version;
     }
 
 

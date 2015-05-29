@@ -28,7 +28,7 @@ class SeoPageName extends AttributeBehavior
      * @var string the attribute that will receive timestamp value
      * Set this property to false if you do not want to record the creation time.
      */
-    public $generatedAttribute  = 'seo_page_name';
+    public $generatedAttribute  = 'code';
     public $fromAttribute       = 'name';
     public $uniqeue             = true;
 
@@ -49,6 +49,7 @@ class SeoPageName extends AttributeBehavior
             $this->attributes =
             [
                 BaseActiveRecord::EVENT_BEFORE_INSERT => [$this->generatedAttribute],
+                BaseActiveRecord::EVENT_BEFORE_UPDATE => [$this->generatedAttribute],
             ];
         }
     }
@@ -57,9 +58,9 @@ class SeoPageName extends AttributeBehavior
      * @param Event $event
      * @return mixed the value of the user.
      */
-    protected function getValue($event)
+    public function getValue($event)
     {
-        if ($this->value === null)
+        if (!$this->value)
         {
             $filter = new FilterSeoPageName();
             if ($this->owner->{$this->generatedAttribute})
@@ -74,9 +75,10 @@ class SeoPageName extends AttributeBehavior
             //Нужно чтобы поле было уникальным
             if ($this->uniqeue)
             {
-
                 //Значит неуникально
-                if ($founded = $this->owner->find()->where([$this->generatedAttribute => $seoPageName])->one())
+                if ($founded = $this->owner->find()->where([
+                    $this->generatedAttribute => $seoPageName
+                ])->andWhere(["!=", "id", $this->owner->id])->one())
                 {
                     if ($last = $this->owner->find()->orderBy('id DESC')->one())
                     {

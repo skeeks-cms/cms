@@ -172,6 +172,14 @@ class AdminModelEditorController extends AdminController
     }
 
     /**
+     * @return string
+     */
+    public function getIndexUrl()
+    {
+        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
+    }
+
+    /**
      * Немного проверок для уверенности что все пойдет как надо
      * @throws InvalidConfigException
      */
@@ -225,7 +233,8 @@ class AdminModelEditorController extends AdminController
         {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            $this->redirect($this->getIndexUrl());
+            //throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
 
@@ -356,10 +365,7 @@ class AdminModelEditorController extends AdminController
 
         if ($this->_label)
         {
-            $this->getView()->params['breadcrumbs'][] = ['label' => $this->_label, 'url' => [
-                'index',
-                UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
-            ]];
+            $this->getView()->params['breadcrumbs'][] = ['label' => $this->_label, 'url' => $this->indexUrl];
         }
 
         $this->getView()->params['breadcrumbs'][] = ['label' => $this->getCurrentModel()->{$this->_modelShowAttribute}, 'url' => [
@@ -525,23 +531,15 @@ class AdminModelEditorController extends AdminController
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
 
-            //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', '/?aaa');
-            if (\Yii::$app->request->isPjax)
+            if (\Yii::$app->request->post('submit-btn') == 'apply')
             {
-
-                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', \Yii::$app->request->referrer);
-
-                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
-                //\Yii::$app->response->getHeaders()->set('X-PJAX-Url', UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString());
-
                 return $this->redirect(
                     UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
                 );
-
             } else
             {
                 return $this->redirect(
-                    UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
+                    $this->indexUrl
                 );
             }
 
@@ -593,10 +591,18 @@ class AdminModelEditorController extends AdminController
             $model->load(\Yii::$app->request->post());
             if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
-                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                //return $this->redirectRefresh();
-                //return $this->redirectRefresh();
-                //print_r(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString() . '&asdasdasd');die;
+
+                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                {
+                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                } else
+                {
+                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+
+                    return $this->redirect(
+                        $this->indexUrl
+                    );
+                }
 
 
             } else

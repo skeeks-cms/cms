@@ -73,12 +73,6 @@ return
 
     ],
 
-    'comment' =>
-    [
-        'modelClass'             => 'skeeks\cms\models\Comment',
-        'name'             => 'Комментарий',
-    ],
-
     'user' =>
     [
         'modelClass'             => 'skeeks\cms\models\User',
@@ -89,18 +83,6 @@ return
     [
         'modelClass'             => 'skeeks\cms\models\UserGroup',
         'name'             => 'Группа пользователя',
-    ],
-
-    'vote'      =>
-    [
-        'modelClass' => 'skeeks\cms\models\Vote',
-        'name' => 'Голос'
-    ],
-
-    'subscribe'   =>
-    [
-        'modelClass' => 'skeeks\cms\models\Subscribe',
-        'name' => 'Подписка'
     ],
 
     'storageFile'   =>
@@ -121,12 +103,20 @@ return
         'name'          => 'Инфоблок'
     ],
 
+    'cmsContentElement'   =>
+    [
+        'modelClass'    => 'skeeks\cms\models\CmsContentElement',
+        'name'          => 'Элемент контента',
+        'adminControllerRoute'          => 'cms/admin-cms-content-element',
+    ],
+
 
     'f-crop' =>
     [
         'modelClass'    => 'skeeks\cms\components\imaging\filters\Crop',
         'name'          => 'Фильтр обрезать'
     ],
+
     'f-thumbnail' =>
     [
         'modelClass'    => 'skeeks\cms\components\imaging\filters\Thumbnail',

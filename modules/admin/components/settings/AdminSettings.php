@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
@@ -17,22 +18,22 @@ use yii\web\View;
  */
 class AdminSettings extends Component
 {
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function descriptorConfig()
+    {
+        return array_merge(parent::descriptorConfig(), [
+            'name'          => 'Настройки админ панели',
+        ]);
+    }
+
     public $asset;
 
     public $enableCustomConfirm   = 1;
     public $enableCustomPromt     = 1;
 
-    /**
-     * Можно задать название и описание компонента
-     * @return array
-     */
-    static public function getDescriptorConfig()
-    {
-        return
-        [
-            'name'                              => 'Настройки админ панели',
-        ];
-    }
 
     public function rules()
     {
@@ -87,5 +88,18 @@ class AdminSettings extends Component
         return $this;
     }
 
+    /**
+     * layout пустой?
+     * @return bool
+     */
+    public function isEmptyLayout()
+    {
+        if (UrlHelper::constructCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
 }

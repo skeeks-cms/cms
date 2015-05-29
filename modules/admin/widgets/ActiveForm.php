@@ -10,6 +10,10 @@
  */
 namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\traits\ActiveFormTrait;
+use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
 use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
@@ -17,6 +21,8 @@ use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\Pjax;
+use yii\helpers\Json;
+use yii\helpers\Url;
 
 /**
  * Class ActiveForm
@@ -24,6 +30,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
  */
 class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 {
+    use AdminActiveFormTrait;
+
     /**
      * @var bool
      */
@@ -94,22 +102,20 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 
 
     /**
+     * TODO: is depricated (1.2) use buttonsStandart
      * @param Model $model
      * @return string
      */
     public function buttonsCreateOrUpdate(Model $model)
     {
-        if (Validate::validate(new IsNewRecord(), $model)->isValid())
+        /*if (Validate::validate(new IsNewRecord(), $model)->isValid())
         {
             $submit = Html::submitButton("<i class=\"glyphicon glyphicon-saved\"></i> " . \Yii::t('app', 'Create'), ['class' => 'btn btn-success']);
         } else
         {
             $submit = Html::submitButton("<i class=\"glyphicon glyphicon-saved\"></i> " .  \Yii::t('app', 'Update'), ['class' => 'btn btn-primary']);
-        }
-        return Html::tag('div',
-            $submit,
-            ['class' => 'form-group']
-        );
+        }*/
+        return $this->buttonsStandart($model);
     }
 
     public function fieldSet($name, $options = [])
@@ -132,38 +138,4 @@ HTML;
     }
 
 
-    /**
-     *
-     * Стилизованный селект админки
-     *
-     * @param $model
-     * @param $attribute
-     * @param $items
-     * @param array $config
-     * @param array $fieldOptions
-     * @return \skeeks\cms\base\widgets\ActiveField
-     */
-    public function fieldSelect($model, $attribute, $items, $config = [], $fieldOptions = [])
-    {
-        $config = ArrayHelper::merge(
-            ['allowDeselect' => false],
-            $config,
-            [
-                'items'         => $items,
-            ]
-        );
-
-        foreach ($config as $key => $value)
-        {
-            if (property_exists(Chosen::className(), $key) === false)
-            {
-                unset($config[$key]);
-            }
-        }
-
-        return $this->field($model, $attribute, $fieldOptions)->widget(
-            Chosen::className(),
-            $config
-        );
-    }
 }

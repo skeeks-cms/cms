@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
+use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use Yii;
 use skeeks\cms\models\searchs\User as UserSearch;
 use \skeeks\cms\App;
@@ -62,11 +63,17 @@ class ModelPropertiesController extends Controller
                 $modelClass = \Yii::$app->request->post('sx-model');
                 $modelValue = \Yii::$app->request->post('sx-model-value');
                 /**
-                 * @var $modelForm Form
+                 * @var RelatedElementModel $modelForm
                  */
                 $modelForm = $modelClass::find()->where(['id' => $modelValue])->one();
 
-                $validateModel = $modelForm->createPropertiesValidateModel();
+                if (method_exists($modelForm, "createPropertiesValidateModel"))
+                {
+                    $validateModel = $modelForm->createPropertiesValidateModel();
+                } else
+                {
+                    $validateModel = $modelForm->getRelatedPropertiesModel();
+                }
 
                 if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate())
                 {
@@ -118,7 +125,13 @@ class ModelPropertiesController extends Controller
                  */
                 $modelForm = $modelClass::find()->where(['id' => $modelValue])->one();
 
-                $model = $modelForm->createPropertiesValidateModel();
+                if (method_exists($modelForm, "createPropertiesValidateModel"))
+                {
+                    $model = $modelForm->createPropertiesValidateModel();
+                } else
+                {
+                    $model = $modelForm->getRelatedPropertiesModel();
+                }
 
                 $model->load(\Yii::$app->request->post());
 

@@ -80,8 +80,7 @@ $config =
                 ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //админка
 
                 '<_c:(profile)>'                        => 'cms/user/profile',
-                '<_c:(publication|user)>'               => 'cms/<_c>/index',
-                '<_c:(publication)>/<seo_page_name>'    => 'cms/<_c>/view',
+                '<_c:(user)>'                           => 'cms/<_c>/index',
                 '<_c:(user)>/<username>'                => 'cms/<_c>/view',
                 '<_c:(user)>/<username>/<action>'       => 'cms/<_c>/<action>',
 
@@ -94,8 +93,6 @@ $config =
             ]
         ],
 
-        'currentSite' => ['class' => 'skeeks\cms\components\CurrentSite'],
-
         'registeredModels' =>
         [
             'class' => 'skeeks\cms\components\RegisteredModels',
@@ -103,30 +100,10 @@ $config =
             'components' => include_once 'models.php'
         ],
 
-        //Зарегистрированные виджеты
-        'registeredWidgets' =>
-        [
-            'class' => 'skeeks\cms\components\RegisteredWidgets',
-            'components' => include_once 'widgets.php'
-        ],
-
         //Админское меню
         'adminMenu' =>
         [
             'class' => '\skeeks\cms\modules\admin\components\Menu',
-        ],
-
-        'registeredLayouts' =>
-        [
-            'class'         => '\skeeks\cms\components\RegisteredLayouts',
-            /*'components'    =>
-            [
-                'default' =>
-                [
-                    'name' => 'По умолчанию',
-                    'path' => '@app/views/layouts/main.php'
-                ]
-            ]*/
         ],
 
         'seo' =>
@@ -139,35 +116,19 @@ $config =
             'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
         ],
 
-        //Глобальные опции страниц
-        'pageOptions' =>
-        [
-            'class' => '\skeeks\cms\components\PageOptions',
-            'components' =>  include_once 'page-options.php'
-        ],
-
-
-        //Языки проекта
-        'langs' =>
-        [
-            'class' => '\skeeks\cms\components\Langs',
-            /*'components' =>
-            [
-                'ru' =>
-                [
-                    'name' => 'Русский'
-                ],
-
-                'en' =>
-                [
-                    'name' => 'Английский'
-                ],
-            ]*/
-        ],
-
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
+
+            'template'                      => "default",
+            'templates'                     =>
+            [
+                [
+                    'name'      => 'Шаблон по умолчанию',
+                    'code'      => 'default',
+                    'path'      => '@app/templates/default',
+                ]
+            ],
         ],
 
         'imaging' =>
@@ -178,6 +139,11 @@ $config =
         'breadcrumbs' =>
         [
             'class' => '\skeeks\cms\components\Breadcrumbs',
+        ],
+
+        'currentSite' =>
+        [
+            'class' => '\skeeks\cms\components\CurrentSite',
         ]
     ],
 

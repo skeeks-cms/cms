@@ -11,6 +11,7 @@
 namespace skeeks\cms\base\widgets;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\widgets\ActiveField;
 
 /**
  * Class ActiveForm

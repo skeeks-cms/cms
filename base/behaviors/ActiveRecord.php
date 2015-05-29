@@ -21,7 +21,7 @@ use yii\base\Behavior;
 class ActiveRecord extends Behavior
 {
     /**
-     * @var \skeeks\cms\base\db\ActiveRecord the owner of this behavior
+     * @var \yii\db\ActiveRecord the owner of this behavior
      */
     public $owner;
 
@@ -31,9 +31,9 @@ class ActiveRecord extends Behavior
      */
     public function attach($owner)
     {
-        if (!$owner instanceof \skeeks\cms\base\db\ActiveRecord)
+        if (!$owner instanceof \yii\db\ActiveRecord)
         {
-            throw new Exception("Данное поведение рассчитано только для работы с " . \skeeks\cms\base\db\ActiveRecord::className());
+            throw new Exception("Данное поведение рассчитано только для работы с " . \yii\db\ActiveRecord::className());
         }
 
         parent::attach($owner);

@@ -10,18 +10,21 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
-use skeeks\cms\base\propertyTypes\PropertyTypeElement;
-use skeeks\cms\base\propertyTypes\PropertyTypeFile;
-use skeeks\cms\base\propertyTypes\PropertyTypeList;
-use skeeks\cms\base\propertyTypes\PropertyTypeListMulti;
-use skeeks\cms\base\propertyTypes\PropertyTypeNumber;
-use skeeks\cms\base\propertyTypes\PropertyTypeRadioList;
-use skeeks\cms\base\propertyTypes\PropertyTypeSelect;
-use skeeks\cms\base\propertyTypes\PropertyTypeSelectMulti;
-use skeeks\cms\base\propertyTypes\PropertyTypeString;
-use skeeks\cms\base\propertyTypes\PropertyTypeTextarea;
-use skeeks\cms\base\propertyTypes\PropertyTypeTextInput;
-use skeeks\cms\base\propertyTypes\PropertyTypeTree;
+use skeeks\cms\exceptions\NotConnectedToDbException;
+use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsSiteDomain;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeListMulti;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeNumber;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeRadioList;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelect;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelectMulti;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeString;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTextarea;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTextInput;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTree;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
@@ -34,16 +37,40 @@ use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\web\View;
 
 /**
- * Class Cms
+ * @property CmsSite                            $site
+ *
  * @package skeeks\cms\components
  */
 class Cms extends \skeeks\cms\base\Component
 {
+    /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function descriptorConfig()
+    {
+        return array_merge(parent::descriptorConfig(), [
+            'name'          => 'Основной модуль CMS',
+        ]);
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function getConfigFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_form.php';
+    }
+
     const BOOL_Y = "Y";
     const BOOL_N = "N";
 
@@ -72,31 +99,33 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userPropertyTypes       = [];
 
+    /**
+     * @var string шаблон
+     */
+    public $template        = "default";
 
     /**
-     * Можно задать название и описание компонента
-     * @return array
+     * @var array Возможные шаблоны сайта
      */
-    static public function getDescriptorConfig()
-    {
-        return
+    public $templates       =
+    [
         [
-            'name'          => 'Основной модуль CMS',
-        ];
+            'name'      => 'Шаблон по умолчанию',
+            'code'      => 'default',
+            'path'      => '@app/templates/default',
+        ]
+    ];
+
+    /**
+     * @return CmsSite
+     */
+    public function getSite()
+    {
+        return \Yii::$app->currentSite->site;
     }
 
     private static $_huck = 'Z2VuZXJhdG9y';
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function configFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_form.php';
-    }
 
     public function init()
     {
@@ -112,7 +141,6 @@ class Cms extends \skeeks\cms\base\Component
         {
             $this->generateModulesConfigFile();
         }
-
 
         /**
          * Генерация SEO метатегов.
@@ -136,13 +164,26 @@ class Cms extends \skeeks\cms\base\Component
                 }
             }
         });
+
+
+        //TODO:: future refactor;
+        $templatePath = "@app/templates/default";
+        foreach ($this->templates as $templateData)
+        {
+            if ($templateData['code'] == $this->template)
+            {
+                $templatePath = $templateData['path'];
+            }
+        }
+        \Yii::setAlias('template', \Yii::getAlias($templatePath));
     }
 
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template'], 'string'],
+            [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
         ]);
     }
@@ -154,6 +195,8 @@ class Cms extends \skeeks\cms\base\Component
             'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
+            'template'                  => 'Шаблон',
+            'templates'                 => 'Возможные шаблон',
         ]);
     }
 
@@ -256,25 +299,6 @@ class Cms extends \skeeks\cms\base\Component
     }
 
 
-    /**
-     * @var Descriptor
-     */
-    protected static $_descriptor = null;
-
-    /**
-     * @return Descriptor
-     */
-    static public function getDescriptor()
-    {
-        if (self::$_descriptor === null)
-        {
-             self::$_descriptor = new Descriptor((array) \Yii::$app->params["descriptor"]);
-        }
-
-        return self::$_descriptor;
-    }
-
-
 
     /**
      * @param $template
@@ -301,52 +325,6 @@ class Cms extends \skeeks\cms\base\Component
     static public function moduleCms()
     {
         return \Yii::$app->getModule("cms");
-    }
-
-    /**
-     *
-     * TODO: is depricated (Не используется с версии 1.0.6) Реализуется через статический инфоблок.
-     * Виджет статический блок
-     *
-     * @param string $code
-     * @param string $defaultValue
-     * @param array $options
-     * @return string
-     */
-    public function widgetStaticBlock($code, $defaultValue = '', $options = [])
-    {
-        return StaticBlock::widget(ArrayHelper::merge($options, [
-            'code'      => (string) $code,
-            'default'   => (string) $defaultValue
-        ]));
-    }
-
-    /**
-     * TODO: is depricated (Не используется с версии 1.0.6) Использовать метод infoblock()
-     * Вызов инфоблока
-     *
-     * @param string|int $id
-     * @param array $config
-     * @param array $options
-     * @return string
-     */
-    public function widgetInfoblock($id, $options = [], $config = [])
-    {
-        return $this->infoblock($id, $config, $options);
-    }
-
-    /**
-     * TODO: is depricated (Не используется с версии 1.1.2) Использовать метод \skeeks\cms\widgets\Infoblock
-     *
-     * @param $id
-     * @param array $configInfoblock    Опции инфоблока
-     * @return string
-     */
-    public function infoblock($id, $configInfoblock = [])
-    {
-        return Infoblock::widget(ArrayHelper::merge($configInfoblock, [
-            'id'        => $id,
-        ]));
     }
 
 

@@ -33,6 +33,28 @@ use yii\web\View;
 class Seo extends Component
 {
     /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function descriptorConfig()
+    {
+        return array_merge(parent::descriptorConfig(), [
+            'name'          => 'Seo компонент',
+        ]);
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function getConfigFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'seo/_form.php';
+    }
+
+    /**
      *
      * длина ключевых слов
      *
@@ -70,18 +92,6 @@ class Seo extends Component
         //"strong"    =>  2,
     ];
 
-    /**
-     * Можно задать название и описание компонента
-     * @return array
-     */
-    static public function getDescriptorConfig()
-    {
-        return
-        [
-            'name'          => 'Seo компонент',
-        ];
-    }
-
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -98,16 +108,7 @@ class Seo extends Component
         ]);
     }
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function configFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'seo/_form.php';
-    }
+
 
 
 

@@ -28,6 +28,29 @@ use \Yii;
 class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterface
 {
     /**
+     * Можно задать название и описание компонента
+     * @return array
+     */
+    static public function descriptorConfig()
+    {
+        return array_merge(parent::descriptorConfig(), [
+            'name'          => 'Панель инструментов публичного раздела',
+        ]);
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function getConfigFormFile()
+    {
+        $class = new \ReflectionClass($this->className());
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cmsToolbar/_form.php';
+    }
+
+
+    /**
      * @var array the list of IPs that are allowed to access this module.
      * Each array element represents a single IP filter which can be either an IP address
      * or an address with wildcard (e.g. 192.168.0.*) to represent a network segment.
@@ -49,28 +72,8 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
     public $infoblockEditBorderColor             = "red";
 
-    /**
-     * Можно задать название и описание компонента
-     * @return array
-     */
-    static public function getDescriptorConfig()
-    {
-        return
-        [
-            'name'          => 'Панель инструментов публичного раздела',
-        ];
-    }
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function configFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cmsToolbar/_form.php';
-    }
+
 
 
 
@@ -81,6 +84,17 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
         {
             $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+        }
+
+        if (!$this->enabled || \Yii::$app->user->isGuest)
+        {
+            $this->enabled = false;
+            return;
+        }
+
+        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
+        {
+            $this->enabled = false;
         }
 
     }
@@ -164,7 +178,8 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
      */
     public function renderToolbar($event)
     {
-        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax() || !$this->enabled) {
+        if (!$this->enabled)
+        {
             return;
         }
 
@@ -173,7 +188,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         $urlUserEdit = UrlHelper::construct('cms/admin-profile/update')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
         if (is_subclass_of(\Yii::$app->controller->action, ViewModelAction::className()))
         {
-            if ($editModel = \Yii::$app->controller->action->getModel())
+            if ($editModel = \Yii::$app->controller->action->model)
             {
                 if ($descriptor = \Yii::$app->registeredModels->getDescriptor($editModel->className()))
                 {
