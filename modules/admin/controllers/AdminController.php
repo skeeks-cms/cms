@@ -32,16 +32,21 @@ use yii\web\ForbiddenHttpException;
  */
 abstract class AdminController extends Controller
 {
+    /**
+     * @var null
+     * @see parrent::$beforeRender
+     */
     public $beforeRender    = null;
 
+    /**
+     * @var string Понятное название контроллера, будет добавлено в хлебные крошки и title страницы
+     */
     public $name           = 'Название контроллера';
 
-    const BEHAVIOR_ACTION_MANAGER = "actionManager";
     /**
-     * @var string понятное название контроллера, будет добавлено в хлебные крошки и title страницы
+     * Проверка доступа к админке
+     * @return array
      */
-    protected $_label   = null;
-
     public function behaviors()
     {
         return
@@ -59,12 +64,6 @@ abstract class AdminController extends Controller
                     ],
                 ],
             ],
-
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                'class'     => ActionManager::className(),
-                'actions'   => [],
-            ],
         ];
     }
 
@@ -72,145 +71,12 @@ abstract class AdminController extends Controller
     {
         parent::init();
 
+        if (!$this->name)
+        {
+            $this->name = Inflector::humanize($this->id);
+        }
+
         $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
-
-        $this->on(self::EVENT_BEFORE_ACTION, [$this, "_beforeAction"]);
-        $this->on(self::EVENT_AFTER_ACTION, [$this, "_afterAction"]);
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getLabel()
-    {
-        return $this->_label;
-    }
-
-    /**
-     * @return ActionManager
-     */
-    public function actionManager()
-    {
-        return $this->getBehavior(self::BEHAVIOR_ACTION_MANAGER);
-    }
-
-
-    /**
-     *
-     * Вытащить объект текущего действия из события
-     *
-     * @param ActionEvent $e
-     * @return bool|helpers\Action
-     */
-    protected function _getActionFromEvent(ActionEvent $e)
-    {
-        $currentAction = false;
-
-        if ($this->actionManager()->hasAction($e->action->id))
-        {
-            $currentAction = $this->actionManager()->getAction($e->action->id);
-        }
-
-        return $currentAction;
-    }
-
-    protected function _afterAction(ActionEvent $e)
-    {
-
-    }
-
-    /**
-     * @param ActionEvent $e
-     */
-    protected function _beforeAction(ActionEvent $e)
-    {
-        if (!\Yii::$app->request->isAjax)
-        {
-
-            $this->_renderMetadata($e);
-        }
-
-        $this->_renderActions($e);
-        $this->_renderBreadcrumbs($e);
-
-    }
-
-    /**
-     *
-     * Рендер действий текущего контроллера
-     * Сразу запускаем нужный виджет и формируем готовый html
-     * @param ActionEvent $e
-     *
-     * @return $this
-     */
-    protected function _renderActions(ActionEvent $e)
-    {
-        $this->getView()->params["actions"] = ControllerActions::begin([
-            "currentActionCode"     => $e->action->id,
-            "controller"            => $this,
-        ])->run();
-
-        return $this;
-    }
-
-
-    /**
-     * Формируем данные для хлебных крошек.
-     * Эти данные в layout - е будут передаваться в нужный виджет.
-     * @param ActionEvent $e
-     *
-     * @return $this
-     */
-    protected function _renderBreadcrumbs(ActionEvent $e)
-    {
-        $actionTitle = Inflector::humanize($e->action->id);
-
-        if ($currentAction = $this->_getActionFromEvent($e))
-        {
-            $actionTitle = $currentAction->label;
-        }
-
-        if ($this->_label)
-        {
-            $this->getView()->params['breadcrumbs'][] = ['label' => $this->_label, 'url' => [
-                'index',
-                UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
-            ]];
-        }
-
-        if ($this->defaultAction != $e->action->id)
-        {
-            $this->getView()->params['breadcrumbs'][] = $actionTitle;
-        }
-
-        return $this;
-    }
-
-    /**
-     *
-     * Строим метаданные на странице
-     *
-     * @param ActionEvent $e
-     * @return $this
-     */
-    protected function _renderMetadata(ActionEvent $e)
-    {
-        $actionTitle = Inflector::humanize($e->action->id);
-        if ($currentAction = $this->_getActionFromEvent($e))
-        {
-            $actionTitle = $currentAction->label;
-        }
-
-        if ($this->defaultAction != $e->action->id)
-        {
-            $this->getView()->title = $actionTitle . " / " . $this->_label;
-        } else
-        {
-            $this->getView()->title = $this->_label;
-        }
-
-        return $this;
     }
 
 

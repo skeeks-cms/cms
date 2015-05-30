@@ -3,18 +3,13 @@
  * AdminModelEditorController - базовый контроллер админки, который позволяет показывать список моделей.
  * А так же предоставляет действия создания сущьностей, редактирования, просмотра, удаления
  *
- *
- * TODO: Доработки, планы
- * 1) сейчас сплошной харкод привязка к id модели, на самом деле первичный ключ может быть не обязатльено id
- * 2) добавить проверки на наличие у модели PK  (добавил но нужно доработать)
- * 3) автоматическая генерация SearchObject опционально
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
  * @date 30.10.2014
- * @since 1.0.0
+ * @since 2.0.0
  */
+
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
@@ -22,6 +17,8 @@ use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\modules\admin\actions\AdminModelAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
@@ -45,40 +42,50 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
- * Class AdminEntityEditor
+ * Class AdminModelEditorController
  * @package skeeks\cms\modules\admin\controllers
  */
 class AdminModelEditorController extends AdminController
 {
     /**
+     * Обязателен к заполнению!
+     * Класс модели с которым работает контроллер.
+     *
+     * @example ActiveRecord::className();
+     * @see _ensure()
      * @var string
      */
-    public $defaultActionModel      = "update";
-    protected $_modelShowAttribute  = "id";
+    public $modelClassName;
+
+    /**
+     * Действие для управления моделью по умолчанию
+     * @var string
+     */
+    public $modelDefaultAction      = "update";
+
+    /**
+     * Атрибут модели который будет показан в хлебных крошках, и title страницы.
+     * @var string
+     */
+    public $modelShowAttribute      = "id";
+
+    /**
+     * PK будет использоваться для поиска модели
+     * @var string
+     */
     public $modelPkAttribute        = "id";
-    public $modelValidate           = false;
-    public $enableScenarios         = false;
-    public $gridColumns             = ['name'];
 
     /**
-     * обязателено указывать!
-     * @var null|string название сласса модели. example: ActiveRecord::className()
+     * Названия параметра PK, в запросе
+     * @var string
      */
-    protected $_modelClassName  = null;
+    public $requestPkParamName        = "pk";
+
 
     /**
-     * @return string
+     * @var ActiveRecord
      */
-    public function getModelClassName()
-    {
-        return $this->_modelClassName;
-    }
-    /**
-     * Опционально
-     * @var null|string
-     */
-    protected $_modelSearchClassName = null;
-
+    public $model = null;
 
     /**
      * @return array
@@ -93,51 +100,6 @@ class AdminModelEditorController extends AdminController
                     'delete' => ['post'],
                 ],
             ],
-
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                "actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Список",
-                        "icon"         => "glyphicon glyphicon-th-list",
-                        "rules"         => NoModel::className()
-                    ],
-
-                    "create" =>
-                    [
-                        "label"         => "Добавить",
-                        "icon"          => "glyphicon glyphicon-plus",
-                        "rules"         => NoModel::className()
-                    ],
-
-                    /*"view" =>
-                    [
-                        "label"         => "Смотреть",
-                        "icon"          => "glyphicon glyphicon-eye-open",
-                        "rules"         => HasModel::className()
-                    ],*/
-
-                    "update" =>
-                    [
-                        "label"         => "Редактировать",
-                        "icon"          => "glyphicon glyphicon-pencil",
-                        "rules"         => HasModel::className()
-                    ],
-
-                    "delete" =>
-                    [
-                        "label"         => "Удалить",
-                        "icon"          => "glyphicon glyphicon-trash",
-                        "method"        => "post",
-                        "request"       => "ajax",
-                        "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
-                        "priority"      => 9999,
-                        "rules"         => HasModel::className()
-                    ]
-                ]
-            ]
         ]);
     }
 
@@ -148,35 +110,36 @@ class AdminModelEditorController extends AdminController
     {
         return
         [
-            'view' =>
+            'index' =>
             [
-                'class'     => 'skeeks\cms\actions\ViewModelActionTree',
-                'view'      => 'default',
-                'callback'  =>  [$this, 'viewTree']
+                'class'         => AdminAction::className(),
+                'name'          => 'Список',
+                "icon"          => "glyphicon glyphicon-th-list",
             ],
+
+            'create' =>
+            [
+                'class'         => AdminAction::className(),
+                'name'          => 'Добавить',
+                "icon"          => "glyphicon glyphicon-plus",
+            ],
+
+
+            "update" =>
+            [
+                'class'         => AdminModelAction::className(),
+                "name"         => "Редактировать",
+                "icon"          => "glyphicon glyphicon-pencil",
+            ],
+
+            "delete" =>
+            [
+                'class'         => AdminModelAction::className(),
+                "name"          => "Удалить",
+                "icon"          => "glyphicon glyphicon-trash",
+                "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+            ]
         ];
-    }
-
-    /**
-     * @param ActionEvent $e
-     */
-    protected function _beforeAction(ActionEvent $e)
-    {
-        parent::_beforeAction($e);
-
-        if ($this->enableScenarios)
-        {
-            if (!$this->getCurrentModel())
-            {
-                $this->setCurrentModel($this->createCurrentModel());
-            }
-
-            $scenarios = $this->getCurrentModel()->scenarios();
-            if (isset($scenarios[$e->action->id]))
-            {
-                $this->getCurrentModel()->scenario = $e->action->id;
-            }
-        }
     }
 
     /**
@@ -190,238 +153,45 @@ class AdminModelEditorController extends AdminController
     }
 
     /**
-     * @return string
-     */
-    public function getIndexUrl()
-    {
-        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
-    }
-
-    /**
      * Немного проверок для уверенности что все пойдет как надо
      * @throws InvalidConfigException
      */
     protected function _ensure()
     {
-        if ($this->_modelClassName === null)
+        if (!$this->modelClassName)
         {
-            throw new InvalidConfigException("Для AdminEntityEditor необходимо указать класс модели");
+            throw new InvalidConfigException("Для AdminModelEditorController необходимо указать класс модели");
         }
 
-        if (!class_exists($this->_modelClassName))
+        if (!class_exists($this->modelClassName))
         {
-            throw new InvalidConfigException("{$this->_modelClassName} класс не нейден, необходимо указать существующий класс модели");
-        }
-
-        if (!is_subclass_of($this->_modelClassName, ActiveRecord::className()))
-        {
-            //throw new InvalidConfigException("{$this->_modelClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
-        }
-
-        //TODO: доработать
-        if ($this->_modelSearchClassName !== null)
-        {
-            if (!class_exists($this->_modelSearchClassName))
-            {
-                throw new InvalidConfigException("{$this->_modelSearchClassName} класс не нейден, необходимо указать существующий класс поиска");
-            }
-
-            if (!is_subclass_of($this->_modelSearchClassName, ActiveRecord::className()))
-            {
-                //throw new InvalidConfigException("{$this->_modelSearchClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
-            }
+            throw new InvalidConfigException("{$this->modelClassName} класс не нейден, необходимо указать существующий класс модели");
         }
     }
 
-
-
     /**
-     * Finds the Game model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return ActiveRecord the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param \yii\base\Action $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
      */
-    protected function _findModel($id)
+    public function beforeAction($action)
     {
-        $modelClass = $this->_modelClassName;
-        if (($model = $modelClass::findOne($id)) !== null)
+        if (parent::beforeAction($action))
         {
-            return $model;
+            if ($action instanceof AdminModelAction)
+            {
+                $pk = \Yii::$app->request->get($this->requestPkParamName);
+                $modelClass = $this->modelClassName;
+                if (($this->model = $modelClass::findOne($pk)) !== null)
+                {
+                    return true;
+                }
+            }
+
         } else {
-            $this->redirect($this->getIndexUrl());
-            //throw new NotFoundHttpException('The requested page does not exist.');
+            return false;
         }
     }
-
-    protected $_currentModel = null;
-
-    /**
-     * @return array
-     * @throws NotFoundHttpException
-     */
-    public function loadModels()
-    {
-        $result = [];
-
-        if ($keys = (array) \Yii::$app->request->post('keys'))
-        {
-            foreach ($keys as $key)
-            {
-                $result[$key] = $this->_findModel($key);
-            }
-        }
-
-        return $result;
-    }
-    /**
-     * @return $this
-     * @throws Exception
-     * @throws NotFoundHttpException
-     */
-    protected function _loadCurrentModel()
-    {
-        $id = \Yii::$app->request->getQueryParam("id");
-        if (!$id)
-        {
-            //throw new Exception("Текущая модель не может быть загружена");
-            $this->_currentModel = false;
-            return $this;
-        }
-        $this->_currentModel = $this->_findModel($id);
-
-
-        //if (!$this->_currentModel->primaryKey)
-        //{
-            //throw new Exception("У модели нет первичного ключа, не сможем с ней работать");
-        //    $this->_currentModel = false;
-        //    return $this;
-        //}
-
-
-        return $this;
-    }
-
-
-
-    /**
-     * TODO: use $this->getModel();
-     * @return ActiveRecord
-     * @throws Exception
-     */
-    public function getCurrentModel()
-    {
-        if ($this->_currentModel === null)
-        {
-            $this->_loadCurrentModel();
-        }
-
-        return $this->_currentModel;
-    }
-
-    /**
-     * @return ActiveRecord
-     */
-    public function createCurrentModel()
-    {
-        $modelClass = $this->_modelClassName;
-        $model = new $modelClass();
-
-        return $model;
-    }
-
-    /**
-     * @return ActiveRecord
-     */
-    public function getModel()
-    {
-        return $this->getCurrentModel();
-    }
-
-    /**
-     * @param Component $model
-     * @return $this
-     */
-    public function setModel($model)
-    {
-        $this->_currentModel = $model;
-        return $this;
-    }
-    /**
-     * TODO: use $this->getModel();
-     * @param ActiveRecord $model
-     * @return $this
-     */
-    public function setCurrentModel(\yii\db\ActiveRecord $model)
-    {
-        $this->_currentModel = $model;
-        return $this;
-    }
-
-
-
-
-    /**
-     * Формируем данные для хлебных крошек.
-     * Эти данные в layout - е будут передаваться в нужный виджет.
-     * @param ActionEvent $e
-     *
-     * @return $this
-     */
-    protected function _renderBreadcrumbs(ActionEvent $e)
-    {
-        $currentAction = $this->_getActionFromEvent($e);
-        if (!$currentAction instanceof Action || !$this->getCurrentModel())
-        {
-            return parent::_renderBreadcrumbs($e);
-        }
-
-        if ($this->_label)
-        {
-            $this->getView()->params['breadcrumbs'][] = ['label' => $this->_label, 'url' => $this->indexUrl];
-        }
-
-        $this->getView()->params['breadcrumbs'][] = ['label' => $this->getCurrentModel()->{$this->_modelShowAttribute}, 'url' => [
-            $this->defaultActionModel,
-            "id" => $this->getCurrentModel()->{$this->modelPkAttribute},
-            UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
-        ]];
-
-
-        if ($this->defaultAction != $e->action->id)
-        {
-            $this->getView()->params['breadcrumbs'][] = $currentAction->label;
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @param ActionEvent $e
-     * @return $this
-     */
-    protected function _renderMetadata(ActionEvent $e)
-    {
-        //Если текущее действие не описано, делаем как нужно по умолчанию
-        $currentAction = $this->_getActionFromEvent($e);
-        if (!$currentAction instanceof Action || !$this->getCurrentModel())
-        {
-            return parent::_renderMetadata($e);
-        }
-
-        $actionTitle    = $currentAction->label;
-
-        $result[] = $actionTitle;
-        $result[] = $this->getCurrentModel()->{$this->_modelShowAttribute};
-        $result[] = $this->_label;
-
-        $this->getView()->title = implode(" / ", $result);
-        return $this;
-    }
-
-
-
 
 
 
@@ -506,16 +276,7 @@ class AdminModelEditorController extends AdminController
 
         return ArrayHelper::merge($columns, $gridColumns);
     }
-    /**
-     * @return string
-     */
-    public function actionView()
-    {
-        return $this->output(\skeeks\cms\modules\admin\widgets\DetailView::widget([
-            'model' => $this->getCurrentModel(),
 
-        ]));
-    }
 
     /**
      * Creates a new Game model.
@@ -737,6 +498,16 @@ class AdminModelEditorController extends AdminController
         }
 
         //return $this->redirect(\Yii::$app->request->getReferrer());
+    }
+
+
+
+    /**
+     * @return string
+     */
+    public function getIndexUrl()
+    {
+        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
     }
 
 }

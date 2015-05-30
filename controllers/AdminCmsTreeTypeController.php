@@ -25,12 +25,9 @@ class AdminCmsTreeTypeController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Настройки разделов";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = CmsTreeType::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Настройки разделов";
+        $this->modelShowAttribute      = "name";
+        $this->modelClassName          = CmsTreeType::className();
 
         parent::init();
 

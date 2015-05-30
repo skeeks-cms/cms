@@ -67,9 +67,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     {
         return ArrayHelper::merge(parent::behaviors(), [
 
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                "actions" =>
+                /*"actions" =>
                 [
                     'related-properties' =>
                     [
@@ -117,8 +115,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             ]
                         ]
                     ],
-                ]
-            ]
+                ]*/
         ]);
     }
 

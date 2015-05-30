@@ -27,7 +27,7 @@ class AdminFileManagerController extends AdminController
 {
     public function init()
     {
-        $this->_label                   = "Файловый менеджер";
+        $this->name                   = "Файловый менеджер";
         parent::init();
     }
 

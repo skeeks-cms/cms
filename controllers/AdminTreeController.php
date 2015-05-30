@@ -46,47 +46,13 @@ class AdminTreeController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Дерево страниц";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = Tree::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Дерево страниц";
+        $this->modelShowAttribute     = "name";
+        $this->modelClassName         = Tree::className();
 
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        $behaviors =  ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                "actions" =>
-                [
-                    /*'new-children' =>
-                    [
-                        "label" => "Управление подразделами",
-                        "rules" =>
-                        [
-                            [
-                                "class" => HasModel::className()
-                            ]
-                        ]
-                    ],*/
-
-                ]
-            ]
-        ]);
-
-        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['create']);
-
-        return $behaviors;
-    }
 
     public function actionNewChildren()
     {
@@ -191,7 +157,7 @@ class AdminTreeController extends AdminModelEditorSmartController
 
         if (!$modelSeacrhClass)
         {
-            $search = new Search($this->_modelClassName);
+            $search = new Search($this->modelClassName);
             $dataProvider = $search->search(\Yii::$app->request->queryParams);
             $searchModel = $search->getLoadedModel();
         } else

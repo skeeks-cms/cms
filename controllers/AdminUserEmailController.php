@@ -34,12 +34,9 @@ class AdminUserEmailController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление email адресами";
-        $this->_modelShowAttribute      = "value";
-        $this->_modelClassName          = UserEmail::className();
-
-        $this->modelValidate            = true;
-        $this->enableScenarios          = true;
+        $this->name                   = "Управление email адресами";
+        $this->modelShowAttribute      = "value";
+        $this->modelClassName          = UserEmail::className();
 
         parent::init();
 

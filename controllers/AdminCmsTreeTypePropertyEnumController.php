@@ -26,12 +26,9 @@ class AdminCmsTreeTypePropertyEnumController extends AdminModelEditorSmartContro
 {
     public function init()
     {
-        $this->_label                   = "Управление значениями свойств раздела";
-        $this->_modelShowAttribute      = "value";
-        $this->_modelClassName          = CmsTreeTypePropertyEnum::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление значениями свойств раздела";
+        $this->modelShowAttribute      = "value";
+        $this->modelClassName          = CmsTreeTypePropertyEnum::className();
 
         parent::init();
 

@@ -33,30 +33,8 @@ class CheckerController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Проверка системы";
+        $this->name = "Проверка системы";
         parent::init();
-    }
-
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                /*"actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Работа с базой данных",
-                        "rules"         => NoModel::className()
-                    ],
-                ]*/
-            ]
-        ]);
     }
 
     public function actionIndex()

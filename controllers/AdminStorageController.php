@@ -27,7 +27,7 @@ class AdminStorageController extends AdminController
 {
     public function init()
     {
-        $this->_label                   = "Управление серверами";
+        $this->name                   = "Управление серверами";
         parent::init();
     }
 

@@ -27,7 +27,7 @@ class GiiController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Информация о системе";
+        $this->name = "Информация о системе";
 
         parent::init();
     }

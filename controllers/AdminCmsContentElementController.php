@@ -27,12 +27,9 @@ class AdminCmsContentElementController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Элементы";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = CmsContentElement::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                     = "Элементы";
+        $this->modelShowAttribute       = "name";
+        $this->modelClassName           = CmsContentElement::className();
 
         parent::init();
     }
@@ -53,7 +50,7 @@ class AdminCmsContentElementController extends AdminModelEditorSmartController
         {
             if ($this->content->name_meny)
             {
-                $this->_label = $this->content->name_meny;
+                $this->name = $this->content->name_meny;
             }
 
         }

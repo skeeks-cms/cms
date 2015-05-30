@@ -40,18 +40,6 @@ class AuthController extends AdminController
     {
         return
         [
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                'class'     => ActionManager::className(),
-                'actions'   =>
-                    [
-                        "login" =>
-                        [
-                            "label" => "Авторизация"
-                        ],
-                    ],
-            ],
-
             'access' =>
             [
                 'class' => AccessControl::className(),

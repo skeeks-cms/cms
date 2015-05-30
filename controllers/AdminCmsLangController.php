@@ -38,15 +38,10 @@ class AdminCmsLangController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление языками";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = CmsLang::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление языками";
+        $this->modelShowAttribute      = "name";
+        $this->modelClassName          = CmsLang::className();
 
         parent::init();
     }
-
-
 }

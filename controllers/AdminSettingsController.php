@@ -21,7 +21,7 @@ class AdminSettingsController extends AdminController
 {
     public function init()
     {
-        $this->_label                   = "Управление настройками";
+        $this->name                   = "Управление настройками";
         parent::init();
     }
 

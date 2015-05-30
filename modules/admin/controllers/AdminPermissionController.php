@@ -32,10 +32,10 @@ class AdminPermissionController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Управление привилегиями";
-        $this->_modelShowAttribute      = "name";
+        $this->name                   = "Управление привилегиями";
+        $this->modelShowAttribute      = "name";
         $this->modelPkAttribute         = "name";
-        $this->_modelClassName          = Permission::className();
+        $this->modelClassName          = Permission::className();
 
         parent::init();
     }

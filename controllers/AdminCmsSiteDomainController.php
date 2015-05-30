@@ -38,12 +38,9 @@ class AdminCmsSiteDomainController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление доменами";
-        $this->_modelShowAttribute      = "domain";
-        $this->_modelClassName          = CmsSiteDomain::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление доменами";
+        $this->modelShowAttribute      = "domain";
+        $this->modelClassName          = CmsSiteDomain::className();
 
         parent::init();
     }

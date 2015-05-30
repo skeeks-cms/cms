@@ -35,10 +35,10 @@ class AdminRoleController extends AdminModelEditorController
 
     public function init()
     {
-        $this->_label                   = "Управление ролями";
-        $this->_modelShowAttribute      = "name";
+        $this->name                   = "Управление ролями";
+        $this->modelShowAttribute      = "name";
         $this->modelPkAttribute         = "name";
-        $this->_modelClassName          = Role::className();
+        $this->modelClassName          = Role::className();
 
         parent::init();
     }

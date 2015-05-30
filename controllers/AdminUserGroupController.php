@@ -30,9 +30,10 @@ class AdminUserGroupController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление группами пользователей";
-        $this->_modelShowAttribute      = "groupname";
-        $this->_modelClassName          = UserGroup::className();
+        $this->name                   = "Управление группами пользователей";
+        $this->modelShowAttribute      = "groupname";
+        $this->modelClassName          = UserGroup::className();
+
         parent::init();
     }
 

@@ -25,12 +25,9 @@ class AdminCmsContentPropertyEnumController extends AdminModelEditorSmartControl
 {
     public function init()
     {
-        $this->_label                   = "Управление значениями свойств";
-        $this->_modelShowAttribute      = "value";
-        $this->_modelClassName          = CmsContentPropertyEnum::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление значениями свойств";
+        $this->modelShowAttribute      = "value";
+        $this->modelClassName          = CmsContentPropertyEnum::className();
 
         parent::init();
 

@@ -41,19 +41,18 @@ class AccessRule extends \yii\filters\AccessRule
      */
     public function allows($action, $user, $request)
     {
-        if ($action->controller instanceof AdminModelEditorController)
+        /*if ($action->controller instanceof AdminModelEditorController)
         {
-
-            if ($action->controller->getCurrentModel())
+            if ($action->controller->model)
             {
-                if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $action->controller->getCurrentModel())->isValid())
+                if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $action->controller->model)->isValid())
                 {
                     if ($action->id == 'delete')
                     {
                         if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_DELETE))
                         {
                             if (!\Yii::$app->user->can($permission->name, [
-                                'model' => $action->controller->getCurrentModel()
+                                'model' => $action->controller->model
                             ])) {
                                 return false;
                             }
@@ -65,7 +64,7 @@ class AccessRule extends \yii\filters\AccessRule
                         if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED))
                         {
                             if (!\Yii::$app->user->can($permission->name, [
-                                'model' => $action->controller->getCurrentModel()
+                                'model' => $action->controller->model
                             ])) {
                                 return false;
                             }
@@ -75,7 +74,7 @@ class AccessRule extends \yii\filters\AccessRule
                     if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
                     {
                         if (!\Yii::$app->user->can($permission->name, [
-                            'model' => $action->controller->getCurrentModel()
+                            'model' => $action->controller->model
                         ])) {
                             return false;
                         }
@@ -89,26 +88,12 @@ class AccessRule extends \yii\filters\AccessRule
                     {
 
                         if (!\Yii::$app->user->can($permission->name, [
-                            'model' => $action->controller->getCurrentModel()
+                            'model' => $action->controller->model
                         ])) {
                             return false;
                         }
                     }
                 }
-            }
-        } /*else if ($action->controller instanceof AdminController)
-        {
-
-            //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
-            $acttionPermissionName = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId() . '/' . $action->id);
-
-            if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
-            {
-                if (!\Yii::$app->user->can($permission->name))
-                {
-                    return false;
-                }
-
             }
         }*/
 
@@ -126,8 +111,6 @@ class AccessRule extends \yii\filters\AccessRule
                 }
             }
         }
-
-
 
         return parent::allows($action, $user, $request);
     }

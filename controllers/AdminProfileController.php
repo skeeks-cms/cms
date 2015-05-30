@@ -33,9 +33,9 @@ class AdminProfileController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Личный кабинет";
-        $this->_modelShowAttribute      = "username";
-        $this->_modelClassName          = User::className();
+        $this->name                   = "Личный кабинет";
+        $this->modelShowAttribute      = "username";
+        $this->modelClassName          = User::className();
         parent::init();
     }
 

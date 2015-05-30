@@ -28,7 +28,7 @@ class DbController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Удаление временных файлов";
+        $this->name = "Удаление временных файлов";
 
         parent::init();
     }

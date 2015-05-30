@@ -24,12 +24,9 @@ class AdminCmsContentPropertyController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление свойствами";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = CmsContentProperty::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление свойствами";
+        $this->modelShowAttribute      = "name";
+        $this->modelClassName          = CmsContentProperty::className();
 
         parent::init();
 

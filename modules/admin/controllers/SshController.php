@@ -34,7 +34,7 @@ class SshController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Ssh консолька";
+        $this->name = "Ssh консолька";
 
         parent::init();
     }

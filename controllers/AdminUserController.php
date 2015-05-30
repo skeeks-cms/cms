@@ -39,14 +39,12 @@ class AdminUserController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление пользователями";
+        $this->name                   = "Управление пользователями";
 
-        $this->_modelShowAttribute      = "username";
+        $this->modelShowAttribute      = "username";
 
-        $this->_modelClassName          = User::className();
+        $this->modelClassName          = User::className();
         //$this->_modelSearchClassName    = UserSearch::className();
-
-        $this->modelValidate = true;
 
         parent::init();
 

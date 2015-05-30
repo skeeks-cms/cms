@@ -37,12 +37,9 @@ class AdminCmsSiteController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление сайтами";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = CmsSite::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление сайтами";
+        $this->modelShowAttribute      = "name";
+        $this->modelClassName          = CmsSite::className();
 
         parent::init();
     }

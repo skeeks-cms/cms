@@ -31,32 +31,11 @@ class EmailController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Тестирование отправки email сообщений с сайта";
+        $this->name = "Тестирование отправки email сообщений с сайта";
 
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                /*"actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Работа с базой данных",
-                        "rules"         => NoModel::className()
-                    ],
-                ]*/
-            ]
-        ]);
-    }
 
     public function actionIndex()
     {

@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\modules\admin\widgets;
 
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
@@ -82,13 +83,12 @@ class ControllerActions
      */
     public function run()
     {
-        $actionManager = $this->controller->actionManager();
-        if (!$actions = $actionManager->getAllowActions())
+        if (!$actions = $this->controller->actions())
         {
             return "";
         }
 
-        $result = $this->renderListLi($actions, $actionManager);
+        $result = $this->renderListLi($actions);
 
         Asset::register($this->getView());
         return Html::tag("ul", implode($result), $this->ulOptions);
@@ -99,30 +99,30 @@ class ControllerActions
      * @param ActionManager $actionManager
      * @return array
      */
-    public function renderListLi($actions = [], ActionManager $actionManager)
+    public function renderListLi($actions = [])
     {
-        $actionManager = $this->controller->actionManager();
         $result = [];
 
         /**
-         * @var Action $action
+         * @var AdminAction $action
          */
         foreach ($actions as $code => $actionData)
         {
-            $action         = $actionManager->getAction($code);
-            $label          = $action->label;
-
-            //$linkOptions["data-method"]         = $action->method;
-            //$linkOptions["data-confirm"]        = $action->confirm;
+            $action         = $this->controller->createAction($code);
             $linkOptions = [];
 
+            $url = $action->url;
+            if ($this->isOpenNewWindow)
+            {
+                $url->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+            }
+
             $actionData = array_merge($actionData, $this->clientOptions, [
-                "url"               => $this->isOpenNewWindow ? $action->getUrlNewWindow() : $action->getUrl(),
+                "url"               => (string) $url,
                 "isOpenNewWindow"   => $this->isOpenNewWindow,
-                "newWindowName"     => $action->getNewWindowName(),
                 "confirm"           => $action->confirm,
-                "method"            => $action->method,
-                "request"           => $action->request,
+                //"method"            => $action->method,
+                //"request"           => $action->request,
             ]);
 
             $icon = '';
@@ -133,7 +133,7 @@ class ControllerActions
 
             $actionDataJson = Json::encode($actionData);
             $result[] = Html::tag("li",
-                Html::a($icon . '  ' . $label, $action->getUrl(), $linkOptions),
+                Html::a($icon . '  ' . $action->name, $action->getUrl(), $linkOptions),
                 [
                     "class" => $this->currentActionCode == $code ? "active" : "",
                     "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;"
