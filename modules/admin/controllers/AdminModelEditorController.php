@@ -187,6 +187,8 @@ class AdminModelEditorController extends AdminController
                     return true;
                 }
             }
+
+            return true;
         } else
         {
             return false;

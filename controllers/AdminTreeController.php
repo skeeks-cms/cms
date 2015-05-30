@@ -43,7 +43,7 @@ use yii\web\Cookie;
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
-class AdminTreeController extends AdminModelEditorSmartController
+class AdminTreeController extends AdminModelEditorController
 {
     public function init()
     {
