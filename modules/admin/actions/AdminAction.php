@@ -54,7 +54,6 @@ class AdminAction extends ViewAction
     public function run()
     {
         $output = parent::run();
-
         return $output;
     }
 
