@@ -10,6 +10,7 @@ namespace skeeks\cms\modules\admin\actions;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
+use yii\base\InvalidParamException;
 use yii\helpers\Inflector;
 use yii\web\Application;
 use yii\web\ViewAction;
@@ -44,17 +45,14 @@ class AdminAction extends ViewAction
             $this->name = Inflector::humanize($this->id);
         }
 
-        parent::init();
-    }
+        if (!$this->controller instanceof AdminController)
+        {
+            throw new InvalidParamException('Это действие рассчитано для работы с контроллером: ' . AdminController::className());
+        }
 
-    /**
-     * @return string
-     * @throws \yii\web\NotFoundHttpException
-     */
-    public function run()
-    {
-        $output = parent::run();
-        return $output;
+        $this->defaultView = $this->id;
+
+        parent::init();
     }
 
     /**

@@ -19,6 +19,8 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\AdminModelAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
@@ -112,7 +114,7 @@ class AdminModelEditorController extends AdminController
         [
             'index' =>
             [
-                'class'         => AdminAction::className(),
+                'class'         => ModelEditorGridAction::className(),
                 'name'          => 'Список',
                 "icon"          => "glyphicon glyphicon-th-list",
             ],
@@ -127,14 +129,14 @@ class AdminModelEditorController extends AdminController
 
             "update" =>
             [
-                'class'         => AdminModelAction::className(),
+                'class'         => AdminOneModelEditAction::className(),
                 "name"         => "Редактировать",
                 "icon"          => "glyphicon glyphicon-pencil",
             ],
 
             "delete" =>
             [
-                'class'         => AdminModelAction::className(),
+                'class'         => AdminOneModelEditAction::className(),
                 "name"          => "Удалить",
                 "icon"          => "glyphicon glyphicon-trash",
                 "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
@@ -178,13 +180,16 @@ class AdminModelEditorController extends AdminController
     {
         if (parent::beforeAction($action))
         {
-            if ($action instanceof AdminModelAction)
+            if ($action instanceof AdminOneModelEditAction)
             {
                 $pk = \Yii::$app->request->get($this->requestPkParamName);
                 $modelClass = $this->modelClassName;
                 if (($this->model = $modelClass::findOne($pk)) !== null)
                 {
                     return true;
+                } else
+                {
+                    throw new NotFoundHttpException('Не найдено');
                 }
             }
 
@@ -255,7 +260,7 @@ class AdminModelEditorController extends AdminController
         /**
          * @var ActiveRecord $model
          */
-        $modelClassName = $this->getModelClassName();
+        $modelClassName = $this->modelClassName;
         $model = new $modelClassName();
 
         $gridColumns = [];
