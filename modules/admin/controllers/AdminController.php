@@ -14,6 +14,7 @@ use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\modules\admin\filters\AccessRule;
+use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
@@ -59,23 +60,44 @@ abstract class AdminController extends Controller
     {
         return
         [
-            'access' =>
+            'baseAccess' =>
             [
-                'class'         => AccessControl::className(),
-                'ruleConfig'    =>
-                [
-                    'class' => AccessRule::className()
-                ],
-
+                'class'         => AdminAccessControl::className(),
                 'rules' =>
                 [
                     [
-                        'allow' => true,
-                        'roles' =>
+                        'allow'         => true,
+                        'roles'         =>
                         [
                             CmsManager::PERMISSION_ADMIN_ACCESS
                         ],
                     ],
+                ]
+            ],
+
+            'adminActionsAccess' =>
+            [
+                'class'         => AdminAccessControl::className(),
+                'rules' =>
+                [
+                    [
+                        'allow'         => true,
+                        'matchCallback' => function($rule, $action)
+                        {
+                            //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
+                            $acttionPermissionName = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId());
+
+                            if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
+                            {
+                                if (!\Yii::$app->user->can($permission->name))
+                                {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        }
+                    ]
                 ],
             ],
         ];

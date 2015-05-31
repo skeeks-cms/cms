@@ -11,6 +11,7 @@
  */
 
 namespace skeeks\cms\modules\admin\controllers;
+use skeeks\admin\components\AccessControl;
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\widgets\ActiveForm;
@@ -29,7 +30,9 @@ use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
+use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
@@ -99,15 +102,49 @@ class AdminModelEditorController extends AdminController
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
+        $behaviors = ArrayHelper::merge(parent::behaviors(), [
 
-            'verbs' => [
+            'verbs' =>
+            [
                 'class' => VerbFilter::className(),
-                'actions' => [
+                'actions' =>
+                [
                     'delete' => ['post'],
                 ],
             ],
+
+            'accessDelete' =>
+            [
+                'class'         => AdminAccessControl::className(),
+                'only'          => ['delete'],
+                'rules'         =>
+                [
+                    [
+                        'allow'         => true,
+                        'matchCallback' => function($rule, $action)
+                        {
+                            if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->model)->isValid())
+                            {
+                                //Если такая привилегия заведена, нужно ее проверять.
+                                if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_DELETE))
+                                {
+                                    if (!\Yii::$app->user->can($permission->name, [
+                                        'model' => $this->model
+                                    ]))
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            return true;
+                        }
+                    ],
+                ],
+            ]
         ]);
+
+        return $behaviors;
     }
 
     /**

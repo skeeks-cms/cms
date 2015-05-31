@@ -9,6 +9,7 @@ namespace skeeks\cms\modules\admin\actions\modelEditor;
 use skeeks\admin\components\AccessControl;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
@@ -39,7 +40,7 @@ class AdminModelEditorUpdateAction extends AdminOneModelEditAction
 
         $this->controller->attachBehavior('accessCreate',
         [
-            'class'         => \skeeks\cms\modules\admin\filters\AccessControl::className(),
+            'class'         => AdminAccessControl::className(),
             'only'          => [$this->id],
             'rules'         =>
             [
