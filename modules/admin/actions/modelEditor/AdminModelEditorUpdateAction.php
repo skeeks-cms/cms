@@ -6,9 +6,14 @@
  * @date 30.05.2015
  */
 namespace skeeks\cms\modules\admin\actions\modelEditor;
+use skeeks\admin\components\AccessControl;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\sx\validate\Validate;
 use yii\base\InvalidParamException;
+use yii\behaviors\BlameableBehavior;
 use yii\web\Response;
 
 /**
@@ -26,6 +31,42 @@ class AdminModelEditorUpdateAction extends AdminOneModelEditAction
      * @var string
      */
     public $modelScenario = "";
+
+
+    public function init()
+    {
+        parent::init();
+
+        $this->controller->attachBehavior('accessCreate',
+        [
+            'class'         => \skeeks\cms\modules\admin\filters\AccessControl::className(),
+            'only'          => [$this->id],
+            'rules'         =>
+            [
+                [
+                    'allow'         => true,
+                    'matchCallback' => function($rule, $action)
+                    {
+                        if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->controller->model)->isValid())
+                        {
+                            //Если такая привилегия заведена, нужно ее проверять.
+                            if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
+                            {
+                                if (!\Yii::$app->user->can($permission->name, [
+                                    'model' => $this->controller->model
+                                ]))
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return true;
+                    }
+                ],
+            ],
+        ]);
+    }
 
     public function run()
     {

@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
@@ -84,11 +85,11 @@ class AdminUserController extends AdminModelEditorController
             'user' => $model
         ]);
 
+        $rr = new RequestResponse();
+
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
-            $modelForm->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return \skeeks\cms\modules\admin\widgets\ActiveForm::validate($modelForm);
+            return $rr->ajaxValidateForm($modelForm);
         }
 
 

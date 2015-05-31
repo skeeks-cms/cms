@@ -8,7 +8,12 @@
 namespace skeeks\cms\modules\admin\actions\modelEditor;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\filters\AccessControl;
+use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\validators\HasBehavior;
+use skeeks\sx\validate\Validate;
 use yii\base\InvalidParamException;
+use yii\behaviors\BlameableBehavior;
 use yii\web\Response;
 
 /**
@@ -26,6 +31,36 @@ class AdminModelEditorCreateAction extends AdminModelEditorAction
      * @var string
      */
     public $modelScenario = "";
+
+    public function init()
+    {
+        parent::init();
+
+        $this->controller->attachBehavior('accessCreate',
+        [
+            'class'         => AccessControl::className(),
+            'only'          => [$this->id],
+            'rules'         =>
+            [
+                [
+                    'allow'         => true,
+                    'matchCallback' => function($rule, $action)
+                    {
+                        //Если такая привилегия заведена, нужно ее проверять.
+                        if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_CREATE))
+                        {
+                            if (!\Yii::$app->user->can($permission->name))
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+                ],
+            ],
+        ]);
+    }
 
     public function run()
     {

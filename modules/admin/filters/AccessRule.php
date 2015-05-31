@@ -71,28 +71,6 @@ class AccessRule extends \yii\filters\AccessRule
                         }
                     }
 
-                    if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
-                    {
-                        if (!\Yii::$app->user->can($permission->name, [
-                            'model' => $action->controller->model
-                        ])) {
-                            return false;
-                        }
-                    }
-                }
-            } else
-            {
-                if ($action->id == 'create')
-                {
-                    if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_CREATE))
-                    {
-
-                        if (!\Yii::$app->user->can($permission->name, [
-                            'model' => $action->controller->model
-                        ])) {
-                            return false;
-                        }
-                    }
                 }
             }
         }*/

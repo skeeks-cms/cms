@@ -41,7 +41,7 @@ class AdminAction extends ViewAction
     /**
      * @var
      */
-    public $runCallback;
+    public $callback;
 
     public function init()
     {
@@ -69,19 +69,14 @@ class AdminAction extends ViewAction
      */
     public function run()
     {
-        if ($this->runCallback)
+        if ($this->callback)
         {
-            if (!is_callable($this->runCallback))
+            if (!is_callable($this->callback))
             {
-                throw new InvalidConfigException('"' . get_class($this) . '::runCallback" should be a valid callback.');
+                throw new InvalidConfigException('"' . get_class($this) . '::callback" should be a valid callback.');
             }
 
-            $result = call_user_func($this->runCallback, $this);
-
-            if ($result)
-            {
-                return $result;
-            }
+            return call_user_func($this->callback, $this);
         }
 
         return parent::run();

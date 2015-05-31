@@ -62,7 +62,8 @@ abstract class AdminController extends Controller
             'access' =>
             [
                 'class'         => AccessControl::className(),
-                'ruleConfig'    => [
+                'ruleConfig'    =>
+                [
                     'class' => AccessRule::className()
                 ],
 
@@ -70,7 +71,10 @@ abstract class AdminController extends Controller
                 [
                     [
                         'allow' => true,
-                        'roles' => [CmsManager::PERMISSION_ADMIN_ACCESS],
+                        'roles' =>
+                        [
+                            CmsManager::PERMISSION_ADMIN_ACCESS
+                        ],
                     ],
                 ],
             ],
