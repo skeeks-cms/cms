@@ -67,23 +67,8 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     {
         return ArrayHelper::merge(parent::behaviors(), [
 
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                "actions" =>
+                /*"actions" =>
                 [
-                    /*'descriptions' =>
-                    [
-                        "label"     => "Описание",
-                        "icon"     => "glyphicon glyphicon-paperclip",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasDescriptionsBehavior::className()
-                            ]
-                        ]
-                    ],*/
-
                     'related-properties' =>
                     [
                         "label"     => "Дополнительные свойства",
@@ -130,29 +115,7 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                             ]
                         ]
                     ],
-
-
-
-                    /*'social' =>
-                    [
-                        "label"     => "Социальные данные",
-                        'icon'      => 'glyphicon glyphicon-thumbs-up',
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => [
-                                    HasVotes::className(),
-                                    HasComments::className(),
-                                    HasSubscribes::className()
-                                ],
-                                "useOr" => true
-                            ]
-                        ]
-                    ],*/
-
-                ]
-            ]
+                ]*/
         ]);
     }
 
@@ -212,121 +175,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
     }
 
 
-    protected function _actionComments()
-    {
-        $result = "";
-
-        if ( Validate::isValid(new HasBehavior(HasComments::className()), $this->getCurrentModel()) )
-        {
-            $search = new Search(Comment::className());
-            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-            $searchModel    = $search->getLoadedModel();
-
-            $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
-
-            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-comment");
-
-            $result = \Yii::$app->cms->moduleCms()->renderFile("admin-comment/index.php", [
-                'searchModel'   => $searchModel,
-                'dataProvider'  => $dataProvider,
-                'controller'    => $controller,
-            ]);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return string
-     * @throws \yii\base\InvalidConfigException
-     */
-    protected function _actionVotes()
-    {
-        $result = "";
-
-        if ( Validate::isValid(new HasBehavior(HasVotes::className()), $this->getCurrentModel()) )
-        {
-            $search = new Search(Vote::className());
-            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-            $searchModel    = $search->getLoadedModel();
-
-            $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
-
-            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-vote");
-
-            $result = \Yii::$app->cms->moduleCms()->renderFile("admin-vote/index.php", [
-                'searchModel'   => $searchModel,
-                'dataProvider'  => $dataProvider,
-                'controller'    => $controller,
-            ]);
-        };
-
-        return $result;
-    }
-
-    /**
-     * @return string
-     * @throws \yii\base\InvalidConfigException
-     */
-    protected function _actionSubscribes()
-    {
-        $result = "";
-
-        if ( Validate::isValid(new HasBehavior(HasSubscribes::className()), $this->getCurrentModel()) )
-        {
-            $search = new Search(Subscribe::className());
-            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-            $searchModel    = $search->getLoadedModel();
-
-            $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
-
-            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-subscribe");
-
-            $result = \Yii::$app->cms->moduleCms()->renderFile("admin-subscribe/index.php", [
-                'searchModel'   => $searchModel,
-                'dataProvider'  => $dataProvider,
-                'controller'    => $controller,
-            ]);
-        }
-
-        return $result;
-
-    }
-
-
-    public function actionSocial()
-    {
-        $subscribes = $this->_actionSubscribes();
-        $comments   = $this->_actionComments();
-        $votes      = $this->_actionVotes();
-
-        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/social.php", [
-            'subscribes'   => $subscribes,
-            'comments'   => $comments,
-            'votes'   => $votes,
-        ]));
-
-    }
-
-    public function actionPublications()
-    {
-        $search = new Search(Publication::className());
-        $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-        $searchModel    = $search->getLoadedModel();
-
-        $dataProvider->query->andWhere($this->getCurrentModel()->getRef()->toArray());
-
-        $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-publication");
-
-        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-publication/index.php", [
-            'searchModel'   => $searchModel,
-            'dataProvider'  => $dataProvider,
-            'controller'    => $controller,
-        ]));
-    }
-
-
-
     public function actionSystem()
     {
         /*$model = $this->getModel();
@@ -373,113 +221,5 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
             "model" => $this->getModel()
         ]));
     }
-
-
-
-    public function actionPageOptions()
-    {
-        $model = $this->getModel();
-
-        $optionsCurrent = $model->getMultiPageOptionsData();
-
-        $pageOption         = null;
-        if ($pageOptionId = \Yii::$app->request->getQueryParam('page-option'))
-        {
-            $pageOption = \Yii::$app->pageOptions->getComponent($pageOptionId);
-
-            if ($model->hasPageOptionValueData($pageOptionId))
-            {
-                $pageOption->getValue()->setAttributes($model->getPageOptionValueData($pageOptionId));
-
-            }
-        }
-
-        if ($pageOption && \Yii::$app->request->isPost)
-        {
-            if ($pageOption->getValue()->load(\Yii::$app->request->post()))
-            {
-                $optionsCurrent[$pageOptionId] = $pageOption->getValue()->attributes;
-                $model->setMultiPageOptionsData($optionsCurrent);
-                $model->save(false);
-
-                return $this->redirectRefresh();
-            } else
-            {
-                $optionsCurrent[$pageOptionId] = $pageOption->getValue()->attributes;
-                $model->setMultiPageOptionsData('');
-                $model->save(false);
-
-                return $this->redirectRefresh();
-            }
-        }
-
-
-        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/page-options.php", [
-            "model"         => $this->getModel(),
-            "pageOption"    => $pageOption
-        ]));
-    }
-
-
-
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionDescriptions()
-    {
-        $model = $this->getModel();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            //$model->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            //return ActiveForm::validate($model);
-            return [];
-        }
-
-        if (\Yii::$app->request->isAjax)
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-            {
-                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                //return $this->redirectRefresh();
-                //return $this->redirectRefresh();
-                //print_r(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString() . '&asdasdasd');die;
-
-
-            } else
-            {
-                //if (\Yii::$app->request->isPost)
-                //{
-                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-                //}
-            }
-
-        } else
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->save(false))
-            {
-                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                if (!\Yii::$app->request->isAjax)
-                {
-                    return $this->redirectRefresh();
-                }
-
-            } else
-            {
-                if (\Yii::$app->request->isPost)
-                {
-                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-                }
-            }
-        }
-
-
-        return $this->output(\Yii::$app->cms->moduleAdmin()->renderFile("base-actions/descriptions.php", [
-            "model" => $this->getModel()
-        ]));
-    }
-
-
 
 }

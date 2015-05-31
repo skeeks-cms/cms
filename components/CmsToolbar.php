@@ -11,6 +11,7 @@ use skeeks\cms\assets\CmsToolbarAsset;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
 use yii\helpers\ArrayHelper;
@@ -194,7 +195,13 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
                 {
                     if ($descriptor->adminControllerRoute)
                     {
-                        $urlEditModel = UrlHelper::construct($descriptor->adminControllerRoute . '/update', ['id' => $editModel->id])->enableAdmin()
+
+                        /**
+                         * @var $controller AdminModelEditorController
+                         */
+                        $controller = \Yii::$app->createController($descriptor->adminControllerRoute)[0];
+
+                        $urlEditModel = UrlHelper::construct($descriptor->adminControllerRoute . '/update', [$controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}])->enableAdmin()
                             ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                             //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                             ;

@@ -12,7 +12,6 @@ use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
@@ -23,26 +22,20 @@ use yii\base\ActionEvent;
  * Class AdminCmsContentTypeController
  * @package skeeks\cms\controllers
  */
-class AdminCmsContentElementController extends AdminModelEditorSmartController
+class AdminCmsContentElementController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Элементы";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = CmsContentElement::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                     = "Элементы";
+        $this->modelShowAttribute       = "name";
+        $this->modelClassName           = CmsContentElement::className();
 
         parent::init();
     }
 
     public $content;
 
-    /**
-     * @param ActionEvent $e
-     */
-    protected function _beforeAction(ActionEvent $e)
+    public function beforeAction($action)
     {
         if ($content_id = \Yii::$app->request->get('content_id'))
         {
@@ -53,12 +46,11 @@ class AdminCmsContentElementController extends AdminModelEditorSmartController
         {
             if ($this->content->name_meny)
             {
-                $this->_label = $this->content->name_meny;
+                $this->name = $this->content->name_meny;
             }
-
         }
 
-        parent::_beforeAction($e);
+        return parent::beforeAction($action);
     }
 
     /**

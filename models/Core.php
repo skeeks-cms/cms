@@ -143,15 +143,4 @@ abstract class Core extends ActiveRecord
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'id'], 'integer'],
         ];
     }
-
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
-        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
-
-        return $scenarios;
-    }
 }

@@ -7,31 +7,20 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\models\CmsContentProperty;
-use skeeks\cms\models\CmsContentType;
-use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
 
 /**
- * Class AdminCmsContentPropertyController
+ * Class AdminCmsTreeTypePropertyEnumController
  * @package skeeks\cms\controllers
  */
-class AdminCmsTreeTypePropertyEnumController extends AdminModelEditorSmartController
+class AdminCmsTreeTypePropertyEnumController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Управление значениями свойств раздела";
-        $this->_modelShowAttribute      = "value";
-        $this->_modelClassName          = CmsTreeTypePropertyEnum::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление значениями свойств раздела";
+        $this->modelShowAttribute      = "value";
+        $this->modelClassName          = CmsTreeTypePropertyEnum::className();
 
         parent::init();
 

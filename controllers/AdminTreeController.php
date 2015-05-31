@@ -15,8 +15,8 @@ use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
@@ -42,50 +42,43 @@ use yii\web\Cookie;
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
-class AdminTreeController extends AdminModelEditorSmartController
+class AdminTreeController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Дерево страниц";
-        $this->_modelShowAttribute      = "name";
-        $this->_modelClassName          = Tree::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Дерево страниц";
+        $this->modelShowAttribute     = "name";
+        $this->modelClassName         = Tree::className();
 
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        $behaviors =  ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return ArrayHelper::merge(parent::actions(), [
+            'index' =>
             [
-                "actions" =>
-                [
-                    /*'new-children' =>
-                    [
-                        "label" => "Управление подразделами",
-                        "rules" =>
-                        [
-                            [
-                                "class" => HasModel::className()
-                            ]
-                        ]
-                    ],*/
+                'class'         => AdminAction::className(),
+                'name'          => 'Разделы',
+                'viewParams'    => $this->indexData()
+            ],
 
-                ]
+            'create' =>
+            [
+                'visible'    => false
             ]
         ]);
+    }
 
-        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['create']);
+    public function indexData()
+    {
+        $tree = new Tree();
+        $models = $tree->findRoots()->all();
 
-        return $behaviors;
+        return
+        [
+            'models' => $models
+        ];
     }
 
     public function actionNewChildren()
@@ -93,7 +86,7 @@ class AdminTreeController extends AdminModelEditorSmartController
         /**
          * @var Tree $parent
          */
-        $parent = $this->getCurrentModel();
+        $parent = $this->model;
 
         if (\Yii::$app->request->isPost)
         {
@@ -169,43 +162,9 @@ class AdminTreeController extends AdminModelEditorSmartController
         }
     }
 
-    public function actionIndex()
-    {
-        $tree = new Tree();
-        $models = $tree->findRoots()->all();
 
 
-        return $this->render('index', [
-            'models' => $models
-        ]);
-    }
 
-
-    /**
-     * Lists all Game models.
-     * @return mixed
-     */
-    public function actionList()
-    {
-        $modelSeacrhClass = $this->_modelSearchClassName;
-
-        if (!$modelSeacrhClass)
-        {
-            $search = new Search($this->_modelClassName);
-            $dataProvider = $search->search(\Yii::$app->request->queryParams);
-            $searchModel = $search->getLoadedModel();
-        } else
-        {
-            $searchModel = new $modelSeacrhClass();
-            $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
-        }
-
-        return $this->render('list', [
-            'searchModel'   => $searchModel,
-            'dataProvider'  => $dataProvider,
-            'controller'    => $this,
-        ]);
-    }
 
     /**
      * Пересортирует элементы дерева при перетаскивании

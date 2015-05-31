@@ -12,6 +12,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\models\forms\SshConsoleForm;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
@@ -34,31 +35,22 @@ class SshController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Ssh консолька";
+        $this->name = "Ssh консоль";
 
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return
+        [
+            "index" =>
             [
-                /*"actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Работа с базой данных",
-                        "rules"         => NoModel::className()
-                    ],
-                ]*/
-            ]
-        ]);
+                "class"        => AdminAction::className(),
+                "name"         => "Консоль",
+                "callback"     => [$this, 'actionIndex'],
+            ],
+        ];
     }
 
     public function actionIndex()
@@ -83,7 +75,7 @@ class SshController extends AdminController
             $result = ob_get_clean();
         }
 
-        return $this->render('index', [
+        return $this->render($this->action->id, [
             'model'     => $model,
             'result'    => $result
         ]);

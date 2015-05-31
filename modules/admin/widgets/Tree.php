@@ -59,17 +59,7 @@ class Tree
     public function init()
     {
         parent::init();
-        $this->_ensure();
-
     }
-
-    /**
-     * Парочка проверок, для целостности
-     * @throws InvalidConfigException
-     */
-    protected function _ensure()
-    {}
-
 
     protected $_selectedTmp = [];
     protected $_openedTmp = [];

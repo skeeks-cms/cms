@@ -43,10 +43,10 @@ class DropdownControllerActions
     public function run()
     {
         return "<div class='{$this->containerClass}' title='Возможные действия'>
-            <button type=\"button\" class='btn btn-xs btn-default' data-toggle=\"dropdown\">
-               <span class=\"caret\"></span>
-            </button>" .
-            parent::run()
-        . "</div>";
+                    <button type=\"button\" class='btn btn-xs btn-default' data-toggle=\"dropdown\">
+                       <span class=\"caret\"></span>
+                    </button>" .
+                    parent::run()
+                . "</div>";
     }
 }

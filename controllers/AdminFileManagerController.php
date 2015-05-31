@@ -12,9 +12,8 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Comment;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -27,12 +26,19 @@ class AdminFileManagerController extends AdminController
 {
     public function init()
     {
-        $this->_label                   = "Файловый менеджер";
+        $this->name                   = "Файловый менеджер";
         parent::init();
     }
 
-    public function actionIndex()
+    public function actions()
     {
-        return $this->render("index");
+        return
+        [
+            "index" =>
+            [
+                "class"        => AdminAction::className(),
+                "name"         => "Файловый менеджер",
+            ],
+        ];
     }
 }

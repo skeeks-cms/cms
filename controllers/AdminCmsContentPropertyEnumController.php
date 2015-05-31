@@ -7,30 +7,21 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
-use skeeks\cms\models\CmsContentType;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
 
 /**
- * Class AdminCmsContentPropertyController
+ * Class AdminCmsContentPropertyEnumController
  * @package skeeks\cms\controllers
  */
-class AdminCmsContentPropertyEnumController extends AdminModelEditorSmartController
+class AdminCmsContentPropertyEnumController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Управление значениями свойств";
-        $this->_modelShowAttribute      = "value";
-        $this->_modelClassName          = CmsContentPropertyEnum::className();
-
-        $this->modelValidate = true;
-        $this->enableScenarios = true;
+        $this->name                   = "Управление значениями свойств";
+        $this->modelShowAttribute      = "value";
+        $this->modelClassName          = CmsContentPropertyEnum::className();
 
         parent::init();
 
