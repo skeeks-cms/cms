@@ -152,41 +152,42 @@ class AdminModelEditorController extends AdminController
      */
     public function actions()
     {
-        return
-        [
-            'index' =>
+        return ArrayHelper::merge(parent::actions(),
             [
-                'class'         => ModelEditorGridAction::className(),
-                'name'          => 'Список',
-                "icon"          => "glyphicon glyphicon-th-list",
-            ],
+                'index' =>
+                [
+                    'class'         => ModelEditorGridAction::className(),
+                    'name'          => 'Список',
+                    "icon"          => "glyphicon glyphicon-th-list",
+                ],
 
-            'create' =>
-            [
-                'class'         => AdminModelEditorCreateAction::className(),
-                'name'          => 'Добавить',
-                "icon"          => "glyphicon glyphicon-plus",
-            ],
+                'create' =>
+                [
+                    'class'         => AdminModelEditorCreateAction::className(),
+                    'name'          => 'Добавить',
+                    "icon"          => "glyphicon glyphicon-plus",
+                ],
 
 
-            "update" =>
-            [
-                'class'         => AdminModelEditorUpdateAction::className(),
-                "name"         => "Редактировать",
-                "icon"          => "glyphicon glyphicon-pencil",
-            ],
+                "update" =>
+                [
+                    'class'         => AdminModelEditorUpdateAction::className(),
+                    "name"         => "Редактировать",
+                    "icon"          => "glyphicon glyphicon-pencil",
+                ],
 
-            "delete" =>
-            [
-                'class'         => AdminOneModelEditAction::className(),
-                "name"          => "Удалить",
-                "icon"          => "glyphicon glyphicon-trash",
-                "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
-                "method"        => "post",
-                "request"       => "ajax",
-                "callback"      => [$this, 'actionDelete'],
+                "delete" =>
+                [
+                    'class'         => AdminOneModelEditAction::className(),
+                    "name"          => "Удалить",
+                    "icon"          => "glyphicon glyphicon-trash",
+                    "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+                    "method"        => "post",
+                    "request"       => "ajax",
+                    "callback"      => [$this, 'actionDelete'],
+                ]
             ]
-        ];
+        );
     }
 
     /**

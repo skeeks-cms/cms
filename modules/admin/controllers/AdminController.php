@@ -11,6 +11,7 @@ use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
+use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\modules\admin\filters\AccessRule;
@@ -20,6 +21,7 @@ use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
+use yii\base\Event;
 use yii\base\InlineAction;
 use yii\base\Model;
 use yii\behaviors\BlameableBehavior;
@@ -36,6 +38,8 @@ use yii\web\ForbiddenHttpException;
  */
 abstract class AdminController extends Controller
 {
+    const EVENT_INIT                   = 'event.adminController.init';
+
     /**
      * @var null
      * @see parrent::$beforeRender
@@ -53,6 +57,14 @@ abstract class AdminController extends Controller
     protected $_actions    = null;
 
     /**
+     * После инициализации, контроллера, любой компонент, может добавить свои дейсвия, они будут добавлены к текущим дейсвоиям контроллера.
+     * @see init()
+     * @see actions()
+     * @var array
+     */
+    public $eventActions = [];
+
+    /**
      * Проверка доступа к админке
      * @return array
      */
@@ -60,7 +72,8 @@ abstract class AdminController extends Controller
     {
         return
         [
-            'baseAccess' =>
+            //Проверка доступа к админ панели
+            'adminAccess' =>
             [
                 'class'         => AdminAccessControl::className(),
                 'rules' =>
@@ -75,6 +88,7 @@ abstract class AdminController extends Controller
                 ]
             ],
 
+            //Стандартная проверка доступности действия. Если действие заведено, в привилегиях, то проверяется наличие у пользователя
             'adminActionsAccess' =>
             [
                 'class'         => AdminAccessControl::className(),
@@ -103,6 +117,7 @@ abstract class AdminController extends Controller
         ];
     }
 
+
     public function init()
     {
         parent::init();
@@ -113,6 +128,20 @@ abstract class AdminController extends Controller
         }
 
         $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
+
+
+        \Yii::$app->trigger(self::EVENT_INIT, new AdminInitEvent([
+            'name'          => self::EVENT_INIT,
+            'controller'    => $this
+        ]));
+    }
+
+    /**
+     * @return array
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge($this->eventActions, []);
     }
 
     /**
@@ -143,14 +172,5 @@ abstract class AdminController extends Controller
         }
 
         return $this->_actions;
-    }
-
-
-    /**
-     * @return \yii\web\Response
-     */
-    public function redirectRefresh()
-    {
-        return $this->redirect(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString());
     }
 }

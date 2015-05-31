@@ -35,6 +35,11 @@ class AdminSettings extends Component
     public $enableCustomPromt     = 1;
 
 
+    public function init()
+    {
+        parent::init();
+    }
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [

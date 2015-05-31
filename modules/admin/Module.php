@@ -16,6 +16,8 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Site;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use skeeks\cms\modules\admin\components\UrlRule;
+use yii\base\Event;
+use yii\base\Object;
 
 /**
  * Class Module
@@ -26,6 +28,8 @@ class Module extends CmsModule
     //Скрывать кнопки действи сущьности
     const SYSTEM_QUERY_NO_ACTIONS_MODEL = 'no-actions';
     const SYSTEM_QUERY_EMPTY_LAYOUT     = 'sx-empty-layout';
+
+    const EVENT_READY                   = 'event.adminModule.ready';
 
     public $controllerNamespace = 'skeeks\cms\modules\admin\controllers';
 
@@ -58,6 +62,18 @@ class Module extends CmsModule
             {
                 $this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
             }
+
+
+            //Загрузка всех компонентов.
+            $components = \Yii::$app->getComponents();
+            foreach ($components as $id => $data)
+            {
+                \Yii::$app->get($id);
+            }
+
+            \Yii::$app->trigger(self::EVENT_READY, new Event([
+                'name' => self::EVENT_READY
+            ]));
         }
     }
 
