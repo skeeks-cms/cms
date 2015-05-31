@@ -73,50 +73,6 @@ class Module extends CmsModule
 
 
     /**
-     * @var array
-     * @see [[items]]
-     */
-    private $_menuItems;
-
-
-    /**
-     * Get avalible menu.
-     * @return array
-     */
-    public function getMenuItems()
-    {
-        if ($this->_menuItems === null)
-        {
-            return $this->_menuItems = $this->_loadMenuItems();
-        }
-
-        return $this->_menuItems;
-    }
-
-    /**
-     * Get core menu
-     * @return array
-     */
-    private function _loadMenuItems()
-    {
-        $modules = \Yii::$app->cms->getModules();
-
-        $result = [];
-        /**
-         * @var \skeeks\cms\Module $module
-         */
-        foreach ($modules as $key => $module)
-        {
-            //Каждый модуль добавляет свои пункты меню
-            $result = array_merge($result, $module->getAdminMenuItems());
-        }
-
-        $result = array_merge($result, \Yii::$app->cms->getAdminMenuItems());
-
-        return $result;
-    }
-
-    /**
      * @param array $data
      * @return string
      */
@@ -145,36 +101,6 @@ class Module extends CmsModule
         return false;
     }
 
-
-    /**
-     * @return null|\skeeks\cms\models\Lang
-     */
-    public function getCurrentLang()
-    {
-        $langId = (string) \Yii::$app->getSession()->get('lang');
-
-        if ($langId)
-        {
-            return \Yii::$app->langs->getComponent($langId);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return null|Site
-     */
-    public function getCurrentSite()
-    {
-        $siteId = \Yii::$app->getSession()->get('site');
-
-        if ($siteId)
-        {
-            return Site::findById($siteId);
-        }
-
-        return null;
-    }
 
 
     /**
