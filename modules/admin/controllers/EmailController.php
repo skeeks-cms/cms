@@ -8,6 +8,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\models\forms\EmailConsoleForm;
 use skeeks\cms\modules\admin\models\forms\SshConsoleForm;
@@ -36,6 +37,18 @@ class EmailController extends AdminController
         parent::init();
     }
 
+    public function actions()
+    {
+        return
+        [
+            "index" =>
+            [
+                "class"        => AdminAction::className(),
+                "name"         => "Тестирование отправки email",
+                "callback"     => [$this, 'actionIndex'],
+            ],
+        ];
+    }
 
     public function actionIndex()
     {

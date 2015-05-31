@@ -13,8 +13,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\models\searchs\Publication as PublicationSearch;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;

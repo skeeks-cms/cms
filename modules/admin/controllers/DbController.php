@@ -11,6 +11,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\sx\Dir;
 use yii\data\ArrayDataProvider;
@@ -34,26 +35,19 @@ class DbController extends AdminController
     }
 
 
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return
+        [
+            "index" =>
             [
-                "actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Работа с базой данных",
-                        "rules"         => NoModel::className()
-                    ],
-                ]
-            ]
-        ]);
+                "class"        => AdminAction::className(),
+                "name"         => "Работа с базой данных",
+                "callback"     => [$this, 'actionIndex'],
+            ],
+        ];
     }
+
 
     public function actionIndex()
     {
@@ -67,7 +61,6 @@ class DbController extends AdminController
                 \Yii::$app->getSession()->setFlash('success', 'Кэш таблиц успешно обновлен');
             }
         }
-
 
 
         $dataProvider = new ArrayDataProvider([

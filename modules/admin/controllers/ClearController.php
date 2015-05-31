@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\sx\Dir;
 use yii\filters\VerbFilter;
@@ -26,30 +27,20 @@ class ClearController extends AdminController
     public function init()
     {
         $this->name = "Удаление временных файлов";
-
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return
+        [
+            "index" =>
             [
-                "actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Чистка всего",
-                        "rules"         => NoModel::className()
-                    ],
-                ]
-            ]
-        ]);
+                "class"        => AdminAction::className(),
+                "name"         => "Чистка всего",
+                "callback"     => [$this, 'actionIndex'],
+            ],
+        ];
     }
 
     public function actionIndex()

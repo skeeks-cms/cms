@@ -9,6 +9,7 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\sx\Dir;
 use yii\data\ArrayDataProvider;
@@ -27,35 +28,21 @@ class GiiController extends AdminController
 {
     public function init()
     {
-        $this->name = "Информация о системе";
+        $this->name = "Помощь в разработке";
 
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return
+        [
+            "index" =>
             [
-
-            ]
-        ]);
+                "class"        => AdminAction::className(),
+                "name"         => "Генератор кода",
+            ],
+        ];
     }
-
-    public function actionIndex()
-    {
-        return $this->render('index', [
-
-
-        ]);
-    }
-
-
-
 
 }

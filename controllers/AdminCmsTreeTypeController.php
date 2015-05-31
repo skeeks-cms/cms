@@ -7,21 +7,14 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\models\CmsContent;
-use skeeks\cms\models\CmsContentType;
 use skeeks\cms\models\CmsTreeType;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
 
 /**
  * Class AdminCmsTreeTypeController
  * @package skeeks\cms\controllers
  */
-class AdminCmsTreeTypeController extends AdminModelEditorSmartController
+class AdminCmsTreeTypeController extends AdminModelEditorController
 {
     public function init()
     {

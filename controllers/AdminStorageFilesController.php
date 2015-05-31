@@ -18,7 +18,6 @@ use skeeks\cms\models\searchs\Publication as PublicationSearch;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
 use skeeks\cms\validators\HasBehavior;
@@ -34,7 +33,7 @@ use yii\web\Response;
  * Class AdminStorageFilesController
  * @package skeeks\cms\controllers
  */
-class AdminStorageFilesController extends AdminModelEditorSmartController
+class AdminStorageFilesController extends AdminModelEditorController
 {
     public function init()
     {

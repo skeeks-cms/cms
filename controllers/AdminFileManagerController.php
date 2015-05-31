@@ -13,8 +13,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Comment;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;

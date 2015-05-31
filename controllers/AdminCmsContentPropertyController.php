@@ -8,19 +8,14 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\CmsContentProperty;
-use skeeks\cms\models\CmsContentType;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
 
 /**
  * Class AdminCmsContentPropertyController
  * @package skeeks\cms\controllers
  */
-class AdminCmsContentPropertyController extends AdminModelEditorSmartController
+class AdminCmsContentPropertyController extends AdminModelEditorController
 {
     public function init()
     {
@@ -29,7 +24,6 @@ class AdminCmsContentPropertyController extends AdminModelEditorSmartController
         $this->modelClassName          = CmsContentProperty::className();
 
         parent::init();
-
     }
 
 }

@@ -11,6 +11,7 @@ use skeeks\cms\base\CheckComponent;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\models\forms\SshConsoleForm;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
@@ -37,10 +38,16 @@ class CheckerController extends AdminController
         parent::init();
     }
 
-    public function actionIndex()
+    public function actions()
     {
-        return $this->render('index', [
-        ]);
+        return
+        [
+            "index" =>
+            [
+                "class"        => AdminAction::className(),
+                "name"         => "Тесирование",
+            ],
+        ];
     }
 
     public function actionCheckTest()

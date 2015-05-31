@@ -17,7 +17,6 @@ use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
@@ -59,6 +58,7 @@ class AdminTreeController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(), [
             'index' =>
             [
+                'class'         => AdminAction::className(),
                 'name'          => 'Разделы',
                 'viewParams'    => $this->indexData()
             ],
@@ -86,7 +86,7 @@ class AdminTreeController extends AdminModelEditorController
         /**
          * @var Tree $parent
          */
-        $parent = $this->getCurrentModel();
+        $parent = $this->model;
 
         if (\Yii::$app->request->isPost)
         {
