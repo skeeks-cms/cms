@@ -30,4 +30,14 @@ trait AdminActionTrait
      * @var string Здавать вопрос перед запуском этого действия?
      */
     public $confirm = '';
+
+    /**
+     * @var string
+     */
+    public $method  = 'get';
+
+    /**
+     * @var string
+     */
+    public $request = ''; //ajax
 }

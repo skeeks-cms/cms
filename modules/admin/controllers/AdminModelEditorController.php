@@ -19,6 +19,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\AdminModelAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\components\UrlRule;
@@ -123,7 +124,7 @@ class AdminModelEditorController extends AdminController
 
             'create' =>
             [
-                'class'         => AdminAction::className(),
+                'class'         => AdminModelEditorCreateAction::className(),
                 'name'          => 'Добавить',
                 "icon"          => "glyphicon glyphicon-plus",
             ],
@@ -142,6 +143,8 @@ class AdminModelEditorController extends AdminController
                 "name"          => "Удалить",
                 "icon"          => "glyphicon glyphicon-trash",
                 "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+                "method"        => "post",
+                "request"       => "ajax",
             ]
         ];
     }
@@ -272,73 +275,6 @@ class AdminModelEditorController extends AdminController
     }
 
 
-
-
-    /**
-     * Creates a new Game model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        /**
-         * @var $model ActiveRecord
-         */
-
-        if (!$model = $this->getCurrentModel())
-        {
-            $model = $this->createCurrentModel();
-        }
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
-        }
-
-        if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
-        {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
-
-            if (\Yii::$app->request->post('submit-btn') == 'apply')
-            {
-                return $this->redirect(
-                    UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
-                );
-            } else
-            {
-                return $this->redirect(
-                    $this->indexUrl
-                );
-            }
-
-        } else
-        {
-            if (\Yii::$app->request->isPost)
-            {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-            }
-
-            try
-            {
-                return $this->render('_form', [
-                    'model' => $model,
-                ]);
-
-            } catch (InvalidParamException $e)
-            {
-                $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
-                    [
-                        'model' => $model,
-                    ]
-                );
-
-                return $this->output($output);
-            }
-
-        }
-    }
 
     /**
      * Updates an existing Game model.

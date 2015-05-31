@@ -118,8 +118,8 @@ class ControllerActions
                 "url"               => (string) $url,
                 "isOpenNewWindow"   => $this->isOpenNewWindow,
                 "confirm"           => $action->confirm,
-                //"method"            => $action->method,
-                //"request"           => $action->request,
+                "method"            => $action->method,
+                "request"           => $action->request,
             ]);
 
             $icon = '';
