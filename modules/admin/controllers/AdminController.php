@@ -164,7 +164,11 @@ abstract class AdminController extends Controller
             foreach ($actions as $id => $data)
             {
                 $action                 = $this->createAction($id);
-                $this->_actions[$id]    = $action;
+
+                if ($action->isVisible())
+                {
+                    $this->_actions[$id]    = $action;
+                }
             }
         } else
         {

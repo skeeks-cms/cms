@@ -298,13 +298,19 @@ class AdminModelEditorController extends AdminController
                 {
                     if ($action instanceof AdminOneModelEditAction)
                     {
-                        $this->_actions[$id] = $action;
+                        if ($action->isVisible())
+                        {
+                            $this->_actions[$id]    = $action;
+                        }
                     }
                 } else
                 {
                     if (!$action instanceof AdminOneModelEditAction)
                     {
-                        $this->_actions[$id] = $action;
+                        if ($action->isVisible())
+                        {
+                            $this->_actions[$id]    = $action;
+                        }
                     }
                 }
             }

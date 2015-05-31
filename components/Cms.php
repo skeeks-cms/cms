@@ -203,17 +203,30 @@ class Cms extends \skeeks\cms\base\Component
                 ]);
             }
 
-            if ($e->controller instanceof AdminCmsContentElementController)
+            if ($e->controller instanceof AdminModelEditorController)
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
-                    'price' =>
+                    'related-properties' =>
                     [
                         'class'         => AdminOneModelFilesAction::className(),
-                        'name'          => 'Цена',
-                        "icon"          => "glyphicon glyphicon-cloud",
+                        'name'          => 'Дополнительные свойства',
+                        "icon"          => "glyphicon glyphicon-plus-sign",
                     ],
                 ]);
             }
+
+            if ($e->controller instanceof AdminModelEditorController)
+            {
+                $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
+                    'system' =>
+                    [
+                        'class'         => AdminOneModelFilesAction::className(),
+                        'name'          => 'Системные данные',
+                        "icon"          => "glyphicon glyphicon-user",
+                    ],
+                ]);
+            }
+
         });
     }
 

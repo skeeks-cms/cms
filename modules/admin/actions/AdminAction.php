@@ -198,4 +198,12 @@ class AdminAction extends ViewAction
 
         return $url;
     }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
 }

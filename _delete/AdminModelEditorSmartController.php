@@ -83,21 +83,6 @@ abstract class AdminModelEditorSmartController extends AdminModelEditorControlle
                     ],
 
 
-                    'files' =>
-                    [
-                        "label"     => "Файлы",
-                        "icon"     => "glyphicon glyphicon-cloud",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                                "behaviors" => HasFiles::className()
-                            ]
-                        ]
-                    ],
-
-
-
                     'system' =>
                     [
                         "label"     => "Служебные данные",
