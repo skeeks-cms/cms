@@ -42,7 +42,7 @@ class InfoController extends AdminController
             [
                 'class'         => AdminAction::className(),
                 'name'          => 'Общая информация',
-                'viewParams'    => $this->indexData()
+                'viewParams'    => $this->indexData(),
             ]
         ];
     }

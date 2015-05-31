@@ -28,7 +28,7 @@ class GiiController extends AdminController
 {
     public function init()
     {
-        $this->name = "Помощь в разработке";
+        $this->name = "Генератор кода";
 
         parent::init();
     }

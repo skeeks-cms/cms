@@ -131,7 +131,11 @@ class AdminAction extends ViewAction
             ];
         }
 
-        $this->controller->view->params['breadcrumbs'][] = $this->name;;
+        if (count($this->controller->actions) > 1)
+        {
+            $this->controller->view->params['breadcrumbs'][] = $this->name;
+        }
+
         return $this;
     }
 
@@ -144,10 +148,13 @@ class AdminAction extends ViewAction
      */
     protected function _initActionsData()
     {
-        $this->controller->view->params["actions"] = ControllerActions::begin([
-            "activeActionId"        => $this->id,
-            "controller"            => $this->controller,
-        ])->run();
+        if (count($this->controller->actions) > 1)
+        {
+            $this->controller->view->params["actions"] = ControllerActions::begin([
+                "activeActionId"        => $this->id,
+                "controller"            => $this->controller,
+            ])->run();
+        }
 
         return $this;
     }

@@ -37,7 +37,7 @@ class ClearController extends AdminController
             "index" =>
             [
                 "class"        => AdminAction::className(),
-                "name"         => "Чистка всего",
+                "name"         => "Чистка временных данных",
                 "callback"     => [$this, 'actionIndex'],
             ],
         ];

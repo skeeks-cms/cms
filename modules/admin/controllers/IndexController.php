@@ -30,8 +30,9 @@ class IndexController extends AdminController
         [
             'index' =>
             [
-                'class' => AdminAction::className(),
-                'name'  => 'Главная страница'
+                'class'         => AdminAction::className(),
+                'name'          => 'Главная страница',
+                "visible"       => false,
             ]
         ];
     }
