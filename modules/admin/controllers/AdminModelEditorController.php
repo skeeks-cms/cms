@@ -44,6 +44,8 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
+ * @property \yii\db\ActiveRecord $model
+ *
  * Class AdminModelEditorController
  * @package skeeks\cms\modules\admin\controllers
  */
@@ -87,7 +89,7 @@ class AdminModelEditorController extends AdminController
     /**
      * @var ActiveRecord
      */
-    public $model = null;
+    protected $_model = null;
 
     /**
      * @return array
@@ -182,9 +184,7 @@ class AdminModelEditorController extends AdminController
         {
             if ($action instanceof AdminOneModelEditAction)
             {
-                $pk = \Yii::$app->request->get($this->requestPkParamName);
-                $modelClass = $this->modelClassName;
-                if (($this->model = $modelClass::findOne($pk)) !== null)
+                if (($this->model !== null))
                 {
                     return true;
                 } else
@@ -200,89 +200,78 @@ class AdminModelEditorController extends AdminController
         }
     }
 
+    /**
+     * @return ActiveRecord
+     * @throws NotFoundHttpException
+     */
+    public function getModel()
+    {
+        if ($this->_model === null)
+        {
+            $pk             = \Yii::$app->request->get($this->requestPkParamName);
+            $modelClass     = $this->modelClassName;
+            $this->_model   = $modelClass::findOne($pk);
+        }
 
+        return $this->_model;
+    }
+
+    /**
+     * @param ActiveRecord $model
+     * @return $this
+     */
+    public function setModel($model)
+    {
+        $this->_model   = $model;
+        $this->_actions = null;
+        return $this;
+    }
 
 
     /**
-     * Lists all Game models.
-     * @var asdasd
-     * @return mixed
+     * Массив объектов действий доступных для текущего контроллера
+     * Используется при построении меню.
+     * @see ControllerActions
+     * @return AdminAction[]
      */
-    public function actionIndex()
+    public function getActions()
     {
-        $modelSeacrhClass = $this->_modelSearchClassName;
-
-        if (!$modelSeacrhClass)
+        if ($this->_actions !== null)
         {
-            $search = new Search($this->_modelClassName);
-            $dataProvider = $search->search(\Yii::$app->request->queryParams);
-            $searchModel = $search->getLoadedModel();
-        } else
-        {
-            $searchModel = new $modelSeacrhClass();
-            $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+            return $this->_actions;
         }
 
-        try
+        $actions = $this->actions();
+
+        if ($actions)
         {
-            return $this->render('index', [
-                'searchModel'   => $searchModel,
-                'dataProvider'  => $dataProvider,
-                'controller'    => $this,
-            ]);
-        } catch (InvalidParamException $e)
-        {
-            $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/index.php',
-                [
-                    'searchModel'   => $searchModel,
-                    'dataProvider'  => $dataProvider,
-                    'controller'    => $this,
-                    'columns'       => $this->getIndexColumns(),
-                ]
-            );
-
-            return $this->output($output);
-        }
-
-    }
-
-    public function getIndexColumns()
-    {
-        $columns = [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            [
-                'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                'controller'    => $this
-            ],
-        ];
-
-        /**
-         * @var ActiveRecord $model
-         */
-        $modelClassName = $this->modelClassName;
-        $model = new $modelClassName();
-
-        $gridColumns = [];
-        if ((array) $this->gridColumns)
-        {
-            foreach ($this->gridColumns as $data)
+            foreach ($actions as $id => $data)
             {
-                if (is_string($data))
+                $action                 = $this->createAction($id);
+
+                if ($this->model)
                 {
-                    if ($model->hasAttribute($data))
+                    if ($action instanceof AdminOneModelEditAction)
                     {
-                        $gridColumns[] = $data;
+                        $this->_actions[$id] = $action;
                     }
                 } else
                 {
-                    $gridColumns[] = $data;
+                    if (!$action instanceof AdminOneModelEditAction)
+                    {
+                        $this->_actions[$id] = $action;
+                    }
                 }
             }
+        } else
+        {
+            $this->_actions = [];
         }
 
-        return ArrayHelper::merge($columns, $gridColumns);
+        return $this->_actions;
     }
+
+
 
 
     /**

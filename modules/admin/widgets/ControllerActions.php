@@ -33,30 +33,28 @@ class ControllerActions
     extends Widget
 {
     /**
-     * @var string id текущего действия
+     * @var string id активного дейсвтичя
      */
-    public $currentActionCode   = null;
+    public $activeActionId          = null;
 
-    public $clientOptions       = [];
+    public $isOpenNewWindow         = false;
 
-
-    public $isOpenNewWindow       = false;
-
-
-    public $ulOptions = [
+    public $ulOptions               =
+    [
         "class" => "nav nav-pills sx-nav"
     ];
 
     /**
      * @var AdminController объект контроллера
      */
-    public $controller      = null;
+    public $controller              = null;
+
+    public $clientOptions           = [];
 
     public function init()
     {
         parent::init();
         $this->_ensure();
-
     }
 
     /**
@@ -103,12 +101,10 @@ class ControllerActions
     {
         $result = [];
 
-        /**
-         * @var AdminAction $action
-         */
-        foreach ($actions as $code => $actionData)
+        $actions = $this->controller->actions;
+
+        foreach ($actions as $id => $action)
         {
-            $action         = $this->controller->createAction($code);
             $linkOptions = [];
 
             $url = $action->url;
@@ -117,7 +113,8 @@ class ControllerActions
                 $url->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
             }
 
-            $actionData = array_merge($actionData, $this->clientOptions, [
+
+            $actionData = array_merge($this->clientOptions, [
                 "url"               => (string) $url,
                 "isOpenNewWindow"   => $this->isOpenNewWindow,
                 "confirm"           => $action->confirm,
@@ -135,7 +132,7 @@ class ControllerActions
             $result[] = Html::tag("li",
                 Html::a($icon . '  ' . $action->name, $action->getUrl(), $linkOptions),
                 [
-                    "class" => $this->currentActionCode == $code ? "active" : "",
+                    "class" => $this->activeActionId == $action->id ? "active" : "",
                     "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;"
                 ]
             );

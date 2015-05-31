@@ -94,10 +94,14 @@ class AdminAction extends ViewAction
     {
         if ($this->controller->name)
         {
-            $this->controller->view->params['breadcrumbs'][] = ['label' => $this->controller->name, 'url' => [
-                $this->controller->defaultAction,
-                UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
-            ]];
+            $this->controller->view->params['breadcrumbs'][] = [
+                'label' => $this->controller->name,
+                'url' =>
+                [
+                    $this->controller->defaultAction,
+                    UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
+                ]
+            ];
         }
 
         $this->controller->view->params['breadcrumbs'][] = $this->name;;
@@ -114,7 +118,7 @@ class AdminAction extends ViewAction
     protected function _initActionsData()
     {
         $this->controller->view->params["actions"] = ControllerActions::begin([
-            "currentActionCode"     => $this->id,
+            "activeActionId"        => $this->id,
             "controller"            => $this->controller,
         ])->run();
 

@@ -9,6 +9,7 @@ namespace skeeks\cms\modules\admin\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
@@ -27,6 +28,8 @@ use yii\helpers\Inflector;
 use yii\web\ForbiddenHttpException;
 
 /**
+ * @property AdminAction[]    $actions
+ *
  * Class AdminController
  * @package skeeks\cms\modules\admin\controllers
  */
@@ -42,6 +45,11 @@ abstract class AdminController extends Controller
      * @var string Понятное название контроллера, будет добавлено в хлебные крошки и title страницы
      */
     public $name           = 'Название контроллера';
+
+    /**
+     * @var null|AdminAction[]
+     */
+    protected $_actions    = null;
 
     /**
      * Проверка доступа к админке
@@ -79,6 +87,35 @@ abstract class AdminController extends Controller
         $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
     }
 
+    /**
+     * Массив объектов действий доступных для текущего контроллера
+     * Используется при построении меню.
+     * @see ControllerActions
+     * @return AdminAction[]
+     */
+    public function getActions()
+    {
+        if ($this->_actions !== null)
+        {
+            return $this->_actions;
+        }
+
+        $actions = $this->actions();
+
+        if ($actions)
+        {
+            foreach ($actions as $id => $data)
+            {
+                $this->_actions[$id] = $this->createAction($id);
+            }
+        } else
+        {
+            $this->_actions = [];
+        }
+
+        return $this->_actions;
+    }
+
 
     /**
      * @return \yii\web\Response
@@ -87,6 +124,4 @@ abstract class AdminController extends Controller
     {
         return $this->redirect(UrlHelper::constructCurrent()->setRoute($this->action->id)->normalizeCurrentRoute()->enableAdmin()->toString());
     }
-
-
 }

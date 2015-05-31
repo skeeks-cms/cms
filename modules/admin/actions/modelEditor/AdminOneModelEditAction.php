@@ -40,4 +40,14 @@ class AdminOneModelEditAction extends AdminModelEditorAction
             return false;
         }
     }
+
+    /**
+     * @return UrlHelper
+     */
+    public function getUrl()
+    {
+        $url = parent::getUrl();
+        $url->set($this->controller->requestPkParamName, $this->controller->model->{$this->controller->modelPkAttribute});
+        return $url;
+    }
 }
