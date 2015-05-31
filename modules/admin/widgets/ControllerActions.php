@@ -105,6 +105,11 @@ class ControllerActions
 
         foreach ($actions as $id => $action)
         {
+            if (!$action->visible)
+            {
+                continue;
+            }
+
             $linkOptions = [];
 
             $url = $action->url;

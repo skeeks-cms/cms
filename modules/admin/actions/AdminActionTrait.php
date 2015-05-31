@@ -40,4 +40,9 @@ trait AdminActionTrait
      * @var string
      */
     public $request = ''; //ajax
+
+    /**
+     * @var bool Показывается в меню или нет
+     */
+    public $visible = true;
 }

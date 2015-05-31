@@ -104,7 +104,6 @@ class AccessRule extends \yii\filters\AccessRule
 
             if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
             {
-
                 if (!\Yii::$app->user->can($permission->name))
                 {
                     return false;

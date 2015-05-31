@@ -15,11 +15,13 @@ use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\AdminModelAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorUpdateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\components\UrlRule;
@@ -132,7 +134,7 @@ class AdminModelEditorController extends AdminController
 
             "update" =>
             [
-                'class'         => AdminOneModelEditAction::className(),
+                'class'         => AdminModelEditorUpdateAction::className(),
                 "name"         => "Редактировать",
                 "icon"          => "glyphicon glyphicon-pencil",
             ],
@@ -145,6 +147,7 @@ class AdminModelEditorController extends AdminController
                 "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
                 "method"        => "post",
                 "request"       => "ajax",
+                "callback"      => [$this, 'actionDelete'],
             ]
         ];
     }
@@ -192,7 +195,8 @@ class AdminModelEditorController extends AdminController
                     return true;
                 } else
                 {
-                    throw new NotFoundHttpException('Не найдено');
+                    //throw new NotFoundHttpException('Не найдено');
+                    $this->redirect($this->getIndexUrl());
                 }
             }
 
@@ -276,100 +280,6 @@ class AdminModelEditorController extends AdminController
 
 
 
-    /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionUpdate()
-    {
-        $model = $this->getCurrentModel();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
-        }
-
-        if (\Yii::$app->request->isAjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
-            {
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {
-                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                } else
-                {
-                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-
-                    return $this->redirect(
-                        $this->indexUrl
-                    );
-                }
-
-
-            } else
-            {
-                //if (\Yii::$app->request->isPost)
-                //{
-                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-                //}
-            }
-
-            try
-            {
-                return $this->render('_form', [
-                    'model'     => $model,
-                ]);
-
-            } catch (InvalidParamException $e)
-            {
-                $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
-                    [
-                        'model' => $model,
-                    ]
-                );
-
-                return $this->output($output);
-            }
-
-
-        } else
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
-            {
-                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                return $this->redirectRefresh();
-            } else
-            {
-
-                if (\Yii::$app->request->isPost)
-                {
-                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-                }
-
-                try
-                {
-                    return $this->render('_form', [
-                        'model' => $model,
-                    ]);
-
-                } catch (InvalidParamException $e)
-                {
-                    $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
-                        [
-                            'model' => $model,
-                        ]
-                    );
-
-                    return $this->output($output);
-                }
-            }
-        }
-    }
 
     /**
      * Deletes an existing Game model.
@@ -378,58 +288,29 @@ class AdminModelEditorController extends AdminController
      */
     public function actionDelete()
     {
-        if (\Yii::$app->request->isAjax)
-        {
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            $success = false;
+        $rr = new RequestResponse();
 
+        if ($rr->isRequestAjaxPost())
+        {
             try
             {
-                if ($this->getCurrentModel()->delete())
+                if ($this->model->delete())
                 {
-                    $message = 'Запись успешно удалена';
-                    //\Yii::$app->getSession()->setFlash('success', $message);
-                    $success = true;
+                    $rr->message = 'Запись успешно удалена';
+                    $rr->success = true;
                 } else
                 {
-                    $message = 'Не получилось удалить запись';
-                    //\Yii::$app->getSession()->setFlash('error', $message);
-                    $success = false;
+                    $rr->message = 'Не получилось удалить запись';
+                    $rr->success = false;
                 }
             } catch (\Exception $e)
             {
-                $message = $e->getMessage();
-                    //\Yii::$app->getSession()->setFlash('error', $message);
-                $success = false;
+                $rr->message = $e->getMessage();
+                $rr->success = false;
             }
 
-
-
-            return [
-                'message' => $message,
-                'success' => $success,
-            ];
-
-        } else
-        {
-            if ($this->getCurrentModel()->delete())
-            {
-                \Yii::$app->getSession()->setFlash('success', 'Запись успешно удалена');
-            } else
-            {
-                \Yii::$app->getSession()->setFlash('error', 'Не получилось удалить запись');
-            }
-
-            if ($ref = UrlHelper::getCurrent()->getRef())
-            {
-                return $this->redirect($ref);
-            } else
-            {
-                return $this->goBack();
-            }
+            return (array) $rr;
         }
-
-        //return $this->redirect(\Yii::$app->request->getReferrer());
     }
 
 
@@ -439,7 +320,7 @@ class AdminModelEditorController extends AdminController
      */
     public function getIndexUrl()
     {
-        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
+        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute($this->defaultAction)->normalizeCurrentRoute()->toString();
     }
 
 }

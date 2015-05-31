@@ -62,7 +62,9 @@ abstract class AdminController extends Controller
             'access' =>
             [
                 'class'         => AccessControl::className(),
-                'ruleConfig'    => ['class' => AccessRule::className()],
+                'ruleConfig'    => [
+                    'class' => AccessRule::className()
+                ],
 
                 'rules' =>
                 [
@@ -106,7 +108,8 @@ abstract class AdminController extends Controller
         {
             foreach ($actions as $id => $data)
             {
-                $this->_actions[$id] = $this->createAction($id);
+                $action                 = $this->createAction($id);
+                $this->_actions[$id]    = $action;
             }
         } else
         {

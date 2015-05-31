@@ -6,6 +6,7 @@
  * @date 12.03.2015
  */
 namespace skeeks\cms\modules\admin\widgets;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 
@@ -64,6 +65,9 @@ class RelatedModelsGrid extends Widget
             return "";
         }
 
+        /**
+         * @var $controller AdminModelEditorController
+         */
         $controller = \Yii::$app->createController($this->controllerRoute)[0];
 
         $rerlation = [];
@@ -82,7 +86,7 @@ class RelatedModelsGrid extends Widget
                 ->enableAdmin()->toString();
 
 
-        $search = new \skeeks\cms\models\Search($controller->getModelClassName());
+        $search = new \skeeks\cms\models\Search($controller->modelClassName);
         $search->getDataProvider()->query->where($rerlation);
 
         if (isset($this->sort['defaultOrder']))

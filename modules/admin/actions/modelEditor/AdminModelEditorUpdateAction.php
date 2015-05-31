@@ -15,7 +15,7 @@ use yii\web\Response;
  * Class AdminModelsGridAction
  * @package skeeks\cms\modules\admin\actions\modelEditor
  */
-class AdminModelEditorCreateAction extends AdminModelEditorAction
+class AdminModelEditorUpdateAction extends AdminOneModelEditAction
 {
     /**
      * @var bool
@@ -29,8 +29,7 @@ class AdminModelEditorCreateAction extends AdminModelEditorAction
 
     public function run()
     {
-        $modelClassName = $this->controller->modelClassName;
-        $model          = new $modelClassName();
+        $model          = $this->controller->model;
 
         if ($scenarios = $model->scenarios() && $this->modelScenario)
         {
@@ -55,11 +54,7 @@ class AdminModelEditorCreateAction extends AdminModelEditorAction
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
-                    return $this->controller->redirect(
-                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->controller->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->controller->requestPkParamName => $model->{$this->controller->modelPkAttribute}])
-                            ->toString()
-                    );
+
                 } else
                 {
                     return $this->controller->redirect(

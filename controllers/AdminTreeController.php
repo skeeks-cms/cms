@@ -59,8 +59,13 @@ class AdminTreeController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(), [
             'index' =>
             [
-                'name'          => 'Просмотр',
+                'name'          => 'Разделы',
                 'viewParams'    => $this->indexData()
+            ],
+
+            'create' =>
+            [
+                'visible'    => false
             ]
         ]);
     }

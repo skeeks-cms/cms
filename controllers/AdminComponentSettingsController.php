@@ -38,39 +38,44 @@ class AdminComponentSettingsController extends AdminController
     protected $_component = null;
 
     /**
-     * @param ActionEvent $e
+     * @inheritdoc
      */
-    protected function _beforeAction(ActionEvent $e)
+    public function beforeAction($action)
     {
-        parent::_beforeAction($e);
+        if (parent::beforeAction($action)) {
 
-        $componentClassName         = \Yii::$app->request->get('componentClassName');
+            $componentClassName         = \Yii::$app->request->get('componentClassName');
 
-        $namespace                  = \Yii::$app->request->get('componentNamespace');
-        if ($namespace)
-        {
-            $component                  = new $componentClassName([
-                'namespace' => $namespace
-            ]);
-        } else
-        {
-            $component                  = new $componentClassName();
+            $namespace                  = \Yii::$app->request->get('componentNamespace');
+            if ($namespace)
+            {
+                $component                  = new $componentClassName([
+                    'namespace' => $namespace
+                ]);
+            } else
+            {
+                $component                  = new $componentClassName();
+            }
+
+
+            if (!$component || !$component instanceof Component)
+            {
+                throw new UserException("Указан некорректный компонент");
+            }
+
+            if (!$component->existsConfigFormFile())
+            {
+                throw new UserException("У компонента не задана форма для управления настройками");
+            }
+
+            $this->_component = $component;
+
+            return true;
+        } else {
+            return false;
         }
-
-
-        if (!$component || !$component instanceof Component)
-        {
-            throw new UserException("Указан некорректный компонент");
-        }
-
-        if (!$component->existsConfigFormFile())
-        {
-            throw new UserException("У компонента не задана форма для управления настройками");
-        }
-
-        $this->_component = $component;
-
     }
+
 
     public function actionIndex()
     {

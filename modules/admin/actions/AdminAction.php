@@ -35,7 +35,13 @@ class AdminAction extends ViewAction
     /**
      * @var array параметры которые будут переданы в шаблон
      */
-    public $viewParams = [];
+    public $viewParams  = [];
+
+
+    /**
+     * @var
+     */
+    public $runCallback;
 
     public function init()
     {
@@ -53,6 +59,32 @@ class AdminAction extends ViewAction
         $this->defaultView = $this->id;
 
         parent::init();
+    }
+
+
+    /**
+     * @return mixed|string
+     * @throws InvalidConfigException
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function run()
+    {
+        if ($this->runCallback)
+        {
+            if (!is_callable($this->runCallback))
+            {
+                throw new InvalidConfigException('"' . get_class($this) . '::runCallback" should be a valid callback.');
+            }
+
+            $result = call_user_func($this->runCallback, $this);
+
+            if ($result)
+            {
+                return $result;
+            }
+        }
+
+        return parent::run();
     }
 
     /**

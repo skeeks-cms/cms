@@ -16,6 +16,7 @@ use skeeks\cms\models\Comment;
 use skeeks\cms\models\Publication;
 use skeeks\cms\models\searchs\Publication as PublicationSearch;
 use skeeks\cms\models\StorageFile;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
@@ -44,93 +45,64 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
         parent::init();
     }
 
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        $behaviors = ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return ArrayHelper::merge(parent::actions(),
+        [
+            'main-image' =>
             [
-                "actions" =>
-                [
-                    'main-image' =>
-                    [
-                        "label"     => "Сделать главным изображением",
-                        "icon"     => "glyphicon glyphicon-asterisk",
-                        "method"        => "post",
-                        "request"       => "ajax",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className()
-                            ]
-                        ]
-                    ],
+                "class"         => AdminOneModelEditAction::className(),
+                "name"          => "Сделать главным изображением",
+                "icon"          => "glyphicon glyphicon-asterisk",
+                "method"        => "post",
+                "request"       => "ajax",
+                "callback"      => [$this, 'actionMainImage'],
+            ],
 
-                    'add-to-images' =>
-                    [
-                        "label"     => "Добавить в группу изображения",
-                        "icon"     => "glyphicon glyphicon-picture",
-                        "method"        => "post",
-                        "request"       => "ajax",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                            ]
-                        ]
-                    ],
+            'add-to-images' =>
+            [
+                "class"         => AdminOneModelEditAction::className(),
+                "name"          => "Добавить в группу изображения",
+                "icon"          => "glyphicon glyphicon-picture",
+                "method"        => "post",
+                "request"       => "ajax",
+                "callback"      => [$this, 'actionAddToImages'],
+            ],
 
-                    'add-to-files' =>
-                    [
-                        "label"     => "Добавить в группу файлы",
-                        "icon"     => "glyphicon glyphicon-folder-open",
-                        "method"        => "post",
-                        "request"       => "ajax",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                            ]
-                        ]
-                    ],
+            'add-to-files' =>
+            [
+                "class"         => AdminOneModelEditAction::className(),
+                "name"          => "Добавить в группу файлы",
+                "icon"          => "glyphicon glyphicon-folder-open",
+                "method"        => "post",
+                "request"       => "ajax",
+                "callback"      => [$this, 'actionAddToFiles'],
+            ],
 
-                    'delete-tmp-dir' =>
-                    [
-                        "label"     => "Удалить временные файлы",
-                        "icon"     => "glyphicon glyphicon-folder-open",
-                        "method"        => "post",
-                        "request"       => "ajax",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                            ]
-                        ]
-                    ],
+            'delete-tmp-dir' =>
+            [
+                "class"         => AdminOneModelEditAction::className(),
+                "name"          => "Удалить временные файлы",
+                "icon"          => "glyphicon glyphicon-folder-open",
+                "method"        => "post",
+                "request"       => "ajax",
+                "callback"      => [$this, 'actionDeleteTmpDir'],
+            ],
 
-                    'download' =>
-                    [
-                        "label"     => "Скачать",
-                        "icon"      => "glyphicon glyphicon-circle-arrow-down",
-                        "method"        => "post",
-                        "rules"     =>
-                        [
-                            [
-                                "class"     => HasModelBehaviors::className(),
-                            ]
-                        ]
-                    ],
+            'download' =>
+            [
+                "class"         => AdminOneModelEditAction::className(),
+                "name"          => "Скачать",
+                "icon"          => "glyphicon glyphicon-circle-arrow-down",
+                "method"        => "post",
+                "callback"      => [$this, 'actionDownload'],
+            ],
 
-                ]
+            'create' =>
+            [
+                'visible' => false
             ]
         ]);
-
-        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['create']);
-
-        return $behaviors;
     }
 
     public function actionDownload()
@@ -141,7 +113,7 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
         /**
          * @var StorageFile $file
          */
-        $file = $this->getCurrentModel();
+        $file = $this->model;
         $file->src;
 
 
@@ -162,7 +134,7 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
             /**
              * @var StorageFile $file
              */
-            $file = $this->getCurrentModel();
+            $file = $this->model;
             $file->deleteTmpDir();
 
             return [
@@ -183,7 +155,7 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                 /**
                  * @var StorageFile $file
                  */
-                $file = $this->getCurrentModel();
+                $file = $this->model;
                 if (!$file->isImage())
                 {
                     throw new Exception("Этот файл не является файлом изображения");
@@ -246,7 +218,7 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                 /**
                  * @var StorageFile $file
                  */
-                $file = $this->getCurrentModel();
+                $file = $this->model;
 
                 if (!$file->isLinked())
                 {
@@ -295,7 +267,6 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
      */
     public function actionMainImage()
     {
-
         if (\Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
@@ -306,7 +277,7 @@ class AdminStorageFilesController extends AdminModelEditorSmartController
                 /**
                  * @var StorageFile $file
                  */
-                $file = $this->getCurrentModel();
+                $file = $this->model;
                 if (!$file->isImage())
                 {
                     throw new Exception("Этот файл не является файлом изображения");
