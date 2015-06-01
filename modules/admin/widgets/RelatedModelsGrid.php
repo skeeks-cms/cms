@@ -97,7 +97,7 @@ class RelatedModelsGrid extends Widget
         $pjaxId = "sx-table-" . md5($this->label . $this->hint . $this->parentModel->className());
         $gridOptions = ArrayHelper::merge([
             /*'filterModel'   => $search,*/
-            'PjaxOptions' => [
+            'pjaxOptions' => [
                 'id' => $pjaxId
             ],
             "usePjax" => true,

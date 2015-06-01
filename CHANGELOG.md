@@ -3,6 +3,8 @@
 
 2.0.0.rc2 (unreleased)
 -----------------
+  * Настриваемый GridView виджет админ панели
+  * Управление настройками компонента и взаимодействие с базой вынесено в трейт HasComponentDbSettingsTrait
   * Исправлены мелкие баги
   * Исправлен баг указания сценариев для AdminOneModelUpdateAction и AdminModelEditorCreateAction
 

@@ -10,7 +10,12 @@
  */
 
 namespace skeeks\cms\modules\admin\widgets;
+use skeeks\cms\modules\admin\widgets\gridView\GridViewSettings;
+use skeeks\cms\traits\HasComponentConfigFormTrait;
+use skeeks\cms\traits\HasComponentDbSettingsTrait;
+use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\jui\Sortable;
 
@@ -27,7 +32,7 @@ class GridView extends \yii\grid\GridView
     /**
      * @var array
      */
-    public $PjaxOptions = [];
+    public $pjaxOptions = [];
 
     /**
      * @var Pjax для того чтобы потом можно было обратиться к объекту pjax.
@@ -44,6 +49,21 @@ class GridView extends \yii\grid\GridView
     public $sortableOptions    = [
         'backend' => ''
     ];
+
+
+    /**
+     * @var GridViewSettings
+     */
+    public $settings = null;
+
+    public function init()
+    {
+        parent::init();
+
+        $this->settings = new GridViewSettings([
+            'namespace' => \Yii::$app->controller->action->getUniqueId()
+        ]);
+    }
     /**
      * Runs the widget.
      */
@@ -53,8 +73,11 @@ class GridView extends \yii\grid\GridView
         {
             $this->pjax = Pjax::begin(ArrayHelper::merge([
                 'id' => 'sx-pjax-grid-' . $this->id,
-            ], $this->PjaxOptions));
+            ], $this->pjaxOptions));
         }
+
+
+        echo Html::a('Настройки', $this->settings->getEditUrl());
 
         parent::run();
 
