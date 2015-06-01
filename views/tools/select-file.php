@@ -201,7 +201,7 @@ JS
             'dataProvider'  => $dataProvider,
             'filterModel'   => $search->getLoadedModel(),
 
-            'PjaxOptions' => [
+            'pjaxOptions' => [
                 'id' => 'sx-storage-files'
             ],
 

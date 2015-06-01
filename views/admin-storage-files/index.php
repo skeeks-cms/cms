@@ -38,7 +38,7 @@ JS
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
 
-    'PjaxOptions' => [
+    'pjaxOptions' => [
         'id' => 'sx-storage-files'
     ],
 
