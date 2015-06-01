@@ -67,8 +67,9 @@ class AdminModelEditorCreateAction extends AdminModelEditorAction
     {
         $modelClassName = $this->controller->modelClassName;
         $model          = new $modelClassName();
+        $scenarios      = $model->scenarios();
 
-        if ($scenarios = $model->scenarios() && $this->modelScenario)
+        if ($scenarios && $this->modelScenario)
         {
             if (isset($scenarios[$this->modelScenario]))
             {
