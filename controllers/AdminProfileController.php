@@ -132,7 +132,7 @@ class AdminProfileController extends AdminModelEditorController
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
             }
 
-            return $this->output(\Yii::$app->cms->moduleCms()->renderFile('admin-user/_form-change-password.php', [
+            return $this->output(\Yii::$app->cms->moduleCms()->renderFile('admin-user/change-password.php', [
                 'model' => $modelForm
             ]));
 
