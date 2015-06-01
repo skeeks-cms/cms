@@ -13,6 +13,7 @@ namespace skeeks\cms\actions;
 
 use skeeks\cms\App;
 use skeeks\cms\exceptions\NotConnectedToDbException;
+use skeeks\cms\rbac\CmsManager;
 use Yii;
 use yii\base\Action;
 use yii\base\Exception;
@@ -57,7 +58,9 @@ class ErrorAction extends \yii\web\ErrorAction
         {
             $name = $this->defaultName ?: Yii::t('yii', 'Error');
         }
-        if ($code) {
+
+        if ($code)
+        {
             $name .= " (#$code)";
         }
 
@@ -69,6 +72,7 @@ class ErrorAction extends \yii\web\ErrorAction
             $message = $this->defaultMessage ?: Yii::t('yii', 'An internal server error occurred.');
         }
 
+
         if (Yii::$app->getRequest()->getIsAjax())
         {
             return "$name: $message";
@@ -76,14 +80,18 @@ class ErrorAction extends \yii\web\ErrorAction
         {
             if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
             {
-                $this->controller->layout = \Yii::$app->cms->moduleAdmin()->layout;
-                return $this->controller->output(nl2br(Html::encode($message)));
+                if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
+                {
+                    $this->controller->layout = \Yii::$app->cms->moduleAdmin()->layout;
+                    return $this->controller->output(nl2br(Html::encode($message)));
+                } else
+                {
 
-                return $this->controller->render($this->view ?: $this->id, [
-                    'name' => $name,
-                    'message' => $message,
-                    'exception' => $exception,
-                ]);
+                    $this->controller->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
+                    return $this->controller->render('@skeeks/cms/modules/admin/views/error/unauthorized-403', [
+                        'message' => nl2br(Html::encode($message))
+                    ]);
+                }
 
             } else
             {

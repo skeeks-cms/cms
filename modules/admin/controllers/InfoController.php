@@ -1,17 +1,14 @@
 <?php
 /**
- * InfoController
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 30.01.2015
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 30.05.2015
  */
-
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\sx\Dir;
 use skeeks\sx\File;
@@ -23,50 +20,37 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 use Yii;
+
 /**
- * Class IndexController
+ * Class InfoController
  * @package skeeks\cms\modules\admin\controllers
  */
 class InfoController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Информация о системе";
+        $this->name = "Информация о системе";
 
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return
+        [
+            'index' =>
             [
-                /*"actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Работа с базой данных",
-                        "rules"         => NoModel::className()
-                    ],
-                ]*/
+                'class'         => AdminAction::className(),
+                'name'          => 'Общая информация',
+                'viewParams'    => $this->indexData(),
             ]
-        ]);
+        ];
     }
 
-    public function actionPhp()
+    public function indexData()
     {
-         phpinfo();
-         die;
-    }
-    public function actionIndex()
-    {
-        return $this->render('index', [
-
+        return
+        [
             'phpVersion' => PHP_VERSION,
             'yiiVersion' => \Yii::getVersion(),
             'application' => [
@@ -85,7 +69,14 @@ class InfoController extends AdminController
                 'gd' => extension_loaded('gd'),
             ],
             'extensions' => $this->getExtensions(),
-        ]);
+        ];
+    }
+
+
+    public function actionPhp()
+    {
+         phpinfo();
+         die;
     }
 
     /**

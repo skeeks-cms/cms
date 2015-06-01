@@ -129,6 +129,11 @@ class Seo extends Component
                 $this->generateBeforeOutputPage($e->sender);
             }
         });
+
+
+        \Yii::$app->on(\skeeks\cms\modules\admin\Module::EVENT_READY, function (Event $e) {
+
+        });
     }
 
 

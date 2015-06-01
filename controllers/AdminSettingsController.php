@@ -8,6 +8,7 @@
 namespace skeeks\cms\controllers;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
+use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -21,8 +22,21 @@ class AdminSettingsController extends AdminController
 {
     public function init()
     {
-        $this->_label                   = "Управление настройками";
+        $this->name                   = "Управление настройками";
         parent::init();
+    }
+
+    public function actions()
+    {
+        return
+        [
+            "index" =>
+            [
+                "class"        => AdminAction::className(),
+                "name"         => "Настройки",
+                "callback"     => [$this, 'actionIndex'],
+            ],
+        ];
     }
 
     public function actionIndex()

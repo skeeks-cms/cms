@@ -1,27 +1,24 @@
 <?php
-
 /**
- * AccessControl
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 05.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 31.05.2015
  */
 namespace skeeks\cms\modules\admin\filters;
 
 use skeeks\cms\App;
 
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use yii\web\User;
 use yii\web\ForbiddenHttpException;
 
 /**
- * Class AccessControl
+ * Class AdminAccessControl
  * @package skeeks\cms\modules\admin\filters
  */
-class AccessControl extends \yii\filters\AccessControl
+class AdminAccessControl extends \yii\filters\AccessControl
 {
     /**
      * Denies the access of the user.
@@ -32,14 +29,23 @@ class AccessControl extends \yii\filters\AccessControl
      */
     protected function denyAccess($user)
     {
+        $rr = new RequestResponse();
+
         if ($user->getIsGuest())
         {
-            \Yii::$app->getResponse()->redirect(
-                UrlHelper::construct("admin/auth")->setCurrentRef()->enableAdmin()->createUrl()
-            );
+            $authUrl = UrlHelper::construct("admin/auth")->setCurrentRef()->enableAdmin()->createUrl();
+
+            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+            {
+                $rr->redirect = $authUrl;
+                return (array) $rr;
+            } else
+            {
+                \Yii::$app->getResponse()->redirect($authUrl);
+            }
+
         } else
         {
-
             throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
         }
     }

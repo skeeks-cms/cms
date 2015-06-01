@@ -65,9 +65,14 @@ class CmsLang extends Core
     public function afterBeforeChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y)
+        if ($this->active != Cms::BOOL_Y)
         {
-            static::updateAll(['def' => Cms::BOOL_N]);
+            $active = static::find()->where(['!=', 'id', $this->id])->active()->one();
+
+            if (!$active)
+            {
+                $this->active = Cms::BOOL_Y;
+            }
         }
     }
 

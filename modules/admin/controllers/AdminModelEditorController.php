@@ -3,31 +3,37 @@
  * AdminModelEditorController - базовый контроллер админки, который позволяет показывать список моделей.
  * А так же предоставляет действия создания сущьностей, редактирования, просмотра, удаления
  *
- *
- * TODO: Доработки, планы
- * 1) сейчас сплошной харкод привязка к id модели, на самом деле первичный ключ может быть не обязатльено id
- * 2) добавить проверки на наличие у модели PK  (добавил но нужно доработать)
- * 3) автоматическая генерация SearchObject опционально
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010-2014 SkeekS (Sx)
  * @date 30.10.2014
- * @since 1.0.0
+ * @since 2.0.0
  */
+
 namespace skeeks\cms\modules\admin\controllers;
+use skeeks\admin\components\AccessControl;
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
+use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\modules\admin\actions\AdminModelAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorUpdateAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
+use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
+use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
@@ -45,122 +51,144 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
- * Class AdminEntityEditor
+ * @property \yii\db\ActiveRecord $model
+ *
+ * Class AdminModelEditorController
  * @package skeeks\cms\modules\admin\controllers
  */
 class AdminModelEditorController extends AdminController
 {
     /**
+     * Обязателен к заполнению!
+     * Класс модели с которым работает контроллер.
+     *
+     * @example ActiveRecord::className();
+     * @see _ensure()
      * @var string
      */
-    public $defaultActionModel      = "update";
-    protected $_modelShowAttribute  = "id";
+    public $modelClassName;
+
+    /**
+     * Действие для управления моделью по умолчанию
+     * @var string
+     */
+    public $modelDefaultAction      = "update";
+
+    /**
+     * Атрибут модели который будет показан в хлебных крошках, и title страницы.
+     * @var string
+     */
+    public $modelShowAttribute      = "id";
+
+    /**
+     * PK будет использоваться для поиска модели
+     * @var string
+     */
     public $modelPkAttribute        = "id";
-    public $modelValidate           = false;
-    public $enableScenarios         = false;
-    public $gridColumns             = ['name'];
 
     /**
-     * обязателено указывать!
-     * @var null|string название сласса модели. example: ActiveRecord::className()
+     * Названия параметра PK, в запросе
+     * @var string
      */
-    protected $_modelClassName  = null;
+    public $requestPkParamName        = "pk";
+
 
     /**
-     * @return string
+     * @var ActiveRecord
      */
-    public function getModelClassName()
-    {
-        return $this->_modelClassName;
-    }
-    /**
-     * Опционально
-     * @var null|string
-     */
-    protected $_modelSearchClassName = null;
-
+    protected $_model = null;
 
     /**
      * @return array
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
+        $behaviors = ArrayHelper::merge(parent::behaviors(), [
 
-            'verbs' => [
+            'verbs' =>
+            [
                 'class' => VerbFilter::className(),
-                'actions' => [
+                'actions' =>
+                [
                     'delete' => ['post'],
                 ],
             ],
 
-            self::BEHAVIOR_ACTION_MANAGER =>
+            'accessDelete' =>
             [
-                "actions" =>
+                'class'         => AdminAccessControl::className(),
+                'only'          => ['delete'],
+                'rules'         =>
                 [
-                    "index" =>
                     [
-                        "label"         => "Список",
-                        "icon"         => "glyphicon glyphicon-th-list",
-                        "rules"         => NoModel::className()
+                        'allow'         => true,
+                        'matchCallback' => function($rule, $action)
+                        {
+                            if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->model)->isValid())
+                            {
+                                //Если такая привилегия заведена, нужно ее проверять.
+                                if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_DELETE))
+                                {
+                                    if (!\Yii::$app->user->can($permission->name, [
+                                        'model' => $this->model
+                                    ]))
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            return true;
+                        }
                     ],
-
-                    "create" =>
-                    [
-                        "label"         => "Добавить",
-                        "icon"          => "glyphicon glyphicon-plus",
-                        "rules"         => NoModel::className()
-                    ],
-
-                    /*"view" =>
-                    [
-                        "label"         => "Смотреть",
-                        "icon"          => "glyphicon glyphicon-eye-open",
-                        "rules"         => HasModel::className()
-                    ],*/
-
-                    "update" =>
-                    [
-                        "label"         => "Редактировать",
-                        "icon"          => "glyphicon glyphicon-pencil",
-                        "rules"         => HasModel::className()
-                    ],
-
-                    "delete" =>
-                    [
-                        "label"         => "Удалить",
-                        "icon"          => "glyphicon glyphicon-trash",
-                        "method"        => "post",
-                        "request"       => "ajax",
-                        "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
-                        "priority"      => 9999,
-                        "rules"         => HasModel::className()
-                    ]
-                ]
+                ],
             ]
         ]);
+
+        return $behaviors;
     }
 
     /**
-     * @param ActionEvent $e
+     * @inheritdoc
      */
-    protected function _beforeAction(ActionEvent $e)
+    public function actions()
     {
-        parent::_beforeAction($e);
+        return ArrayHelper::merge(parent::actions(),
+            [
+                'index' =>
+                [
+                    'class'         => ModelEditorGridAction::className(),
+                    'name'          => 'Список',
+                    "icon"          => "glyphicon glyphicon-th-list",
+                ],
 
-        if ($this->enableScenarios)
-        {
-            if (!$this->getCurrentModel())
-            {
-                $this->setCurrentModel($this->createCurrentModel());
-            }
+                'create' =>
+                [
+                    'class'         => AdminModelEditorCreateAction::className(),
+                    'name'          => 'Добавить',
+                    "icon"          => "glyphicon glyphicon-plus",
+                ],
 
-            $scenarios = $this->getCurrentModel()->scenarios();
-            if (isset($scenarios[$e->action->id]))
-            {
-                $this->getCurrentModel()->scenario = $e->action->id;
-            }
-        }
+
+                "update" =>
+                [
+                    'class'         => AdminOneModelUpdateAction::className(),
+                    "name"         => "Редактировать",
+                    "icon"          => "glyphicon glyphicon-pencil",
+                ],
+
+                "delete" =>
+                [
+                    'class'         => AdminOneModelEditAction::className(),
+                    "name"          => "Удалить",
+                    "icon"          => "glyphicon glyphicon-trash",
+                    "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+                    "method"        => "post",
+                    "request"       => "ajax",
+                    "callback"      => [$this, 'actionDelete'],
+                ]
+            ]
+        );
     }
 
     /**
@@ -169,14 +197,8 @@ class AdminModelEditorController extends AdminController
     public function init()
     {
         parent::init();
-    }
 
-    /**
-     * @return string
-     */
-    public function getIndexUrl()
-    {
-        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
+        $this->_ensure();
     }
 
     /**
@@ -185,485 +207,124 @@ class AdminModelEditorController extends AdminController
      */
     protected function _ensure()
     {
-        parent::_ensure();
-
-        if ($this->_modelClassName === null)
+        if (!$this->modelClassName)
         {
-            throw new InvalidConfigException("Для AdminEntityEditor необходимо указать класс модели");
+            throw new InvalidConfigException("Для AdminModelEditorController необходимо указать класс модели");
         }
 
-        if (!class_exists($this->_modelClassName))
+        if (!class_exists($this->modelClassName))
         {
-            throw new InvalidConfigException("{$this->_modelClassName} класс не нейден, необходимо указать существующий класс модели");
-        }
-
-        if (!is_subclass_of($this->_modelClassName, ActiveRecord::className()))
-        {
-            //throw new InvalidConfigException("{$this->_modelClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
-        }
-
-        //TODO: доработать
-        if ($this->_modelSearchClassName !== null)
-        {
-            if (!class_exists($this->_modelSearchClassName))
-            {
-                throw new InvalidConfigException("{$this->_modelSearchClassName} класс не нейден, необходимо указать существующий класс поиска");
-            }
-
-            if (!is_subclass_of($this->_modelSearchClassName, ActiveRecord::className()))
-            {
-                //throw new InvalidConfigException("{$this->_modelSearchClassName} класс должен быть дочерним классом — " . ActiveRecord::className());
-            }
+            throw new InvalidConfigException("{$this->modelClassName} класс не нейден, необходимо указать существующий класс модели");
         }
     }
 
-
-
     /**
-     * Finds the Game model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return ActiveRecord the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param \yii\base\Action $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
      */
-    protected function _findModel($id)
+    public function beforeAction($action)
     {
-        $modelClass = $this->_modelClassName;
-        if (($model = $modelClass::findOne($id)) !== null)
+        if (parent::beforeAction($action))
         {
-            return $model;
-        } else {
-            $this->redirect($this->getIndexUrl());
-            //throw new NotFoundHttpException('The requested page does not exist.');
+            if ($action instanceof AdminOneModelEditAction)
+            {
+                if (($this->model !== null))
+                {
+                    return true;
+                } else
+                {
+                    //throw new NotFoundHttpException('Не найдено');
+                    $this->redirect($this->getIndexUrl());
+                }
+            }
+
+            return true;
+        } else
+        {
+            return false;
         }
     }
 
-    protected $_currentModel = null;
-
     /**
-     * @return array
+     * @return ActiveRecord
      * @throws NotFoundHttpException
-     */
-    public function loadModels()
-    {
-        $result = [];
-
-        if ($keys = (array) \Yii::$app->request->post('keys'))
-        {
-            foreach ($keys as $key)
-            {
-                $result[$key] = $this->_findModel($key);
-            }
-        }
-
-        return $result;
-    }
-    /**
-     * @return $this
-     * @throws Exception
-     * @throws NotFoundHttpException
-     */
-    protected function _loadCurrentModel()
-    {
-        $id = \Yii::$app->request->getQueryParam("id");
-        if (!$id)
-        {
-            //throw new Exception("Текущая модель не может быть загружена");
-            $this->_currentModel = false;
-            return $this;
-        }
-        $this->_currentModel = $this->_findModel($id);
-
-
-        //if (!$this->_currentModel->primaryKey)
-        //{
-            //throw new Exception("У модели нет первичного ключа, не сможем с ней работать");
-        //    $this->_currentModel = false;
-        //    return $this;
-        //}
-
-        $this->_setLangAndSite($this->_currentModel);
-
-        return $this;
-    }
-
-
-
-    /**
-     * TODO: use $this->getModel();
-     * @return ActiveRecord
-     * @throws Exception
-     */
-    public function getCurrentModel()
-    {
-        if ($this->_currentModel === null)
-        {
-            $this->_loadCurrentModel();
-        }
-
-        return $this->_currentModel;
-    }
-
-    /**
-     * @return ActiveRecord
-     */
-    public function createCurrentModel()
-    {
-        $modelClass = $this->_modelClassName;
-        $model = new $modelClass();
-
-        $this->_setLangAndSite($model);
-
-        return $model;
-    }
-
-    /**
-     * @return ActiveRecord
      */
     public function getModel()
     {
-        return $this->getCurrentModel();
+        if ($this->_model === null)
+        {
+            $pk             = \Yii::$app->request->get($this->requestPkParamName);
+            $modelClass     = $this->modelClassName;
+            $this->_model   = $modelClass::findOne($pk);
+        }
+
+        return $this->_model;
     }
 
     /**
-     * @param Component $model
+     * @param ActiveRecord $model
      * @return $this
      */
     public function setModel($model)
     {
-        $this->_currentModel = $model;
-        return $this;
-    }
-    /**
-     * TODO: use $this->getModel();
-     * @param ActiveRecord $model
-     * @return $this
-     */
-    public function setCurrentModel(\yii\db\ActiveRecord $model)
-    {
-        $this->_currentModel = $model;
-        return $this;
-    }
-
-
-
-
-    /**
-     * Формируем данные для хлебных крошек.
-     * Эти данные в layout - е будут передаваться в нужный виджет.
-     * @param ActionEvent $e
-     *
-     * @return $this
-     */
-    protected function _renderBreadcrumbs(ActionEvent $e)
-    {
-        $currentAction = $this->_getActionFromEvent($e);
-        if (!$currentAction instanceof Action || !$this->getCurrentModel())
-        {
-            return parent::_renderBreadcrumbs($e);
-        }
-
-        if ($this->_label)
-        {
-            $this->getView()->params['breadcrumbs'][] = ['label' => $this->_label, 'url' => $this->indexUrl];
-        }
-
-        $this->getView()->params['breadcrumbs'][] = ['label' => $this->getCurrentModel()->{$this->_modelShowAttribute}, 'url' => [
-            $this->defaultActionModel,
-            "id" => $this->getCurrentModel()->{$this->modelPkAttribute},
-            UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
-        ]];
-
-
-        if ($this->defaultAction != $e->action->id)
-        {
-            $this->getView()->params['breadcrumbs'][] = $currentAction->label;
-        }
-
+        $this->_model   = $model;
+        $this->_actions = null;
         return $this;
     }
 
 
     /**
-     * @param ActionEvent $e
-     * @return $this
+     * Массив объектов действий доступных для текущего контроллера
+     * Используется при построении меню.
+     * @see ControllerActions
+     * @return AdminAction[]
      */
-    protected function _renderMetadata(ActionEvent $e)
+    public function getActions()
     {
-        //Если текущее действие не описано, делаем как нужно по умолчанию
-        $currentAction = $this->_getActionFromEvent($e);
-        if (!$currentAction instanceof Action || !$this->getCurrentModel())
+        if ($this->_actions !== null)
         {
-            return parent::_renderMetadata($e);
+            return $this->_actions;
         }
 
-        $actionTitle    = $currentAction->label;
+        $actions = $this->actions();
 
-        $result[] = $actionTitle;
-        $result[] = $this->getCurrentModel()->{$this->_modelShowAttribute};
-        $result[] = $this->_label;
-
-        $this->getView()->title = implode(" / ", $result);
-        return $this;
-    }
-
-
-
-
-
-
-
-    /**
-     * Lists all Game models.
-     * @var asdasd
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $modelSeacrhClass = $this->_modelSearchClassName;
-
-        if (!$modelSeacrhClass)
+        if ($actions)
         {
-            $search = new Search($this->_modelClassName);
-            $dataProvider = $search->search(\Yii::$app->request->queryParams);
-            $searchModel = $search->getLoadedModel();
-        } else
-        {
-            $searchModel = new $modelSeacrhClass();
-            $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
-        }
-
-        try
-        {
-            return $this->render('index', [
-                'searchModel'   => $searchModel,
-                'dataProvider'  => $dataProvider,
-                'controller'    => $this,
-            ]);
-        } catch (InvalidParamException $e)
-        {
-            $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/index.php',
-                [
-                    'searchModel'   => $searchModel,
-                    'dataProvider'  => $dataProvider,
-                    'controller'    => $this,
-                    'columns'       => $this->getIndexColumns(),
-                ]
-            );
-
-            return $this->output($output);
-        }
-
-    }
-
-    public function getIndexColumns()
-    {
-        $columns = [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            [
-                'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                'controller'    => $this
-            ],
-        ];
-
-        /**
-         * @var ActiveRecord $model
-         */
-        $modelClassName = $this->getModelClassName();
-        $model = new $modelClassName();
-
-        $gridColumns = [];
-        if ((array) $this->gridColumns)
-        {
-            foreach ($this->gridColumns as $data)
+            foreach ($actions as $id => $data)
             {
-                if (is_string($data))
+                $action                 = $this->createAction($id);
+
+                if ($this->model)
                 {
-                    if ($model->hasAttribute($data))
+                    if ($action instanceof AdminOneModelEditAction)
                     {
-                        $gridColumns[] = $data;
+                        if ($action->isVisible())
+                        {
+                            $this->_actions[$id]    = $action;
+                        }
                     }
                 } else
                 {
-                    $gridColumns[] = $data;
+                    if (!$action instanceof AdminOneModelEditAction)
+                    {
+                        if ($action->isVisible())
+                        {
+                            $this->_actions[$id]    = $action;
+                        }
+                    }
                 }
             }
-        }
-
-        return ArrayHelper::merge($columns, $gridColumns);
-    }
-    /**
-     * @return string
-     */
-    public function actionView()
-    {
-        return $this->output(\skeeks\cms\modules\admin\widgets\DetailView::widget([
-            'model' => $this->getCurrentModel(),
-
-        ]));
-    }
-
-    /**
-     * Creates a new Game model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        /**
-         * @var $model ActiveRecord
-         */
-
-        if (!$model = $this->getCurrentModel())
-        {
-            $model = $this->createCurrentModel();
-        }
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
-        }
-
-        if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
-        {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно добавлено');
-
-            if (\Yii::$app->request->post('submit-btn') == 'apply')
-            {
-                return $this->redirect(
-                    UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute('update')->normalizeCurrentRoute()->addData(['id' => $model->id])->toString()
-                );
-            } else
-            {
-                return $this->redirect(
-                    $this->indexUrl
-                );
-            }
-
         } else
         {
-            if (\Yii::$app->request->isPost)
-            {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-            }
-
-            try
-            {
-                return $this->render('_form', [
-                    'model' => $model,
-                ]);
-
-            } catch (InvalidParamException $e)
-            {
-                $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
-                    [
-                        'model' => $model,
-                    ]
-                );
-
-                return $this->output($output);
-            }
-
+            $this->_actions = [];
         }
+
+        return $this->_actions;
     }
 
-    /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionUpdate()
-    {
-        $model = $this->getCurrentModel();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
-        }
-
-        if (\Yii::$app->request->isAjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
-            {
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {
-                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                } else
-                {
-                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-
-                    return $this->redirect(
-                        $this->indexUrl
-                    );
-                }
 
 
-            } else
-            {
-                //if (\Yii::$app->request->isPost)
-                //{
-                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-                //}
-            }
-
-            try
-            {
-                return $this->render('_form', [
-                    'model'     => $model,
-                ]);
-
-            } catch (InvalidParamException $e)
-            {
-                $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
-                    [
-                        'model' => $model,
-                    ]
-                );
-
-                return $this->output($output);
-            }
-
-
-        } else
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
-            {
-                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                return $this->redirectRefresh();
-            } else
-            {
-
-                if (\Yii::$app->request->isPost)
-                {
-                    \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
-                }
-
-                try
-                {
-                    return $this->render('_form', [
-                        'model' => $model,
-                    ]);
-
-                } catch (InvalidParamException $e)
-                {
-                    $output = \Yii::$app->cms->moduleAdmin()->renderFile('base-actions/_form.php',
-                        [
-                            'model' => $model,
-                        ]
-                    );
-
-                    return $this->output($output);
-                }
-            }
-        }
-    }
 
     /**
      * Deletes an existing Game model.
@@ -672,58 +333,39 @@ class AdminModelEditorController extends AdminController
      */
     public function actionDelete()
     {
-        if (\Yii::$app->request->isAjax)
-        {
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            $success = false;
+        $rr = new RequestResponse();
 
+        if ($rr->isRequestAjaxPost())
+        {
             try
             {
-                if ($this->getCurrentModel()->delete())
+                if ($this->model->delete())
                 {
-                    $message = 'Запись успешно удалена';
-                    //\Yii::$app->getSession()->setFlash('success', $message);
-                    $success = true;
+                    $rr->message = 'Запись успешно удалена';
+                    $rr->success = true;
                 } else
                 {
-                    $message = 'Не получилось удалить запись';
-                    //\Yii::$app->getSession()->setFlash('error', $message);
-                    $success = false;
+                    $rr->message = 'Не получилось удалить запись';
+                    $rr->success = false;
                 }
             } catch (\Exception $e)
             {
-                $message = $e->getMessage();
-                    //\Yii::$app->getSession()->setFlash('error', $message);
-                $success = false;
+                $rr->message = $e->getMessage();
+                $rr->success = false;
             }
 
-
-
-            return [
-                'message' => $message,
-                'success' => $success,
-            ];
-
-        } else
-        {
-            if ($this->getCurrentModel()->delete())
-            {
-                \Yii::$app->getSession()->setFlash('success', 'Запись успешно удалена');
-            } else
-            {
-                \Yii::$app->getSession()->setFlash('error', 'Не получилось удалить запись');
-            }
-
-            if ($ref = UrlHelper::getCurrent()->getRef())
-            {
-                return $this->redirect($ref);
-            } else
-            {
-                return $this->goBack();
-            }
+            return (array) $rr;
         }
+    }
 
-        //return $this->redirect(\Yii::$app->request->getReferrer());
+
+
+    /**
+     * @return string
+     */
+    public function getIndexUrl()
+    {
+        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute($this->defaultAction)->normalizeCurrentRoute()->toString();
     }
 
 }

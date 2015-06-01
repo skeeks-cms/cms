@@ -31,14 +31,23 @@ class AdminSettings extends Component
 
     public $asset;
 
-    public $enableCustomConfirm   = 1;
-    public $enableCustomPromt     = 1;
+    public $enableCustomConfirm     = 1;
+    public $enableCustomPromt       = 1;
 
+    public $languageCode     = "ru";
+
+
+    public function init()
+    {
+        parent::init();
+
+        \Yii::$app->language = $this->languageCode;
+    }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['asset'], 'string'],
+            [['asset', 'languageCode'], 'string'],
             [['enableCustomConfirm', 'enableCustomPromt'], 'integer'],
         ]);
     }
@@ -49,6 +58,7 @@ class AdminSettings extends Component
             'asset'                             => 'Дополнительные css и js админки',
             'enableCustomConfirm'               => 'Включить стилизованные окошки подтверждения (confirm)',
             'enableCustomPromt'                 => 'Включить стилизованные окошки вопрос с одним полем (promt)',
+            'languageCode'               => 'Язык интерфейса',
         ]);
     }
 

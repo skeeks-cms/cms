@@ -10,9 +10,12 @@ use skeeks\cms\actions\ViewModelAction;
 use skeeks\cms\assets\CmsToolbarAsset;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -74,31 +77,6 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
 
 
-
-
-
-    public function init()
-    {
-        parent::init();
-
-        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
-        {
-            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
-        }
-
-        if (!$this->enabled || \Yii::$app->user->isGuest)
-        {
-            $this->enabled = false;
-            return;
-        }
-
-        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
-        {
-            $this->enabled = false;
-        }
-
-    }
-
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -157,11 +135,33 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         return (bool) ($this->mode == self::EDIT_MODE);
     }
 
+    public function init()
+    {
+        parent::init();
+
+
+    }
     /**
      * @inheritdoc
      */
     public function bootstrap($app)
     {
+        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
+        {
+            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+        }
+
+        if (!$this->enabled || \Yii::$app->user->isGuest)
+        {
+            $this->enabled = false;
+            return;
+        }
+
+        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
+        {
+            $this->enabled = false;
+        }
+
         if ($this->enabled)
         {
             // delay attaching event handler to the view component after it is fully configured
@@ -194,7 +194,13 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
                 {
                     if ($descriptor->adminControllerRoute)
                     {
-                        $urlEditModel = UrlHelper::construct($descriptor->adminControllerRoute . '/update', ['id' => $editModel->id])->enableAdmin()
+
+                        /**
+                         * @var $controller AdminModelEditorController
+                         */
+                        $controller = \Yii::$app->createController($descriptor->adminControllerRoute)[0];
+
+                        $urlEditModel = UrlHelper::construct($descriptor->adminControllerRoute . '/update', [$controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}])->enableAdmin()
                             ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                             //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                             ;

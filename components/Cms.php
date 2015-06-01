@@ -10,9 +10,19 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
+use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelFilesAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction;
+use skeeks\cms\modules\admin\controllers\AdminController;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
@@ -102,7 +112,12 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string шаблон
      */
-    public $template        = "default";
+    public $template                = "default";
+
+    /**
+     * @var string язык по умолчанию
+     */
+    public $languageCode         = "ru";
 
     /**
      * @var array Возможные шаблоны сайта
@@ -176,13 +191,55 @@ class Cms extends \skeeks\cms\base\Component
             }
         }
         \Yii::setAlias('template', \Yii::getAlias($templatePath));
+
+        \Yii::$app->language = $this->languageCode;
+
+        \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
+
+            if ($e->controller instanceof AdminModelEditorController)
+            {
+                $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
+                    'files' =>
+                    [
+                        'class'         => AdminOneModelFilesAction::className(),
+                        'name'          => 'Файлы',
+                        "icon"          => "glyphicon glyphicon-cloud",
+                    ],
+                ]);
+            }
+
+            if ($e->controller instanceof AdminModelEditorController)
+            {
+                $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
+                    'related-properties' =>
+                    [
+                        'class'         => AdminOneModelRelatedPropertiesAction::className(),
+                        'name'          => 'Дополнительные свойства',
+                        "icon"          => "glyphicon glyphicon-plus-sign",
+                    ],
+                ]);
+            }
+
+            if ($e->controller instanceof AdminModelEditorController)
+            {
+                $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
+                    'system' =>
+                    [
+                        'class'         => AdminOneModelSystemAction::className(),
+                        'name'          => 'Системные данные',
+                        "icon"          => "glyphicon glyphicon-cog",
+                    ],
+                ]);
+            }
+
+        });
     }
 
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
         ]);
@@ -197,6 +254,7 @@ class Cms extends \skeeks\cms\base\Component
             'appName'                   => 'Название проекта',
             'template'                  => 'Шаблон',
             'templates'                 => 'Возможные шаблон',
+            'languageCode'       => 'Язык по умолчанию',
         ]);
     }
 
