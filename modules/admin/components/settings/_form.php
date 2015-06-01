@@ -21,7 +21,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Языковые настройки'); ?>
-        <?= $form->fieldSelect($model, 'defaultLanguageCode', \yii\helpers\ArrayHelper::map(
+        <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\CmsLang::find()->active()->all(),
             'code',
             'name'

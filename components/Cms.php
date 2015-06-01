@@ -117,7 +117,7 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string язык по умолчанию
      */
-    public $defaultLanguageCode         = "ru";
+    public $languageCode         = "ru";
 
     /**
      * @var array Возможные шаблоны сайта
@@ -192,7 +192,7 @@ class Cms extends \skeeks\cms\base\Component
         }
         \Yii::setAlias('template', \Yii::getAlias($templatePath));
 
-        \Yii::$app->language = $this->defaultLanguageCode;
+        \Yii::$app->language = $this->languageCode;
 
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
@@ -239,7 +239,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'defaultLanguageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
         ]);
@@ -254,7 +254,7 @@ class Cms extends \skeeks\cms\base\Component
             'appName'                   => 'Название проекта',
             'template'                  => 'Шаблон',
             'templates'                 => 'Возможные шаблон',
-            'defaultLanguageCode'       => 'Язык по умолчанию',
+            'languageCode'       => 'Язык по умолчанию',
         ]);
     }
 
