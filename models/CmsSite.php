@@ -76,7 +76,9 @@ class CmsSite extends Core
         if ($this->def == Cms::BOOL_Y)
         {
             static::updateAll(['def' => Cms::BOOL_N]);
+            $this->active = Cms::BOOL_Y; //сайт по умолчанию всегда активный
         }
+
     }
 
     public function createTreeAfterInsert(Event $e)

@@ -15,8 +15,17 @@ use skeeks\cms\models\Tree;
 <?= $form->fieldSet("Основное"); ?>
 
     <?= $form->field($model, 'code')->textInput(); ?>
-    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
-    <?= $form->fieldRadioListBoolean($model, 'def'); ?>
+
+
+    <? if ($model->def === \skeeks\cms\components\Cms::BOOL_Y): ?>
+        <?= $form->field($model, 'active')->hiddenInput()->hint('Сайт выбранный по умолчанию всегда активный'); ?>
+        <?= $form->field($model, 'def')->hiddenInput()->hint('Этот сайт выбран сайтом по умолчанию. Если вы хотите изменить это, вам нужно выбрать другой сайт, сайтом по умолчанию.'); ?>
+    <? else : ?>
+        <?= $form->fieldRadioListBoolean($model, 'active'); ?>
+        <?= $form->fieldRadioListBoolean($model, 'def'); ?>
+    <? endif; ?>
+
+
     <?= $form->field($model, 'name')->textarea(); ?>
     <?= $form->fieldSelect($model, 'lang_code', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsLang::find()->active()->all(),

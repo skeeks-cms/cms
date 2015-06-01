@@ -20,4 +20,9 @@ class CmsActiveQuery extends ActiveQuery
     {
         return $this->andWhere(['active' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
     }
+
+    public function def($state = true)
+    {
+        return $this->andWhere(['def' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
+    }
 }
