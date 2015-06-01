@@ -34,10 +34,5 @@ use skeeks\cms\modules\admin\widgets\GridView;
             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
             'attribute'     => "active"
         ],
-
-        [
-            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-            'attribute'     => "def"
-        ],
     ],
 ]); ?>
