@@ -189,8 +189,6 @@ class Cms extends \skeeks\cms\base\Component
 
 
 
-
-
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
             if ($e->controller instanceof AdminModelEditorController)
