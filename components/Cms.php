@@ -18,6 +18,8 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelFilesAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
@@ -208,7 +210,7 @@ class Cms extends \skeeks\cms\base\Component
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'related-properties' =>
                     [
-                        'class'         => AdminOneModelFilesAction::className(),
+                        'class'         => AdminOneModelRelatedPropertiesAction::className(),
                         'name'          => 'Дополнительные свойства',
                         "icon"          => "glyphicon glyphicon-plus-sign",
                     ],
@@ -220,9 +222,9 @@ class Cms extends \skeeks\cms\base\Component
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'system' =>
                     [
-                        'class'         => AdminOneModelFilesAction::className(),
+                        'class'         => AdminOneModelSystemAction::className(),
                         'name'          => 'Системные данные',
-                        "icon"          => "glyphicon glyphicon-user",
+                        "icon"          => "glyphicon glyphicon-cog",
                     ],
                 ]);
             }

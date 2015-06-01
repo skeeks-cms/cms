@@ -103,6 +103,11 @@ class ControllerActions
 
         $actions = $this->controller->actions;
 
+        if (!$actions)
+        {
+            return [];
+        }
+
         foreach ($actions as $id => $action)
         {
             if (!$action->visible)

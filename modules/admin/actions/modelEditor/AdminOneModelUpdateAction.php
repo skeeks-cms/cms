@@ -18,10 +18,10 @@ use yii\behaviors\BlameableBehavior;
 use yii\web\Response;
 
 /**
- * Class AdminModelsGridAction
+ * Class AdminOneModelUpdateAction
  * @package skeeks\cms\modules\admin\actions\modelEditor
  */
-class AdminModelEditorUpdateAction extends AdminOneModelEditAction
+class AdminOneModelUpdateAction extends AdminOneModelEditAction
 {
     /**
      * @var bool
@@ -32,42 +32,6 @@ class AdminModelEditorUpdateAction extends AdminOneModelEditAction
      * @var string
      */
     public $modelScenario = "";
-
-
-    public function init()
-    {
-        parent::init();
-
-        $this->controller->attachBehavior('accessCreate',
-        [
-            'class'         => AdminAccessControl::className(),
-            'only'          => [$this->id],
-            'rules'         =>
-            [
-                [
-                    'allow'         => true,
-                    'matchCallback' => function($rule, $action)
-                    {
-                        if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->controller->model)->isValid())
-                        {
-                            //Если такая привилегия заведена, нужно ее проверять.
-                            if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
-                            {
-                                if (!\Yii::$app->user->can($permission->name, [
-                                    'model' => $this->controller->model
-                                ]))
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-
-                        return true;
-                    }
-                ],
-            ],
-        ]);
-    }
 
     public function run()
     {

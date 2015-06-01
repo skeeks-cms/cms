@@ -63,6 +63,7 @@ class Module extends CmsModule
                 $this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
             }
 
+            \Yii::beginProfile('admin loading');
 
             //Загрузка всех компонентов.
             $components = \Yii::$app->getComponents();
@@ -74,6 +75,8 @@ class Module extends CmsModule
             \Yii::$app->trigger(self::EVENT_READY, new Event([
                 'name' => self::EVENT_READY
             ]));
+
+            \Yii::endProfile('admin loading');
         }
     }
 

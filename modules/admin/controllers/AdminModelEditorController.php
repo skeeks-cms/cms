@@ -24,6 +24,7 @@ use skeeks\cms\modules\admin\actions\AdminModelAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorUpdateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
@@ -171,7 +172,7 @@ class AdminModelEditorController extends AdminController
 
                 "update" =>
                 [
-                    'class'         => AdminModelEditorUpdateAction::className(),
+                    'class'         => AdminOneModelUpdateAction::className(),
                     "name"         => "Редактировать",
                     "icon"          => "glyphicon glyphicon-pencil",
                 ],
