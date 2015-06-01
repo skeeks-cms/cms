@@ -24,6 +24,7 @@ use skeeks\cms\modules\admin\actions\AdminModelAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorUpdateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\helpers\Action;
@@ -152,41 +153,42 @@ class AdminModelEditorController extends AdminController
      */
     public function actions()
     {
-        return
-        [
-            'index' =>
+        return ArrayHelper::merge(parent::actions(),
             [
-                'class'         => ModelEditorGridAction::className(),
-                'name'          => 'Список',
-                "icon"          => "glyphicon glyphicon-th-list",
-            ],
+                'index' =>
+                [
+                    'class'         => ModelEditorGridAction::className(),
+                    'name'          => 'Список',
+                    "icon"          => "glyphicon glyphicon-th-list",
+                ],
 
-            'create' =>
-            [
-                'class'         => AdminModelEditorCreateAction::className(),
-                'name'          => 'Добавить',
-                "icon"          => "glyphicon glyphicon-plus",
-            ],
+                'create' =>
+                [
+                    'class'         => AdminModelEditorCreateAction::className(),
+                    'name'          => 'Добавить',
+                    "icon"          => "glyphicon glyphicon-plus",
+                ],
 
 
-            "update" =>
-            [
-                'class'         => AdminModelEditorUpdateAction::className(),
-                "name"         => "Редактировать",
-                "icon"          => "glyphicon glyphicon-pencil",
-            ],
+                "update" =>
+                [
+                    'class'         => AdminOneModelUpdateAction::className(),
+                    "name"         => "Редактировать",
+                    "icon"          => "glyphicon glyphicon-pencil",
+                ],
 
-            "delete" =>
-            [
-                'class'         => AdminOneModelEditAction::className(),
-                "name"          => "Удалить",
-                "icon"          => "glyphicon glyphicon-trash",
-                "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
-                "method"        => "post",
-                "request"       => "ajax",
-                "callback"      => [$this, 'actionDelete'],
+                "delete" =>
+                [
+                    'class'         => AdminOneModelEditAction::className(),
+                    "name"          => "Удалить",
+                    "icon"          => "glyphicon glyphicon-trash",
+                    "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+                    "method"        => "post",
+                    "request"       => "ajax",
+                    "callback"      => [$this, 'actionDelete'],
+                ]
             ]
-        ];
+        );
     }
 
     /**
@@ -297,13 +299,19 @@ class AdminModelEditorController extends AdminController
                 {
                     if ($action instanceof AdminOneModelEditAction)
                     {
-                        $this->_actions[$id] = $action;
+                        if ($action->isVisible())
+                        {
+                            $this->_actions[$id]    = $action;
+                        }
                     }
                 } else
                 {
                     if (!$action instanceof AdminOneModelEditAction)
                     {
-                        $this->_actions[$id] = $action;
+                        if ($action->isVisible())
+                        {
+                            $this->_actions[$id]    = $action;
+                        }
                     }
                 }
             }

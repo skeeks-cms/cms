@@ -127,7 +127,7 @@ class AdminPermissionController extends AdminModelEditorController
                             if (!$adminAccess = $auth->getPermission($permissionCode))
                             {
                                 $adminAccess = $auth->createPermission($permissionCode);
-                                $adminAccess->description = 'Администрирование | ' . $controller->getLabel();
+                                $adminAccess->description = 'Администрирование | ' . $controller->name;
                                 $auth->add($adminAccess);
 
                                 if ($root = $auth->getRole('root'))

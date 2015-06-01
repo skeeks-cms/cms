@@ -75,31 +75,6 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
 
 
-
-
-
-    public function init()
-    {
-        parent::init();
-
-        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
-        {
-            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
-        }
-
-        if (!$this->enabled || \Yii::$app->user->isGuest)
-        {
-            $this->enabled = false;
-            return;
-        }
-
-        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
-        {
-            $this->enabled = false;
-        }
-
-    }
-
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -163,6 +138,22 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
      */
     public function bootstrap($app)
     {
+        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
+        {
+            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+        }
+
+        if (!$this->enabled || \Yii::$app->user->isGuest)
+        {
+            $this->enabled = false;
+            return;
+        }
+
+        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
+        {
+            $this->enabled = false;
+        }
+
         if ($this->enabled)
         {
             // delay attaching event handler to the view component after it is fully configured

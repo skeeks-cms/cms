@@ -37,6 +37,11 @@ class AdminAction extends ViewAction
      */
     public $viewParams  = [];
 
+    /**
+     * @var
+     */
+    public $viewName    = null;
+
 
     /**
      * @var
@@ -57,6 +62,11 @@ class AdminAction extends ViewAction
         }
 
         $this->defaultView = $this->id;
+
+        if ($this->viewName)
+        {
+            $this->defaultView = $this->viewName;
+        }
 
         parent::init();
     }
@@ -187,5 +197,13 @@ class AdminAction extends ViewAction
         $url = UrlHelper::constructCurrent()->setRoute($route)->enableAdmin()->setCurrentRef();
 
         return $url;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
     }
 }

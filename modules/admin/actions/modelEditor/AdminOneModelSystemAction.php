@@ -8,6 +8,9 @@
 namespace skeeks\cms\modules\admin\actions\modelEditor;
 
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\HasFiles;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
@@ -16,29 +19,31 @@ use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
+use skeeks\cms\validators\HasBehaviorsOr;
 use skeeks\sx\validate\Validate;
 use yii\authclient\AuthAction;
 use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
 use yii\helpers\Inflector;
 use yii\web\Application;
 use yii\web\ViewAction;
 use \skeeks\cms\modules\admin\controllers\AdminController;
 
 /**
- * @property AdminModelEditorController    $controller
- *
- * Class AdminModelsGridAction
- * @package skeeks\cms\modules\admin\actions
+ * Class AdminOneModelSystemAction
+ * @package skeeks\cms\modules\admin\actions\modelEditor
  */
-class AdminOneModelEditAction extends AdminModelEditorAction
+class AdminOneModelSystemAction extends AdminOneModelUpdateAction
 {
+    public $modelValidate = false;
+
 
     public function init()
     {
         parent::init();
 
         //Для работы с любой моделью нужно как минимум иметь привилегию CmsManager::PERMISSION_ALLOW_MODEL_UPDATE
-        $this->controller->attachBehavior('accessCreate',
+        $this->controller->attachBehavior('accessAdvanced',
         [
             'class'         => AdminAccessControl::className(),
             'only'          => [$this->id],
@@ -46,20 +51,26 @@ class AdminOneModelEditAction extends AdminModelEditorAction
             [
                 [
                     'allow'         => true,
-                    'matchCallback' => [$this, 'checkUpdateAccess']
+                    'matchCallback' => [$this, 'checkAdvancedAccess']
                 ],
             ],
         ]);
     }
 
     /**
-     * @return UrlHelper
+     * Renders a view
+     *
+     * @param string $viewName view name
+     * @return string result of the rendering
      */
-    public function getUrl()
+    protected function render($viewName)
     {
-        $url = parent::getUrl();
-        $url->set($this->controller->requestPkParamName, $this->controller->model->{$this->controller->modelPkAttribute});
-        return $url;
+        $this->viewParams =
+        [
+            'model' => $this->controller->model
+        ];
+
+        return $this->controller->render("@skeeks/cms/modules/admin/views/base-actions/system", (array) $this->viewParams);
     }
 
     /**
@@ -72,15 +83,25 @@ class AdminOneModelEditAction extends AdminModelEditorAction
             return false;
         }
 
-        return $this->checkUpdateAccess();
+        if (!Validate::validate(new HasBehaviorsOr([
+            TimestampBehavior::className(),
+            TimestampPublishedBehavior::className(),
+            BlameableBehavior::className()
+        ]), $this->controller->model)->isValid())
+        {
+            return false;
+        }
+
+        return $this->checkAdvancedAccess();
     }
 
-    public function checkUpdateAccess()
+
+    public function checkAdvancedAccess()
     {
         if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->controller->model)->isValid())
         {
             //Если такая привилегия заведена, нужно ее проверять.
-            if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
+            if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED))
             {
                 if (!\Yii::$app->user->can($permission->name, [
                     'model' => $this->controller->model
@@ -92,7 +113,7 @@ class AdminOneModelEditAction extends AdminModelEditorAction
         } else
         {
             //Если такая привилегия заведена, нужно ее проверять.
-            if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
+            if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED))
             {
                 if (!\Yii::$app->user->can($permission->name))
                 {
@@ -103,4 +124,5 @@ class AdminOneModelEditAction extends AdminModelEditorAction
 
         return true;
     }
+
 }
