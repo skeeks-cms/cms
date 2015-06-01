@@ -3,6 +3,7 @@
 
 2.0.0.rc2 (unreleased)
 -----------------
+  * Исправлены мелкие баги
   * Исправлен баг указания сценариев для AdminOneModelUpdateAction и AdminModelEditorCreateAction
 
 2.0.0.rc1
