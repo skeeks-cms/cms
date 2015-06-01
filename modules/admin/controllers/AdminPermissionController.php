@@ -10,8 +10,11 @@
  */
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\AuthItem;
 use skeeks\cms\models\searchs\AuthItem as AuthItemSearch;
+use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use yii\helpers\ArrayHelper;
@@ -32,100 +35,71 @@ class AdminPermissionController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Управление привилегиями";
-        $this->_modelShowAttribute      = "name";
+        $this->name                   = "Управление привилегиями";
+        $this->modelShowAttribute      = "name";
         $this->modelPkAttribute         = "name";
-        $this->_modelClassName          = Permission::className();
+        $this->modelClassName          = Permission::className();
 
         parent::init();
     }
 
-    /**
-     * Finds the Game model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return ActiveRecord the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function _findModel($id)
+    public function actions()
     {
-        return $this->findModel($id);
-    }
+        return ArrayHelper::merge(parent::actions(), [
 
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
+            'index' =>
+            [
+                'class'     => AdminAction::className(),
+                'callback'  => [$this, 'actionIndex']
             ],
 
-            self::BEHAVIOR_ACTION_MANAGER =>
+            'view' =>
             [
-                "actions" =>
-                [
-                    "index" =>
-                    [
-                        "label"         => "Список",
-                        "icon"         => "glyphicon glyphicon-th-list",
-                        "rules"         => NoModel::className()
-                    ],
+                "class"     => AdminOneModelEditAction::className(),
+                "name"      => "Смотреть",
+                "icon"      => "glyphicon glyphicon-eye-open",
+                "callback"  => [$this, "actionView"],
+            ],
 
-                    "view" =>
-                    [
-                        "label"         => "Смотреть",
-                        "icon"          => "glyphicon glyphicon-eye-open",
-                        "rules"         => HasModel::className()
-                    ],
-
-                    "create" =>
-                    [
-                        "label"         => "Добавить",
-                        "icon"          => "glyphicon glyphicon-plus",
-                        "rules"         => NoModel::className()
-                    ],
-
-                    "update-data" =>
-                    [
-                        "label"         => "Обновить привилегии",
-                        "icon"          => "glyphicon glyphicon-plus",
-                        "rules"         => NoModel::className(),
-                        "method"        => "post",
-                        "request"       => "ajax",
-                    ],
+            'create' =>
+            [
+                'class'         => AdminAction::className(),
+                'callback'      => [$this, 'actionCreate']
+            ],
 
 
+            "update-data" =>
+            [
+                "class"         => AdminAction::className(),
+                "name"          => "Обновить привилегии",
+                "icon"          => "glyphicon glyphicon-retweet",
+                "method"        => "post",
+                "request"       => "ajax",
+                'callback'      => [$this, 'actionUpdateData']
+            ],
 
-
-                    /*
-
-                    "update" =>
-                    [
-                        "label"         => "Редактировать",
-                        "icon"          => "glyphicon glyphicon-pencil",
-                        "rules"         => HasModel::className()
-                    ],
-
-                    "delete" =>
-                    [
-                        "label"         => "Удалить",
-                        "icon"          => "glyphicon glyphicon-trash",
-                        "method"        => "post",
-                        "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
-                        "priority"      => 9999,
-                        "rules"         => HasModel::className()
-                    ]*/
-                ]
-            ]
         ]);
     }
+
+    /**
+     * @return Role
+     * @throws NotFoundHttpException
+     */
+    public function getModel()
+    {
+        if ($this->_model === null)
+        {
+            if ($pk             = \Yii::$app->request->get($this->requestPkParamName))
+            {
+                $this->_model   = $this->findModel($pk);
+            }
+        }
+
+        return $this->_model;
+    }
+
+
+
 
     public function actionUpdateData()
     {
@@ -153,7 +127,7 @@ class AdminPermissionController extends AdminModelEditorController
                             if (!$adminAccess = $auth->getPermission($permissionCode))
                             {
                                 $adminAccess = $auth->createPermission($permissionCode);
-                                $adminAccess->description = 'Администрирование | ' . $controller->getLabel();
+                                $adminAccess->description = 'Администрирование | ' . $controller->name;
                                 $auth->add($adminAccess);
 
                                 if ($root = $auth->getRole('root'))
@@ -192,7 +166,7 @@ class AdminPermissionController extends AdminModelEditorController
      */
     public function actionView()
     {
-        $model = $this->getCurrentModel();
+        $model = $this->model;
         $id = $model->name;
         $model = $this->findModel($id);
         $authManager = Yii::$app->getAuthManager();
@@ -246,7 +220,7 @@ class AdminPermissionController extends AdminModelEditorController
      */
     public function actionUpdate()
     {
-        $model = $this->getCurrentModel();
+        $model = $this->model;
         $id = $model->name;
 
         $model = $this->findModel($id);
@@ -271,20 +245,43 @@ class AdminPermissionController extends AdminModelEditorController
 
         return $this->render('update', ['model' => $model,]);
     }
+
+
+
     /**
-     * Deletes an existing AuthItem model.
+     * Deletes an existing Game model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param  string $id
      * @return mixed
      */
     public function actionDelete()
     {
-        $model = $this->getCurrentModel();
-        $id = $model->name;
+        $rr = new RequestResponse();
 
-        $model = $this->findModel($id);
-        Yii::$app->getAuthManager()->remove($model->item);
-        return $this->redirect(['index']);
+        if ($rr->isRequestAjaxPost())
+        {
+            try
+            {
+                $model  = $this->model;
+                $id     = $model->name;
+
+                $model  = $this->findModel($id);
+                if (\Yii::$app->getAuthManager()->remove($model->item))
+                {
+                    $rr->message = 'Запись успешно удалена';
+                    $rr->success = true;
+                } else
+                {
+                    $rr->message = 'Не получилось удалить запись';
+                    $rr->success = false;
+                }
+            } catch (\Exception $e)
+            {
+                $rr->message = $e->getMessage();
+                $rr->success = false;
+            }
+
+            return (array) $rr;
+        }
     }
     /**
      * Assign or remove items

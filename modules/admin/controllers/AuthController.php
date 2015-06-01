@@ -20,6 +20,7 @@ use skeeks\cms\models\forms\PasswordResetRequestForm;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
+use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -40,21 +41,9 @@ class AuthController extends AdminController
     {
         return
         [
-            self::BEHAVIOR_ACTION_MANAGER =>
-            [
-                'class'     => ActionManager::className(),
-                'actions'   =>
-                    [
-                        "login" =>
-                        [
-                            "label" => "Авторизация"
-                        ],
-                    ],
-            ],
-
             'access' =>
             [
-                'class' => AccessControl::className(),
+                'class' => AdminAccessControl::className(),
                 'only' => ['logout', 'login', 'auth', 'reset-password'],
                 'rules' => [
                     [

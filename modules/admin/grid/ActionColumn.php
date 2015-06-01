@@ -28,9 +28,9 @@ class ActionColumn extends DataColumn
     /**
      * @var AdminModelEditorController
      */
-    public $controller      = null;
-    public $isOpenNewWindow      = null;
-    public $clientOptions      = [];
+    public $controller              = null;
+    public $isOpenNewWindow         = null;
+    public $clientOptions           = [];
 
     /**
      * @inheritdoc
@@ -63,12 +63,12 @@ class ActionColumn extends DataColumn
         }
 
         $controller = clone $this->controller;
-        $controller->setModel($model);
+        $controller->model = $model;
 
         return DropdownControllerActions::widget([
-                    "controller"            => $controller,
-                    "isOpenNewWindow"       => $this->isOpenNewWindow,
-                    "clientOptions"         => $this->clientOptions,
-                ]);
+            "controller"            => $controller,
+            "isOpenNewWindow"       => $this->isOpenNewWindow,
+            "clientOptions"         => $this->clientOptions,
+        ]);
     }
 }

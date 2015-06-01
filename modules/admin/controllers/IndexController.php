@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\controllers;
+use skeeks\cms\modules\admin\actions\AdminAction;
 
 /**
  * Class IndexController
@@ -18,13 +19,21 @@ class IndexController extends AdminController
 {
     public function init()
     {
-        $this->_label = "Админка";
+        $this->name = "Рабочий стол";
 
         parent::init();
     }
 
-    public function actionIndex()
+    public function actions()
     {
-        return $this->render("index");
+        return
+        [
+            'index' =>
+            [
+                'class'         => AdminAction::className(),
+                'name'          => 'Главная страница',
+                "visible"       => false,
+            ]
+        ];
     }
 }

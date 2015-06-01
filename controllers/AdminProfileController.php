@@ -15,8 +15,8 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\UserGroup;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use Yii;
@@ -29,67 +29,50 @@ use yii\web\Response;
  * Class AdminProfileController
  * @package skeeks\cms\controllers
  */
-class AdminProfileController extends AdminModelEditorSmartController
+class AdminProfileController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Личный кабинет";
-        $this->_modelShowAttribute      = "username";
-        $this->_modelClassName          = User::className();
+        $this->name                     = "Личный кабинет";
+        $this->modelShowAttribute      = "username";
+        $this->modelClassName          = User::className();
         parent::init();
     }
 
-    /**
-     * @return array
-     */
-    public function behaviors()
+    public function actions()
     {
-        $behaviors = parent::behaviors();
-        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['delete']);
-        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['social']);
-        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['system']);
-        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['files']);
-
-        $behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['change-password'] = [
-            "label"     => "Изменение пароля",
-            "icon"     => "glyphicon glyphicon-cog",
-            "rules" =>
+        $actions = ArrayHelper::merge(parent::actions(),
+        [
+            'change-password' =>
             [
-                [
-                    "class" => HasModel::className()
-                ]
-            ]
-        ];
+                "class"         => AdminOneModelEditAction::className(),
+                "name"          => "Изменение пароля",
+                "icon"          => "glyphicon glyphicon-cog",
+                "callback"      => [$this, 'actionChangePassword'],
+            ],
 
-        $behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['file-manager'] = [
-            "label"     => "Личные файлы",
-            "icon"      => "glyphicon glyphicon-folder-open",
-            "rules"     =>
+            'file-manager' =>
             [
-                [
-                    "class" => HasModel::className()
-                ]
-            ]
-        ];
+                "class"         => AdminOneModelEditAction::className(),
+                "name"          => "Личные файлы",
+                "icon"          => "glyphicon glyphicon-folder-open",
+                "callback"      => [$this, 'actionFileManager'],
+            ],
+        ]);
 
+        unset($actions['delete']);
+        unset($actions['create']);
+        unset($actions['index']);
 
-        return $behaviors;
+        return $actions;
     }
 
 
 
-
-    /**
-     * @return \common\models\User|null|\skeeks\cms\base\db\ActiveRecord|User|\yii\web\User
-     */
-    public function getCurrentModel()
+    public function beforeAction($action)
     {
-        if ($this->_currentModel === null)
-        {
-            $this->_currentModel = \Yii::$app->cms->getAuthUser();
-        }
-
-        return $this->_currentModel;
+        $this->model = \Yii::$app->user->identity;
+        return parent::beforeAction($action);
     }
 
     /**
@@ -97,7 +80,7 @@ class AdminProfileController extends AdminModelEditorSmartController
      */
     public function actionIndex()
     {
-        return $this->redirect(UrlHelper::construct("cms/admin-profile/view"));
+        return $this->redirect(UrlHelper::construct("cms/admin-profile/update")->enableAdmin()->toString());
     }
 
     /**
@@ -107,7 +90,7 @@ class AdminProfileController extends AdminModelEditorSmartController
      */
     public function actionFileManager()
     {
-        $model = $this->getCurrentModel();
+        $model = $this->model;
 
 
         return $this->output(\Yii::$app->cms->moduleCms()->renderFile('admin-user/file-manager.php', [
@@ -124,7 +107,7 @@ class AdminProfileController extends AdminModelEditorSmartController
      */
     public function actionChangePassword()
     {
-        $model = $this->getCurrentModel();
+        $model = $this->model;
 
         $modelForm = new PasswordChangeForm([
             'user' => $model

@@ -10,9 +10,10 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\widgets\ActiveForm;
@@ -27,117 +28,48 @@ use yii\rbac\Item;
 use yii\web\Response;
 
 /**
- * Test
- * asas
- * asdasdasdasdasdasd
- * @link asd
- *
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */
-class AdminUserController extends AdminModelEditorSmartController
+class AdminUserController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->_label                   = "Управление пользователями";
-
-        $this->_modelShowAttribute      = "username";
-
-        $this->_modelClassName          = User::className();
-        //$this->_modelSearchClassName    = UserSearch::className();
-
-        $this->modelValidate = true;
+        $this->name                     = "Управление пользователями";
+        $this->modelShowAttribute       = "username";
+        $this->modelClassName           = User::className();
 
         parent::init();
-
     }
 
-    /**
-     * @param ActionEvent $e
-     */
-    protected function _beforeAction(ActionEvent $e)
+    public function actions()
     {
-        parent::_beforeAction($e);
-
-        if ($e->action->id == 'create')
-        {
-            $this->setCurrentModel($this->createCurrentModel());
-            $this->getCurrentModel()->scenario = 'create';
-        }
-
-        if ($e->action->id == 'update')
-        {
-            $this->getCurrentModel()->scenario = 'update';
-        }
-    }
-
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-            self::BEHAVIOR_ACTION_MANAGER =>
+        return ArrayHelper::merge(parent::actions(), [
+            'create' =>
             [
-                "actions" =>
-                [
-                    /*'file-manager' =>
-                    [
-                        "label"     => "Личные файлы",
-                        "icon"      => "glyphicon glyphicon-folder-open",
-                        "rules"     =>
-                        [
-                            [
-                                "class" => HasModel::className()
-                            ]
-                        ]
-                    ],*/
+                'modelScenario' => 'create'
+            ],
+            'update' =>
+            [
+                'modelScenario' => 'update'
+            ],
+            'change-password' =>
+            [
+                "class"     => AdminOneModelEditAction::className(),
+                "name"      => "Изменение пароля",
+                "icon"      => "glyphicon glyphicon-cog",
+                "callback"  => [$this, "actionChangePassword"],
+            ],
 
-                    'change-password' =>
-                    [
-                        "label" => "Изменение пароля",
-                        "icon"     => "glyphicon glyphicon-cog",
-                        "rules" =>
-                        [
-                            [
-                                "class" => HasModel::className()
-                            ]
-                        ]
-                    ],
-
-                    'permission' =>
-                    [
-                        "label" => "Привилегии",
-                        "icon"     => "glyphicon glyphicon-exclamation-sign",
-                        "rules" =>
-                        [
-                            [
-                                "class" => HasModel::className()
-                            ]
-                        ]
-                    ],
-                ]
-            ]
+            'permission' =>
+            [
+                "class"     => AdminOneModelEditAction::className(),
+                "name"      => "Привилегии",
+                "icon"      => "glyphicon glyphicon-exclamation-sign",
+                "callback"  => [$this, "actionPermission"],
+            ],
         ]);
     }
-
-
-    /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionFileManager()
-    {
-        $model = $this->getCurrentModel();
-
-        return $this->render('file-manager', [
-            'model' => $model,
-        ]);
-    }
-
 
 
     /**
@@ -147,35 +79,34 @@ class AdminUserController extends AdminModelEditorSmartController
      */
     public function actionChangePassword()
     {
-        $model = $this->getCurrentModel();
+        $model = $this->model;
 
         $modelForm = new PasswordChangeForm([
             'user' => $model
         ]);
 
+        $rr = new RequestResponse();
+
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
-            $modelForm->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return \skeeks\cms\modules\admin\widgets\ActiveForm::validate($modelForm);
+            return $rr->ajaxValidateForm($modelForm);
         }
 
 
         if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
         {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(['change-password', 'id' => $model->id]);
         } else
         {
             if (\Yii::$app->request->isPost)
             {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
             }
-
-            return $this->render('_form-change-password', [
-                'model' => $modelForm,
-            ]);
         }
+
+        return $this->render($this->action->id, [
+            'model' => $modelForm,
+        ]);
     }
 
     /**
@@ -183,7 +114,7 @@ class AdminUserController extends AdminModelEditorSmartController
      */
     public function actionPermission()
     {
-        $model = $this->getCurrentModel();
+        $model = $this->model;
         $authManager = Yii::$app->authManager;
         $avaliable = [];
         $assigned = [];

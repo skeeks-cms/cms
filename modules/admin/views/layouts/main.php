@@ -48,73 +48,10 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
     <? endif; ?>
 
-    <!--<ul class="nav navbar-nav visible-md visible-lg">
-        <li>&nbsp;</li>
-        <li>
-            <?/*= Html::button('Перейти на сайт', [
-                'class' => 'btn btn-default',
-                'onclick' => 'sx.helpers.Url.redirect("' . \yii\helpers\Url::home() . '"); return false;'
-            ])*/?>
-        </li>
-    </ul>-->
-
     <ul class="nav navbar-nav navbar-right visible-md visible-lg visible-sm visible-xs sx-top-nav-menu">
         <!--<li><span class="timer"><i class="icon-clock"></i> <span id="clock"></span></span></li>-->
         <li class="dropdown visible-md visible-lg"></li>
         <? if (!Yii::$app->user->isGuest): ?>
-
-            <?/* if ($sites = \skeeks\cms\models\Site::getAll()) : */?><!--
-                <li class="sx-left-border dropdown visible-md visible-lg">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?/*= \Yii::$app->cms->moduleAdmin()->getCurrentSite() ? \Yii::$app->cms->moduleAdmin()->getCurrentSite()->host_name : 'Сайт'*/?> <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                          <?/* if (\Yii::$app->cms->moduleAdmin()->getCurrentSite()) : */?>
-                              <li>
-                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', ''); */?>" data-method="post">
-                                    Сбросить сайт
-                                </a>
-                              </li>
-                          <?/* endif; */?>
-
-                        <?/* foreach ($sites as $site) : */?>
-                            <li>
-                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('site', $site->primaryKey); */?>" data-method="post">
-                                    <?/*= $site->host_name; */?> (<?/*= $site->name; */?>)
-                                </a>
-                            </li>
-                        <?/* endforeach; */?>
-
-                      </ul>
-                    </div>
-                </li>
-            <?/* endif; */?>
-
-            <?/* if ($langs = \Yii::$app->langs->getComponents()) : */?>
-                <li class="sx-left-border dropdown visible-md visible-lg">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <?/*= \Yii::$app->cms->moduleAdmin()->getCurrentLang() ? \Yii::$app->cms->moduleAdmin()->getCurrentLang()->name . ' (' . \Yii::$app->cms->moduleAdmin()->getCurrentLang()->id . ')' : 'Язык'*/?> <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-
-                          <?/* if (\Yii::$app->cms->moduleAdmin()->getCurrentLang()) : */?>
-                              <li>
-                                <a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', ''); */?>" data-method="post">
-                                    Сбросить язык
-                                </a>
-                              </li>
-                          <?/* endif; */?>
-
-                        <?/* foreach ($langs as $lang) : */?>
-                            <li><a href="<?/*= UrlHelper::construct('admin/admin-system/session')->enableAdmin()->set('lang', $lang->id); */?>" data-method="post"><?/*= $lang->name; */?> (<?/*= $lang->id; */?>)</a></li>
-                        <?/* endforeach; */?>
-                      </ul>
-                    </div>
-                </li>
-            --><?/* endif; */?>
-
 
 
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
@@ -150,32 +87,6 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         <? endif; ?>
     </ul>
 
-    <?php
-/*        NavBar::begin([
-            'brandLabel' => 'My Company',
-            'brandUrl' => Yii::$app->homeUrl,
-            'options' => [
-                'class' => 'navbar-inverse navbar-fixed-top',
-            ],
-        ]);
-        $menuItems = [
-            ['label' => 'Home', 'url' => ['/site/index']],
-        ];
-        if (Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-        } else {
-            $menuItems[] = [
-                'label' => 'Logout (' . Yii::$app->user->identity->username . ')',
-                'url' => ['/site/logout'],
-                'linkOptions' => ['data-method' => 'post']
-            ];
-        }
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav navbar-right'],
-            'items' => $menuItems,
-        ]);
-        NavBar::end();
-    */?>
 </div>
 
 <? if (!$sidebarHidden): ?>

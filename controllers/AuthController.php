@@ -38,7 +38,7 @@ class AuthController extends Controller
         [
             'access' =>
             [
-                'class' => AccessControl::className(),
+                'class' => \yii\filters\AccessControl::className(),
                 'only' => ['logout', 'login'],
                 'rules' => [
                     [
