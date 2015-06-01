@@ -15,6 +15,7 @@ use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\user\UserEmail;
@@ -432,6 +433,14 @@ class User
     public static function findIdentity($id)
     {
         return static::findOne(['id' => $id, 'active' => Cms::BOOL_Y]);
+
+        /*try
+        {
+            return static::findOne(['id' => $id, 'active' => Cms::BOOL_Y]);
+        } catch(\yii\db\Exception $e)
+        {
+            //throw new NotConnectedToDbException;
+        }*/
     }
 
     /**

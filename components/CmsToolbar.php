@@ -10,10 +10,12 @@ use skeeks\cms\actions\ViewModelAction;
 use skeeks\cms\assets\CmsToolbarAsset;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -133,6 +135,12 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         return (bool) ($this->mode == self::EDIT_MODE);
     }
 
+    public function init()
+    {
+        parent::init();
+
+
+    }
     /**
      * @inheritdoc
      */
