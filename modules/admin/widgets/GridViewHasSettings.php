@@ -17,6 +17,7 @@ use skeeks\cms\modules\admin\widgets\gridView\GridViewSettings;
 use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
+use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -53,6 +54,8 @@ class GridViewHasSettings extends GridView
 
     public function init()
     {
+
+
         parent::init();
 
         $settingsData =
@@ -74,6 +77,22 @@ class GridViewHasSettings extends GridView
         }
 
         $this->initDataProvider();
+
+        /*$modelColumns = [];
+        $models = $this->dataProvider->getModels();
+        $model = reset($models);
+        if (is_array($model) || is_object($model)) {
+            foreach ($model as $name => $value) {
+                $modelColumns[] = $name;
+            }
+        } else {
+            throw new InvalidConfigException('Unable to generate columns from the data. Please manually configure the "columns" property.');
+        }
+
+        print_r($modelColumns);
+        die;*/
+
+
     }
 
     /**
