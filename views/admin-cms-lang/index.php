@@ -8,15 +8,13 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
-use skeeks\cms\modules\admin\widgets\GridView;
-
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 ?>
 
-<?= GridView::widget([
+<?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
     'columns' => [
@@ -33,11 +31,6 @@ use skeeks\cms\modules\admin\widgets\GridView;
         [
             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
             'attribute'     => "active"
-        ],
-
-        [
-            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-            'attribute'     => "def"
         ],
     ],
 ]); ?>

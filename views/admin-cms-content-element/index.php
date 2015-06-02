@@ -1,15 +1,10 @@
 <?php
 /**
- * index
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 30.10.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 02.06.2015
  */
-use skeeks\cms\modules\admin\widgets\GridView;
-
 /* @var $this yii\web\View */
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -22,9 +17,13 @@ if ($content_id = \Yii::$app->request->get('content_id'))
 
 ?>
 
-<?= GridView::widget([
+<?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
+    'settingsData'  =>
+    [
+        'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
+    ],
 
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],

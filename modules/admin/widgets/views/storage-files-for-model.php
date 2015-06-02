@@ -109,7 +109,7 @@ JS
 
         'dataProvider'  => $dataProvider,
         'filterModel'   => $searchModel,
-        'PjaxOptions' =>
+        'pjaxOptions' =>
         [
             'id' => 'sx-table-files'
         ],

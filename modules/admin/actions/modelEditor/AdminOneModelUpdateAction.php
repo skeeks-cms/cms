@@ -36,8 +36,9 @@ class AdminOneModelUpdateAction extends AdminOneModelEditAction
     public function run()
     {
         $model          = $this->controller->model;
+        $scenarios      = $model->scenarios();
 
-        if ($scenarios = $model->scenarios() && $this->modelScenario)
+        if ($scenarios && $this->modelScenario)
         {
             if (isset($scenarios[$this->modelScenario]))
             {

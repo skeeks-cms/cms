@@ -368,4 +368,43 @@ class AdminModelEditorController extends AdminController
         return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute($this->defaultAction)->normalizeCurrentRoute()->toString();
     }
 
+
+
+    /**
+     * @return array
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionSortablePriority()
+    {
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost)
+        {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+
+            if ($keys = \Yii::$app->request->post('keys'))
+            {
+                $counter = count($keys);
+
+                foreach ($keys as $key)
+                {
+                    $priority = $counter * 1000;
+
+                    $modelClassName = $this->modelClassName;
+                    $model = $modelClassName::findOne($key);
+                    if ($model)
+                    {
+                        $model->priority = $priority;
+                        $model->save(false);
+                    }
+
+                    $counter = $counter - 1;
+                }
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Изминения сохранены',
+            ];
+        }
+    }
+
 }

@@ -35,7 +35,7 @@
         $search->getDataProvider()->query->andWhere(['active' => \skeeks\cms\components\Cms::BOOL_Y]);
 
     ?>
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+    <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
         'dataProvider' => $search->getDataProvider(),
         'filterModel' => $search->getLoadedModel(),
         'columns' => [

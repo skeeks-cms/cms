@@ -13,7 +13,7 @@ use Yii;
 
 <?php else: ?>
 
-    <table class="table table-condensed table-bordered table-striped table-hover" style="table-layout: fixed;">
+    <table class="table table-condensed table-bordered table-striped table-hover sx-table" style="table-layout: fixed;">
         <thead>
             <tr>
                 <th>Название</th>

@@ -13,10 +13,27 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
+
+
 <?= $form->fieldSet('Основное'); ?>
     <?= $form->field($model, 'enableCustomConfirm')->radioList(\Yii::$app->formatter->booleanFormat) ?>
     <?= $form->field($model, 'enableCustomPromt')->radioList(\Yii::$app->formatter->booleanFormat) ?>
 <?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Языковые настройки'); ?>
+    <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\models\CmsLang::find()->active()->all(),
+        'code',
+        'name'
+    )); ?>
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Настройка таблиц'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldInputInt($model, 'pageSize'); ?>
+    <?= $form->field($model, 'pageParamName')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
+
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

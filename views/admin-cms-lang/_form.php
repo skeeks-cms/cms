@@ -5,7 +5,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use skeeks\cms\models\Tree;
 
 /* @var $this yii\web\View */
-/* @var $model Tree */
+/* @var $model \skeeks\cms\models\CmsLang */
 ?>
 
 
@@ -13,8 +13,7 @@ use skeeks\cms\models\Tree;
 
 
 <?= $form->field($model, 'code')->textInput(); ?>
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
-<?= $form->fieldRadioListBoolean($model, 'def'); ?>
+<?= $form->fieldRadioListBoolean($model, 'active')->hint('На сайте должен быть включен хотя бы один язык'); ?>
 <?= $form->field($model, 'name')->textarea(); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>

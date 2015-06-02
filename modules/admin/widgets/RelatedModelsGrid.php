@@ -6,6 +6,7 @@
  * @date 12.03.2015
  */
 namespace skeeks\cms\modules\admin\widgets;
+use skeeks\cms\components\Cms;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
@@ -97,10 +98,13 @@ class RelatedModelsGrid extends Widget
         $pjaxId = "sx-table-" . md5($this->label . $this->hint . $this->parentModel->className());
         $gridOptions = ArrayHelper::merge([
             /*'filterModel'   => $search,*/
-            'PjaxOptions' => [
+            'pjaxOptions' => [
                 'id' => $pjaxId
             ],
-            "usePjax" => true,
+            "settingsData" =>
+            [
+                'enabledPjaxPagination' => Cms::BOOL_Y
+            ],
             "sortableOptions" => [
                 'backend' => $sortableUrl
             ],

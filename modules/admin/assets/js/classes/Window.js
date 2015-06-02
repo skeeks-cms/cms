@@ -53,27 +53,6 @@
                 }).appendTo('body').fancybox(options).click();
             });
 
-            /*this._openedWindow = window.open(this._src, this._name, paramsSting);
-            if (!this._openedWindow)
-            {
-                this.trigger('error', {
-                    'message': 'Браузер блокирует окно, необходимо его разрешить'
-                });
-
-                return this;
-            }
-
-            this.trigger('afterOpen');
-
-            var timer = setInterval(function()
-            {
-                if(self._openedWindow.closed)
-                {
-                    clearInterval(timer);
-                    self.trigger('close');
-                }
-            }, 1000);*/
-
             return this;
         },
     });
