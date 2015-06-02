@@ -196,12 +196,12 @@ JS
         ]); ?>
         <p></p>
         <? $dataProvider->pagination->defaultPageSize = 10; ?>
-        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+        <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
 
             'dataProvider'  => $dataProvider,
             'filterModel'   => $search->getLoadedModel(),
 
-            'PjaxOptions' => [
+            'pjaxOptions' => [
                 'id' => 'sx-storage-files'
             ],
 
