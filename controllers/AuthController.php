@@ -199,6 +199,8 @@ class AuthController extends Controller
         $rr         = new RequestResponse();
         $model      = new SignupForm();
 
+        $model->scenario = SignupForm::SCENARION_FULLINFO;
+
         //Запрос на валидацию ajax формы
         if ($rr->isRequestOnValidateAjaxForm())
         {
