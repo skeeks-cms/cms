@@ -8,7 +8,6 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
-use skeeks\cms\modules\admin\widgets\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\searchs\Game */
@@ -16,7 +15,7 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
 ?>
 
-<?= GridView::widget([
+<?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
     'columns' => [

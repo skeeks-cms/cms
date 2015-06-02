@@ -24,7 +24,6 @@ class AdminAsset extends AssetBundle
     public $sourcePath = '@skeeks/cms/modules/admin/assets';
 
     public $css = [
-        'css/table.css',
         'css/app.css',
     ];
     public $js = [

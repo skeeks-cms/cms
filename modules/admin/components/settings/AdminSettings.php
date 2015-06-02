@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
+use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use yii\helpers\ArrayHelper;
@@ -34,7 +35,12 @@ class AdminSettings extends Component
     public $enableCustomConfirm     = 1;
     public $enableCustomPromt       = 1;
 
-    public $languageCode     = "ru";
+    public $languageCode            = "ru";
+
+
+    public $enabledPjaxPagination       = Cms::BOOL_Y;
+    public $pageSize                    =   10;
+    public $pageParamName               =   "page";
 
 
     public function init()
@@ -47,8 +53,8 @@ class AdminSettings extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['asset', 'languageCode'], 'string'],
-            [['enableCustomConfirm', 'enableCustomPromt'], 'integer'],
+            [['asset', 'languageCode', 'pageParamName', 'enabledPjaxPagination'], 'string'],
+            [['enableCustomConfirm', 'enableCustomPromt', 'pageSize'], 'integer'],
         ]);
     }
 
@@ -58,7 +64,13 @@ class AdminSettings extends Component
             'asset'                             => 'Дополнительные css и js админки',
             'enableCustomConfirm'               => 'Включить стилизованные окошки подтверждения (confirm)',
             'enableCustomPromt'                 => 'Включить стилизованные окошки вопрос с одним полем (promt)',
-            'languageCode'               => 'Язык интерфейса',
+            'languageCode'                      => 'Язык интерфейса',
+
+            'pageParamName'                     => 'Язык интерфейса',
+
+            'enabledPjaxPagination'             => 'Включение ajax навигации',
+            'pageParamName'                     => 'Названия парамтера страниц, при постраничной навигации',
+            'pageSize'                          => 'Количество записей на одной странице',
         ]);
     }
 

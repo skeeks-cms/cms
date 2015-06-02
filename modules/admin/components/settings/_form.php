@@ -21,12 +21,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Языковые настройки'); ?>
-        <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\models\CmsLang::find()->active()->all(),
-            'code',
-            'name'
-        )); ?>
-    <?= $form->fieldSetEnd(); ?>
+    <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\models\CmsLang::find()->active()->all(),
+        'code',
+        'name'
+    )); ?>
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Настройка таблиц'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldInputInt($model, 'pageSize'); ?>
+    <?= $form->field($model, 'pageParamName')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
+
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

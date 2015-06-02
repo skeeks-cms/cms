@@ -23,18 +23,35 @@ class GridViewSettings extends Component
         ]);
     }
 
-    public $enabledPjaxPagination       = Cms::BOOL_Y;
-    public $pageSize                    = 10;
-    public $pageParamName               = 'page';
+    public $enabledPjaxPagination;
+    /**
+     * @var int
+     */
+    public $pageSize;
+    /**
+     * @var string
+     */
+    public $pageParamName;
+
 
     //Сортировка
-    public $orderBy                     = "published_at";
+    public $orderBy                     = "id";
     public $order                       = SORT_DESC;
+
+    public function init()
+    {
+        $this->pageSize                 = \Yii::$app->admin->pageSize;
+        $this->pageParamName            = \Yii::$app->admin->pageParamName;
+        $this->enabledPjaxPagination    = \Yii::$app->admin->enabledPjaxPagination;
+
+        parent::init();
+    }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
+            'enabledPjaxPagination'     => 'Включение ajax навигации',
             'pageParamName'             => 'Названия парамтера страниц, при постраничной навигации',
             'pageSize'                  => 'Количество записей на одной странице',
 
