@@ -54,6 +54,7 @@ use yii\web\View;
 
 /**
  * @property CmsSite                            $site
+ * @property Tree                               $currentTree
  *
  * @package skeeks\cms\components
  */
