@@ -24,6 +24,17 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ]); ?>
     <?= $form->fieldSetEnd(); ?>
 
+    <? $columns = \skeeks\cms\helpers\UrlHelper::constructCurrent()->getSystem('columns'); ?>
+    <? if ($columns) : ?>
+        <?= $form->fieldSet('Поля таблицы'); ?>
+            <?= $form->field($model, 'visibleColumns')->listBox($columns, [
+                'size' => "15",
+                'multiple' => 'multiple'
+            ]); ?>
+        <?= $form->fieldSetEnd(); ?>
+    <? endif; ?>
+
+
 
 <?= $form->buttonsStandart($model) ?>
 <?php ActiveForm::end(); ?>
