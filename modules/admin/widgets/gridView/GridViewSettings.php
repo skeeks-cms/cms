@@ -8,6 +8,7 @@
 namespace skeeks\cms\modules\admin\widgets\gridView;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
+use skeeks\cms\modules\admin\widgets\GridViewHasSettings;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -34,6 +35,17 @@ class GridViewSettings extends Component
     public $pageParamName;
 
 
+    /**
+     * @var array
+     */
+    public $visibleColumns = [];
+
+
+    /**
+     * @var GridViewHasSettings
+     */
+    public $grid;
+
     //Сортировка
     public $orderBy                     = "id";
     public $order                       = SORT_DESC;
@@ -57,6 +69,8 @@ class GridViewSettings extends Component
 
             'orderBy'                   => 'По какому параметру сортировать',
             'order'                     => 'Направление сортировки',
+
+            'visibleColumns'            => 'Отображаемые колонки',
         ]);
     }
 
@@ -80,6 +94,23 @@ class GridViewSettings extends Component
             [['enabledCurrentTree'], 'string'],
             [['enabledCurrentTreeChild'], 'string'],
             [['tree_ids'], 'safe'],
+            [['visibleColumns'], 'safe'],
         ]);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getEditUrl()
+    {
+        $url = parent::getEditUrl();
+
+        if ($this->grid)
+        {
+            $columnsData = $this->grid->getColumnsKeyLabels();
+            $url->setSystemParam('columns', $columnsData);
+        }
+
+        return $url;
     }
 }

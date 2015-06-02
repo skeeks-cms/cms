@@ -17,6 +17,8 @@ use yii\base\Model;
 use yii\caching\TagDependency;
 
 /**
+ * @property UrlHelper editUrl
+ *
  * Class HasComponentDbSettingsTrait
  * @package skeeks\cms\traits
  */
@@ -252,14 +254,24 @@ trait HasComponentDbSettingsTrait
     }
 
     /**
-     * @return $this
+     * @return UrlHelper
      */
     public function getEditUrl()
     {
+        $attributes = [];
+
+        foreach ($this->attributes as $key => $value)
+        {
+            if (!is_object($value))
+            {
+                $attributes[$key] = $value;
+            }
+        }
+
         return UrlHelper::construct('cms/admin-component-settings/index', [
-            'componentClassName'    => $this->className(),
-            'attributes'            => $this->attributes,
-            'componentNamespace'             => $this->namespace,
+            'componentClassName'                => $this->className(),
+            'attributes'                        => $attributes,
+            'componentNamespace'                => $this->namespace,
         ])
         ->enableAdmin()
         ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');

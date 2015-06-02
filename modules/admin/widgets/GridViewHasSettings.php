@@ -12,14 +12,21 @@
 namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\components\Cms;
 use skeeks\cms\grid\GridViewPjaxTrait;
+use skeeks\cms\modules\admin\grid\ActionColumn;
 use skeeks\cms\modules\admin\traits\GridViewSortableTrait;
 use skeeks\cms\modules\admin\widgets\gridView\GridViewSettings;
 use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
+use yii\base\InvalidConfigException;
+use yii\base\Model;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQueryInterface;
 use yii\grid\DataColumn;
+use yii\grid\SerialColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Inflector;
 use yii\helpers\Json;
 use yii\jui\Sortable;
 use yii\web\JsExpression;
@@ -52,47 +59,26 @@ class GridViewHasSettings extends GridView
      */
     public $settingsData = [];
 
+
+
+    /**
+     * @var array исходные настройки колонок с сгенерированными ключами.
+     */
+    protected $_columns = [];
+
+    /**
+     * @var array Исходные нетронутые columns переданные в виджет
+     */
+    protected $_sourceColumns = [];
+
     public function init()
     {
-
+        $this->_configureColumns();
+        $this->_initGridSettings();
 
         parent::init();
 
-        $settingsData =
-        [
-            //namespace настроек по умолчанию.
-            'namespace' => \Yii::$app->controller->action->getUniqueId()
-        ];
-
-        $settingsData       = ArrayHelper::merge($settingsData, (array) $this->settingsData);
-        $this->_settings    = new GridViewSettings($settingsData);
-
-
-        if ($this->settings->enabledPjaxPagination == Cms::BOOL_Y)
-        {
-            $this->enabledPjax = true;
-        } else
-        {
-            $this->enabledPjax = false;
-        }
-
-        $this->initDataProvider();
-
-        /*$modelColumns = [];
-        $models = $this->dataProvider->getModels();
-        $model = reset($models);
-        if (is_array($model) || is_object($model)) {
-            foreach ($model as $name => $value) {
-                $modelColumns[] = $name;
-            }
-        } else {
-            throw new InvalidConfigException('Unable to generate columns from the data. Please manually configure the "columns" property.');
-        }
-
-        print_r($modelColumns);
-        die;*/
-
-
+        $this->_applyGridSettings();
     }
 
     /**
@@ -208,7 +194,81 @@ CSS
 JS
 );
     }
-    public function initDataProvider()
+
+    /**
+     * Инициализация объекта настроек.
+     * @return $this
+     */
+    protected function _initGridSettings()
+    {
+        $defaultSettingsData =
+        [
+            //namespace настроек по умолчанию.
+            'namespace' => \Yii::$app->controller->action->getUniqueId(),
+            'grid'      => $this
+        ];
+
+        $settingsData       = ArrayHelper::merge($defaultSettingsData, (array) $this->settingsData);
+        $this->_settings    = new GridViewSettings($settingsData);
+
+        return $this;
+    }
+
+
+    /**
+     * @return $this
+     */
+    protected function _applyGridSettings()
+    {
+        //Pjax init
+        if ($this->settings->enabledPjaxPagination == Cms::BOOL_Y)
+        {
+            $this->enabledPjax = true;
+        } else
+        {
+            $this->enabledPjax = false;
+        }
+
+        //Применение data provider-a
+        $this->_applyDataProvider();
+        $this->_applyColumns();
+
+        return $this;
+    }
+
+    public $allColumns = [];
+
+    /**
+     * @return $this
+     */
+    protected function _applyColumns()
+    {
+        $this->allColumns = $this->columns;
+
+        if ($this->settings->visibleColumns)
+        {
+            $newColumns = [];
+            $hiddenColumns = [];
+
+            foreach ($this->settings->visibleColumns as $code)
+            {
+                if ($column = ArrayHelper::getValue($this->columns, $code))
+                {
+                    $newColumns[$code] = $column;
+                }
+            }
+
+            if ($newColumns)
+            {
+                $this->columns = $newColumns;
+            }
+        }
+
+        return $this;
+    }
+
+
+    protected function _applyDataProvider()
     {
         $this->dataProvider;
 
@@ -224,6 +284,136 @@ JS
         }
 
         return $this;
+    }
+
+
+
+
+
+    /**
+     * Reconfigure columns with unique keys
+     *
+     * @return void
+     */
+    protected function _configureColumns()
+    {
+        if (empty($this->columns)) {
+            $this->guessColumns();
+        }
+        $this->_sourceColumns = $this->columns;;
+
+        $columnsByKey = [];
+        foreach ($this->columns as $column) {
+            $columnKey = $this->_getColumnKey($column);
+            for ($j = 0; true; $j++) {
+                $suffix = ($j) ? '_' . $j : '';
+                $columnKey .= $suffix;
+                if (!array_key_exists($columnKey, $columnsByKey)) {
+                    break;
+                }
+            }
+            $columnsByKey[$columnKey] = $column;
+        }
+
+        $this->columns = $columnsByKey;
+    }
+
+    /**
+     * Generate an unique column key
+     *
+     * @param mixed $column
+     *
+     * @return mixed
+     */
+    protected function _getColumnKey($column)
+    {
+        if (!is_array($column)) {
+            $matches = $this->_matchColumnString($column);
+            $columnKey = $matches[1];
+        } elseif (!empty($column['attribute'])) {
+            $columnKey = $column['attribute'];
+        } elseif (!empty($column['label'])) {
+            $columnKey = $column['label'];
+        } elseif (!empty($column['header'])) {
+            $columnKey = $column['header'];
+        } elseif (!empty($column['class'])) {
+            $columnKey = $column['class'];
+        } else {
+            $columnKey = null;
+        }
+        return hash('crc32', $columnKey);
+    }
+
+    /**
+     * Finds the matches for a string column format
+     *
+     * @param string $column
+     *
+     * @return mixed
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function _matchColumnString($column)
+    {
+        $matches = [];
+        if (!preg_match('/^([\w\.]+)(:(\w*))?(:(.*))?$/', $column, $matches)) {
+            throw new InvalidConfigException("Invalid column configuration for '{$column}'. The column must be specified in the format of 'attribute', 'attribute:format' or 'attribute:format: label'.");
+        }
+        return $matches;
+    }
+
+
+    public function getColumnsKeyLabels()
+    {
+        $data = [];
+
+        foreach ($this->allColumns as $code => $column)
+        {
+            if ($column instanceof ActionColumn)
+            {
+                $data[$code] = 'Кнопка действий';
+            }
+            else if ($column instanceof SerialColumn)
+            {
+                $data[$code] = 'Порядковый номер';
+            } else if ($column instanceof DataColumn)
+            {
+
+                if ($column->label === null)
+                {
+                    $provider = $this->dataProvider;
+
+                    if ($provider instanceof ActiveDataProvider && $provider->query instanceof ActiveQueryInterface) {
+                        /* @var $model Model */
+                        $model = new $provider->query->modelClass;
+                        $label = $model->getAttributeLabel($column->attribute);
+                    } else {
+                        $models = $provider->getModels();
+                        if (($model = reset($models)) instanceof Model) {
+                            /* @var $model Model */
+                            $label = $model->getAttributeLabel($column->attribute);
+                        } else {
+                            $label = Inflector::camel2words($column->attribute);
+                        }
+                    }
+                } else
+                {
+                    $label = $column->label;
+                }
+
+                $data[$code] = $label;
+
+            } else
+            {
+                $data[$code] = $code;
+            }
+
+            if (!$data[$code])
+            {
+                $data[$code] = " - Не определено";
+            }
+        }
+
+        return $data;
     }
 
 }
