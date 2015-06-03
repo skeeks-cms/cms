@@ -153,9 +153,11 @@ class Tree extends Core
             'priority'          => Yii::t('app', 'Приоритет'),
             'code'              => Yii::t('app', 'Код'),
             'active'              => Yii::t('app', 'Active'),
-            'meta_title' => Yii::t('app', 'Meta Title'),
-            'meta_keywords' => Yii::t('app', 'Meta Keywords'),
-            'meta_description' => Yii::t('app', 'Meta Description'),
+            'meta_title'        => Yii::t('app', 'Meta Title'),
+            'meta_keywords'         => Yii::t('app', 'Meta Keywords'),
+            'meta_description'  => Yii::t('app', 'Meta Description'),
+            'description_short' => Yii::t('app', 'Description Short'),
+            'description_full' => Yii::t('app', 'Description Full'),
         ]);
     }
 
@@ -172,11 +174,11 @@ class Tree extends Core
             [['priority', 'tree_type_id'], 'integer'],
             [['tree_menu_ids'], 'safe'],
             [['code'], 'string', 'max' => 64],
-            [['code'], 'unique'],
             [['name'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
             [['site_code'], 'string', 'max' => 5],
+            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'The combination of Code and Pid has already been taken.']
         ]);
     }
 
