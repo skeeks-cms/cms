@@ -64,6 +64,7 @@ use yii\web\ErrorHandler;
 
  * @property CmsContentElementProperty[]    relatedElementProperties
  * @property CmsContentProperty[]           relatedProperties
+ * @property CmsContentElementTree[]        cmsContentElementTrees
  */
 class CmsContentElement extends RelatedElementModel
 {
@@ -188,6 +189,14 @@ class CmsContentElement extends RelatedElementModel
     public function getRelatedProperties()
     {
         return $this->cmsContent->cmsContentProperties;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElementTrees()
+    {
+        return $this->hasMany(CmsContentElementTree::className(), ['element_id' => 'id']);
     }
 
 
