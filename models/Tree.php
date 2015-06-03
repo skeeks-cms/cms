@@ -147,6 +147,16 @@ class Tree extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
+            'id' => Yii::t('app', 'ID'),
+            'created_by' => Yii::t('app', 'Created By'),
+            'updated_by' => Yii::t('app', 'Updated By'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'published_at' => Yii::t('app', 'Published At'),
+            'published_to' => Yii::t('app', 'Published To'),
+            'priority' => Yii::t('app', 'Priority'),
+            'active' => Yii::t('app', 'Active'),
+            'name' => Yii::t('app', 'Name'),
             'tree_type_id'              => Yii::t('app', 'Тип'),
             'redirect'          => Yii::t('app', 'Redirect'),
             'tree_menu_ids'     => Yii::t('app', 'Позиции меню'),
