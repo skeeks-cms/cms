@@ -33,7 +33,9 @@ if ($content_id = \Yii::$app->request->get('content_id'))
             'controller'    => $controller
         ],
 
-        ['class' => \skeeks\cms\grid\ImageColumn::className()],
+        [
+            'class' => \skeeks\cms\grid\ImageColumn::className(),
+        ],
 
         'name',
         //'content_id',

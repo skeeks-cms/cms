@@ -12,6 +12,7 @@
 namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\components\Cms;
 use skeeks\cms\grid\GridViewPjaxTrait;
+use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\modules\admin\grid\ActionColumn;
 use skeeks\cms\modules\admin\traits\GridViewSortableTrait;
 use skeeks\cms\modules\admin\widgets\gridView\GridViewSettings;
@@ -375,6 +376,9 @@ JS
             else if ($column instanceof SerialColumn)
             {
                 $data[$code] = 'Порядковый номер';
+            } else if ($column instanceof ImageColumn)
+            {
+                $data[$code] = 'Главное изображение';
             } else if ($column instanceof DataColumn)
             {
 
@@ -409,7 +413,7 @@ JS
 
             if (!$data[$code])
             {
-                $data[$code] = " - Не определено";
+                $data[$code] = " — "  . $column->className();
             }
         }
 
