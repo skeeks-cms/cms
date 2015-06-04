@@ -28,6 +28,7 @@ use skeeks\cms\components\TreeTypes;
 use skeeks\cms\mail\Mailer;
 use skeeks\cms\modules\admin\components\Menu;
 use skeeks\cms\modules\admin\components\settings\AdminSettings;
+use yii\authclient\Collection;
 
 /**
  *
@@ -42,6 +43,7 @@ use skeeks\cms\modules\admin\components\settings\AdminSettings;
  * @property Mailer                         $mailer
  * @property AdminSettings                  $admin
  * @property CurrentSite                    $currentSite
+ * @property Collection                     $authClientCollection
  *
  * Class Application
  * @package yii\web

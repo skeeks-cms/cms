@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\models;
 
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use Yii;
 use \yii\db\ActiveRecord;
 
@@ -28,6 +29,20 @@ class UserAuthclient extends ActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            HasJsonFieldsBehavior::className() =>
+            [
+                'class'     => HasJsonFieldsBehavior::className(),
+                'fields'    => ['provider_data']
+            ]
+        ]);
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
@@ -35,7 +50,7 @@ class UserAuthclient extends ActiveRecord
         return [
             [['user_id'], 'required'],
             [['user_id', 'created_at', 'updated_at'], 'integer'],
-            [['provider_data'], 'string'],
+            [['provider_data'], 'safe'],
             [['provider'], 'string', 'max' => 50],
             [['provider_identifier'], 'string', 'max' => 100]
         ];

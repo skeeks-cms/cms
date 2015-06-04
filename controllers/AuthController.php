@@ -20,11 +20,14 @@ use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
 use skeeks\cms\models\forms\SignupForm;
+use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
+use skeeks\cms\models\UserAuthClient;
 use yii\filters\VerbFilter;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
+use \Yii;
 
 /**
  * Class AuthController
@@ -69,10 +72,103 @@ class AuthController extends Controller
     public function actions()
     {
         return [
+
             'logout' => [
                 'class' => LogoutAction::className(),
             ],
+
+            'client' => [
+                'class' => 'yii\authclient\AuthAction',
+                'successCallback' => [$this, 'onAuthSuccess'],
+            ],
         ];
+    }
+
+
+    public function onAuthSuccess($client)
+    {
+        $attributes = $client->getUserAttributes();
+
+        /* @var $userAuthClient UserAuthClient */
+        $userAuthClient = UserAuthClient::find()->where([
+            'provider' => $client->getId(),
+            'provider_identifier' => $attributes['id'],
+        ])->one();
+
+        if (Yii::$app->user->isGuest)
+        {
+            if ($userAuthClient)
+            { // login
+
+                $userAuthClient->provider_data = $attributes;
+                $userAuthClient->save();
+
+                $user = $userAuthClient->user;
+                Yii::$app->user->login($user);
+            } else
+            { // signup
+                if (isset($attributes['email']) && User::find()->where(['email' => $attributes['email']])->exists())
+                {
+                    Yii::$app->getSession()->setFlash('error', [
+                        Yii::t('app', "User with the same email as in {client} account already exists but isn't linked to it. Login using email first to link it.", ['client' => $client->getTitle()]),
+                    ]);
+                } else {
+
+                    /**
+                     * @var User $user
+                     */
+                    $userClassName          = \Yii::$app->cms->getUserClassName();
+                    $user                   = new $userClassName([
+                        'username'      => $attributes['login'],
+                        'email'         => $attributes['email']
+                    ]);
+
+                    $password = \Yii::$app->security->generateRandomString(6);
+                    $user->generateUsername();
+                    $user->setPassword($password);
+                    $user->generateAuthKey();
+                    $user->generatePasswordResetToken();
+                    $user->save();
+
+                    $transaction = $user->getDb()->beginTransaction();
+                    if ($user->save())
+                    {
+                        $auth = new UserAuthClient([
+                            'user_id' => $user->id,
+                            'provider' => $client->getId(),
+                            'provider_identifier' => (string)$attributes['id'],
+                            'provider_data' => $attributes,
+                        ]);
+                        if ($auth->save()) {
+                            $transaction->commit();
+                            Yii::$app->user->login($user);
+                        } else {
+                            print_r($auth->getErrors());
+                        }
+                    } else {
+                        print_r($user->getErrors());
+                    }
+                }
+            }
+        } else
+        { // user already logged in
+            if (!$userAuthClient)
+            { // add auth provider
+
+                $userAuthClient = new UserAuthClient([
+                    'user_id' => Yii::$app->user->id,
+                    'provider' => $client->getId(),
+                    'provider_identifier' => $attributes['id'],
+                    'provider_data' => $attributes,
+                ]);
+
+                $userAuthClient->save();
+            } else
+            {
+                $userAuthClient->provider_data = $attributes;
+                $userAuthClient->save();
+            }
+        }
     }
 
     /**
@@ -209,10 +305,15 @@ class AuthController extends Controller
         //Запрос ajax post
         if ($rr->isRequestAjaxPost())
         {
-            if ($model->load(\Yii::$app->request->post()) && $model->signup())
+            if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup())
             {
                 $rr->success = true;
                 $rr->message = 'Вы успешно зарегистрированны';
+
+                \Yii::$app->user->login($registeredUser, 0);
+
+                return $this->redirect($registeredUser->getPageUrl());
+
             } else
             {
                 $rr->message = 'Не удалось зарегистрироваться';
