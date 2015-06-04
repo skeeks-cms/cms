@@ -82,6 +82,14 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
+<?= $form->fieldSet('Дополнительно'); ?>
+    <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\models\CmsContent::find()->active()->all(),
+        'id',
+        'name'
+    )); ?>
+<?= $form->fieldSetEnd() ?>
+
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
