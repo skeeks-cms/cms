@@ -28,7 +28,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint("Этот параметр влияет на адрес страницы"); ?>
 
 <?= $form->fieldSetEnd()?>
 

@@ -3,6 +3,7 @@
 
 2.0.0.rc3 (unreleased)
 -----------------
+  * Доработка ValidateRulesTrait.
   * Исправлена ошибка в TreeMenuCmsWidget.
   * Новый виджет SitesCmsWidget — позволяет выводить список сайтов.
   * Обновлен виджет ContentElementsCmsWidget - добавлен учет вложенных разделов.
