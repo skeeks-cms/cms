@@ -39,6 +39,8 @@ use yii\helpers\ArrayHelper;
  * @property string $server_name
  * @property string $description
  *
+ * @property string $url
+ *
  * @property CmsLang $cmsLang
  * @property CmsSiteDomain[] $cmsSiteDomains
  * @property CmsTree[] $cmsTrees
