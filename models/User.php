@@ -57,7 +57,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property UserAuthclient[] $userAuthclients
  */
 class User
-    extends ActiveRecord
+    extends Core
     implements IdentityInterface
 {
     use behaviors\traits\HasFiles;
