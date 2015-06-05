@@ -25,11 +25,6 @@ use Yii;
 class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
 {
     /**
-     * @var TODO: is depricated (skeeks CMS 1.1.6)
-     */
-    public $callbackImages;
-
-    /**
      * @var Модель к которой привязываются файлы
      */
     public $relatedModel;
@@ -47,7 +42,6 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
                 $additionalData = $this->relatedModel->getRef()->toArray();
             }
         }
-
 
         $this->clientOptions['filebrowserImageBrowseUrl'] = UrlHelper::construct('cms/tools/select-file', $additionalData)
             ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
