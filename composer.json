@@ -1,6 +1,6 @@
 {
     "name": "skeeks/cms",
-    "description": "SkeekS CMS",
+    "description": "SkeekS CMS — система управления интернет проектами, создание веб-проектов, система управления внутренним порталом компании",
     "keywords": ["framework", "cms", "skeeks", "sx", "skeeks cms", "app", "yii2", "extension"],
     "homepage": "http://cms.skeeks.com",
     "type": "yii2-extension",
