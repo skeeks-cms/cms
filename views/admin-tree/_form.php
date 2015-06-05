@@ -104,6 +104,20 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     )->label('Изображения');; ?>
 <?= $form->fieldSetEnd()?>
 
+
+<?= $form->fieldSet('Анонс'); ?>
+    <div data-listen="isLink" data-show="0" class="sx-hide">
+        <?= $form->field($model, 'description_short')->widget(
+            \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+            [
+                'options'       => ['rows' => 6],
+                'preset'        => 'full',
+                'relatedModel'  => $model,
+            ])
+            ?>
+    </div>
+<?= $form->fieldSetEnd() ?>
+
 <?= $form->fieldSet('Описание'); ?>
 
 <div data-listen="isLink" data-show="0" class="sx-hide">
@@ -116,16 +130,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'relatedModel'  => $model,
         ])
     ?>
-
-    <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
-        [
-            'options'       => ['rows' => 6],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
-    ?>
-
 
 </div>
 <?= $form->fieldSetEnd() ?>

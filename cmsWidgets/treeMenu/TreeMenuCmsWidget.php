@@ -34,7 +34,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public $orderBy                     = "priority";
     public $order                       = SORT_DESC;
 
-    public $enabledCurrentTree          = Cms::BOOL_Y;
+    public $enabledCurrentSite          = Cms::BOOL_Y;
 
     public $enabledRunCache             = Cms::BOOL_Y;
     public $runCacheDuration            = 0;
