@@ -78,7 +78,7 @@ class TreeBehavior extends ActiveRecordBehavior
         ]);
     }
 
-    public function afterUpdateNode(AfterSaveEvent $фвыevent)
+    public function afterUpdateNode(AfterSaveEvent $event)
     {
         if ($event->changedAttributes)
         {
