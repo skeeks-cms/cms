@@ -25,6 +25,7 @@ use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_tree}}".
@@ -86,32 +87,30 @@ class Tree extends Core
     {
         $behaviors = parent::behaviors();
 
-        $result = [];
-
-        $result[] = SeoPageName::className();
-        $result[] = HasFiles::className();
-        $result[] = TreeBehavior::className();
-        $result[] = [
-            'class' => Implode::className(),
-            "fields" =>  [
-                "tree_menu_ids"
-            ]
-        ];
-
-        $result[HasRelatedProperties::className()] =
-        [
-            'class'                             => HasRelatedProperties::className(),
-            'relatedElementPropertyClassName'   => CmsTreeProperty::className(),
-            'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
-        ];
-
-        $result[HasTableCache::className()] =
-        [
-            'class' => HasTableCache::className(),
-            'cache' => \Yii::$app->cache
-        ];
-
-        return $result;
+        return ArrayHelper::merge(parent::behaviors(), [
+            HasFiles::className() =>
+            [
+                'class' => HasFiles::className()
+            ],
+            TreeBehavior::className() =>
+            [
+                'class' => TreeBehavior::className()
+            ],
+            Implode::className() =>
+            [
+                'class' => Implode::className(),
+                "fields" =>  [
+                    "tree_menu_ids"
+                ]
+            ],
+            HasRelatedProperties::className() =>
+            [
+                'class' => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName'   => CmsTreeProperty::className(),
+                'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
+            ],
+        ]);
+        //$result[] = SeoPageName::className();
     }
 
     public function init()
