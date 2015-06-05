@@ -2,15 +2,20 @@
     "name": "skeeks/cms",
     "description": "SkeekS cms",
     "keywords": ["framework", "cms", "skeeks", "sx", "app", "yii2", "extension"],
-    "homepage": "http://www.skeeks.com/",
+    "homepage": "http://cms.skeeks.com/",
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "http://www.skeeks.com/",
-        "wiki": "http://git.skeeks.com/skeeks/cms/tree/master/docs/guide-ru#cms",
+        "issues": "http://cms.skeeks.com/",
+        "wiki": "http://git.skeeks.com/skeeks/cms/wikis/home",
         "source": "http://git.skeeks.com/skeeks/cms"
     },
     "authors": [
+        {
+            "name": "SkeekS",
+            "email": "support@skeeks.com",
+            "homepage": "http://www.skeeks.com/"
+        },
         {
             "name": "Semenov Alexander",
             "email": "semenov@skeeks.com"
