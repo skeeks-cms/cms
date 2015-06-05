@@ -1,7 +1,7 @@
 {
     "name": "skeeks/cms",
-    "description": "SkeekS cms",
-    "keywords": ["framework", "cms", "skeeks", "sx", "app", "yii2", "extension"],
+    "description": "SkeekS CMS",
+    "keywords": ["framework", "cms", "skeeks", "sx", "skeeks cms", "app", "yii2", "extension"],
     "homepage": "http://cms.skeeks.com/",
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
