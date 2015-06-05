@@ -38,6 +38,7 @@
         "skeeks/yii2-widget-ckeditor": "*",
         "skeeks/yii2-widget-chosen": "*",
         "skeeks/yii2-widget-highcharts": "*",
+        "skeeks/yii2-widget-codemirror": "*",
         "kartik-v/yii2-datecontrol": "*",
         "kartik-v/yii2-widget-datepicker": "*",
         "kartik-v/yii2-widget-datetimepicker": "*",
