@@ -19,6 +19,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <? endif; ?>
 
 <?= $form->fieldSet('Основное'); ?>
+
     <?= $form->field($model, 'image')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
         [
@@ -53,21 +54,31 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd()?>
 
 
+<?= $form->fieldSet('Анонс'); ?>
+    <?= $form->field($model, 'description_short')->widget(
+        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+        [
+            'options'       => ['rows' => 6],
+            'preset'        => 'full',
+            'relatedModel'  => $model,
+        ])
+        ?>
+    <?/*= $form->field($model, 'description_short')->widget(
+        \skeeks\widget\codemirror\CodemirrorWidget::className(),
+        [
+            'preset'=>'php',
+            'options'=>['rows' => 20],
+        ]
+    ); */?>
+
+<?= $form->fieldSetEnd() ?>
+
 <?= $form->fieldSet('Описание'); ?>
 
     <?= $form->field($model, 'description_full')->widget(
         \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
         [
             'options'       => ['rows' => 20],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
-    ?>
-
-    <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
-        [
-            'options'       => ['rows' => 6],
             'preset'        => 'full',
             'relatedModel'  => $model,
         ])
@@ -82,13 +93,15 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Дополнительно'); ?>
-    <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
-        \skeeks\cms\models\CmsContent::find()->active()->all(),
-        'id',
-        'name'
-    )); ?>
-<?= $form->fieldSetEnd() ?>
+<? if (!$model->isNewRecord) : ?>
+    <?= $form->fieldSet('Дополнительно'); ?>
+        <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
+            \skeeks\cms\models\CmsContent::find()->active()->all(),
+            'id',
+            'name'
+        )); ?>
+    <?= $form->fieldSetEnd() ?>
+<? endif; ?>
 
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
