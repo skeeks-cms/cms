@@ -3,6 +3,7 @@
 
 2.0.0.rc3 (unreleased)
 -----------------
+  * Новый элемент форм ComboTextWidget
   * Ckeditor remove depricated property
   * Разделены вкладки анонс и полное описание, в разделах и элементах
   * Добавлена зависимость от пакета skeeks/yii2-widget-codemirror

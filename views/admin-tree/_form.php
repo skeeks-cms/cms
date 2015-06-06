@@ -107,14 +107,42 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Анонс'); ?>
     <div data-listen="isLink" data-show="0" class="sx-hide">
-        <?= $form->field($model, 'description_short')->widget(
+        <?/*= $form->field($model, 'description_short')->widget(
             \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
             [
                 'options'       => ['rows' => 6],
                 'preset'        => 'full',
                 'relatedModel'  => $model,
             ])
-            ?>
+        */?>
+
+        <?= $form->field($model, 'description_short')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'ckeditorOptions' => [
+                'options'       => ['rows' => 20],
+                'preset'        => 'full',
+                'relatedModel'  => $model,
+            ],
+            'codemirrorOptions' =>
+            [
+                'preset'    => 'php',
+                'assets'    =>
+                [
+                    \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
+                ],
+                'options'   =>
+                [
+                    'rows' => 20
+                ],
+                'clientOptions'   =>
+                [
+                    'theme' => 'night'
+                ],
+            ]
+        ])
+    ?>
+
     </div>
 <?= $form->fieldSetEnd() ?>
 
@@ -122,12 +150,39 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <div data-listen="isLink" data-show="0" class="sx-hide">
 
-    <?= $form->field($model, 'description_full')->widget(
+    <?/*= $form->field($model, 'description_full')->widget(
         \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
         [
             'options'       => ['rows' => 20],
             'preset'        => 'full',
             'relatedModel'  => $model,
+        ])
+    */?>
+
+    <?= $form->field($model, 'description_full')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'ckeditorOptions' => [
+                'options'       => ['rows' => 20],
+                'preset'        => 'full',
+                'relatedModel'  => $model,
+            ],
+            'codemirrorOptions' =>
+            [
+                'preset'    => 'htmlmixed',
+                'assets'    =>
+                [
+                    \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
+                ],
+                'options'   =>
+                [
+                    'rows' => 20
+                ],
+                'clientOptions'   =>
+                [
+                    'theme' => 'night'
+                ],
+            ]
         ])
     ?>
 
