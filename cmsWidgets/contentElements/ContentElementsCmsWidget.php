@@ -157,19 +157,31 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         if ($treeIds)
         {
-            /**
-             * @var $query ActiveQuery
-             */
-            $query = $this->dataProvider->query;
+            foreach ($treeIds as $key => $treeId)
+            {
+                if (!$treeId)
+                {
+                    unset($treeIds[$key]);
+                }
+            }
 
-            $query->joinWith('cmsContentElementTrees');
-            $query->andWhere(
-                [
-                    'or',
-                    [CmsContentElement::tableName() . '.tree_id' => $treeIds],
-                    [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
-                ]
-            );
+            if ($treeIds)
+            {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $this->dataProvider->query;
+
+                $query->joinWith('cmsContentElementTrees');
+                $query->andWhere(
+                    [
+                        'or',
+                        [CmsContentElement::tableName() . '.tree_id' => $treeIds],
+                        [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
+                    ]
+                );
+            }
+
         }
 
         return parent::_run();

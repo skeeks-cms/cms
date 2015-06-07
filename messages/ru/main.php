@@ -23,6 +23,8 @@ return
     "Updated By"            =>  "Последний обновил",
     "Created At"            =>  "Время создания",
     "Updated At"            =>  "Время последнего обновления",
+    "Published At"          =>  "Опубликован",
+    "Published To"          =>  "Опубликован до",
     "Name"                  =>  "Название",
     "Description Short"     =>  "Короткое описание",
     "Description Full"      =>  "Подробное описание",
