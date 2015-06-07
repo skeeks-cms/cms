@@ -15,17 +15,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Основное'); ?>
 
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Главное изображение'); ?>
+
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint("Этот параметр влияет на адрес страницы, будте внимательно при его редактировании."); ?>
+
+
+
 
     <?= Html::checkbox("isLink", $model->isLink(), [
         'value'     => '1',
@@ -54,55 +52,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Дополнительные разделы') ?>
-
-
-
-<?= $form->field($model, 'tree_menu_ids')->label('Метки')->widget(
-    \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
-        'items' => \yii\helpers\ArrayHelper::map(
-             \skeeks\cms\models\TreeMenu::find()->all(),
-             "id",
-             "name"
-         ),
-        'multiple' => true,
-        'controllerRoute' => 'cms/admin-tree-menu',
-    ]
-    /*\skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 \skeeks\cms\models\TreeMenu::find()->all(),
-                 "id",
-                 "name"
-             ),
-            'multiple' => true
-    ]*/
-    )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
-?>
-
-<!--<div data-listen="isLink" data-show="0" class="sx-hide">
-
-    <?/*= $form->field($model, 'tree_ids')->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-        [
-            'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
-        ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
-    */?>
-
-</div>-->
-
-
-
-<?= $form->fieldSetEnd() ?>
-
-<?= $form->fieldSet('Изображения'); ?>
-    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'images',
-        ]
-    )->label('Изображения');; ?>
-<?= $form->fieldSetEnd()?>
 
 
 <?= $form->fieldSet('Анонс'); ?>
@@ -142,7 +91,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     </div>
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Описание'); ?>
+<?= $form->fieldSet('Подробно'); ?>
 
 <div data-listen="isLink" data-show="0" class="sx-hide">
 
@@ -162,6 +111,61 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
+
+<?= $form->fieldSet('Изображения'); ?>
+    <?= $form->field($model, 'image')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'image',
+        ]
+    )->label('Главное изображение'); ?>
+
+    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
+    <?= $form->field($model, 'images')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'images',
+        ]
+    )->label('Изображения');; ?>
+<?= $form->fieldSetEnd()?>
+
+
+<?= $form->fieldSet('Дополнительно') ?>
+
+    <?= $form->field($model, 'tree_menu_ids')->label('Метки')->widget(
+        \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
+            'items' => \yii\helpers\ArrayHelper::map(
+                 \skeeks\cms\models\TreeMenu::find()->all(),
+                 "id",
+                 "name"
+             ),
+            'multiple' => true,
+            'controllerRoute' => 'cms/admin-tree-menu',
+        ]
+        /*\skeeks\widget\chosen\Chosen::className(), [
+                'items' => \yii\helpers\ArrayHelper::map(
+                     \skeeks\cms\models\TreeMenu::find()->all(),
+                     "id",
+                     "name"
+                 ),
+                'multiple' => true
+        ]*/
+        )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
+    ?>
+
+<!--<div data-listen="isLink" data-show="0" class="sx-hide">
+
+    <?/*= $form->field($model, 'tree_ids')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+        [
+            'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
+        ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
+    */?>
+
+</div>-->
+
+
+<?= $form->fieldSetEnd() ?>
 
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

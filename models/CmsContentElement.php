@@ -135,7 +135,7 @@ class CmsContentElement extends RelatedElementModel
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
             'files' => Yii::t('app', 'Files'),
-            'content_id' => Yii::t('app', 'Content ID'),
+            'content_id' => Yii::t('app', 'Контент'),
             'tree_id' => Yii::t('app', 'Tree ID'),
             'show_counter' => Yii::t('app', 'Show Counter'),
             'show_counter_start' => Yii::t('app', 'Show Counter Start'),

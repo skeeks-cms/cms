@@ -20,12 +20,6 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSet('Основное'); ?>
 
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Главное изображение'); ?>
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
@@ -33,25 +27,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd()?>
 
-<?= $form->fieldSet('Показывать в разделах'); ?>
-    <?= $form->field($model, 'treeIds')->label('Разделы сайта')->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-        [
-            "attributeMulti" => "treeIds"
-        ])->hint('Укажите разделы сайт, где бы хотелось видеть эту публикацию');
-    ?>
 
-<?= $form->fieldSetEnd()?>
 
-<?= $form->fieldSet('Изображения'); ?>
-    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'images',
-        ]
-    )->label('Изображения');; ?>
-<?= $form->fieldSetEnd()?>
 
 
 <?= $form->fieldSet('Анонс'); ?>
@@ -64,7 +41,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Описание'); ?>
+<?= $form->fieldSet('Подробно'); ?>
 
     <?= $form->field($model, 'description_full')->widget(
         \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
@@ -75,12 +52,41 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd() ?>
 
+<?= $form->fieldSet('Разделы'); ?>
+    <?= $form->field($model, 'treeIds')->label('Разделы сайта')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+        [
+            "attributeMulti" => "treeIds"
+        ])->hint('Укажите разделы сайт, где бы хотелось видеть эту публикацию');
+    ?>
+
+<?= $form->fieldSetEnd()?>
+
+
 
 <?= $form->fieldSet('SEO'); ?>
     <?= $form->field($model, 'meta_title')->textarea(); ?>
     <?= $form->field($model, 'meta_description')->textarea(); ?>
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Изображения'); ?>
+     <?= $form->field($model, 'image')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'image',
+        ]
+    )->label('Главное изображение'); ?>
+
+
+    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
+    <?= $form->field($model, 'images')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'images',
+        ]
+    )->label('Изображения');; ?>
+<?= $form->fieldSetEnd()?>
 
 <? if (!$model->isNewRecord) : ?>
     <?= $form->fieldSet('Дополнительно'); ?>
