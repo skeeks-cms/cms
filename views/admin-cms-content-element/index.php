@@ -49,6 +49,10 @@ if ($content_id = \Yii::$app->request->get('content_id'))
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
         //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
         ['class' => \skeeks\cms\grid\PublishedAtColumn::className()],
+        [
+            'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+            'attribute' => "published_to"
+        ],
 
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
         //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],

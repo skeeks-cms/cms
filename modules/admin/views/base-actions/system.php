@@ -35,6 +35,13 @@ use \skeeks\cms\validators\HasBehavior;
     ]); ?>
 <? endif;?>
 
+<? if ($model->hasAttribute('updated_at')) : ?>
+    <?= $form->field($model, 'updated_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'displayFormat' => 'php:d-M-Y H:i:s',
+        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+    ]); ?>
+<? endif;?>
+
 <? if (Validate::validate( new HasBehavior(\skeeks\cms\models\behaviors\TimestampPublishedBehavior::className()), $model)->isValid()) : ?>
     <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
         //'displayFormat' => 'php:d-M-Y H:i:s',
