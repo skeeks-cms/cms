@@ -199,7 +199,7 @@
                 this.ControllCodemirror.run();
             } else
             {
-                sx.notify.error('Еще не реализовано');
+                //sx.notify.error('Еще не реализовано');
             }
         },
 
