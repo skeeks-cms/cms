@@ -39,12 +39,18 @@
         "skeeks/yii2-widget-chosen": "*",
         "skeeks/yii2-widget-highcharts": "*",
         "skeeks/yii2-widget-codemirror": "*",
-        "kartik-v/yii2-datecontrol": "dev-master",
+        "kartik-v/yii2-datecontrol": "master",
         "kartik-v/yii2-widget-datepicker": "*",
         "kartik-v/yii2-widget-datetimepicker": "*",
         "mihaildev/yii2-elfinder": "*",
         "bower-asset/fancybox": "*"
     },
+    "repositories":[
+        {
+            "type":"git",
+            "url":"https://github.com/kartik-v/yii2-datecontrol"
+        }
+    ],
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
