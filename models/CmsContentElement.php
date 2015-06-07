@@ -56,6 +56,9 @@ use yii\web\ErrorHandler;
  * @property string $meta_description
  * @property string $meta_keywords
  *
+ * @property string $description_short_type
+ * @property string $description_full_type
+ *
  * @property string $absoluteUrl
  * @property string $url
  *
@@ -139,6 +142,8 @@ class CmsContentElement extends RelatedElementModel
             'meta_title' => Yii::t('app', 'Meta Title'),
             'meta_keywords' => Yii::t('app', 'Meta Keywords'),
             'meta_description' => Yii::t('app', 'Meta Description'),
+            'description_short_type' => Yii::t('app', 'Description Short Type'),
+            'description_full_type' => Yii::t('app', 'Description Full Type'),
         ]);
     }
 
@@ -161,6 +166,11 @@ class CmsContentElement extends RelatedElementModel
             ['active', 'default', 'value' => Cms::BOOL_Y],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
+
+            ['description_short_type', 'string'],
+            ['description_full_type', 'string'],
+            ['description_short_type', 'default', 'value' => "text"],
+            ['description_full_type', 'default', 'value' => "text"],
         ]);
     }
 

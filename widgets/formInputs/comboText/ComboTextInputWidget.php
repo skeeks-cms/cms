@@ -27,19 +27,49 @@ use Yii;
 class ComboTextInputWidget extends InputWidget
 {
     /**
-     * @var array Общие js опции
+     * @var array Возможные редакторы.
+     */
+    static public $editors = [
+        'text'          => 'Текст',
+        'editor'        => 'Визуальный редактор',
+        'html'          => 'HTML',
+    ];
+
+    /**
+     * @var array Опции текстового поля по умолчанию.
+     */
+    public $defaultOptions = [
+        'class' => 'form-control',
+        'rows'  => '20',
+    ];
+
+    /**
+     * @var array Общие js опции текущего виджета
      */
     public $clientOptions = [];
+
+    /**
+     * @var string название поля, в котором будет храниться выбранный тип редактора.
+     * Если не будет указан, то редактор по умолчанию будет выбран из настроек.
+     */
+    public $modelAttributeSaveType = "";
+
 
     /**
      * @var array Опции для CKEditor
      */
     public $ckeditorOptions = [];
+
+    /**
+     * @var array Опции для CodeMirror
+     */
     public $codemirrorOptions = [];
 
-    public $options = ['class' => 'form-control'];
 
 
+
+
+    //TODO: сделать etter и зактрытый setter
     /**
      * @var \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor
      */
@@ -51,6 +81,7 @@ class ComboTextInputWidget extends InputWidget
     public $codemirror = null;
 
 
+
     public function init()
     {
         parent::init();
@@ -60,11 +91,14 @@ class ComboTextInputWidget extends InputWidget
             $this->clientOptions['id'] = $this->id;
         }
     }
+
     /**
 	 * @inheritdoc
 	 */
 	public function run()
 	{
+        $this->options = ArrayHelper::merge($this->defaultOptions, $this->options);
+
         if ($this->hasModel())
         {
             if (!array_key_exists('id', $this->options))
@@ -103,18 +137,33 @@ class ComboTextInputWidget extends InputWidget
         $this->ckeditor = new \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor(ArrayHelper::merge([
             'model'         => $this->model,
             'attribute'     => $this->attribute,
+            'preset'        => 'full',
+            'relatedModel'  => $this->model
         ], $this->ckeditorOptions));
 
         $this->codemirror = new CodemirrorWidget(ArrayHelper::merge([
             'model'         => $this->model,
             'attribute'     => $this->attribute,
+
+            'preset'    => 'htmlmixed',
+            'assets'    =>
+            [
+                \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
+            ],
+            'clientOptions'   =>
+            [
+                'theme' => 'night'
+            ],
+
         ], $this->codemirrorOptions));
 
         $this->ckeditor->registerAssets();
         $this->codemirror->registerAssets();
 
-        $this->clientOptions['ckeditor'] = $this->ckeditor->clientOptions;
-        $this->clientOptions['codemirror'] = $this->codemirror->clientOptions;
+        $this->clientOptions['ckeditor']    = $this->ckeditor->clientOptions;
+        $this->clientOptions['codemirror']  = $this->codemirror->clientOptions;
+
+        ComboTextInputWidgetAsset::register($this->view);
 
 	}
 }
