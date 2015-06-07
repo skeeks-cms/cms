@@ -108,13 +108,37 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet('Анонс'); ?>
     <div data-listen="isLink" data-show="0" class="sx-hide">
         <?= $form->field($model, 'description_short')->widget(
-            \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+            \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
             [
-                'options'       => ['rows' => 6],
+                'modelAttributeSaveType' => 'description_short_type',
+            ]);
+        ?>
+
+        <?/*= $form->field($model, 'description_short')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'modelAttributeSaveType' => 'description_short_type',
+            'ckeditorOptions' => [
+
                 'preset'        => 'full',
                 'relatedModel'  => $model,
-            ])
-            ?>
+            ],
+            'codemirrorOptions' =>
+            [
+                'preset'    => 'php',
+                'assets'    =>
+                [
+                    \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
+                ],
+
+                'clientOptions'   =>
+                [
+                    'theme' => 'night',
+                ],
+            ]
+        ])
+        */?>
+
     </div>
 <?= $form->fieldSetEnd() ?>
 
@@ -123,12 +147,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <div data-listen="isLink" data-show="0" class="sx-hide">
 
     <?= $form->field($model, 'description_full')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
         [
-            'options'       => ['rows' => 20],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
+            'modelAttributeSaveType' => 'description_full_type',
+        ]);
     ?>
 
 </div>

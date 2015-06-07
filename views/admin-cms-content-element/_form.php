@@ -56,32 +56,21 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSet('Анонс'); ?>
     <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
         [
-            'options'       => ['rows' => 6],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
-        ?>
-    <?/*= $form->field($model, 'description_short')->widget(
-        \skeeks\widget\codemirror\CodemirrorWidget::className(),
-        [
-            'preset'=>'php',
-            'options'=>['rows' => 20],
-        ]
-    ); */?>
+            'modelAttributeSaveType' => 'description_short_type',
+        ]);
+    ?>
 
 <?= $form->fieldSetEnd() ?>
 
 <?= $form->fieldSet('Описание'); ?>
 
     <?= $form->field($model, 'description_full')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
         [
-            'options'       => ['rows' => 20],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
+            'modelAttributeSaveType' => 'description_full_type',
+        ]);
     ?>
 
 <?= $form->fieldSetEnd() ?>

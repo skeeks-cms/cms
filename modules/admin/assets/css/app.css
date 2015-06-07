@@ -50,6 +50,7 @@ body.sidebar-hidden .main
 .sx-navbar
 {
     box-shadow: 1px 5px 9px rgba(0, 0, 0, 0.17);
+    z-index: 9; /* Если больше то будет перекрываться full scrin CodeMirror*/
 }
 
 .navbar .navbar-nav.navbar-right:last-child

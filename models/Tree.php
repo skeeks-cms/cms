@@ -55,6 +55,8 @@ use yii\helpers\ArrayHelper;
  * @property string $meta_description
  * @property string $meta_keywords
  * @property string $site_code
+ * @property string $description_short_type
+ * @property string $description_full_type
  *
  * @property string $absoluteUrl
  * @property string $url
@@ -167,6 +169,8 @@ class Tree extends Core
             'meta_description'  => Yii::t('app', 'Meta Description'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
+            'description_short_type' => Yii::t('app', 'Description Short Type'),
+            'description_full_type' => Yii::t('app', 'Description Full Type'),
         ]);
     }
 
@@ -188,7 +192,12 @@ class Tree extends Core
             [['meta_title'], 'string', 'max' => 500],
             [['site_code'], 'string', 'max' => 5],
             [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'Для данного подраздела этот код уже занят.'],
-            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'The combination of Code and Pid has already been taken.']
+            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'The combination of Code and Pid has already been taken.'],
+
+            ['description_short_type', 'string'],
+            ['description_full_type', 'string'],
+            ['description_short_type', 'default', 'value' => "text"],
+            ['description_full_type', 'default', 'value' => "text"],
         ]);
     }
 
