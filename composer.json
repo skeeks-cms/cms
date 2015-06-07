@@ -35,7 +35,7 @@
         "skeeks/yii2-imagine": "*",
         "skeeks/yii2-sx": ">=1.1",
         "skeeks/yii2-widget-simpleajaxuploader": "*",
-        "skeeks/yii2-widget-ckeditor": ">=1.0.3",
+        "skeeks/yii2-widget-ckeditor": ">=1.0.4",
         "skeeks/yii2-widget-chosen": "*",
         "skeeks/yii2-widget-highcharts": "*",
         "skeeks/yii2-widget-codemirror": "*",
