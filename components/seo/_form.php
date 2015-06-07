@@ -30,6 +30,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->field($model, 'maxKeywordsLength')->textInput()->hint('Максимальная длинна строки ключевых слов (при автоматической генерации)'); ?>
 
 <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSet('Индексация'); ?>
+    <?= $form->field($model, 'robotsContent')->textarea(['rows' => 7])->hint('Это значение будет добавлено в автоматически сгенерированный файл robots.txt, в том случае если его не будет физически создано на сервере.'); ?>
+<?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
