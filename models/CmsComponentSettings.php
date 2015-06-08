@@ -61,7 +61,8 @@ class CmsComponentSettings extends Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'user_id'], 'integer'],
             [['value'], 'safe'],
             [['component'], 'string', 'max' => 255],
-            [['site_code', 'lang_code'], 'string', 'max' => 5],
+            [['site_code'], 'string', 'max' => 15],
+            [['lang_code'], 'string', 'max' => 5],
             [['namespace'], 'string', 'max' => 50]
         ]);
     }

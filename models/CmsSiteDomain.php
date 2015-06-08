@@ -70,7 +70,7 @@ class CmsSiteDomain extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['site_code', 'domain'], 'required'],
-            [['site_code'], 'string', 'max' => 5],
+            [['site_code'], 'string', 'max' => 15],
             [['domain'], 'string', 'max' => 255],
             [['domain', 'site_code'], 'unique', 'targetAttribute' => ['domain', 'site_code'], 'message' => 'The combination of Site Code and Domain has already been taken.']
         ]);
