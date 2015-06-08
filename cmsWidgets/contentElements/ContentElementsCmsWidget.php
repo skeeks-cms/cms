@@ -53,6 +53,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $createdBy                   = [];
     public $content_ids                 = [];
 
+    public $enabledActiveTime           = CMS::BOOL_Y;
+
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
@@ -82,6 +84,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
             'enabledCurrentTree'        => 'При выборке учитывать текущий раздел (где показывается виджет)',
             'enabledCurrentTreeChild'   => 'При выборке учитывать текущий раздел (где показывается виджет) и все его подразделы',
             'tree_ids'                  => 'Показывать элементы привязанные к разделам',
+            'enabledActiveTime'         => 'Учиьывать время активности',
         ]);
     }
 
@@ -105,6 +108,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
             [['enabledCurrentTree'], 'string'],
             [['enabledCurrentTreeChild'], 'string'],
             [['tree_ids'], 'safe'],
+            [['enabledActiveTime'], 'string'],
         ]);
     }
 
@@ -182,6 +186,22 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 );
             }
 
+        }
+
+
+        if ($this->enabledActiveTime == Cms::BOOL_Y)
+        {
+            $this->dataProvider->query->andWhere(
+                ["<=", CmsContentElement::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
+            );
+
+            $this->dataProvider->query->andWhere(
+                [
+                    'or',
+                    [">=", CmsContentElement::tableName() . '.published_to', \Yii::$app->formatter->asTimestamp(time())],
+                    [CmsContentElement::tableName() . '.published_to' => null],
+                ]
+            );
         }
 
         return parent::_run();
