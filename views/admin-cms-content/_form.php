@@ -6,7 +6,6 @@ use common\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model \yii\db\ActiveRecord */
-/* @var $console \skeeks\cms\controllers\AdminUserController */
 ?>
 
 

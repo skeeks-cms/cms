@@ -100,6 +100,10 @@ class AdminAction extends ViewAction
      */
     protected function render($viewName)
     {
+        $this->viewParams = array_merge($this->viewParams, [
+            'action' => $this
+        ]);
+
         return $this->controller->render($viewName, (array) $this->viewParams);
     }
 
