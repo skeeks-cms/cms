@@ -129,15 +129,13 @@ class AdminAction extends ViewAction
      */
     protected function _initBreadcrumbsData()
     {
+        $baseRoute = $this->controller->module instanceof Application ? $this->controller->id : ("/" . $this->controller->module->id . "/" . $this->controller->id);
+
         if ($this->controller->name)
         {
             $this->controller->view->params['breadcrumbs'][] = [
                 'label' => $this->controller->name,
-                'url' =>
-                [
-                    $this->controller->defaultAction,
-                    UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE
-                ]
+                'url' => UrlHelper::constructCurrent()->setRoute($baseRoute. '/' . $this->controller->defaultAction)->enableAdmin()->toString()
             ];
         }
 
