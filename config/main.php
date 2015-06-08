@@ -80,6 +80,7 @@ $config =
                 ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //админка
 
                 'robots.txt'                            => 'cms/seo/robots',
+                'sitemap.xml'                           => 'cms/seo/sitemap',
 
                 '<_c:(profile)>'                        => 'cms/user/profile',
                 '<_c:(user)>'                           => 'cms/<_c>/index',
