@@ -90,6 +90,6 @@ class CmsContentElementTree extends Core
      */
     public function getTree()
     {
-        return $this->hasOne(CmsTree::className(), ['id' => 'tree_id']);
+        return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
     }
 }
