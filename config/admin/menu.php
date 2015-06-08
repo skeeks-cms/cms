@@ -63,7 +63,7 @@ return
             [
                 "label"     => "Файловый менеджер",
                 "url"       => ["cms/admin-file-manager"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/folder.png'],
             ],
 
             [
