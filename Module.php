@@ -37,7 +37,7 @@ class Module extends base\Module implements BootstrapInterface
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            "version"               => "2.0.0.rc3-dev",
+            "version"               => "2.0.0.rc3",
 
             "name"          => "SkeekS CMS",
             "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
