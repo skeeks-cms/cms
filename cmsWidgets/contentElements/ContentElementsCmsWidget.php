@@ -13,6 +13,7 @@ use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use yii\data\ActiveDataProvider;
@@ -113,17 +114,17 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         if ($this->createdBy)
         {
-            $this->dataProvider->query->andWhere(['created_by' => $this->createdBy]);
+            $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.created_by' => $this->createdBy]);
         }
 
         if ($this->active)
         {
-            $this->dataProvider->query->andWhere(['active' => $this->active]);
+            $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.active' => $this->active]);
         }
 
         if ($this->content_ids)
         {
-            $this->dataProvider->query->andWhere(['content_id' => $this->content_ids]);
+            $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.content_id' => $this->content_ids]);
         }
 
         if ($this->limit)
@@ -132,25 +133,55 @@ class ContentElementsCmsWidget extends WidgetRenderable
         }
 
 
+        $treeIds = (array) $this->tree_ids;
+
         if ($this->enabledCurrentTree == Cms::BOOL_Y)
         {
             $tree = \Yii::$app->cms->getCurrentTree();
             if ($tree)
             {
-                $ids[] = $tree->id;
-                /*if ($tree->hasChildrens() && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
+                $treeIds[] = $tree->id;
+                if ($tree->hasChildrens() && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
                 {
                     if ($childrens = $tree->findChildrens()->all())
                     {
                         foreach ($childrens as $chidren)
                         {
-                            $ids[] = $chidren->id;
+                            $treeIds[] = $chidren->id;
                         }
                     }
-                }*/
+                }
 
-                $this->dataProvider->query->andWhere(['tree_id' => $ids]);
             }
+        }
+
+        if ($treeIds)
+        {
+            foreach ($treeIds as $key => $treeId)
+            {
+                if (!$treeId)
+                {
+                    unset($treeIds[$key]);
+                }
+            }
+
+            if ($treeIds)
+            {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $this->dataProvider->query;
+
+                $query->joinWith('cmsContentElementTrees');
+                $query->andWhere(
+                    [
+                        'or',
+                        [CmsContentElement::tableName() . '.tree_id' => $treeIds],
+                        [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
+                    ]
+                );
+            }
+
         }
 
         return parent::_run();

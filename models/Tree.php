@@ -25,6 +25,7 @@ use skeeks\cms\models\behaviors\TreeBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_tree}}".
@@ -54,6 +55,8 @@ use yii\db\BaseActiveRecord;
  * @property string $meta_description
  * @property string $meta_keywords
  * @property string $site_code
+ * @property string $description_short_type
+ * @property string $description_full_type
  *
  * @property string $absoluteUrl
  * @property string $url
@@ -86,32 +89,30 @@ class Tree extends Core
     {
         $behaviors = parent::behaviors();
 
-        $result = [];
-
-        $result[] = SeoPageName::className();
-        $result[] = HasFiles::className();
-        $result[] = TreeBehavior::className();
-        $result[] = [
-            'class' => Implode::className(),
-            "fields" =>  [
-                "tree_menu_ids"
-            ]
-        ];
-
-        $result[HasRelatedProperties::className()] =
-        [
-            'class'                             => HasRelatedProperties::className(),
-            'relatedElementPropertyClassName'   => CmsTreeProperty::className(),
-            'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
-        ];
-
-        $result[HasTableCache::className()] =
-        [
-            'class' => HasTableCache::className(),
-            'cache' => \Yii::$app->cache
-        ];
-
-        return $result;
+        return ArrayHelper::merge(parent::behaviors(), [
+            HasFiles::className() =>
+            [
+                'class' => HasFiles::className()
+            ],
+            TreeBehavior::className() =>
+            [
+                'class' => TreeBehavior::className()
+            ],
+            Implode::className() =>
+            [
+                'class' => Implode::className(),
+                "fields" =>  [
+                    "tree_menu_ids"
+                ]
+            ],
+            HasRelatedProperties::className() =>
+            [
+                'class' => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName'   => CmsTreeProperty::className(),
+                'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
+            ],
+        ]);
+        //$result[] = SeoPageName::className();
     }
 
     public function init()
@@ -147,15 +148,29 @@ class Tree extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
+            'id' => Yii::t('app', 'ID'),
+            'created_by' => Yii::t('app', 'Created By'),
+            'updated_by' => Yii::t('app', 'Updated By'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'published_at' => Yii::t('app', 'Published At'),
+            'published_to' => Yii::t('app', 'Published To'),
+            'priority' => Yii::t('app', 'Priority'),
+            'active' => Yii::t('app', 'Active'),
+            'name' => Yii::t('app', 'Name'),
             'tree_type_id'              => Yii::t('app', 'Тип'),
             'redirect'          => Yii::t('app', 'Redirect'),
             'tree_menu_ids'     => Yii::t('app', 'Позиции меню'),
             'priority'          => Yii::t('app', 'Приоритет'),
             'code'              => Yii::t('app', 'Код'),
             'active'              => Yii::t('app', 'Active'),
-            'meta_title' => Yii::t('app', 'Meta Title'),
-            'meta_keywords' => Yii::t('app', 'Meta Keywords'),
-            'meta_description' => Yii::t('app', 'Meta Description'),
+            'meta_title'        => Yii::t('app', 'Meta Title'),
+            'meta_keywords'         => Yii::t('app', 'Meta Keywords'),
+            'meta_description'  => Yii::t('app', 'Meta Description'),
+            'description_short' => Yii::t('app', 'Description Short'),
+            'description_full' => Yii::t('app', 'Description Full'),
+            'description_short_type' => Yii::t('app', 'Description Short Type'),
+            'description_full_type' => Yii::t('app', 'Description Full Type'),
         ]);
     }
 
@@ -172,11 +187,17 @@ class Tree extends Core
             [['priority', 'tree_type_id'], 'integer'],
             [['tree_menu_ids'], 'safe'],
             [['code'], 'string', 'max' => 64],
-            [['code'], 'unique'],
             [['name'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
             [['site_code'], 'string', 'max' => 5],
+            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'Для данного подраздела этот код уже занят.'],
+            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'The combination of Code and Pid has already been taken.'],
+
+            ['description_short_type', 'string'],
+            ['description_full_type', 'string'],
+            ['description_short_type', 'default', 'value' => "text"],
+            ['description_full_type', 'default', 'value' => "text"],
         ]);
     }
 

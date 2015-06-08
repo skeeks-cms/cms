@@ -56,6 +56,9 @@ use yii\web\ErrorHandler;
  * @property string $meta_description
  * @property string $meta_keywords
  *
+ * @property string $description_short_type
+ * @property string $description_full_type
+ *
  * @property string $absoluteUrl
  * @property string $url
  *
@@ -64,6 +67,7 @@ use yii\web\ErrorHandler;
 
  * @property CmsContentElementProperty[]    relatedElementProperties
  * @property CmsContentProperty[]           relatedProperties
+ * @property CmsContentElementTree[]        cmsContentElementTrees
  */
 class CmsContentElement extends RelatedElementModel
 {
@@ -131,13 +135,15 @@ class CmsContentElement extends RelatedElementModel
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
             'files' => Yii::t('app', 'Files'),
-            'content_id' => Yii::t('app', 'Content ID'),
+            'content_id' => Yii::t('app', 'Контент'),
             'tree_id' => Yii::t('app', 'Tree ID'),
             'show_counter' => Yii::t('app', 'Show Counter'),
             'show_counter_start' => Yii::t('app', 'Show Counter Start'),
             'meta_title' => Yii::t('app', 'Meta Title'),
             'meta_keywords' => Yii::t('app', 'Meta Keywords'),
             'meta_description' => Yii::t('app', 'Meta Description'),
+            'description_short_type' => Yii::t('app', 'Description Short Type'),
+            'description_full_type' => Yii::t('app', 'Description Full Type'),
         ]);
     }
 
@@ -160,6 +166,11 @@ class CmsContentElement extends RelatedElementModel
             ['active', 'default', 'value' => Cms::BOOL_Y],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
+
+            ['description_short_type', 'string'],
+            ['description_full_type', 'string'],
+            ['description_short_type', 'default', 'value' => "text"],
+            ['description_full_type', 'default', 'value' => "text"],
         ]);
     }
 
@@ -188,6 +199,14 @@ class CmsContentElement extends RelatedElementModel
     public function getRelatedProperties()
     {
         return $this->cmsContent->cmsContentProperties;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElementTrees()
+    {
+        return $this->hasMany(CmsContentElementTree::className(), ['element_id' => 'id']);
     }
 
 

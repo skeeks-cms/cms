@@ -1,16 +1,21 @@
 {
     "name": "skeeks/cms",
-    "description": "SkeekS cms",
-    "keywords": ["framework", "cms", "skeeks", "sx", "app", "yii2", "extension"],
-    "homepage": "http://www.skeeks.com/",
+    "description": "SkeekS CMS — система управления интернет проектами, создание веб-проектов, система управления внутренним порталом компании",
+    "keywords": ["framework", "cms", "skeeks", "sx", "skeeks cms", "app", "yii2", "extension"],
+    "homepage": "http://cms.skeeks.com",
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "http://www.skeeks.com/",
-        "wiki": "http://git.skeeks.com/skeeks/cms/tree/master/docs/guide-ru#cms",
+        "issues": "http://cms.skeeks.com",
+        "wiki": "http://git.skeeks.com/skeeks/cms/wikis/home",
         "source": "http://git.skeeks.com/skeeks/cms"
     },
     "authors": [
+        {
+            "name": "SkeekS",
+            "email": "support@skeeks.com",
+            "homepage": "http://www.skeeks.com"
+        },
         {
             "name": "Semenov Alexander",
             "email": "semenov@skeeks.com"
@@ -30,10 +35,11 @@
         "skeeks/yii2-imagine": "*",
         "skeeks/yii2-sx": ">=1.1",
         "skeeks/yii2-widget-simpleajaxuploader": "*",
-        "skeeks/yii2-widget-ckeditor": "*",
+        "skeeks/yii2-widget-ckeditor": ">=1.0.5",
         "skeeks/yii2-widget-chosen": "*",
         "skeeks/yii2-widget-highcharts": "*",
-        "kartik-v/yii2-datecontrol": "*",
+        "skeeks/yii2-widget-codemirror": "*",
+        "skeeks/yii2-widget-kartik-datecontrol": "*",
         "kartik-v/yii2-widget-datepicker": "*",
         "kartik-v/yii2-widget-datetimepicker": "*",
         "mihaildev/yii2-elfinder": "*",

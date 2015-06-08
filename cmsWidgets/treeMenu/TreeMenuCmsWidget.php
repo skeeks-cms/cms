@@ -34,7 +34,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public $orderBy                     = "priority";
     public $order                       = SORT_DESC;
 
-    public $enabledCurrentTree          = Cms::BOOL_Y;
+    public $enabledCurrentSite          = Cms::BOOL_Y;
 
     public $enabledRunCache             = Cms::BOOL_Y;
     public $runCacheDuration            = 0;
@@ -65,7 +65,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
             'site_codes'            => 'Разделы привязанные к сайтам',
             'orderBy'               => 'По какому параметру сортировать',
             'order'                 => 'Направление сортировки',
-            'enabledCurrentTree'    => 'Учитывать текущий сайт',
+            'enabledCurrentSite'    => 'Учитывать текущий сайт',
             'enabledRunCache'       => 'Включить кэширование',
             'runCacheDuration'      => 'Время жизни кэша',
         ]);
@@ -76,7 +76,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
         return ArrayHelper::merge(parent::rules(),
         [
             ['text', 'string'],
-            [['viewFile', 'label', 'active', 'orderBy', 'enabledCurrentTree', 'enabledRunCache'], 'string'],
+            [['viewFile', 'label', 'active', 'orderBy', 'enabledCurrentSite', 'enabledRunCache'], 'string'],
             [['treePid', 'level', 'runCacheDuration'], 'integer'],
             [['order'], 'integer'],
             [['site_codes'], 'safe'],
@@ -120,7 +120,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                 $this->activeQuery->andWhere(['site_code' => $this->site_codes]);
             }
 
-            if ($this->enabledCurrentTree == Cms::BOOL_Y && $currentSite = \Yii::$app->cms->site)
+            if ($this->enabledCurrentSite == Cms::BOOL_Y && $currentSite = \Yii::$app->cms->site)
             {
                 $this->activeQuery->andWhere(['site_code' => $currentSite->code]);
             }

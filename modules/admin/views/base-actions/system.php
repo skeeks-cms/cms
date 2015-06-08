@@ -7,7 +7,7 @@ use \skeeks\sx\validate\Validate;
 use \skeeks\cms\validators\HasBehavior;
 
 /* @var $this yii\web\View */
-/* @var $model \skeeks\cms\models\Page */
+/* @var $model \skeeks\cms\models\CmsContentElement */
 ?>
 
 
@@ -35,8 +35,22 @@ use \skeeks\cms\validators\HasBehavior;
     ]); ?>
 <? endif;?>
 
+<? if ($model->hasAttribute('updated_at')) : ?>
+    <?= $form->field($model, 'updated_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'displayFormat' => 'php:d-M-Y H:i:s',
+        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+    ]); ?>
+<? endif;?>
+
 <? if (Validate::validate( new HasBehavior(\skeeks\cms\models\behaviors\TimestampPublishedBehavior::className()), $model)->isValid()) : ?>
     <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'displayFormat' => 'php:d-M-Y H:i:s',
+        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+    ]); ?>
+<? endif;?>
+
+<? if ($model->hasAttribute('published_to')) : ?>
+    <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::classname(), [
         //'displayFormat' => 'php:d-M-Y H:i:s',
         'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
     ]); ?>

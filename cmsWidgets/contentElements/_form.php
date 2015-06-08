@@ -25,6 +25,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat(), [
             'allowDeselect' => true
         ]); ?>
+
         <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\User::find()->active()->all(),
             'id',
@@ -52,7 +53,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Сортировка'); ?>
+    <?= $form->fieldSet('Сортировка и количество'); ?>
+        <?= $form->fieldInputInt($model, 'limit'); ?>
         <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
         <?= $form->fieldSelect($model, 'order', [
             SORT_ASC    => "ASC (от меньшего к большему)",

@@ -15,16 +15,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Основное'); ?>
 
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Главное изображение'); ?>
+
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint("Этот параметр влияет на адрес страницы, будте внимательно при его редактировании."); ?>
+
+
+
 
     <?= Html::checkbox("isLink", $model->isLink(), [
         'value'     => '1',
@@ -53,30 +52,106 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Дополнительные разделы') ?>
 
 
+<?= $form->fieldSet('Анонс'); ?>
+    <div data-listen="isLink" data-show="0" class="sx-hide">
+        <?= $form->field($model, 'description_short')->widget(
+            \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+            [
+                'modelAttributeSaveType' => 'description_short_type',
+            ]);
+        ?>
 
-<?= $form->field($model, 'tree_menu_ids')->label('Метки')->widget(
-    \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
-        'items' => \yii\helpers\ArrayHelper::map(
-             \skeeks\cms\models\TreeMenu::find()->all(),
-             "id",
-             "name"
-         ),
-        'multiple' => true,
-        'controllerRoute' => 'cms/admin-tree-menu',
-    ]
-    /*\skeeks\widget\chosen\Chosen::className(), [
+        <?/*= $form->field($model, 'description_short')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'modelAttributeSaveType' => 'description_short_type',
+            'ckeditorOptions' => [
+
+                'preset'        => 'full',
+                'relatedModel'  => $model,
+            ],
+            'codemirrorOptions' =>
+            [
+                'preset'    => 'php',
+                'assets'    =>
+                [
+                    \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
+                ],
+
+                'clientOptions'   =>
+                [
+                    'theme' => 'night',
+                ],
+            ]
+        ])
+        */?>
+
+    </div>
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Подробно'); ?>
+
+<div data-listen="isLink" data-show="0" class="sx-hide">
+
+    <?= $form->field($model, 'description_full')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'modelAttributeSaveType' => 'description_full_type',
+        ]);
+    ?>
+
+</div>
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('SEO'); ?>
+    <?= $form->field($model, 'meta_title')->textarea(); ?>
+    <?= $form->field($model, 'meta_description')->textarea(); ?>
+    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
+<?= $form->fieldSetEnd() ?>
+
+
+<?= $form->fieldSet('Изображения'); ?>
+    <?= $form->field($model, 'image')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'image',
+        ]
+    )->label('Главное изображение'); ?>
+
+    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
+    <?= $form->field($model, 'images')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'images',
+        ]
+    )->label('Изображения');; ?>
+<?= $form->fieldSetEnd()?>
+
+
+<?= $form->fieldSet('Дополнительно') ?>
+
+    <?= $form->field($model, 'tree_menu_ids')->label('Метки')->widget(
+        \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\TreeMenu::find()->all(),
                  "id",
                  "name"
              ),
-            'multiple' => true
-    ]*/
-    )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
-?>
+            'multiple' => true,
+            'controllerRoute' => 'cms/admin-tree-menu',
+        ]
+        /*\skeeks\widget\chosen\Chosen::className(), [
+                'items' => \yii\helpers\ArrayHelper::map(
+                     \skeeks\cms\models\TreeMenu::find()->all(),
+                     "id",
+                     "name"
+                 ),
+                'multiple' => true
+        ]*/
+        )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
+    ?>
 
 <!--<div data-listen="isLink" data-show="0" class="sx-hide">
 
@@ -90,51 +165,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 </div>-->
 
 
-
 <?= $form->fieldSetEnd() ?>
-
-<?= $form->fieldSet('Изображения'); ?>
-    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'images',
-        ]
-    )->label('Изображения');; ?>
-<?= $form->fieldSetEnd()?>
-
-<?= $form->fieldSet('Описание'); ?>
-
-<div data-listen="isLink" data-show="0" class="sx-hide">
-
-    <?= $form->field($model, 'description_full')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
-        [
-            'options'       => ['rows' => 20],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
-    ?>
-
-    <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
-        [
-            'options'       => ['rows' => 6],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
-    ?>
-
-
-</div>
-<?= $form->fieldSetEnd() ?>
-
-<?= $form->fieldSet('SEO'); ?>
-    <?= $form->field($model, 'meta_title')->textarea(); ?>
-    <?= $form->field($model, 'meta_description')->textarea(); ?>
-    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
-<?= $form->fieldSetEnd() ?>
-
 
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

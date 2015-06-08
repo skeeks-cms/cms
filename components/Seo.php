@@ -77,6 +77,12 @@ class Seo extends Component
      */
     public $enableKeywordsGenerator = true;
 
+
+    /**
+     * @var string
+     */
+    public $robotsContent           = "User-agent: *";
+
     /**
      * @var array
      */
@@ -96,6 +102,7 @@ class Seo extends Component
     {
         return ArrayHelper::merge(parent::rules(), [
             [['enableKeywordsGenerator', 'minKeywordLenth', 'maxKeywordsLength'], 'integer'],
+            ['robotsContent', 'string'],
         ]);
     }
 
@@ -105,6 +112,7 @@ class Seo extends Component
             'enableKeywordsGenerator'                => 'Автоматическая генерация ключевых слов',
             'minKeywordLenth'                        => 'Минимальная длина ключевого слова',
             'maxKeywordsLength'                      => 'Длинна ключевых слов',
+            'robotsContent'                          => 'Robots.txt файл',
         ]);
     }
 

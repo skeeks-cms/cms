@@ -19,20 +19,54 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <? endif; ?>
 
 <?= $form->fieldSet('Основное'); ?>
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Главное изображение'); ?>
+
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
+    <div class="row">
+        <div class="col-md-3">
+            <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+                //'displayFormat' => 'php:d-M-Y H:i:s',
+                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+            ]); ?>
+        </div>
+        <div class="col-md-3">
+            <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::classname(), [
+                //'displayFormat' => 'php:d-M-Y H:i:s',
+                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+            ]); ?>
+        </div>
+    </div>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint("Этот параметр влияет на адрес страницы"); ?>
 
 <?= $form->fieldSetEnd()?>
 
-<?= $form->fieldSet('Показывать в разделах'); ?>
+
+
+
+
+<?= $form->fieldSet('Анонс'); ?>
+    <?= $form->field($model, 'description_short')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'modelAttributeSaveType' => 'description_short_type',
+        ]);
+    ?>
+
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Подробно'); ?>
+
+    <?= $form->field($model, 'description_full')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'modelAttributeSaveType' => 'description_full_type',
+        ]);
+    ?>
+
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet('Разделы'); ?>
     <?= $form->field($model, 'treeIds')->label('Разделы сайта')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
@@ -42,7 +76,23 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd()?>
 
+
+
+<?= $form->fieldSet('SEO'); ?>
+    <?= $form->field($model, 'meta_title')->textarea(); ?>
+    <?= $form->field($model, 'meta_description')->textarea(); ?>
+    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
+<?= $form->fieldSetEnd() ?>
+
 <?= $form->fieldSet('Изображения'); ?>
+     <?= $form->field($model, 'image')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
+        [
+            'fileGroup' => 'image',
+        ]
+    )->label('Главное изображение'); ?>
+
+
     <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
     <?= $form->field($model, 'images')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
@@ -52,35 +102,17 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     )->label('Изображения');; ?>
 <?= $form->fieldSetEnd()?>
 
+<? if (!$model->isNewRecord) : ?>
+    <?= $form->fieldSet('Дополнительно'); ?>
+        <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
+            \skeeks\cms\models\CmsContent::find()->active()->all(),
+            'id',
+            'name'
+        )); ?>
+        <?= $form->fieldInputInt($model, 'priority'); ?>
 
-<?= $form->fieldSet('Описание'); ?>
-
-    <?= $form->field($model, 'description_full')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
-        [
-            'options'       => ['rows' => 20],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
-    ?>
-
-    <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
-        [
-            'options'       => ['rows' => 6],
-            'preset'        => 'full',
-            'relatedModel'  => $model,
-        ])
-    ?>
-
-<?= $form->fieldSetEnd() ?>
-
-
-<?= $form->fieldSet('SEO'); ?>
-    <?= $form->field($model, 'meta_title')->textarea(); ?>
-    <?= $form->field($model, 'meta_description')->textarea(); ?>
-    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
-<?= $form->fieldSetEnd() ?>
+    <?= $form->fieldSetEnd() ?>
+<? endif; ?>
 
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
