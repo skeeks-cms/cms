@@ -16,31 +16,51 @@ $data = \yii\helpers\Json::encode([
 ])
 ?>
 
-<?= \yii\helpers\Html::a("Удалить временные файлы", $url, [
-    'class'             => 'btn btn-primary',
-    'onclick'           => 'new sx.classes.Clear(' . $data . '); return false;'
-]); ?>
-<hr />
-<? foreach ($clearDirs as $dataDir) : ?>
-    <?php
-    /**
-     * @var \skeeks\sx\Dir $dir
-     */
-        $dir = \yii\helpers\ArrayHelper::getValue($dataDir, 'dir');
-    ?>
-    <div class="row-fluid">
-        <b><?= \yii\helpers\ArrayHelper::getValue($dataDir, 'label'); ?></b>: <?= $dir->getSize()->formatedShortSize(); ?><br />
-        <?= $dir->getPath(); ?>
-    </div>
+<div class="sx-box sx-p-10 sx-bg-primary">
+    <?= \yii\helpers\Html::a("Удалить временные файлы", $url, [
+        'class'             => 'btn btn-primary',
+        'onclick'           => 'new sx.classes.Clear(' . $data . '); return false;'
+    ]); ?>
     <hr />
-<? endforeach; ?>
 
+    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+            'dataProvider'  => new \yii\data\ArrayDataProvider([
+                'allModels' => $clearDirs
+            ]),
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                'label',
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'value' => function($data)
+                    {
+                        /**
+                         * @var $dir \skeeks\sx\Dir
+                         */
+                        $dir = $data['dir'];
+                        return $dir->getPath();
+                    }
+                ],
+
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'value' => function($data)
+                    {
+                        /**
+                         * @var $dir \skeeks\sx\Dir
+                         */
+                        $dir = $data['dir'];
+                        return $dir->getSize()->formatedShortSize();
+                    }
+                ],
+            ]
+        ]);
+    ?>
+</div>
 <?
     $this->registerJs(<<<JS
     (function(sx, $, _)
     {
-        sx.createNamespace('classes.Clear', sx);
-
         sx.classes.Clear = sx.classes.Component.extend({
 
             _init: function()

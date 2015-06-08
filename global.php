@@ -20,6 +20,7 @@
 //define("COMMON_CONFIG_DIR",       COMMON_DIR . '/config');  //Общие конфиги
 //define("COMMON_RUNTIME_DIR",      COMMON_DIR . '/runtime'); //Временные файлы
 //define("VENDOR_DIR",              ROOT_DIR . '/vendor');    //Вендоры
+//define("BACKUP_DIR",              ROOT_DIR . '/backup');    //Дирриктория для бекапов
 
 /**
  * Будут определены по ходу выполенения кода
@@ -43,6 +44,8 @@ defined('COMMON_DIR') or define('COMMON_DIR', ROOT_DIR . '/common');
 defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', COMMON_DIR . '/config');
 defined('COMMON_RUNTIME_DIR') or define('COMMON_RUNTIME_DIR', COMMON_DIR . '/runtime');
 defined('VENDOR_DIR') or define('VENDOR_DIR', ROOT_DIR . '/vendor');
+//Дирриктория для бекапов
+defined('BACKUP_DIR') or define('BACKUP_DIR', ROOT_DIR . '/backup');
 
 //Использовать кэширование конфигов
 defined('CONFIG_CACHE') or define("CONFIG_CACHE", true);
