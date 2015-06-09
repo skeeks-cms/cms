@@ -151,7 +151,7 @@ JS
 );
 ?>
 
-<h1>Настройки компонента: <?= $component->descriptor->name; ?></h1>
+<h1>Управление: <?= $component->descriptor->name; ?></h1>
     <hr />
     <div class="row">
         <div class="col-lg-2">

@@ -13,6 +13,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSet('Основные настройки') ?>
 
+    <?= $form->fieldRadioListBoolean($model, 'active') ?>
+
 <? if ($content_id = \Yii::$app->request->get('tree_type_id')) : ?>
 
     <?= $form->field($model, 'tree_type_id')->hiddenInput(['value' => $content_id])->label(false); ?>
@@ -35,13 +37,12 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= $form->fieldSelect($model, 'component', [
         'Базовые типы'          => \Yii::$app->cms->basePropertyTypes(),
         'Пользовательские типы' => \Yii::$app->cms->userPropertyTypes(),
-    ]); ?>
+    ])->label("Тип свойства");; ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->field($model, 'code')->textInput() ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'active') ?>
     <?/*= $form->fieldRadioListBoolean($model, 'multiple') */?>
     <?= $form->fieldRadioListBoolean($model, 'is_required') ?>
 

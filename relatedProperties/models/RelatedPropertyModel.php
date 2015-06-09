@@ -109,20 +109,19 @@ abstract class RelatedPropertyModel extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'multiple_cnt', 'version'], 'integer'],
-            [['name'], 'required'],
+            [['name', 'component'], 'required'],
             [['component_settings'], 'string'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 64],
+
             [['active', 'property_type', 'list_type', 'multiple', 'with_description', 'searchable', 'filtrable', 'is_required', 'smart_filtrable'], 'string', 'max' => 1],
-            [['code'], 'unique'],
             ['code', 'default', 'value' => function($model, $attribute)
             {
                 return "property" . String::ucfirst(md5(rand(1, 10) . time()));
             }],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
+            ['priority', 'default', 'value' => 500],
+            [['active', 'searchable'], 'default', 'value' => Cms::BOOL_Y],
+            [['is_required', 'smart_filtrable', 'filtrable', 'with_description'], 'default', 'value' => Cms::BOOL_N],
         ]);
     }
 
@@ -192,88 +191,4 @@ abstract class RelatedPropertyModel extends Core
 
         return $result;
     }
-
-
-    /**
-     * @param RelatedElementModel $relatedElementModel
-     * @return mixed
-     */
-    /*public function value($relatedElementModel)
-    {
-        if ($this->multiple == "Y")
-        {
-            if ($values = $relatedElementModel->findRelatedElementProperties($this->id)->all())
-            {
-                return ArrayHelper::map($values, "id", "value");
-            } else
-            {
-                return [];
-            }
-        } else
-        {
-            if ($value = $relatedElementModel->findRelatedElementProperties($this->id)->one())
-            {
-                return $value->value;
-            } else
-            {
-                return null;
-            }
-        }
-    }*/
-
-    /**
-     * @param RelatedElementModel $relatedElementModel
-     * @param $value
-     * @return $this
-     */
-    /*public function saveValue($relatedElementModel, $value)
-    {
-        if ($this->multiple == "Y")
-        {
-            $propertyValues = $relatedElementModel->findRelatedElementProperties($this->id)->all();
-            if ($propertyValues)
-            {
-                foreach ($propertyValues as $pv)
-                {
-                    $pv->delete();
-                }
-            }
-
-            $values = (array) $value;
-
-            if ($values)
-            {
-                foreach ($values as $key => $value)
-                {
-                    $productPropertyValue = new RelatedPropertiesModel([
-                        'element_id'    => $modelWhithProperties->id,
-                        'property_id'   => $this->id,
-                        'value'         => $value,
-                    ]);
-
-                    $productPropertyValue->save(false);
-                }
-            }
-
-        } else
-        {
-            /**
-             * @var $propertyValue ProductPropertyMap
-            if ($productPropertyValue = $modelWhithProperties->getPropertyValues()->where(['property_id' => $this->id])->one())
-            {
-                $productPropertyValue->value = $value;
-            } else
-            {
-                $productPropertyValue = new ProductPropertyMap([
-                    'product_id'    => $modelWhithProperties->id,
-                    'property_id'   => $this->id,
-                    'value'         => $value,
-                ]);
-            }
-
-            $productPropertyValue->save();
-        }
-
-        return $this;
-    }*/
 }
