@@ -62,11 +62,11 @@ abstract class RelatedPropertyModel extends Core
             /**
              * @var $propertyType PropertyType
              */
-            $propertyTypeClassName = $this->component;
-            $propertyType = new $propertyTypeClassName();
+            $propertyTypeClassName  = $this->component;
+            $propertyType           = new $propertyTypeClassName();
 
             $this->property_type    = $propertyType->code;
-            $this->multiple         = $propertyType->multiple ? Cms::BOOL_Y :  Cms::BOOL_N;
+            $this->multiple         = $propertyType->multiple;
         }
     }
 
