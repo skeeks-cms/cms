@@ -174,6 +174,8 @@ class HasRelatedProperties extends ActiveRecord
                         'element_id'    => $this->owner->id,
                         'property_id'   => $property->id,
                         'value'         => $value,
+                        'value_enum'    => (int) $value,
+                        'value_num'     => (float) $value,
                     ]);
 
                     $productPropertyValue->save(false);
@@ -184,7 +186,9 @@ class HasRelatedProperties extends ActiveRecord
         {
             if ($productPropertyValue = $this->findRelatedElementProperties($property->id)->one())
             {
-                $productPropertyValue->value = $value;
+                $productPropertyValue->value        = $value;
+                $productPropertyValue->value_enum   = (int) $value;
+                $productPropertyValue->value_num    = (float) $value;
             } else
             {
                 $className = $this->relatedElementPropertyClassName;
@@ -193,6 +197,8 @@ class HasRelatedProperties extends ActiveRecord
                     'element_id'    => $this->owner->id,
                     'property_id'   => $property->id,
                     'value'         => $value,
+                    'value_enum'    => (int) $value,
+                    'value_num'     => (float) $value,
                 ]);
             }
 
