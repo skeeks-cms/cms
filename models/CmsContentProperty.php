@@ -84,6 +84,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         return array_merge(parent::rules(), [
             [['content_id'], 'integer'],
+            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
         ]);
     }
 }

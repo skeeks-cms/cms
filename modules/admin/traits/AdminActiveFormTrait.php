@@ -20,6 +20,7 @@ use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\Pjax;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\widgets\ActiveField;
 
 /**
  * Class AdminActiveFormTrait
@@ -132,7 +133,7 @@ JS
      * @param $items
      * @param array $config
      * @param array $fieldOptions
-     * @return \skeeks\cms\base\widgets\ActiveField
+     * @return ActiveField
      */
     public function fieldSelect($model, $attribute, $items, $config = [], $fieldOptions = [])
     {
