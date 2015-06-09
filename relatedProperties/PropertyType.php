@@ -11,6 +11,7 @@
 namespace skeeks\cms\relatedProperties;
 use skeeks\cms\base\Component;
 use skeeks\cms\base\widgets\ActiveForm;
+use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Model;
@@ -37,9 +38,9 @@ abstract class PropertyType extends Component
      */
     public $name;
     /**
-     * @var bool множественный выбор
+     * @var string множественный выбор
      */
-    public $multiple    = false;
+    public $multiple    = Cms::BOOL_N;
 
     /**
      * @var RelatedElementModel

@@ -32,6 +32,7 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeRadioList;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelect;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelectMulti;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeString;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTextarea;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTextInput;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTree;
@@ -538,6 +539,7 @@ $fileContent .= '];';
     public function basePropertyTypes()
     {
         return [
+            PropertyTypeText::className()           => (new PropertyTypeText)->name,
             PropertyTypeTextarea::className()       => (new PropertyTypeTextarea)->name,
             PropertyTypeTextInput::className()      => (new PropertyTypeTextInput)->name,
             PropertyTypeNumber::className()         => (new PropertyTypeNumber)->name,

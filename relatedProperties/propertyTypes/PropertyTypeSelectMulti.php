@@ -6,6 +6,7 @@
  * @date 30.04.2015
  */
 namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\widget\chosen\Chosen;
 use yii\helpers\ArrayHelper;
@@ -18,7 +19,7 @@ class PropertyTypeSelectMulti extends PropertyType
 {
     public function init()
     {
-        $this->multiple                 = true;
+        $this->multiple                 = Cms::BOOL_Y;
         $this->code                     = self::CODE_LIST;
         $this->name                     = "Выпадающий список (выбор множественного значения)";
 
