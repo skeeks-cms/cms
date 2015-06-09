@@ -12,6 +12,7 @@ namespace skeeks\cms\relatedProperties\models;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\sx\String;
 use Yii;
 use yii\base\Model;
@@ -77,22 +78,28 @@ abstract class RelatedPropertyModel extends Core
 
         return $scenarios;
     }
+
     public function processBeforeSave()
     {
         if ($this->component)
         {
             if ($this->scenario == static::SCENARIO_UPDATE_CONFIG)
             {
-                $this->component_settings = base64_decode($this->component_settings);
-            }
-            /**
-             * @var $propertyType PropertyType
-             */
-            $propertyTypeClassName  = $this->component;
-            $propertyType           = new $propertyTypeClassName();
+                $this->component_settings = unserialize(\skeeks\sx\String::base64DecodeUrl($this->component_settings));
 
-            $this->property_type    = $propertyType->code;
-            $this->multiple         = $propertyType->multiple;
+                /**
+                 * @var $propertyType PropertyType
+                 */
+                $propertyTypeClassName      = $this->component;
+                $propertyType               = new $propertyTypeClassName();
+                $propertyType->attributes   = $this->component_settings;
+                $propertyType->initInstance();
+
+                $this->property_type    = $propertyType->code;
+                $this->multiple         = $propertyType->multiple;
+
+                $this->component_settings = serialize($this->component_settings);
+            }
         }
     }
 

@@ -41,6 +41,8 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
+use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
+use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\widgets\Infoblock;
 use skeeks\cms\widgets\StaticBlock;
 use skeeks\sx\File;
@@ -541,9 +543,7 @@ $fileContent .= '];';
         return [
             PropertyTypeText::className()           => (new PropertyTypeText)->name,
             PropertyTypeNumber::className()         => (new PropertyTypeNumber)->name,
-            PropertyTypeSelect::className()         => (new PropertyTypeSelect)->name,
-            PropertyTypeSelectMulti::className()    => (new PropertyTypeSelectMulti)->name,
-            PropertyTypeRadioList::className()      => (new PropertyTypeRadioList)->name,
+            PropertyTypeList::className()           => (new PropertyTypeList)->name,
             PropertyTypeFile::className()           => (new PropertyTypeFile)->name,
             PropertyTypeTree::className()           => (new PropertyTypeTree)->name,
             PropertyTypeElement::className()        => (new PropertyTypeElement)->name,
@@ -556,7 +556,10 @@ $fileContent .= '];';
      */
     public function userPropertyTypes()
     {
-        return (array) $this->userPropertyTypes;
+        return (array) ArrayHelper::merge([
+            UserPropertyTypeDate::className() => (new UserPropertyTypeDate)->name,
+            UserPropertyTypeComboText::className() => (new UserPropertyTypeComboText)->name
+        ], (array) $this->userPropertyTypes);
     }
 
     /**

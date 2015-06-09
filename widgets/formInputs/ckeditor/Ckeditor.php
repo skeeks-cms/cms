@@ -12,6 +12,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -35,7 +36,7 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
         parent::initOptions();
 
         $additionalData = [];
-        if ($this->relatedModel && !$this->relatedModel->isNewRecord)
+        if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord))
         {
             if (Validate::isValid(new HasBehavior(HasFiles::className()), $this->relatedModel))
             {

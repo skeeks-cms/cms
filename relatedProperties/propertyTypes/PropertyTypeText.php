@@ -41,7 +41,7 @@ class PropertyTypeText extends PropertyType
         return ArrayHelper::merge(parent::rules(),
         [
             ['fieldElement', 'string'],
-            ['rows', 'integer']
+            ['rows', 'integer', 'min' => 1, 'max' => 50],
         ]);
     }
 
@@ -66,19 +66,15 @@ class PropertyTypeText extends PropertyType
         if (in_array($this->fieldElement, array_keys(self::$fieldElements)))
         {
             $fieldElement = $this->fieldElement;
-            $field->$fieldElement($this->getFieldSettings());
+            $field->$fieldElement([
+                'rows' => $this->rows
+            ]);
         } else
         {
-            $field->textInput($this->getFieldSettings());
+            $field->textInput([]);
         }
 
         return $field;
     }
 
-    public function getFieldSettings()
-    {
-        return [
-            'rows' => $this->rows
-        ];
-    }
 }

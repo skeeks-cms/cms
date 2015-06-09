@@ -33,7 +33,7 @@ class AdminUniversalComponentSettingsController extends AdminController
         $classComponentSettings = (string) \Yii::$app->request->get('settings');
         if ($classComponentSettings)
         {
-            $classComponentSettings = unserialize(base64_decode($classComponentSettings));
+            $classComponentSettings = unserialize(\skeeks\sx\String::base64DecodeUrl($classComponentSettings));
         }
         /**
          * @var $component \skeeks\cms\relatedProperties\PropertyType;
@@ -54,7 +54,7 @@ class AdminUniversalComponentSettingsController extends AdminController
             if ($component->load(\Yii::$app->request->post()))
             {
                 \Yii::$app->session->setFlash('success', 'Сохранено');
-                $forSave = base64_encode(serialize($component->attributes));
+                $forSave = \skeeks\sx\String::base64EncodeUrl(serialize($component->attributes));
 
             } else
             {
@@ -83,7 +83,7 @@ class AdminUniversalComponentSettingsController extends AdminController
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
             $component->load(\Yii::$app->request->post());
-            $forSave = base64_encode(serialize($component->attributes));
+            $forSave = \skeeks\sx\String::base64EncodeUrl(serialize($component->attributes));
 
             $rr->success = true;
             $rr->message;

@@ -6,12 +6,26 @@
  * @date 30.04.2015
  */
 namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\relatedProperties\PropertyType;
+
 /**
  * Class PropertyTypeNumber
  * @package skeeks\cms\relatedProperties\propertyTypes
  */
-class PropertyTypeNumber extends PropertyTypeTextInput
+class PropertyTypeNumber extends PropertyType
 {
     public $code                 = self::CODE_NUMBER;
     public $name                 = "Число";
+
+    /**
+     * @return \yii\widgets\ActiveField
+     */
+    public function renderForActiveForm()
+    {
+        $field = parent::renderForActiveForm();
+
+        $field->textInput();
+
+        return $field;
+    }
 }

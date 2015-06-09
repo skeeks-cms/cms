@@ -45,7 +45,7 @@ class ComponentSettingsWidget extends InputWidget
         if ($this->hasModel())
         {
             $name   = Html::getInputName($this->model, $this->attribute);
-            $value  = base64_encode(serialize((array) $this->model->{$this->attribute}));
+            $value  = \skeeks\sx\String::base64EncodeUrl(serialize((array) $this->model->{$this->attribute}));
 
             $this->options['id'] = Html::getInputId($this->model, $this->attribute);
 
