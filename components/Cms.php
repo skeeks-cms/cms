@@ -540,8 +540,6 @@ $fileContent .= '];';
     {
         return [
             PropertyTypeText::className()           => (new PropertyTypeText)->name,
-            PropertyTypeTextarea::className()       => (new PropertyTypeTextarea)->name,
-            PropertyTypeTextInput::className()      => (new PropertyTypeTextInput)->name,
             PropertyTypeNumber::className()         => (new PropertyTypeNumber)->name,
             PropertyTypeSelect::className()         => (new PropertyTypeSelect)->name,
             PropertyTypeSelectMulti::className()    => (new PropertyTypeSelectMulti)->name,

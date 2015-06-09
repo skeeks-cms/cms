@@ -5,9 +5,10 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 09.06.2015
  */
-use skeeks\modules\cms\form\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <? $form = ActiveForm::begin(); ?>
     <?= $form->fieldSelect($model, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText::$fieldElements); ?>
-    <?= $form->fieldInputInt($model, 'textareaRows'); ?>
+    <?= $form->fieldInputInt($model, 'rows'); ?>
+    <?= $form->buttonsStandart($model); ?>
 <? ActiveForm::end(); ?>

@@ -8,8 +8,11 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminCmsContentPropertyController
@@ -24,6 +27,21 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
         $this->modelClassName          = CmsContentProperty::className();
 
         parent::init();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                "update" =>
+                [
+                    "modelScenario" => RelatedPropertyModel::SCENARIO_UPDATE_CONFIG,
+                ],
+            ]
+        );
     }
 
 }

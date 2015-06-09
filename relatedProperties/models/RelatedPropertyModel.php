@@ -10,9 +10,11 @@
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 use skeeks\sx\String;
 use Yii;
+use yii\base\Model;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -47,6 +49,19 @@ use yii\widgets\ActiveForm;
  */
 abstract class RelatedPropertyModel extends Core
 {
+    const SCENARIO_UPDATE_CONFIG = "updateConfig";
+
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            Serialize::className() =>
+            [
+                'class' => Serialize::className(),
+                'fields' => ['component_settings']
+            ]
+        ]);
+    }
+
     public function init()
     {
         parent::init();
@@ -55,10 +70,21 @@ abstract class RelatedPropertyModel extends Core
         $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE,    [$this, "processBeforeSave"]);
     }
 
+    public function scenarios()
+    {
+        $scenarios                                  = parent::scenarios();
+        $scenarios[static::SCENARIO_UPDATE_CONFIG]  = $scenarios[static::SCENARIO_DEFAULT];
+
+        return $scenarios;
+    }
     public function processBeforeSave()
     {
         if ($this->component)
         {
+            if ($this->scenario == static::SCENARIO_UPDATE_CONFIG)
+            {
+                $this->component_settings = base64_decode($this->component_settings);
+            }
             /**
              * @var $propertyType PropertyType
              */
@@ -110,7 +136,7 @@ abstract class RelatedPropertyModel extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'multiple_cnt', 'version'], 'integer'],
             [['name', 'component'], 'required'],
-            [['component_settings'], 'string'],
+            [['component_settings'], 'safe'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 64],
 
@@ -159,6 +185,8 @@ abstract class RelatedPropertyModel extends Core
             'property'      => $this,
             'activeForm'    => $activeForm,
         ]);
+
+        $propertyType->attributes = $this->component_settings;
 
         return $propertyType->renderForActiveForm();
     }
