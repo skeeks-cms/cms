@@ -1,8 +1,13 @@
+/*!
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 09.06.2015
+ */
 (function(sx, $, _)
 {
     sx.createNamespace('classes.combotext', sx);
     sx.createNamespace('classes.combotext.controlls', sx);
-
 
     sx.classes.combotext.controlls._Base = sx.classes.Component.extend({
 

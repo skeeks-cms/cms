@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\relatedProperties\PropertyType;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class PropertyTypeTextarea
@@ -24,14 +25,14 @@ class PropertyTypeText extends PropertyType
     ];
 
     public $fieldElement            = 'textInput';
-    public $textareaRows            = 5;
+    public $rows                    = 5;
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
-            'fieldElement' => 'Элемент формы',
-            'textareaRows' => 'Количество строк текстового поля'
+            'fieldElement'  => 'Элемент формы',
+            'rows'          => 'Количество строк текстового поля'
         ]);
     }
 
@@ -40,7 +41,7 @@ class PropertyTypeText extends PropertyType
         return ArrayHelper::merge(parent::rules(),
         [
             ['fieldElement', 'string'],
-            ['textareaRows', 'integer']
+            ['rows', 'integer', 'min' => 1, 'max' => 50],
         ]);
     }
 
@@ -52,7 +53,7 @@ class PropertyTypeText extends PropertyType
     public function getConfigFormFile()
     {
         $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . '_formPropertyTypeText.php';
+        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formPropertyTypeText.php';
     }
 
     /**
@@ -65,12 +66,15 @@ class PropertyTypeText extends PropertyType
         if (in_array($this->fieldElement, array_keys(self::$fieldElements)))
         {
             $fieldElement = $this->fieldElement;
-            $field->$fieldElement($this->getActiveFormConfig());
+            $field->$fieldElement([
+                'rows' => $this->rows
+            ]);
         } else
         {
-            $field->textInput($this->getActiveFormConfig());
+            $field->textInput([]);
         }
 
         return $field;
     }
+
 }

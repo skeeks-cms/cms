@@ -39,8 +39,16 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= $form->fieldSelect($model, 'component', [
         'Базовые типы'          => \Yii::$app->cms->basePropertyTypes(),
         'Пользовательские типы' => \Yii::$app->cms->userPropertyTypes(),
-    ])->label("Тип свойства"); ?>
-    <?= $form->field($model, 'component_settings')->label(false)->hiddenInput(); ?>
+    ])
+        ->label("Тип свойства")
+        ;
+    ?>
+    <?= $form->field($model, 'component_settings')->label(false)->widget(
+        \skeeks\cms\widgets\formInputs\componentSettings\ComponentSettingsWidget::className(),
+        [
+            'componentSelectId' => Html::getInputId($model, "component")
+        ]
+    ); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'code')->textInput() ?>

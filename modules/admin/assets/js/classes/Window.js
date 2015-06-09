@@ -55,6 +55,12 @@
 
             return this;
         },
+
+        close: function()
+        {
+            $.fancybox.close();
+            return this;
+        }
     });
 
 })(sx, sx.$, sx._);

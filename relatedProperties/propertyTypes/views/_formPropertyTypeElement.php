@@ -8,7 +8,11 @@
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <? $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSelect($model, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText::$fieldElements); ?>
-    <?= $form->fieldInputInt($model, 'rows'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'multiple'); ?>
+    <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\models\CmsContent::find()->active()->all(),
+        'id',
+        'name'
+    )); ?>
     <?= $form->buttonsStandart($model); ?>
 <? ActiveForm::end(); ?>

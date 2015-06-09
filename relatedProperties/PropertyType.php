@@ -15,6 +15,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class PropertyType
@@ -62,6 +63,24 @@ abstract class PropertyType extends Component
         //Не загружаем настройки по умолчанию (В родительском классе идет загрузка настроек из базы, тут этого не надо)
     }
 
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(),
+        [
+            'multiple'  => 'Множественный выбор',
+        ]);
+    }
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(),
+        [
+            ['multiple', 'string'],
+            ['multiple', 'in', 'range' => array_keys(\Yii::$app->cms->booleanFormat())],
+        ]);
+    }
+
+
     /**
      * @return \yii\widgets\ActiveField
      */
@@ -104,10 +123,11 @@ abstract class PropertyType extends Component
     }
 
     /**
-     * @return array
+     * Установка свойства перед сохранением
+     * @return $this
      */
-    public function getActiveFormConfig()
+    public function initInstance()
     {
-        return (array) $this->property->component_settings;
+        return $this;
     }
 }
