@@ -45,7 +45,6 @@ class UserPropertyTypeComboText extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        print_r($this->model);die;
         $field->widget(\skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
         [
             'ckeditorOptions' =>
