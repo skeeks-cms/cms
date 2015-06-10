@@ -133,7 +133,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         if ($this->limit)
         {
-            $this->dataProvider->query->limit($limit);
+            $this->dataProvider->query->limit($this->limit);
         }
 
 
