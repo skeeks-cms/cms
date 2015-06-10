@@ -232,6 +232,7 @@ class Cms extends \skeeks\cms\base\Component
                         'class'         => AdminOneModelSystemAction::className(),
                         'name'          => 'Системные данные',
                         "icon"          => "glyphicon glyphicon-cog",
+                        "priority"      => 9999,
                     ],
                 ]);
             }
