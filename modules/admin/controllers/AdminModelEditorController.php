@@ -160,6 +160,7 @@ class AdminModelEditorController extends AdminController
                     'class'         => ModelEditorGridAction::className(),
                     'name'          => 'Список',
                     "icon"          => "glyphicon glyphicon-th-list",
+                    "priority"      => 0,
                 ],
 
                 'create' =>
@@ -175,6 +176,7 @@ class AdminModelEditorController extends AdminController
                     'class'         => AdminOneModelUpdateAction::className(),
                     "name"         => "Редактировать",
                     "icon"          => "glyphicon glyphicon-pencil",
+                    "priority"      => 0,
                 ],
 
                 "delete" =>
@@ -186,6 +188,7 @@ class AdminModelEditorController extends AdminController
                     "method"        => "post",
                     "request"       => "ajax",
                     "callback"      => [$this, 'actionDelete'],
+                    "priority"      => 99999,
                 ]
             ]
         );
@@ -318,6 +321,13 @@ class AdminModelEditorController extends AdminController
         } else
         {
             $this->_actions = [];
+        }
+
+        //Сортировка по приоритетам
+        if ($this->_actions)
+        {
+            ArrayHelper::multisort($this->_actions, 'priority');
+
         }
 
         return $this->_actions;
