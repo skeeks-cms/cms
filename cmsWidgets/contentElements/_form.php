@@ -26,6 +26,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'allowDeselect' => true
         ]); ?>
 
+        <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint("Будет учитываться время начала и окончанию публикации");; ?>
+
         <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\User::find()->active()->all(),
             'id',

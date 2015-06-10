@@ -11,12 +11,15 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
+use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\ActionEvent;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminCmsContentTypeController
@@ -31,6 +34,23 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $this->modelClassName           = CmsContentElement::className();
 
         parent::init();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                'settings' =>
+                [
+                    'class'         => AdminModelEditorAction::className(),
+                    'name'          => 'Настройки',
+                    "icon"          => "glyphicon glyphicon-cog",
+                ],
+            ]
+        );
     }
 
     public $content;
@@ -52,6 +72,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return parent::beforeAction($action);
     }
+
 
     /**
      * @return string

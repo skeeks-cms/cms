@@ -9,6 +9,8 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminCmsTreeTypePropertyController
@@ -24,6 +26,21 @@ class AdminCmsTreeTypePropertyController extends AdminModelEditorController
 
         parent::init();
 
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                "update" =>
+                [
+                    "modelScenario" => RelatedPropertyModel::SCENARIO_UPDATE_CONFIG,
+                ],
+            ]
+        );
     }
 
 }

@@ -220,4 +220,17 @@ class CmsContentElement extends RelatedElementModel
             'code'  => $this->code,
         ])->toString();
     }
+
+    /**
+     * @return string
+     */
+    public function getAbsoluteUrl()
+    {
+        if ($this->cmsTree)
+        {
+            return $this->cmsTree->site->url . $this->getUrl();
+        }
+
+        return $this->getUrl();
+    }
 }

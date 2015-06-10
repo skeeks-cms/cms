@@ -45,4 +45,9 @@ trait AdminActionTrait
      * @var bool Показывается в меню или нет
      */
     public $visible = true;
+
+    /**
+     * @var int приоритет виляет на сортировку
+     */
+    public $priority = 100;
 }

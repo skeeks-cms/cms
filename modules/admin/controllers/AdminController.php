@@ -175,6 +175,15 @@ abstract class AdminController extends Controller
             $this->_actions = [];
         }
 
+        //Сортировка по приоритетам
+        if ($this->_actions)
+        {
+            ArrayHelper::multisort($this->_actions, 'priority');
+
+        }
+
         return $this->_actions;
     }
+
+
 }

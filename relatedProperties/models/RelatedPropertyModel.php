@@ -10,9 +10,12 @@
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\sx\String;
 use Yii;
+use yii\base\Model;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -47,6 +50,19 @@ use yii\widgets\ActiveForm;
  */
 abstract class RelatedPropertyModel extends Core
 {
+    const SCENARIO_UPDATE_CONFIG = "updateConfig";
+
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            Serialize::className() =>
+            [
+                'class' => Serialize::className(),
+                'fields' => ['component_settings']
+            ]
+        ]);
+    }
+
     public function init()
     {
         parent::init();
@@ -55,18 +71,35 @@ abstract class RelatedPropertyModel extends Core
         $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE,    [$this, "processBeforeSave"]);
     }
 
+    public function scenarios()
+    {
+        $scenarios                                  = parent::scenarios();
+        $scenarios[static::SCENARIO_UPDATE_CONFIG]  = $scenarios[static::SCENARIO_DEFAULT];
+
+        return $scenarios;
+    }
+
     public function processBeforeSave()
     {
         if ($this->component)
         {
-            /**
-             * @var $propertyType PropertyType
-             */
-            $propertyTypeClassName = $this->component;
-            $propertyType = new $propertyTypeClassName();
+            if ($this->scenario == static::SCENARIO_UPDATE_CONFIG)
+            {
+                $this->component_settings = unserialize(\skeeks\sx\String::base64DecodeUrl($this->component_settings));
 
-            $this->property_type    = $propertyType->code;
-            $this->multiple         = $propertyType->multiple ? Cms::BOOL_Y :  Cms::BOOL_N;
+                /**
+                 * @var $propertyType PropertyType
+                 */
+                $propertyTypeClassName      = $this->component;
+                $propertyType               = new $propertyTypeClassName();
+                $propertyType->attributes   = $this->component_settings;
+                $propertyType->initInstance();
+
+                $this->property_type    = $propertyType->code;
+                $this->multiple         = $propertyType->multiple;
+
+                $this->component_settings = serialize($this->component_settings);
+            }
         }
     }
 
@@ -109,20 +142,19 @@ abstract class RelatedPropertyModel extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'multiple_cnt', 'version'], 'integer'],
-            [['name'], 'required'],
-            [['component_settings'], 'string'],
+            [['name', 'component'], 'required'],
+            [['component_settings'], 'safe'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 64],
+
             [['active', 'property_type', 'list_type', 'multiple', 'with_description', 'searchable', 'filtrable', 'is_required', 'smart_filtrable'], 'string', 'max' => 1],
-            [['code'], 'unique'],
             ['code', 'default', 'value' => function($model, $attribute)
             {
                 return "property" . String::ucfirst(md5(rand(1, 10) . time()));
             }],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
+            ['priority', 'default', 'value' => 500],
+            [['active', 'searchable'], 'default', 'value' => Cms::BOOL_Y],
+            [['is_required', 'smart_filtrable', 'filtrable', 'with_description'], 'default', 'value' => Cms::BOOL_N],
         ]);
     }
 
@@ -145,7 +177,7 @@ abstract class RelatedPropertyModel extends Core
 
     /**
      * @param ActiveForm $activeForm
-     * @param $relatedElementModel $model
+     * @param \skeeks\cms\relatedProperties\models\RelatedElementModel $model
      * @return mixed
      */
     public function renderActiveForm(ActiveForm $activeForm, $model)
@@ -160,6 +192,8 @@ abstract class RelatedPropertyModel extends Core
             'property'      => $this,
             'activeForm'    => $activeForm,
         ]);
+
+        $propertyType->attributes = $this->component_settings;
 
         return $propertyType->renderForActiveForm();
     }
@@ -192,88 +226,4 @@ abstract class RelatedPropertyModel extends Core
 
         return $result;
     }
-
-
-    /**
-     * @param RelatedElementModel $relatedElementModel
-     * @return mixed
-     */
-    /*public function value($relatedElementModel)
-    {
-        if ($this->multiple == "Y")
-        {
-            if ($values = $relatedElementModel->findRelatedElementProperties($this->id)->all())
-            {
-                return ArrayHelper::map($values, "id", "value");
-            } else
-            {
-                return [];
-            }
-        } else
-        {
-            if ($value = $relatedElementModel->findRelatedElementProperties($this->id)->one())
-            {
-                return $value->value;
-            } else
-            {
-                return null;
-            }
-        }
-    }*/
-
-    /**
-     * @param RelatedElementModel $relatedElementModel
-     * @param $value
-     * @return $this
-     */
-    /*public function saveValue($relatedElementModel, $value)
-    {
-        if ($this->multiple == "Y")
-        {
-            $propertyValues = $relatedElementModel->findRelatedElementProperties($this->id)->all();
-            if ($propertyValues)
-            {
-                foreach ($propertyValues as $pv)
-                {
-                    $pv->delete();
-                }
-            }
-
-            $values = (array) $value;
-
-            if ($values)
-            {
-                foreach ($values as $key => $value)
-                {
-                    $productPropertyValue = new RelatedPropertiesModel([
-                        'element_id'    => $modelWhithProperties->id,
-                        'property_id'   => $this->id,
-                        'value'         => $value,
-                    ]);
-
-                    $productPropertyValue->save(false);
-                }
-            }
-
-        } else
-        {
-            /**
-             * @var $propertyValue ProductPropertyMap
-            if ($productPropertyValue = $modelWhithProperties->getPropertyValues()->where(['property_id' => $this->id])->one())
-            {
-                $productPropertyValue->value = $value;
-            } else
-            {
-                $productPropertyValue = new ProductPropertyMap([
-                    'product_id'    => $modelWhithProperties->id,
-                    'property_id'   => $this->id,
-                    'value'         => $value,
-                ]);
-            }
-
-            $productPropertyValue->save();
-        }
-
-        return $this;
-    }*/
 }

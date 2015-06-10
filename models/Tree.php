@@ -190,7 +190,7 @@ class Tree extends Core
             [['name'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
-            [['site_code'], 'string', 'max' => 5],
+            [['site_code'], 'string', 'max' => 15],
             [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'Для данного подраздела этот код уже занят.'],
             [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => 'The combination of Code and Pid has already been taken.'],
 

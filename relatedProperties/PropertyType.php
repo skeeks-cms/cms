@@ -11,9 +11,11 @@
 namespace skeeks\cms\relatedProperties;
 use skeeks\cms\base\Component;
 use skeeks\cms\base\widgets\ActiveForm;
+use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class PropertyType
@@ -37,12 +39,15 @@ abstract class PropertyType extends Component
      */
     public $name;
     /**
-     * @var bool множественный выбор
+     * @var string множественный выбор
      */
-    public $multiple    = false;
+    public $multiple    = Cms::BOOL_N;
 
     /**
-     * @var RelatedElementModel
+     * Это модель со свойствами
+     * Для полей формы используется $this->model->relatedPropertiesModel
+     *
+     * @var \skeeks\cms\relatedProperties\models\RelatedElementModel
      */
     public $model;
     /**
@@ -61,12 +66,30 @@ abstract class PropertyType extends Component
         //Не загружаем настройки по умолчанию (В родительском классе идет загрузка настроек из базы, тут этого не надо)
     }
 
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(),
+        [
+            'multiple'  => 'Множественный выбор',
+        ]);
+    }
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(),
+        [
+            ['multiple', 'string'],
+            ['multiple', 'in', 'range' => array_keys(\Yii::$app->cms->booleanFormat())],
+        ]);
+    }
+
+
     /**
      * @return \yii\widgets\ActiveField
      */
     public function renderForActiveForm()
     {
-        $field = $this->activeForm->field($this->model, $this->property->code);
+        $field = $this->activeForm->field($this->model->relatedPropertiesModel, $this->property->code);
 
         if (!$field)
         {
@@ -103,10 +126,11 @@ abstract class PropertyType extends Component
     }
 
     /**
-     * @return array
+     * Установка свойства перед сохранением
+     * @return $this
      */
-    public function getActiveFormConfig()
+    public function initInstance()
     {
-        return (array) $this->property->component_settings;
+        return $this;
     }
 }

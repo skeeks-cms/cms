@@ -11,6 +11,7 @@
 namespace skeeks\cms\modules\admin\widgets;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\assets\AdminFormAsset;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
@@ -93,6 +94,8 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
     public function run()
     {
         parent::run();
+
+        AdminFormAsset::register($this->view);
 
         if ($this->usePjax)
         {

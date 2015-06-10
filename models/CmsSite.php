@@ -130,7 +130,8 @@ class CmsSite extends Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
             [['code', 'lang_code', 'name'], 'required'],
             [['active', 'def'], 'string', 'max' => 1],
-            [['code', 'lang_code'], 'string', 'max' => 5],
+            [['code'], 'string', 'max' => 15],
+            [['lang_code'], 'string', 'max' => 5],
             [['name', 'server_name', 'description'], 'string', 'max' => 255],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
@@ -183,13 +184,14 @@ class CmsSite extends Core
 
 
     /**
+     * TODO: добавить настройку схемы в будущем.
      * @return string
      */
     public function getUrl()
     {
         if ($this->server_name)
         {
-            return '//' . $this->server_name;
+            return 'http://' . $this->server_name;
         }
 
         return \Yii::$app->request->hostInfo;
