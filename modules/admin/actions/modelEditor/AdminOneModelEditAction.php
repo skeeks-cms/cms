@@ -77,7 +77,7 @@ class AdminOneModelEditAction extends AdminModelEditorAction
         {
             $this->controller->view->params['breadcrumbs'][] = [
                 'label' => $this->controller->name,
-                'url' => UrlHelper::constructCurrent()->setRoute($baseRoute. '/' . $this->controller->defaultAction)->enableAdmin()->toString()
+                'url' => $this->controller->getIndexUrl()
             ];
         }
 
