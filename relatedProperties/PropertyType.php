@@ -44,7 +44,10 @@ abstract class PropertyType extends Component
     public $multiple    = Cms::BOOL_N;
 
     /**
-     * @var RelatedElementModel
+     * Это модель со свойствами
+     * Для полей формы используется $this->model->relatedPropertiesModel
+     *
+     * @var \skeeks\cms\relatedProperties\models\RelatedElementModel
      */
     public $model;
     /**
@@ -86,7 +89,7 @@ abstract class PropertyType extends Component
      */
     public function renderForActiveForm()
     {
-        $field = $this->activeForm->field($this->model, $this->property->code);
+        $field = $this->activeForm->field($this->model->relatedPropertiesModel, $this->property->code);
 
         if (!$field)
         {

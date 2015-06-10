@@ -17,7 +17,7 @@ use skeeks\cms\widgets\ActiveFormRelatedProperties as ActiveForm;
 ?>
 <? if ($properties = $modelHasRelatedProperties->relatedProperties) : ?>
     <? foreach ($properties as $property) : ?>
-        <?= $property->renderActiveForm($form, $modelHasRelatedProperties->getRelatedPropertiesModel())?>
+        <?= $property->renderActiveForm($form, $modelHasRelatedProperties)?>
     <? endforeach; ?>
 <? endif; ?>
 
