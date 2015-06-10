@@ -70,7 +70,7 @@ class PropertyTypeList extends PropertyType
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT)
         {
             $field = $this->activeForm->fieldSelect(
-                $this->model,
+                $this->model->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($this->property->enums, 'id', 'value'),
                 []
@@ -78,7 +78,7 @@ class PropertyTypeList extends PropertyType
         } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI)
         {
             $field = $this->activeForm->fieldSelectMulti(
-                $this->model,
+                $this->model->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($this->property->enums, 'id', 'value'),
                 []

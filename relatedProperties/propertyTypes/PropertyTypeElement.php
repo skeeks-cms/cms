@@ -56,7 +56,7 @@ class PropertyTypeElement extends PropertyType
         if ($this->multiple == Cms::BOOL_N)
         {
             $field = $this->activeForm->fieldSelect(
-                $this->model,
+                $this->model->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($find->all(), 'id', 'name'),
                 []
@@ -64,7 +64,7 @@ class PropertyTypeElement extends PropertyType
         } else if ($this->multiple == Cms::BOOL_Y)
         {
             $field = $this->activeForm->fieldSelectMulti(
-                $this->model,
+                $this->model->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($find->all(), 'id', 'name'),
                 []

@@ -177,7 +177,7 @@ abstract class RelatedPropertyModel extends Core
 
     /**
      * @param ActiveForm $activeForm
-     * @param $relatedElementModel $model
+     * @param \skeeks\cms\relatedProperties\models\RelatedElementModel $model
      * @return mixed
      */
     public function renderActiveForm(ActiveForm $activeForm, $model)
