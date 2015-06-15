@@ -54,9 +54,10 @@ abstract class Widget extends Component implements ViewContextInterface
 
         if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
         {
-            $pre = Html::tag('pre', Json::encode($this->attributes), [
+            $pre = "";
+            /*$pre = Html::tag('pre', Json::encode($this->attributes), [
                 'style' => 'display: none;'
-            ]);
+            ]);*/
 
             $id = 'sx-infoblock-' . $this->getId();
 
