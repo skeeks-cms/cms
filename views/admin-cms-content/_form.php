@@ -42,7 +42,7 @@ use common\models\User;
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet('Свойства элементов') ?>
+    <?= $form->fieldSet('Свойства') ?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => "Свойства элементов",
             'hint'              => "У каждого контента на сайте есть свой набор свойств, тут они и задаются",
