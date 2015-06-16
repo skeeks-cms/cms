@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\models\user;
 
+use skeeks\cms\components\Cms;
 use Yii;
 use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
@@ -43,11 +44,13 @@ class UserEmail extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'value'], 'required'],
-            [['user_id', 'created_at', 'updated_at', 'approved'], 'integer'],
+            [['value'], 'required'],
+            [['user_id', 'created_at', 'updated_at'], 'integer'],
             [['value', 'approved_key'], 'string'],
             [['value'], 'email'],
             [['value'], 'unique'],
+            [['approved'], 'string'],
+            [['approved'], 'default', 'value' => Cms::BOOL_N],
         ];
     }
 

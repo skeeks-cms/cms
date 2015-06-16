@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\models\user;
 
+use skeeks\cms\components\Cms;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use \yii\db\ActiveRecord;
@@ -44,9 +45,11 @@ class UserPhone extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'value'], 'required'],
-            [['user_id', 'created_at', 'updated_at', 'approved'], 'integer'],
+            [['value'], 'required'],
+            [['user_id', 'created_at', 'updated_at'], 'integer'],
             [['value', 'approved_key'], 'string'],
+            [['approved'], 'string'],
+            [['approved'], 'default', 'value' => Cms::BOOL_N],
         ];
     }
 
@@ -63,6 +66,8 @@ class UserPhone extends ActiveRecord
             'provider_data' => Yii::t('app', 'Provider Data'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
+            'approved' => "Подтвержден",
+            'value' => "Телефон",
         ];
     }
 

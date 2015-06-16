@@ -54,6 +54,8 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $image_cover
  * @property string $gender
  *
+ * @property string $displayName
+ *
  * @property UserAuthclient[] $userAuthclients
  */
 class User
