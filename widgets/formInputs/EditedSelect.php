@@ -91,6 +91,8 @@ HTML;
 
 
     echo "</div>";
+
+
         Pjax::end();
 
         $options = [
@@ -106,6 +108,11 @@ HTML;
 
                 _init: function()
                 {},
+
+                getWrapper: function()
+                {
+                    return $(this._wrapper);
+                },
 
                 _onDomReady: function()
                 {
@@ -164,6 +171,9 @@ HTML;
                         {
                             self.hideUpdateControll();
                         }
+                    } else
+                    {
+                        self.hideUpdateControll();
                     }
 
                     return this;
@@ -192,7 +202,14 @@ HTML;
 
                 reload: function()
                 {
-                    $.pjax.reload(this.getWrapper(), {});
+                    var self = this;
+
+                    $.pjax.reload("#" + this.getWrapper().attr('id'), {});
+
+                    _.delay(function()
+                    {
+                        self.updateButtons();
+                    }, 500);
                 }
             });
 
@@ -200,6 +217,7 @@ HTML;
         })(sx, sx.$, sx._);
 JS
 );
+
 
     }
 
