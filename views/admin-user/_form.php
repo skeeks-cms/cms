@@ -41,7 +41,10 @@ use common\models\User;
         'columns' => [
             //['class' => 'yii\grid\SerialColumn'],
             'value',
-            'approved',
+            [
+                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => 'approved',
+            ],
 
             [
                 'class'     => \yii\grid\DataColumn::className(),

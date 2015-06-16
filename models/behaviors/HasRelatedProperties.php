@@ -71,11 +71,11 @@ class HasRelatedProperties extends ActiveRecord
     /**
      * @return string
      */
-    public function renderRelatedPropertiesForm()
+    public function renderRelatedPropertiesForm($viewFile = '@skeeks/cms/views/blank-form')
     {
         try
         {
-            return \Yii::$app->view->render('@skeeks/cms/views/blank-form', [
+            return \Yii::$app->view->render($viewFile, [
                 'modelHasRelatedProperties'     => $this->owner,
             ]);
 
