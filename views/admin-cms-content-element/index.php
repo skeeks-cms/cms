@@ -57,42 +57,38 @@ if ($content_id = \Yii::$app->request->get('content_id'))
         ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
         //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
 
-
-        /*[
+        [
             'class'     => \yii\grid\DataColumn::className(),
-            'value'     => function($model)
+            'value'     => function(\skeeks\cms\models\CmsContentElement $model)
             {
-                $class = 'label-default';
-                if ($model->status == \skeeks\cms\models\behaviors\HasStatus::STATUS_ACTIVE)
+
+                return $model->cmsTree->name;
+
+            },
+            'format' => 'raw',
+            'attribute' => 'tree_id'
+        ],
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function(\skeeks\cms\models\CmsContentElement $model)
+            {
+                $result = [];
+
+                if ($model->cmsContentElementTrees)
                 {
-                    $class = 'label-success';
-                } else if ($model->status == \skeeks\cms\models\behaviors\HasStatus::STATUS_DELETED)
-                {
-                    $class = 'label-danger';
-                } else if ($model->status == \skeeks\cms\models\behaviors\HasStatus::STATUS_ONMODER)
-                {
-                    $class = 'label-warning';
+                    foreach ($model->cmsContentElementTrees as $contentElementTree)
+                    {
+                        $result[] = $contentElementTree->tree->name;
+                    }
                 }
-                return '<span class="label ' . $class . '">' . $model->getStatusText() . '</span>';
-            },
-            'format' => 'html'
-        ],*/
 
-        /*[
-            'class'     => \yii\grid\DataColumn::className(),
-            'value'     => function($model)
-            {
-
-                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->getPageUrl(), [
-                    'target' => '_blank',
-                    'title' => 'Посмотреть на сайте (Откроется в новом окне)',
-                    'data-pjax' => '0',
-                    'class' => 'btn btn-default btn-sm'
-                ]);
+                return implode(', ', $result);
 
             },
-            'format' => 'raw'
-        ],*/
+            'format' => 'raw',
+            'label' => 'Дополнительные разделы',
+        ],
 
         [
             'class'     => \yii\grid\DataColumn::className(),
