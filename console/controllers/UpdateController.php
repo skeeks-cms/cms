@@ -155,12 +155,12 @@ class UpdateController extends Controller
         if (file_exists($composer))
         {
             $this->stdoutN("composer есть, обновляем его");
-            $this->systemCmdRoot("php composer.phar self-update");
+            $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar self-update 1.0.0-alpha10");
         } else
         {
-            $this->stdoutN("composer не надйен");
+            $this->stdoutN("composer не найден");
             $this->systemCmdRoot('php -r "readfile(\'https://getcomposer.org/installer\');" | php');
-            $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar global require \"fxp/composer-asset-plugin:1.0.0\" --profile"');
+            $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar global require \"fxp/composer-asset-plugin:1.0.2\" --profile"');
         }
     }
 
