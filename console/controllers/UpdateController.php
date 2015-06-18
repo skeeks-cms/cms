@@ -14,6 +14,7 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\rbac\AuthorRule;
 use skeeks\sx\Dir;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 /**
@@ -31,16 +32,43 @@ class UpdateController extends Controller
         $this->_initRootPath();
     }
 
-    /*public $all = false;
+
+    /**
+     * @var bool
+     * optimize-autoloader оптимизировать автолоадер? (рекоммендуется)
+     */
+    public $optimize = true;
+
+    /**
+     * @var string
+     * Версия композера, последняя стабильная
+     */
+    public $composerVersion = "1.0.0-alpha10";
+
+    /**
+     * @var string
+     * Версия композер assets, последняя стабильная
+     */
+    public $composerAssetPluginV = "1.0.2";
+
+
+    /**
+     * @var bool
+     * --profile добавлять к запросам на исполнения команд композер --profile опцию
+     */
+    public $composerProfile = true;
+
+
+
     /**
      * @inheritdoc
      */
-    /*public function options($actionID)
+    public function options($actionID)
     {
-        return array_merge(parent::options($actionID), [
-            'all'
+        return ArrayHelper::merge(parent::options($actionID), [
+            'optimize', 'composerVersion', 'composerProfile', 'composerAssetPluginV'
         ]);
-    }*/
+    }
 
     /**
      * Полное обновление проекта
@@ -155,13 +183,13 @@ class UpdateController extends Controller
         if (file_exists($composer))
         {
             $this->stdoutN("composer есть, обновляем его");
-            $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar self-update 1.0.0-alpha10");
+            $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar self-update " . $this->composerVersion);
         } else
         {
             $this->stdoutN("composer не найден");
             $this->systemCmdRoot('php -r "readfile(\'https://getcomposer.org/installer\');" | php');
-            $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar self-update 1.0.0-alpha10");
-            $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar global require "fxp/composer-asset-plugin:1.0.2" --profile"');
+            $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar self-update " . $this->composerVersion);
+            $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar global require "fxp/composer-asset-plugin:' . $this->composerAssetPluginV . '" "' . ($this->composerProfile ? " --profile": "") );
         }
     }
 
@@ -170,7 +198,13 @@ class UpdateController extends Controller
      */
     public function actionUpdateComposerJson()
     {
-        $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar update --profile");
+        $cmd = "COMPOSER_HOME=.composer php composer.phar update " . ($this->composerProfile ? " --profile": "");
+        if ($this->optimize)
+        {
+            $cmd .= " -o";
+        }
+
+        $this->systemCmdRoot($cmd);
     }
 
     protected function _initRootPath()
