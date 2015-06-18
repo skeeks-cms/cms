@@ -63,8 +63,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsContentElement[]        $cmsContentElements
  * @property CmsContentElementTree[]    $cmsContentElementTrees
- * @property CmsTree                    $parentTree
- * @property CmsTree[]                  $parentTrees
+ * @property Tree                    $parentTree
+ * @property Tree[]                  $parentTrees
  * @property CmsSite                    $site
  * @property CmsTreeType                $treeType
  * @property CmsTreeProperty[]          $cmsTreeProperties
