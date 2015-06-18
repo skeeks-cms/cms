@@ -13,8 +13,6 @@ use skeeks\cms\helpers\UrlHelper;
 AdminAsset::register($this);
 \Yii::$app->admin->registerAsset($this);
 
-
-
 $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 ?>
@@ -56,6 +54,12 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
             <a href="/" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
+        </li>
+
+        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+            <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="Переключение полноэкранного режима">
+                <i class="glyphicon glyphicon-fullscreen"></i>
+            </a>
         </li>
 
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
@@ -194,7 +198,9 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <div class="row">
         <div class="col-sm-5">
             <div class="sx-footer-copyright">
-                <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
+                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт SkeekS CMS">
+                    <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
+                </a>
                 | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
             </div>
         </div><!--/.col-->

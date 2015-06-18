@@ -33,6 +33,7 @@ class AdminAsset extends AssetBundle
         'js/classes/Iframe.js',
         'js/classes/Window.js',
         'js/classes/modal/Dialog.js',
+        'js/classes/Fullscreen.js',
         'js/app.js',
     ];
     public $depends = [
@@ -44,7 +45,8 @@ class AdminAsset extends AssetBundle
         '\skeeks\sx\assets\ComponentAjaxLoader',
         '\skeeks\cms\modules\admin\assets\JqueryScrollbarAsset',
         '\skeeks\cms\modules\admin\assets\ThemeRealAdminAsset',
-        '\skeeks\cms\assets\FancyboxAssets'
+        '\skeeks\cms\assets\FancyboxAssets',
+        '\skeeks\cms\assets\JqueryFullscreenAsset'
     ];
 }
 
