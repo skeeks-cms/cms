@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\modules\admin\widgets;
 
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
@@ -86,18 +87,16 @@ class ControllerActions
             return "";
         }
 
-        $result = $this->renderListLi($actions);
+        $result = $this->renderListLi();
 
         Asset::register($this->getView());
         return Html::tag("ul", implode($result), $this->ulOptions);
     }
 
     /**
-     * @param array $actions
-     * @param ActionManager $actionManager
      * @return array
      */
-    public function renderListLi($actions = [])
+    public function renderListLi()
     {
         $result = [];
 
@@ -115,32 +114,10 @@ class ControllerActions
                 continue;
             }
 
-            $linkOptions = [];
+            $tagA = $this->renderActionTagA($action);
 
-            $url = $action->url;
-            if ($this->isOpenNewWindow)
-            {
-                $url->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
-            }
-
-
-            $actionData = array_merge($this->clientOptions, [
-                "url"               => (string) $url,
-                "isOpenNewWindow"   => $this->isOpenNewWindow,
-                "confirm"           => $action->confirm,
-                "method"            => $action->method,
-                "request"           => $action->request,
-            ]);
-
-            $icon = '';
-            if ($action->icon)
-            {
-                $icon = Html::tag('span', '', ['class' => $action->icon]);
-            }
-
-            $actionDataJson = Json::encode($actionData);
-            $result[] = Html::tag("li",
-                Html::a($icon . '  ' . $action->name, $action->getUrl(), $linkOptions),
+            $actionDataJson = Json::encode($this->getActionData($action));
+            $result[] = Html::tag("li", $tagA,
                 [
                     "class" => $this->activeActionId == $action->id ? "active" : "",
                     "onclick" => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;"
@@ -149,5 +126,70 @@ class ControllerActions
         }
 
         return $result;
+    }
+
+    /**
+     * @param AdminAction $action
+     * @return array
+     */
+    public function getActionData($action)
+    {
+        $actionData = array_merge($this->clientOptions, [
+            "url"               => (string) $this->getActionUrl($action),
+            "isOpenNewWindow"   => $this->isOpenNewWindow,
+            "confirm"           => $action->confirm,
+            "method"            => $action->method,
+            "request"           => $action->request,
+        ]);
+
+        return $actionData;
+    }
+
+    /**
+     * @param AdminAction $action
+     */
+    public function renderActionTagA($action, $tagOptions = [])
+    {
+        if (!$action->visible)
+        {
+            return "";
+        }
+
+        $icon = '';
+        if ($action->icon)
+        {
+            $icon = Html::tag('span', '', ['class' => $action->icon]);
+        }
+
+        return Html::a($icon . '  ' . $action->name, $this->getActionUrl($action), $tagOptions);
+    }
+
+    /**
+     * @param AdminAction $action
+     * @return string
+     */
+    public function getSpanIcon($action)
+    {
+        $icon = '';
+        if ($action->icon)
+        {
+            $icon = Html::tag('span', '', ['class' => $action->icon]);
+        }
+
+        return $icon;
+    }
+    /**
+     * @param AdminAction $action
+     * @return UrlHelper
+     */
+    public function getActionUrl($action)
+    {
+        $url = $action->url;
+        if ($this->isOpenNewWindow)
+        {
+            $url->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+        }
+
+        return $url;
     }
 }

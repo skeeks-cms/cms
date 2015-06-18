@@ -22,7 +22,7 @@ class WidgetRenderable extends Widget
     /**
      * @var null Файл в котором будет реднериться виджет
      */
-    public $viewFile    = null;
+    public $viewFile    = "default";
 
     public function attributeLabels()
     {

@@ -74,7 +74,13 @@ class RelatedModelsGrid extends Widget
         $rerlation = [];
         foreach ($this->relation as $relationLink => $parent)
         {
-            $rerlation[$relationLink] = $this->parentModel->{$parent};
+            if ($this->parentModel->getAttribute($parent))
+            {
+                $rerlation[$relationLink] = $this->parentModel->{$parent};
+            } else
+            {
+                $rerlation[$relationLink] = $parent;
+            }
         }
 
         $createUrl = \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->controllerCreateAction, $rerlation)

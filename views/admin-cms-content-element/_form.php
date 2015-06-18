@@ -7,6 +7,14 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
+
+ if ($model->isNewRecord)
+ {
+     if ($tree_id = \Yii::$app->request->get("tree_id"))
+     {
+         $model->tree_id = $tree_id;
+     }
+ }
 ?>
 
 <?php $form = ActiveForm::begin(); ?>

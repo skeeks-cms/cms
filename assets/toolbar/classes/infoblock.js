@@ -20,6 +20,12 @@
             this.jWrapper = $('#' + this.get('id'));
             this._createBorder();
 
+            var height  = this.jWrapper.height();
+            if (height == 0)
+            {
+                this.jWrapper.css('height', '10px');
+            }
+
             this.jWrapper.hover(
                 function ()
                 {

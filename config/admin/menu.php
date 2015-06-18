@@ -152,6 +152,18 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png']
             ],
 
+            [
+                "label"     => "База email адресов",
+                "url"       => ["cms/admin-user-email"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/email-2.png']
+            ],
+
+            [
+                "label"     => "База телефонов",
+                "url"       => ["cms/admin-user-phone"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/phone.png']
+            ],
+
             /*[
                 "label"     => "Управление группами пользователей",
                 "url"       => ["cms/admin-user-group"],

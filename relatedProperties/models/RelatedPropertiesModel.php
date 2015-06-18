@@ -8,10 +8,12 @@
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
+use skeeks\cms\relatedProperties\PropertyType;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -29,6 +31,11 @@ class RelatedPropertiesModel extends Model
      */
     public $relatedElementModel = null;
 
+    /**
+     * @var RelatedPropertyModel[]
+     */
+    private $_properties = [];
+
     public function init()
     {
         parent::init();
@@ -38,6 +45,7 @@ class RelatedPropertiesModel extends Model
             foreach ($this->relatedElementModel->relatedProperties as $property)
             {
                 $this->_attributes[$property->code] = $this->relatedElementModel->getRelatedPropertyValue($property);
+                $this->_properties[$property->code] = $property;
             }
         }
     }
@@ -215,5 +223,53 @@ class RelatedPropertiesModel extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $name
+     * @return RelatedPropertyModel
+     */
+    public function getRelatedProperty($name)
+    {
+        return ArrayHelper::getValue($this->_properties, $name);
+    }
+
+    public function getSmartAttribute($name)
+    {
+        /**
+         * @var $property RelatedPropertyModel
+         */
+        $value      = $this->getAttribute($name);
+        $property   = $this->getRelatedProperty($name);
+
+        if ($property->property_type == PropertyType::CODE_LIST)
+        {
+            if ($property->multiple == Cms::BOOL_Y)
+            {
+                if ($property->enums)
+                {
+                    $result = [];
+
+                    foreach ($property->enums as $enum)
+                    {
+                        $result[$enum->code] = $enum->value;
+                    }
+
+                    return $result;
+                }
+            } else
+            {
+                if ($property->enums)
+                {
+                    $enum = array_shift($property->enums);
+                    return $enum->value;
+                }
+
+                return "";
+            }
+        } else
+        {
+            return $value;
+        }
     }
 }

@@ -37,16 +37,47 @@ class DropdownControllerActions
 
     public $containerClass = 'dropdown';
 
+    public $renderFirstAction = true;
+
     /**
      * @return string
      */
     public function run()
     {
+        if ($this->controller->actions)
+        {
+            $firstAction = array_shift($this->controller->actions);
+        }
+
+        $style = '';
+        $firstActionString = '';
+
+        if ($firstAction && $this->renderFirstAction)
+        {
+            $actionDataJson = Json::encode($this->getActionData($firstAction));
+
+            $tagOptions = [
+                "onclick"   => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;",
+                "class"     => "btn btn-xs btn-default",
+                "title"     => $firstAction->name
+            ];
+
+            $firstActionString = Html::a($this->getSpanIcon($firstAction), $this->getActionUrl($firstAction), $tagOptions);
+            $style = 'min-width: 43px;';
+        }
+
+
         return "<div class='{$this->containerClass}' title='Возможные действия'>
-                    <button type=\"button\" class='btn btn-xs btn-default' data-toggle=\"dropdown\">
-                       <span class=\"caret\"></span>
-                    </button>" .
+                    <div class=\"btn-group\" role=\"group\" style='{$style}'>
+                        {$firstActionString}
+                        <button type=\"button\" class='btn btn-xs btn-default' data-toggle=\"dropdown\">
+                           <span class=\"caret\"></span>
+                        </button>" .
                     parent::run()
-                . "</div>";
+
+                . "
+                    </div>
+                </div>
+                ";
     }
 }
