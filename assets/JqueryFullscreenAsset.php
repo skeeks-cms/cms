@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (—ÍËÍ—)
+ * @copyright 2010 SkeekS (–°–∫–∏–∫–°)
  * @date 18.06.2015
  */
 namespace skeeks\cms\assets;
@@ -14,9 +14,15 @@ use skeeks\cms\base\AssetBundle;
  */
 class JqueryFullscreenAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/jq-fullscreen/source';
+    public $sourcePath = '@bower/jq-fullscreen';
 
-    public $js = [];
+    public $js = [
+        'release/jquery.fullscreen.min.js'
+    ];
 
     public $css = [];
+
+    public $depends = [
+        '\skeeks\sx\assets\Core',
+    ];
 }
