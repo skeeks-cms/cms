@@ -3,6 +3,7 @@
 
 2.0.0.pre (unreleased)
 -----------------
+  * Обновлены установочные скрипты + тест
   * Доработка cms/update console tool
   * В системе администрирования добавлен FullScrenn режим
   * Новая консольный контроллер с полезными утилитами UtilsController (php yii help cms/utils)
