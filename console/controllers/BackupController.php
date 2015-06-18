@@ -27,7 +27,6 @@ class BackupController extends Controller
      */
     public function actionDb()
     {
-        print_r(\Yii::$app->db->ser);
 
     }
 
@@ -37,7 +36,6 @@ class BackupController extends Controller
     public function actionFiles()
     {
 
-
     }
 
     /**
@@ -45,7 +43,6 @@ class BackupController extends Controller
      */
     public function actionAll()
     {
-
 
     }
 }
