@@ -373,6 +373,7 @@ JS
                             Html::tag("div",
                                     DropdownControllerActions::widget([
                                         "controller"    => $controller,
+                                        "renderFirstAction"    => false,
                                         "containerClass"     => "dropdown pull-left",
                                         'clientOptions' =>
                                         [
