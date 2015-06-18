@@ -8,6 +8,31 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $model Tree */
 ?>
 
+<div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="pull-left">
+                <? if ($model->parentTrees) : ?>
+                    <? foreach ($model->parentTrees as $tree) : ?>
+                        <a href="<?= $tree->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
+                            <?= $tree->name ?>
+                            <? if ($tree->level == 0) : ?>
+                                [<?= $tree->site->name; ?>]
+                            <? endif;  ?>
+                        </a>
+                        /
+                    <? endforeach; ?>
+                <? endif; ?>
+                <a href="<?= $model->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
+                    <?= $model->name; ?>
+                </a>
+            </div>
+            <div class="pull-right">
+
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php $form = ActiveForm::begin(); ?>
 
@@ -153,20 +178,45 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
     ?>
 
-<!--<div data-listen="isLink" data-show="0" class="sx-hide">
-
-    <?/*= $form->field($model, 'tree_ids')->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-        [
-            'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI
-        ])->label('Дополнительные разделы сайта')->hint('Дополнительные разделы сайта, где бы хотелось видеть этот раздел.');
-    */?>
-
-</div>-->
-
-
 <?= $form->fieldSetEnd() ?>
 
+
+<?
+$columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_columns.php');
+/**
+ * @var $content \skeeks\cms\models\CmsContent
+ */
+?>
+<? if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : ?>
+    <? foreach ($contents as $content) : ?>
+        <?= $form->fieldSet($content->name) ?>
+
+
+            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                'label'             => $content->name,
+                'hint'              => "Показаны все элементы типа '{$content->name}' связанные с этим разделом. Учитывается только главная привязка.",
+                'parentModel'       => $model,
+                'relation'          => [
+                    'tree_id'       => 'id',
+                    'content_id'    => $content->id
+                ],
+
+                'sort'              => [
+                    'defaultOrder' =>
+                    [
+                        'priority' => 'published_at'
+                    ]
+                ],
+
+                'controllerRoute'   => 'cms/admin-cms-content-element',
+                'gridViewOptions'   => [
+                    'columns' => (array) include $columnsFile
+                ],
+            ]); ?>
+
+        <?= $form->fieldSetEnd() ?>
+    <? endforeach; ?>
+<? endif; ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
