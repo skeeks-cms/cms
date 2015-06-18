@@ -26,13 +26,6 @@ class UpdateController extends Controller
 {
     public $defaultAction = 'all';
 
-    public function init()
-    {
-        parent::init();
-        $this->_initRootPath();
-    }
-
-
     /**
      * @var bool
      * optimize-autoloader оптимизировать автолоадер? (рекоммендуется)
@@ -179,7 +172,7 @@ class UpdateController extends Controller
      */
     public function actionComposerUpdate()
     {
-        $composer = \Yii::getAlias('@root/composer.phar');
+        $composer = ROOT_DIR . "/composer.phar";
         if (file_exists($composer))
         {
             $this->stdoutN("composer есть, обновляем его");
@@ -207,8 +200,4 @@ class UpdateController extends Controller
         $this->systemCmdRoot($cmd);
     }
 
-    protected function _initRootPath()
-    {
-        \Yii::setAlias('root', dirname(\Yii::getAlias('@common')));
-    }
 }
