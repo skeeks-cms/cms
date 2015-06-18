@@ -21,7 +21,7 @@ use Yii;
  * Class Ckeditor
  * @package skeeks\cms\widgets\formInputs\ckeditor
  */
-class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
+class CkeditorBad extends \skeeks\widget\ckeditor\CKEditor
 {
 
     public $callbackImages;
