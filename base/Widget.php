@@ -7,9 +7,11 @@
  */
 namespace skeeks\cms\base;
 
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\traits\WidgetTrait;
 use yii\base\ViewContextInterface;
+use yii\db\Exception;
 use yii\helpers\Html;
 use yii\helpers\Json;
 
@@ -46,8 +48,8 @@ abstract class Widget extends Component implements ViewContextInterface
             \Yii::beginProfile("Run: " . $this->_token);
                 $content = $this->_run();
             \Yii::endProfile("Run: " . $this->_token);
-
-        } catch (\Exception $e)
+        }
+        catch (\Exception $e)
         {
             $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
         }

@@ -77,6 +77,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
 
 
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -139,36 +140,21 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     {
         parent::init();
 
-
+        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
+        {
+            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+        }
     }
+
     /**
      * @inheritdoc
      */
     public function bootstrap($app)
     {
-        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
-        {
-            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
-        }
-
-        if (!$this->enabled || \Yii::$app->user->isGuest)
-        {
-            $this->enabled = false;
-            return;
-        }
-
-        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
-        {
-            $this->enabled = false;
-        }
-
-        if ($this->enabled)
-        {
-            // delay attaching event handler to the view component after it is fully configured
-            $app->on(Application::EVENT_BEFORE_REQUEST, function () use ($app) {
-                $app->getView()->on(View::EVENT_END_BODY, [$this, 'renderToolbar']);
-            });
-        }
+        // delay attaching event handler to the view component after it is fully configured
+        $app->on(Application::EVENT_BEFORE_REQUEST, function () use ($app) {
+            $app->getView()->on(View::EVENT_END_BODY, [$this, 'renderToolbar']);
+        });
     }
 
     /**
@@ -182,6 +168,21 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         {
             return;
         }
+
+        if (\Yii::$app->user->isGuest)
+        {
+            $this->enabled = false;
+            return;
+        }
+
+
+        if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
+        {
+            $this->enabled = false;
+            return;
+        }
+
+
 
         $editModel = null;
         $urlEditModel = "";
