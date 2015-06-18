@@ -441,7 +441,10 @@ class User
             return static::findOne(['id' => $id, 'active' => Cms::BOOL_Y]);
         } catch(\yii\db\Exception $e)
         {
-            //throw new NotConnectedToDbException;
+            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
+            {
+                throw new NotConnectedToDbException;
+            }
         }*/
     }
 

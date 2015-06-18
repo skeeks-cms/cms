@@ -14,4 +14,6 @@ use yii\base\UserException;
  * @package skeeks\cms\exceptions
  */
 class NotConnectedToDbException extends UserException
-{}
+{
+    static public $invalidConnectionCodes = [1049, 2002, 1045];
+}
