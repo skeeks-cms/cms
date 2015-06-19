@@ -44,9 +44,9 @@ class BackupController extends Controller
     }
 
     /**
-     * Бэкап базы данных
+     * Сделать бэкап базы данных
      */
-    public function actionGoDb()
+    public function actionDbExecute()
     {
         $result = \Yii::$app->dbDump->dumpRun();
         $this->stdoutN($result);
@@ -56,16 +56,11 @@ class BackupController extends Controller
      * Бэкап файлов
      */
     public function actionFiles()
-    {
-
-    }
+    {}
 
     /**
      * Полный бэкап, база файлы все.
      */
-    public function actionAll()
-    {
-
-    }
-
+    public function actionFull()
+    {}
 }
