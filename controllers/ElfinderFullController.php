@@ -88,5 +88,7 @@ class ElfinderFullController extends ElfinderController
         }
 
         parent::init();
+
+        \Yii::$app->cmsToolbar->enabled = false;
     }
 }

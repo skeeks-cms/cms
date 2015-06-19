@@ -182,8 +182,6 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             return;
         }
 
-
-
         $editModel = null;
         $urlEditModel = "";
         $urlUserEdit = UrlHelper::construct('cms/admin-profile/update')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
