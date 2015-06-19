@@ -75,18 +75,9 @@ class DbController extends AdminController
         ]);
 
 
-        $dbBackupDir = new Dir(BACKUP_DIR . "/db");
-        if (!$dbBackupDir->isExist())
-        {
-            $dbBackupDir->make();
-        }
-
-
-
-
         return $this->render('index', [
             'dataProvider'  => $dataProvider,
-            'dbBackupDir'  => $dbBackupDir,
+            'dbBackupDir'  => \Yii::$app->dbDump->backupDir,
         ]);
     }
 
@@ -96,68 +87,26 @@ class DbController extends AdminController
 
         if ($rr->isRequestAjaxPost())
         {
-            $dbBackupDir = new Dir(BACKUP_DIR . "/db");
-            if (!$dbBackupDir->isExist())
+
+            try
             {
-                $dbBackupDir->make();
+                $result = \Yii::$app->dbDump->dumpRun();
+
+                $rr->success = true;
+                $rr->message = "Копия создана успешно";
+                $rr->data = [
+                    'result' => $result
+                ];
+
+            } catch (\Exception $e)
+            {
+                $rr->success = false;
+                $rr->message = $e->getMessage();
             }
-
-            $dsnData = $this->getDsnData();
-            $username = \Yii::$app->db->username;
-            $password = \Yii::$app->db->password;
-            $dbname = ArrayHelper::getValue($dsnData, 'dbname');
-            $host = ArrayHelper::getValue($dsnData, 'host');
-
-            $file = $dbBackupDir->newFile(date('Y-m-d_H:i:s') . ".sql.gz");
-            $filePath = $file->getPath();
-
-            $cmd = "mysqldump -h{$host} -u {$username} -p{$password} {$dbname} | gzip > {$filePath}";
-
-            ob_start();
-            system($cmd);
-            $result = ob_get_clean();
-
-
-            $rr->success = true;
-            $rr->message = "Копия создана успешно";
-            $rr->data = [
-                'result' => $result
-            ];
 
             return $rr;
         }
 
         return $rr;
     }
-
-    /**
-     * @return array
-     */
-    public function getDsnData()
-    {
-        //TODO: it's bad tmp code
-        $dsnData = [];
-
-        $dsn = \Yii::$app->db->dsn;
-        if ($strpos = strpos($dsn, ':'))
-        {
-            $dsn = substr($dsn, ($strpos + 1), strlen(\Yii::$app->db->dsn));
-        };
-
-        $dsnDataTmp = explode(';', $dsn);
-        if ($dsnDataTmp)
-        {
-            foreach ($dsnDataTmp as $data)
-            {
-                $tmpData = explode("=", $data);
-                $dsnData[$tmpData[0]] = $tmpData[1];
-            }
-        }
-
-        $dsnData['username'] = \Yii::$app->db->username;
-        $dsnData['password'] = \Yii::$app->db->password;
-
-        return $dsnData;
-    }
-
 }
