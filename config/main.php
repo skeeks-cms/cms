@@ -147,6 +147,11 @@ $config =
         'currentSite' =>
         [
             'class' => '\skeeks\cms\components\CurrentSite',
+        ],
+
+        'dbDump' =>
+        [
+            'class' => '\skeeks\cms\components\db\DbDumpComponent',
         ]
     ],
 

@@ -16,6 +16,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ControlToolbar;
 use skeeks\cms\components\CurrentSite;
+use skeeks\cms\components\db\DbDumpComponent;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\Langs;
 use skeeks\cms\components\PublicationTypes;
@@ -44,6 +45,7 @@ use yii\authclient\Collection;
  * @property AdminSettings                  $admin
  * @property CurrentSite                    $currentSite
  * @property Collection                     $authClientCollection
+ * @property DbDumpComponent                $dbDump
  *
  * Class Application
  * @package yii\web

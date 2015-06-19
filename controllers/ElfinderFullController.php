@@ -79,6 +79,12 @@ class ElfinderFullController extends ElfinderController
                 'path'      => 'assets',
                 'name'      => 'Временные js и css'
             ];
+
+            $this->roots[] =
+            [
+                'basePath'  => BACKUP_DIR,
+                'name'      => 'Бэкапы'
+            ];
         }
 
         parent::init();

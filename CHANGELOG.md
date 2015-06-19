@@ -3,7 +3,8 @@
 
 2.0.0.pre (unreleased)
 -----------------
-  * Доработка onsole tools cms/backup/go-db и cms/backup/db-list
+  * Новый component dbDump
+  * Доработка console tools cms/backup/go-db и cms/backup/db-list
   * Доработка отображения ошибки, при отсутствии коннекта к базе данных
   * Обновлены установочные скрипты + тест
   * Доработка cms/update console tool

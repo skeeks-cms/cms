@@ -29,8 +29,7 @@ class BackupController extends Controller
      */
     public function actionDbList()
     {
-        $dbBackupDir = new Dir(BACKUP_DIR . "/db");
-        if (!$dbBackupDir->isExist() || !$files = $dbBackupDir->findFiles())
+        if (!\Yii::$app->dbDump->backupDir->isExist() || !$files = \Yii::$app->dbDump->backupDir->findFiles())
         {
             $this->stdoutN('Бэкапов не найдено');
             return;
@@ -49,24 +48,8 @@ class BackupController extends Controller
      */
     public function actionGoDb()
     {
-        $dbBackupDir = new Dir(BACKUP_DIR . "/db");
-        if (!$dbBackupDir->isExist())
-        {
-            $dbBackupDir->make();
-        }
-
-        $dsnData = $this->getDsnData();
-        $username = \Yii::$app->db->username;
-        $password = \Yii::$app->db->password;
-        $dbname = ArrayHelper::getValue($dsnData, 'dbname');
-        $host = ArrayHelper::getValue($dsnData, 'host');
-
-        $file = $dbBackupDir->newFile(date('Y-m-d_H:i:s') . ".sql.gz");
-        $filePath = $file->getPath();
-
-        $cmd = "mysqldump -h{$host} -u {$username} -p{$password} {$dbname} | gzip > {$filePath}";
-        $this->systemCmd($cmd);
-
+        $result = \Yii::$app->dbDump->dumpRun();
+        $this->stdoutN($result);
     }
 
     /**
@@ -85,38 +68,4 @@ class BackupController extends Controller
 
     }
 
-
-
-
-
-
-    /**
-     * @return array
-     */
-    public function getDsnData()
-    {
-        //TODO: it's bad tmp code
-        $dsnData = [];
-
-        $dsn = \Yii::$app->db->dsn;
-        if ($strpos = strpos($dsn, ':'))
-        {
-            $dsn = substr($dsn, ($strpos + 1), strlen(\Yii::$app->db->dsn));
-        };
-
-        $dsnDataTmp = explode(';', $dsn);
-        if ($dsnDataTmp)
-        {
-            foreach ($dsnDataTmp as $data)
-            {
-                $tmpData = explode("=", $data);
-                $dsnData[$tmpData[0]] = $tmpData[1];
-            }
-        }
-
-        $dsnData['username'] = \Yii::$app->db->username;
-        $dsnData['password'] = \Yii::$app->db->password;
-
-        return $dsnData;
-    }
 }
