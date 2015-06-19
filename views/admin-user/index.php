@@ -44,13 +44,19 @@
                 {
                     foreach ($roles as $role)
                     {
-                        $result[] = $role->name;
+                        $result[] = $role->description . " ({$role->name})";
                     }
                 }
 
                 return implode(', ', $result);
             },
-            'format' => 'html',
+            'format'    => 'html',
+            'label'     => 'Роли',
+        ],
+
+        [
+            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute'     => "active"
         ],
 
     ],
