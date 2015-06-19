@@ -16,6 +16,8 @@ use common\models\User;
 <?= $form->fieldSet('Общая ниформация')?>
 
 
+    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
+
     <?= $form->field($model, 'image')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
         [
