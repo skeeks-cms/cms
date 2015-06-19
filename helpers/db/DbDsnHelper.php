@@ -35,6 +35,7 @@ class DbDsnHelper
     public $password    = "";
     public $host        = "";
     public $dbname      = "";
+    public $charset     = "utf8";
 
     public function __construct(Connection $connection, $data = [])
     {
@@ -55,6 +56,7 @@ class DbDsnHelper
     {
         $this->username = $this->connection->username;
         $this->password = $this->connection->password;
+        $this->charset  = $this->connection->charset;
 
         $dsn = $this->connection->dsn;
         if ($strpos = strpos($dsn, ':'))

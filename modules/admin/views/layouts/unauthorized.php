@@ -179,19 +179,24 @@ JS
     <img src="<?= $urlBg; ?>" id="sx-auth-bg"/></div>
 </div>
 
+
+
 <footer class="sx-admin-footer">
     <div class="row">
         <div class="col-sm-5">
             <div class="sx-footer-copyright">
-            <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
-             | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
-            </div><!--/.col-->
+                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт SkeekS CMS">
+                    <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
+                </a>
+                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
+            </div>
         </div><!--/.col-->
         <div class="col-sm-7 text-right">
 
         </div><!--/.col-->
     </div><!--/.row-->
 </footer>
+
 
     <?php $this->endBody() ?>
 
