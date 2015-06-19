@@ -28,15 +28,21 @@ class ComposerController extends Controller
 
     /**
      * @var
-     * Increase verbosity of messages.
+     * --verbose (-v): Increase verbosity of messages.
      */
     public $verbose;
 
     /**
      * @var
-     * Display timing and memory usage information
+     * --profile: Display timing and memory usage information
      */
     public $profile = true;
+
+    /**
+     * @var bool
+     * --no-interaction (-n): Do not ask any interactive question.
+     */
+    public $noInteraction = false;
 
     /**
      * @inheritdoc
@@ -44,16 +50,39 @@ class ComposerController extends Controller
     public function options($actionID)
     {
         return ArrayHelper::merge(parent::options($actionID), [
-            'verbose', 'profile'
+            'verbose', 'profile', 'noInteraction'
         ]);
     }
+
+    public function init()
+    {
+        parent::init();
+
+        //Проверка наличия composer, установка если нет.
+        $composer = ROOT_DIR . "/composer.phar";
+        if (!file_exists($composer))
+        {
+            $this->systemCmdRoot('php -r "readfile(\'https://getcomposer.org/installer\');" | php');
+            $this->actionSelfUpdate();
+        }
+
+        if (!file_exists($composer))
+        {
+            throw new \InvalidArgumentException("composer.phar file не найден");
+        }
+    }
+
+
+
+
+
 
     /**
      * Текущая версия установленного композера
      */
     public function actionVersion()
     {
-        $this->composerCmd('-V');
+        $this->_composerCmd('-V');
     }
 
     /**
@@ -61,7 +90,7 @@ class ComposerController extends Controller
      */
     public function actionHelp()
     {
-        $this->composerCmd('--help');
+        $this->_composerCmd('--help');
     }
 
     /**
@@ -69,7 +98,7 @@ class ComposerController extends Controller
      */
     public function actionSelfUpdate($version = "1.0.0-alpha10")
     {
-        $this->composerCmd('self-update ' . $version);
+        $this->_composerCmd('self-update ' . $version);
     }
 
     /**
@@ -93,7 +122,7 @@ class ComposerController extends Controller
             $dir = "--dir=" . $dir;
         }
 
-        $this->composerCmd("archive {$package} {$version} {$dir} {$format}");
+        $this->_composerCmd("archive {$package} {$version} {$dir} {$format}");
     }
 
     /**
@@ -108,8 +137,53 @@ class ComposerController extends Controller
             $this->verbose = true;
         }
 
-        $this->composerCmd('status');
+        $this->_composerCmd('status');
     }
+
+    /**
+     * Установка необходимых composer asset plugin-ов
+     * @param string $version
+     */
+    public function actionUpdateAssetPlugins($version = "1.0.2")
+    {
+        $this->_composerCmd('global require "fxp/composer-asset-plugin:' . $version . '"');
+    }
+
+
+    /**
+     * Обновление зависимостей composer
+     * In order to get the latest versions of the dependencies and to update the composer.lock file, you should use the update command.
+     * @param $options
+     *
+     *  --prefer-source: Install packages from source when available.
+        --prefer-dist: Install packages from dist when available.
+        --ignore-platform-reqs: ignore php, hhvm, lib-* and ext-* requirements and force the installation even if the local machine does not fulfill these. See also the platform config option.
+        --dry-run: Simulate the command without actually doing anything.
+        --dev: Install packages listed in require-dev (this is the default behavior).
+        --no-dev: Skip installing packages listed in require-dev. The autoloader generation skips the autoload-dev rules.
+        --no-autoloader: Skips autoloader generation.
+        --no-scripts: Skips execution of scripts defined in composer.json.
+        --no-plugins: Disables plugins.
+        --no-progress: Removes the progress display that can mess with some terminals or scripts which don't handle backspace characters.
+        --optimize-autoloader (-o): Convert PSR-0/4 autoloading to classmap to get a faster autoloader. This is recommended especially for production, but can take a bit of time to run so it is currently not done by default.
+        --lock: Only updates the lock file hash to suppress warning about the lock file being out of date.
+        --with-dependencies Add also all dependencies of whitelisted packages to the whitelist.
+        --prefer-stable: Prefer stable versions of dependencies.
+        --prefer-lowest: Prefer lowest versions of dependencies. Useful for testing minimal versions of requirements, generally used with --prefer-stable.
+     */
+    public function actionUpdate($options /*...*/)
+    {
+        $options = func_get_args();
+
+        $optionsString = "";
+        if ($options)
+        {
+            $optionsString = implode(" ", $options);
+        }
+
+        $this->_composerCmd('update ' . $optionsString);
+    }
+
 
 
 
@@ -120,7 +194,7 @@ class ComposerController extends Controller
     /**
      * @param $cmd
      */
-    public function composerCmd($cmd)
+    protected function _composerCmd($cmd)
     {
         if ($this->verbose)
         {
@@ -132,6 +206,11 @@ class ComposerController extends Controller
             $cmd .= " --profile";
         }
 
-        $this->systemCmdRoot('php composer.phar ' . $cmd);
+        if ($this->noInteraction)
+        {
+            $cmd .= " --no-interaction";
+        }
+
+        $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar ' . $cmd);
     }
 }

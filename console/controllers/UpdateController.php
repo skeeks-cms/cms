@@ -32,6 +32,13 @@ class UpdateController extends Controller
      */
     public $optimize = true;
 
+
+    /**
+     * @var bool
+     * Не задавать вопросы в процессе установки
+     */
+    public $noInteraction = true;
+
     /**
      * @var string
      * Версия композера, последняя стабильная
@@ -46,30 +53,28 @@ class UpdateController extends Controller
 
 
     /**
-     * @var bool
-     * --profile добавлять к запросам на исполнения команд композер --profile опцию
-     */
-    public $composerProfile = true;
-
-
-
-    /**
      * @inheritdoc
      */
     public function options($actionID)
     {
         return ArrayHelper::merge(parent::options($actionID), [
-            'optimize', 'composerVersion', 'composerProfile', 'composerAssetPluginV'
+            'optimize', 'composerVersion', 'composerAssetPluginV', 'noInteraction'
         ]);
     }
 
     /**
-     * Полное обновление проекта
+     * Полное обновление проекта, с сохранением дампа базы
      *
      * @param int $autoremove стереть существующие файлы и скачать заново
      */
     public function actionAll($autoremove = 0)
     {
+        //Создание бэкапа базы данных.
+        $this->systemCmdRoot("php yii cms/backup/db-execute");
+
+        //Список сохранненных баз данных
+        $this->systemCmdRoot("php yii cms/backup/db-list");
+
         if ($autoremove)
         {
             $this->stdoutN('    - remove all');
@@ -80,8 +85,15 @@ class UpdateController extends Controller
             //$this->systemCmdRoot("rm -rf vendor");
         }
 
-        $this->actionComposerUpdate();
-        $this->actionUpdateComposerJson();
+
+        //Проверка версии композера, его установка если нет
+        $this->systemCmdRoot("php yii cms/composer/self-update " . ($this->noInteraction ? "--noInteraction":"" ));
+        //Обновление asset plugins composer
+        $this->systemCmdRoot("php yii cms/composer/update-asset-plugins " . ($this->noInteraction ? "--noInteraction":"" ));
+        //Обновление зависимостей
+        $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
+
+
         $this->actionMigration();
         $this->actionClearRuntimes();
         $this->actionGenerateModulesConfigFile();
@@ -166,38 +178,4 @@ class UpdateController extends Controller
 
         $this->systemCmdRoot("php yii migrate --interactive=0");
     }
-
-    /**
-     * Обновление проверка и установка композера, а также глобальных asset-plugin
-     */
-    public function actionComposerUpdate()
-    {
-        $composer = ROOT_DIR . "/composer.phar";
-        if (file_exists($composer))
-        {
-            $this->stdoutN("composer есть, обновляем его");
-            $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar self-update " . $this->composerVersion);
-        } else
-        {
-            $this->stdoutN("composer не найден");
-            $this->systemCmdRoot('php -r "readfile(\'https://getcomposer.org/installer\');" | php');
-            $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar self-update " . $this->composerVersion);
-            $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar global require "fxp/composer-asset-plugin:' . $this->composerAssetPluginV . '" "' . ($this->composerProfile ? " --profile": "") );
-        }
-    }
-
-    /**
-     * Обновление зависимостей и библиотек, через композер
-     */
-    public function actionUpdateComposerJson()
-    {
-        $cmd = "COMPOSER_HOME=.composer php composer.phar update " . ($this->composerProfile ? " --profile": "");
-        if ($this->optimize)
-        {
-            $cmd .= " -o";
-        }
-
-        $this->systemCmdRoot($cmd);
-    }
-
 }
