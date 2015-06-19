@@ -274,7 +274,7 @@ return
             ],
 
             [
-                "label"     => "Читска временных данных",
+                "label"     => "Чистка временных данных",
                 "url"       => ["admin/clear"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clear.png'],
             ],
