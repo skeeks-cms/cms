@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (Ð¡ÐºÐ¸ÐºÐ¡)
  * @date 27.03.2015
  */
 namespace skeeks\cms\components\db;
@@ -13,6 +13,7 @@ use yii\db\Connection;
 
 /**
  * @property Dir    $backupDir
+ *
  *
  * Class DbDumpComponent
  * @package skeeks\cms\components\db
@@ -37,13 +38,13 @@ class DbDumpComponent extends Component
         }
 
         /**
-         * TODO: äîáàâèòü ïðîâåðêè
+         * TODO: Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ¸
          */
         $this->connection = \Yii::$app->{$this->dbConnectionName};
 
         if (!$this->connection || !$this->connection instanceof Connection)
         {
-            throw new \InvalidArgumentException("Íåêîððåêòíûé êîííåêò ê áàçå äàííûõ");
+            throw new \InvalidArgumentException("ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ ÐºÐ¾Ð½Ð½ÐµÐºÑ‚ Ðº Ð±Ð°Ð·Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ…");
         }
     }
 
@@ -57,7 +58,7 @@ class DbDumpComponent extends Component
 
 
     /**
-     * @return string
+     *
      */
     public function dumpRun()
     {
@@ -68,20 +69,41 @@ class DbDumpComponent extends Component
 
         if (!$this->backupDir->isExist())
         {
-            throw new \InvalidArgumentException("Íå ïîëó÷èëîñü ñîçäàòü ïàïêó ñ ôàéëàìè áåêàïîâ: " . $this->backupDir->getPath());
+            throw new \InvalidArgumentException("ÐÐµ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ð»Ð¾ÑÑŒ ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ Ð¿Ð°Ð¿ÐºÑƒ Ñ Ñ„Ð°Ð¹Ð»Ð°Ð¼Ð¸ Ð±ÐµÐºÐ°Ð¿Ð¾Ð²: " . $this->backupDir->getPath());
         }
 
         $dsn = new DbDsnHelper($this->connection);
 
-        $file       = $this->backupDir->newFile($dsn->dbname . "__" . date('Y-m-d_H:i:s') . ".sql.gz");
+        $file       = $this->backupDir->newFile($dsn->dbname . "__" . date('Y-m-d_H:i:s') . ".sql");
         $filePath   = $file->getPath();
 
-        $cmd = "mysqldump -h{$dsn->host} -u {$dsn->username} -p{$dsn->password} {$dsn->dbname} | gzip > {$filePath}";
+        $cmd = "mysqldump -h{$dsn->host} -u {$dsn->username} -p{$dsn->password} {$dsn->dbname} > {$filePath}";
 
-        ob_start();
         system($cmd);
-        $result = ob_get_clean();
+    }
 
-        return $result;
+    /**
+     * @return string
+     */
+    public function dumpRestore($fileName)
+    {
+        if (!$this->backupDir->isExist())
+        {
+            throw new \InvalidArgumentException("Ð‘ÑÐºÐ°Ð¿ Ñ„Ð°Ð¹Ð»Ð¾Ð² Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾" . $this->backupDir->getPath());
+        }
+
+        $file = $this->backupDir->newFile($fileName);
+        if (!$file->isExist())
+        {
+            throw new \InvalidArgumentException("Ð‘ÑÐºÐ°Ð¿ Ñ„Ð°Ð¹Ð» Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½" . $file->getPath());
+        }
+
+        $filePath = $file->getPath();
+
+        $dsn = new DbDsnHelper($this->connection);
+        $cmd = "mysql -h{$dsn->host} -u{$dsn->username} -p{$dsn->password} {$dsn->dbname} < {$filePath}";
+
+        echo $cmd;
+        system($cmd);
     }
 }
