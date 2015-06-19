@@ -37,7 +37,7 @@ class UpdateController extends Controller
      * @var bool
      * Не задавать вопросы в процессе установки
      */
-    public $noInteraction = true;
+    public $noInteraction = false;
 
     /**
      * @var string

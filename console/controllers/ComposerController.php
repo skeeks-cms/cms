@@ -171,7 +171,7 @@ class ComposerController extends Controller
         --prefer-stable: Prefer stable versions of dependencies.
         --prefer-lowest: Prefer lowest versions of dependencies. Useful for testing minimal versions of requirements, generally used with --prefer-stable.
      */
-    public function actionUpdate($options /*...*/)
+    public function actionUpdate(/*...*/)
     {
         $options = func_get_args();
 
@@ -196,17 +196,17 @@ class ComposerController extends Controller
      */
     protected function _composerCmd($cmd)
     {
-        if ($this->verbose)
+        if ((bool) $this->verbose === true)
         {
             $cmd .= " --verbose";
         }
 
-        if ($this->profile)
+        if ((bool) $this->profile === true)
         {
             $cmd .= " --profile";
         }
 
-        if ($this->noInteraction)
+        if ((bool) $this->noInteraction === true)
         {
             $cmd .= " --no-interaction";
         }
