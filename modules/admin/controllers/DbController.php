@@ -90,7 +90,10 @@ class DbController extends AdminController
 
             try
             {
-                $result = \Yii::$app->dbDump->dumpRun();
+                ob_start();
+                    \Yii::$app->dbDump->dumpRun();
+                $result = ob_get_clean();
+
 
                 $rr->success = true;
                 $rr->message = "Копия создана успешно";
