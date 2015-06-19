@@ -90,6 +90,33 @@ $this->registerJs(<<<JS
             },
         });
 
+        sx.classes.ConnectDb = sx.classes.Component.extend({
+
+            _init: function()
+            {
+
+            },
+
+            _onDomReady: function()
+            {
+                $(".sx-btn-additional").on("click", function()
+                {
+                    if ($(".sx-additional").hasClass('sx-hide'))
+                    {
+                        $(".sx-additional").removeClass('sx-hide');
+                    } else
+                    {
+                        $(".sx-additional").addClass('sx-hide');
+                    }
+                });
+            },
+
+            _onWindowReady: function()
+            {}
+        });
+
+        new sx.classes.ConnectDb();
+
         sx.auth = new sx.classes.Auth({});
     })(sx, sx.$, sx._);
 JS
@@ -105,22 +132,31 @@ JS
                 <div class="panel-content">
 
                     <div class="sx-act sx-act-reset-password">
-                        Нет подключения к базе данных
-                        <? $connectToDbForm = new \skeeks\cms\models\forms\ConnectToDbForm(); ?>
-                        <? $form = ActiveForm::begin(); ?>
-                            <?= $form->field($connectToDbForm, 'host')->textInput(); ?>
-                            <?= $form->field($connectToDbForm, 'dbname')->textInput(); ?>
-                            <?= $form->field($connectToDbForm, 'username')->textInput(); ?>
-                            <?= $form->field($connectToDbForm, 'password')->passwordInput(); ?>
-                            <?= $form->field($connectToDbForm, 'charset')->textInput(); ?>
-                            <?= $form->fieldRadioListBoolean($connectToDbForm, 'enableSchemaCache'); ?>
-                            <?= $form->fieldInputInt($connectToDbForm, 'schemaCacheDuration'); ?>
-                            <div class="form-group sx-buttons-standart">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="glyphicon glyphicon-save"></i> Сохранить и продолжить
-                                </button>
-                            </div>
-                        <? ActiveForm::end(); ?>
+                        <div class="alert alert-danger" role="alert">
+                            Нет подключения к базе данных
+                        </div>
+
+                        <? if (YII_ENV != "prod") : ?>
+                            <? $connectToDbForm = new \skeeks\cms\models\forms\ConnectToDbForm(); ?>
+                            <? $form = ActiveForm::begin(); ?>
+                                <?= $form->field($connectToDbForm, 'host')->textInput(); ?>
+                                <?= $form->field($connectToDbForm, 'dbname')->textInput(); ?>
+                                <?= $form->field($connectToDbForm, 'username')->textInput(); ?>
+                                <?= $form->field($connectToDbForm, 'password')->passwordInput(); ?>
+                                <a href="#" class="sx-btn-additional">Дополнительные настройки</a>
+                                <div class="sx-additional sx-hide">
+                                    <?= $form->field($connectToDbForm, 'charset')->textInput(); ?>
+                                    <?= $form->fieldRadioListBoolean($connectToDbForm, 'enableSchemaCache'); ?>
+                                    <?= $form->fieldInputInt($connectToDbForm, 'schemaCacheDuration'); ?>
+                                </div>
+                                <div class="form-group sx-buttons-standart">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="glyphicon glyphicon-save"></i> Сохранить и продолжить
+                                    </button>
+                                </div>
+                            <? ActiveForm::end(); ?>
+                        <? endif; ?>
+
                     </div>
 
                 </div>
