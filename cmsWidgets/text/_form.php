@@ -10,9 +10,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <?php $form = ActiveForm::begin(); ?>
     <?= $form->fieldSet('Настройки'); ?>
-        <?= $form->field($model, 'text')->textarea([
-            'rows' => '15'
-        ]); ?>
+        <?= $form->field($model, 'text')->widget(
+            \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className()
+        ); ?>
     <?= $form->fieldSetEnd(); ?>
 <?= $form->buttonsStandart($model) ?>
 <?php ActiveForm::end(); ?>
