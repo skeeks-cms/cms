@@ -13,6 +13,7 @@ namespace yii\web;
 
 use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
+use skeeks\cms\components\CmsSearchComponent;
 use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ControlToolbar;
 use skeeks\cms\components\CurrentSite;
@@ -46,6 +47,7 @@ use yii\authclient\Collection;
  * @property CurrentSite                    $currentSite
  * @property Collection                     $authClientCollection
  * @property DbDumpComponent                $dbDump
+ * @property CmsSearchComponent             $cmsSearch
  *
  * Class Application
  * @package yii\web

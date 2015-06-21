@@ -91,6 +91,7 @@ $config =
 
                 'skeeks-cms'                            => 'cms/cms/index',
                 'skeeks-cms/<action>'                   => 'cms/cms/<action>',
+                'search'                                => 'cms/search/result',
 
                 ["class" => 'skeeks\cms\components\ImagingUrlRule'], //админка
             ]
@@ -152,6 +153,11 @@ $config =
         'dbDump' =>
         [
             'class' => '\skeeks\cms\components\db\DbDumpComponent',
+        ],
+
+        'cmsSearch' =>
+        [
+            'class' => '\skeeks\cms\components\CmsSearchComponent',
         ]
     ],
 

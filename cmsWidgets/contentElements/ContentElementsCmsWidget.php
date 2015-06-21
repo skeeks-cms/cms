@@ -55,6 +55,10 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
     public $enabledActiveTime           = CMS::BOOL_Y;
 
+
+    public $activeQueryCallback;
+
+
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
@@ -202,6 +206,12 @@ class ContentElementsCmsWidget extends WidgetRenderable
                     [CmsContentElement::tableName() . '.published_to' => null],
                 ]
             );
+        }
+
+        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
+        {
+            $callback = $this->activeQueryCallback;
+            $callback($this->dataProvider->query);
         }
 
         return parent::_run();
