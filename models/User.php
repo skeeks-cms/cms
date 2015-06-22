@@ -52,6 +52,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $info
  * @property string $image
  * @property string $image_cover
+ * @property integer $logged_at
  * @property string $gender
  *
  * @property string $displayName
@@ -273,6 +274,7 @@ class User
             ['username', 'string', 'min' => 3, 'max' => 12],
             [['username'], 'unique'],
             [['username'], 'validateLogin'],
+            [['logged_at'], 'integer'],
         ];
     }
 
@@ -324,6 +326,7 @@ class User
             'address' => Yii::t('app', 'Адрес'),
             'info' => Yii::t('app', 'Информация'),
             'gender' => Yii::t('app', 'Пол'),
+            'logged_at' => Yii::t('app', 'Время последней авторизации'),
             'status_of_life' => Yii::t('app', 'Статус'),
         ];
     }
