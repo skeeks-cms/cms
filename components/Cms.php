@@ -116,7 +116,12 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string шаблон
      */
-    public $template                = "default";
+    public $template                        = "default";
+
+    /**
+     * @var string
+     */
+    public $templateDefault                 = "default";
 
     /**
      * @var string язык по умолчанию
@@ -186,15 +191,22 @@ class Cms extends \skeeks\cms\base\Component
 
 
         //TODO:: future refactor;
-        $templatePath = "@app/templates/default";
+        $templatePath           = "@app/templates/default";
+        $templateDefaultPath    = "@app/templates/default";
         foreach ($this->templates as $templateData)
         {
             if ($templateData['code'] == $this->template)
             {
                 $templatePath = $templateData['path'];
             }
+
+            if ($templateData['code'] == $this->templateDefault)
+            {
+                $templateDefaultPath = $templateData['path'];
+            }
         }
         \Yii::setAlias('template', \Yii::getAlias($templatePath));
+        \Yii::setAlias('templateDefault', \Yii::getAlias($templateDefaultPath));
 
         \Yii::$app->language = $this->languageCode;
 
@@ -244,7 +256,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'templateDefault', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
         ]);
@@ -259,7 +271,8 @@ class Cms extends \skeeks\cms\base\Component
             'appName'                   => 'Название проекта',
             'template'                  => 'Шаблон',
             'templates'                 => 'Возможные шаблон',
-            'languageCode'       => 'Язык по умолчанию',
+            'languageCode'              => 'Язык по умолчанию',
+            'templateDefault'           => 'Шаблон по умолчанию',
         ]);
     }
 

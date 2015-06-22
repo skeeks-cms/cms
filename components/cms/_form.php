@@ -23,6 +23,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Шаблоны/отображение'); ?>
     <?= $form->fieldSelect($model, 'template', \yii\helpers\ArrayHelper::map(\Yii::$app->cms->templates, 'code', 'name')); ?>
+    <?= $form->fieldSelect($model, 'templateDefault', \yii\helpers\ArrayHelper::map(\Yii::$app->cms->templates, 'code', 'name'))
+        ->hint('В том случае, если файл шаблона не будет найден в шаблоне сайта, поиск этого файла будет произведен в этом шаблоне'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Языковые настройки'); ?>
