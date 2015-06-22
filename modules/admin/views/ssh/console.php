@@ -294,7 +294,7 @@ $autocomplete = array(
     '^php \w*$' => array('yii'),
     '^php yii .*' => array('help', 'cms/', 'cms/update', 'cms/composer'),
     '^yii .*' => array('help', 'cms/', 'cms/update', 'cms/composer'),
-    '^composer .*' => array('status', 'update', 'install', '-v', '-o', '--profile'),
+    '^composer .*' => array('status', 'update', 'show', 'install', '-v', '-o', '--profile'),
 );
 ###############################################
 #                    View                     #
