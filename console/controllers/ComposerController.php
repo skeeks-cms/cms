@@ -16,6 +16,7 @@ use skeeks\sx\Dir;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
+use yii\helpers\FileHelper;
 
 /**
  * Полезные комманды для работы с композером
@@ -182,6 +183,32 @@ class ComposerController extends Controller
         }
 
         $this->_composerCmd('update ' . $optionsString);
+    }
+
+    /**
+     * Откатить модифицированные файлы venodr-s
+     */
+    public function actionRevertModifiedFiles()
+    {
+        ob_start();
+            system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status');
+        $result = ob_get_clean();
+        $result = trim($result);
+
+        if ($result)
+        {
+            $dirs = explode("\n", $result);
+
+            if ($dirs)
+            {
+                foreach ($dirs as $dirPath)
+                {
+                    //FileHelper::removeDirectory($dirPath);
+                    system('cd ' . $dirPath . '; git checkout -f 2>&1; git clean -f -d 2>&1');
+                }
+            }
+        }
+
     }
 
 

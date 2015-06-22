@@ -40,6 +40,12 @@ class UpdateController extends Controller
     public $noInteraction = false;
 
     /**
+     * @var bool
+     * Откатить изменнные файлы перед началом установки
+     */
+    public $revertModified = true;
+
+    /**
      * @var string
      * Версия композера, последняя стабильная
      */
@@ -58,7 +64,7 @@ class UpdateController extends Controller
     public function options($actionID)
     {
         return ArrayHelper::merge(parent::options($actionID), [
-            'optimize', 'composerVersion', 'composerAssetPluginV', 'noInteraction'
+            'optimize', 'composerVersion', 'composerAssetPluginV', 'noInteraction', 'revertModified'
         ]);
     }
 
@@ -90,6 +96,13 @@ class UpdateController extends Controller
         $this->systemCmdRoot("php yii cms/composer/self-update " . ($this->noInteraction ? "--noInteraction":"" ));
         //Обновление asset plugins composer
         $this->systemCmdRoot("php yii cms/composer/update-asset-plugins " . ($this->noInteraction ? "--noInteraction":"" ));
+
+        if ($this->revertModified)
+        {
+            //Откатить измененные файлы
+            $this->systemCmdRoot("php yii cms/composer/revert-modified-files");
+        }
+
         //Обновление зависимостей
         $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
 
