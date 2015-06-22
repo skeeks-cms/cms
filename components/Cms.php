@@ -51,6 +51,7 @@ use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\console\Application;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
@@ -212,11 +213,14 @@ class Cms extends \skeeks\cms\base\Component
 
         \Yii::$app->language = $this->languageCode;
 
-        \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
-            $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
-            $e->identity->save();
-        });
 
+        if (!\Yii::$app instanceof Application)
+        {
+            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
+                $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
+                $e->identity->save();
+            });
+        }
 
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
