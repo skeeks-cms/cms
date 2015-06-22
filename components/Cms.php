@@ -11,6 +11,7 @@ use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
 use skeeks\cms\controllers\AdminCmsContentElementController;
+use skeeks\cms\events\LoginEvent;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
@@ -53,6 +54,7 @@ use yii\base\Event;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
+use yii\web\UserEvent;
 use yii\web\View;
 
 /**
@@ -210,17 +212,23 @@ class Cms extends \skeeks\cms\base\Component
 
         \Yii::$app->language = $this->languageCode;
 
+        \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
+            $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
+            $e->identity->save();
+        });
+
+
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
             if ($e->controller instanceof AdminModelEditorController)
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'files' =>
-                    [
-                        'class'         => AdminOneModelFilesAction::className(),
-                        'name'          => 'Файлы',
-                        "icon"          => "glyphicon glyphicon-cloud",
-                    ],
+                        [
+                            'class'         => AdminOneModelFilesAction::className(),
+                            'name'          => 'Файлы',
+                            "icon"          => "glyphicon glyphicon-cloud",
+                        ],
                 ]);
             }
 
@@ -228,11 +236,11 @@ class Cms extends \skeeks\cms\base\Component
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'related-properties' =>
-                    [
-                        'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                        'name'          => 'Дополнительные свойства',
-                        "icon"          => "glyphicon glyphicon-plus-sign",
-                    ],
+                        [
+                            'class'         => AdminOneModelRelatedPropertiesAction::className(),
+                            'name'          => 'Дополнительные свойства',
+                            "icon"          => "glyphicon glyphicon-plus-sign",
+                        ],
                 ]);
             }
 
@@ -240,12 +248,12 @@ class Cms extends \skeeks\cms\base\Component
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'system' =>
-                    [
-                        'class'         => AdminOneModelSystemAction::className(),
-                        'name'          => 'Системные данные',
-                        "icon"          => "glyphicon glyphicon-cog",
-                        "priority"      => 9999,
-                    ],
+                        [
+                            'class'         => AdminOneModelSystemAction::className(),
+                            'name'          => 'Системные данные',
+                            "icon"          => "glyphicon glyphicon-cog",
+                            "priority"      => 9999,
+                        ],
                 ]);
             }
 

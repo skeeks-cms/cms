@@ -33,6 +33,10 @@
 
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+        [
+            'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+            'attribute' => 'logged_at'
+        ],
 
         [
             'class'     => \yii\grid\DataColumn::className(),
