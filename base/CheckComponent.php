@@ -82,4 +82,12 @@ abstract class CheckComponent extends \yii\base\Component
 
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isSuccess()
+    {
+        return ($this->result == self::RESULT_SUCCESS);
+    }
 }
