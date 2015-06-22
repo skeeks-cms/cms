@@ -33,11 +33,6 @@ class Controller extends YiiWebController
      */
     public $layout          = '@template/layouts/default.php';
 
-    public function init()
-    {
-        parent::init();
-    }
-
     /**
      *
      * Если не хочется рендерить шаблон текущего действия, можно воспользоваться этой функцией.
@@ -62,6 +57,7 @@ class Controller extends YiiWebController
      */
     public function render($view, $params = [])
     {
+        //Если не нужно ничего рендерить, то делаем стандартный рендер yii2
         if (!$this->beforeRender)
         {
             return parent::render($view, $params);

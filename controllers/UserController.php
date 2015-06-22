@@ -1,15 +1,13 @@
 <?php
 /**
- * UserController
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 23.10.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 22.06.2015
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\actions\user\UserAction;
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
@@ -17,6 +15,8 @@ use skeeks\cms\models\User;
 use Yii;
 use skeeks\cms\models\searchs\User as UserSearch;
 use \skeeks\cms\App;
+use yii\helpers\ArrayHelper;
+use yii\rest\UpdateAction;
 
 /**
  * Class UserController
@@ -24,6 +24,27 @@ use \skeeks\cms\App;
  */
 class UserController extends Controller
 {
+    const EVENT_INIT                   = 'event.userController.init';
+
+    /**
+     * @var null|AdminAction[]
+     */
+    protected $_actions    = null;
+
+    /**
+     * После инициализации, контроллера, любой компонент, может добавить свои дейсвия, они будут добавлены к текущим дейсвоиям контроллера.
+     * @see init()
+     * @see actions()
+     * @var array
+     */
+    public $eventActions = [];
+
+    /**
+     * @var User
+     */
+    public $user = null;
+
+
     /**
      * @inheritdoc
      */
@@ -33,26 +54,76 @@ class UserController extends Controller
     }
 
 
-    public function actionIndex()
+    public function init()
     {
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        parent::init();
+    }
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+
+
+    /**
+     * @return array
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge($this->eventActions, [
+            "view" =>
+            [
+                'class'         => UserAction::className(),
+                "name"          => "Профиль",
+                "icon"          => "glyphicon glyphicon-trash",
+            ],
+
+            "edit" =>
+            [
+                'class'         => UserAction::className(),
+                "name"          => "Настройки",
+                "icon"          => "fa fa-cog",
+            ]
         ]);
     }
 
-    public function actionProfile()
+    /**
+     * Массив объектов действий доступных для текущего контроллера
+     * Используется при построении меню.
+     * @see ControllerActions
+     * @return AdminAction[]
+     */
+    public function getActions()
     {
-        if (\Yii::$app->user->isGuest)
+        if ($this->_actions !== null)
         {
-            return $this->goHome();
+            return $this->_actions;
         }
 
-        return $this->redirect(\Yii::$app->cms->getAuthUser()->getPageUrl());
+        $actions = $this->actions();
+
+        if ($actions)
+        {
+            foreach ($actions as $id => $data)
+            {
+                $action                 = $this->createAction($id);
+
+                if ($action->isVisible())
+                {
+                    $this->_actions[$id]    = $action;
+                }
+            }
+        } else
+        {
+            $this->_actions = [];
+        }
+
+        //Сортировка по приоритетам
+        if ($this->_actions)
+        {
+            ArrayHelper::multisort($this->_actions, 'priority');
+
+        }
+
+        return $this->_actions;
     }
+
 
     /**
      * @param $username
@@ -79,34 +150,12 @@ class UserController extends Controller
             $model = \Yii::$app->cms->findUser()->where(["username" => $username])->one(); //(["username" => $username]);
         }
 
-
         return [
             'model'         => $model,
             'personal'      => $personal,
         ];
     }
 
-    public function actionPublications($username)
-    {
-        $data = $this->_user($username);
-        return $this->render('publications', $data);
-    }
-
-    public function actionEdit($username)
-    {
-        $data = $this->_user($username);
-        return $this->render('edit', $data);
-    }
-
-    /**
-     * @param $username
-     * @return string
-     */
-    public function actionView($username)
-    {
-        $data = $this->_user($username);
-        return $this->render('view', $data);
-    }
 
     /**
      * @param $username
