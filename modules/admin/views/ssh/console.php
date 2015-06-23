@@ -73,6 +73,7 @@ $commands = array(
     'git*' => '/usr/bin/local/git $1',
     'yii*' => 'php yii $1',
     'composer*' => 'COMPOSER_HOME=.composer php composer.phar $1',
+    'cms*' => 'php yii cms$1',
     '*' => '$1', // Allow any command. Must be at the end of the list.
 );
 
@@ -287,15 +288,22 @@ function httpDigestParse($txt)
 ###############################################
 #                Autocomplete                 #
 ###############################################
-$autocomplete = array(
-    '^\w*$' => array('cd', 'ls', 'mkdir', 'chmod', 'git', 'hg', 'diff', 'rm', 'mv', 'cp', 'more', 'grep', 'ff', 'whoami', 'kill', 'php', 'yii', 'composer'),
+
+ob_start();
+    system('cd '  . ROOT_DIR . '; php yii cms/utils/all-cmd');
+$result = ob_get_clean();
+$result = trim($result);
+$possibleCmd = explode("\n", $result);
+
+$autocomplete = [
+    '^\w*$' => array('cd', 'ls', 'mkdir', 'chmod', 'git', 'hg', 'diff', 'rm', 'mv', 'cp', 'more', 'grep', 'ff', 'whoami', 'kill', 'php', 'yii', 'composer', 'cms/update', 'cms/composer/status'),
     '^git \w*$' => array('status', 'push', 'pull', 'add', 'bisect', 'branch', 'checkout', 'clone', 'commit', 'diff', 'fetch', 'grep', 'init', 'log', 'merge', 'mv', 'rebase', 'reset', 'rm', 'show', 'tag', 'remote'),
     '^git \w* .*' => array('HEAD', 'origin', 'master', 'production', 'develop', 'rename', '--cached', '--global', '--local', '--merged', '--no-merged', '--amend', '--tags', '--no-hardlinks', '--shared', '--reference', '--quiet', '--no-checkout', '--bare', '--mirror', '--origin', '--upload-pack', '--template=', '--depth', '--help'),
     '^php \w*$' => array('yii'),
-    '^php yii .*' => array('help', 'cms/', 'cms/update', 'cms/composer'),
-    '^yii .*' => array('help', 'cms/', 'cms/update', 'cms/composer'),
+    '^php yii .*' => $possibleCmd,
+    '^yii .*' => $possibleCmd,
     '^composer .*' => array('status', 'update', 'show', 'install', '-v', '-o', '--profile'),
-);
+];
 ###############################################
 #                    View                     #
 ###############################################

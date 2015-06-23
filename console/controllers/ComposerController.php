@@ -186,6 +186,50 @@ class ComposerController extends Controller
     }
 
     /**
+     * Просмотр установленных пакетов
+     */
+    public function actionShow()
+    {
+        $this->_composerCmd('show');
+    }
+
+    /**
+     * Установка пакета
+     * The require command adds new packages to the composer.json file from the current directory. If no file exists one will be created on the fly.
+     *
+     * @param string $packageName
+     * @param string $version
+     * @param bool|true $noUpdate --no-update: Disables the automatic update of the dependencies.
+     */
+    public function actionRequire($packageName, $version = "*", $noUpdate = true)
+    {
+        $options = "";
+        if ($noUpdate)
+        {
+            $options = "--no-update";
+        }
+
+        $this->_composerCmd('require ' . $packageName . ":" . $version . ' ' . $options);
+    }
+    /**
+     * Удаление пакета
+     * The remove command removes packages from the composer.json file from the current directory.
+     *
+     * @param string $packageName
+     * @param bool|true $noUpdate --no-update: Disables the automatic update of the dependencies.
+     */
+    public function actionRemove($packageName, $noUpdate = true)
+    {
+        $options = "";
+        if ($noUpdate)
+        {
+            $options = "--no-update";
+        }
+
+        $this->_composerCmd('remove ' . $packageName . " " . $options);
+    }
+
+    /**
      * Откатить модифицированные файлы venodr-s
      */
     public function actionRevertModifiedFiles()

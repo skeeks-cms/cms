@@ -11,11 +11,17 @@
 
     <iframe style="border: none; width: 100%; height: 600px;" src="<?= \skeeks\cms\helpers\UrlHelper::construct('/admin/ssh/console')->enableAdmin()->toString(); ?>"></iframe>
     <div class="sx-bg-primary">
-        <p><code>php yii help</code></p>
-        <p><code>php yii help <?= htmlspecialchars('<cmd name>')?></code></p>
-        <p><code>php yii help cms/update/all</code></p>
+        <p><code>php yii help</code> - посмотреть хелп</p>
+        <p><code>php yii help <?= htmlspecialchars('<cmd-name>')?></code>  - посмотреть хелп определлной команды</p>
+        <p><code>php yii help cms/update</code> - пример хелпа определнного контроллера</p>
+        <p><code>php yii help cms/update/all</code> - пример хелпа определнного действия</p>
+        <p><code>php yii cms/update/all</code> - запуск действия</p>
+        <p><code>php yii cms/composer/status</code> - запуск действия</p>
     </div>
     <pre>
         <? system("cd " . ROOT_DIR . " && php yii help;"); ?>
     </pre>
+
+
+
 </div>
