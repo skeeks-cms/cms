@@ -186,11 +186,12 @@ class ComposerController extends Controller
     }
 
     /**
-     * Просмотр установленных пакетов
+     * Просмотр установленных пакетов или информации об одном из них
+     * @param string $package
      */
-    public function actionShow()
+    public function actionShow($package = '')
     {
-        $this->_composerCmd('show');
+        $this->_composerCmd('show ' . $package);
     }
 
     /**
