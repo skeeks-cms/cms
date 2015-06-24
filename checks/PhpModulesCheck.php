@@ -44,6 +44,7 @@ HTML;
 			'mcrypt_encrypt'        => "Функции шифрования MCrypt",
 			'highlight_file'        => 'PHP Syntax Highlight',
 			'mb_substr'             => "Поддержка mbstring",
+			'curl_init'             => "Поддержка curl",
 		];
 
         $strError = '';

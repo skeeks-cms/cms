@@ -306,4 +306,28 @@ return
 
 
 
+    'cms-marketplace' =>
+    [
+        'label'     => 'Маркетплейс',
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png'],
+
+        'items' =>
+        [
+
+            [
+                "label"     => "Установленные решения",
+                "url"       => ["cms/admin-marketplace/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
+            ],
+
+            [
+                "label"     => "Каталог",
+                "url"       => ["cms/admin-marketplace/catalog"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
+            ],
+
+        ]
+    ]
+
+
 ];
