@@ -44,9 +44,11 @@ class DropdownControllerActions
      */
     public function run()
     {
-        if ($this->controller->actions)
+        $actions = $this->controller->actions;
+
+        if ($actions && is_array($actions) && count($actions) >= 1)
         {
-            $firstAction = array_shift($this->controller->actions);
+            $firstAction = array_shift($actions);
         }
 
         $style = '';

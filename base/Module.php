@@ -20,11 +20,6 @@ use skeeks\sx\Dir;
 abstract class Module extends \yii\base\Module
 {
     use HasComponentDescriptorTrait;
-    /**
-     * @var ComponentDescriptor
-     */
-    protected $_descriptor = null;
-
 
     const CHECKS_DIR_NAME = "checks";
     /**

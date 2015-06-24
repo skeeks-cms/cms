@@ -30,6 +30,10 @@ $deny = array();
 // Use next two for long time executing commands.
 ignore_user_abort(true);
 set_time_limit(0);
+
+error_reporting(E_ALL | E_STRICT);
+// определяем режим вывода ошибок
+ini_set('display_errors', 'On');
 // If exist config include it.
 /*if (is_readable($file = __DIR__ . '/console.config.php')) {
     include $file;

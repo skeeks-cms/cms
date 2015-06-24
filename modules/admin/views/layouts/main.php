@@ -176,7 +176,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
             <div class="panel-body">
                     <div class="panel-content-before">
                         <? if (!UrlHelper::constructCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL)) : ?>
-                            <?= $this->params['actions'] ?>
+                            <?= \yii\helpers\ArrayHelper::getValue($this->params, 'actions'); ?>
                         <? endif; ?>
                         <?/*= Alert::widget() */?>
                     </div>

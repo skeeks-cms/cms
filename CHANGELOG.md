@@ -3,6 +3,7 @@
 
 2.0.0.pre (unreleased)
 -----------------
+  * Исправление багов и ошибок в режиме включенных notice
   * Новый независимый пакет skeeks/yii2-curl
   * Начало интеграции с marketplace
   * Зависимость cms от php curl extension
