@@ -6,47 +6,86 @@
  * @date 24.06.2015
  */
 namespace skeeks\cms\components\marketplace;
-use skeeks\cms\helpers\Curl;
+use skeeks\yii2\curl\Curl;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 /**
+ * @property string $url;
  * @property string $baseUrl;
  *
  * Class MarketPlaceApi
  * @package skeeks\cms\components\marketplace
  */
-class MarketPlaceApi extends Component
+class MarketplaceApi extends Component
 {
+    const RESPONSE_FORMAT_JSON = 'json';
+
     public $schema          = "http";
     public $host            = "cms.skeeks.com";
     public $version         = "v1";
 
+    public $responseFormat  = self::RESPONSE_FORMAT_JSON;
+
     /**
+     * Базовый путь к апи, без версии
+     *
+     * Пример http://cms.skeeks.com/v1/
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        if ($this->version)
+        {
+            $this->baseUrl . $this->version . "/";
+        }
+
+        return $this->baseUrl;
+    }
+
+    /**
+     * Базовый путь к апи, с версией
+     *
+     * Пример http://cms.skeeks.com/
+     *
      * @return string
      */
     public function getBaseUrl()
     {
-        return $this->schema . "://" . $this->host . "/" . $this->version . "/";
+        return $this->schema . "://" . $this->host . "/";
     }
 
     /**
      * @param string $method
-     * @param array $data
-     * @return []
+     * @param string|array $route
+     * @return array
+     * @throws \yii\base\Exception
      */
-    public function get($method, $data = [])
+    public function request($method, $route)
     {
         $curl = new Curl();
 
         $curl->setOption(CURLOPT_HTTPHEADER, [
-            'Accept: application/json; q=1.0, */*; q=0.1'
+            'Accept: application/' . $this->responseFormat. '; q=1.0, */*; q=0.1'
         ]);
 
-        $url = $this->baseUrl . $method . "?" . http_build_query($data);
-        $curl->get($url);
+        if (is_string($route))
+        {
+            $url = $this->url . $route;
+        } else if (is_array($route))
+        {
+            list($route, $data) = $route;
+            $url = $this->url . $route;
+        }
 
-        return Json::decode($curl->response);
+        $curl->httpRequest($method, $url);
+        if ($curl->response)
+        {
+            return (array) Json::decode($curl->response);
+        }
+
+        return [];
     }
-
 }
