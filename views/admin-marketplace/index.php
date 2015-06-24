@@ -5,9 +5,27 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 24.06.2015
  */
-
-$api = new \skeeks\cms\components\marketplace\MarketPlaceApi();
-$packages = $api->get('packages');
-print_r($packages);die;
+use \skeeks\cms\components\marketplace\models\PackageModel;
 ?>
-asd
+<? if ($allModels = PackageModel::fetchInstalls()) :  ?>
+    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+        'dataProvider' => new \yii\data\ArrayDataProvider([
+            'allModels' => $allModels
+        ]),
+        'columns' =>
+        [
+            [
+                'class' => \yii\grid\DataColumn::className(),
+                'value' => function(PackageModel $model)
+                {
+                    return \yii\helpers\Html::img($model->image, [
+                        'width' => '100'
+                    ]);
+                },
+                'format' => 'raw'
+            ],
+
+            'name',
+        ]
+    ])?>
+<? endif; ?>

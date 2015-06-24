@@ -23,7 +23,7 @@ class MarketplaceApi extends Component
     const RESPONSE_FORMAT_JSON = 'json';
 
     public $schema          = "http";
-    public $host            = "cms.skeeks.com";
+    public $host            = "marketplace.cms.skeeks.com";
     public $version         = "v1";
 
     public $responseFormat  = self::RESPONSE_FORMAT_JSON;
@@ -39,7 +39,7 @@ class MarketplaceApi extends Component
     {
         if ($this->version)
         {
-            $this->baseUrl . $this->version . "/";
+            return $this->baseUrl . $this->version . "/";
         }
 
         return $this->baseUrl;
@@ -58,9 +58,33 @@ class MarketplaceApi extends Component
     }
 
     /**
+     * @param $route
+     * @return string
+     */
+    public function getRequestUrl($route)
+    {
+        $url = $this->url;
+
+        if (is_string($route))
+        {
+            $url = $this->url . $route;
+        } else if (is_array($route))
+        {
+            list($route, $data) = $route;
+            $url = $this->url . $route;
+            if ($data)
+            {
+                $url .= '?' . http_build_query($data);
+            }
+        }
+
+        return $url;
+    }
+
+    /**
      * @param string $method
      * @param string|array $route
-     * @return array
+     * @return Curl
      * @throws \yii\base\Exception
      */
     public function request($method, $route)
@@ -71,19 +95,23 @@ class MarketplaceApi extends Component
             'Accept: application/' . $this->responseFormat. '; q=1.0, */*; q=0.1'
         ]);
 
-        if (is_string($route))
-        {
-            $url = $this->url . $route;
-        } else if (is_array($route))
-        {
-            list($route, $data) = $route;
-            $url = $this->url . $route;
-        }
-
+        $url = $this->getRequestUrl($route);
         $curl->httpRequest($method, $url);
-        if ($curl->response)
+
+        return $curl;
+    }
+
+
+    /**
+     * @param $route
+     * @return array
+     */
+    public function get($route)
+    {
+        $curl = $this->request(Curl::METHOD_GET, $route);
+        if ($curl->responseCode == 200 && $curl->response)
         {
-            return (array) Json::decode($curl->response);
+            return Json::decode($curl->response);
         }
 
         return [];
