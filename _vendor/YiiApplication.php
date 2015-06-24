@@ -20,6 +20,7 @@ use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\db\DbDumpComponent;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\Langs;
+use skeeks\cms\components\marketplace\MarketplaceApi;
 use skeeks\cms\components\PublicationTypes;
 use skeeks\cms\components\RegisteredActionViews;
 use skeeks\cms\components\RegisteredModels;
@@ -48,6 +49,7 @@ use yii\authclient\Collection;
  * @property Collection                     $authClientCollection
  * @property DbDumpComponent                $dbDump
  * @property CmsSearchComponent             $cmsSearch
+ * @property MarketplaceApi                 $cmsMarkeplace
  *
  * Class Application
  * @package yii\web

@@ -158,6 +158,11 @@ $config =
         'cmsSearch' =>
         [
             'class' => '\skeeks\cms\components\CmsSearchComponent',
+        ],
+
+        'cmsMarkeplace' =>
+        [
+            'class' => '\skeeks\cms\components\marketplace\MarketplaceApi',
         ]
     ],
 
