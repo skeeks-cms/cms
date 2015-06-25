@@ -65,7 +65,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public function fieldInputInt($model, $attribute, $config = [], $fieldOptions = [])
     {
         //Html::addCssClass($config, "sx-input-int");
-        $config['class'] = $config['class'] . "form-control sx-input-int";
+        $config['class'] = ArrayHelper::getValue($config, 'class') . "form-control sx-input-int";
         return $this->field($model, $attribute, $fieldOptions)->textInput($config);
     }
 

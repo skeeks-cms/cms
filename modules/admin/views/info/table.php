@@ -5,7 +5,6 @@ use Yii;
 /* @var $values array */
 ?>
 
-<h3><?= $caption ?></h3>
 
 <?php if (empty($values)): ?>
 
