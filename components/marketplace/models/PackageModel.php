@@ -6,6 +6,7 @@
  * @date 24.06.2015
  */
 namespace skeeks\cms\components\marketplace\models;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\yii2\curl\Curl;
 use yii\base\Component;
 use yii\base\Model;
@@ -22,6 +23,7 @@ use yii\helpers\Json;
  * @property string $url
  * @property string $authorName
  * @property string $authorImage
+ * @property UrlHelper $adminUrl
  *
  * Class PackageModel
  * @package skeeks\cms\components\marketplace
@@ -99,7 +101,7 @@ class PackageModel extends Model
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPackagistCode()
     {
@@ -109,9 +111,59 @@ class PackageModel extends Model
     /**
      * @return string
      */
+    public function getSupport()
+    {
+        return (string) ArrayHelper::getValue($this->apiData, 'related.support');
+    }
+
+    /**
+     * @return string
+     */
+    public function getInstallHelp()
+    {
+        return (string) ArrayHelper::getValue($this->apiData, 'related.install');
+    }
+
+    /**
+     * @return string
+     */
+    public function getDemoUrl()
+    {
+        return (string) ArrayHelper::getValue($this->apiData, 'related.demo_url');
+    }
+    /**
+     * @return string
+     */
+    public function getVideoUrl()
+    {
+        return (string) ArrayHelper::getValue($this->apiData, 'related.video_url');
+    }
+
+    /**
+     * @return string
+     */
     public function getUrl()
     {
         return $this->absoluteUrl;
+    }
+
+    /**
+     * @return UrlHelper
+     */
+    public function getAdminUrl()
+    {
+        return UrlHelper::construct('/cms/admin-marketplace/catalog', ['code' => $this->packagistCode])
+            ->enableAdmin();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInstalled()
+    {
+        $extensions = ArrayHelper::map(\Yii::$app->extensions, 'name', 'name');
+
+        return (bool) ArrayHelper::getValue($extensions, $this->packagistCode);
     }
 
 }
