@@ -17,6 +17,11 @@ use yii\helpers\Json;
  * @property integer $created_by
  * @property integer $created_at
  * @property string $name
+ * @property string $packagistCode
+ * @property string $image
+ * @property string $url
+ * @property string $authorName
+ * @property string $authorImage
  *
  * Class PackageModel
  * @package skeeks\cms\components\marketplace
@@ -36,18 +41,23 @@ class PackageModel extends Model
         $extensionCodes = ArrayHelper::map(\Yii::$app->extensions, 'name', 'name');
 
         $result = \Yii::$app->cmsMarkeplace->get(['packages', [
-            'packages' => $extensionCodes
+            //'packages' => $extensionCodes
+            'per-page' => 200
         ]]);
+
+        $items = ArrayHelper::getValue($result, 'items');
 
         $resultModels = [];
 
-        if ($result)
+        if ($items)
         {
-            foreach ($result as $data)
+            foreach ($items as $data)
             {
-                $resultModels[] = new static([
+                $model = new static([
                     'apiData' => $data
                 ]);
+
+                $resultModels[$model->getPackagistCode()] = $model;
             }
         }
 
@@ -66,7 +76,23 @@ class PackageModel extends Model
             return ArrayHelper::getValue($this->apiData, $name);
         }
 
-        parent::__get($name);
+        return parent::__get($name);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPackagistCode()
+    {
+        return (string) ArrayHelper::getValue($this->apiData, 'related.packagist_code');
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->absoluteUrl;
     }
 
 }

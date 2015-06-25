@@ -317,7 +317,7 @@ return
             [
                 "label"     => "Установленные решения",
                 "url"       => ["cms/admin-marketplace/index"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installed.png']
             ],
 
             [

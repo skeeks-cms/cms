@@ -46,11 +46,11 @@ class AdminMarketplaceController extends AdminController
                 "name"         => "Каталог решений",
             ],
 
-            "update" =>
+            /*"update" =>
             [
                 "class"        => AdminAction::className(),
                 "name"         => "Обновление платформы",
-            ],
+            ],*/
         ];
     }
 }
