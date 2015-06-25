@@ -31,6 +31,25 @@ class PackageModel extends Model
     public $apiData = [];
 
     /**
+     * @param $packagistCode
+     * @return null|static
+     */
+    static public function fetchByCode($packagistCode)
+    {
+        $result = \Yii::$app->cmsMarkeplace->get(['packages/view-by-code', [
+            'packagistCode' => (string) $packagistCode
+        ]]);
+
+        if (!$result)
+        {
+            return null;
+        }
+
+        return new static([
+            'apiData' => $result
+        ]);
+    }
+    /**
      * Установленные пакеты
      *
      * @return static[]
@@ -41,8 +60,8 @@ class PackageModel extends Model
         $extensionCodes = ArrayHelper::map(\Yii::$app->extensions, 'name', 'name');
 
         $result = \Yii::$app->cmsMarkeplace->get(['packages', [
-            //'packages' => $extensionCodes
-            'per-page' => 200
+            'onlyPackages'  => $extensionCodes,
+            'per-page'      => 200
         ]]);
 
         $items = ArrayHelper::getValue($result, 'items');
