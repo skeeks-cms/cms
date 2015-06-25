@@ -12,7 +12,7 @@
 <? if ($model->marketplacePackage) : ?>
     <div style="width: 120px; float:left; ">
 
-        <a data-pjax="0" href="<?= $model->marketplacePackage->url; ?>" target="_blank" title="Посмотреть на Packagist.org (откроется в новом окне)">
+        <a data-pjax="0" href="<?= $model->marketplacePackage->adminUrl->toString(); ?>">
 
             <?= \yii\helpers\Html::img($model->marketplacePackage->image, [
                 'width' => '100'
@@ -21,7 +21,11 @@
         </a>
     </div>
     <div>
-        <h3 style="margin-top: 0px;"><?= $model->marketplacePackage->name; ?></h3>
+        <h3 style="margin-top: 0px;">
+            <a data-pjax="0" href="<?= $model->marketplacePackage->adminUrl->toString(); ?>">
+                <?= $model->marketplacePackage->name; ?>
+            </a>
+        </h3>
         <p>
             <a data-pjax="0" href="<?= $model->getPackagistUrl(); ?>" class="btn btn-default btn-xs" target="_blank" title="Посмотреть на Packagist.org (откроется в новом окне)">
                 <?= $model->marketplacePackage->packagistCode; ?>
