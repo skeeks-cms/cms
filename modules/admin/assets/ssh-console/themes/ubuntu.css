@@ -1,0 +1,20 @@
+body {
+    color: #FFFFFF;
+    background-color: #281022;
+}
+code {
+    color: #898989;
+}
+.diff-header {
+    color: #FFF;
+}
+
+#currentDirName
+{
+    color: red;
+}
+
+#currentUser
+{
+    color: blue;
+}

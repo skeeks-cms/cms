@@ -44,7 +44,9 @@ if ($widget->enabledTabs != \skeeks\cms\components\Cms::BOOL_Y)
 }
 ?>
 <div class="sx-widget-ssh-console" id="<?= $widget->id; ?>">
-    <iframe style="border: none; width: <?= $widget->consoleWidth; ?>; height: <?= $widget->consoleHeight; ?>;" src="<?= \skeeks\cms\helpers\UrlHelper::construct('/admin/ssh/console')->enableAdmin()->toString(); ?>"></iframe>
+    <div class="sx-blocked-area">
+        <iframe id="<?= $widget->iframeId; ?>" style="border: none; width: <?= $widget->consoleWidth; ?>; height: <?= $widget->consoleHeight; ?>;" data-src="<?= \skeeks\cms\helpers\UrlHelper::construct('/admin/ssh/console')->enableAdmin()->toString(); ?>"></iframe>
+    </div>
 
     <? if ($items) : ?>
         <?= \yii\bootstrap\Tabs::widget([
@@ -63,17 +65,69 @@ $this->registerJs(<<<JS
         sx.classes.SshConsole = sx.classes.Component.extend({
 
             _init: function()
-            {},
+            {
+                this.isReady = false;
+                this.Blocker = new sx.classes.Blocker(".sx-blocked-area");
+            },
 
-            _onDomReady: function()
-            {},
+            _initIframeConsole: function()
+            {
+                var self = this;
 
-            _onWindowReady: function()
-            {},
+                this.IframeConsole.bind('submit', function(e, data)
+                {
+                    self.Blocker.block();
+                });
+
+                this.IframeConsole.bind('error', function(e, data)
+                {
+                    self.Blocker.unblock();
+                });
+
+                this.IframeConsole.bind('success', function(e, data)
+                {
+                    self.Blocker.unblock();
+                });
+
+                this.trigger('ready');
+                this.isReady = true;
+            },
+
+            /**
+            *
+            * @param callback
+            * @returns {sx.classes.SshConsole}
+            */
+            onReady: function(callback)
+            {
+                if (this.isReady)
+                {
+                    callback();
+                } else
+                {
+                    this.bind('ready', callback);
+                }
+
+                return this;
+            },
 
             execute: function(cmd)
             {
+                var self = this;
+                this.onReady(function()
+                {
+                    self._execute(cmd);
+                });
 
+                return this;
+            },
+
+            _execute: function(cmd)
+            {
+                this.IframeConsole.input.val(cmd);
+                this.IframeConsole.form.submit();
+
+                return this;
             },
 
             /**
@@ -83,6 +137,32 @@ $this->registerJs(<<<JS
             {
                 return $("#" + this.get('id'));
             },
+
+
+            _onDomReady: function()
+            {
+                var self = this;
+                this.IframeConsole = null;
+
+                this.jIframe = $('#' + this.get('iframeId'));
+                this.jIframe.attr('src', this.jIframe.data('src'));
+
+                sx.Iframe = new sx.classes.Iframe(this.get('iframeId'), {
+                   'autoHeight'     : false,                    //автоматически менять высоту фрейма
+                   'heightTimer'    : 50000,
+                   'scrolling'      : 'yes'
+                });
+
+                sx.Iframe.onSxReady(function()
+                {
+                    self.IframeConsole = sx.Iframe.sx.SshConsole;
+                    self._initIframeConsole();
+                });
+
+            },
+
+            _onWindowReady: function()
+            {},
         });
 
         sx.SshConsole = new sx.classes.SshConsole($options);

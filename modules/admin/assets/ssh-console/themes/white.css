@@ -1,0 +1,11 @@
+body {
+    color: #FFFFFF;
+    background-color: #000000;
+    font-family: monospace;
+}
+code {
+    color: #898989;
+}
+.diff-header {
+    color: #FFF;
+}

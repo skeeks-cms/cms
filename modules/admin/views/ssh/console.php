@@ -1,5 +1,5 @@
 <?php
-$action->controller->layout = false;
+$action->controller->layout = '@skeeks/cms/views/layouts/clean';
 /**
  * Console
  *
@@ -8,65 +8,15 @@ $action->controller->layout = false;
 // Change next variables as you need.
 // Digest HTTP Authentication
 // To enable, add user: "name" => "password".
-$users = array();
-$realm = 'Console';
+$users  = [];
+$realm  = 'SkeekS CMS ssh console';
 // Console theme.
 // Available styles: white, green, grey, far, ubuntu
-$theme = 'default';
-// Commands
-$commands = array(
-    '*' => '$1',
-);
-// Start with this dir.
-$currentDir = ROOT_DIR;
-$allowChangeDir = true;
-// Allowed and denied commands.
-$allow = array();
-$deny = array();
-// Next comes the code...
-###############################################
-#                Controller                   #
-###############################################
-// Use next two for long time executing commands.
-ignore_user_abort(true);
-set_time_limit(0);
-
-error_reporting(E_ALL | E_STRICT);
-// определяем режим вывода ошибок
-ini_set('display_errors', 'On');
-// If exist config include it.
-/*if (is_readable($file = __DIR__ . '/console.config.php')) {
-    include $file;
-}*/
-
-
-
-
-
-
-
-
-
-/**
- * Copy this file to console.config.php and place it (with your settings inside) near console.php
- */
-
-/**
- * Digest HTTP Authentication
- *
- * To enable, add user: "name" => "password".
- */
-$users = array(
-    //'admin' => '1234',
-);
-
-$realm = 'Console';
-
-/**
- * Console style.
- * Available styles: white, green, grey, far, ubuntu
- */
 $theme = 'ubuntu';
+
+// Start with this dir.
+$currentDir         = ROOT_DIR;
+$allowChangeDir     = false;
 
 /**
  * List of commands filters. You can use * for any symbol. And $1 as replacement.
@@ -81,26 +31,36 @@ $commands = array(
     '*' => '$1', // Allow any command. Must be at the end of the list.
 );
 
+// Allowed and denied commands.
 /**
  * array of allowed commands. Default: empty array (all are allowed)
  * You can use * for any symbol.
  * Example: "branch*" will allow both "branch" and "branch -v" commands
  */
-$allow = array();
+$allow = [];
 
 /**
  * array of denied commands. Default: empty array (none is denied)
  * You can use * for any symbol.
  */
-$deny = array(
+$deny = [
     "rm*",
     "cd*",
-);
+];
 
 
 
+// Next comes the code...
+###############################################
+#                Controller                   #
+###############################################
+// Use next two for long time executing commands.
+ignore_user_abort(true);
+set_time_limit(0);
 
-
+//error_reporting(E_ALL | E_STRICT);
+// определяем режим вывода ошибок
+//ini_set('display_errors', 'On');
 
 
 
@@ -314,336 +274,31 @@ $autocomplete = [
 ###############################################
 ?>
 
-<!doctype html>
-<html>
-<head>
-<title>console</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style type="text/css">
-    * {
-        margin: 0;
-        padding: 0;
-    }
-    body {
-        padding: 10px;
-        background: #FFFFFF;
-        color: #333333;
-        font-family: 'Lucida Console', Monaco, monospace;
-        font-size: 16px;
-    }
-    form {
-        display: table;
-        width: 100%;
-        white-space: nowrap;
-    }
-    form div {
-        display: table-cell;
-        width: auto;
-    }
-    form #command {
-        width: 100%;
-    }
-    input {
-        border: none;
-        outline: none;
-        background: transparent;
-        width: 100%;
-    }
-    input:focus {
-        outline: none;
-    }
-    pre, form, input {
-        color: inherit;
-        font-family: inherit;
-        font-size: inherit;
-    }
-    pre {
-        white-space: pre;
-    }
-    code {
-        color: blue;
-        font-family: inherit;
-        font-size: inherit;
-    }
-    strong {
-        font-weight: bolder;
-        font-family: Tahoma, Geneva, sans-serif
-    }
-    .error {
-        color: red;
-    }
-    .autocomplete .guess {
-        color: #a9a9a9;
-    }
-    .diff-header {
-        color: #333;
-        font-weight: bold;
-    }
-    .diff-sub-header {
-        color: #33a;
-    }
-    .diff-added {
-        color: #3a3;
-    }
-    .diff-deleted {
-        color: #a33;
-    }
-</style>
-<?php if ($theme == "ubuntu") { ?>
-    <style type="text/css">
-        body {
-            color: #FFFFFF;
-            background-color: #281022;
-        }
-        code {
-            color: #898989;
-        }
-        .diff-header {
-            color: #FFF;
-        }
-    </style>
-<?php } elseif ($theme == "grey") { ?>
-    <style type="text/css">
-        body {
-            color: #B8B8B8;
-            background-color: #424242;
-            font-family: Monaco, Courier, monospace;
-        }
-        code {
-            color: #FFFFFF;
-        }
-        form, input {
-            color: #FFFFFF;
-        }
-        .diff-header {
-            color: #B8B8B8;
-        }
-        .diff-sub-header {
-            color: #cbcbcb;
-        }
-    </style>
-<?php } elseif ($theme == "far") { ?>
-    <style type="text/css">
-        body {
-            color: #CCCCCC;
-            background-color: #001F7C;
-            font-family: Terminal, monospace;
-        }
-        code {
-            color: #6CF7FC;
-        }
-        .diff-header {
-            color: aqua;
-        }
-        .diff-sub-header {
-            color: #1f7184;
-        }
-    </style>
-<?php } elseif ($theme == "white") { ?>
-    <style type="text/css">
-        body {
-            color: #FFFFFF;
-            background-color: #000000;
-            font-family: monospace;
-        }
-        code {
-            color: #898989;
-        }
-        .diff-header {
-            color: #FFF;
-        }
-    </style>
-<?php } elseif ($theme == "green") { ?>
-    <style type="text/css">
-        body {
-            background-color: #000000;
-            color: #00C000;
-            font-family: monospace;
-        }
-        code {
-            color: #00C000;
-        }
-        .diff-added {
-            color: #23be8c;
-        }
-    </style>
-<?php } ?>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type="text/javascript">
-    /**
-     *  History of commands.
-     */
-    (function ($) {
-        var maxHistory = 100;
-        var position = -1;
-        var currentCommand = '';
-        var addCommand = function (command) {
-            var ls = localStorage['commands'];
-            var commands = ls ? JSON.parse(ls) : [];
-            if (commands.length > maxHistory) {
-                commands.shift();
-            }
-            commands.push(command);
-            localStorage['commands'] = JSON.stringify(commands);
-        };
-        var getCommand = function (at) {
-            var ls = localStorage['commands'];
-            var commands = ls ? JSON.parse(ls) : [];
-            if (at < 0) {
-                position = at = -1;
-                return currentCommand;
-            }
-            if (at >= commands.length) {
-                position = at = commands.length - 1;
-            }
-            return commands[commands.length - at - 1];
-        };
-        $.fn.history = function () {
-            var input = $(this);
-            input.keydown(function (e) {
-                var code = (e.keyCode ? e.keyCode : e.which);
-                if (code == 38) { // Up
-                    if (position == -1) {
-                        currentCommand = input.val();
-                    }
-                    input.val(getCommand(++position));
-                    return false;
-                } else if (code == 40) { // Down
-                    input.val(getCommand(--position));
-                    return false;
-                } else {
-                    position = -1;
-                }
-            });
-            return input;
-        };
-        $.fn.addHistory = function (command) {
-            addCommand(command);
-        };
-    })(jQuery);
-    /**
-     * Autocomplete input.
-     */
-    (function ($) {
-        $.fn.autocomplete = function (suggest) {
-            // Wrap and extra html to input.
-            var input = $(this);
-            input.wrap('<span class="autocomplete" style="position: relative;"></span>');
-            var html =
-                '<span class="overflow" style="position: absolute; z-index: -10;">' +
-                    '<span class="repeat" style="opacity: 0;"></span>' +
-                    '<span class="guess"></span></span>';
-            $('.autocomplete').prepend(html);
-            // Search of input changes.
-            var repeat = $('.repeat');
-            var guess = $('.guess');
-            var search = function (command) {
-                var array = [];
-                for (var key in suggest) {
-                    if (!suggest.hasOwnProperty(key))
-                        continue;
-                    var pattern = new RegExp(key);
-                    if (command.match(pattern)) {
-                        array = suggest[key];
-                    }
-                }
-                var text = command.split(' ').pop();
-                var found = '';
-                if (text != '') {
-                    for (var i = 0; i < array.length; i++) {
-                        var value = array[i];
-                        if (value.length > text.length &&
-                            value.substring(0, text.length) == text) {
-                            found = value.substring(text.length, value.length);
-                            break;
-                        }
-                    }
-                }
-                guess.text(found);
-            };
-            var update = function () {
-                var command = input.val();
-                repeat.text(command);
-                search(command);
-            };
-            input.change(update);
-            input.keyup(update);
-            input.keypress(update);
-            input.keydown(update);
-            input.keydown(function (e) {
-                var code = (e.keyCode ? e.keyCode : e.which);
-                if (code == 9) {
-                    var val = input.val();
-                    input.val(val + guess.text());
-                    return false;
-                }
-            });
-            return input;
-        };
-    })(jQuery);
-    /**
-     * Windows variables.
-     */
-    window.currentDir = '<?php echo $currentDirName; ?>';
-    window.currentDirName = window.currentDir.split('/').pop();
-    window.currentUser = '<?php echo $currentUser; ?>';
-    window.titlePattern = "* — console";
-    window.document.title = window.titlePattern.replace('*', window.currentDirName);
-    /**
-     * Init console.
-     */
-    $(function () {
-        var screen = $('pre');
-        var input = $('input').focus();
-        var form = $('form');
-        var scroll = function () {
-            window.scrollTo(0, document.body.scrollHeight);
-        };
-        input.history();
-        input.autocomplete(<?php echo json_encode($autocomplete); ?>);
-        form.submit(function () {
-            var command = $.trim(input.val());
-            if (command == '') {
-                return false;
-            }
-            $("<code>" + window.currentDirName + "&nbsp;" + window.currentUser + "$&nbsp;" + command + "</code><br>").appendTo(screen);
-            scroll();
-            input.val('');
-            form.hide();
-            input.addHistory(command);
-            $.get('', {'command': command, 'cd': window.currentDir}, function (output) {
-                var pattern = /^set current directory (.+?)$/i;
-                if (matches = output.match(pattern)) {
-                    window.currentDir = matches[1];
-                    window.currentDirName = window.currentDir.split('/').pop();
-                    $('#currentDirName').text(window.currentDirName);
-                    window.document.title = window.titlePattern.replace('*', window.currentDirName);
-                } else {
-                    screen.append(output);
-                }
-            })
-                .fail(function () {
-                    screen.append("<span class='error'>Command is sent, but due to an HTTP error result is not known.</span>\n");
-                })
-                .always(function () {
-                    form.show();
-                    scroll();
-                });
-            return false;
-        });
-        $(document).keydown(function () {
-            input.focus();
-        });
-    });
-</script>
-</head>
-<body>
 <pre></pre>
 <form>
     <div id="currentDirName"><?php echo $currentDirName; ?></div>
-    <div>&nbsp;<?php echo $currentUser; ?>$&nbsp;</div>
+    <div id="currentUser">&nbsp;<?php echo $currentUser; ?>$&nbsp;</div>
     <div id="command"><input type="text" value=""></div>
 </form>
-</body>
-</html>
+
+<?
+/* @var $this yii\web\View */
+\skeeks\cms\modules\admin\assets\AdminSshConsoleAsset::register($this);
+
+$options = [
+    'currentDirName'    => $currentDirName,
+    'currentUser'       => $currentUser,
+    'autocomplete'      => $autocomplete
+];
+
+$options = \yii\helpers\Json::encode($options);
+
+$this->registerJs(<<<JS
+
+(function(sx, $, _)
+{
+    sx.SshConsole = new sx.classes.SshConsole({$options});
+})(sx, sx.$, sx._);
+JS
+)
+?>

@@ -24,6 +24,18 @@ class SshConsoleWidget extends Widget
     public $enabledTabHelp          = Cms::BOOL_Y;
     public $enabledTabCmds          = Cms::BOOL_Y;
 
+    public $iframeId            = "";
+
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->iframeId)
+        {
+            $this->iframeId = 'sx-iframe-' . $this->id;
+        }
+
+    }
     public function run()
     {
         return $this->render('ssh-console', [
@@ -37,7 +49,8 @@ class SshConsoleWidget extends Widget
     public function getClientOptionsJson()
     {
         return Json::encode([
-            'id'            => $this->id,
+            'id'                    => $this->id,
+            'iframeId'              => $this->iframeId,
         ]);
     }
 }
