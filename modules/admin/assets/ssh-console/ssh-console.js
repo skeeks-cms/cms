@@ -42,6 +42,12 @@
             this.input  = input;
             this.form   = form;
 
+            $('html, body').on('click', function()
+            {
+                self.input.focus();
+            });
+            self.input.focus();
+
             form.submit(function ()
             {
                 var command = $.trim(input.val());
