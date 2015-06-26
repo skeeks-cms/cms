@@ -157,13 +157,19 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         });
     }
 
+    public $inited = false;
+
     /**
-     * Renders mini-toolbar at the end of page body.
-     *
-     * @param \yii\base\Event $event
+     * Установка проверок один раз.
+     * Эти проверки могут быть запущены при отрисовке первого виджета.
      */
-    public function renderToolbar($event)
+    public function initEnabled()
     {
+        if ($this->inited)
+        {
+            return;
+        }
+
         if (!$this->enabled)
         {
             return;
@@ -175,10 +181,24 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             return;
         }
 
-
         if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
         {
             $this->enabled = false;
+            return;
+        }
+    }
+
+    /**
+     * Renders mini-toolbar at the end of page body.
+     *
+     * @param \yii\base\Event $event
+     */
+    public function renderToolbar($event)
+    {
+        $this->initEnabled();
+
+        if (!$this->enabled)
+        {
             return;
         }
 
