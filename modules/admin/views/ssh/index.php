@@ -6,5 +6,4 @@
  * @date 23.06.2015
  */
 ?>
-
-<?= \skeeks\cms\widgets\SshConsoleWidget::widget(); ?>
+<?= \skeeks\cms\widgets\ssh\SshConsoleWidget::widget(); ?>
