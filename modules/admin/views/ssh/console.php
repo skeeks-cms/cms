@@ -94,6 +94,7 @@ $allow = array();
  */
 $deny = array(
     "rm*",
+    "cd*",
 );
 
 
