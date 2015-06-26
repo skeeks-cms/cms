@@ -7,6 +7,7 @@
 (function(sx, $, _)
 {
     sx.createNamespace('classes', sx);
+
     /**
      * Настройка блокировщика для админки по умолчанию. Глобальное перекрытие
      * @type {void|*|Function}
@@ -15,26 +16,23 @@
 
         _init: function()
         {
-            this.applyParentMethod(sx.classes.BlockerJqueyUi, '_init', []);
+            this.imageLoader = '';
 
-            var self = this;
-            sx.onReady(function()
+            if (sx.App)
             {
-                console.log(sx.config.get("Blocker"));
-                var BlockerData = sx.config.get("Blocker");
-                console.log(BlockerData);
-                self.imageLoader = String(BlockerData.circulareBlue);
+                this.imageLoader = sx.App.get('BlockerImageLoader');
+            }
 
-                self.defaultOpts({
-                    message: "<div style='padding: 5px;'><img src='" + self.imageLoader + "' />Подождите...</div>",
-                    css: {
-                        border: '1px solid #108acb',
-                        padding: '10px;',
-                    }
-                });
+            this.defaultOpts({
+                message: "<div style='padding: 5px;'><img src='" + this.imageLoader + "' /> Подождите...</div>",
+                css: {
+                    border: '1px solid #108acb',
+                    padding: '10px;',
+                }
             });
 
-        }
+            this.applyParentMethod(sx.classes.BlockerJqueyUi, '_init', []);
+        },
     });
 
 })(sx, sx.$, sx._);

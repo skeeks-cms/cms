@@ -35,7 +35,8 @@ class AdminAsset extends AssetBundle
         'js/classes/Window.js',
         'js/classes/modal/Dialog.js',
         'js/classes/Fullscreen.js',
-        'js/app.js',
+        //'js/App.js',
+        'js/Admin.js',
     ];
     public $depends = [
 
@@ -61,19 +62,24 @@ class AdminAsset extends AssetBundle
 
         $options =
         [
-            'Blocker' =>
-            [
-                'circulareBlue'    => \Yii::$app->getAssetManager()->getAssetUrl($this, 'images/loaders/circulare-blue-24_24.GIF'),
-            ]
+            'BlockerImageLoader'        => \Yii::$app->getAssetManager()->getAssetUrl($this, 'images/loaders/circulare-blue-24_24.GIF'),
+            'disableCetainLink'         => false,
+            'globalAjaxLoader'          => true,
+            'menu'                      => [],
         ];
 
         $options = Json::encode($options);
 
         $view->registerJs(<<<JS
-        (function(sx, $, _)
-        {
-            sx.config.merge({$options});
-        })(sx, sx.$, sx._);
+(function(sx, $, _)
+{
+    /**
+     * Запускаем глобальный класс админки
+     * @type {Admin}
+     */
+    sx.App = new sx.classes.Admin($options);
+
+})(sx, sx.$, sx._);
 JS
 );
     }

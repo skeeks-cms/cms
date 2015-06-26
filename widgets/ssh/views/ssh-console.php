@@ -67,7 +67,7 @@ $this->registerJs(<<<JS
             _init: function()
             {
                 this.isReady = false;
-                this.Blocker = new sx.classes.Blocker(".sx-blocked-area");
+                this.Blocker = null;
             },
 
             _initIframeConsole: function()
@@ -76,17 +76,17 @@ $this->registerJs(<<<JS
 
                 this.IframeConsole.bind('submit', function(e, data)
                 {
-                    self.Blocker.block();
+                    self.getBlocker().block();
                 });
 
                 this.IframeConsole.bind('error', function(e, data)
                 {
-                    self.Blocker.unblock();
+                    self.getBlocker().unblock();
                 });
 
                 this.IframeConsole.bind('success', function(e, data)
                 {
-                    self.Blocker.unblock();
+                    self.getBlocker().unblock();
                 });
 
                 this.trigger('ready');
@@ -139,8 +139,24 @@ $this->registerJs(<<<JS
             },
 
 
+            /**
+            *
+            * @returns {null|*}
+            */
+            getBlocker: function()
+            {
+                if (!this.Blocker)
+                {
+                    this.Blocker = new sx.classes.Blocker(".sx-blocked-area");
+                }
+
+                return this.Blocker;
+            }
+
             _onDomReady: function()
             {
+
+
                 var self = this;
                 this.IframeConsole = null;
 
