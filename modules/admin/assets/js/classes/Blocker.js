@@ -17,13 +17,23 @@
         {
             this.applyParentMethod(sx.classes.BlockerJqueyUi, '_init', []);
 
-            this.defaultOpts({
-                message: "<div style='padding: 5px;'>Подождите...</div>",
-                css: {
-                    border: '1px solid #108acb',
-                    padding: '10px;',
-                }
+            var self = this;
+            sx.onReady(function()
+            {
+                console.log(sx.config.get("Blocker"));
+                var BlockerData = sx.config.get("Blocker");
+                console.log(BlockerData);
+                self.imageLoader = String(BlockerData.circulareBlue);
+
+                self.defaultOpts({
+                    message: "<div style='padding: 5px;'><img src='" + self.imageLoader + "' />Подождите...</div>",
+                    css: {
+                        border: '1px solid #108acb',
+                        padding: '10px;',
+                    }
+                });
             });
+
         }
     });
 

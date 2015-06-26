@@ -12,6 +12,7 @@
 namespace skeeks\cms\modules\admin\assets;
 use skeeks\cms\assets\FancyboxAssets;
 use skeeks\cms\base\AssetBundle;
+use yii\helpers\Json;
 
 
 /**
@@ -48,5 +49,33 @@ class AdminAsset extends AssetBundle
         '\skeeks\cms\assets\FancyboxAssets',
         '\skeeks\cms\assets\JqueryFullscreenAsset'
     ];
+
+    /**
+     * Registers this asset bundle with a view.
+     * @param View $view the view to be registered with
+     * @return static the registered asset bundle instance
+     */
+    public function registerAssetFiles($view)
+    {
+        parent::registerAssetFiles($view);
+
+        $options =
+        [
+            'Blocker' =>
+            [
+                'circulareBlue'    => \Yii::$app->getAssetManager()->getAssetUrl($this, 'images/loaders/circulare-blue-24_24.GIF'),
+            ]
+        ];
+
+        $options = Json::encode($options);
+
+        $view->registerJs(<<<JS
+        (function(sx, $, _)
+        {
+            sx.config.merge({$options});
+        })(sx, sx.$, sx._);
+JS
+);
+    }
 }
 
