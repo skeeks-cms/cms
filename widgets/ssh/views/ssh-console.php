@@ -151,7 +151,7 @@ $this->registerJs(<<<JS
                 }
 
                 return this.Blocker;
-            }
+            },
 
             _onDomReady: function()
             {
