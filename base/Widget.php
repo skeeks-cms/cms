@@ -38,6 +38,25 @@ abstract class Widget extends Component implements ViewContextInterface
         \Yii::endProfile("Init: " . $this->_token);
     }
 
+
+    /**
+     * В ключ добавляется зависимость, какой режим используется
+     * @return string
+     */
+    /*public function getCacheKey()
+    {
+        \Yii::$app->cmsToolbar->initEnabled();
+        if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
+        {
+            return implode([
+                "edit-mode-true"
+            ]) . parent::getCacheKey();
+        } else
+        {
+            parent::getCacheKey();
+        }
+    }*/
+
     /**
      * @return string
      */
@@ -54,6 +73,7 @@ abstract class Widget extends Component implements ViewContextInterface
             $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
         }
 
+        \Yii::$app->cmsToolbar->initEnabled();
         if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
         {
             $pre = "";
