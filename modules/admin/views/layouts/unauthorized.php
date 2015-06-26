@@ -137,7 +137,7 @@ $this->registerJs(<<<JS
             }
         });
 
-        sx.app = new sx.classes.AppUnAuthorized({});
+        new sx.classes.AppUnAuthorized({});
     })(sx, sx.$, sx._);
 JS
 );

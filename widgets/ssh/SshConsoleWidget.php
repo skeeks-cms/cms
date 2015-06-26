@@ -5,14 +5,14 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 26.06.2015
  */
-namespace skeeks\cms\widgets;
+namespace skeeks\cms\widgets\ssh;
 use skeeks\cms\components\Cms;
 use yii\base\Widget;
 use yii\helpers\Json;
 
 /**
  * Class SshConsoleWidget
- * @package skeeks\cms\widgets
+ * @package skeeks\cms\widgets\ssh
  */
 class SshConsoleWidget extends Widget
 {
