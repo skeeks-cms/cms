@@ -8,6 +8,7 @@
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\base\console\Controller;
+use skeeks\sx\Dir;
 use Yii;
 use yii\console\controllers\HelpController;
 use yii\helpers\ArrayHelper;
@@ -30,8 +31,8 @@ class UtilsController extends Controller
     }
 
     /**
-     * Проверка какие библиотечные файлы были заменены вручную (папка vendor)
-     * Не желательно менять библиотечные файлы, поскольку при следующем обновлении все изменения могут быть стерты.
+     * Получение списка всех возможных консольных команд
+     * Используется в console ssh для автокомплита
      */
     public function actionAllCmd()
     {
@@ -56,5 +57,62 @@ class UtilsController extends Controller
         };
 
         $this->stdout(implode("\n", $commands));
+    }
+
+
+    /**
+     * Читска временный файлов (runtimes)
+     *
+     * '@console/runtime'
+     * '@common/runtime'
+     * '@frontend/runtime'
+     *
+     */
+    public function actionClearRuntimes()
+    {
+        $dir = new Dir(\Yii::getAlias('@console/runtime'));
+        $dir->clear();
+        $this->_checkIsEmptyDir($dir);
+
+        $dir = new Dir(\Yii::getAlias('@common/runtime'));
+        $dir->clear();
+        $this->_checkIsEmptyDir($dir);
+
+        $dir = new Dir(\Yii::getAlias('@frontend/runtime'));
+        $dir->clear();
+        $this->_checkIsEmptyDir($dir);
+    }
+
+    /**
+     * Читска временный файлов ('@frontend/web/assets')
+     */
+    public function actionClearAssets($dirPath = '@frontend/web/assets')
+    {
+        $dir = new Dir(\Yii::getAlias($dirPath));
+        $dir->clear();
+        $this->_checkIsEmptyDir($dir);
+    }
+
+    /**
+     * Проверка папка пустая или нет
+     * @param $dirPath
+     */
+    protected function _checkIsEmptyDir($dirPath)
+    {
+        if ($dirPath instanceof Dir)
+        {
+            $dir = $dirPath;
+        } else
+        {
+            $dir = new Dir($dirPath);
+        }
+
+        if ($dir->findFiles() || $dir->findDirs())
+        {
+            $this->stdoutN('Папка assets (' . $dir->getPath() . ') не очищена. В ней остались файлы');
+        } else
+        {
+            $this->stdoutN('Папка assets (' . $dir->getPath() . ') очищена.');
+        }
     }
 }

@@ -106,22 +106,21 @@ class UpdateController extends Controller
         //Обновление зависимостей
         $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
 
+        //Установка всех миграций
+        $this->systemCmdRoot("php yii cms/db/apply-migrations");
 
-        $this->actionMigration();
-        $this->actionClearRuntimes();
+        //Чистка временных диррикторий
+        $this->systemCmdRoot("php yii cms/utils/clear-runtimes");
+
         $this->actionGenerateModulesConfigFile();
-        $this->actionDbRefresh();
-        $this->actionRbacUpdate();
-    }
 
+        //Сброс кэша стрктуры базы данных
+        $this->systemCmdRoot("php yii cms/db/db-refresh");
 
-    /**
-     * Обновление и добавления прав доступа
-     */
-    public function actionRbacUpdate()
-    {
+        //Обновление привилегий
         $this->systemCmdRoot("php yii cms/rbac/init");
     }
+
 
     /**
      * Генерация файла со списком модулей
@@ -131,64 +130,4 @@ class UpdateController extends Controller
         \Yii::$app->cms->generateModulesConfigFile();
     }
 
-    /**
-     * Инвалидация кэша стуктуры базы данных
-     */
-    public function actionDbRefresh()
-    {
-        \Yii::$app->db->getSchema()->refresh();
-    }
-
-    /**
-     * Читска временный файлов (assets и runtimes)
-     */
-    public function actionClearRuntimes()
-    {
-        $dir = new Dir(\Yii::getAlias('@console/runtime'));
-        $dir->clear();
-
-        $dir = new Dir(\Yii::getAlias('@common/runtime'));
-        $dir->clear();
-
-        $dir = new Dir(\Yii::getAlias('@frontend/runtime'));
-        $dir->clear();
-        $dir = new Dir(\Yii::getAlias('@frontend/web/assets'));
-        $dir->clear();
-    }
-
-    /**
-     * Проведение всех миграций всех подключенных модулей
-     */
-    public function actionMigration()
-    {
-        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations --interactive=0" ;
-        $this->systemCmdRoot($cmd);
-
-        foreach (\Yii::$app->extensions as $code => $data)
-        {
-            if ($data['alias'])
-            {
-                foreach ($data['alias'] as $code => $path)
-                {
-                    $migrationsPath = $path . '/migrations';
-
-
-                    if (PHP_OS == 'Windows')
-                    {
-                        $migrationsPath = str_replace("/", "\\", $migrationsPath);
-                    }
-
-
-                    if (is_dir($migrationsPath))
-                    {
-                        $cmd = "php yii migrate --migrationPath=" . $migrationsPath . '  --interactive=0' ;
-                        $this->systemCmdRoot($cmd);
-                    }
-
-                }
-            }
-        }
-
-        $this->systemCmdRoot("php yii migrate --interactive=0");
-    }
 }
