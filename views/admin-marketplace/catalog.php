@@ -21,7 +21,7 @@ $self = $this;
 
         <div class="row">
             <div class="col-lg-2">
-                <a href="<?= $packageModel->image; ?>" class="sx-img-link-hover sx-fancybox">
+                <a href="<?= $packageModel->image; ?>" class="sx-img-link-hover sx-border-1px sx-fancybox">
                     <img src="<?= $packageModel->image; ?>" style="width: 100%" />
                 </a>
             </div>
@@ -52,7 +52,7 @@ $self = $this;
                 <div class="col-lg-12">
                 <h2>Фото и скриншоты</h2>
                 <? foreach($images as $image) : ?>
-                    <a href="<?= $image; ?>" class="sx-fancybox sx-img-link-hover">
+                    <a href="<?= $image; ?>" class="sx-fancybox sx-img-link-hover sx-border-1px">
                         <img src="<?= $image; ?>" style="max-width: 300px;"/>
                     </a>
                 <? endforeach; ?>

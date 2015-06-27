@@ -754,3 +754,13 @@ a.sx-img-link-hover img
         border: 2px solid #5dc3e7;
         box-shadow: 1px 1px 14px rgba(32, 168, 216, 0.69);
     }
+
+a.sx-border-1px img
+{
+    border-width: 1px;
+}
+
+    a.sx-width-1px img:hover
+    {
+        border-width: 1px;
+    }
