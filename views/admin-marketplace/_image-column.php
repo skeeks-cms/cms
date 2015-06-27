@@ -12,7 +12,7 @@
 <? if ($model->marketplacePackage) : ?>
     <div style="width: 120px; float:left; ">
 
-        <a data-pjax="0" href="<?= $model->marketplacePackage->adminUrl->toString(); ?>">
+        <a data-pjax="0" href="<?= $model->marketplacePackage->adminUrl->toString(); ?>" class="sx-img-link-hover">
 
             <?= \yii\helpers\Html::img($model->marketplacePackage->image, [
                 'width' => '100'
