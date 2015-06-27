@@ -12,6 +12,8 @@
 
         _init: function()
         {
+            var self = this;
+
             new sx.classes.ssh.Autocomplete();
             new sx.classes.ssh.History();
 
@@ -24,7 +26,23 @@
             window.currentUser = this.get('currentUser');;
             window.titlePattern = "* — console";
             window.document.title = window.titlePattern.replace('*', window.currentDirName);
+
+
+            this.bind('success', function(e, data)
+            {
+                _.delay(function(){
+                    self.input.focus()
+                }, 200);
+            });
+
+            this.bind('error', function(e, data)
+            {
+                _.delay(function(){
+                    self.input.focus()
+                }, 200);
+            });
         },
+
 
         _onDomReady: function()
         {
@@ -90,14 +108,14 @@
                     })
                     .always(function () {
 
+                        form.show();
+                        scroll();
+
                         self.trigger('success', {
                             'SshConsole': self,
                             'command': command,
                             'cd': window.currentDir,
                         });
-
-                        form.show();
-                        scroll();
                     });
                 return false;
             });
