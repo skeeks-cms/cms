@@ -10,7 +10,7 @@
 ?>
 <div class="sx-fast-cmd sx-blocked-area">
     <div class="row">
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <h2>Help</h2>
             <p>
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii help'); return false;">
@@ -21,7 +21,7 @@
                 </a>
             </p>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <h2>Обновление и установка</h2>
             <p>
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii cms/update'); return false;">
@@ -40,7 +40,7 @@
                 </a>
             </p>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <h2>Утилиты</h2>
             <p>
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii cms/composer/status'); return false;">
@@ -71,6 +71,9 @@
             </p>
         </div>
 
+    </div>
+
+    <div class="row">
         <div class="col-lg-3">
             <h2>Работа с базой данных</h2>
             <p>
@@ -91,6 +94,5 @@
                 </a>
             </p>
         </div>
-
     </div>
 </div>

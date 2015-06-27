@@ -14,8 +14,13 @@
         {
             var self = this;
 
-            new sx.classes.ssh.Autocomplete();
-            new sx.classes.ssh.History();
+            new sx.classes.ssh.Autocomplete({
+                'SshConsole': this
+            });
+
+            new sx.classes.ssh.History({
+                'SshConsole': this
+            });
 
 
             /**
@@ -44,6 +49,12 @@
         },
 
 
+        scroll: function()
+        {
+            window.scrollTo(0, document.body.scrollHeight);
+        },
+
+
         _onDomReady: function()
         {
             var self = this;
@@ -51,9 +62,7 @@
             var screen = $('pre');
             var input = $('input').focus();
             var form = $('form');
-            var scroll = function () {
-                window.scrollTo(0, document.body.scrollHeight);
-            };
+
             input.history();
             input.autocomplete(this.get('autocomplete'));
 
@@ -73,7 +82,7 @@
                     return false;
                 }
                 $("<code>" + window.currentDirName + "&nbsp;" + window.currentUser + "$&nbsp;" + command + "</code><br>").appendTo(screen);
-                scroll();
+                self.scroll();
                 input.val('');
                 form.hide();
                 input.addHistory(command);
@@ -109,7 +118,7 @@
                     .always(function () {
 
                         form.show();
-                        scroll();
+                        self.scroll();
 
                         self.trigger('success', {
                             'SshConsole': self,
@@ -126,8 +135,15 @@
     });
 
     sx.classes.ssh.History = sx.classes.Component.extend({
+        _init: function()
+        {
+            this.SshConsole = this.get('SshConsole');
+        },
+
         _onDomReady: function()
         {
+            var self = this;
+
             /**
              *  History of commands.
              */
@@ -165,9 +181,11 @@
                                 currentCommand = input.val();
                             }
                             input.val(getCommand(++position));
+                            self.SshConsole.scroll();
                             return false;
                         } else if (code == 40) { // Down
                             input.val(getCommand(--position));
+                            self.SshConsole.scroll();
                             return false;
                         } else {
                             position = -1;
