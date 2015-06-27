@@ -154,7 +154,7 @@ $this->registerJs(<<<JS
                 _.delay(function()
                 {
                     window.location.href = urlGo;
-                }, 3000);
+                }, 2000);
 
             }
         });
@@ -209,8 +209,8 @@ JS
                     </div>
 
                     <div class="sx-act sx-act-successLogin">
-                        <p class="sx-step sx-step-1">Авторизация прошла успешно</p>
-                        <p class="sx-step sx-step-2">Ожидайте сейчас все будет...</p>
+                        <p class="sx-step sx-step-1"><h2>Авторизация прошла успешно</h2></p>
+                        <p class="sx-step sx-step-2">Открытие системы администрирования...</p>
                     </div>
 
                     <div class="sx-act sx-act-forget">
