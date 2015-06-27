@@ -22,6 +22,8 @@ use skeeks\cms\helpers\UrlHelper;
 AdminAsset::register($this);
 \Yii::$app->admin->registerAsset($this);
 
+\skeeks\cms\modules\admin\assets\AdminCanvasBg::register($this);
+
 $urlBg = \Yii::$app->assetManager->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/bg/582738_www.Gde-Fon.com.jpg');
 
 $this->registerCss(<<<CSS
@@ -63,6 +65,16 @@ form.sx-form-admin
 }
 
 
+#canvas-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
 CSS
 );
 
@@ -100,6 +112,15 @@ $this->registerJs(<<<JS
                         "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
                     }
                 });
+
+             // Init CanvasBG and pass target starting location
+                CanvasBG.init({
+                  Loc: {
+                    x: window.innerWidth / 2.1,
+                    y: window.innerHeight / 2.2
+                  },
+                });
+
             },
 
             _onWindowReady: function()
@@ -159,6 +180,10 @@ JS
 
 
 <?php $this->beginBody() ?>
+
+
+
+
 <div class="navbar" role="navigation">
     <div class="navbar-header sx-header-logo">
         <?= Html::a("<span><img src='" . \Yii::$app->cms->logo() . "' /> " . \Yii::$app->cms->moduleCms()->getDescriptor()->name . "</span>", \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
@@ -171,6 +196,11 @@ JS
             <a href="/">Перейти на сайт &rarr;</a>
     </ul>
 </div>
+
+<!-- begin canvas animation bg -->
+      <div id="canvas-wrapper">
+        <canvas id="demo-canvas"></canvas>
+      </div>
 
 <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
 <?= $content ?>
