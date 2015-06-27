@@ -31,14 +31,16 @@
                     </small>
                 </a>
             </p>
+
             <p>
-                <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('cms/db/apply-migrations'); return false;">
-                    cms/db/apply-migrations
+                <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii cms/update --dry-run'); return false;">
+                    php yii cms/update --dry-run
                     <small>
-                        (установка миграций)
+                        (симуляция обновления)
                     </small>
                 </a>
             </p>
+
         </div>
         <div class="col-lg-4">
             <h2>Утилиты</h2>
@@ -90,6 +92,15 @@
                     cms/db/db-refresh
                     <small>
                         (сброс кэша структуры таблиц)
+                    </small>
+                </a>
+            </p>
+
+            <p>
+                <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('cms/db/apply-migrations'); return false;">
+                    cms/db/apply-migrations
+                    <small>
+                        (установка миграций)
                     </small>
                 </a>
             </p>

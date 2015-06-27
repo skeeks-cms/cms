@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\components\marketplace\models\PackageModel;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Comment;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -46,11 +47,31 @@ class AdminMarketplaceController extends AdminController
                 "name"         => "Каталог решений",
             ],
 
+            "install" =>
+            [
+                "class"        => AdminAction::className(),
+                "name"         => "Установка нового решения",
+                "callback"     => [$this, 'actionInstall'],
+            ],
+
             /*"update" =>
             [
                 "class"        => AdminAction::className(),
                 "name"         => "Обновление платформы",
             ],*/
         ];
+    }
+
+    public function actionInstall()
+    {
+        if ($packagistCode = \Yii::$app->request->get('packagistCode'))
+        {
+            $packageModel = PackageModel::fetchByCode($packagistCode);
+        }
+
+        return $this->render($this->action->id, [
+            'packagistCode' => $packagistCode,
+            'packageModel'  => $packageModel,
+        ]);
     }
 }
