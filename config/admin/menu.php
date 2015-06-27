@@ -315,16 +315,24 @@ return
         [
 
             [
+                "label"     => "Каталог",
+                "url"       => ["cms/admin-marketplace/catalog"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
+            ],
+
+            [
                 "label"     => "Установленные решения",
                 "url"       => ["cms/admin-marketplace/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installed.png']
             ],
 
+
             [
-                "label"     => "Каталог",
-                "url"       => ["cms/admin-marketplace/catalog"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
+                "label"     => "Установить новое",
+                "url"       => ["cms/admin-marketplace/install"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installer.png']
             ],
+
 
         ]
     ]

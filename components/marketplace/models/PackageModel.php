@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\components\marketplace\models;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsExtension;
 use skeeks\yii2\curl\Curl;
 use yii\base\Component;
 use yii\base\Model;
@@ -111,6 +112,14 @@ class PackageModel extends Model
     /**
      * @return string
      */
+    public function getPackagistUrl()
+    {
+        return (string) 'https://packagist.org/packages/' . $this->packagistCode;
+    }
+
+    /**
+     * @return string
+     */
     public function getSupport()
     {
         return (string) ArrayHelper::getValue($this->apiData, 'related.support');
@@ -166,4 +175,20 @@ class PackageModel extends Model
         return (bool) ArrayHelper::getValue($extensions, $this->packagistCode);
     }
 
+    /**
+     * @return null|CmsExtension
+     */
+    public function createCmsExtension()
+    {
+        if (!$this->isInstalled())
+        {
+            return null;
+        }
+
+        $extensionData  = ArrayHelper::getValue(\Yii::$app->extensions, $this->packagistCode);
+        $cmsExtension   = new CmsExtension($extensionData);
+
+        $cmsExtension->marketplacePackage = $this;
+        return $cmsExtension;
+    }
 }
