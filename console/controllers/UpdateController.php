@@ -106,13 +106,14 @@ class UpdateController extends Controller
         //Обновление зависимостей
         $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
 
+        $this->actionGenerateModulesConfigFile();
+
         //Установка всех миграций
         $this->systemCmdRoot("php yii cms/db/apply-migrations");
 
         //Чистка временных диррикторий
         $this->systemCmdRoot("php yii cms/utils/clear-runtimes");
 
-        $this->actionGenerateModulesConfigFile();
 
         //Сброс кэша стрктуры базы данных
         $this->systemCmdRoot("php yii cms/db/db-refresh");
@@ -130,4 +131,25 @@ class UpdateController extends Controller
         \Yii::$app->cms->generateModulesConfigFile();
     }
 
+    /**
+     * Установка пакета
+     *
+     * @param $package skeeks/cms-module:*
+     */
+    public function actionInstall($package)
+    {
+        $this->systemCmdRoot("php yii cms/composer/require {$package}");
+        $this->systemCmdRoot("php yii cms/update");
+    }
+
+    /**
+     * Удаление пакета
+     *
+     * @param $package skeeks/cms-module
+     */
+    public function actionRemove($package)
+    {
+        $this->systemCmdRoot("php yii cms/composer/remove {$package}");
+        $this->systemCmdRoot("php yii cms/update");
+    }
 }

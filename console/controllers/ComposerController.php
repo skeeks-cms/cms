@@ -199,36 +199,35 @@ class ComposerController extends Controller
      * Установка пакета
      * The require command adds new packages to the composer.json file from the current directory. If no file exists one will be created on the fly.
      *
-     * @param string $packageName
-     * @param string $version
+     * @param string $package  skeeks/cms-module:*
      * @param bool|true $noUpdate --no-update: Disables the automatic update of the dependencies.
      */
-    public function actionRequire($packageName, $version = "*", $noUpdate = true)
+    public function actionRequire($package, $update = 0)
     {
         $options = "";
-        if ($noUpdate)
+        if ((int) $update == 0)
         {
             $options = "--no-update";
         }
 
-        $this->_composerCmd('require ' . $packageName . ":" . $version . ' ' . $options);
+        $this->_composerCmd('require ' . $package . ' ' . $options);
     }
     /**
      * Удаление пакета
      * The remove command removes packages from the composer.json file from the current directory.
      *
-     * @param string $packageName
+     * @param string $package
      * @param bool|true $noUpdate --no-update: Disables the automatic update of the dependencies.
      */
-    public function actionRemove($packageName, $noUpdate = true)
+    public function actionRemove($package, $update = 0)
     {
         $options = "";
-        if ($noUpdate)
+        if ((int) $update == 0)
         {
             $options = "--no-update";
         }
 
-        $this->_composerCmd('remove ' . $packageName . " " . $options);
+        $this->_composerCmd('remove ' . $package . " " . $options);
     }
 
     /**
