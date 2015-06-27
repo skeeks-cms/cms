@@ -73,10 +73,14 @@ $self = $this;
                             return $model->createCmsExtension()->version;
                         } else
                         {
+                            $code = $model->packagistCode;
                             return <<<HTML
 <a data-pjax="0"  class="btn btn-default btn-danger" target="_blank" title="">
     <i class="glyphicon glyphicon-download-alt"></i> Установить
 </a>
+<pre>
+php yii cms/update/install {$code}:*
+</pre>
 HTML;
 ;
                         }
