@@ -16,5 +16,5 @@
     <p><code>php yii cms/update/all</code> - запуск действия</p>
     <p><code>php yii cms/composer/status</code> - запуск действия</p>
     <p><code>php yii cms/composer/require skeeks/cms-module-form2</code> - установка пакета</p>
-    <p><code>php yii cms/composer/update --pry-run</code> - проверка установки или обновления</p>
+    <p><code>php yii cms/composer/update --dry-run</code> - проверка установки или обновления</p>
 </div>
