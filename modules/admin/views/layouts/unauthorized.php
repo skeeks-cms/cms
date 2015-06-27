@@ -25,12 +25,10 @@ AdminAsset::register($this);
 \skeeks\cms\modules\admin\assets\AdminCanvasBg::register($this);
 
 $urlBg = \Yii::$app->assetManager->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/bg/582738_www.Gde-Fon.com.jpg');
+$blockerLoader = \Yii::$app->getAssetManager()->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/loaders/circulare-blue-24_24.GIF');
 
 $this->registerCss(<<<CSS
-body
-{
-    background: silver center fixed;
-}
+
 body.sx-styled
 {
     background: url({$urlBg}) center fixed;
@@ -94,7 +92,7 @@ $this->registerJs(<<<JS
             {
                 var self = this;
                 this.blockerHtml = sx.block('html', {
-                    message: "<div style='padding: 10px;'><h2>Загрузка...</h2></div>",
+                    message: "<div style='padding: 10px;'><h2><img src='{$blockerLoader}'/> Загрузка...</h2></div>",
                     css: {
                         "border-radius": "6px",
                         "border-width": "3px",
@@ -104,7 +102,7 @@ $this->registerJs(<<<JS
                 });
 
                 this.blockerLogin = new sx.classes.Blocker('.sx-panel', {
-                    message: "<div style='padding: 10px;'><h2>Загрузка...</h2></div>",
+                    message: "<div style='padding: 10px;'><h2><img src='{$blockerLoader}'/> Загрузка...</h2></div>",
                     css: {
                         "border-radius": "6px",
                         "border-width": "1px",
