@@ -115,4 +115,13 @@ class UtilsController extends Controller
             $this->stdoutN('Папка assets (' . $dir->getPath() . ') очищена.');
         }
     }
+
+    /**
+     * Генерация файла со списком модулей
+     */
+    public function actionGenerateModulesConfigFile()
+    {
+        \Yii::$app->cms->generateModulesConfigFile();
+    }
+
 }
