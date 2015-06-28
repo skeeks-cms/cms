@@ -148,6 +148,37 @@
         getSavedInstance: function()
         {
             return String( this.getCookieManager().get('instance')) ;
+        },
+
+        /**
+         * @returns {*|void|*|Function}
+         */
+        getBlocker: function()
+        {
+            if (!this.Blocker)
+            {
+                this.Blocker = new sx.classes.Blocker('.sx-sidebar');
+            }
+
+            return this.Blocker;
+        },
+
+        /**
+         * @returns {sx.classes.AdminMenu}
+         */
+        block: function()
+        {
+            this.getBlocker().block();
+            return this;
+        },
+
+        /**
+         * @returns {sx.classes.AdminMenu}
+         */
+        unblock: function()
+        {
+            this.getBlocker().unblock();
+            return this;
         }
     });
 
