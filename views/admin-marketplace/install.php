@@ -92,6 +92,8 @@ $self = $this;
                         if ($model->isInstalled())
                         {
                             $extension = $model->createCmsExtension();
+                            $code = $model->packagistCode;
+
                             if ($extension->canDelete())
                             {
                                 return <<<HTML
