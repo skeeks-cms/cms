@@ -124,9 +124,7 @@ HTML;
         </div>
         <hr />
     </div>
-    <div id="sx-tmp-result">
-
-    </div>
+    <div id="sx-tmp-result"></div>
     <div id="sx-ssh-console-wrapper" style="display: none;">
         <?=
             \skeeks\cms\widgets\ssh\SshConsoleWidget::widget([
@@ -254,10 +252,17 @@ $this->registerJs(<<<JS
                 }
             }));
 
+            tasks.push(new sx.classes.InstallerTaskConsole({
+                'cmd':'php yii cms/composer/revert-modified-files',
+                'name':'Откат модификаций ядра',
+                'delay': 1500
+            }));
+
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подключение к серверу обновлений',
                 'delay':2000
             }));
+
 
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/update/install ' + packageName,
