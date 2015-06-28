@@ -249,6 +249,8 @@ $this->registerJs(<<<JS
 
         install: function(packageName)
         {
+            var tasks = [];
+
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подготовка к установке пакета',
                 'delay':3000
