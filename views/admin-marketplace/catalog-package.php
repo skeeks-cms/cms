@@ -12,6 +12,7 @@ use \skeeks\cms\components\marketplace\models\PackageModel;
 use \skeeks\cms\models\CmsExtension;
 $self = $this;
 
+$extension = $packageModel->createCmsExtension();
 ?>
 <div class="row">
     <div class="col-lg-2">
@@ -28,8 +29,18 @@ $self = $this;
 
         <? if ($packageModel->isInstalled()) : ?>
             <a data-pjax="0" href="<?= $packageModel->url; ?>" class="btn btn-default btn-success" target="_blank" title="">
-                <i class="glyphicon glyphicon-ok"></i> Это решение установлено
+                <i class="glyphicon glyphicon-ok"></i> Установлена версия: <?= $extension->version; ?>
             </a>
+
+            <? if ($extension) : ?>
+                <? if ($extension->canDelete()) : ?>
+                    <a data-pjax="0" href="<?= $extension->controllUrl; ?>" class="btn btn-default btn-danger" title="">
+                        <i class="glyphicon glyphicon-remove"></i> Удалить
+                    </a>
+                <? endif; ?>
+            <? endif; ?>
+
+
         <? else : ?>
             <a data-pjax="0" href="<?= $packageModel->url; ?>" class="btn btn-default btn-danger" target="_blank" title="">
                 <i class="glyphicon glyphicon-download-alt"></i> Установить

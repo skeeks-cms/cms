@@ -13,6 +13,8 @@ use skeeks\cms\base\Module;
 use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\events\LoginEvent;
 use skeeks\cms\exceptions\NotConnectedToDbException;
+use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
@@ -54,6 +56,7 @@ use yii\base\Event;
 use yii\console\Application;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\UploadedFile;
 use yii\web\UserEvent;
 use yii\web\View;
@@ -61,6 +64,8 @@ use yii\web\View;
 /**
  * @property CmsSite                            $site
  * @property Tree                               $currentTree
+ * @property ComposerHelper                     $composer
+ * @property ComposerHelper                     $appComposer
  *
  * @package skeeks\cms\components
  */
@@ -595,5 +600,34 @@ $fileContent .= '];';
     public function allPropertyTypes()
     {
         return array_merge($this->basePropertyTypes(), $this->userPropertyTypes());
+    }
+
+
+    /**
+     * @return ComposerHelper
+     */
+    public function getComposer()
+    {
+        $extension = CmsExtension::getInstance('skeeks/cms');
+        return $extension->composer;
+    }
+
+    /**
+     * @return ComposerHelper
+     */
+    public function getAppComposer()
+    {
+        $composerFile = ROOT_DIR . "/composer.json";
+        if (file_exists($composerFile))
+        {
+            $data = file_get_contents($composerFile);
+            $data = Json::decode($data);
+
+            return new ComposerHelper([
+                'data' => (array) $data
+            ]);
+        }
+
+        return new ComposerHelper();
     }
 }
