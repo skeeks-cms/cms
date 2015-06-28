@@ -77,20 +77,43 @@ $self = $this;
                             return $model->createCmsExtension()->version;
                         } else
                         {
+                            return ' — '
+;
+                        }
+                    },
+                    'label' => 'Версия',
+                    'format' => 'raw'
+                ],
+
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'value' => function(PackageModel $model)
+                    {
+                        if ($model->isInstalled())
+                        {
+                            $extension = $model->createCmsExtension();
+                            if ($extension->canDelete())
+                            {
+                                return <<<HTML
+                                <a data-pjax="0"  class="btn btn-default btn-danger" target="" title="" onclick="sx.Installer.remove('{$code}'); return false;">
+                                    <i class="glyphicon glyphicon-remove"></i> Запустить удаление
+                                </a>
+HTML;
+;
+                            }
+                        } else
+                        {
                             $code = $model->packagistCode;
                             return <<<HTML
-<a data-pjax="0"  class="btn btn-default btn-danger" target="" title="" onclick="sx.Installer.start('{$code}'); return false;">
+<a data-pjax="0"  class="btn btn-default btn-danger" target="" title="" onclick="sx.Installer.install('{$code}'); return false;">
     <i class="glyphicon glyphicon-download-alt"></i> Запустить установку
 </a>
 
 HTML;
 ;
-//                            <pre>
-//php yii cms/update/install {$code}:*
-//</pre>
                         }
                     },
-                    'label' => 'Версия',
+                    'label' => 'Действия',
                     'format' => 'raw'
                 ],
 
@@ -143,10 +166,10 @@ HTML;
       ]
     ]);
 ?>
-    <p>Установка пакетов обычно длится 1-5 минут.</p>
+    <p>Установка/Удаление пакетов обычно длится 1-5 минут.</p>
     <p>В процессе установки будут изменены все ваши модификации ядра.</p>
     <p>Будет создана резервная копия базы данных</p>
-    <p>сброшен кэш</p>
+    <p>Сброшен кэш</p>
     <p>Удалены временные файлы</p>
 <? \yii\bootstrap\Alert::end(); ?>
 
@@ -209,8 +232,6 @@ $this->registerJs(<<<JS
 
                 $('#sx-installer').hide();
 
-                sx.notify.success('Установка пакета завершена');
-
                 _.delay(function()
                 {
                     $('#sx-package-search').submit();
@@ -223,10 +244,9 @@ $this->registerJs(<<<JS
             });
         },
 
-        start: function(packageName)
-        {
-            var tasks = [];
 
+        install: function(packageName)
+        {
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подготовка к установке пакета',
                 'delay':3000
@@ -266,7 +286,7 @@ $this->registerJs(<<<JS
 
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/update/install ' + packageName,
-                'name':'Скачивание пакета и его установка',
+                'name':'Скачивание пакета и его установка (длиться около 1 минуты)',
                 'delay': 500
             }));
 
@@ -306,11 +326,114 @@ $this->registerJs(<<<JS
                 'name':'Проверка установленного решения',
                 'delay':3000
             }));
+
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Завершение процесса установки',
+                'delay':3000,
+            }));
+
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Готово',
+                'delay':200,
+                'callback':function()
+                {
+                    sx.notify.success('Установка пакета завершена');
+                }
+            }));
+
+
+            this.TaskManager.setTasks(tasks);
+            this.TaskManager.start();
+        },
+
+        remove: function(packageName)
+        {
+            var tasks = [];
+
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Подготовка к удалению пакета',
                 'delay':3000
             }));
 
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Проверка системы, окружения',
+                'delay':2000
+            }));
+
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Запуска ssh консоли',
+                'delay':1000,
+                'callback':function()
+                {
+                    var jSshConsole = $('#sx-ssh-console-wrapper');
+                    jSshConsole.show();
+                }
+            }));
+
+
+            tasks.push(new sx.classes.InstallerTaskConsole({
+                'cmd':'php yii cms/composer/revert-modified-files',
+                'name':'Откат модификаций ядра',
+                'delay': 1500
+            }));
+
+            tasks.push(new sx.classes.InstallerTaskConsole({
+                'cmd':'php yii cms/backup/db-execute',
+                'name':'Создание резервной копии базы данных',
+                'delay': 1500
+            }));
+
+            tasks.push(new sx.classes.InstallerTaskConsole({
+                'cmd':'php yii cms/update/remove ' + packageName,
+                'name':'Удаление пакета и его зависимостей (длиться около 1 минуты)',
+                'delay': 500
+            }));
+
+
+
+                tasks.push(new sx.classes.InstallerTaskConsole({
+                    'cmd':'php yii cms/utils/generate-modules-config-file',
+                    'name':'Генерация файла со списком модулей',
+                }));
+
+                tasks.push(new sx.classes.InstallerTaskConsole({
+                    'cmd':'php yii cms/db/apply-migrations',
+                    'name':'Установка всех миграций базы данных',
+                }));
+
+                tasks.push(new sx.classes.InstallerTaskConsole({
+                    'cmd':'php yii cms/utils/clear-runtimes',
+                    'name':'Чистка временных диррикторий',
+                }));
+
+                tasks.push(new sx.classes.InstallerTaskConsole({
+                    'cmd':'php yii cms/db/db-refresh',
+                    'name':'Сброс кэша стрктуры базы данных',
+                }));
+
+                tasks.push(new sx.classes.InstallerTaskConsole({
+                    'cmd':'php yii cms/rbac/init',
+                    'name':'Обновление привилегий',
+                }));
+
+
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Тестирование системы после удаления',
+                'delay':3000,
+            }));
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Завершение процесса удаления',
+                'delay':3000,
+            }));
+
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Готово',
+                'delay':200,
+                'callback':function()
+                {
+                    sx.notify.success('Удаление пакета завершено');
+                }
+            }));
 
             this.TaskManager.setTasks(tasks);
             this.TaskManager.start();

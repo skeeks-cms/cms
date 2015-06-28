@@ -321,14 +321,14 @@ return
             ],
 
             [
-                "label"     => "Установленные решения",
+                "label"     => "Установленные",
                 "url"       => ["cms/admin-marketplace/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installed.png']
             ],
 
 
             [
-                "label"     => "Установить новое",
+                "label"     => "Установить/Удалить",
                 "url"       => ["cms/admin-marketplace/install"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installer.png']
             ],

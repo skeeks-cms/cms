@@ -8,6 +8,9 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\marketplace\models\PackageModel;
+use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\helpers\FileHelper;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\yii2\curl\Curl;
 use yii\base\Component;
 use yii\base\Model;
@@ -15,21 +18,78 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 /**
- * @property string $packagistUrl
+ * @property string                 $packagistUrl
+ * @property ComposerHelper         $composer
+ * @property string                 $controllUrl
  *
  * Class CmsExtension
  * @package skeeks\cms\models
  */
 class CmsExtension extends Model
 {
+    public static $extensions       = [];
+    public static $coreExtensions   = [];
+
     public $name        = '';
     public $version     = '';
-    public $alias       = '';
+    /**
+     * @var array
+     */
+    public $alias       = [];
+
 
     /**
      * @var PackageModel
      */
-    public $marketplacePackage = null;
+    public $marketplacePackage  = null;
+
+    /**
+     * @param $name
+     * @return static
+     */
+    static public function getInstance($name)
+    {
+        $extension = ArrayHelper::getValue(self::$extensions, $name);
+
+        if (!$extension || (!$extension instanceof static) )
+        {
+            $data = ArrayHelper::getValue(\Yii::$app->extensions, $name);
+            if (!$data)
+            {
+                return null;
+            }
+
+            $extension = new static($data);
+            self::$extensions[$name] = $extension;
+        }
+
+        return $extension;
+    }
+
+    /**
+     * @param string $extension
+     */
+    static public function initCoreExtensions($extension = 'skeeks/cms')
+    {
+        if ($coreExtension == 'skeeks/cms' && static::$coreExtensions)
+        {
+            return;
+        }
+
+        $coreExtension = static::getInstance($extension);
+        if ($coreExtension && $coreExtension->composer->require && is_array($coreExtension->composer->require))
+        {
+            foreach ($coreExtension->composer->require as $name => $version)
+            {
+                static::initCoreExtensions($name);
+            }
+        }
+
+        if ($coreExtension)
+        {
+            static::$coreExtensions[$coreExtension->name] = $coreExtension;
+        }
+    }
 
     /**
      * @return static[];
@@ -42,7 +102,7 @@ class CmsExtension extends Model
         {
             foreach (\Yii::$app->extensions as $name => $extensionData)
             {
-                $result[$name] = new static($extensionData);
+                $result[$name] = static::getInstance($name);
             }
         }
 
@@ -50,6 +110,7 @@ class CmsExtension extends Model
     }
 
     /**
+     * Получение всех установленных расширений с данными из SkeekS маркетплейс
      * @return static[];
      */
     static public function fetchAllWhithMarketplace()
@@ -78,6 +139,102 @@ class CmsExtension extends Model
         ]);
     }
 
+
+    /**
+     * @return ComposerHelper
+     */
+    public function getComposer()
+    {
+        $composerFiles = [];
+        foreach ($this->alias as $name => $path)
+        {
+            $composerFiles[] = $path . '/composer.json';
+        }
+
+        $file = FileHelper::getFirstExistingFileArray($composerFiles);
+        if (!$file)
+        {
+            throw new \InvalidArgumentException('composer.json не найден в пакете $name');
+        }
+
+        $data = file_get_contents($file);
+        $data = Json::decode($data);
+
+        return new ComposerHelper(['data' => $data]);
+    }
+
+    /**
+     * Входит ли в базовую сборку
+     * @return bool
+     */
+    public function isCore()
+    {
+        static::initCoreExtensions();
+
+        if (ArrayHelper::getValue(static::$coreExtensions, $this->name))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Входит ли в базовую сборку
+     * @return bool
+     */
+    public function inAppComposer()
+    {
+        $composer = \Yii::$app->cms->appComposer;
+        if ($composer)
+        {
+            if ($composer->require)
+            {
+                if (ArrayHelper::getValue($composer->require, $this->name))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllUrl()
+    {
+        return UrlHelper::construct('/cms/admin-marketplace/install', [
+            'packagistCode' => $this->name
+        ])->enableAdmin()->toString();
+    }
+    /**
+     * Можно ли его удалять
+     * @return bool
+     */
+    public function canDelete()
+    {
+        if ($this->inAppComposer() && !$this->isCore())
+        {
+            return true;
+        }
+
+        return false;
+    }
+    /**
+     * Можно ли его обновлять
+     * @return bool
+     */
+    public function canUpdate()
+    {
+        if ($this->inAppComposer() && !$this->isCore())
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * @return string
