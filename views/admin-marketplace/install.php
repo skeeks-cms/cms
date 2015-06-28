@@ -107,7 +107,7 @@ HTML;
                         {
                             $code = $model->packagistCode;
                             return <<<HTML
-<a data-pjax="0"  class="btn btn-default btn-danger" target="" title="" onclick="sx.Installer.install('{$code}'); return false;">
+<a data-pjax="0"  class="btn btn-default btn-success" target="" title="" onclick="sx.Installer.install('{$code}'); return false;">
     <i class="glyphicon glyphicon-download-alt"></i> Запустить установку
 </a>
 
