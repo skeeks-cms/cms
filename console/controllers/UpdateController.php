@@ -106,7 +106,8 @@ class UpdateController extends Controller
         //Обновление зависимостей
         $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
 
-        $this->actionGenerateModulesConfigFile();
+        //Генерация файла со списком модулей
+        $this->systemCmdRoot("php yii cms/utils/generate-modules-config-file");
 
         //Установка всех миграций
         $this->systemCmdRoot("php yii cms/db/apply-migrations");
@@ -122,14 +123,6 @@ class UpdateController extends Controller
         $this->systemCmdRoot("php yii cms/rbac/init");
     }
 
-
-    /**
-     * Генерация файла со списком модулей
-     */
-    public function actionGenerateModulesConfigFile()
-    {
-        \Yii::$app->cms->generateModulesConfigFile();
-    }
 
     /**
      * Установка пакета
