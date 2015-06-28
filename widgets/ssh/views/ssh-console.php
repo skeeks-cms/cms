@@ -76,16 +76,19 @@ $this->registerJs(<<<JS
 
                 this.IframeConsole.bind('submit', function(e, data)
                 {
+                    self.trigger('submit', data);
                     self.getBlocker().block();
                 });
 
                 this.IframeConsole.bind('error', function(e, data)
                 {
+                    self.trigger('error', data);
                     self.getBlocker().unblock();
                 });
 
                 this.IframeConsole.bind('success', function(e, data)
                 {
+                    self.trigger('success', data);
                     self.getBlocker().unblock();
                 });
 

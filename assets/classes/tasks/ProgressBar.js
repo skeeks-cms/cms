@@ -60,6 +60,11 @@
                     'Task' : data.task
                 });
 
+                self.trigger("updateProgressBar", {
+                    'ProgressBar' : this,
+                    'Task' : data.task
+                });
+
                 self.updateProgress();
             });
         },

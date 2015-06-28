@@ -197,15 +197,12 @@
          */
         start: function()
         {
-            console.info('Task manager start');
-
             //Загрузка очереди
             this._loadQueque();
 
             //Задачи не найдены
             if (this.countQuequeTasks() == 0)
             {
-                console.info('Not found queque');
                 this.trigger("error", {
                     'manager' : this,
                     'error' : "Задачи не найдены"
