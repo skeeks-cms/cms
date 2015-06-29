@@ -166,10 +166,10 @@ class UrlRuleTree
             {
                 throw new NotConnectedToDbException;
             }
-        }/* catch (\yii\base\InvalidConfigException $e)
+        } catch (\yii\base\InvalidConfigException $e)
         {
             throw new NotConnectedToDbException;
-        }*/
+        }
 
         if ($treeNode)
         {
