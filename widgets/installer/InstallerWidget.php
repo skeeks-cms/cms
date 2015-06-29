@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\widgets\installer;
 use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\UrlHelper;
 use yii\base\Widget;
 use yii\helpers\Json;
 
@@ -42,6 +43,7 @@ class InstallerWidget extends Widget
         return Json::encode([
             'id'                        => $this->id,
             'canSsh'                    => $canSsh,
+            'permissionsUpdateBackend'  => UrlHelper::construct('/admin/admin-permission/update-data')->enableAbsolute()->toString(),
         ]);
     }
 }
