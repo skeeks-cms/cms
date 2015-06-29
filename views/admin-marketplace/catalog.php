@@ -34,9 +34,30 @@ $self = $this;
           'class' => 'alert-info',
       ]
     ]); ?>
-        <p>В этом разделе показаны все расширения, которые успешно установлены и используются в вашем проекте.</p>
-        <p>Вы так же, можете ознакомиться с версией установленного расширения, посмотреть его в маркетплейс.</p>
+        <p>Вы можете выбрать подходящее решение для вашего проекта и установить его.</p>
+        <p>В следующих версиях маркетплей будет интегрирован сюда. А пока, просто перейдите по ссылке ниже.</p>
     <? \yii\bootstrap\Alert::end(); ?>
+
+    <div class="sx-marketplace">
+        <a href="http://marketplace.cms.skeeks.com/" target="_blank">Marketplace.CMS.SkeekS.com</a> — каталог доступных решений
+    </div>
+
+<?
+$this->registerCss(<<<CSS
+.sx-marketplace
+{
+    text-align: center;
+    font-size: 30px;
+    color: #e74c3c;
+}
+    .sx-marketplace a
+    {
+        font-size: 30px;
+        color: #e74c3c;
+    }
+CSS
+);
+?>
 
 <? endif; ?>
 
