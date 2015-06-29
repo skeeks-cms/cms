@@ -59,14 +59,14 @@ JS
                 {
 
                     $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
-                    return "<a href='" . $model->src . "' class='sx-fancybox' title='Увеличить'>
+                    return "<a href='" . $model->src . "' class='sx-fancybox' data-pjax='0' title='Увеличить'>
                             <img src='" . $smallImage . "' />
                         </a>";
                 }
 
                 return \yii\helpers\Html::tag('span', $model->extension, ['class' => 'label label-primary', 'style' => 'font-size: 18px;']);
             },
-            'format' => 'html'
+            'format' => 'raw'
         ],
 
         'name',
