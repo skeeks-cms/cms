@@ -54,11 +54,11 @@ class AdminMarketplaceController extends AdminController
                 "callback"     => [$this, 'actionInstall'],
             ],
 
-            /*"update" =>
+            "update" =>
             [
                 "class"        => AdminAction::className(),
                 "name"         => "Обновление платформы",
-            ],*/
+            ],
         ];
     }
 
