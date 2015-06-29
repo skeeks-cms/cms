@@ -326,14 +326,17 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installed.png']
             ],
 
-
             [
                 "label"     => "Установить/Удалить",
                 "url"       => ["cms/admin-marketplace/install"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installer.png']
             ],
 
-
+            [
+                "label"     => "Обновление платформы",
+                "url"       => ["cms/admin-marketplace/update"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update-2.png']
+            ],
         ]
     ]
 
