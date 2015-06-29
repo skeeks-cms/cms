@@ -6,7 +6,10 @@
  */
 (function(sx, $, _)
 {
-    sx.classes.InstallerTask = sx.classes.tasks.AjaxTask.extend({});
+    sx.classes.InstallerTaskAjax = sx.classes.tasks.AjaxTask.extend({
+
+    });
+
     sx.classes.InstallerTaskClean = sx.classes.tasks.Task.extend({
         execute: function()
         {

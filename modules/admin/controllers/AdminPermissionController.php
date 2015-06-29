@@ -103,45 +103,55 @@ class AdminPermissionController extends AdminModelEditorController
 
     public function actionUpdateData()
     {
-        $auth = Yii::$app->authManager;
+        $rr = new RequestResponse();
 
-        foreach (\Yii::$app->adminMenu->getData() as $group)
+        if ($rr->isRequestAjaxPost())
         {
-            if (is_array($group))
+            $auth = Yii::$app->authManager;
+
+            foreach (\Yii::$app->adminMenu->getData() as $group)
             {
-                foreach ($group['items'] as $itemData)
+                if (is_array($group))
                 {
-                    /**
-                     * @var $controller \yii\web\Controller
-                     */
-                    list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
-
-
-                    if ($controller)
+                    foreach ($group['items'] as $itemData)
                     {
-                        if ($controller instanceof AdminController)
+                        /**
+                         * @var $controller \yii\web\Controller
+                         */
+                        list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
+
+
+                        if ($controller)
                         {
-                            $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
-
-                            //Привилегия доступу к админке
-                            if (!$adminAccess = $auth->getPermission($permissionCode))
+                            if ($controller instanceof AdminController)
                             {
-                                $adminAccess = $auth->createPermission($permissionCode);
-                                $adminAccess->description = 'Администрирование | ' . $controller->name;
-                                $auth->add($adminAccess);
+                                $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
 
-                                if ($root = $auth->getRole('root'))
+                                //Привилегия доступу к админке
+                                if (!$adminAccess = $auth->getPermission($permissionCode))
                                 {
-                                    $auth->addChild($root, $adminAccess);
+                                    $adminAccess = $auth->createPermission($permissionCode);
+                                    $adminAccess->description = 'Администрирование | ' . $controller->name;
+                                    $auth->add($adminAccess);
+
+                                    if ($root = $auth->getRole('root'))
+                                    {
+                                        $auth->addChild($root, $adminAccess);
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
+            $rr->success = true;
+            $rr->message = "Обновление завершено";
+
+            return $rr;
         }
 
-        return $this;
+        return [];
     }
 
 

@@ -126,6 +126,12 @@
                 'name':'Сброс кэша стрктуры базы данных',
             }));
 
+
+            var ajaxPermissions = sx.ajax.preparePostQuery(this.get('permissionsUpdateBackend'));
+            tasks.push(new sx.classes.InstallerTaskAjax(ajaxPermissions, {
+                'name':'Обновление привилегий',
+            }));
+
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/rbac/init',
                 'name':'Обновление привилегий',
@@ -224,6 +230,11 @@
                 tasks.push(new sx.classes.InstallerTaskConsole({
                     'cmd':'php yii cms/db/db-refresh',
                     'name':'Сброс кэша стрктуры базы данных',
+                }));
+
+                var ajaxPermissions = sx.ajax.preparePostQuery(this.get('permissionsUpdateBackend'));
+                tasks.push(new sx.classes.InstallerTaskAjax(ajaxPermissions, {
+                    'name':'Обновление привилегий',
                 }));
 
                 tasks.push(new sx.classes.InstallerTaskConsole({
@@ -333,8 +344,13 @@
                 'name':'Сброс кэша стрктуры базы данных',
             }));
 
-            tasks.push(new sx.classes.InstallerTaskConsole({
+            tasks.push(new sx.classes.InstallerTask({
                 'cmd':'php yii cms/rbac/init',
+                'name':'Обновление привилегий',
+            }));
+
+            var ajaxPermissions = sx.ajax.preparePostQuery(this.get('permissionsUpdateBackend'));
+            tasks.push(new sx.classes.InstallerTaskAjax(ajaxPermissions, {
                 'name':'Обновление привилегий',
             }));
 
