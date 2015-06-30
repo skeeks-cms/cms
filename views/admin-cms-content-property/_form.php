@@ -84,15 +84,43 @@ use skeeks\cms\modules\admin\widgets\Pjax;
             ]
         ],
 
+        'dataProviderCallback' => function($dataProvider)
+        {
+            /**
+             * @var \yii\data\BaseDataProvider $dataProvider
+            */
+            $dataProvider->getPagination()->defaultPageSize   = 5000;
+        },
+
         'controllerRoute'   => 'cms/admin-cms-content-property-enum',
         'gridViewOptions'   => [
             'sortable' => true,
             'columns' => [
-                'id',
-                'code',
-                'value',
-                'priority',
-                'def',
+                [
+                    'attribute'     => 'id',
+                    'enableSorting' => false
+                ],
+
+                [
+                    'attribute'     => 'code',
+                    'enableSorting' => false
+                ],
+
+                [
+                    'attribute'     => 'value',
+                    'enableSorting' => false
+                ],
+
+                [
+                    'attribute'     => 'priority',
+                    'enableSorting' => false
+                ],
+
+                [
+                    'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                    'attribute'     => 'def',
+                    'enableSorting' => false
+                ],
             ],
         ],
     ]); ?>
