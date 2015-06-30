@@ -47,7 +47,6 @@
         "bower-asset/fancybox": "*",
         "bower-asset/jq-fullscreen": "*"
     },
-    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "skeeks\\cms\\": ""
