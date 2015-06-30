@@ -34,7 +34,7 @@ $controller = \Yii::$app->createController($widget->controllerRoute)[0];
 JS
     ); ?>"><i class="glyphicon glyphicon-plus"></i>Добавить</a>
 
-            <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget($gridOptions); ?>
+            <?= \skeeks\cms\modules\admin\widgets\GridView::widget($gridOptions); ?>
 
     <?
 

@@ -54,6 +54,11 @@ class RelatedModelsGrid extends Widget
     public $sort = [];
 
     /**
+     * @var callback
+     */
+    public $dataProviderCallback = null;
+
+    /**
      * @var Родительская модель к которой будут строиться привязанные сущьности
      */
     public $parentModel  = null;
@@ -101,16 +106,22 @@ class RelatedModelsGrid extends Widget
             $search->getDataProvider()->sort->defaultOrder = $this->sort['defaultOrder'];
         }
 
+        if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
+        {
+            $function = $this->dataProviderCallback;
+            $function($search->getDataProvider());
+        }
+
         $pjaxId = "sx-table-" . md5($this->label . $this->hint . $this->parentModel->className());
         $gridOptions = ArrayHelper::merge([
             /*'filterModel'   => $search,*/
             'pjaxOptions' => [
                 'id' => $pjaxId
             ],
-            "settingsData" =>
+            /*"settingsData" =>
             [
                 'enabledPjaxPagination' => Cms::BOOL_Y
-            ],
+            ],*/
             "sortableOptions" => [
                 'backend' => $sortableUrl
             ],
