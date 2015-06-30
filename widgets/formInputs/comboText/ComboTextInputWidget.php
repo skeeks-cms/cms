@@ -12,8 +12,8 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
-use skeeks\widget\ckeditor\CKEditorWidgetAsset;
 use skeeks\widget\codemirror\CodemirrorWidget;
+use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -141,7 +141,6 @@ class ComboTextInputWidget extends InputWidget
         $this->ckeditor = new \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor(ArrayHelper::merge([
             'model'         => $this->model,
             'attribute'     => $this->attribute,
-            'preset'        => 'full',
             'relatedModel'  => $this->model
         ], $this->ckeditorOptions));
 

@@ -16,8 +16,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?= $form->fieldSet('Основное'); ?>
-    <?= $form->field($model, 'enableCustomConfirm')->radioList(\Yii::$app->formatter->booleanFormat) ?>
-    <?= $form->field($model, 'enableCustomPromt')->radioList(\Yii::$app->formatter->booleanFormat) ?>
+    <?= $form->fieldRadioListBoolean($model, 'enableCustomConfirm') ?>
+    <?= $form->fieldRadioListBoolean($model, 'enableCustomPromt') ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Языковые настройки'); ?>
@@ -32,6 +32,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
     <?= $form->fieldInputInt($model, 'pageSize'); ?>
     <?= $form->field($model, 'pageParamName')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Настройка визуального редактора'); ?>
+    <?= $form->fieldSelect($model, 'ckeditorPreset', \skeeks\yii2\ckeditor\CKEditorPresets::allowPresets()); ?>
+    <?= $form->fieldSelect($model, 'ckeditorSkin', \skeeks\yii2\ckeditor\CKEditorPresets::skins()); ?>
+    <?= $form->fieldInputInt($model, 'ckeditorHeight'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
