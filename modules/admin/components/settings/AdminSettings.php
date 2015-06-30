@@ -47,7 +47,7 @@ class AdminSettings extends Component
     public $pageParamName               =   "page";
 
     //Настройки ckeditor
-    public $ckeditorPreset              = CKEditorPresets::FULL;
+    public $ckeditorPreset              = CKEditorPresets::EXTRA;
     public $ckeditorSkin                = CKEditorPresets::SKIN_MOONO_COLOR;
     public $ckeditorHeight              = 400;
 
