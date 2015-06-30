@@ -39,6 +39,13 @@ class ElfinderFullController extends ElfinderController
         {
             $this->roots[] =
             [
+                'basePath'  =>  ROOT_DIR,
+                'path'      => '/',
+                'name'      => 'ROOT_DIR'
+            ]
+
+            ;$this->roots[] =
+            [
                 'baseUrl'   =>'@web',
                 'basePath'  =>'@webroot',
                 'path'      => '/',
