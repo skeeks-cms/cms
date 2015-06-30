@@ -121,17 +121,14 @@ $extension = $packageModel->createCmsExtension();
 
           <? if ($extension->changeLog) : ?>
               <?= $form->fieldSet('Процесс разработки'); ?>
-                  <pre>
-                      <?= $extension->changeLog; ?>
-                  </pre>
+                    <?= \kartik\markdown\Markdown::convert($extension->changeLog); ?>
+
               <?= $form->fieldSetEnd(); ?>
           <? endif; ?>
 
           <? if ($extension->readme) : ?>
               <?= $form->fieldSet('Для разработчика'); ?>
-                  <pre>
-                      <?= $extension->readme; ?>
-                  </pre>
+              <?= \kartik\markdown\Markdown::convert($extension->readme); ?>
               <?= $form->fieldSetEnd(); ?>
           <? endif; ?>
 

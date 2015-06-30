@@ -188,6 +188,10 @@ $config =
             'class'                         => '\skeeks\cms\Module',
         ],
 
+        'markdown' => [
+            'class' => 'kartik\markdown\Module',
+        ],
+
         'datecontrol' =>  [
             'class' => '\kartik\datecontrol\Module',
 
