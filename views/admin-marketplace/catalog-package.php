@@ -84,11 +84,19 @@ $extension = $packageModel->createCmsExtension();
           <?= $form->fieldSetEnd(); ?>
 
           <?= $form->fieldSet('Установка'); ?>
-              <?= $packageModel->installHelp; ?>
+              <? if ($packageModel->installHelp): ?>
+                  <?= $packageModel->installHelp; ?>
+              <? else: ?>
+                  Для установки модуля необходимо запустить стандартную установку.
+              <? endif; ?>
           <?= $form->fieldSetEnd(); ?>
 
           <?= $form->fieldSet('Поддержка'); ?>
-              <?= $packageModel->support; ?>
+              <? if ($packageModel->support): ?>
+                  <?= $packageModel->support; ?>
+              <? else: ?>
+                  Разработчик не оставил контактов для связи с ним. Но вы всегда можете обратиться к разработчикам SkeekS CMS <a href="http://cms.skeeks.com/contacts" target="_blank">http://cms.skeeks.com/contacts</a>
+              <? endif; ?>
           <?= $form->fieldSetEnd(); ?>
 
           <? if ($packageModel->demoUrl) : ?>
@@ -110,6 +118,22 @@ $extension = $packageModel->createCmsExtension();
                 </div>
               <?= $form->fieldSetEnd(); ?>
         <? endif; ?>
+
+          <? if ($extension->changeLog) : ?>
+              <?= $form->fieldSet('Процесс разработки'); ?>
+                  <pre>
+                      <?= $extension->changeLog; ?>
+                  </pre>
+              <?= $form->fieldSetEnd(); ?>
+          <? endif; ?>
+
+          <? if ($extension->readme) : ?>
+              <?= $form->fieldSet('Для разработчика'); ?>
+                  <pre>
+                      <?= $extension->readme; ?>
+                  </pre>
+              <?= $form->fieldSetEnd(); ?>
+          <? endif; ?>
 
 
           <? \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
