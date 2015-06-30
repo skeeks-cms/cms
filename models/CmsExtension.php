@@ -21,6 +21,8 @@ use yii\helpers\Json;
  * @property string                 $packagistUrl
  * @property ComposerHelper         $composer
  * @property string                 $controllUrl
+ * @property string                 $changeLog
+ * @property string                 $readme
  *
  * Class CmsExtension
  * @package skeeks\cms\models
@@ -141,17 +143,58 @@ class CmsExtension extends Model
 
 
     /**
-     * @return ComposerHelper
+     * Путь к файлу в этом расширении
+     *
+     * @param $filePath
+     * @return null|string
      */
-    public function getComposer()
+    public function getFilePath($filePath)
     {
         $composerFiles = [];
         foreach ($this->alias as $name => $path)
         {
-            $composerFiles[] = $path . '/composer.json';
+            $composerFiles[] = $path . '/' . $filePath;
         }
 
-        $file = FileHelper::getFirstExistingFileArray($composerFiles);
+        return FileHelper::getFirstExistingFileArray($composerFiles);
+    }
+
+    /**
+     * Прочитать CHANGELOG.md
+     * @return string
+     */
+    public function getChangeLog()
+    {
+        $file = $this->getFilePath('CHANGELOG.md');
+        if (!$file)
+        {
+            return "";
+        }
+
+        return file_get_contents($file);
+    }
+
+    /**
+     * Прочитать README.md
+     * @return string
+     */
+    public function getReadme()
+    {
+        $file = $this->getFilePath('README.md');
+        if (!$file)
+        {
+            return "";
+        }
+
+        return file_get_contents($file);
+    }
+
+    /**
+     * @return ComposerHelper
+     */
+    public function getComposer()
+    {
+        $file = $this->getFilePath('composer.json');
         if (!$file)
         {
             throw new \InvalidArgumentException('composer.json не найден в пакете $name');
