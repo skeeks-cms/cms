@@ -13,7 +13,6 @@ use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\modules\admin\Module;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
-use skeeks\widget\ckeditor\CKEditorWidgetAsset;
 use skeeks\widget\codemirror\CodemirrorWidget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
