@@ -70,10 +70,8 @@ class UpdateController extends Controller
 
     /**
      * Полное обновление проекта, с сохранением дампа базы
-     *
-     * @param int $autoremove стереть существующие файлы и скачать заново
      */
-    public function actionAll($autoremove = 0)
+    public function actionAll()
     {
         //Создание бэкапа базы данных.
         $this->systemCmdRoot("php yii cms/backup/db-execute");
@@ -81,16 +79,8 @@ class UpdateController extends Controller
         //Список сохранненных баз данных
         $this->systemCmdRoot("php yii cms/backup/db-list");
 
-        if ($autoremove)
-        {
-            $this->stdoutN('    - remove all');
-
-            //$this->systemCmdRoot("rm -rf .composer");
-            $this->systemCmdRoot("rm -f composer.lock");
-            $this->systemCmdRoot("rm -f composer.phar");
-            //$this->systemCmdRoot("rm -rf vendor");
-        }
-
+        //Удаление блокирующего файла
+        $this->systemCmdRoot("rm -f composer.lock");
 
         //Проверка версии композера, его установка если нет
         $this->systemCmdRoot("php yii cms/composer/self-update " . ($this->noInteraction ? "--noInteraction":"" ));
