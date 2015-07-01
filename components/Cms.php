@@ -66,6 +66,7 @@ use yii\web\View;
  * @property Tree                               $currentTree
  * @property ComposerHelper                     $composer
  * @property ComposerHelper                     $appComposer
+ * @property Extension                          $extension
  *
  * @package skeeks\cms\components
  */
@@ -78,7 +79,7 @@ class Cms extends \skeeks\cms\base\Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Основной модуль CMS',
+            'name'          => 'Базовый модуль CMS',
         ]);
     }
 
@@ -602,6 +603,14 @@ $fileContent .= '];';
         return array_merge($this->basePropertyTypes(), $this->userPropertyTypes());
     }
 
+
+    /**
+     * @return Extension
+     */
+    public function getExtension()
+    {
+        return CmsExtension::getInstance('skeeks/cms');
+    }
 
     /**
      * @return ComposerHelper
