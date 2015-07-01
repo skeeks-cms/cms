@@ -11,6 +11,8 @@
 
 namespace skeeks\cms\base;
 use skeeks\cms\App;
+use skeeks\cms\helpers\FileHelper;
+use skeeks\sx\File;
 use yii\base\Exception;
 use yii\base\InvalidParamException;
 use yii\web\Application;
@@ -24,18 +26,24 @@ class Controller extends YiiWebController
 {
     /**
      * Использвается в методе render, для начала попробуем поискать шаблон в проекте, затем по умолчанию по правилам yii
-     * @var string
+     * @var array
      */
-    public $beforeRender    = '@template/modules/';
+    public $beforeRender    = ['@template/modules/', '@templateDefault/modules/'];
 
     /**
-     * @var string
+     * @var array возможные лейоуты, поиск в шаблонах
      */
-    public $layout          = '@template/layouts/default.php';
+    public $layouts          = ['@template/layouts/default.php', '@templateDefault/layouts/default.php'];
 
     public function init()
     {
         parent::init();
+
+        //Установка layout-a
+        if ($file = FileHelper::getFirstExistingFileArray($this->layouts))
+        {
+            $this->layout = $file;
+        }
     }
 
     /**
@@ -62,34 +70,56 @@ class Controller extends YiiWebController
      */
     public function render($view, $params = [])
     {
+        //Если не нужно ничего рендерить, то делаем стандартный рендер yii2
         if (!$this->beforeRender)
         {
             return parent::render($view, $params);
         }
 
-        try
+        if (is_string($this->beforeRender))
         {
-            $viewApp = '';
+            $this->beforeRender = [$this->beforeRender];
+        }
+
+        //Возможные пути к файлу шаблона
+        $viewFilePaths = [];
+        foreach ($this->beforeRender as $path)
+        {
             if (!$this->module instanceof Application)
             {
-                $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
-                return parent::render($viewApp, $params);
+                $viewFilePaths[] = $path . $this->module->id . '/' . $this->id . '/' . $view . ".php";
             } else
             {
-                return parent::render($view, $params);
+                $viewFilePaths[] = $path . $this->id . '/' . $view . ".php";
             }
-        } catch (InvalidParamException $e)
-        {
-            \Yii::warning('Шаблон не построен: ' . ($viewApp ? $viewApp : $view) . ' - ' . $e->getMessage());
+        }
 
+        if ($viewFile = FileHelper::getFirstExistingFileArray($viewFilePaths))
+        {
+            try
+            {
+                return parent::render($viewFile, $params);
+
+            } catch (InvalidParamException $e)
+            {
+
+                \Yii::warning('Ошибка в шаблоне: ' . $viewFile . ' - ' . $e->getMessage());
+                return $this->output($e->getMessage());
+            }
+        } else
+        {
             try
             {
                 return parent::render($view, $params);
             } catch (InvalidParamException $e)
             {
+                $message = "Шаблоные не найдены: " . implode(', ', $viewFilePaths);
+                $message .= $e->getMessage();
                 return $this->output($e->getMessage());
             }
         }
+
+
     }
 
 

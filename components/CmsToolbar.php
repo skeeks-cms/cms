@@ -77,6 +77,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
 
 
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -139,19 +140,42 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     {
         parent::init();
 
-
+        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
+        {
+            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+        }
     }
+
     /**
      * @inheritdoc
      */
     public function bootstrap($app)
     {
-        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
+        // delay attaching event handler to the view component after it is fully configured
+        $app->on(Application::EVENT_BEFORE_REQUEST, function () use ($app) {
+            $app->getView()->on(View::EVENT_END_BODY, [$this, 'renderToolbar']);
+        });
+    }
+
+    public $inited = false;
+
+    /**
+     * Установка проверок один раз.
+     * Эти проверки могут быть запущены при отрисовке первого виджета.
+     */
+    public function initEnabled()
+    {
+        if ($this->inited)
         {
-            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
+            return;
         }
 
-        if (!$this->enabled || \Yii::$app->user->isGuest)
+        if (!$this->enabled)
+        {
+            return;
+        }
+
+        if (\Yii::$app->user->isGuest)
         {
             $this->enabled = false;
             return;
@@ -160,14 +184,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         if (!$this->checkAccess() || Yii::$app->getRequest()->getIsAjax())
         {
             $this->enabled = false;
-        }
-
-        if ($this->enabled)
-        {
-            // delay attaching event handler to the view component after it is fully configured
-            $app->on(Application::EVENT_BEFORE_REQUEST, function () use ($app) {
-                $app->getView()->on(View::EVENT_END_BODY, [$this, 'renderToolbar']);
-            });
+            return;
         }
     }
 
@@ -178,6 +195,8 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
      */
     public function renderToolbar($event)
     {
+        $this->initEnabled();
+
         if (!$this->enabled)
         {
             return;

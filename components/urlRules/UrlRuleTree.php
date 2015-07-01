@@ -162,10 +162,13 @@ class UrlRuleTree
             }
         } catch (Exception $e)
         {
-            if ($e->getCode() == 1045)
+            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
             {
                 throw new NotConnectedToDbException;
             }
+        } catch (\yii\base\InvalidConfigException $e)
+        {
+            throw new NotConnectedToDbException;
         }
 
         if ($treeNode)

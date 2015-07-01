@@ -39,6 +39,13 @@ class ElfinderFullController extends ElfinderController
         {
             $this->roots[] =
             [
+                'basePath'  =>  ROOT_DIR,
+                'path'      => '/',
+                'name'      => 'ROOT_DIR'
+            ]
+
+            ;$this->roots[] =
+            [
                 'baseUrl'   =>'@web',
                 'basePath'  =>'@webroot',
                 'path'      => '/',
@@ -79,8 +86,16 @@ class ElfinderFullController extends ElfinderController
                 'path'      => 'assets',
                 'name'      => 'Временные js и css'
             ];
+
+            $this->roots[] =
+            [
+                'basePath'  => BACKUP_DIR,
+                'name'      => 'Бэкапы'
+            ];
         }
 
         parent::init();
+
+        \Yii::$app->cmsToolbar->enabled = false;
     }
 }

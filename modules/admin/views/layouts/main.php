@@ -13,8 +13,6 @@ use skeeks\cms\helpers\UrlHelper;
 AdminAsset::register($this);
 \Yii::$app->admin->registerAsset($this);
 
-
-
 $sidebarHidden = \Yii::$app->user->getIsGuest();
 
 ?>
@@ -59,6 +57,12 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         </li>
 
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+            <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="Переключение полноэкранного режима">
+                <i class="glyphicon glyphicon-fullscreen"></i>
+            </a>
+        </li>
+
+        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
             <a href="<?= UrlHelper::construct('cms/admin-settings')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Настройки проекта"><i class="glyphicon glyphicon-cog"></i></a>
         </li>
 
@@ -95,11 +99,11 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
 <!-- start: Main Menu -->
 <div class="sidebar sx-sidebar">
 
-    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="Закрыть меню">
+    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="Закрыть меню">
         <i class="glyphicon glyphicon-menu-left"></i>
     </a>
 
-    <a href="#" onclick="sx.app.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-closed" data-sx-widget="tooltip-r" data-original-title="Открыть меню">
+    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-closed" data-sx-widget="tooltip-r" data-original-title="Открыть меню">
         <i class="glyphicon glyphicon-menu-right"></i>
     </a>
 
@@ -172,7 +176,7 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
             <div class="panel-body">
                     <div class="panel-content-before">
                         <? if (!UrlHelper::constructCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL)) : ?>
-                            <?= $this->params['actions'] ?>
+                            <?= \yii\helpers\ArrayHelper::getValue($this->params, 'actions'); ?>
                         <? endif; ?>
                         <?/*= Alert::widget() */?>
                     </div>
@@ -194,7 +198,9 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <div class="row">
         <div class="col-sm-5">
             <div class="sx-footer-copyright">
-                <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
+                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт SkeekS CMS">
+                    <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
+                </a>
                 | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
             </div>
         </div><!--/.col-->

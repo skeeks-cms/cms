@@ -8,6 +8,7 @@
 namespace skeeks\cms\modules\admin\traits;
 use yii\helpers\Json;
 use yii\jui\Sortable;
+use yii\widgets\Pjax;
 
 /**
  *
@@ -28,11 +29,24 @@ trait GridViewSortableTrait
 
     public function registerSortableJs()
     {
+        $pjaxId = '';
+        if (property_exists($this, 'pjax'))
+        {
+            $pjax = $this->pjax;
+            if ($pjax && ($pjax instanceof Pjax))
+            {
+                $pjaxId = $pjax->id;
+            }
+        }
+
         if ($this->sortable)
         {
             Sortable::widget();
 
-            $sortableOptions = Json::encode($this->sortableOptions);
+            $options = $this->sortableOptions;
+            $options['pjaxId'] = $pjaxId;
+
+            $sortableOptions = Json::encode($options);
             $this->view->registerCss(<<<Css
             table.sx-sortable tbody>tr
             {
@@ -82,6 +96,11 @@ Css
 
                                 ajax.onError(function(e, data)
                                 {
+                                    if (self.get('pjaxId'))
+                                    {
+                                        $.pjax.reload($("#" + self.get('pjaxId')), {});
+                                    }
+
                                     blocker.unblock();
                                     //sx.notify.info("Подождите сейчас страница будет перезагружена");
                                     _.delay(function()
@@ -92,6 +111,11 @@ Css
                                 })
                                 .onSuccess(function(e, data)
                                 {
+                                    if (self.get('pjaxId'))
+                                    {
+                                        $.pjax.reload($("#" + self.get('pjaxId')), {});
+                                    }
+
                                     var response = data.response;
                                     if (response.success === false)
                                     {

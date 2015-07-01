@@ -129,18 +129,8 @@
             });
 
             return this;
-        }
-    });
+        },
 
-    /**
-     * Запускаем глобальный класс админки
-     * @type {Admin}
-     */
-    sx.app = new sx.classes.Admin({
-        //Отключение ссылок с href="#"
-        disableCetainLink: false,
-        globalAjaxLoader: true,
-        menu: {}
     });
 
 })(sx, sx.$, sx._);

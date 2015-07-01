@@ -586,33 +586,34 @@ class RbacController extends Controller
 
         foreach (\Yii::$app->adminMenu->getData() as $group)
         {
-            if (is_array($itemData))
+            if (is_array($group))
             {
-
                 foreach ($group['items'] as $itemData)
                 {
+                    /**
+                     * @var $controller \yii\web\Controller
+                     */
+                    list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
 
-                        /**
-                         * @var $controller \yii\web\Controller
-                         */
-                        list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
 
+                    //print_r("---------");
+                    //print_r($controller);die;
 
-                        if ($controller)
+                    if ($controller)
+                    {
+                        if ($controller instanceof AdminController)
                         {
-                            if ($controller instanceof AdminController)
-                            {
-                                $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
+                            $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
 
-                                //Привилегия доступу к админке
-                                if (!$adminAccess = $auth->getPermission($permissionCode))
-                                {
-                                    $adminAccess = $auth->createPermission($permissionCode);
-                                    $adminAccess->description = 'Администрирование | ' . $controller->name;
-                                    $auth->add($adminAccess);
-                                }
+                            //Привилегия доступу к админке
+                            if (!$adminAccess = $auth->getPermission($permissionCode))
+                            {
+                                $adminAccess = $auth->createPermission($permissionCode);
+                                $adminAccess->description = 'Администрирование | ' . $controller->name;
+                                $auth->add($adminAccess);
                             }
                         }
+                    }
                 }
 
             }

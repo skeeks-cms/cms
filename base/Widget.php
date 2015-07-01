@@ -7,9 +7,11 @@
  */
 namespace skeeks\cms\base;
 
+use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\traits\WidgetTrait;
 use yii\base\ViewContextInterface;
+use yii\db\Exception;
 use yii\helpers\Html;
 use yii\helpers\Json;
 
@@ -36,6 +38,25 @@ abstract class Widget extends Component implements ViewContextInterface
         \Yii::endProfile("Init: " . $this->_token);
     }
 
+
+    /**
+     * В ключ добавляется зависимость, какой режим используется
+     * @return string
+     */
+    /*public function getCacheKey()
+    {
+        \Yii::$app->cmsToolbar->initEnabled();
+        if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
+        {
+            return implode([
+                "edit-mode-true"
+            ]) . parent::getCacheKey();
+        } else
+        {
+            parent::getCacheKey();
+        }
+    }*/
+
     /**
      * @return string
      */
@@ -46,12 +67,13 @@ abstract class Widget extends Component implements ViewContextInterface
             \Yii::beginProfile("Run: " . $this->_token);
                 $content = $this->_run();
             \Yii::endProfile("Run: " . $this->_token);
-
-        } catch (\Exception $e)
+        }
+        catch (\Exception $e)
         {
             $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
         }
 
+        \Yii::$app->cmsToolbar->initEnabled();
         if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
         {
             $pre = "";

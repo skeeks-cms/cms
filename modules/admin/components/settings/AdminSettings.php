@@ -10,6 +10,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\assets\AdminAsset;
+use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
 
@@ -32,15 +33,23 @@ class AdminSettings extends Component
 
     public $asset;
 
-    public $enableCustomConfirm     = 1;
-    public $enableCustomPromt       = 1;
+    //Всплывающие окошки
+    public $enableCustomConfirm     = Cms::BOOL_Y;
+    public $enableCustomPromt       = Cms::BOOL_Y;
 
+    //Языковые настройки
     public $languageCode            = "ru";
 
 
+    //Настройки таблиц
     public $enabledPjaxPagination       = Cms::BOOL_Y;
     public $pageSize                    =   10;
     public $pageParamName               =   "page";
+
+    //Настройки ckeditor
+    public $ckeditorPreset              = CKEditorPresets::EXTRA;
+    public $ckeditorSkin                = CKEditorPresets::SKIN_MOONO_COLOR;
+    public $ckeditorHeight              = 400;
 
 
     public function init()
@@ -54,7 +63,10 @@ class AdminSettings extends Component
     {
         return ArrayHelper::merge(parent::rules(), [
             [['asset', 'languageCode', 'pageParamName', 'enabledPjaxPagination'], 'string'],
-            [['enableCustomConfirm', 'enableCustomPromt', 'pageSize'], 'integer'],
+            [['pageSize'], 'integer'],
+            [['enableCustomConfirm', 'enableCustomPromt', 'pageSize'], 'string'],
+            [['ckeditorPreset', 'ckeditorSkin'], 'string'],
+            [['ckeditorHeight'], 'integer'],
         ]);
     }
 
@@ -71,6 +83,10 @@ class AdminSettings extends Component
             'enabledPjaxPagination'             => 'Включение ajax навигации',
             'pageParamName'                     => 'Названия парамтера страниц, при постраничной навигации',
             'pageSize'                          => 'Количество записей на одной странице',
+
+            'ckeditorPreset'                    => 'Инструменты',
+            'ckeditorSkin'                      => 'Тема оформления',
+            'ckeditorHeight'                    => 'Высота',
         ]);
     }
 
@@ -90,7 +106,7 @@ class AdminSettings extends Component
             }
         }
 
-        if ($this->enableCustomPromt)
+        if ($this->enableCustomPromt == Cms::BOOL_Y)
         {
             $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Promt.js');
             \Yii::$app->view->registerJsFile($file,
@@ -99,7 +115,7 @@ class AdminSettings extends Component
             ]);
         }
 
-        if ($this->enableCustomConfirm)
+        if ($this->enableCustomConfirm == Cms::BOOL_Y)
         {
             $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Confirm.js');
             \Yii::$app->view->registerJsFile($file,
@@ -122,6 +138,21 @@ class AdminSettings extends Component
         }
 
         return false;
+    }
+
+    /**
+     * Настройки для Ckeditor, по умолчанию
+     * @return array
+     */
+    public function getCkeditorOptions()
+    {
+        return [
+            'preset' => $this->ckeditorPreset,
+            'clientOptions' => [
+                'height'    => $this->ckeditorHeight,
+                'skin'      => $this->ckeditorSkin,
+            ]
+        ];
     }
 
 }

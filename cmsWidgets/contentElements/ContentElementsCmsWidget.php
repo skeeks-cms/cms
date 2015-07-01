@@ -44,6 +44,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $enabledSearchParams         = CMS::BOOL_Y;
     public $enabledCurrentTree          = CMS::BOOL_Y;
     public $enabledCurrentTreeChild     = CMS::BOOL_Y;
+    public $enabledCurrentTreeChildAll  = CMS::BOOL_Y;
 
     public $tree_ids                    = [];
 
@@ -54,6 +55,10 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $content_ids                 = [];
 
     public $enabledActiveTime           = CMS::BOOL_Y;
+
+
+    public $activeQueryCallback;
+
 
     static public function descriptorConfig()
     {
@@ -82,7 +87,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
             'createdBy'                 => 'Выбор записей пользователей',
             'content_ids'               => 'Элементы контента',
             'enabledCurrentTree'        => 'При выборке учитывать текущий раздел (где показывается виджет)',
-            'enabledCurrentTreeChild'   => 'При выборке учитывать текущий раздел (где показывается виджет) и все его подразделы',
+            'enabledCurrentTreeChild'   => 'При выборке учитывать текущий раздел и его подразделы',
+            'enabledCurrentTreeChildAll'=> 'При выборке учитывать текущий раздел и все его подразделы',
             'tree_ids'                  => 'Показывать элементы привязанные к разделам',
             'enabledActiveTime'         => 'Учиьывать время активности',
         ]);
@@ -107,6 +113,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
             [['content_ids'], 'safe'],
             [['enabledCurrentTree'], 'string'],
             [['enabledCurrentTreeChild'], 'string'],
+            [['enabledCurrentTreeChildAll'], 'string'],
             [['tree_ids'], 'safe'],
             [['enabledActiveTime'], 'string'],
         ]);
@@ -147,11 +154,23 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 $treeIds[] = $tree->id;
                 if ($tree->hasChildrens() && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
                 {
-                    if ($childrens = $tree->findChildrens()->all())
+                    if ($this->enabledCurrentTreeChildAll)
                     {
-                        foreach ($childrens as $chidren)
+                        if ($childrens = $tree->findChildrensAll()->all())
                         {
-                            $treeIds[] = $chidren->id;
+                            foreach ($childrens as $chidren)
+                            {
+                                $treeIds[] = $chidren->id;
+                            }
+                        }
+                    } else
+                    {
+                        if ($childrens = $tree->findChildrens()->all())
+                        {
+                            foreach ($childrens as $chidren)
+                            {
+                                $treeIds[] = $chidren->id;
+                            }
                         }
                     }
                 }
@@ -202,6 +221,12 @@ class ContentElementsCmsWidget extends WidgetRenderable
                     [CmsContentElement::tableName() . '.published_to' => null],
                 ]
             );
+        }
+
+        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
+        {
+            $callback = $this->activeQueryCallback;
+            $callback($this->dataProvider->query);
         }
 
         return parent::_run();

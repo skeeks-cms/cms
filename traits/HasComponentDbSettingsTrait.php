@@ -15,6 +15,7 @@ use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
 use yii\caching\TagDependency;
+use yii\db\Exception;
 
 /**
  * @property UrlHelper editUrl
@@ -40,6 +41,10 @@ trait HasComponentDbSettingsTrait
             {
                 $this->setAttributes($settingsValues);
             }
+
+
+        } catch (Exception $e)
+        {
 
         } catch (\Exception $e)
         {

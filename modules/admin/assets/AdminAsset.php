@@ -12,6 +12,7 @@
 namespace skeeks\cms\modules\admin\assets;
 use skeeks\cms\assets\FancyboxAssets;
 use skeeks\cms\base\AssetBundle;
+use yii\helpers\Json;
 
 
 /**
@@ -33,7 +34,9 @@ class AdminAsset extends AssetBundle
         'js/classes/Iframe.js',
         'js/classes/Window.js',
         'js/classes/modal/Dialog.js',
-        'js/app.js',
+        'js/classes/Fullscreen.js',
+        //'js/App.js',
+        'js/Admin.js',
     ];
     public $depends = [
 
@@ -44,7 +47,41 @@ class AdminAsset extends AssetBundle
         '\skeeks\sx\assets\ComponentAjaxLoader',
         '\skeeks\cms\modules\admin\assets\JqueryScrollbarAsset',
         '\skeeks\cms\modules\admin\assets\ThemeRealAdminAsset',
-        '\skeeks\cms\assets\FancyboxAssets'
+        '\skeeks\cms\assets\FancyboxAssets',
+        '\skeeks\cms\assets\JqueryFullscreenAsset'
     ];
+
+    /**
+     * Registers this asset bundle with a view.
+     * @param View $view the view to be registered with
+     * @return static the registered asset bundle instance
+     */
+    public function registerAssetFiles($view)
+    {
+        parent::registerAssetFiles($view);
+
+        $options =
+        [
+            'BlockerImageLoader'        => \Yii::$app->getAssetManager()->getAssetUrl($this, 'images/loaders/circulare-blue-24_24.GIF'),
+            'disableCetainLink'         => false,
+            'globalAjaxLoader'          => true,
+            'menu'                      => [],
+        ];
+
+        $options = Json::encode($options);
+
+        $view->registerJs(<<<JS
+(function(sx, $, _)
+{
+    /**
+     * Запускаем глобальный класс админки
+     * @type {Admin}
+     */
+    sx.App = new sx.classes.Admin($options);
+
+})(sx, sx.$, sx._);
+JS
+);
+    }
 }
 

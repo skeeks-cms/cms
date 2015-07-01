@@ -15,13 +15,13 @@
 
         execute: function()
         {
-            throw new Error("Это асбтрактный класс.");
+            //throw new Error("Это асбтрактный класс.");
 
             this.trigger("beforeExecute", {
                 'task' : this
             });
 
-            var result = {};
+            var result = {'message': 'Задача выполнена'};
 
             this.trigger("complete", {
                 'task'      : this,

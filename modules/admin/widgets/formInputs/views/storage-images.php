@@ -68,7 +68,7 @@ CSS
             <? if ($images = $model->getFilesGroups()->getComponent($widget->fileGroup)->fetchFiles()) : ?>
                 <? foreach($images as $imageFile) : ?>
                     <div class="sx-image">
-                        <a href="<?= $imageFile->src; ?>" class="sx-fancybox">
+                        <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
                             <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
                         </a>
                         <div class="sx-controlls">

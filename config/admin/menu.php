@@ -274,7 +274,7 @@ return
             ],
 
             [
-                "label"     => "Читска временных данных",
+                "label"     => "Чистка временных данных",
                 "url"       => ["admin/clear"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clear.png'],
             ],
@@ -304,6 +304,41 @@ return
         ]
     ],
 
+
+
+    'cms-marketplace' =>
+    [
+        'label'     => 'Маркетплейс',
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png'],
+
+        'items' =>
+        [
+
+            [
+                "label"     => "Каталог",
+                "url"       => ["cms/admin-marketplace/catalog"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
+            ],
+
+            [
+                "label"     => "Установленные",
+                "url"       => ["cms/admin-marketplace/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installed.png']
+            ],
+
+            [
+                "label"     => "Установить/Удалить",
+                "url"       => ["cms/admin-marketplace/install"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installer.png']
+            ],
+
+            [
+                "label"     => "Обновление платформы",
+                "url"       => ["cms/admin-marketplace/update"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update-2.png']
+            ],
+        ]
+    ]
 
 
 ];

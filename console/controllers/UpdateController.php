@@ -14,6 +14,7 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\rbac\AuthorRule;
 use skeeks\sx\Dir;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 /**
@@ -25,155 +26,113 @@ class UpdateController extends Controller
 {
     public $defaultAction = 'all';
 
-    public function init()
-    {
-        parent::init();
-        $this->_initRootPath();
-    }
+    /**
+     * @var bool
+     * optimize-autoloader оптимизировать автолоадер? (рекоммендуется)
+     */
+    public $optimize = true;
 
-    /*public $all = false;
+
+    /**
+     * @var bool
+     * Не задавать вопросы в процессе установки
+     */
+    public $noInteraction = false;
+
+    /**
+     * @var bool
+     * Откатить изменнные файлы перед началом установки
+     */
+    public $revertModified = true;
+
+    /**
+     * @var string
+     * Версия композера, последняя стабильная
+     */
+    public $composerVersion = "1.0.0-alpha10";
+
+    /**
+     * @var string
+     * Версия композер assets, последняя стабильная
+     */
+    public $composerAssetPluginV = "1.0.2";
+
+
     /**
      * @inheritdoc
      */
-    /*public function options($actionID)
+    public function options($actionID)
     {
-        return array_merge(parent::options($actionID), [
-            'all'
+        return ArrayHelper::merge(parent::options($actionID), [
+            'optimize', 'composerVersion', 'composerAssetPluginV', 'noInteraction', 'revertModified'
         ]);
-    }*/
-
-    /**
-     * Полное обновление проекта
-     *
-     * @param int $autoremove стереть существующие файлы и скачать заново
-     */
-    public function actionAll($autoremove = 0)
-    {
-        if ($autoremove)
-        {
-            $this->stdoutN('    - remove all');
-
-            //$this->systemCmdRoot("rm -rf .composer");
-            $this->systemCmdRoot("rm -f composer.lock");
-            $this->systemCmdRoot("rm -f composer.phar");
-            //$this->systemCmdRoot("rm -rf vendor");
-        }
-
-        $this->actionComposerUpdate();
-        $this->actionUpdateComposerJson();
-        $this->actionMigration();
-        $this->actionClearRuntimes();
-        $this->actionGenerateModulesConfigFile();
-        $this->actionDbRefresh();
-        $this->actionRbacUpdate();
     }
 
-
     /**
-     * Обновление и добавления прав доступа
+     * Полное обновление проекта, с сохранением дампа базы
      */
-    public function actionRbacUpdate()
+    public function actionAll()
     {
+        //Создание бэкапа базы данных.
+        $this->systemCmdRoot("php yii cms/backup/db-execute");
+
+        //Список сохранненных баз данных
+        $this->systemCmdRoot("php yii cms/backup/db-list");
+
+        //Удаление блокирующего файла
+        $this->systemCmdRoot("rm -f composer.lock");
+
+        //Проверка версии композера, его установка если нет
+        $this->systemCmdRoot("php yii cms/composer/self-update " . ($this->noInteraction ? "--noInteraction":"" ));
+        //Обновление asset plugins composer
+        $this->systemCmdRoot("php yii cms/composer/update-asset-plugins " . ($this->noInteraction ? "--noInteraction":"" ));
+
+        if ($this->revertModified)
+        {
+            //Откатить измененные файлы
+            $this->systemCmdRoot("php yii cms/composer/revert-modified-files");
+        }
+
+        //Обновление зависимостей
+        $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
+
+        //Генерация файла со списком модулей
+        $this->systemCmdRoot("php yii cms/utils/generate-modules-config-file");
+
+        //Установка всех миграций
+        $this->systemCmdRoot("php yii cms/db/apply-migrations");
+
+        //Чистка временных диррикторий
+        $this->systemCmdRoot("php yii cms/utils/clear-runtimes");
+
+
+        //Сброс кэша стрктуры базы данных
+        $this->systemCmdRoot("php yii cms/db/db-refresh");
+
+        //Обновление привилегий
         $this->systemCmdRoot("php yii cms/rbac/init");
     }
 
+
     /**
-     * Генерация файла со списком модулей
+     * Установка пакета
+     *
+     * @param $package skeeks/cms-module:*
      */
-    public function actionGenerateModulesConfigFile()
+    public function actionInstall($package)
     {
-        \Yii::$app->cms->generateModulesConfigFile();
+        $this->systemCmdRoot("php yii cms/composer/require {$package}");
+        $this->systemCmdRoot("php yii cms/update");
     }
 
     /**
-     * Инвалидация кэша стуктуры базы данных
+     * Удаление пакета
+     *
+     * @param $package skeeks/cms-module
      */
-    public function actionDbRefresh()
+    public function actionRemove($package)
     {
-        \Yii::$app->db->getSchema()->refresh();
-    }
-
-    /**
-     * Читска временный файлов (assets и runtimes)
-     */
-    public function actionClearRuntimes()
-    {
-        $dir = new Dir(\Yii::getAlias('@console/runtime'));
-        $dir->clear();
-
-        $dir = new Dir(\Yii::getAlias('@common/runtime'));
-        $dir->clear();
-
-        $dir = new Dir(\Yii::getAlias('@frontend/runtime'));
-        $dir->clear();
-        $dir = new Dir(\Yii::getAlias('@frontend/web/assets'));
-        $dir->clear();
-    }
-
-    /**
-     * Проведение всех миграций всех подключенных модулей
-     */
-    public function actionMigration()
-    {
-        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations --interactive=0" ;
-        $this->systemCmdRoot($cmd);
-
-        foreach (\Yii::$app->extensions as $code => $data)
-        {
-            if ($data['alias'])
-            {
-                foreach ($data['alias'] as $code => $path)
-                {
-                    $migrationsPath = $path . '/migrations';
-
-
-                    if (PHP_OS == 'Windows')
-                    {
-                        $migrationsPath = str_replace("/", "\\", $migrationsPath);
-                    }
-
-
-                    if (is_dir($migrationsPath))
-                    {
-                        $cmd = "php yii migrate --migrationPath=" . $migrationsPath . '  --interactive=0' ;
-                        $this->systemCmdRoot($cmd);
-                    }
-
-                }
-            }
-        }
-
-        $this->systemCmdRoot("php yii migrate --interactive=0");
-    }
-
-    /**
-     * Обновление проверка и установка композера, а также глобальных asset-plugin
-     */
-    public function actionComposerUpdate()
-    {
-        $composer = \Yii::getAlias('@root/composer.phar');
-        if (file_exists($composer))
-        {
-            $this->stdoutN("composer есть, обновляем его");
-            $this->systemCmdRoot("php composer.phar self-update");
-        } else
-        {
-            $this->stdoutN("composer не надйен");
-            $this->systemCmdRoot('php -r "readfile(\'https://getcomposer.org/installer\');" | php');
-            $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar global require \"fxp/composer-asset-plugin:1.0.0\" --profile"');
-        }
-    }
-
-    /**
-     * Обновление зависимостей и библиотек, через композер
-     */
-    public function actionUpdateComposerJson()
-    {
-        $this->systemCmdRoot("COMPOSER_HOME=.composer php composer.phar update --profile");
-    }
-
-    protected function _initRootPath()
-    {
-        \Yii::setAlias('root', dirname(\Yii::getAlias('@common')));
+        $this->systemCmdRoot("php yii cms/composer/remove {$package}");
+        $this->systemCmdRoot("php yii cms/update");
     }
 }

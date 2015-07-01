@@ -11,7 +11,10 @@ use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
 use skeeks\cms\controllers\AdminCmsContentElementController;
+use skeeks\cms\events\LoginEvent;
 use skeeks\cms\exceptions\NotConnectedToDbException;
+use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
@@ -50,14 +53,20 @@ use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\console\Application;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\UploadedFile;
+use yii\web\UserEvent;
 use yii\web\View;
 
 /**
  * @property CmsSite                            $site
  * @property Tree                               $currentTree
+ * @property ComposerHelper                     $composer
+ * @property ComposerHelper                     $appComposer
+ * @property Extension                          $extension
  *
  * @package skeeks\cms\components
  */
@@ -70,7 +79,7 @@ class Cms extends \skeeks\cms\base\Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Основной модуль CMS',
+            'name'          => 'Базовый модуль CMS',
         ]);
     }
 
@@ -116,7 +125,12 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string шаблон
      */
-    public $template                = "default";
+    public $template                        = "default";
+
+    /**
+     * @var string
+     */
+    public $templateDefault                 = "default";
 
     /**
      * @var string язык по умолчанию
@@ -186,17 +200,33 @@ class Cms extends \skeeks\cms\base\Component
 
 
         //TODO:: future refactor;
-        $templatePath = "@app/templates/default";
+        $templatePath           = "@app/templates/default";
+        $templateDefaultPath    = "@app/templates/default";
         foreach ($this->templates as $templateData)
         {
             if ($templateData['code'] == $this->template)
             {
                 $templatePath = $templateData['path'];
             }
+
+            if ($templateData['code'] == $this->templateDefault)
+            {
+                $templateDefaultPath = $templateData['path'];
+            }
         }
         \Yii::setAlias('template', \Yii::getAlias($templatePath));
+        \Yii::setAlias('templateDefault', \Yii::getAlias($templateDefaultPath));
 
         \Yii::$app->language = $this->languageCode;
+
+
+        if (!\Yii::$app instanceof Application)
+        {
+            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
+                $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
+                $e->identity->save();
+            });
+        }
 
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
@@ -204,11 +234,11 @@ class Cms extends \skeeks\cms\base\Component
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'files' =>
-                    [
-                        'class'         => AdminOneModelFilesAction::className(),
-                        'name'          => 'Файлы',
-                        "icon"          => "glyphicon glyphicon-cloud",
-                    ],
+                        [
+                            'class'         => AdminOneModelFilesAction::className(),
+                            'name'          => 'Файлы',
+                            "icon"          => "glyphicon glyphicon-cloud",
+                        ],
                 ]);
             }
 
@@ -216,11 +246,11 @@ class Cms extends \skeeks\cms\base\Component
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'related-properties' =>
-                    [
-                        'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                        'name'          => 'Дополнительные свойства',
-                        "icon"          => "glyphicon glyphicon-plus-sign",
-                    ],
+                        [
+                            'class'         => AdminOneModelRelatedPropertiesAction::className(),
+                            'name'          => 'Дополнительные свойства',
+                            "icon"          => "glyphicon glyphicon-plus-sign",
+                        ],
                 ]);
             }
 
@@ -228,12 +258,12 @@ class Cms extends \skeeks\cms\base\Component
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'system' =>
-                    [
-                        'class'         => AdminOneModelSystemAction::className(),
-                        'name'          => 'Системные данные',
-                        "icon"          => "glyphicon glyphicon-cog",
-                        "priority"      => 9999,
-                    ],
+                        [
+                            'class'         => AdminOneModelSystemAction::className(),
+                            'name'          => 'Системные данные',
+                            "icon"          => "glyphicon glyphicon-cog",
+                            "priority"      => 9999,
+                        ],
                 ]);
             }
 
@@ -244,7 +274,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'templateDefault', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
         ]);
@@ -259,7 +289,8 @@ class Cms extends \skeeks\cms\base\Component
             'appName'                   => 'Название проекта',
             'template'                  => 'Шаблон',
             'templates'                 => 'Возможные шаблон',
-            'languageCode'       => 'Язык по умолчанию',
+            'languageCode'              => 'Язык по умолчанию',
+            'templateDefault'           => 'Шаблон по умолчанию',
         ]);
     }
 
@@ -570,5 +601,42 @@ $fileContent .= '];';
     public function allPropertyTypes()
     {
         return array_merge($this->basePropertyTypes(), $this->userPropertyTypes());
+    }
+
+
+    /**
+     * @return Extension
+     */
+    public function getExtension()
+    {
+        return CmsExtension::getInstance('skeeks/cms');
+    }
+
+    /**
+     * @return ComposerHelper
+     */
+    public function getComposer()
+    {
+        $extension = CmsExtension::getInstance('skeeks/cms');
+        return $extension->composer;
+    }
+
+    /**
+     * @return ComposerHelper
+     */
+    public function getAppComposer()
+    {
+        $composerFile = ROOT_DIR . "/composer.json";
+        if (file_exists($composerFile))
+        {
+            $data = file_get_contents($composerFile);
+            $data = Json::decode($data);
+
+            return new ComposerHelper([
+                'data' => (array) $data
+            ]);
+        }
+
+        return new ComposerHelper();
     }
 }

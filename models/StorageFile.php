@@ -31,6 +31,7 @@ use yii\base\Event;
  *
  * @property integer $id
  * @property string $src
+ * @property string $absoluteSrc
  * @property string $cluster_id
  * @property string $cluster_file
  * @property integer $created_by
@@ -282,4 +283,11 @@ class StorageFile extends Core
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getAbsoluteSrc()
+    {
+        return $this->cluster()->getAbsoluteUrl($this->cluster_file);
+    }
 }

@@ -12,7 +12,9 @@ use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\rbac\AuthorRule;
+use skeeks\sx\Dir;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 /**
@@ -23,29 +25,42 @@ use yii\helpers\Console;
 class BackupController extends Controller
 {
     /**
-     * Бэкап базы данных
+     * Просмотр созданных бекапов баз данных
      */
-    public function actionDb()
+    public function actionDbList()
     {
-        print_r(\Yii::$app->db->ser);
+        if (!\Yii::$app->dbDump->backupDir->isExist() || !$files = \Yii::$app->dbDump->backupDir->findFiles())
+        {
+            $this->stdoutN('Бэкапов не найдено');
+            return;
+        }
 
+        $this->stdoutN('Найдено бэкапов баз данных: ' . count($files));
+
+        foreach ($files as $file)
+        {
+            $this->stdoutN($file->getBaseName() . " (" . $file->size()->toString() . ")");
+        }
+    }
+
+    /**
+     * Сделать бэкап базы данных
+     */
+    public function actionDbExecute()
+    {
+        $result = \Yii::$app->dbDump->dumpRun();
+        $this->stdoutN($result);
     }
 
     /**
      * Бэкап файлов
      */
     public function actionFiles()
-    {
-
-
-    }
+    {}
 
     /**
      * Полный бэкап, база файлы все.
      */
-    public function actionAll()
-    {
-
-
-    }
+    public function actionFull()
+    {}
 }

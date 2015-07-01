@@ -81,6 +81,11 @@ $config =
         [
             'class' => '\skeeks\cms\modules\admin\components\Menu',
         ],
+
+        'dbDump' =>
+        [
+            'class' => '\skeeks\cms\components\db\DbDumpComponent',
+        ]
     ],
 
 

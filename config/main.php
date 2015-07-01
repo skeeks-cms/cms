@@ -91,6 +91,7 @@ $config =
 
                 'skeeks-cms'                            => 'cms/cms/index',
                 'skeeks-cms/<action>'                   => 'cms/cms/<action>',
+                'search'                                => 'cms/search/result',
 
                 ["class" => 'skeeks\cms\components\ImagingUrlRule'], //админка
             ]
@@ -147,6 +148,21 @@ $config =
         'currentSite' =>
         [
             'class' => '\skeeks\cms\components\CurrentSite',
+        ],
+
+        'dbDump' =>
+        [
+            'class' => '\skeeks\cms\components\db\DbDumpComponent',
+        ],
+
+        'cmsSearch' =>
+        [
+            'class' => '\skeeks\cms\components\CmsSearchComponent',
+        ],
+
+        'cmsMarkeplace' =>
+        [
+            'class' => '\skeeks\cms\components\marketplace\MarketplaceApi',
         ]
     ],
 
@@ -170,6 +186,10 @@ $config =
         'cms' =>
         [
             'class'                         => '\skeeks\cms\Module',
+        ],
+
+        'markdown' => [
+            'class' => 'kartik\markdown\Module',
         ],
 
         'datecontrol' =>  [

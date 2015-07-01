@@ -12,6 +12,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
+use skeeks\yii2\ckeditor\CKEditorWidget;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -23,18 +24,25 @@ use Yii;
  * Class Ckeditor
  * @package skeeks\cms\widgets\formInputs\ckeditor
  */
-class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
+class Ckeditor extends CKEditorWidget
 {
     /**
      * @var Модель к которой привязываются файлы
      */
     public $relatedModel;
 
-
-    protected function initOptions()
+    public function __construct($config = [])
     {
-        parent::initOptions();
+        if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
+        {
+            $config = ArrayHelper::merge(\Yii::$app->admin->getCkeditorOptions(), $config);
+        }
 
+        parent::__construct($config);
+    }
+
+    public function init()
+    {
         $additionalData = [];
         if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord))
         {
@@ -48,5 +56,7 @@ class Ckeditor extends \skeeks\widget\ckeditor\CKEditor
             ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
             ->enableAdmin()
             ->toString();
+
+        parent::init();
     }
 }

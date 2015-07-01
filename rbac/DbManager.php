@@ -106,10 +106,19 @@ class DbManager extends CmsManager
      */
     public function checkAccess($userId, $permissionName, $params = [])
     {
-        $this->loadItems();
-        $this->loadChildren();
-        $this->loadRules();
-        $assignments = $this->getAssignments($userId);
+        try
+        {
+            $this->loadItems();
+            $this->loadChildren();
+            $this->loadRules();
+            $assignments = $this->getAssignments($userId);
+        } catch (Exception $e)
+        {
+            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
+            {
+                throw new NotConnectedToDbException;
+            }
+        }
 
         return $this->checkAccessRecursive($userId, $permissionName, $params, $assignments);
     }
@@ -607,7 +616,7 @@ class DbManager extends CmsManager
             }
         } catch (Exception $e)
         {
-            if ($e->getCode() == 1045)
+            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
             {
                 throw new NotConnectedToDbException;
             }
@@ -620,17 +629,27 @@ class DbManager extends CmsManager
      */
     private function loadChildren()
     {
-        $part = self::PART_CHILDREN;
-        if ($this->_children === null && ($this->_children = $this->getFromCache($part)) === false) {
-            $query = (new Query)->from($this->itemChildTable);
+        try
+        {
+            $part = self::PART_CHILDREN;
+            if ($this->_children === null && ($this->_children = $this->getFromCache($part)) === false) {
+                $query = (new Query)->from($this->itemChildTable);
 
-            $this->_children = [];
-            foreach ($query->all($this->db) as $row) {
-                if (isset($this->_items[$row['parent']], $this->_items[$row['child']])) {
-                    $this->_children[$row['parent']][] = $row['child'];
+                $this->_children = [];
+                foreach ($query->all($this->db) as $row) {
+                    if (isset($this->_items[$row['parent']], $this->_items[$row['child']])) {
+                        $this->_children[$row['parent']][] = $row['child'];
+                    }
                 }
+                $this->saveToCache($part, $this->_children);
             }
-            $this->saveToCache($part, $this->_children);
+
+        } catch (Exception $e)
+        {
+            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
+            {
+                throw new NotConnectedToDbException;
+            }
         }
     }
 
@@ -640,18 +659,28 @@ class DbManager extends CmsManager
      */
     private function loadRules()
     {
-        $part = self::PART_RULES;
-        if ($this->_rules === null && ($this->_rules = $this->getFromCache($part)) === false) {
-            $query = (new Query)->from($this->ruleTable);
+        try
+        {
+            $part = self::PART_RULES;
+            if ($this->_rules === null && ($this->_rules = $this->getFromCache($part)) === false) {
+                $query = (new Query)->from($this->ruleTable);
 
-            $this->_rules = [];
-            foreach ($query->all($this->db) as $row) {
-                $rule = @unserialize($row['data']);
-                if ($rule instanceof Rule) {
-                    $this->_rules[$row['name']] = $rule;
+                $this->_rules = [];
+                foreach ($query->all($this->db) as $row) {
+                    $rule = @unserialize($row['data']);
+                    if ($rule instanceof Rule) {
+                        $this->_rules[$row['name']] = $rule;
+                    }
                 }
+                $this->saveToCache($part, $this->_rules);
             }
-            $this->saveToCache($part, $this->_rules);
+
+        } catch (Exception $e)
+        {
+            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
+            {
+                throw new NotConnectedToDbException;
+            }
         }
     }
 

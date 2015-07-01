@@ -51,23 +51,40 @@ use common\models\User;
                 ]
             ],
 
+            'dataProviderCallback' => function($dataProvider)
+            {
+                /**
+                 * @var \yii\data\BaseDataProvider $dataProvider
+                */
+                $dataProvider->getPagination()->defaultPageSize   = 5000;
+            },
+
             'controllerRoute'   => 'cms/admin-cms-tree-type-property',
             'gridViewOptions'   => [
                 'sortable' => true,
                 'columns' => [
-                    'name',
-
+                    [
+                        'attribute'     => 'name',
+                        'enableSorting' => false
+                    ],
 
                     [
                         'class'         => \skeeks\cms\grid\BooleanColumn::className(),
                         'attribute'     => 'active',
                         'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
-                        'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y
+                        'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,
+                        'enableSorting' => false
                     ],
 
+                    [
+                        'attribute'     => 'code',
+                        'enableSorting' => false
+                    ],
 
-                    'code',
-                    'priority',
+                    [
+                        'attribute'     => 'priority',
+                        'enableSorting' => false
+                    ],
                 ],
             ],
         ]); ?>

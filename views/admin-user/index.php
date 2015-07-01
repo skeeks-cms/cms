@@ -33,6 +33,10 @@
 
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+        [
+            'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+            'attribute' => 'logged_at'
+        ],
 
         [
             'class'     => \yii\grid\DataColumn::className(),
@@ -44,13 +48,19 @@
                 {
                     foreach ($roles as $role)
                     {
-                        $result[] = $role->name;
+                        $result[] = $role->description . " ({$role->name})";
                     }
                 }
 
                 return implode(', ', $result);
             },
-            'format' => 'html',
+            'format'    => 'html',
+            'label'     => 'Роли',
+        ],
+
+        [
+            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute'     => "active"
         ],
 
     ],

@@ -37,10 +37,11 @@ class Module extends base\Module implements BootstrapInterface
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            "version"               => file_get_contents(__DIR__ . "/VERSION"),
+            //"version"               => file_get_contents(__DIR__ . "/VERSION"),
+            "version"               => \Yii::$app->cms->extension->version,
 
-            "name"          => "SkeekS CMS",
-            "description"   => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
+            "name"                  => "SkeekS CMS",
+            "description"           => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
         ]);
     }
 

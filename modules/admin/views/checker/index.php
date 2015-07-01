@@ -88,7 +88,7 @@ CSS
                                 'content' => $model->description,
                             ]);
 
-                            return \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#" . $infoId, [
+                            return \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#", [
                                 'class' => 'btn btn-default',
                                 'onclick' => "sx.dialog({$optionsJson}); return false;"
                             ]);

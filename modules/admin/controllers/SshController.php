@@ -50,7 +50,15 @@ class SshController extends AdminController
                 "name"         => "Консоль",
                 "callback"     => [$this, 'actionIndex'],
             ],
+
         ];
+    }
+
+    public function actionConsole()
+    {
+        return $this->render($this->action->id, [
+            'action' => $this->action
+        ]);
     }
 
     public function actionIndex()
