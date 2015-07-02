@@ -15,11 +15,20 @@ use \skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 $this->registerJs(<<<JS
     (function(sx, $, _)
     {
+
         sx.createNamespace('classes', sx);
         sx.classes.Blocked = sx.classes.Component.extend({
         
             _init: function()
             {},
+
+            _onDomReady: function()
+            {
+                _.delay(function()
+                {
+                    $("[type=password]").val('');
+                }, 200);
+            },
             
             afterValidate: function(jForm, ajaxQuery)
             {
