@@ -164,9 +164,13 @@ class Cms extends \skeeks\cms\base\Component
     {
         parent::init();
 
+
         if (!$this->appName)
         {
             $this->appName = \Yii::$app->name;
+        } else
+        {
+            \Yii::$app->name = $this->appName;
         }
 
         //TODO: доработать
@@ -224,7 +228,7 @@ class Cms extends \skeeks\cms\base\Component
         {
             \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
                 $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
-                $e->identity->save();
+                $e->identity->save(false);
             });
         }
 
@@ -265,6 +269,12 @@ class Cms extends \skeeks\cms\base\Component
                             "priority"      => 9999,
                         ],
                 ]);
+            }
+
+            if (!\Yii::$app->user->isGuest)
+            {
+                //Обновление времени последней актиности пользователя
+                \Yii::$app->user->identity->updateLastAdminActivity();
             }
 
         });
