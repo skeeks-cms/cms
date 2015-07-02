@@ -46,7 +46,8 @@ class AuthController extends AdminController
             'access' =>
             [
                 'class' => AdminAccessControl::className(),
-                'only' => ['logout'
+                'only' => [
+                    'logout', 'lock'
                     //, 'login', 'auth', 'reset-password'
                 ],
                 'rules' => [
@@ -56,7 +57,7 @@ class AuthController extends AdminController
                         'roles' => ['?'],
                     ],*/
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'lock'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -67,6 +68,7 @@ class AuthController extends AdminController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
+                    'lock' => ['post'],
                 ],
             ],
         ];
@@ -87,6 +89,19 @@ class AuthController extends AdminController
                 'class' => LogoutAction::className(),
             ],
         ];
+    }
+
+    public function actionLock()
+    {
+        \Yii::$app->user->identity->lockAdmin();
+
+        if ($ref = UrlHelper::getCurrent()->getRef())
+        {
+            return $this->redirect($ref);
+        } else
+        {
+            return $this->redirect(Yii::$app->getUser()->getReturnUrl());
+        }
     }
 
     public function actionResetPassword()

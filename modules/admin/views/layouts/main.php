@@ -96,6 +96,9 @@ JS
                 <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
                 <li class="divider"></li>
                 <li>
+                    <?= Html::a('<i class="fa fa-shield"></i> Заблокировать', UrlHelper::construct("admin/auth/lock")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+                </li>
+                <li>
                     <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
                 </li>
             </ul>
