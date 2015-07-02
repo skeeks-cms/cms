@@ -4,7 +4,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 02.07.2015
  */
-(function(sx, $, _)
+(function(sx, $, _, window)
 {
     sx.createNamespace('classes', sx);
 
@@ -40,12 +40,7 @@
             });
 
          // Init CanvasBG and pass target starting location
-            CanvasBG.init({
-              Loc: {
-                x: window.innerWidth / 2.1,
-                y: window.innerHeight / 2.2
-              },
-            });
+
         },
 
         _onWindowReady: function()
@@ -57,13 +52,31 @@
 
             _.delay(function()
             {
+                /*console.log(window.top.sx);
+                if (!window.top.sx)
+                {
+
+                }*/
                 $('.navbar, .sx-admin-footer').addClass('op-05').fadeIn('slow');
+
+                CanvasBG.init({
+                  Loc: {
+                    x: window.innerWidth / 2.1,
+                    y: window.innerHeight / 2.2
+                  },
+                });
+
             }, 2000);
+
+
+
 
             _.delay(function()
             {
                 $('.sx-windowReady-fadeIn').fadeIn();
             }, 500);
+
+
         },
 
         hideHeader: function()
@@ -87,4 +100,4 @@
         }
     });
 
-})(sx, sx.$, sx._);
+})(sx, sx.$, sx._, window);
