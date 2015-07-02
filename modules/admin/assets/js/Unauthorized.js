@@ -57,14 +57,34 @@
 
             _.delay(function()
             {
-                $('.navbar, .sx-admin-footer').addClass('op-05').fadeIn();
-            }, 1000);
+                $('.navbar, .sx-admin-footer').addClass('op-05').fadeIn('slow');
+            }, 2000);
 
             _.delay(function()
             {
                 $('.sx-windowReady-fadeIn').fadeIn();
             }, 500);
         },
+
+        hideHeader: function()
+        {
+            $(".navbar").fadeOut();
+            return this;
+        },
+
+        hideFooter: function()
+        {
+            $(".sx-admin-footer").fadeOut();
+            return this;
+        },
+
+        triggerBeforeReddirect: function()
+        {
+            var self = this;
+            this.hideHeader().hideFooter();
+            $('.sx-content-block').fadeOut();
+            self.blockerHtml.block();
+        }
     });
 
 })(sx, sx.$, sx._);

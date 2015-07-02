@@ -36,7 +36,7 @@ $this->registerJs(<<<JS
                     'blocker'                           : sx.AppUnAuthorized.PanelBlocker,
                     'blockerSelector'                   : '',
                     'enableBlocker'                     : true,
-                    'redirectDelay'                     : 1000,
+                    'redirectDelay'                     : 2000,
                     'allowResponseSuccessMessage'       : false,
                     'allowResponseErrorMessage'         : false,
                 });
@@ -45,8 +45,7 @@ $this->registerJs(<<<JS
                 {
                     _.delay(function()
                     {
-                        $('.sx-content-block').fadeOut();
-                        sx.AppUnAuthorized.blockerHtml.block();
+                        sx.AppUnAuthorized.triggerBeforeReddirect();
                     }, 200)
                 });
             }
