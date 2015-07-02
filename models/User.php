@@ -45,6 +45,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $email
  * @property integer $status
  * @property integer $created_at
+ * @property integer $last_activity_at
  * @property integer $updated_at
  * @property string $name
  * @property string $city
@@ -54,6 +55,10 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $image_cover
  * @property integer $logged_at
  * @property string $gender
+ *
+ *
+ * @property string $lastActivityRelativeTime
+ * @property string $lastAdminActivityRelativeTime
  *
  * @property string $displayName
  *
@@ -261,6 +266,7 @@ class User
 
             [['username', 'auth_key', 'password_hash'], 'required'],
             [['created_at', 'updated_at', 'group_id'], 'integer'],
+
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
@@ -274,7 +280,10 @@ class User
             ['username', 'string', 'min' => 3, 'max' => 12],
             [['username'], 'unique'],
             [['username'], 'validateLogin'],
+
             [['logged_at'], 'integer'],
+            [['last_activity_at'], 'integer'],
+            [['last_admin_activity_at'], 'integer'],
         ];
     }
 
@@ -327,9 +336,72 @@ class User
             'info' => Yii::t('app', 'Информация'),
             'gender' => Yii::t('app', 'Пол'),
             'logged_at' => Yii::t('app', 'Время последней авторизации'),
+            'last_activity_at' => Yii::t('app', 'Время последней активности'),
+            'last_admin_activity_at' => Yii::t('app', 'Время последней активности в админке'),
             'status_of_life' => Yii::t('app', 'Статус'),
         ];
     }
+
+
+    /**
+     * Время проявления последней активности на сайте
+     *
+     * @return int
+     */
+    public function getLastAdminActivityRelativeTime()
+    {
+        $now = \Yii::$app->formatter->asRelativeTime(time());
+        return (int) ((int) $this->last_admin_activity_at - $now);
+    }
+    /**
+     * Обновление времени последней актиности пользователя.
+     * Только в том случае, если время его последней актиности больше 10 сек.
+     * @return $this
+     */
+    public function updateLastAdminActivity()
+    {
+        $now = \Yii::$app->formatter->asTimestamp(time());
+
+        if (!$this->lastAdminActivityRelativeTime || $this->lastAdminActivityRelativeTime > 10)
+        {
+            $this->last_activity_at         = $now;
+            $this->last_admin_activity_at   = $now;
+
+            $this->save(false);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Время проявления последней активности на сайте
+     *
+     * @return int
+     */
+    public function getLastActivityRelativeTime()
+    {
+        $now = \Yii::$app->formatter->asRelativeTime(time());
+        return (int) ((int) $this->last_activity_at - $now);
+    }
+    /**
+     * Обновление времени последней актиности пользователя.
+     * Только в том случае, если время его последней актиности больше 10 сек.
+     * @return $this
+     */
+    public function updateLastActivity()
+    {
+        $now = \Yii::$app->formatter->asTimestamp(time());
+
+        if (!$this->lastActivityRelativeTime || $this->lastActivityRelativeTime > 10)
+        {
+            $this->last_activity_at = $now;
+            $this->save(false);
+        }
+
+        return $this;
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
