@@ -18,6 +18,7 @@ use yii\base\Object;
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseUrl;
 use yii\helpers\Url;
+use yii\web\Application;
 
 /**
  * Class RequestOptions
@@ -58,11 +59,22 @@ class UrlHelper
      */
     static public function constructCurrent()
     {
-        $url = new static("/", \Yii::$app->request->getQueryParams());
+
+        $route = [];
+        if (!\Yii::$app->controller->module instanceof Application)
+        {
+            $route[] = \Yii::$app->controller->module->id;
+        }
+
+        $route[] = \Yii::$app->controller->id;
+        $route[] = \Yii::$app->controller->action->id;
+
+        $url = new static("/" . implode('/', $route), \Yii::$app->request->getQueryParams());
         if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
         {
             $url->enableAdmin();
         }
+
 
         return $url;
     }
@@ -195,6 +207,16 @@ class UrlHelper
     }
 
     /**
+     * Добавить параметры, указывающие что запрос на валидацию данных формы.
+     * @return $this
+     */
+    public function enableAjaxValidateForm()
+    {
+        return $this->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME);
+    }
+
+    /**
+     * Это урл админки.
      * @return $this
      */
     public function enableAdmin()
