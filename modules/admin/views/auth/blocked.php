@@ -66,7 +66,7 @@ $logoutUrl = \skeeks\cms\helpers\UrlHelper::construct("admin/auth/logout")->enab
 
                                 <div class="row">
                                     <div class="col-lg-3">
-                                        <img src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->user->identity->getAvatarSrc()); ?>" />
+                                        <img src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->user->identity->getMainImageSrc()); ?>" style="width: 100%;"/>
                                     </div>
                                     <div class="col-lg-9">
                                         <?= $form->field($model, 'password')->passwordInput([
@@ -74,23 +74,27 @@ $logoutUrl = \skeeks\cms\helpers\UrlHelper::construct("admin/auth/logout")->enab
                                             'autocomplete' => 'off',
                                         ])->label(\Yii::$app->user->identity->displayName) ?>
                                         <?= Html::submitButton("<i class='glyphicon glyphicon-lock'></i> Разблокировать", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-                                        <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', $logoutUrl, [
-                                            "data-method" => "post",
-                                            "data-pjax" => "0",
-                                            "class" => "btn btn-danger btn-lg pull-right",
-                                        ]); ?>
+
                                     </div>
                                 </div>
-
+                        <?php ActiveForm::end(); ?>
                                 <div>
                                     <hr />
                                     <div style="color:#999;margin:1em 0">
                                         Вы успешно авторизованы, но слишком долго не проявляли активность в панеле управления сайтом.
                                         Пожалуйста, подтвердите что это вы, и введите ваш пароль.
+                                        <p>
+
+                                            <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', $logoutUrl, [
+                                                "data-method" => "post",
+                                                "data-pjax" => "0",
+                                                "class" => "btn btn-danger btn-xs pull-right",
+                                            ]); ?>
+                                        </p>
                                     </div>
                                 </div>
 
-                        <?php ActiveForm::end(); ?>
+
                 </div>
             </div>
         </div>

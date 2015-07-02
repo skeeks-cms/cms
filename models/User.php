@@ -344,6 +344,18 @@ class User
 
 
     /**
+     * Установка последней активности пользователя. Больше чем в настройках.
+     * @return $this
+     */
+    public function lockAdmin()
+    {
+        $this->last_admin_activity_at   = \Yii::$app->formatter->asTimestamp(time()) - (\Yii::$app->admin->blockedTime + 1);
+        $this->save(false);
+
+        return $this;
+    }
+
+    /**
      * Время проявления последней активности на сайте
      *
      * @return int
