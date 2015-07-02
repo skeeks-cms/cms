@@ -83,14 +83,8 @@ $this->registerJs(<<<JS
 
                 _.delay(function()
                 {
-                    $(".navbar").slideUp(800);
-                    $(".sx-admin-footer").slideUp(800);
-                }, 300);
-
-                _.delay(function()
-                {
-                    self.goActSuccessLogin();
-                }, 300);
+                    sx.AppUnAuthorized.triggerBeforeReddirect();
+                }, 200)
 
                 _.delay(function()
                 {
@@ -118,7 +112,7 @@ JS
                         <?php $form = ActiveForm::begin([
                             'id' => 'login-form',
                             'enableAjaxValidation' => false,
-                            'PjaxOptions' =>
+                            'pjaxOptions' =>
                             [
                                 'blockPjaxContainer'   => false,
                                 'blockContainer'        => '.sx-panel'
@@ -157,7 +151,7 @@ JS
                     <div class="sx-act sx-act-forget">
                         <?php $form = ActiveForm::begin([
                             'id' => 'forget-form',
-                            'PjaxOptions' =>
+                            'pjaxOptions' =>
                             [
                                 'blockPjaxContainer'   => false,
                                 'blockContainer'        => '.sx-panel-login'
