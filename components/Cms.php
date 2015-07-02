@@ -226,9 +226,15 @@ class Cms extends \skeeks\cms\base\Component
 
         if (!\Yii::$app instanceof Application)
         {
-            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
+            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
+            {
                 $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
                 $e->identity->save(false);
+
+                if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
+                {
+                    \Yii::$app->user->identity->updateLastAdminActivity();
+                }
             });
         }
 
@@ -269,12 +275,6 @@ class Cms extends \skeeks\cms\base\Component
                             "priority"      => 9999,
                         ],
                 ]);
-            }
-
-            if (!\Yii::$app->user->isGuest)
-            {
-                //Обновление времени последней актиности пользователя
-                \Yii::$app->user->identity->updateLastAdminActivity();
             }
 
         });

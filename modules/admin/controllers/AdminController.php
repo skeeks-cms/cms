@@ -17,6 +17,7 @@ use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\modules\admin\filters\AccessRule;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
+use skeeks\cms\modules\admin\filters\AdminLastActivityAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\HasBehavior;
@@ -110,6 +111,27 @@ abstract class AdminController extends Controller
                                 }
                             }
 
+                            return true;
+                        }
+                    ]
+                ],
+            ],
+
+            'adminLastActivityAccess' =>
+            [
+                'class'         => AdminLastActivityAccessControl::className(),
+                'rules' =>
+                [
+                    [
+                        'allow'         => true,
+                        'matchCallback' => function($rule, $action)
+                        {
+                            if (\Yii::$app->user->identity->lastAdminActivityAgo > \Yii::$app->admin->blockedTime)
+                            {
+                                return false;
+                            }
+
+                            \Yii::$app->user->identity->updateLastAdminActivity();
                             return true;
                         }
                     ]

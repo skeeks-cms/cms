@@ -52,6 +52,9 @@ class AdminSettings extends Component
     public $ckeditorHeight              = 400;
 
 
+    public $blockedTime                 = 900; //15 минут
+
+
     public function init()
     {
         parent::init();
@@ -67,6 +70,7 @@ class AdminSettings extends Component
             [['enableCustomConfirm', 'enableCustomPromt', 'pageSize'], 'string'],
             [['ckeditorPreset', 'ckeditorSkin'], 'string'],
             [['ckeditorHeight'], 'integer'],
+            [['blockedTime'], 'integer', 'min' => 300],
         ]);
     }
 
@@ -87,6 +91,8 @@ class AdminSettings extends Component
             'ckeditorPreset'                    => 'Инструменты',
             'ckeditorSkin'                      => 'Тема оформления',
             'ckeditorHeight'                    => 'Высота',
+
+            'blockedTime'                       => 'Время через, через которое, блокировать пользователя',
         ]);
     }
 

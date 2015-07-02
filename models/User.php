@@ -57,8 +57,8 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $gender
  *
  *
- * @property string $lastActivityRelativeTime
- * @property string $lastAdminActivityRelativeTime
+ * @property string $lastActivityAgo
+ * @property string $lastAdminActivityAgo
  *
  * @property string $displayName
  *
@@ -348,10 +348,10 @@ class User
      *
      * @return int
      */
-    public function getLastAdminActivityRelativeTime()
+    public function getLastAdminActivityAgo()
     {
-        $now = \Yii::$app->formatter->asRelativeTime(time());
-        return (int) ((int) $this->last_admin_activity_at - $now);
+        $now = \Yii::$app->formatter->asTimestamp(time());
+        return (int) ($now - (int) $this->last_admin_activity_at);
     }
     /**
      * Обновление времени последней актиности пользователя.
@@ -362,7 +362,7 @@ class User
     {
         $now = \Yii::$app->formatter->asTimestamp(time());
 
-        if (!$this->lastAdminActivityRelativeTime || $this->lastAdminActivityRelativeTime > 10)
+        if (!$this->lastAdminActivityAgo || $this->lastAdminActivityAgo > 10)
         {
             $this->last_activity_at         = $now;
             $this->last_admin_activity_at   = $now;
@@ -379,10 +379,10 @@ class User
      *
      * @return int
      */
-    public function getLastActivityRelativeTime()
+    public function getLastActivityAgo()
     {
-        $now = \Yii::$app->formatter->asRelativeTime(time());
-        return (int) ((int) $this->last_activity_at - $now);
+        $now = \Yii::$app->formatter->asTimestamp(time());
+        return (int) ($now - (int) $this->last_activity_at);
     }
     /**
      * Обновление времени последней актиности пользователя.
@@ -393,7 +393,7 @@ class User
     {
         $now = \Yii::$app->formatter->asTimestamp(time());
 
-        if (!$this->lastActivityRelativeTime || $this->lastActivityRelativeTime > 10)
+        if (!$this->lastActivityAgo || $this->lastActivityAgo > 10)
         {
             $this->last_activity_at = $now;
             $this->save(false);

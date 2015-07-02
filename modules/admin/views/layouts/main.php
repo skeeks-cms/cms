@@ -15,6 +15,19 @@ AdminAsset::register($this);
 
 $sidebarHidden = \Yii::$app->user->getIsGuest();
 
+$userLastActivity = [
+    'lastAdminActivityAgo'  => \Yii::$app->user->identity->lastAdminActivityAgo,
+    'blockedTime'           => \Yii::$app->admin->blockedTime,
+    'timeLeft'              => (\Yii::$app->admin->blockedTime - \Yii::$app->user->identity->lastAdminActivityAgo),
+    'startTime'             => \Yii::$app->formatter->asTimestamp(time()),
+];
+$userLastActivity = \yii\helpers\Json::encode($userLastActivity);
+
+$this->registerJs(<<<JS
+    new sx.classes.UserLastActivity({$userLastActivity});
+JS
+)
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

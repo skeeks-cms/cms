@@ -12,7 +12,9 @@ namespace skeeks\cms\modules\admin\controllers;
 
 
 use skeeks\cms\actions\LogoutAction;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\forms\BlockedUserForm;
 use skeeks\cms\models\User;
 use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
@@ -44,13 +46,15 @@ class AuthController extends AdminController
             'access' =>
             [
                 'class' => AdminAccessControl::className(),
-                'only' => ['logout', 'login', 'auth', 'reset-password'],
+                'only' => ['logout'
+                    //, 'login', 'auth', 'reset-password'
+                ],
                 'rules' => [
-                    [
+                    /*[
                         'actions' => ['login', 'auth', 'reset-password'],
                         'allow' => true,
                         'roles' => ['?'],
-                    ],
+                    ],*/
                     [
                         'actions' => ['logout'],
                         'allow' => true,
@@ -135,14 +139,58 @@ class AuthController extends AdminController
         ]);
     }
 
-    public function actionAuth()
+    public function actionBlocked()
     {
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
-        if (!\Yii::$app->user->isGuest)
+        if ($ref = UrlHelper::getCurrent()->getRef())
         {
-            return $this->goHome();
+            $goUrl = $ref;
         }
+
+        if (!$goUrl)
+        {
+            $goUrl = \Yii::$app->getHomeUrl();
+        }
+
+        if (\Yii::$app->user->isGuest)
+        {
+            return $goUrl ? $this->redirect($goUrl) : $this->goHome();
+        }
+
+        $model             = new BlockedUserForm();
+
+        $rr = new RequestResponse();
+        if ($rr->isRequestOnValidateAjaxForm())
+        {
+            return $rr->ajaxValidateForm($model);
+        }
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->login())
+            {
+                $rr->success = true;
+                $rr->message = "";
+                $rr->redirect = $goUrl;
+            } else
+            {
+                $rr->success = false;
+                $rr->message = "Не получилось авторизоваться";
+            }
+
+            return $rr;
+        }
+
+        return $this->render('blocked',
+        [
+            'model' => $model
+        ]);
+    }
+
+    public function actionAuth()
+    {
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         $goUrl = "";
         $success = null;
@@ -151,6 +199,18 @@ class AuthController extends AdminController
         $successReset = null;
         $resetMessage = '';
         $passwordResetModel     = new PasswordResetRequestFormEmailOrLogin();
+
+        if ($ref = UrlHelper::getCurrent()->getRef())
+        {
+            $goUrl = $ref;
+        }
+
+        $rr = new RequestResponse();
+
+        if (!\Yii::$app->user->isGuest)
+        {
+            return $goUrl ? $this->redirect($goUrl) : $this->goHome();
+        }
 
         //Авторизация
         if (\Yii::$app->request->post('do') == 'login')
@@ -168,17 +228,15 @@ class AuthController extends AdminController
                 {
                     $success = true;
 
-                    if ($ref = UrlHelper::getCurrent()->getRef())
-                    {
-                        $goUrl = $ref;
-                    } else
+                    if (!$goUrl)
                     {
                         $goUrl = Yii::$app->getUser()->getReturnUrl($defaultUrl);
                     }
 
                     if (\Yii::$app->request->isAjax)
                     {
-
+                        //$rr->redirect = $goUrl;
+                        //return $rr;
                     } else
                     {
                         return $this->redirect($goUrl);
@@ -224,59 +282,4 @@ class AuthController extends AdminController
         ]);
     }
 
-
-
-
-    public function actionLogin()
-    {
-        $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
-
-        if (!\Yii::$app->user->isGuest)
-        {
-            return $this->goHome();
-        }
-
-        $goUrl = "";
-        $success = false;
-
-        $model = new LoginForm();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
-        }
-
-        if (\Yii::$app->request->isPost)
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->login())
-            {
-                $success = true;
-
-                if ($ref = UrlHelper::getCurrent()->getRef())
-                {
-                    $goUrl = $ref;
-                } else
-                {
-                    $goUrl = Yii::$app->getUser()->getReturnUrl($defaultUrl);
-                }
-
-                if (\Yii::$app->request->isAjax)
-                {
-
-                } else
-                {
-                    return $this->redirect($goUrl);
-                }
-            }
-        }
-
-
-        return $this->render('login', [
-            'model' => $model,
-            'goUrl' => $goUrl,
-            'success' => $success
-        ]);
-    }
 }
