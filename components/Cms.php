@@ -138,6 +138,11 @@ class Cms extends \skeeks\cms\base\Component
     public $languageCode         = "ru";
 
     /**
+     * @var int сбрасывать токен пароля через час
+     */
+    public $passwordResetTokenExpire        = 3600;
+
+    /**
      * @var array Возможные шаблоны сайта
      */
     public $templates       =
@@ -287,6 +292,7 @@ class Cms extends \skeeks\cms\base\Component
             [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'templateDefault', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
+            [['passwordResetTokenExpire'], 'integer', 'min' => 300],
         ]);
     }
 
@@ -301,6 +307,7 @@ class Cms extends \skeeks\cms\base\Component
             'templates'                 => 'Возможные шаблон',
             'languageCode'              => 'Язык по умолчанию',
             'templateDefault'           => 'Шаблон по умолчанию',
+            'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
         ]);
     }
 

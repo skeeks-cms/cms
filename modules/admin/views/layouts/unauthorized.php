@@ -65,7 +65,11 @@ JS
         <!--<li><span class="timer"><i class="icon-clock"></i> <span id="clock"></span></span></li>-->
         <li class="dropdown visible-md visible-lg"></li>
 
-            <a href="/">Перейти на сайт &rarr;</a>
+            <!--<a href="/">Перейти на сайт &rarr;</a>-->
+        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+            <a href="/" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
+        </li>
+
     </ul>
 </div>
 

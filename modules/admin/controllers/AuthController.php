@@ -93,6 +93,7 @@ class AuthController extends AdminController
 
     public function actionLock()
     {
+        $this->view->title = 'Режим блокировки';
         \Yii::$app->user->identity->lockAdmin();
 
         if ($ref = UrlHelper::getCurrent()->getRef())
@@ -106,6 +107,7 @@ class AuthController extends AdminController
 
     public function actionResetPassword()
     {
+        $this->view->title = 'Восстановление пароля';
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         if (!\Yii::$app->user->isGuest)
@@ -122,15 +124,15 @@ class AuthController extends AdminController
 
         $user = User::findByPasswordResetToken($token);
 
-        if($user)
+        if ($user)
         {
             $password = \Yii::$app->getSecurity()->generateRandomString(10);
 
             $user->setPassword($password);
-
             $user->generatePasswordResetToken();
 
-            if ($user->save()) {
+            if ($user->save(false))
+            {
 
                 \Yii::$app->mailer->setViewPath(\Yii::$app->cms->moduleCms()->basePath . '/mail');
 
@@ -142,12 +144,11 @@ class AuthController extends AdminController
 
                 $message = 'Новый пароль отправлен на ваш e-mail';
             }
+        } else
+        {
+            $message = 'Ссылка устарела, попробуйте запросить восстановление пароля еще раз.';
         }
 
-        if(!$message)
-        {
-            $message = 'Ошибка, попробуйте еще раз';
-        }
 
         return $this->render('reset-password', [
             'message' => $message,
@@ -156,6 +157,8 @@ class AuthController extends AdminController
 
     public function actionBlocked()
     {
+        $this->view->title = 'Режим блокировки';
+
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         if ($ref = UrlHelper::getCurrent()->getRef())
@@ -205,6 +208,7 @@ class AuthController extends AdminController
 
     public function actionAuth()
     {
+        $this->view->title = 'Авторизация';
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         $goUrl = "";
