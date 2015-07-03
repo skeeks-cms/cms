@@ -92,14 +92,14 @@ class AdminComponentSettingsController extends AdminController
 
 
         $rr = new RequestResponse();
-        if ($rr->isRequestOnValidateAjaxForm())
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax)
         {
             return $rr->ajaxValidateForm($component);
         }
 
-        if ($rr->isRequestAjaxPost())
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax)
         {
-            if ($component->load(\Yii::$app->request->post()))
+            if ($component->load(\Yii::$app->request->post()) && $component->validate())
             {
                 if ($component->saveDefaultSettings())
                 {
@@ -140,14 +140,15 @@ class AdminComponentSettingsController extends AdminController
 
 
         $rr = new RequestResponse();
-        if ($rr->isRequestOnValidateAjaxForm())
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax)
         {
             return $rr->ajaxValidateForm($component);
         }
 
-        if ($rr->isRequestAjaxPost())
+
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax)
         {
-            if ($component->load(\Yii::$app->request->post()))
+            if ($component->load(\Yii::$app->request->post()) && $component->validate())
             {
                 if ($component->saveDefaultSettingsBySiteCode($site->code))
                 {
@@ -189,14 +190,14 @@ class AdminComponentSettingsController extends AdminController
         $component->loadSettingsByUser($user);
 
         $rr = new RequestResponse();
-        if ($rr->isRequestOnValidateAjaxForm())
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax)
         {
             return $rr->ajaxValidateForm($component);
         }
 
-        if ($rr->isRequestAjaxPost())
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax)
         {
-            if ($component->load(\Yii::$app->request->post()))
+            if ($component->load(\Yii::$app->request->post()) && $component->validate())
             {
                 if ($component->saveDefaultSettingsByUserId($user->id))
                 {
