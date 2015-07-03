@@ -213,9 +213,6 @@ class AuthController extends AdminController
 
         $goUrl = "";
         $loginModel             = new LoginFormUsernameOrEmail();
-
-        $successReset = null;
-        $resetMessage = '';
         $passwordResetModel     = new PasswordResetRequestFormEmailOrLogin();
 
         if ($ref = UrlHelper::getCurrent()->getRef())
@@ -267,23 +264,23 @@ class AuthController extends AdminController
         //Запрос на сброс пароля
         if (\Yii::$app->request->post('do') == 'password-reset')
         {
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+            if ($rr->isRequestOnValidateAjaxForm())
             {
-                $passwordResetModel->load(\Yii::$app->request->post());
-                \Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($passwordResetModel);
+                return $rr->ajaxValidateForm($passwordResetModel);
             }
 
-            if (\Yii::$app->request->isPost)
+            if ($rr->isRequestAjaxPost())
             {
                 if ($passwordResetModel->load(\Yii::$app->request->post()) && $passwordResetModel->sendEmail())
                 {
-                    $resetMessage = 'Проверьте ваш email';
-                    $successReset = true;
+                    $rr->success = true;
+                    $rr->message = "Проверьте ваш email";
+                    return (array) $rr;
                 } else
                 {
-                    $successReset = false;
-                    $resetMessage = 'Не удалось отправить email';
+                    $rr->success = false;
+                    $rr->message = "Не получилось отправить email";
+                    return (array) $rr;
                 }
             }
         }
@@ -294,9 +291,6 @@ class AuthController extends AdminController
             'loginModel'            => $loginModel,
             'passwordResetModel'    => $passwordResetModel,
             'goUrl'                 => $goUrl,
-            'success'               => $success,
-            'successReset'               => $successReset,
-            'resetMessage'               => $resetMessage
         ]);
     }
 

@@ -28,9 +28,9 @@ $this->registerJs(<<<JS
 
             _onDomReady: function()
             {
-                this.JloginContainer = $('.sx-act-login');
+                this.JloginContainer        = $('.sx-act-login');
                 this.JSuccessLoginContainer = $('.sx-act-successLogin');
-                this.JForgetContainer = $('.sx-act-forget');
+                this.JForgetContainer       = $('.sx-act-forget');
             },
 
             _onWindowReady: function()
@@ -130,7 +130,67 @@ $this->registerJs(<<<JS
                     }
 
                 });
-            }
+            },
+
+            afterValidateResetPassword: function(jForm, ajaxQuery)
+            {
+                var self = this;
+                $('.sx-form-messages', jForm).empty();
+
+
+                var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                    'blocker'                           : sx.AppUnAuthorized.PanelBlocker,
+                    'blockerSelector'                   : '',
+                    'enableBlocker'                     : true,
+                    'redirectDelay'                     : 2000,
+                    'allowResponseSuccessMessage'       : false,
+                    'allowResponseErrorMessage'         : false,
+                });
+
+                new sx.classes.AjaxHandlerNoLoader(ajaxQuery);
+
+                handler.bind('success', function(e, response)
+                {
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-success',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
+
+                    $('.sx-form-messages', jForm).fadeOut();
+
+                    _.delay(function()
+                    {
+                        self.goActLogin();
+                    }, 2000);
+
+                });
+
+                handler.bind('error', function(e, response)
+                {
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-danger',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
+
+                });
+            },
+
         });
 
         sx.auth = new sx.classes.Auth({});
@@ -154,7 +214,7 @@ JS
                             'afterValidateCallback'         => 'sx.auth.afterValidateLogin',
                         ]); ?>
 
-                        <div class="sx-form-messages"></div>
+                            <div class="sx-form-messages"></div>
 
                             <?= $form->field($loginModel, 'identifier')->label('Логин или email'); ?>
                             <?= $form->field($loginModel, 'password')->passwordInput()->label('Пароль') ?>
@@ -175,6 +235,7 @@ JS
                     <div class="sx-act sx-act-forget">
                         <?php $form = ActiveForm::begin([
                             'id' => 'forget-form',
+                            'afterValidateCallback'         => 'sx.auth.afterValidateResetPassword',
                         ]); ?>
 
                             <div class="sx-form-messages"></div>
