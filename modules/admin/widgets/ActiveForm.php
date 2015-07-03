@@ -42,11 +42,6 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
      * @var bool
      */
     public $enableAjaxValidation = true;
-    /**
-     * TODO:: Is depricated
-     * @var array
-     */
-    public $PjaxOptions = [];
 
     /**
      * @var array
@@ -59,8 +54,6 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
      */
     public function init()
     {
-        $this->pjaxOptions = ArrayHelper::merge($this->pjaxOptions, $this->PjaxOptions);
-
         if ($classes = ArrayHelper::getValue($this->options, 'class'))
         {
             $this->options = ArrayHelper::merge($this->options, [
@@ -72,8 +65,6 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
                 'class' => 'sx-form-admin'
             ]);
         }
-
-
 
         if ($this->usePjax)
         {

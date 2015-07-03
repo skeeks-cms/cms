@@ -40,6 +40,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldInputInt($model, 'ckeditorHeight'); ?>
 <?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet('Безопасность'); ?>
+    <?= $form->fieldInputInt($model, 'blockedTime')->hint('Если пользователь, в течение указанного времени, не проявит активность в админ панели, у него будет запрошен пароль.'); ?>
+<?= $form->fieldSetEnd(); ?>
+
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Этот класс никогда не запускается, служит просто для подсказок IDE
+ * Псевдо класс только для подсказок IDE
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
@@ -11,6 +11,7 @@
 
 namespace yii\web;
 
+use skeeks\cms\_ide\UserIde;
 use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsSearchComponent;
@@ -50,6 +51,8 @@ use yii\authclient\Collection;
  * @property DbDumpComponent                $dbDump
  * @property CmsSearchComponent             $cmsSearch
  * @property MarketplaceApi                 $cmsMarkeplace
+ *
+ * @property \yii\web\User|UserIde                 $user
  *
  * Class Application
  * @package yii\web

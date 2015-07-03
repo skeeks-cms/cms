@@ -12,7 +12,9 @@ namespace skeeks\cms\modules\admin\controllers;
 
 
 use skeeks\cms\actions\LogoutAction;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\forms\BlockedUserForm;
 use skeeks\cms\models\User;
 use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
@@ -44,15 +46,18 @@ class AuthController extends AdminController
             'access' =>
             [
                 'class' => AdminAccessControl::className(),
-                'only' => ['logout', 'login', 'auth', 'reset-password'],
+                'only' => [
+                    'logout', 'lock'
+                    //, 'login', 'auth', 'reset-password'
+                ],
                 'rules' => [
-                    [
+                    /*[
                         'actions' => ['login', 'auth', 'reset-password'],
                         'allow' => true,
                         'roles' => ['?'],
-                    ],
+                    ],*/
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'lock'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -63,6 +68,7 @@ class AuthController extends AdminController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
+                    'lock' => ['post'],
                 ],
             ],
         ];
@@ -85,8 +91,23 @@ class AuthController extends AdminController
         ];
     }
 
+    public function actionLock()
+    {
+        $this->view->title = 'Режим блокировки';
+        \Yii::$app->user->identity->lockAdmin();
+
+        if ($ref = UrlHelper::getCurrent()->getRef())
+        {
+            return $this->redirect($ref);
+        } else
+        {
+            return $this->redirect(Yii::$app->getUser()->getReturnUrl());
+        }
+    }
+
     public function actionResetPassword()
     {
+        $this->view->title = 'Восстановление пароля';
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         if (!\Yii::$app->user->isGuest)
@@ -103,15 +124,15 @@ class AuthController extends AdminController
 
         $user = User::findByPasswordResetToken($token);
 
-        if($user)
+        if ($user)
         {
             $password = \Yii::$app->getSecurity()->generateRandomString(10);
 
             $user->setPassword($password);
-
             $user->generatePasswordResetToken();
 
-            if ($user->save()) {
+            if ($user->save(false))
+            {
 
                 \Yii::$app->mailer->setViewPath(\Yii::$app->cms->moduleCms()->basePath . '/mail');
 
@@ -123,66 +144,118 @@ class AuthController extends AdminController
 
                 $message = 'Новый пароль отправлен на ваш e-mail';
             }
+        } else
+        {
+            $message = 'Ссылка устарела, попробуйте запросить восстановление пароля еще раз.';
         }
 
-        if(!$message)
-        {
-            $message = 'Ошибка, попробуйте еще раз';
-        }
 
         return $this->render('reset-password', [
             'message' => $message,
         ]);
     }
 
+    public function actionBlocked()
+    {
+        $this->view->title = 'Режим блокировки';
+
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
+
+        if ($ref = UrlHelper::getCurrent()->getRef())
+        {
+            $goUrl = $ref;
+        }
+
+        if (!$goUrl)
+        {
+            $goUrl = \Yii::$app->getHomeUrl();
+        }
+
+        if (\Yii::$app->user->isGuest)
+        {
+            return $goUrl ? $this->redirect($goUrl) : $this->goHome();
+        }
+
+        $model             = new BlockedUserForm();
+
+        $rr = new RequestResponse();
+        if ($rr->isRequestOnValidateAjaxForm())
+        {
+            return $rr->ajaxValidateForm($model);
+        }
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($model->load(\Yii::$app->request->post()) && $model->login())
+            {
+                $rr->success = true;
+                $rr->message = "";
+                $rr->redirect = $goUrl;
+            } else
+            {
+                $rr->success = false;
+                $rr->message = "Не получилось авторизоваться";
+            }
+
+            return $rr;
+        }
+
+        return $this->render('blocked',
+        [
+            'model' => $model
+        ]);
+    }
+
     public function actionAuth()
     {
+        $this->view->title = 'Авторизация';
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
+
+        $goUrl = "";
+        $loginModel             = new LoginFormUsernameOrEmail();
+        $passwordResetModel     = new PasswordResetRequestFormEmailOrLogin();
+
+        if ($ref = UrlHelper::getCurrent()->getRef())
+        {
+            $goUrl = $ref;
+        }
+
+        $rr = new RequestResponse();
 
         if (!\Yii::$app->user->isGuest)
         {
-            return $this->goHome();
+            return $goUrl ? $this->redirect($goUrl) : $this->goHome();
         }
-
-        $goUrl = "";
-        $success = null;
-        $loginModel             = new LoginFormUsernameOrEmail();
-
-        $successReset = null;
-        $resetMessage = '';
-        $passwordResetModel     = new PasswordResetRequestFormEmailOrLogin();
 
         //Авторизация
         if (\Yii::$app->request->post('do') == 'login')
         {
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+
+            if ($rr->isRequestOnValidateAjaxForm())
             {
-                $loginModel->load(\Yii::$app->request->post());
-                \Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($loginModel);
+                return $rr->ajaxValidateForm($loginModel);
             }
 
-            if (\Yii::$app->request->isPost)
+            if ($rr->isRequestAjaxPost())
             {
                 if ($loginModel->load(\Yii::$app->request->post()) && $loginModel->login())
                 {
-                    $success = true;
-
-                    if ($ref = UrlHelper::getCurrent()->getRef())
-                    {
-                        $goUrl = $ref;
-                    } else
+                    if (!$goUrl)
                     {
                         $goUrl = Yii::$app->getUser()->getReturnUrl($defaultUrl);
                     }
 
-                    if (\Yii::$app->request->isAjax)
-                    {
+                    $rr->redirect = $goUrl;
 
-                    } else
-                    {
-                        return $this->redirect($goUrl);
-                    }
+                    $rr->success = true;
+                    $rr->message = "";
+                    $rr->message = "";
+                    return (array) $rr;
+                } else
+                {
+                    $rr->success = false;
+                    $rr->message = "Неудачная попытка авторизации";
+                    return (array) $rr;
                 }
             }
         }
@@ -191,23 +264,23 @@ class AuthController extends AdminController
         //Запрос на сброс пароля
         if (\Yii::$app->request->post('do') == 'password-reset')
         {
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+            if ($rr->isRequestOnValidateAjaxForm())
             {
-                $passwordResetModel->load(\Yii::$app->request->post());
-                \Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($passwordResetModel);
+                return $rr->ajaxValidateForm($passwordResetModel);
             }
 
-            if (\Yii::$app->request->isPost)
+            if ($rr->isRequestAjaxPost())
             {
                 if ($passwordResetModel->load(\Yii::$app->request->post()) && $passwordResetModel->sendEmail())
                 {
-                    $resetMessage = 'Проверьте ваш email';
-                    $successReset = true;
+                    $rr->success = true;
+                    $rr->message = "Проверьте ваш email";
+                    return (array) $rr;
                 } else
                 {
-                    $successReset = false;
-                    $resetMessage = 'Не удалось отправить email';
+                    $rr->success = false;
+                    $rr->message = "Не получилось отправить email";
+                    return (array) $rr;
                 }
             }
         }
@@ -218,65 +291,7 @@ class AuthController extends AdminController
             'loginModel'            => $loginModel,
             'passwordResetModel'    => $passwordResetModel,
             'goUrl'                 => $goUrl,
-            'success'               => $success,
-            'successReset'               => $successReset,
-            'resetMessage'               => $resetMessage
         ]);
     }
 
-
-
-
-    public function actionLogin()
-    {
-        $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
-
-        if (!\Yii::$app->user->isGuest)
-        {
-            return $this->goHome();
-        }
-
-        $goUrl = "";
-        $success = false;
-
-        $model = new LoginForm();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            $model->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model);
-        }
-
-        if (\Yii::$app->request->isPost)
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->login())
-            {
-                $success = true;
-
-                if ($ref = UrlHelper::getCurrent()->getRef())
-                {
-                    $goUrl = $ref;
-                } else
-                {
-                    $goUrl = Yii::$app->getUser()->getReturnUrl($defaultUrl);
-                }
-
-                if (\Yii::$app->request->isAjax)
-                {
-
-                } else
-                {
-                    return $this->redirect($goUrl);
-                }
-            }
-        }
-
-
-        return $this->render('login', [
-            'model' => $model,
-            'goUrl' => $goUrl,
-            'success' => $success
-        ]);
-    }
 }

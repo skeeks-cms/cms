@@ -45,6 +45,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $email
  * @property integer $status
  * @property integer $created_at
+ * @property integer $last_activity_at
  * @property integer $updated_at
  * @property string $name
  * @property string $city
@@ -54,6 +55,10 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $image_cover
  * @property integer $logged_at
  * @property string $gender
+ *
+ *
+ * @property string $lastActivityAgo
+ * @property string $lastAdminActivityAgo
  *
  * @property string $displayName
  *
@@ -261,6 +266,7 @@ class User
 
             [['username', 'auth_key', 'password_hash'], 'required'],
             [['created_at', 'updated_at', 'group_id'], 'integer'],
+
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
@@ -274,7 +280,10 @@ class User
             ['username', 'string', 'min' => 3, 'max' => 12],
             [['username'], 'unique'],
             [['username'], 'validateLogin'],
+
             [['logged_at'], 'integer'],
+            [['last_activity_at'], 'integer'],
+            [['last_admin_activity_at'], 'integer'],
         ];
     }
 
@@ -327,9 +336,84 @@ class User
             'info' => Yii::t('app', 'Информация'),
             'gender' => Yii::t('app', 'Пол'),
             'logged_at' => Yii::t('app', 'Время последней авторизации'),
+            'last_activity_at' => Yii::t('app', 'Время последней активности'),
+            'last_admin_activity_at' => Yii::t('app', 'Время последней активности в админке'),
             'status_of_life' => Yii::t('app', 'Статус'),
         ];
     }
+
+
+    /**
+     * Установка последней активности пользователя. Больше чем в настройках.
+     * @return $this
+     */
+    public function lockAdmin()
+    {
+        $this->last_admin_activity_at   = \Yii::$app->formatter->asTimestamp(time()) - (\Yii::$app->admin->blockedTime + 1);
+        $this->save(false);
+
+        return $this;
+    }
+
+    /**
+     * Время проявления последней активности на сайте
+     *
+     * @return int
+     */
+    public function getLastAdminActivityAgo()
+    {
+        $now = \Yii::$app->formatter->asTimestamp(time());
+        return (int) ($now - (int) $this->last_admin_activity_at);
+    }
+    /**
+     * Обновление времени последней актиности пользователя.
+     * Только в том случае, если время его последней актиности больше 10 сек.
+     * @return $this
+     */
+    public function updateLastAdminActivity()
+    {
+        $now = \Yii::$app->formatter->asTimestamp(time());
+
+        if (!$this->lastAdminActivityAgo || $this->lastAdminActivityAgo > 10)
+        {
+            $this->last_activity_at         = $now;
+            $this->last_admin_activity_at   = $now;
+
+            $this->save(false);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Время проявления последней активности на сайте
+     *
+     * @return int
+     */
+    public function getLastActivityAgo()
+    {
+        $now = \Yii::$app->formatter->asTimestamp(time());
+        return (int) ($now - (int) $this->last_activity_at);
+    }
+    /**
+     * Обновление времени последней актиности пользователя.
+     * Только в том случае, если время его последней актиности больше 10 сек.
+     * @return $this
+     */
+    public function updateLastActivity()
+    {
+        $now = \Yii::$app->formatter->asTimestamp(time());
+
+        if (!$this->lastActivityAgo || $this->lastActivityAgo > 10)
+        {
+            $this->last_activity_at = $now;
+            $this->save(false);
+        }
+
+        return $this;
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -510,7 +594,8 @@ class User
      */
     public static function findByPasswordResetToken($token)
     {
-        if (!static::isPasswordResetTokenValid($token)) {
+        if (!static::isPasswordResetTokenValid($token))
+        {
             return null;
         }
 
@@ -528,10 +613,11 @@ class User
      */
     public static function isPasswordResetTokenValid($token)
     {
-        if (empty($token)) {
+        if (empty($token))
+        {
             return false;
         }
-        $expire = Yii::$app->params['user.passwordResetTokenExpire'];
+        $expire = Yii::$app->cms->passwordResetTokenExpire;
         $parts = explode('_', $token);
         $timestamp = (int) end($parts);
         return $timestamp + $expire >= time();

@@ -138,6 +138,11 @@ class Cms extends \skeeks\cms\base\Component
     public $languageCode         = "ru";
 
     /**
+     * @var int сбрасывать токен пароля через час
+     */
+    public $passwordResetTokenExpire        = 3600;
+
+    /**
      * @var array Возможные шаблоны сайта
      */
     public $templates       =
@@ -164,9 +169,13 @@ class Cms extends \skeeks\cms\base\Component
     {
         parent::init();
 
+
         if (!$this->appName)
         {
             $this->appName = \Yii::$app->name;
+        } else
+        {
+            \Yii::$app->name = $this->appName;
         }
 
         //TODO: доработать
@@ -222,9 +231,15 @@ class Cms extends \skeeks\cms\base\Component
 
         if (!\Yii::$app instanceof Application)
         {
-            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
+            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
+            {
                 $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
-                $e->identity->save();
+                $e->identity->save(false);
+
+                if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
+                {
+                    \Yii::$app->user->identity->updateLastAdminActivity();
+                }
             });
         }
 
@@ -277,6 +292,7 @@ class Cms extends \skeeks\cms\base\Component
             [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'templateDefault', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
+            [['passwordResetTokenExpire'], 'integer', 'min' => 300],
         ]);
     }
 
@@ -291,6 +307,7 @@ class Cms extends \skeeks\cms\base\Component
             'templates'                 => 'Возможные шаблон',
             'languageCode'              => 'Язык по умолчанию',
             'templateDefault'           => 'Шаблон по умолчанию',
+            'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
         ]);
     }
 

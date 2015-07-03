@@ -9,62 +9,10 @@
  */
 /* @var $this \yii\web\View */
 use yii\helpers\Html;
-use \skeeks\cms\modules\admin\widgets\ActiveForm;
+//use \skeeks\cms\modules\admin\widgets\ActiveForm;
 
-$this->registerCss(<<<CSS
-.sx-auth
-{
-    display: none;
-}
-    .sx-auth .sx-panel
-    {
-        margin-top: 20%;
-        border-radius: 6px;
-        border-width: 3px;
-        border-color: rgba(32, 168, 216, 0.25);
-        box-shadow: 0 11px 51px 9px rgba(0,0,0,.55);
-        padding: 10px;
-    }
+use \skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 
-    .sx-auth form input
-    {
-        height: 45px;
-        font-size: 25px;
-        border-radius: 6px;
-        border-width: 2px;
-    }
-    .sx-auth form button
-    {
-        font-size: 20px;
-    }
-    .sx-auth form label
-    {
-        font-size: 16px;
-    }
-
-    .sx-auth form .sx-submit-group
-    {
-        text-align: center;
-    }
-
-    .sx-act
-    {
-        display: none;
-    }
-
-    .sx-act-controll
-    {
-        border-bottom: 1px dashed;
-        text-decoration: none;
-    }
-
-    .sx-act-controll:hover
-    {
-        border-bottom: 1px dashed;
-        text-decoration: none;
-    }
-CSS
-);
 $this->registerJs(<<<JS
     (function(sx, $, _)
     {
@@ -80,19 +28,14 @@ $this->registerJs(<<<JS
 
             _onDomReady: function()
             {
-                this.JloginContainer = $('.sx-act-login');
+                this.JloginContainer        = $('.sx-act-login');
                 this.JSuccessLoginContainer = $('.sx-act-successLogin');
-                this.JForgetContainer = $('.sx-act-forget');
+                this.JForgetContainer       = $('.sx-act-forget');
             },
 
             _onWindowReady: function()
             {
                 var self = this;
-
-                _.delay(function()
-                {
-                    $('.sx-auth').fadeIn();
-                }, 500);
 
                 _.delay(function()
                 {
@@ -136,27 +79,116 @@ $this->registerJs(<<<JS
                 return this;
             },
 
-            loginnedSuccess: function(urlGo)
+
+            afterValidateLogin: function(jForm, ajaxQuery)
+            {
+                var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                    'blocker'                           : sx.AppUnAuthorized.PanelBlocker,
+                    'blockerSelector'                   : '',
+                    'enableBlocker'                     : true,
+                    'redirectDelay'                     : 2000,
+                    'allowResponseSuccessMessage'       : false,
+                    'allowResponseErrorMessage'         : false,
+                });
+
+                new sx.classes.AjaxHandlerNoLoader(ajaxQuery);
+
+                handler.bind('success', function(e, response)
+                {
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-success',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
+
+                    _.delay(function()
+                    {
+                        sx.AppUnAuthorized.triggerBeforeReddirect();
+                    }, 200)
+                });
+
+                handler.bind('error', function(e, response)
+                {
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-danger',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
+
+                });
+            },
+
+            afterValidateResetPassword: function(jForm, ajaxQuery)
             {
                 var self = this;
 
-                _.delay(function()
-                {
-                    $(".navbar").slideUp(800);
-                    $(".sx-admin-footer").slideUp(800);
-                }, 300);
+                $('.sx-form-messages', jForm).empty();
 
-                _.delay(function()
-                {
-                    self.goActSuccessLogin();
-                }, 300);
+                var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                    'blocker'                           : sx.AppUnAuthorized.PanelBlocker,
+                    'blockerSelector'                   : '',
+                    'enableBlocker'                     : true,
+                    'redirectDelay'                     : 2000,
+                    'allowResponseSuccessMessage'       : false,
+                    'allowResponseErrorMessage'         : false,
+                });
 
-                _.delay(function()
-                {
-                    window.location.href = urlGo;
-                }, 2000);
+                new sx.classes.AjaxHandlerNoLoader(ajaxQuery);
 
-            }
+                handler.bind('success', function(e, response)
+                {
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-success',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
+
+                    _.delay(function()
+                    {
+                        self.goActLogin();
+                    }, 2000);
+
+                });
+
+                handler.bind('error', function(e, response)
+                {
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-danger',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
+
+                });
+            },
+
         });
 
         sx.auth = new sx.classes.Auth({});
@@ -165,7 +197,7 @@ JS
 );
 ?>
 
-<div class="main sx-auth">
+<div class="main sx-auth sx-content-block sx-windowReady-fadeIn">
     <div class="col-lg-4"></div>
 
     <div class="col-lg-4">
@@ -175,23 +207,13 @@ JS
 
                     <div class="sx-act sx-act-login">
                         <?php $form = ActiveForm::begin([
-                            'id' => 'login-form',
-                            'enableAjaxValidation' => false,
-                            'PjaxOptions' =>
-                            [
-                                'blockPjaxContainer'   => false,
-                                'blockContainer'        => '.sx-panel'
-                            ],
+                            'id'                            => 'login-form',
+                            'enableAjaxValidation'          => false,
+                            'afterValidateCallback'         => 'function(jForm, ajaxQuery){ sx.auth.afterValidateLogin(jForm, ajaxQuery); }',
                         ]); ?>
-                            <? if (\Yii::$app->request->isAjax && $success) : ?>
-                                <? $this->registerJs(<<<JS
-                                (function(sx, $, _)
-                                {
-                                    sx.auth.loginnedSuccess('{$goUrl}');
-                                })(sx, sx.$, sx._);
-JS
-)?>
-                            <? endif;?>
+
+                            <div class="sx-form-messages"></div>
+
                             <?= $form->field($loginModel, 'identifier')->label('Логин или email'); ?>
                             <?= $form->field($loginModel, 'password')->passwordInput()->label('Пароль') ?>
                                 <?= Html::input('hidden', 'do', 'login'); ?>
@@ -208,25 +230,13 @@ JS
                         <?php ActiveForm::end(); ?>
                     </div>
 
-                    <div class="sx-act sx-act-successLogin">
-                        <p class="sx-step sx-step-1"><h2>Авторизация прошла успешно</h2></p>
-                        <p class="sx-step sx-step-2">Открытие системы администрирования...</p>
-                    </div>
-
                     <div class="sx-act sx-act-forget">
                         <?php $form = ActiveForm::begin([
                             'id' => 'forget-form',
-                            'PjaxOptions' =>
-                            [
-                                'blockPjaxContainer'   => false,
-                                'blockContainer'        => '.sx-panel-login'
-                            ],
+                            'afterValidateCallback'         => 'function(jForm, ajaxQuery){ sx.auth.afterValidateResetPassword(jForm, ajaxQuery); }',
                         ]); ?>
-                            <? if ($successReset === true) : ?>
-                                <div class="alert alert-success" data-dismiss="alert" aria-label="Close"><?= $resetMessage; ?></div>
-                            <? elseif($successReset === false) : ?>
-                                <div class="alert alert-danger" data-dismiss="alert" aria-label="Close"><?= $resetMessage; ?></div>
-                            <? endif; ?>
+
+                            <div class="sx-form-messages"></div>
 
                             <?= $form->field($passwordResetModel, 'identifier')->label('Логин или email'); ?>
                                 <?= Html::input('hidden', 'do', 'password-reset'); ?>

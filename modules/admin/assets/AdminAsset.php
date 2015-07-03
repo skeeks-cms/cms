@@ -35,6 +35,7 @@ class AdminAsset extends AssetBundle
         'js/classes/Window.js',
         'js/classes/modal/Dialog.js',
         'js/classes/Fullscreen.js',
+        'js/classes/UserLastActivity.js',
         //'js/App.js',
         'js/Admin.js',
     ];

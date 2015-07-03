@@ -19,148 +19,28 @@ use skeeks\cms\helpers\UrlHelper;
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-AdminAsset::register($this);
+\skeeks\cms\modules\admin\assets\AdminUnauthorizedAsset::register($this);
 \Yii::$app->admin->registerAsset($this);
-
-\skeeks\cms\modules\admin\assets\AdminCanvasBg::register($this);
 
 $urlBg = \Yii::$app->assetManager->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/bg/582738_www.Gde-Fon.com.jpg');
 $blockerLoader = \Yii::$app->getAssetManager()->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/loaders/circulare-blue-24_24.GIF');
 
 $this->registerCss(<<<CSS
-
-body.sx-styled
-{
-    background: url({$urlBg}) center fixed;
-}
-
-.navbar.op-05:hover, .sx-admin-footer.op-05:hover
-{
-    opacity: 1;
-    transition-duration: 1s;
-}
-
-.navbar, .sx-admin-footer {
-    display: none;
-}
-.navbar.op-05, .sx-admin-footer.op-05 {
-    opacity: 0.5;
-}
-
-.sx-hidden
-{
-    display: none;
-}
-
-form.sx-form-admin
-{
-    border: none;
-    padding: 0px;
-}
-
-.main {
-    padding: 0px;
-}
-
-
-#canvas-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-
+    body.sx-styled
+    {
+        background: url({$urlBg}) center fixed;
+    }
 CSS
 );
-
 $this->registerJs(<<<JS
     (function(sx, $, _)
     {
-        sx.createNamespace('classes', sx);
-
-        sx.classes.AppUnAuthorized = sx.classes.Component.extend({
-
-            _init: function()
-            {
-                this.blocker    = new sx.classes.Blocker();
-            },
-
-            _onDomReady: function()
-            {
-                var self = this;
-                this.blockerHtml = sx.block('html', {
-                    message: "<div style='padding: 10px;'><h2><img src='{$blockerLoader}'/> Загрузка...</h2></div>",
-                    css: {
-                        "border-radius": "6px",
-                        "border-width": "3px",
-                        "border-color": "rgba(32, 168, 216, 0.25)",
-                        "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
-                    }
-                });
-
-                this.blockerLogin = new sx.classes.Blocker('.sx-panel', {
-                    message: "<div style='padding: 10px;'><h2><img src='{$blockerLoader}'/> Загрузка...</h2></div>",
-                    css: {
-                        "border-radius": "6px",
-                        "border-width": "1px",
-                        "border-color": "rgba(32, 168, 216, 0.25)",
-                        "box-shadow": "0 11px 51px 9px rgba(0,0,0,.55)"
-                    }
-                });
-
-             // Init CanvasBG and pass target starting location
-                CanvasBG.init({
-                  Loc: {
-                    x: window.innerWidth / 2.1,
-                    y: window.innerHeight / 2.2
-                  },
-                });
-
-            },
-
-            _onWindowReady: function()
-            {
-                var self = this;
-                $("body").addClass('sx-styled');
-
-                this.blockerHtml.unblock();
-
-                _.delay(function()
-                {
-                    $('.navbar, .sx-admin-footer').addClass('op-05').fadeIn();
-                }, 1000);
-            },
-
-            loginnedSuccess: function(urlGo)
-            {
-                var self = this;
-
-                _.delay(function()
-                {
-                    $(".navbar").slideUp(800);
-                    $(".sx-admin-footer").slideUp(800);
-                }, 300);
-
-                _.delay(function()
-                {
-                    self.goActSuccessLogin();
-                }, 300);
-
-                _.delay(function()
-                {
-                    window.location.href = urlGo;
-                }, 3000);
-            }
+        sx.AppUnAuthorized = new sx.classes.AppUnAuthorized({
+            'blockerLoader': '{$blockerLoader}'
         });
-
-        new sx.classes.AppUnAuthorized({});
     })(sx, sx.$, sx._);
 JS
 );
-
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -174,13 +54,7 @@ JS
     <?php $this->head() ?>
 </head>
 <body>
-
-
-
 <?php $this->beginBody() ?>
-
-
-
 
 <div class="navbar" role="navigation">
     <div class="navbar-header sx-header-logo">
@@ -191,7 +65,11 @@ JS
         <!--<li><span class="timer"><i class="icon-clock"></i> <span id="clock"></span></span></li>-->
         <li class="dropdown visible-md visible-lg"></li>
 
-            <a href="/">Перейти на сайт &rarr;</a>
+            <!--<a href="/">Перейти на сайт &rarr;</a>-->
+        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+            <a href="/" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
+        </li>
+
     </ul>
 </div>
 
@@ -206,8 +84,6 @@ JS
 <div style="display: none;">
     <img src="<?= $urlBg; ?>" id="sx-auth-bg"/></div>
 </div>
-
-
 
 <footer class="sx-admin-footer">
     <div class="row">
@@ -224,10 +100,7 @@ JS
         </div><!--/.col-->
     </div><!--/.row-->
 </footer>
-
-
     <?php $this->endBody() ?>
-
 </body>
 </html>
 <?php $this->endPage() ?>

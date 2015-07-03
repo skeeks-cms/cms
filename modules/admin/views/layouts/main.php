@@ -15,6 +15,19 @@ AdminAsset::register($this);
 
 $sidebarHidden = \Yii::$app->user->getIsGuest();
 
+$userLastActivity = [
+    'lastAdminActivityAgo'  => \Yii::$app->user->identity->lastAdminActivityAgo,
+    'blockedTime'           => \Yii::$app->admin->blockedTime,
+    'timeLeft'              => (\Yii::$app->admin->blockedTime - \Yii::$app->user->identity->lastAdminActivityAgo),
+    'startTime'             => \Yii::$app->formatter->asTimestamp(time()),
+];
+$userLastActivity = \yii\helpers\Json::encode($userLastActivity);
+
+$this->registerJs(<<<JS
+    new sx.classes.UserLastActivity({$userLastActivity});
+JS
+)
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -82,6 +95,9 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
                 <li><a href="<?= UrlHelper::construct("cms/admin-profile/update")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
                 <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
                 <li class="divider"></li>
+                <li>
+                    <?= Html::a('<i class="fa fa-shield"></i> Заблокировать', UrlHelper::construct("admin/auth/lock")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+                </li>
                 <li>
                     <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
                 </li>
