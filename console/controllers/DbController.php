@@ -77,6 +77,8 @@ class DbController extends Controller
             }
         }
 
+        \Yii::$app->db->getSchema()->refresh();
+
         /*$this->systemCmdRoot("php yii migrate --interactive=0");*/
     }
 
