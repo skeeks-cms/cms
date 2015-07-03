@@ -212,7 +212,6 @@ class AuthController extends AdminController
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         $goUrl = "";
-        $success = null;
         $loginModel             = new LoginFormUsernameOrEmail();
 
         $successReset = null;
@@ -234,32 +233,32 @@ class AuthController extends AdminController
         //Авторизация
         if (\Yii::$app->request->post('do') == 'login')
         {
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+
+            if ($rr->isRequestOnValidateAjaxForm())
             {
-                $loginModel->load(\Yii::$app->request->post());
-                \Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($loginModel);
+                return $rr->ajaxValidateForm($loginModel);
             }
 
-            if (\Yii::$app->request->isPost)
+            if ($rr->isRequestAjaxPost())
             {
                 if ($loginModel->load(\Yii::$app->request->post()) && $loginModel->login())
                 {
-                    $success = true;
-
                     if (!$goUrl)
                     {
                         $goUrl = Yii::$app->getUser()->getReturnUrl($defaultUrl);
                     }
 
-                    if (\Yii::$app->request->isAjax)
-                    {
-                        //$rr->redirect = $goUrl;
-                        //return $rr;
-                    } else
-                    {
-                        return $this->redirect($goUrl);
-                    }
+                    $rr->redirect = $goUrl;
+
+                    $rr->success = true;
+                    $rr->message = "";
+                    $rr->message = "";
+                    return (array) $rr;
+                } else
+                {
+                    $rr->success = false;
+                    $rr->message = "Неудачная попытка авторизации";
+                    return (array) $rr;
                 }
             }
         }
