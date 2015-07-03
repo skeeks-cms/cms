@@ -9,7 +9,9 @@
  */
 /* @var $this \yii\web\View */
 use yii\helpers\Html;
-use \skeeks\cms\modules\admin\widgets\ActiveForm;
+//use \skeeks\cms\modules\admin\widgets\ActiveForm;
+
+use \skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 
 $this->registerJs(<<<JS
     (function(sx, $, _)
@@ -77,20 +79,57 @@ $this->registerJs(<<<JS
                 return this;
             },
 
-            loginnedSuccess: function(urlGo)
+
+            afterValidateLogin: function(jForm, ajaxQuery)
             {
-                var self = this;
+                var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                    'blocker'                           : sx.AppUnAuthorized.PanelBlocker,
+                    'blockerSelector'                   : '',
+                    'enableBlocker'                     : true,
+                    'redirectDelay'                     : 2000,
+                    'allowResponseSuccessMessage'       : false,
+                    'allowResponseErrorMessage'         : false,
+                });
 
-                _.delay(function()
+                new sx.classes.AjaxHandlerNoLoader(ajaxQuery);
+
+                handler.bind('success', function(e, response)
                 {
-                    sx.AppUnAuthorized.triggerBeforeReddirect();
-                }, 200)
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-success',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
 
-                _.delay(function()
+                    _.delay(function()
+                    {
+                        sx.AppUnAuthorized.triggerBeforeReddirect();
+                    }, 200)
+                });
+
+                handler.bind('error', function(e, response)
                 {
-                    window.location.href = urlGo;
-                }, 2000);
+                    if (response.message)
+                    {
+                        $('.sx-form-messages', jForm).empty().append(
+                            $('<div>',{
+                                'class' : 'alert alert-danger',
+                                'data-dismiss' : 'alert',
+                                'aria-label' : 'Закрыть',
+                            })
+                            .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+                            .append(response.message)
+                        );
+                    }
 
+                });
             }
         });
 
@@ -110,23 +149,13 @@ JS
 
                     <div class="sx-act sx-act-login">
                         <?php $form = ActiveForm::begin([
-                            'id' => 'login-form',
-                            'enableAjaxValidation' => false,
-                            'pjaxOptions' =>
-                            [
-                                'blockPjaxContainer'   => false,
-                                'blockContainer'        => '.sx-panel'
-                            ],
+                            'id'                            => 'login-form',
+                            'enableAjaxValidation'          => false,
+                            'afterValidateCallback'         => 'sx.auth.afterValidateLogin',
                         ]); ?>
-                            <? if (\Yii::$app->request->isAjax && $success) : ?>
-                                <? $this->registerJs(<<<JS
-                                (function(sx, $, _)
-                                {
-                                    sx.auth.loginnedSuccess('{$goUrl}');
-                                })(sx, sx.$, sx._);
-JS
-)?>
-                            <? endif;?>
+
+                        <div class="sx-form-messages"></div>
+
                             <?= $form->field($loginModel, 'identifier')->label('Логин или email'); ?>
                             <?= $form->field($loginModel, 'password')->passwordInput()->label('Пароль') ?>
                                 <?= Html::input('hidden', 'do', 'login'); ?>
@@ -143,25 +172,12 @@ JS
                         <?php ActiveForm::end(); ?>
                     </div>
 
-                    <div class="sx-act sx-act-successLogin">
-                        <p class="sx-step sx-step-1"><h2>Авторизация прошла успешно</h2></p>
-                        <p class="sx-step sx-step-2">Открытие системы администрирования...</p>
-                    </div>
-
                     <div class="sx-act sx-act-forget">
                         <?php $form = ActiveForm::begin([
                             'id' => 'forget-form',
-                            'pjaxOptions' =>
-                            [
-                                'blockPjaxContainer'   => false,
-                                'blockContainer'        => '.sx-panel-login'
-                            ],
                         ]); ?>
-                            <? if ($successReset === true) : ?>
-                                <div class="alert alert-success" data-dismiss="alert" aria-label="Close"><?= $resetMessage; ?></div>
-                            <? elseif($successReset === false) : ?>
-                                <div class="alert alert-danger" data-dismiss="alert" aria-label="Close"><?= $resetMessage; ?></div>
-                            <? endif; ?>
+
+                            <div class="sx-form-messages"></div>
 
                             <?= $form->field($passwordResetModel, 'identifier')->label('Логин или email'); ?>
                                 <?= Html::input('hidden', 'do', 'password-reset'); ?>
