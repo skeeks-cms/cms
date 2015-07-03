@@ -135,8 +135,8 @@ $this->registerJs(<<<JS
             afterValidateResetPassword: function(jForm, ajaxQuery)
             {
                 var self = this;
-                $('.sx-form-messages', jForm).empty();
 
+                $('.sx-form-messages', jForm).empty();
 
                 var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
                     'blocker'                           : sx.AppUnAuthorized.PanelBlocker,
@@ -163,8 +163,6 @@ $this->registerJs(<<<JS
                             .append(response.message)
                         );
                     }
-
-                    $('.sx-form-messages', jForm).fadeOut();
 
                     _.delay(function()
                     {
@@ -211,7 +209,7 @@ JS
                         <?php $form = ActiveForm::begin([
                             'id'                            => 'login-form',
                             'enableAjaxValidation'          => false,
-                            'afterValidateCallback'         => 'sx.auth.afterValidateLogin',
+                            'afterValidateCallback'         => 'function(jForm, ajaxQuery){ sx.auth.afterValidateLogin(jForm, ajaxQuery); }',
                         ]); ?>
 
                             <div class="sx-form-messages"></div>
@@ -235,7 +233,7 @@ JS
                     <div class="sx-act sx-act-forget">
                         <?php $form = ActiveForm::begin([
                             'id' => 'forget-form',
-                            'afterValidateCallback'         => 'sx.auth.afterValidateResetPassword',
+                            'afterValidateCallback'         => 'function(jForm, ajaxQuery){ sx.auth.afterValidateResetPassword(jForm, ajaxQuery); }',
                         ]); ?>
 
                             <div class="sx-form-messages"></div>
