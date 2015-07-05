@@ -113,7 +113,7 @@ class Controller extends YiiWebController
                 return parent::render($view, $params);
             } catch (InvalidParamException $e)
             {
-                $message = "Шаблоные не найдены: " . implode(', ', $viewFilePaths);
+                $message = "Шаблоны не найдены: " . implode(', ', $viewFilePaths);
                 $message .= $e->getMessage();
                 return $this->output($e->getMessage());
             }

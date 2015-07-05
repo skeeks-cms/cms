@@ -128,6 +128,7 @@ class Cms extends \skeeks\cms\base\Component
     public $template                        = "default";
 
     /**
+     * TODO: is depricated
      * @var string
      */
     public $templateDefault                 = "default";
@@ -224,6 +225,7 @@ class Cms extends \skeeks\cms\base\Component
             }
         }
         \Yii::setAlias('template', \Yii::getAlias($templatePath));
+        //TODO: is depricated
         \Yii::setAlias('templateDefault', \Yii::getAlias($templateDefaultPath));
 
         \Yii::$app->language = $this->languageCode;
