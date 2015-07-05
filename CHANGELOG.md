@@ -1,6 +1,10 @@
 Процесс разработки проекта.
 ==============
 
+2.0.2.pre
+-----------------
+  * Is depricated \skeeks\cms\components\Cms property templateDefault (будут задействованы view theme yii2)
+
 2.0.1
 -----------------
   * Чистка кэша после применения миграций
