@@ -127,10 +127,16 @@ $config =
             'template'                      => "default",
             'templates'                     =>
             [
+                'default' =>
                 [
-                    'name'      => 'Шаблон по умолчанию',
-                    'code'      => 'default',
-                    'path'      => '@app/templates/default',
+                    'name'          => 'Базовый шаблон (по умолчанию)',
+                    'pathMap'       =>
+                    [
+                        '@app/views' =>
+                        [
+                            '@app/templates/default',
+                        ],
+                    ]
                 ]
             ],
         ],
