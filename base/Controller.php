@@ -26,25 +26,9 @@ class Controller extends YiiWebController
 {
     /**
      * Использвается в методе render, для начала попробуем поискать шаблон в проекте, затем по умолчанию по правилам yii
-     * @var array
+     * @var string
      */
-    public $beforeRender    = ['@template/modules/', '@templateDefault/modules/'];
-
-    /**
-     * @var array возможные лейоуты, поиск в шаблонах
-     */
-    public $layouts          = ['@template/layouts/default.php', '@templateDefault/layouts/default.php'];
-
-    public function init()
-    {
-        parent::init();
-
-        //Установка layout-a
-        if ($file = FileHelper::getFirstExistingFileArray($this->layouts))
-        {
-            $this->layout = $file;
-        }
-    }
+    public $beforeRender = '@app/views/modules/';
 
     /**
      *
@@ -68,7 +52,7 @@ class Controller extends YiiWebController
      * @param array $params
      * @return string
      */
-    public function render($view, $params = [])
+    /*public function render($view, $params = [])
     {
         //Если не нужно ничего рендерить, то делаем стандартный рендер yii2
         if (!$this->beforeRender)
@@ -113,13 +97,46 @@ class Controller extends YiiWebController
                 return parent::render($view, $params);
             } catch (InvalidParamException $e)
             {
-                $message = "Шаблоные не найдены: " . implode(', ', $viewFilePaths);
+                $message = "Шаблоны не найдены: " . implode(', ', $viewFilePaths);
                 $message .= $e->getMessage();
                 return $this->output($e->getMessage());
             }
         }
+    }*/
 
 
+    /**
+     * @param string $view
+     * @param array $params
+     * @return string
+     */
+    public function render($view, $params = [])
+    {
+        if (!$this->beforeRender)
+        {
+            return parent::render($view, $params);
+        }
+
+        try
+        {
+            if (!$this->module instanceof Application)
+            {
+                $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
+                return parent::render($viewApp, $params);
+            } else
+            {
+                return parent::render($view, $params);
+            }
+        } catch (InvalidParamException $e)
+        {
+            try
+            {
+                return parent::render($view, $params);
+            } catch (InvalidParamException $e)
+            {
+                return $this->output($e->getMessage());
+            }
+        }
     }
 
 

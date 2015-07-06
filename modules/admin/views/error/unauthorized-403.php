@@ -78,16 +78,7 @@ $this->registerJs(<<<JS
 
         sx.classes.Auth = sx.classes.Component.extend({
 
-            _onWindowReady: function()
-            {
-                var self = this;
 
-                _.delay(function()
-                {
-                    $('.sx-auth').fadeIn();
-                }, 500);
-
-            },
         });
 
         sx.auth = new sx.classes.Auth({});
@@ -96,7 +87,7 @@ JS
 );
 ?>
 
-<div class="main sx-auth">
+<div class="main sx-auth sx-content-block sx-windowReady-fadeIn">
     <div class="col-lg-4"></div>
 
     <div class="col-lg-4">
@@ -104,7 +95,7 @@ JS
             <div class="panel-body">
                 <div class="panel-content">
 
-                    <div class="sx-act sx-act-reset-password">
+                    <div class="sx-act-reset-password">
                         <?= $message; ?>
                     </div>
 

@@ -53,6 +53,7 @@ use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\base\Theme;
 use yii\console\Application;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
@@ -128,11 +129,6 @@ class Cms extends \skeeks\cms\base\Component
     public $template                        = "default";
 
     /**
-     * @var string
-     */
-    public $templateDefault                 = "default";
-
-    /**
      * @var string язык по умолчанию
      */
     public $languageCode         = "ru";
@@ -145,14 +141,25 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var array Возможные шаблоны сайта
      */
-    public $templates       =
+    public $templatesDefault       =
     [
+        'default' =>
         [
-            'name'      => 'Шаблон по умолчанию',
-            'code'      => 'default',
-            'path'      => '@app/templates/default',
+            'name'          => 'Базовый шаблон (по умолчанию)',
+            'pathMap'       =>
+            [
+                '@app/views' =>
+                [
+                    '@app/templates/default',
+                ],
+            ]
         ]
     ];
+
+    /**
+     * @var array Возможные шаблоны сайта
+     */
+    public $templates       = [];
 
     /**
      * @return CmsSite
@@ -208,26 +215,28 @@ class Cms extends \skeeks\cms\base\Component
         });
 
 
-        //TODO:: future refactor;
-        $templatePath           = "@app/templates/default";
-        $templateDefaultPath    = "@app/templates/default";
-        foreach ($this->templates as $templateData)
+        //init view theme
+        $this->templates = ArrayHelper::merge($this->templatesDefault, (array) $this->templates);
+        foreach ($this->templates as $code => $templateData)
         {
-            if ($templateData['code'] == $this->template)
+            if ($code == $this->template)
             {
-                $templatePath = $templateData['path'];
-            }
-
-            if ($templateData['code'] == $this->templateDefault)
-            {
-                $templateDefaultPath = $templateData['path'];
+                if ($pathMap = ArrayHelper::getValue($templateData, 'pathMap'))
+                {
+                    if (is_array($pathMap))
+                    {
+                        \Yii::$app->view->theme = new Theme([
+                            'pathMap' => $pathMap
+                        ]);
+                    }
+                }
             }
         }
-        \Yii::setAlias('template', \Yii::getAlias($templatePath));
-        \Yii::setAlias('templateDefault', \Yii::getAlias($templateDefaultPath));
+        //TODO: may be is depricated. While better to use '@app/views/'
+        \Yii::setAlias('template', '@app/views/');
+
 
         \Yii::$app->language = $this->languageCode;
-
 
         if (!\Yii::$app instanceof Application)
         {
@@ -289,7 +298,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'templateDefault', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
@@ -306,7 +315,6 @@ class Cms extends \skeeks\cms\base\Component
             'template'                  => 'Шаблон',
             'templates'                 => 'Возможные шаблон',
             'languageCode'              => 'Язык по умолчанию',
-            'templateDefault'           => 'Шаблон по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
         ]);
     }
