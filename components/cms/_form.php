@@ -10,6 +10,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\WidgetConfig */
+
+$templates = [];
+
+foreach (\Yii::$app->cms->templates as $code => $data)
+{
+    $templates[$code] = \yii\helpers\ArrayHelper::getValue($data, 'name');
+}
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
@@ -22,9 +29,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Шаблоны/отображение'); ?>
-    <?= $form->fieldSelect($model, 'template', \yii\helpers\ArrayHelper::map(\Yii::$app->cms->templates, 'code', 'name')); ?>
-    <?= $form->fieldSelect($model, 'templateDefault', \yii\helpers\ArrayHelper::map(\Yii::$app->cms->templates, 'code', 'name'))
-        ->hint('В том случае, если файл шаблона не будет найден в шаблоне сайта, поиск этого файла будет произведен в этом шаблоне'); ?>
+    <?= $form->fieldSelect($model, 'template', $templates); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Языковые настройки'); ?>

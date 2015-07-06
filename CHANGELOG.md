@@ -3,6 +3,8 @@
 
 2.0.2.pre
 -----------------
+  * Обновлена система шаблонов
+  * Удалено свойство templateDefault \skeeks\cms\components\Cms
   * Исправлено отображение ошибки, при попытке входа в админ панель неавторизованного пользователя.
   * Is depricated \skeeks\cms\components\Cms property templateDefault (будут задействованы view theme yii2)
 
