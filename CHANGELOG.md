@@ -3,6 +3,7 @@
 
 2.0.2.pre
 -----------------
+  * Исправлено отображение ошибки, при попытке входа в админ панель неавторизованного пользователя.
   * Is depricated \skeeks\cms\components\Cms property templateDefault (будут задействованы view theme yii2)
 
 2.0.1
