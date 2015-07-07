@@ -72,7 +72,16 @@ class HasJsonFieldsBehavior extends Behavior
             {
                 if (is_string($this->owner->{$fielName}))
                 {
-                    $this->owner->{$fielName} = Json::decode($this->owner->{$fielName});
+                    try
+                    {
+                        $this->owner->{$fielName} = Json::decode($this->owner->{$fielName});
+
+                    } catch(\Exception $e)
+                    {
+                        \Yii::error($e->getMessage());
+                        $this->owner->{$fielName} = [];
+                    }
+
                 }
             }
             else
