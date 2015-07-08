@@ -33,6 +33,8 @@ abstract class Widget extends Component implements ViewContextInterface
     {
         $this->_token = 'Виджет: ' . $this->id;
 
+        $this->defaultAttributes = $this->attributes;
+
         \Yii::beginProfile("Init: " . $this->_token);
             $this->initSettings();
         \Yii::endProfile("Init: " . $this->_token);
