@@ -266,7 +266,7 @@ trait HasComponentDbSettingsTrait
     {
         $attributes = [];
 
-        foreach ($this->attributes as $key => $value)
+        foreach ($this->defaultAttributes as $key => $value)
         {
             if (!is_object($value))
             {
