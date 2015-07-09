@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms\helpers;
 
-use skeeks\sx\String;
 use yii\base\Component;
 use yii\base\Object;
 
@@ -46,10 +45,10 @@ class HiddenCaptcha extends Component
     public function getVerifyedCaptcha()
     {
         $captcha = $this->_captchaSource;
-        $captcha = String::substr($this->_captchaSource, 4, 5);
-        $captcha = $captcha . String::substr($this->_captchaSource, 1, 4);
-        $captcha = $captcha . String::substr($this->_captchaSource, 1, 2);
-        $captcha = $captcha . String::substr($this->_captchaSource, 5, 6);
+        $captcha = StringHelper::substr($this->_captchaSource, 4, 5);
+        $captcha = $captcha . StringHelper::substr($this->_captchaSource, 1, 4);
+        $captcha = $captcha . StringHelper::substr($this->_captchaSource, 1, 2);
+        $captcha = $captcha . StringHelper::substr($this->_captchaSource, 5, 6);
 
         return $captcha;
     }

@@ -11,6 +11,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
@@ -190,7 +191,7 @@ class Seo extends Component
                 strpos($word, '@')!==false ||
                 strpos($word, '_')!==false ||
                 strpos($word, '=')!==false ||
-                in_array(\skeeks\sx\String::strtolower($word), $this->keywordsStopWords)
+                in_array(StringHelper::strtolower($word), $this->keywordsStopWords)
                 ) {
                     unset($words[$n]);
                 }
@@ -207,9 +208,9 @@ class Seo extends Component
                 $count ++;
                 if($count>1)
                 {
-                    $result .= ', '. \skeeks\sx\String::strtolower($word);
+                    $result .= ', '. StringHelper::strtolower($word);
                 } else
-                    $result .= \skeeks\sx\String::strtolower($word);
+                    $result .= StringHelper::strtolower($word);
             }
         }
         return $result;

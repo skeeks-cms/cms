@@ -12,7 +12,7 @@
 namespace skeeks\cms\components\imaging\validators;
 
 
-use skeeks\sx\String;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\sx\validators\Validator;
 
 class AllowExtension extends Validator
@@ -32,7 +32,7 @@ class AllowExtension extends Validator
      */
     public function validate($extension)
     {
-        return !in_array(String::strtolower($extension), self::getPossibleExtensions()) ? $this->_bad("Расширение '{$extension}' Не поддерживается данной библиотекой")
+        return !in_array(StringHelper::strtolower($extension), self::getPossibleExtensions()) ? $this->_bad("Расширение '{$extension}' Не поддерживается данной библиотекой")
                                  : $this->_ok();
     }
 }
