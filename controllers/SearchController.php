@@ -8,6 +8,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\Tree;
 use Yii;
@@ -24,7 +25,7 @@ class SearchController extends Controller
      */
     public function actionResult()
     {
-        $this->view->title = \skeeks\sx\String::ucfirst(\Yii::$app->cmsSearch->searchQuery) . " — результаты поиска";
+        $this->view->title = StringHelper::ucfirst(\Yii::$app->cmsSearch->searchQuery) . " — результаты поиска";
         return $this->render($this->action->id);
     }
 }

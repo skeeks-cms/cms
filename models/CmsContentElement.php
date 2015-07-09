@@ -25,7 +25,6 @@ use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\user\models\User;
-use skeeks\sx\String;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;

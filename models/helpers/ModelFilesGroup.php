@@ -9,10 +9,10 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\models\helpers;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\ComponentModel;
 use skeeks\cms\models\StorageFile;
-use skeeks\sx\String;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -62,7 +62,7 @@ class ModelFilesGroup extends ComponentModel
         //Если в конфиге указаны допустимые расширения файлов то проверим расширение файла
         if ($allowedExtensions = $this->getConfigAllowedExtensions())
         {
-            if (!in_array(String::strtolower($file->extension), $allowedExtensions))
+            if (!in_array(StringHelper::strtolower($file->extension), $allowedExtensions))
             {
                 throw new Exception("Файл с расширением {$file->extension} не может быть привязан. Допустимые расширения: " . implode(", ", $allowedExtensions));
             }

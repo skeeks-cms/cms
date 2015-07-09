@@ -17,7 +17,6 @@ use skeeks\cms\models\helpers\ModelRef;
 use skeeks\sx\Dir;
 use skeeks\sx\File;
 use skeeks\sx\models\Ref;
-use skeeks\sx\String;
 use Yii;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\searchs\StorageFile as StorageFileSearch;

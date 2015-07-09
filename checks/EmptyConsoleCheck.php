@@ -8,7 +8,6 @@
 namespace skeeks\cms\checks;
 use skeeks\cms\base\CheckComponent;
 use skeeks\cms\console\controllers\CheckController;
-use skeeks\sx\String;
 
 /**
  * Class EmptyConsoleCheck

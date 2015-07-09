@@ -10,10 +10,10 @@
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
-use skeeks\sx\String;
 use Yii;
 use yii\base\Model;
 use yii\db\BaseActiveRecord;
@@ -85,7 +85,7 @@ abstract class RelatedPropertyModel extends Core
         {
             if ($this->scenario == static::SCENARIO_UPDATE_CONFIG)
             {
-                $this->component_settings = unserialize(\skeeks\sx\String::base64DecodeUrl($this->component_settings));
+                $this->component_settings = unserialize(StringHelper::base64DecodeUrl($this->component_settings));
 
                 /**
                  * @var $propertyType PropertyType
@@ -150,7 +150,7 @@ abstract class RelatedPropertyModel extends Core
             [['active', 'property_type', 'list_type', 'multiple', 'with_description', 'searchable', 'filtrable', 'is_required', 'smart_filtrable'], 'string', 'max' => 1],
             ['code', 'default', 'value' => function($model, $attribute)
             {
-                return "property" . String::ucfirst(md5(rand(1, 10) . time()));
+                return "property" . StringHelper::ucfirst(md5(rand(1, 10) . time()));
             }],
             ['priority', 'default', 'value' => 500],
             [['active', 'searchable'], 'default', 'value' => Cms::BOOL_Y],
