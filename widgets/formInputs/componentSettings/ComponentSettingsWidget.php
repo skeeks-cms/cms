@@ -8,6 +8,7 @@
 namespace skeeks\cms\widgets\formInputs\componentSettings;
 
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\modules\admin\Module;
@@ -44,7 +45,7 @@ class ComponentSettingsWidget extends InputWidget
         if ($this->hasModel())
         {
             $name   = Html::getInputName($this->model, $this->attribute);
-            $value  = \skeeks\sx\String::base64EncodeUrl(serialize((array) $this->model->{$this->attribute}));
+            $value  = StringHelper::base64EncodeUrl(serialize((array) $this->model->{$this->attribute}));
 
             $this->options['id'] = Html::getInputId($this->model, $this->attribute);
 

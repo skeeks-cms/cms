@@ -10,7 +10,7 @@
  */
 namespace skeeks\cms\grid;
 
-use skeeks\sx\String;
+use skeeks\cms\helpers\StringHelper;
 use yii\grid\DataColumn;
 
 /**
@@ -26,7 +26,7 @@ class LongTextColumnData extends DataColumn
     protected function renderDataCellContent($model, $key, $index)
     {
         $text = $model->{$this->attribute};
-        return "<small>" . String::substr($text, 0, $this->maxLength) . ( (String::strlen($text) > $this->maxLength) ? " ..." : "" ) . "</small>";
+        return "<small>" . StringHelper::substr($text, 0, $this->maxLength) . ( (StringHelper::strlen($text) > $this->maxLength) ? " ..." : "" ) . "</small>";
 
     }
 }

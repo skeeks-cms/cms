@@ -23,8 +23,12 @@ abstract class Component extends Model
     //Можно сохранять настройки в базу
     use HasComponentDbSettingsTrait;
 
+    public $defaultAttributes = [];
+
     public function init()
     {
+        $this->defaultAttributes = $this->attributes;
+
         \Yii::beginProfile("Init: " . $this->className());
             $this->initSettings();
         \Yii::endProfile("Init: " . $this->className());

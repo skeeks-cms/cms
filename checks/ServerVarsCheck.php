@@ -7,8 +7,6 @@
  */
 namespace skeeks\cms\checks;
 use skeeks\cms\base\CheckComponent;
-use skeeks\sx\String;
-
 /**
  * Class ServerVarsCheck
  * @package skeeks\cms\checks
