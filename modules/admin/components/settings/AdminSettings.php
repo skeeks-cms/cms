@@ -50,6 +50,8 @@ class AdminSettings extends Component
     public $ckeditorPreset              = CKEditorPresets::EXTRA;
     public $ckeditorSkin                = CKEditorPresets::SKIN_MOONO_COLOR;
     public $ckeditorHeight              = 400;
+    public $ckeditorCodeSnippetGeshi    = Cms::BOOL_Y;
+    public $ckeditorCodeSnippetTheme    = 'monokai_sublime';
 
 
     public $blockedTime                 = 900; //15 минут
@@ -67,6 +69,8 @@ class AdminSettings extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['asset', 'languageCode', 'pageParamName', 'enabledPjaxPagination'], 'string'],
             [['pageSize'], 'integer'],
+            [['ckeditorCodeSnippetGeshi'], 'string'],
+            [['ckeditorCodeSnippetTheme'], 'string'],
             [['enableCustomConfirm', 'enableCustomPromt', 'pageSize'], 'string'],
             [['ckeditorPreset', 'ckeditorSkin'], 'string'],
             [['ckeditorHeight'], 'integer'],
@@ -91,6 +95,8 @@ class AdminSettings extends Component
             'ckeditorPreset'                    => 'Инструменты',
             'ckeditorSkin'                      => 'Тема оформления',
             'ckeditorHeight'                    => 'Высота',
+            'ckeditorCodeSnippetGeshi'          => 'Использовать подсветку кода (Code Snippets Using GeSHi)',
+            'ckeditorCodeSnippetTheme'          => 'Тема highlight подсветки кода',
 
             'blockedTime'                       => 'Время через, через которое, блокировать пользователя',
         ]);
@@ -152,12 +158,33 @@ class AdminSettings extends Component
      */
     public function getCkeditorOptions()
     {
+        $clientOptions = [
+            'height'                => $this->ckeditorHeight,
+            'skin'                  => $this->ckeditorSkin,
+            'codeSnippet_theme'     => $this->ckeditorCodeSnippetTheme,
+        ];
+
+        if ($this->ckeditorCodeSnippetGeshi == Cms::BOOL_Y)
+        {
+            $clientOptions['codeSnippetGeshi_url'] = '../lib/colorize.php';
+
+            $preset = CKEditorPresets::getPresets($this->ckeditorPreset);
+            $extraplugins = ArrayHelper::getValue($preset, 'extraPlugins', "");
+
+            if ($extraplugins)
+            {
+                $extraplugins = explode(",", $extraplugins);
+            }
+
+            $extraplugins = array_merge($extraplugins, ['codesnippetgeshi']);
+            $extraplugins = array_unique($extraplugins);
+
+            $clientOptions['extraPlugins'] = implode(',', $extraplugins);
+        }
+
         return [
             'preset' => $this->ckeditorPreset,
-            'clientOptions' => [
-                'height'    => $this->ckeditorHeight,
-                'skin'      => $this->ckeditorSkin,
-            ]
+            'clientOptions' => $clientOptions
         ];
     }
 
