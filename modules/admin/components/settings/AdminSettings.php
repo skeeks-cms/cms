@@ -50,7 +50,7 @@ class AdminSettings extends Component
     public $ckeditorPreset              = CKEditorPresets::EXTRA;
     public $ckeditorSkin                = CKEditorPresets::SKIN_MOONO_COLOR;
     public $ckeditorHeight              = 400;
-    public $ckeditorCodeSnippetGeshi    = Cms::BOOL_Y;
+    public $ckeditorCodeSnippetGeshi    = Cms::BOOL_N;
     public $ckeditorCodeSnippetTheme    = 'monokai_sublime';
 
 
