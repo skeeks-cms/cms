@@ -91,7 +91,7 @@ CSS
 
                             $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
 
-                            return "<a href='{$model->src}' class='sx-fancybox'>" . \yii\helpers\Html::img($smallImage, [
+                            return "<a href='{$model->src}' data-pjax='0' class='sx-fancybox'>" . \yii\helpers\Html::img($smallImage, [
                                 'width' => '50',
                                 'class' => 'sx-img-small'
                             ]) . '</a>';
@@ -99,7 +99,7 @@ CSS
 
                         return \yii\helpers\Html::tag('span', $model->extension, ['class' => 'label label-primary', 'style' => 'font-size: 18px;']);
                     },
-                    'format' => 'html'
+                    'format' => 'raw'
                 ],
 
 
@@ -233,14 +233,14 @@ JS
                         {
 
                             $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
-                            return "<a href='" . $model->src . "' class='sx-fancybox' title='Увеличить'>
+                            return "<a href='" . $model->src . "' data-pjax='0' class='sx-fancybox' title='Увеличить'>
                                     <img src='" . $smallImage . "' />
                                 </a>";
                         }
 
                         return \yii\helpers\Html::tag('span', $model->extension, ['class' => 'label label-primary', 'style' => 'font-size: 18px;']);
                     },
-                    'format' => 'html'
+                    'format' => 'raw'
                 ],
 
                 'name',
