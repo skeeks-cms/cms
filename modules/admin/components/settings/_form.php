@@ -38,6 +38,21 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldSelect($model, 'ckeditorPreset', \skeeks\yii2\ckeditor\CKEditorPresets::allowPresets()); ?>
     <?= $form->fieldSelect($model, 'ckeditorSkin', \skeeks\yii2\ckeditor\CKEditorPresets::skins()); ?>
     <?= $form->fieldInputInt($model, 'ckeditorHeight'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'ckeditorCodeSnippetGeshi')->hint('Будет задействован этот плагин http://ckeditor.com/addon/codesnippetgeshi'); ?>
+    <?= $form->fieldSelect($model, 'ckeditorCodeSnippetTheme', [
+        'monokai_sublime' => 'monokai_sublime',
+        'default' => 'default',
+        'arta' => 'arta',
+        'ascetic' => 'ascetic',
+        'atelier-dune.dark' => 'atelier-dune.dark',
+        'atelier-dune.light' => 'atelier-dune.light',
+        'atelier-forest.dark' => 'atelier-forest.dark',
+        'atelier-forest.light' => 'atelier-forest.light',
+        'atelier-heath.dark' => 'atelier-heath.dark',
+        'atelier-heath.light' => 'atelier-heath.light',
+        'atelier-lakeside.dark' => 'atelier-lakeside.dark',
+        'atelier-lakeside.light' => 'atelier-lakeside.light',
+    ])->hint('https://highlightjs.org/static/demo/ - темы'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Безопасность'); ?>

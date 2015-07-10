@@ -141,7 +141,7 @@ class ComboTextInputWidget extends InputWidget
         $this->ckeditor = new \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor(ArrayHelper::merge([
             'model'         => $this->model,
             'attribute'     => $this->attribute,
-            'relatedModel'  => $this->model
+            'relatedModel'  => $this->model,
         ], $this->ckeditorOptions));
 
         $this->codemirror = new CodemirrorWidget(ArrayHelper::merge([

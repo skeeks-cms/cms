@@ -3,6 +3,7 @@
 
 2.0.3.pre
 -----------------
+  * В Ckeditor появились сниппеты, и возможность настройки тем сниппетов
   * Адаптация проекта для работы с php70. Удален \skeeks\sx\String  (Cannot use skeeks\sx\String as String because 'String' is a special class name)
   * У базового компонента CMS добавлено свойство defaultAttributes, в котором, хранятся базовые параметры вызова. Если это виджет то, данные вызова виджета; есди же компонент приложения - то конфиг.
   * HasJsonFieldsBehavior - добавлен перехват json::decode невалидного значения
