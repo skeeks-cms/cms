@@ -39,7 +39,8 @@ $this->registerJs(<<<JS
         {
             this.Iframe = new sx.classes.Iframe('sx-test', {
                 'autoHeight'        : true,
-                'heightSelector'    : '.sx-panel-content'
+                'heightSelector'    : '.sx-panel-content',
+                'minHeight'         : 800
             });
         },
 

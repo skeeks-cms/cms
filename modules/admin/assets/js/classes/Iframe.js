@@ -179,7 +179,8 @@
      * new sx.classes._Iframe('id', {
      *      'autoHeight' : true,                    //автоматически менять высоту фрейма
      *      'heightSelector' : '.sx-panel-test',    //высоты какого контейнера слушать
-     *      'heightTimer' : 500                     //Частота обновления таймера
+     *      'heightTimer' : 500                     //Частота обновления таймера,
+     *      'minHeight' : 800                       //Минимальная высот фрейма в пикселях
      * })
      * @type {*|void|Function}
      * @private
@@ -308,6 +309,11 @@
             var self = this;
 
             newHeight = Number(newHeight);
+
+            if (Number(this.get('minHeight', 200)) > newHeight)
+            {
+                newHeight = Number(this.get('minHeight', 200));
+            }
 
             this.onDomReady(function()
             {

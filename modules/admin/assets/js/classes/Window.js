@@ -8,6 +8,11 @@
 {
     sx.createNamespace('classes', sx);
     /**
+     * @type {void|*|Function}
+     */
+    sx.classes.WindowOriginal  = sx.classes._Window.extend({});
+
+    /**
      * Настройка блокировщика для админки по умолчанию. Глобальное перекрытие
      * @type {void|*|Function}
      */
