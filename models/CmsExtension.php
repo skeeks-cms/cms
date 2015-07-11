@@ -21,6 +21,7 @@ use yii\helpers\Json;
  * @property string                 $packagistUrl
  * @property ComposerHelper         $composer
  * @property string                 $controllUrl
+ * @property UrlHelper              $adminUrl
  * @property string                 $changeLog
  * @property string                 $readme
  *
@@ -251,6 +252,15 @@ class CmsExtension extends Model
         return UrlHelper::construct('/cms/admin-marketplace/install', [
             'packagistCode' => $this->name
         ])->enableAdmin()->toString();
+    }
+
+    /**
+     * @return UrlHelper
+     */
+    public function getAdminUrl()
+    {
+        return UrlHelper::construct('/cms/admin-marketplace/catalog', ['code' => $this->name])
+            ->enableAdmin();
     }
     /**
      * Можно ли его удалять

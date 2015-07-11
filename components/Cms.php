@@ -69,6 +69,9 @@ use yii\web\View;
  * @property ComposerHelper                     $appComposer
  * @property Extension                          $extension
  *
+ * @property \skeeks\cms\modules\admin\Module            $moduleAdmin
+ * @property \skeeks\cms\Module                          $moduleCms
+ *
  * @package skeeks\cms\components
  */
 class Cms extends \skeeks\cms\base\Component
@@ -431,6 +434,7 @@ class Cms extends \skeeks\cms\base\Component
 
 
     /**
+     * TODO: is depricated
      * @return null|\skeeks\cms\modules\admin\Module
      */
     static public function moduleAdmin()
@@ -439,9 +443,27 @@ class Cms extends \skeeks\cms\base\Component
     }
 
     /**
+     * TODO: is depricated
      * @return null|\skeeks\cms\Module
      */
     static public function moduleCms()
+    {
+        return \Yii::$app->getModule("cms");
+    }
+
+
+    /**
+     * @return null|\skeeks\cms\modules\admin\Module
+     */
+    public function getModuleAdmin()
+    {
+        return \Yii::$app->getModule("admin");
+    }
+
+    /**
+     * @return null|\skeeks\cms\Module
+     */
+    public function getModuleCms()
     {
         return \Yii::$app->getModule("cms");
     }
