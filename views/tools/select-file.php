@@ -20,24 +20,43 @@ $this->registerJs(<<<JS
 
         _onDomReady: function()
         {
-            this.message = window.location.search.replace(/^.*C(\d+).*$/, "$1");
-            this.name = window.location.search.replace(/^.*CKEditorFuncNum=(\d+).*$/, "$1");
-            this.baseUrl = window.location.search.replace(/^.*langCode=([a-z]{2}).*$/, "$1");
-            this.tagname = "";
-            if (this.name == this.message)
-            {
-                this.tagname = window.location.search.replace(/^.*BaseBackId=(\S+).*$/, "$1");
-            }
+            this.GetParams              = sx.helpers.Request.getParams();
         },
 
         submit: function(file)
         {
-            window.opener.CKEDITOR.tools.callFunction(this.name, file);
-            window.close();
+            if (this.GetParams['CKEditorFuncNum'])
+            {
+                if (window.opener)
+                {
+                    if (window.opener.CKEDITOR)
+                    {
+                        window.opener.CKEDITOR.tools.callFunction(this.GetParams['CKEditorFuncNum'], file);
+                        window.close();
+                        return this;
+                    }
+                }
+            }
+
+            if (this.GetParams['callbackEvent'])
+            {
+                if (window.opener)
+                {
+                    if (window.opener.sx)
+                    {
+                        window.opener.sx.EventManager.trigger(this.GetParams['callbackEvent'], {
+                            'file' : file
+                        });
+
+                        window.close();
+                        return this;
+                    }
+                }
+            }
+
+            sx.alert(file);
             return this;
-        },
-        _onWindowReady: function()
-        {}
+        }
     });
 
     sx.SelectFile = new sx.classes.SelectFile();
@@ -64,7 +83,8 @@ JS
                     {
                         return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> Выбрать файл', $model->src, [
                             'class' => 'btn btn-primary',
-                            'onclick' => 'sx.SelectFile.submit("' . $model->src . '"); return false;'
+                            'onclick' => 'sx.SelectFile.submit("' . $model->src . '"); return false;',
+                            'data-pjax' => 0
                         ]);
                     },
                     'format' => 'raw'
@@ -213,7 +233,8 @@ JS
                     {
                         return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> Выбрать файл', $model->src, [
                             'class' => 'btn btn-primary',
-                            'onclick' => 'sx.SelectFile.submit("' . $model->src . '"); return false;'
+                            'onclick' => 'sx.SelectFile.submit("' . $model->src . '"); return false;',
+                            'data-pjax' => 0
                         ]);
                     },
                     'format' => 'raw'
