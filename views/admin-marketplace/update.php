@@ -41,6 +41,9 @@ JS
         ], $attrDisabled)
 
     ); ?>
+    <hr />
+    <p><b><a data-pjax="0" href="<?= \skeeks\cms\models\CmsExtension::getInstance('skeeks/cms')->adminUrl; ?>">SkeekS CMS Version</a>: </b> <?= \Yii::$app->cms->moduleCms->descriptor->version; ?></p>
+    <p><b>Yii Version: </b> <?= Yii::getVersion(); ?></p>
     <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 </div>
 
