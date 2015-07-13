@@ -55,5 +55,8 @@ return
 
     "Status"                =>  "Статус",
     "Rating"                =>  "Рейтинг",
+    "Phone"                 =>  "Телефон",
+    "City"                  =>  "Город",
+    "Verification Code"     =>  "Проверочный код",
 
 ];
