@@ -25,7 +25,10 @@ foreach (\Yii::$app->cms->templates as $code => $data)
     <?= $form->field($model, 'appName')->textInput()->hint(''); ?>
     <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта (отправитель по умолчанию).'); ?>
     <?= $form->field($model, 'notifyAdminEmails')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.'); ?>
-    <?= $form->field($model, 'noImageUrl')->textInput()->hint('Это изображение показывается в тех случаях, когда не найдено основное.'); ?>
+
+    <?= $form->field($model, 'noImageUrl')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\OneImage::className()
+    )->hint('Это изображение показывается в тех случаях, когда не найдено основное.');; ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Шаблоны/отображение'); ?>
