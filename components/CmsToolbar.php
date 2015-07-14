@@ -71,7 +71,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
     public $mode                            = self::NO_EDIT_MODE;
     public $enabled                         = 1;
-    public $enableFancyboxWindow            = 1;
+    public $enableFancyboxWindow            = 0;
 
     public $infoblockEditBorderColor             = "red";
 

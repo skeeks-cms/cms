@@ -34,13 +34,22 @@ class SshConsoleWidget extends Widget
         {
             $this->iframeId = 'sx-iframe-' . $this->id;
         }
-
     }
+
     public function run()
     {
-        return $this->render('ssh-console', [
-            'widget' => $this
-        ]);
+        if (!function_exists('system'))
+        {
+            return $this->render('ssh-no-console', [
+                'widget' => $this
+            ]);
+        } else
+        {
+            return $this->render('ssh-console', [
+                'widget' => $this
+            ]);
+        }
+
     }
 
     /**

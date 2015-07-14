@@ -31,6 +31,19 @@ class ToolsController extends Controller
 
 
     /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return [
+            'captcha' => [
+                'class' => 'yii\captcha\CaptchaAction',
+                'fixedVerifyCode' => null,
+            ],
+        ];
+    }
+
+    /**
      * Выбор файла
      * @return string
      */
