@@ -297,9 +297,28 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
             ],
             [
-                "label"     => "Генератор кода gii",
-                "url"       => ["admin/gii"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
+                "label"         => "Генератор кода gii",
+                "url"           => ["admin/gii"],
+                "img"           => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
+                "accessCallback"=> function()
+                {
+                    if ((bool) \Yii::$app->hasModule('gii'))
+                    {
+                        /**
+                         * @var $gii yii\gii\Module
+                         */
+                        $gii = \Yii::$app->getModule('gii');
+
+                        $ip = Yii::$app->getRequest()->getUserIP();
+                        foreach ($gii->allowedIPs as $filter) {
+                            if ($filter === '*' || $filter === $ip || (($pos = strpos($filter, '*')) !== false && !strncmp($ip, $filter, $pos))) {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+                },
             ],
         ]
     ],
