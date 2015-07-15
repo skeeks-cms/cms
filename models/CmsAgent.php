@@ -5,7 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.07.2015
  */
-namespace skeeks\cms;
+namespace skeeks\cms\models;
 
 use Yii;
 
