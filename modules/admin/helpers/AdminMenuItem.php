@@ -56,6 +56,11 @@ class AdminMenuItem extends Component
      */
     public $parent = null;
 
+    /**
+     * @var null
+     */
+    public $accessCallback = null;
+
 
     public function init()
     {
@@ -134,20 +139,33 @@ class AdminMenuItem extends Component
             {
                 if (\Yii::$app->user->can($permission->name))
                 {
-                    return true;
+                    return $this->_accessCallback();
                 } else
                 {
                     return false;
                 }
             } else
             {
-                return true;
+                return $this->_accessCallback();
             }
+        }
+
+        return $this->_accessCallback();
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _accessCallback()
+    {
+        if ($this->accessCallback && is_callable($this->accessCallback))
+        {
+            $callback = $this->accessCallback;
+            return (bool) $callback();
         }
 
         return true;
     }
-
     /**
      * Путь до изображения.
      * @return string
