@@ -78,22 +78,11 @@ class GridViewSettings extends Component
     {
         return ArrayHelper::merge(parent::rules(),
         [
-            [['enabledPaging'], 'string'],
             [['enabledPjaxPagination'], 'string'],
             [['pageParamName'], 'string'],
             [['pageSize'], 'string'],
             [['orderBy'], 'string'],
             [['order'], 'integer'],
-            [['label'], 'string'],
-            [['label'], 'string'],
-            [['enabledSearchParams'], 'string'],
-            [['limit'], 'integer'],
-            [['active'], 'string'],
-            [['createdBy'], 'safe'],
-            [['content_ids'], 'safe'],
-            [['enabledCurrentTree'], 'string'],
-            [['enabledCurrentTreeChild'], 'string'],
-            [['tree_ids'], 'safe'],
             [['visibleColumns'], 'safe'],
         ]);
     }

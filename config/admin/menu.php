@@ -130,6 +130,12 @@ return
                 "url"       => ["cms/admin-settings"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
             ],
+
+            [
+                "label"     => "Агенты",
+                "url"       => ["cms/admin-cms-agent"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clock.png'],
+            ],
         ]
     ],
 
