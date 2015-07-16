@@ -8,8 +8,10 @@
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\base\console\Controller;
+use skeeks\cms\components\Cms;
 use skeeks\sx\Dir;
 use Yii;
+use yii\base\Event;
 use yii\console\controllers\HelpController;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
@@ -122,6 +124,38 @@ class UtilsController extends Controller
     public function actionGenerateModulesConfigFile()
     {
         \Yii::$app->cms->generateModulesConfigFile();
+    }
+
+    /**
+     * Сообщение всем подключенным компонентам, что нужно обновление завершено
+     * В этот момент компоненты, могут выполнить какой либо код, например добавить агентов или email событий
+     */
+    public function actionTriggerAfterUpdate()
+    {
+        //Загрузка всех компонентов.
+        $components = \Yii::$app->getComponents();
+        foreach ($components as $id => $data)
+        {
+            try
+            {
+                \Yii::$app->get($id);
+            } catch (\Exception $e)
+            {
+                continue;
+            }
+        }
+
+        \Yii::$app->trigger(Cms::EVENT_AFTER_UPDATE, new Event([
+            'name' => Cms::EVENT_AFTER_UPDATE
+        ]));
+    }
+
+    /**
+     * Выполнить агентов
+     */
+    public function actionAgentsExecute()
+    {
+        Yii::error('agents execute');
     }
 
 }

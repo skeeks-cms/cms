@@ -16,6 +16,7 @@ use Yii;
  * @property integer $last_exec_at
  * @property integer $next_exec_at
  * @property string $name
+ * @property string $description
  * @property integer $agent_interval
  * @property integer $priority
  * @property string $active
@@ -40,6 +41,7 @@ class CmsAgent extends \yii\db\ActiveRecord
         return [
             [['last_exec_at', 'next_exec_at', 'agent_interval', 'priority'], 'integer'],
             [['name', 'next_exec_at'], 'required'],
+            [['description'], 'string'],
             [['name'], 'string'],
             [['active', 'is_period', 'is_running'], 'string', 'max' => 1]
         ];
@@ -52,14 +54,15 @@ class CmsAgent extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'last_exec_at' => Yii::t('app', 'Last Exec At'),
-            'next_exec_at' => Yii::t('app', 'Next Exec At'),
-            'name' => Yii::t('app', 'Name'),
-            'agent_interval' => Yii::t('app', 'Agent Interval'),
+            'last_exec_at' => Yii::t('app', 'Дата последнего запуска'),
+            'next_exec_at' => Yii::t('app', 'Дата и время следующего запуска'),
+            'name' => Yii::t('app', 'Функция агента'),
+            'agent_interval' => Yii::t('app', 'Интервал (сек.)'),
             'priority' => Yii::t('app', 'Priority'),
             'active' => Yii::t('app', 'Active'),
-            'is_period' => Yii::t('app', 'Is Period'),
+            'is_period' => Yii::t('app', 'Периодический'),
             'is_running' => Yii::t('app', 'Is Running'),
+            'description' => Yii::t('app', 'Description'),
         ];
     }
 }

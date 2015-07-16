@@ -32,6 +32,7 @@ class m150715_103220_create_table__cms_agent extends Migration
             'next_exec_at'          => Schema::TYPE_INTEGER . ' NOT NULL',
 
             'name'                  => Schema::TYPE_TEXT . " NOT NULL",
+            'description'           => Schema::TYPE_TEXT . " NULL",
 
             'agent_interval'        => Schema::TYPE_INTEGER . " NOT NULL DEFAULT '86400'",
             'priority'              => Schema::TYPE_INTEGER . " NOT NULL DEFAULT '100'",

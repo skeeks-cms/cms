@@ -43,24 +43,6 @@ $config =
             'components' => include_once 'models.php'
         ],
 
-        'langs' =>
-        [
-            'class' => '\skeeks\cms\components\Langs',
-            /*'components' =>
-            [
-                'ru' =>
-                [
-                    'name' => 'Русский'
-                ],
-
-                'en' =>
-                [
-                    'name' => 'Английский'
-                ],
-            ]*/
-
-        ],
-
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',

@@ -28,7 +28,13 @@ foreach (\Yii::$app->cms->templates as $code => $data)
 
     <?= $form->field($model, 'noImageUrl')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\OneImage::className()
-    )->hint('Это изображение показывается в тех случаях, когда не найдено основное.');; ?>
+    )->hint('Это изображение показывается в тех случаях, когда не найдено основное.'); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Агенты'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledHitAgents')->hint('Если вы отключаете выполнение агентов на хитах, то не забудте включить их в задание cron'); ?>
+    <?= $form->fieldInputInt($model, 'hitAgentsInterval')->hint('Если агенты выполняются на хитах, то их выполнение будет осуществляться с заданным переидом (сек.)'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Шаблоны/отображение'); ?>

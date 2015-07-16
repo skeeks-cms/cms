@@ -29,8 +29,8 @@ use \skeeks\cms\validators\HasBehavior;
 
 
 <? if (Validate::validate( new HasBehavior(\yii\behaviors\TimestampBehavior::className()), $model)->isValid()) : ?>
-    <?= $form->field($model, 'created_at')->widget(\kartik\datecontrol\DateControl::classname(), [
-        //'displayFormat' => 'php:d-M-Y H:i:s',
+    <?= $form->field($model, 'created_at')->widget(
+        \kartik\datecontrol\DateControl::classname(), [
         'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
     ]); ?>
 <? endif;?>
