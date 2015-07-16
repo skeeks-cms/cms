@@ -322,35 +322,54 @@ class Cms extends \skeeks\cms\base\Component
                         ],
                 ]);
             }
-
         });
 
 
-        \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
+        if (\Yii::$app instanceof Application)
         {
-            //Вставка агентов
-            if (!CmsAgent::find()->where(['name' => 'cms/db/refresh'])->one())
+            \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
             {
-                ( new CmsAgent([
-                    'name'              => 'cms/db/refresh',
-                    'description'       => 'Инвалидация кэша структуры таблиц',
-                    'agent_interval'    => 3600*3, //раз в три часа
-                    'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*3
-                ]) )->save();
-            }
-
-            if (!CmsAgent::find()->where(['name' => 'cms/utils/clear-runtimes'])->one())
-            {
-                ( new CmsAgent([
-                    'name'              => 'cms/utils/clear-runtimes',
-                    'description'       => 'Чистка временных диррикторий',
-                    'agent_interval'    => 3600*24, //раз в три часа
-                    'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24
-                ]) )->save();
-            }
-        });
+                $this->_installAgents();
+            });
+        }
     }
 
+    protected function _installAgents()
+    {
+        //Вставка агентов
+        if (!CmsAgent::find()->where(['name' => 'cms/db/refresh'])->one())
+        {
+            ( new CmsAgent([
+                'name'              => 'cms/db/refresh',
+                'description'       => 'Инвалидация кэша структуры таблиц',
+                'agent_interval'    => 3600*3, //раз в три часа
+                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*3,
+                'is_period'         => Cms::BOOL_N
+            ]) )->save();
+        }
+
+        if (!CmsAgent::find()->where(['name' => 'cms/utils/clear-runtimes'])->one())
+        {
+            ( new CmsAgent([
+                'name'              => 'cms/utils/clear-runtimes',
+                'description'       => 'Чистка временных диррикторий',
+                'agent_interval'    => 3600*24,
+                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,
+                'is_period'         => Cms::BOOL_N
+            ]) )->save();
+        }
+
+        if (!CmsAgent::find()->where(['name' => 'cms/backup/db-execute'])->one())
+        {
+            ( new CmsAgent([
+                'name'              => 'cms/backup/db-execute',
+                'description'       => 'Бэкап базы данных',
+                'agent_interval'    => 3600*24, //раз в три часа
+                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,
+                'is_period'         => Cms::BOOL_N
+            ]) )->save();
+        }
+    }
 
     public function rules()
     {

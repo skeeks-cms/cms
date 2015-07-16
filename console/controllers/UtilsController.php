@@ -9,6 +9,7 @@ namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\base\console\Controller;
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\CmsAgent;
 use skeeks\sx\Dir;
 use Yii;
 use yii\base\Event;
@@ -155,7 +156,21 @@ class UtilsController extends Controller
      */
     public function actionAgentsExecute()
     {
-        Yii::error('agents execute');
+        /**
+         * Поиск агентов к выполнению
+         */
+        $agents = CmsAgent::findForExecute()->all();
+
+        Yii::info('Agents execute: ' . count($agents), CmsAgent::className());
+
+        if ($agents)
+        {
+            foreach ($agents as $agent)
+            {
+                $agent->execute();
+            }
+        }
+
     }
 
 }

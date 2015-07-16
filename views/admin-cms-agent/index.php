@@ -37,6 +37,10 @@
         ],
 
         [
+            'attribute'     => "agent_interval"
+        ],
+
+        [
             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
             'attribute'     => "active"
         ],
