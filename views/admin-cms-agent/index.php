@@ -24,6 +24,7 @@
 
         'id',
         'name',
+        'description',
 
         [
             'class'         => \skeeks\cms\grid\DateTimeColumnData::className(),

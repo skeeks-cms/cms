@@ -14,6 +14,7 @@ use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\events\LoginEvent;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
@@ -327,8 +328,26 @@ class Cms extends \skeeks\cms\base\Component
 
         \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
         {
+            //Вставка агентов
+            if (!CmsAgent::find()->where(['name' => 'cms/db/refresh'])->one())
+            {
+                ( new CmsAgent([
+                    'name'              => 'cms/db/refresh',
+                    'description'       => 'Инвалидация кэша структуры таблиц',
+                    'agent_interval'    => 3600*3, //раз в три часа
+                    'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*3
+                ]) )->save();
+            }
 
-
+            if (!CmsAgent::find()->where(['name' => 'cms/utils/clear-runtimes'])->one())
+            {
+                ( new CmsAgent([
+                    'name'              => 'cms/utils/clear-runtimes',
+                    'description'       => 'Чистка временных диррикторий',
+                    'agent_interval'    => 3600*24, //раз в три часа
+                    'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24
+                ]) )->save();
+            }
         });
     }
 
