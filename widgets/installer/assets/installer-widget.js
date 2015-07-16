@@ -137,6 +137,11 @@
                 'name':'Обновление привилегий',
             }));
 
+            tasks.push(new sx.classes.InstallerTaskConsole({
+                'cmd':'php yii cms/utils/trigger-after-update',
+                'name':'Получение агентов и почтовых событий',
+            }));
+
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка обновленных решений',
@@ -242,6 +247,10 @@
                     'name':'Обновление привилегий',
                 }));
 
+                tasks.push(new sx.classes.InstallerTaskConsole({
+                    'cmd':'php yii cms/utils/trigger-after-update',
+                    'name':'Получение агентов и почтовых событий',
+                }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Тестирование системы после удаления',
@@ -354,6 +363,11 @@
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/rbac/init',
                 'name':'Обновление привилегий',
+            }));
+
+            tasks.push(new sx.classes.InstallerTaskConsole({
+                'cmd':'php yii cms/utils/trigger-after-update',
+                'name':'Получение агентов и почтовых событий',
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
