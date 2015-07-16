@@ -161,7 +161,7 @@ class UtilsController extends Controller
          */
         $agents = CmsAgent::findForExecute()->all();
 
-        \Yii::info('Agents execute: ' . count($agents));
+        \Yii::info('Agents execute: ' . count($agents), CmsAgent::className());
 
         if ($agents)
         {
