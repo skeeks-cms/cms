@@ -12,6 +12,9 @@
         {
             var self = this;
 
+            this._inProcessing  = false;
+            this._ssh           = false;
+
             this.TaskManager = new sx.classes.tasks.Manager({
                 'tasks' : [],
                 'delayQueque' : 500
@@ -23,16 +26,39 @@
             {
                 $('#' + self.get('id')).show();
                 sx.App.Menu.block();
+                $('.sx-notify-install').show();
+                self._inProcessing = true;
             });
 
             this.TaskManager.bind('stop', function()
             {
                 sx.App.Menu.unblock();
-                $('#' + self.get('id')).hide();
+
+                if (self._ssh === true)
+                {
+                    $('.sx-notify-install').hide();
+                } else
+                {
+                    $('#' + self.get('id')).hide();
+                    $('.sx-notify-install').hide();
+                }
+
+                self._inProcessing = false;
             });
 
             this.checkAccess();
         },
+
+
+        _onDomReady: function()
+        {
+            $('.btn-ssh-toggle').on('click', function()
+            {
+                $('#sx-ssh-console-wrapper').toggle();
+                return false;
+            });
+        },
+
 
         /**
          * @returns {boolean}
@@ -48,8 +74,23 @@
             return true;
         },
 
+        /**
+         * @returns {sx.classes.Installer}
+         */
+        initSshConsole: function()
+        {
+            $('#sx-ssh-console-wrapper').show();
+            $('.sx-toggle-ssh').show();
+
+            this._ssh = true;
+
+            return this;
+        },
+
         update: function()
         {
+            var self = this;
+
             if (!this.checkAccess())
             {
                 return this;
@@ -74,11 +115,11 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Запуска ssh консоли',
-                'delay':1000,
+                'delay':5000,
                 'callback':function()
                 {
-                    var jSshConsole = $('#sx-ssh-console-wrapper');
-                    jSshConsole.show();
+                    self.initSshConsole();
+                    self.TaskManager.stop();
                 }
             }));
 
@@ -169,6 +210,8 @@
 
         remove: function(packageName)
         {
+            var self = this;
+
             if (!this.checkAccess())
             {
                 return this;
@@ -191,8 +234,7 @@
                 'delay':1000,
                 'callback':function()
                 {
-                    var jSshConsole = $('#sx-ssh-console-wrapper');
-                    jSshConsole.show();
+                    self.initSshConsole();
                 }
             }));
 
@@ -277,6 +319,8 @@
 
         install: function(packageName)
         {
+            var self = this;
+
             if (!this.checkAccess())
             {
                 return this;
@@ -304,8 +348,7 @@
                 'delay':1000,
                 'callback':function()
                 {
-                    var jSshConsole = $('#sx-ssh-console-wrapper');
-                    jSshConsole.show();
+                    self.initSshConsole();
                 }
             }));
 
