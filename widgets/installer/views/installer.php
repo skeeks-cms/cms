@@ -10,11 +10,16 @@
 
 ?>
 <div class="sx-box sx-p-10 sx-mb-10" style="display: none;" id="<?= $widget->id; ?>">
+    <div class="sx-toggle-ssh sx-p-10" style="display: none;">
+        <a href="#" class="btn btn-default btn-ssh-toggle">Показать/Скрыть подробности</a>
+    </div>
+
     <?=
         \yii\bootstrap\Alert::widget([
             'options' => [
-              'class' => 'alert-danger',
-          ],
+              'class' => 'alert-danger sx-notify-install',
+              'style' => 'display: none;',
+            ],
           'body' => \yii\helpers\Html::tag("div", 'Идет процесс установки нового пакета, пожалуйста не закрывайте эту страницу.
                                                     Это может привести к печальным последствиям работы вашего сайта.'),
         ]);

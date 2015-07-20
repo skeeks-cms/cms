@@ -111,6 +111,9 @@ class UpdateController extends Controller
 
         //Обновление привилегий
         $this->systemCmdRoot("php yii cms/rbac/init");
+
+        //Дополнительные действия после обновления
+        $this->systemCmdRoot("php yii cms/utils/trigger-after-update");
     }
 
 

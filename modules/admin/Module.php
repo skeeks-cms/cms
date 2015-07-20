@@ -69,7 +69,13 @@ class Module extends CmsModule
             $components = \Yii::$app->getComponents();
             foreach ($components as $id => $data)
             {
-                \Yii::$app->get($id);
+                try
+                {
+                    \Yii::$app->get($id);
+                } catch(\Exception $e)
+                {
+                    continue;
+                }
             }
 
             \Yii::$app->trigger(self::EVENT_READY, new Event([

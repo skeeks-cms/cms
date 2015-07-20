@@ -14,6 +14,7 @@ use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\events\LoginEvent;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
@@ -76,6 +77,11 @@ use yii\web\View;
  */
 class Cms extends \skeeks\cms\base\Component
 {
+    /**
+     * Событие срабатываемое после выполнения процесса установки или обновления cms
+     */
+    const EVENT_AFTER_UPDATE = 'cms.event.after.update';
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -142,6 +148,16 @@ class Cms extends \skeeks\cms\base\Component
     public $passwordResetTokenExpire        = 3600;
 
     /**
+     * @var string агенты на хитах
+     */
+    public $enabledHitAgents                = self::BOOL_Y;
+
+    /**
+     * @var int Интервал выполенения агентов на хитах
+     */
+    public $hitAgentsInterval               = 60;
+
+    /**
      * @var array Возможные шаблоны сайта
      */
     public $templatesDefault       =
@@ -179,7 +195,6 @@ class Cms extends \skeeks\cms\base\Component
     {
         parent::init();
 
-
         if (!$this->appName)
         {
             $this->appName = \Yii::$app->name;
@@ -192,6 +207,20 @@ class Cms extends \skeeks\cms\base\Component
         if (!file_exists(AUTO_GENERATED_MODULES_FILE))
         {
             $this->generateModulesConfigFile();
+        }
+
+        //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
+        if ($this->enabledHitAgents == self::BOOL_Y && function_exists('system') && (!Yii::$app instanceof Application))
+        {
+            $key = 'Agents';
+            Yii::beginProfile($key);
+                $data = \Yii::$app->cache->get($key);
+                if ($data === false)
+                {
+                    system("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
+                    \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
+                }
+            Yii::endProfile($key);
         }
 
         /**
@@ -293,10 +322,54 @@ class Cms extends \skeeks\cms\base\Component
                         ],
                 ]);
             }
-
         });
+
+
+        if (\Yii::$app instanceof Application)
+        {
+            \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
+            {
+                $this->_installAgents();
+            });
+        }
     }
 
+    protected function _installAgents()
+    {
+        //Вставка агентов
+        if (!CmsAgent::find()->where(['name' => 'cms/db/refresh'])->one())
+        {
+            ( new CmsAgent([
+                'name'              => 'cms/db/refresh',
+                'description'       => 'Инвалидация кэша структуры таблиц',
+                'agent_interval'    => 3600*3, //раз в три часа
+                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*3,
+                'is_period'         => Cms::BOOL_N
+            ]) )->save();
+        }
+
+        if (!CmsAgent::find()->where(['name' => 'cms/utils/clear-runtimes'])->one())
+        {
+            ( new CmsAgent([
+                'name'              => 'cms/utils/clear-runtimes',
+                'description'       => 'Чистка временных диррикторий',
+                'agent_interval'    => 3600*24,
+                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,
+                'is_period'         => Cms::BOOL_N
+            ]) )->save();
+        }
+
+        if (!CmsAgent::find()->where(['name' => 'cms/backup/db-execute'])->one())
+        {
+            ( new CmsAgent([
+                'name'              => 'cms/backup/db-execute',
+                'description'       => 'Бэкап базы данных',
+                'agent_interval'    => 3600*24, //раз в три часа
+                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,
+                'is_period'         => Cms::BOOL_N
+            ]) )->save();
+        }
+    }
 
     public function rules()
     {
@@ -305,6 +378,8 @@ class Cms extends \skeeks\cms\base\Component
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
+            [['hitAgentsInterval'], 'integer', 'min' => 60],
+            [['enabledHitAgents'], 'string'],
         ]);
     }
 
@@ -319,6 +394,8 @@ class Cms extends \skeeks\cms\base\Component
             'templates'                 => 'Возможные шаблон',
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
+            'enabledHitAgents'          => 'Выполнение агентов на хитах',
+            'hitAgentsInterval'         => 'Интервал выполнения агентов на хитах',
         ]);
     }
 

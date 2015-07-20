@@ -15,6 +15,7 @@ use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
 use yii\caching\TagDependency;
+use yii\console\Application;
 use yii\db\Exception;
 
 /**
@@ -70,6 +71,12 @@ trait HasComponentDbSettingsTrait
      */
     public function getSettings()
     {
+        if (\Yii::$app instanceof Application)
+        {
+            return $this->fetchDefaultSettings();
+        }
+
+
         $key = $this->getCacheKey();
 
         $dependency = new TagDependency([
