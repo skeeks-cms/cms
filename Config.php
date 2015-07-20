@@ -147,7 +147,14 @@ class Config
             if ($this->cacheIsAllow())
             {
                 \Yii::trace('cache read ' . $this->name . ' : ' . $this->getCacheFile());
-                $this->result = $this->readCache();
+                $this->result = (array) $this->readCache();
+
+                if (count($this->result) < 5)
+                {
+                    \Yii::trace('cache file is empty ' . $this->name . ' : ' . $this->getCacheFile());
+                    $this->result = (array) $this->merge();
+                    $this->saveCache();
+                }
 
             } else
             {
