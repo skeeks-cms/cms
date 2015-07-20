@@ -20,7 +20,7 @@ if (!\Yii::$app->user->can('admin/ssh'))
 
 ?>
 
-<div id="sx-search">
+<div id="sx-search" style="margin-bottom: 10px;">
     <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
         'method' => 'get',
         'options' =>
