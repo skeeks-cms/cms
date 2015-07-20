@@ -115,11 +115,10 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Запуска ssh консоли',
-                'delay':5000,
+                'delay':1000,
                 'callback':function()
                 {
                     self.initSshConsole();
-                    self.TaskManager.stop();
                 }
             }));
 
