@@ -60,7 +60,7 @@
 
         [
             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-            'attribute'     => "active"
+            'attribute'     => "active",
         ],
 
     ],
