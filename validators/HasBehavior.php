@@ -13,6 +13,7 @@ namespace skeeks\cms\validators;
 use skeeks\sx\validators\Validator;
 use yii\base\Behavior;
 use yii\base\Component;
+use yii\base\Object;
 
 class HasBehavior
     extends Validator
@@ -44,7 +45,14 @@ class HasBehavior
     {
         if (!$component instanceof Component)
         {
-            return $this->_bad("Объект: " . $component->className() . " должен быть наследован от: " . Component::className());
+            if ($component instanceof Object)
+            {
+                return $this->_bad("Объект: " . $component->className() . " должен быть наследован от: " . Component::className());
+            } else
+            {
+                return $this->_bad("Объект должен быть наследован от: " . Component::className());
+            }
+
         }
 
         if (!$this->_behavior)
