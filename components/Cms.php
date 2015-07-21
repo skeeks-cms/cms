@@ -337,10 +337,10 @@ class Cms extends \skeeks\cms\base\Component
     protected function _installAgents()
     {
         //Вставка агентов
-        if (!CmsAgent::find()->where(['name' => 'cms/db/refresh'])->one())
+        if (!CmsAgent::find()->where(['name' => 'cms/db/db-refresh'])->one())
         {
             ( new CmsAgent([
-                'name'              => 'cms/db/refresh',
+                'name'              => 'cms/db/db-refresh',
                 'description'       => 'Инвалидация кэша структуры таблиц',
                 'agent_interval'    => 3600*3, //раз в три часа
                 'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*3,
