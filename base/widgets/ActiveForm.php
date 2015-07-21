@@ -66,7 +66,10 @@ class ActiveForm extends \yii\widgets\ActiveForm
     {
         //Html::addCssClass($config, "sx-input-int");
         $config['class'] = ArrayHelper::getValue($config, 'class') . "form-control sx-input-int";
-        return $this->field($model, $attribute, $fieldOptions)->textInput($config);
+        //return $this->field($model, $attribute, $fieldOptions)->textInput($config);
+        return $this->field($model, $attribute, $fieldOptions)->widget(
+            \kartik\widgets\TouchSpin::className()
+        );
     }
 
     /**
