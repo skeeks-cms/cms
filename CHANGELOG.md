@@ -3,6 +3,7 @@
 
 2.0.6.pre
 -----------------
+  * Исправлен агент cms/db/db-refresh
   * skeeks\cms\widgets\ColorInput
   * Новый элемент выбора цвета yii2-widget-colorinput
   * Перенастройка assetManager по умолчанию
