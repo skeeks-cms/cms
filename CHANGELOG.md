@@ -3,6 +3,7 @@
 
 2.0.6.pre
 -----------------
+  * Чистка вывода результата выполнения агентов на хитах
   * Исправлен агент cms/db/db-refresh
   * skeeks\cms\widgets\ColorInput
   * Новый элемент выбора цвета yii2-widget-colorinput
