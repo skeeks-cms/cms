@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\modules\admin\widgets;
+use Yii;
 use skeeks\cms\components\Cms;
 use skeeks\cms\grid\GridViewPjaxTrait;
 use skeeks\cms\grid\ImageColumn;
@@ -244,8 +245,6 @@ JS
      */
     protected function _applyColumns()
     {
-        $this->allColumns = $this->columns;
-
         if ($this->settings->visibleColumns)
         {
             $newColumns = [];
@@ -253,7 +252,7 @@ JS
 
             foreach ($this->settings->visibleColumns as $code)
             {
-                if ($column = ArrayHelper::getValue($this->columns, $code))
+                if ($column = ArrayHelper::getValue($this->allColumns, $code))
                 {
                     $newColumns[$code] = $column;
                 }
@@ -266,6 +265,35 @@ JS
         }
 
         return $this;
+    }
+
+
+    /**
+     * Creates column objects and initializes them.
+     */
+    protected function initColumns()
+    {
+        if (empty($this->columns)) {
+            $this->guessColumns();
+        }
+
+        foreach ($this->columns as $i => $column) {
+            if (is_string($column)) {
+                $column = $this->createDataColumn($column);
+            } else {
+                $column = Yii::createObject(array_merge([
+                    'class' => $this->dataColumnClass ? : DataColumn::className(),
+                    'grid' => $this,
+                ], $column));
+            }
+            if (!$column->visible) {
+                unset($this->columns[$i]);
+                $this->allColumns[$i] = $column;
+                continue;
+            }
+            $this->columns[$i] = $column;
+            $this->allColumns[$i] = $column;
+        }
     }
 
 
