@@ -71,6 +71,11 @@ return [
         },
         'format' => 'raw'
     ],
+
+    [
+        'attribute' => 'active',
+        'class' => \skeeks\cms\grid\BooleanColumn::className()
+    ]
 ]
 ?>
 

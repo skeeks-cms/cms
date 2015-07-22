@@ -118,10 +118,16 @@ $this->registerJs(<<<JS
 
         appendToVisible: function(JQuerySelect)
         {
+            var self = this;
             this.JQueryVisibleSelected.append(
                 $("<li>", {
                     'data-value': JQuerySelect.attr("value")
                 }).text(JQuerySelect.text())
+                .on('dblclick', function()
+                {
+                    $(this).remove();
+                    self.updateHiddenSelect();
+                })
             );
 
             this.updateHiddenSelect();
