@@ -24,7 +24,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ]); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <? $columns = \skeeks\cms\helpers\UrlHelper::constructCurrent()->getSystem('columns'); ?>
+    <? $columns         = \skeeks\cms\helpers\UrlHelper::constructCurrent()->getSystem('columns'); ?>
+    <? $selectedColumns = \skeeks\cms\helpers\UrlHelper::constructCurrent()->getSystem('selectedColumns'); ?>
+
     <? if ($columns) : ?>
         <?= $form->fieldSet('Поля таблицы'); ?>
 
@@ -76,7 +78,9 @@ CSS
 
 
 $options = [
-    'id' => \yii\helpers\Html::getInputId($model, 'visibleColumns')
+    'id'                => \yii\helpers\Html::getInputId($model, 'visibleColumns'),
+    'selectedColumns'   => $selectedColumns,
+    'hasColumns'        => $model->visibleColumns
 ];
 $optionsString = \yii\helpers\Json::encode($options);
 
@@ -112,7 +116,14 @@ $this->registerJs(<<<JS
                 self.appendToVisible($(this));
             });
 
-            this.updateVisible();
+            if (_.size(this.get('hasColumns')))
+            {
+                this.updateVisible();
+            } else
+            {
+                this.initVisible();
+            }
+
         },
 
 
@@ -170,6 +181,27 @@ $this->registerJs(<<<JS
                     })
                     .appendTo(self.JQueryVisibleSelected);
                 }
+            });
+        },
+
+        initVisible: function()
+        {
+            var self = this;
+
+            this.JQueryVisibleSelected.empty();
+
+            _.each(this.get('selectedColumns'), function(value, key)
+            {
+
+                $("<li>", {
+                    'data-value': value
+                }).text( $('option[value=' + value + ']', self.JQuerySelect).text() )
+                .on('dblclick', function()
+                {
+                    $(this).remove();
+                    self.updateHiddenSelect();
+                })
+                .appendTo(self.JQueryVisibleSelected);
             });
         },
 
