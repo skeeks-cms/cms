@@ -59,8 +59,12 @@ class GridViewHasSettings extends GridView
     /**
      * @var array
      */
-    public $settingsData = [];
+    public $settingsData    = [];
 
+    /**
+     * @var bool Включение автоматического добавления колонок таблицы
+     */
+    public $autoColumns     = true;
 
 
     /**
@@ -73,14 +77,61 @@ class GridViewHasSettings extends GridView
      */
     protected $_sourceColumns = [];
 
+
+
     public function init()
     {
+        $this->_initAutoColumns();
         $this->_configureColumns();
         $this->_initGridSettings();
 
         parent::init();
 
         $this->_applyGridSettings();
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _initAutoColumns()
+    {
+        if (!$this->autoColumns)
+        {
+            return $this;
+        }
+
+        $autoColumns = [];
+        $models = $this->dataProvider->getModels();
+        $model = reset($models);
+
+        if (is_array($model) || is_object($model))
+        {
+            foreach ($model as $name => $value) {
+                $autoColumns[] = [
+                    'attribute' => $name,
+                    'visible' => false,
+                    'format' => 'raw',
+                    'class' => \yii\grid\DataColumn::className(),
+                    'value' => function($model, $key, $index) use ($name)
+                    {
+                        if (is_array($model->{$name}))
+                        {
+                            return implode(",", $model->{$name});
+                        } else
+                        {
+                            return $model->{$name};
+                        }
+                    },
+                ];
+            }
+        }
+
+        if ($autoColumns)
+        {
+            $this->columns = ArrayHelper::merge($this->columns, $autoColumns);
+        }
+
+        return $this;
     }
 
     /**
@@ -301,7 +352,7 @@ JS
     {
         $this->dataProvider;
 
-        $this->dataProvider->getPagination()->defaultPageSize   = $this->settings->pageSize;
+        $this->dataProvider->getPagination()->defaultPageSize   = (int) $this->settings->pageSize;
         $this->dataProvider->getPagination()->pageParam         = $this->settings->pageParamName;
 
         if ($this->settings->orderBy)

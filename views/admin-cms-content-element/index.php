@@ -83,6 +83,7 @@ $columns = \yii\helpers\ArrayHelper::merge($userColumns, $autoColumns);
 <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
+    'autoColumns'   => false,
     'settingsData'  =>
     [
         'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
