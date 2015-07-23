@@ -79,7 +79,7 @@ CSS
 
 $options = [
     'id'                => \yii\helpers\Html::getInputId($model, 'visibleColumns'),
-    'selectedColumns'   => $selectedColumns,
+    'selectedColumns'   => $model->visibleColumns ? $model->visibleColumns : $selectedColumns,
     'hasColumns'        => $model->visibleColumns
 ];
 $optionsString = \yii\helpers\Json::encode($options);
@@ -92,9 +92,7 @@ $this->registerJs(<<<JS
     sx.classes.Columns = sx.classes.Component.extend({
 
         _init: function()
-        {
-
-        },
+        {},
 
         _onDomReady: function()
         {
@@ -116,13 +114,15 @@ $this->registerJs(<<<JS
                 self.appendToVisible($(this));
             });
 
-            if (_.size(this.get('hasColumns')))
+            /*if (_.size(this.get('hasColumns')))
             {
                 this.updateVisible();
             } else
             {
                 this.initVisible();
-            }
+            }*/
+
+            this.initVisible();
 
         },
 
@@ -168,6 +168,8 @@ $this->registerJs(<<<JS
             var self = this;
 
             this.JQueryVisibleSelected.empty();
+
+            console.log(this.JQueryVisibleSelected);
 
             $('option', this.JQuerySelect).each(function()
             {
