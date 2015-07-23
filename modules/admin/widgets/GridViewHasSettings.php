@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\modules\admin\widgets;
+use Yii;
 use skeeks\cms\components\Cms;
 use skeeks\cms\grid\GridViewPjaxTrait;
 use skeeks\cms\grid\ImageColumn;
@@ -58,8 +59,12 @@ class GridViewHasSettings extends GridView
     /**
      * @var array
      */
-    public $settingsData = [];
+    public $settingsData    = [];
 
+    /**
+     * @var bool Включение автоматического добавления колонок таблицы
+     */
+    public $autoColumns     = true;
 
 
     /**
@@ -72,14 +77,63 @@ class GridViewHasSettings extends GridView
      */
     protected $_sourceColumns = [];
 
+
+
     public function init()
     {
-        $this->_configureColumns();
         $this->_initGridSettings();
+        $this->_applyDataProvider();
+
+        $this->_initAutoColumns();
+        $this->_configureColumns();
 
         parent::init();
 
         $this->_applyGridSettings();
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _initAutoColumns()
+    {
+        if (!$this->autoColumns)
+        {
+            return $this;
+        }
+
+        $autoColumns = [];
+        $models = $this->dataProvider->getModels();
+        $model = reset($models);
+
+        if (is_array($model) || is_object($model))
+        {
+            foreach ($model as $name => $value) {
+                $autoColumns[] = [
+                    'attribute' => $name,
+                    'visible' => false,
+                    'format' => 'raw',
+                    'class' => \yii\grid\DataColumn::className(),
+                    'value' => function($model, $key, $index) use ($name)
+                    {
+                        if (is_array($model->{$name}))
+                        {
+                            return implode(",", $model->{$name});
+                        } else
+                        {
+                            return $model->{$name};
+                        }
+                    },
+                ];
+            }
+        }
+
+        if ($autoColumns)
+        {
+            $this->columns = ArrayHelper::merge($this->columns, $autoColumns);
+        }
+
+        return $this;
     }
 
     /**
@@ -231,7 +285,7 @@ JS
         }
 
         //Применение data provider-a
-        $this->_applyDataProvider();
+        //$this->_applyDataProvider();
         $this->_applyColumns();
 
         return $this;
@@ -244,8 +298,6 @@ JS
      */
     protected function _applyColumns()
     {
-        $this->allColumns = $this->columns;
-
         if ($this->settings->visibleColumns)
         {
             $newColumns = [];
@@ -253,7 +305,7 @@ JS
 
             foreach ($this->settings->visibleColumns as $code)
             {
-                if ($column = ArrayHelper::getValue($this->columns, $code))
+                if ($column = ArrayHelper::getValue($this->allColumns, $code))
                 {
                     $newColumns[$code] = $column;
                 }
@@ -269,11 +321,40 @@ JS
     }
 
 
+    /**
+     * Creates column objects and initializes them.
+     */
+    protected function initColumns()
+    {
+        if (empty($this->columns)) {
+            $this->guessColumns();
+        }
+
+        foreach ($this->columns as $i => $column) {
+            if (is_string($column)) {
+                $column = $this->createDataColumn($column);
+            } else {
+                $column = Yii::createObject(array_merge([
+                    'class' => $this->dataColumnClass ? : DataColumn::className(),
+                    'grid' => $this,
+                ], $column));
+            }
+            if (!$column->visible) {
+                unset($this->columns[$i]);
+                $this->allColumns[$i] = $column;
+                continue;
+            }
+            $this->columns[$i] = $column;
+            $this->allColumns[$i] = $column;
+        }
+    }
+
+
     protected function _applyDataProvider()
     {
         $this->dataProvider;
 
-        $this->dataProvider->getPagination()->defaultPageSize   = $this->settings->pageSize;
+        $this->dataProvider->getPagination()->defaultPageSize   = (int) $this->settings->pageSize;
         $this->dataProvider->getPagination()->pageParam         = $this->settings->pageParamName;
 
         if ($this->settings->orderBy)

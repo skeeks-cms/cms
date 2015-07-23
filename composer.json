@@ -46,7 +46,9 @@
         "mihaildev/yii2-elfinder": "*",
         "bower-asset/fancybox": "*",
         "bower-asset/jq-fullscreen": "*",
-        "skeeks/yii2-kartik-markdown": "*"
+        "skeeks/yii2-kartik-markdown": "*",
+        "kartik-v/yii2-widget-colorinput": "*",
+        "kartik-v/yii2-widget-touchspin": "*"
     },
     "minimum-stability" : "dev",
     "prefer-stable" : true,
