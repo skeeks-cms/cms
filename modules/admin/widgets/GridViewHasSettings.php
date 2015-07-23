@@ -81,9 +81,11 @@ class GridViewHasSettings extends GridView
 
     public function init()
     {
+        $this->_initGridSettings();
+        $this->_applyDataProvider();
+
         $this->_initAutoColumns();
         $this->_configureColumns();
-        $this->_initGridSettings();
 
         parent::init();
 
@@ -283,7 +285,7 @@ JS
         }
 
         //Применение data provider-a
-        $this->_applyDataProvider();
+        //$this->_applyDataProvider();
         $this->_applyColumns();
 
         return $this;
