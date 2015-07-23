@@ -15,15 +15,9 @@ if ($content_id = \Yii::$app->request->get('content_id'))
     $dataProvider->query->andWhere(['content_id' => $content_id]);
 }
 
-/**
- * @var $content \skeeks\cms\models\CmsContent
- */
-$content = \skeeks\cms\models\CmsContent::findOne('$content_id');
-
 
 $autoColumns = [];
-$models = $dataProvider->getModels();
-$model = reset($models);
+$model = \skeeks\cms\models\CmsContentElement::find()->where(['content_id' => $content_id])->one();
 
 if (is_array($model) || is_object($model))
 {
@@ -58,8 +52,12 @@ if (is_array($model) || is_object($model))
                 'visible' => false,
                 'format' => 'raw',
                 'class' => \yii\grid\DataColumn::className(),
-                'value' => function($model, $key, $index) use ($value)
+                'value' => function($model, $key, $index) use ($name)
                 {
+                    /**
+                     * @var $model \skeeks\cms\models\CmsContentElement
+                     */
+                    $value = $model->relatedPropertiesModel->getSmartAttribute($name);
                     if (is_array($value))
                     {
                         return implode(",", $value);

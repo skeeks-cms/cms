@@ -57,6 +57,11 @@ return [
     ],
 
     [
+        'attribute' => 'active',
+        'class' => \skeeks\cms\grid\BooleanColumn::className()
+    ],
+
+    [
         'class'     => \yii\grid\DataColumn::className(),
         'value'     => function(\skeeks\cms\models\CmsContentElement $model)
         {
@@ -70,11 +75,6 @@ return [
 
         },
         'format' => 'raw'
-    ],
-
-    [
-        'attribute' => 'active',
-        'class' => \skeeks\cms\grid\BooleanColumn::className()
     ]
 ]
 ?>
