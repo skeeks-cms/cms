@@ -48,3 +48,12 @@ table.sx-table
             box-shadow: 1px 1px 14px rgba(32, 168, 216, 0.69);
         }
 
+    table.sx-table > tbody > tr:hover > td, table.sx-table>tbody>tr:nth-of-type(odd):hover>td
+    {
+        background-color: rgba(93, 195, 231, 0.15);
+    }
+
+    table.sx-table > tbody > tr.sx-active td
+    {
+        background-color: #e2e7cb;
+    }
