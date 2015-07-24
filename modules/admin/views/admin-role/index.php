@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
     <?php
 
-    echo GridView::widget([
+    echo \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [

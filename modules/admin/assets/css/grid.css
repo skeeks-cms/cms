@@ -1,3 +1,15 @@
 .sx-grid-view {
 
 }
+    .sx-grid-view .sx-before-table {
+        height: 42px;
+        box-shadow: inset 0 1px 0 #fff/*, inset 0 0 2px -1px rgba(232,19,64, 1)*/;
+        background: rgba(221, 229, 231, 0.47);
+        border-radius: 4px 4px 0px 0px;
+        border-top: 1px solid #adbdca;
+        border-right: 1px solid #adbdca;
+        border-left: 1px solid #adbdca;
+        padding: 5px;
+        border-color: #d6dfe1 #ced7d8 #969d9e #bec7c8;
+    }
+

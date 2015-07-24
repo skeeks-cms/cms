@@ -64,7 +64,7 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
 ?>
 
-<?= GridView::widget([
+<?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
     'columns' => [

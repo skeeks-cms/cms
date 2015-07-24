@@ -16,6 +16,7 @@
     'filterModel'   => $searchModel,
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
+        ['class' => 'yii\grid\CheckboxColumn'],
 
         [
             'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
