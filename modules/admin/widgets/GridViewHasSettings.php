@@ -54,7 +54,7 @@ class GridViewHasSettings extends GridView
      * - `{pager}`: the pager. See [[renderPager()]].
      * - `{settings-btn}`: the settings. See [[renderSettings()]].
      */
-    public $layout = "{summary}\n{items}\n<div class='pull-left'>{pager}</div><div class='pull-right'>{settings}</div>";
+    public $layout = "<div class='sx-before-table'><div class='pull-left'></div><div class='pull-right'>{settings}</div></div>{items}\n<div class='sx-after-table'></div>\n<div class='pull-left'>{pager}</div><div class='pull-right'>{summary}</div>";
 
     /**
      * @var array
@@ -76,8 +76,6 @@ class GridViewHasSettings extends GridView
      * @var array Исходные нетронутые columns переданные в виджет
      */
     protected $_sourceColumns = [];
-
-
 
     public function init()
     {
@@ -191,12 +189,26 @@ JS
         parent::registerAsset();
 
         $this->view->registerCss(<<<CSS
-        .sx-grid-settings
-        {
-            margin: 20px 0;
-        }
+    .sx-grid-view .pagination {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .sx-grid-view .summary {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    table.sx-table
+    {
+       margin-top: 0px !important;
+       margin-bottom: 0px !important;
+    }
+
+
 CSS
-);
+        );
+
         $this->view->registerJs(<<<JS
         (function(sx, $, _)
         {
