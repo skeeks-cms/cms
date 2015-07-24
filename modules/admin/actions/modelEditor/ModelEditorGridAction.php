@@ -49,7 +49,6 @@ class ModelEditorGridAction extends AdminModelEditorAction
             $dataProvider   = $searchModel->search(\Yii::$app->request->queryParams);
         }
 
-
         $this->viewParams =
         [
             'searchModel'   => $searchModel,
