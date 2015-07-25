@@ -61,7 +61,7 @@ class AdminUserGroupController extends AdminModelEditorController
 
         $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-user");
 
-        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-user/index.php", [
+        return $this->output(\Yii::$app->cms->moduleCms()->renderFile("admin-user/index_.php", [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $controller,

@@ -15,7 +15,7 @@ use yii\helpers\Json;
  */
 class CheckboxColumn extends \yii\grid\CheckboxColumn
 {
-    public function init()
+    protected function renderHeaderCellContent()
     {
         $this->checkboxOptions = ArrayHelper::merge(['class' => 'sx-admin-grid-checkbox'], $this->checkboxOptions);
 
@@ -32,7 +32,9 @@ class CheckboxColumn extends \yii\grid\CheckboxColumn
             sx.classes.CheckboxAdmin = sx.classes.Component.extend({
 
                 _init: function()
-                {},
+                {
+                    console.log('aaaa');
+                },
 
                 _onDomReady: function()
                 {
@@ -77,6 +79,7 @@ class CheckboxColumn extends \yii\grid\CheckboxColumn
         })(sx, sx.$, sx._);
 JS
 );
-        parent::init();
+
+        return parent::renderHeaderCellContent();
     }
 }

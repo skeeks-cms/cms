@@ -126,7 +126,7 @@ class RelatedModelsGrid extends Widget
                 'backend' => $sortableUrl
             ],
             'dataProvider'  => $search->getDataProvider(),
-            'layout' => "\n{items}\n{pager}",
+            'layout' => "\n{beforeTable}\n{items}\n{afterTable}\n{pager}",
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],
 

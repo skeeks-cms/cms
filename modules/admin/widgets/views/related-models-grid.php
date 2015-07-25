@@ -24,17 +24,23 @@ $controller = \Yii::$app->createController($widget->controllerRoute)[0];
 <? if ($widget->hint) : ?>
     <p><small><?= $widget->hint; ?></small></p>
 <? endif;?>
-
 <div>
-    <a class="btn btn-default btn-xs" onclick="<?= new \yii\web\JsExpression(<<<JS
+
+    <? $onclick = new \yii\web\JsExpression(<<<JS
         new sx.classes.RelationModelsGrid({
         'createUrl': '{$createUrl}',
         'pjaxId': '{$pjaxId}',
         }); return false;
 JS
-    ); ?>"><i class="glyphicon glyphicon-plus"></i>Добавить</a>
+    ); ?>
 
-            <?= \skeeks\cms\modules\admin\widgets\GridView::widget($gridOptions); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\GridView::widget(\yii\helpers\ArrayHelper::merge($gridOptions, [
+        'beforeTableLeft' => <<<HTML
+        <a class="btn btn-default btn-sm" onclick="{$onclick}"><i class="glyphicon glyphicon-plus"></i>Добавить</a>
+HTML
+
+    ])); ?>
 
     <?
 

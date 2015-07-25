@@ -6,9 +6,11 @@
  * @date 24.07.2015
  */
 namespace skeeks\cms\modules\admin\widgets;
+use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\grid\CheckboxColumn;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * Class GridViewStandart
@@ -16,6 +18,9 @@ use yii\helpers\ArrayHelper;
  */
 class GridViewStandart extends GridViewHasSettings
 {
+    /**
+     * @var AdminModelEditorController
+     */
     public $adminController = null;
 
     public function init()
@@ -34,4 +39,39 @@ class GridViewStandart extends GridViewHasSettings
 
         parent::init();
     }
+
+    /**
+     * @return string
+     */
+    public function renderAfterTable()
+    {
+        $checkbox = Html::checkbox('sx-select-full-all');
+
+        $this->afterTableLeft = <<<HTML
+    {$checkbox} для всех
+
+    <span class="sx-admin-grid-controlls">
+        <button class="btn btn-default btn-sm">Кнопка</button>
+        <button class="btn btn-default btn-sm"><i class="glyphicon glyphicon-ok"></i> Применить</button>
+    </span>
+HTML;
+
+        $this->view->registerJs(<<<JS
+
+JS
+);
+
+        $this->view->registerCss(<<<CSS
+    .sx-admin-grid-controlls
+    {
+        margin-left: 20px;
+    }
+CSS
+);
+
+        return parent::renderAfterTable();
+
+
+    }
+
 }
