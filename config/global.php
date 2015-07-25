@@ -27,7 +27,7 @@ if (!defined('GETENV_POSSIBLE_NAMES'))
 }
 
 
-//Если Yii окружение не определено раньше в index.php или @app/config/global.php
+//Если Yii окружение не определено раньше в index_.php или @app/config/global.php
 if (!defined('YII_ENV'))
 {
     $env = '';

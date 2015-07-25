@@ -23,6 +23,7 @@ use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\AdminModelAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorUpdateAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
@@ -94,6 +95,11 @@ class AdminModelEditorController extends AdminController
 
 
     /**
+     * @var null|AdminMultiModelEditAction[]
+     */
+    protected $_multiActions    = null;
+
+    /**
      * @var ActiveRecord
      */
     protected $_model = null;
@@ -110,7 +116,8 @@ class AdminModelEditorController extends AdminController
                 'class' => VerbFilter::className(),
                 'actions' =>
                 [
-                    'delete' => ['post'],
+                    'delete'        => ['post'],
+                    'delete-multi'  => ['post'],
                 ],
             ],
 
@@ -188,6 +195,16 @@ class AdminModelEditorController extends AdminController
                     "method"        => "post",
                     "request"       => "ajax",
                     "callback"      => [$this, 'actionDelete'],
+                    "priority"      => 99999,
+                ],
+
+                "delete-multi" =>
+                [
+                    'class'         => AdminMultiModelEditAction::className(),
+                    "name"          => "Удалить",
+                    "icon"          => "glyphicon glyphicon-trash",
+                    "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
+//                    "callback"      => [$this, 'actionDelete'],
                     "priority"      => 99999,
                 ]
             ]
@@ -276,6 +293,47 @@ class AdminModelEditorController extends AdminController
         return $this;
     }
 
+    /**
+     * @return array|null|\skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction[]
+     */
+    public function getMultiActions()
+    {
+        if ($this->_multiActions !== null)
+        {
+            return $this->_multiActions;
+        }
+
+        $actions = $this->actions();
+
+        if ($actions)
+        {
+            foreach ($actions as $id => $data)
+            {
+                $action                 = $this->createAction($id);
+
+                if ($action instanceof AdminMultiModelEditAction)
+                {
+                    if ($action->isVisible())
+                    {
+                        $this->_multiActions[$id]    = $action;
+                    }
+                }
+
+            }
+        } else
+        {
+            $this->_multiActions = [];
+        }
+
+        //Сортировка по приоритетам
+        if ($this->_multiActions)
+        {
+            ArrayHelper::multisort($this->_multiActions, 'priority');
+
+        }
+
+        return $this->_multiActions;
+    }
 
     /**
      * Массив объектов действий доступных для текущего контроллера
@@ -309,7 +367,7 @@ class AdminModelEditorController extends AdminController
                     }
                 } else
                 {
-                    if (!$action instanceof AdminOneModelEditAction)
+                    if (!$action instanceof AdminOneModelEditAction && !$action instanceof AdminMultiModelEditAction)
                     {
                         if ($action->isVisible())
                         {

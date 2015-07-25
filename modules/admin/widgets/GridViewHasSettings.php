@@ -24,6 +24,7 @@ use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQueryInterface;
+use yii\grid\CheckboxColumn;
 use yii\grid\DataColumn;
 use yii\grid\SerialColumn;
 use yii\helpers\ArrayHelper;
@@ -44,19 +45,6 @@ use yii\web\JsExpression;
 class GridViewHasSettings extends GridView
 {
     /**
-     * @var string the layout that determines how different sections of the list view should be organized.
-     * The following tokens will be replaced with the corresponding section contents:
-     *
-     * - `{summary}`: the summary section. See [[renderSummary()]].
-     * - `{errors}`: the filter model error summary. See [[renderErrors()]].
-     * - `{items}`: the list items. See [[renderItems()]].
-     * - `{sorter}`: the sorter. See [[renderSorter()]].
-     * - `{pager}`: the pager. See [[renderPager()]].
-     * - `{settings-btn}`: the settings. See [[renderSettings()]].
-     */
-    public $layout = "<div class='sx-before-table'><div class='pull-left'></div><div class='pull-right'>{settings}</div></div>{items}\n<div class='sx-after-table'></div>\n<div class='pull-left'>{pager}</div><div class='pull-right'>{summary}</div>";
-
-    /**
      * @var array
      */
     public $settingsData    = [];
@@ -65,7 +53,6 @@ class GridViewHasSettings extends GridView
      * @var bool Включение автоматического добавления колонок таблицы
      */
     public $autoColumns     = true;
-
 
     /**
      * @var array исходные настройки колонок с сгенерированными ключами.
@@ -79,6 +66,7 @@ class GridViewHasSettings extends GridView
 
     public function init()
     {
+
         $this->_initGridSettings();
         $this->_applyDataProvider();
 
@@ -147,19 +135,19 @@ class GridViewHasSettings extends GridView
         return $this->_settings;
     }
 
+
+
+
+
     /**
-     * @param string $name
-     * @return bool|string
+     * @return string
      */
-    public function renderSection($name)
+    public function renderBeforeTable()
     {
-        switch ($name) {
-            case "{settings}":
-                return $this->renderSettings();
-            default:
-                return parent::renderSection($name);
-        }
+        $this->beforeTableRight = $this->beforeTableRight . $this->renderSettings();
+        return parent::renderBeforeTable();
     }
+
 
     /**
      * @return string
@@ -187,27 +175,6 @@ JS
     public function registerAsset()
     {
         parent::registerAsset();
-
-        $this->view->registerCss(<<<CSS
-    .sx-grid-view .pagination {
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
-
-    .sx-grid-view .summary {
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
-
-    table.sx-table
-    {
-       margin-top: 0px !important;
-       margin-bottom: 0px !important;
-    }
-
-
-CSS
-        );
 
         $this->view->registerJs(<<<JS
         (function(sx, $, _)
@@ -465,6 +432,10 @@ JS
             if ($column instanceof ActionColumn)
             {
                 $data[$code] = 'Кнопка действий';
+            }
+            else if ($column instanceof CheckboxColumn)
+            {
+                $data[$code] = 'Выбор элементов';
             }
             else if ($column instanceof SerialColumn)
             {
