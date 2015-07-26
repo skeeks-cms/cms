@@ -26,14 +26,16 @@ class GridViewStandart extends GridViewHasSettings
      * @var AdminModelEditorController
      */
     public $adminController = null;
+    public $isOpenNewWindow = false;
 
     public function init()
     {
         $this->columns = ArrayHelper::merge([
             ['class' => 'skeeks\cms\modules\admin\grid\CheckboxColumn'],
             [
-                'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                'controller'    => $this->adminController
+                'class'                 => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'controller'            => $this->adminController,
+                'isOpenNewWindow'       => $this->isOpenNewWindow
             ],
             [
                 'class' => 'yii\grid\SerialColumn',
