@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminCmsContentTypeController
@@ -24,7 +25,36 @@ class AdminCmsContentTypeController extends AdminModelEditorController
         $this->modelClassName          = CmsContentType::className();
 
         parent::init();
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                'index' =>
+                [
+                    "columns" => [
+                        'name',
+                        'code',
+
+                        [
+                            'value'     => function(\skeeks\cms\models\CmsContentType $model)
+                            {
+                                $contents = \yii\helpers\ArrayHelper::map($model->cmsContents, 'id', 'name');
+                                return implode(', ', $contents);
+                            },
+
+                            'label' => 'Контент',
+                        ],
+
+                        'priority',
+                    ],
+                ],
+            ]
+        );
     }
 
 }

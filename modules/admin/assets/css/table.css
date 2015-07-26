@@ -4,8 +4,15 @@ table.sx-table
     border-top:1px solid #adbdca;
     border-spacing:0;
     width:100%;
+    margin-top: 0px !important;
+   margin-bottom: 0px !important;
 }
 
+    table.sx-table>thead:first-child>tr:first-child>th
+    {
+        border-color:#d6dfe1 #ced7d8 #969d9e #bec7c8;
+        height: 35px;
+    }
     table.sx-table thead tr th
     {
         background-image: -webkit-linear-gradient(top, rgba(93, 195, 231, 0.76), #5dc3e7);
@@ -41,3 +48,13 @@ table.sx-table
             border: 2px solid #5dc3e7;
             box-shadow: 1px 1px 14px rgba(32, 168, 216, 0.69);
         }
+
+    table.sx-table > tbody > tr:hover > td, table.sx-table>tbody>tr:nth-of-type(odd):hover>td
+    {
+        background-color: rgba(93, 195, 231, 0.15);
+    }
+
+    table.sx-table > tbody > tr.sx-active td
+    {
+        background-color: #e2e7cb;
+    }

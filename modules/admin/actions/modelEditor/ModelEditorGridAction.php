@@ -32,6 +32,11 @@ class ModelEditorGridAction extends AdminModelEditorAction
     public $modelSearchClassName = '';
 
     /**
+     * @var array
+     */
+    public $columns = [];
+
+    /**
      * @return string
      */
     public function run()
@@ -49,14 +54,35 @@ class ModelEditorGridAction extends AdminModelEditorAction
             $dataProvider   = $searchModel->search(\Yii::$app->request->queryParams);
         }
 
-
         $this->viewParams =
         [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $this->controller,
+            'columns'       => $this->columns,
         ];
 
         return parent::run();
+    }
+
+
+    /**
+     * Renders a view
+     *
+     * @param string $viewName view name
+     * @return string result of the rendering
+     */
+    protected function render($viewName)
+    {
+        try
+        {
+            //Если шаблона нет в стандартном пути, или в нем ошибки берем базовый
+            $result = parent::render($viewName);
+        } catch (\Exception $e)
+        {
+            $result = $this->controller->render("@skeeks/cms/modules/admin/views/base-actions/grid-standart", (array) $this->viewParams);
+        }
+
+        return $result;
     }
 }
