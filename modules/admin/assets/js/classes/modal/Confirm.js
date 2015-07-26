@@ -14,7 +14,6 @@
         _init: function()
         {
             this.applyParentMethod(sx.classes.modal._Confirm, '_init', []);
-
         },
 
         /**
@@ -23,6 +22,7 @@
         show: function()
         {
             var self = this;
+            this._triggerYes = false;
 
             var jSubmit = $("<button>", {
                 'class': "btn btn-primary",
@@ -37,11 +37,15 @@
 
             Dialog.bind('afterHide', function(e, data)
             {
-                self.trigger("no", self);
+                if (self._triggerYes === false)
+                {
+                    self.trigger("no", self);
+                }
             });
 
             jSubmit.on("click", function()
             {
+                self._triggerYes = true;
                 Dialog.hide();
                 self.trigger("yes", self);
                 return false;

@@ -15,17 +15,11 @@
 
 ?>
 
-<?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
     'dataProvider'  => $dataProvider,
     'filterModel'   => $searchModel,
+    'adminController'   => $controller,
     'columns' => [
-
-        ['class' => 'yii\grid\SerialColumn'],
-
-        [
-            'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-            'controller'    => $controller
-        ],
 
         'value',
         [

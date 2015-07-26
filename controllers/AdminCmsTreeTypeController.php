@@ -8,7 +8,10 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\CmsTreeType;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminCmsTreeTypeController
@@ -16,6 +19,8 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
  */
 class AdminCmsTreeTypeController extends AdminModelEditorController
 {
+    use AdminModelEditorStandartControllerTrait;
+
     public function init()
     {
         $this->name                   = "Настройки разделов";
@@ -23,7 +28,46 @@ class AdminCmsTreeTypeController extends AdminModelEditorController
         $this->modelClassName          = CmsTreeType::className();
 
         parent::init();
+    }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                'index' =>
+                [
+                    "columns" => [
+                        'name',
+                        'code',
+
+                        [
+                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                            'attribute'     => 'active'
+                        ],
+                    ],
+                ],
+
+                "activate-multi" =>
+                [
+                    'class' => AdminMultiModelEditAction::className(),
+                    "name" => "Активировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiActivate'],
+                ],
+
+                "inActivate-multi" =>
+                [
+                    'class' => AdminMultiModelEditAction::className(),
+                    "name" => "Деактивировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiInActivate'],
+                ]
+            ]
+        );
     }
 
 }

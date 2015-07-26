@@ -7,9 +7,13 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsLang;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminCmsLangController
@@ -17,6 +21,8 @@ use Yii;
  */
 class AdminCmsLangController extends AdminModelEditorController
 {
+    use AdminModelEditorStandartControllerTrait;
+
     public function init()
     {
         $this->name                   = "Управление языками";
@@ -24,5 +30,43 @@ class AdminCmsLangController extends AdminModelEditorController
         $this->modelClassName          = CmsLang::className();
 
         parent::init();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                'index' =>
+                [
+                    "columns"      => [
+                        'name',
+                        'code',
+                        [
+                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                            'attribute'     => "active"
+                        ],
+                    ],
+                ],
+
+                "activate-multi" =>
+                [
+                    'class'             => AdminMultiModelEditAction::className(),
+                    "name"              => "Активировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback"      => [$this, 'eachMultiActivate'],
+                ],
+
+                "inActivate-multi" =>
+                [
+                    'class'             => AdminMultiModelEditAction::className(),
+                    "name"              => "Деактивировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback"      => [$this, 'eachMultiInActivate'],
+                ]
+            ]
+        );
     }
 }

@@ -12,10 +12,12 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
+use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\widgets\ActiveForm;
 use Yii;
 use skeeks\cms\models\User;
@@ -33,6 +35,8 @@ use yii\web\Response;
  */
 class AdminUserController extends AdminModelEditorController
 {
+    use AdminModelEditorStandartControllerTrait;
+
     public function init()
     {
         $this->name                     = "Управление пользователями";
@@ -68,6 +72,23 @@ class AdminUserController extends AdminModelEditorController
                 "icon"      => "glyphicon glyphicon-exclamation-sign",
                 "callback"  => [$this, "actionPermission"],
             ],
+
+
+            "activate-multi" =>
+            [
+                'class' => AdminMultiModelEditAction::className(),
+                "name" => "Активировать",
+                //"icon"              => "glyphicon glyphicon-trash",
+                "eachCallback" => [$this, 'eachMultiActivate'],
+            ],
+
+            "inActivate-multi" =>
+            [
+                'class' => AdminMultiModelEditAction::className(),
+                "name" => "Деактивировать",
+                //"icon"              => "glyphicon glyphicon-trash",
+                "eachCallback" => [$this, 'eachMultiInActivate'],
+            ]
         ]);
     }
 

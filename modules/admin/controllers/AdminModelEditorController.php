@@ -15,6 +15,7 @@ use skeeks\admin\components\AccessControl;
 use skeeks\cms\App;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\widgets\ActiveForm;
+use skeeks\cms\components\Cms;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -200,13 +201,14 @@ class AdminModelEditorController extends AdminController
 
                 "delete-multi" =>
                 [
-                    'class'         => AdminMultiModelEditAction::className(),
-                    "name"          => "Удалить",
-                    "icon"          => "glyphicon glyphicon-trash",
-                    "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
-//                    "callback"      => [$this, 'actionDelete'],
-                    "priority"      => 99999,
-                ]
+                    'class'             => AdminMultiModelEditAction::className(),
+                    "name"              => "Удалить",
+                    "icon"              => "glyphicon glyphicon-trash",
+                    "confirm"           => \Yii::t('yii', 'Вы действительно хотите безвозвратно удалить выбранные элементы?'),
+                    "eachCallback"      => [$this, 'eachMultiDelete'],
+                    "priority"          => 99999,
+                ],
+
             ]
         );
     }
@@ -425,6 +427,23 @@ class AdminModelEditorController extends AdminController
             return (array) $rr;
         }
     }
+
+    /**
+     * @param $model
+     * @param $action
+     * @return bool
+     */
+    public function eachMultiDelete($model, $action)
+    {
+        try
+        {
+            return $model->delete();
+        } catch (\Exception $e)
+        {
+            return false;
+        }
+    }
+
 
 
 

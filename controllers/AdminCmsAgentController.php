@@ -7,9 +7,12 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -18,6 +21,8 @@ use yii\helpers\ArrayHelper;
  */
 class AdminCmsAgentController extends AdminModelEditorController
 {
+    use AdminModelEditorStandartControllerTrait;
+
     public function init()
     {
         $this->name                     = "Управление агентами";
@@ -61,7 +66,24 @@ class AdminCmsAgentController extends AdminModelEditorController
                         ],
                     ],
                 ],
+
+                "activate-multi" =>
+                [
+                    'class'             => AdminMultiModelEditAction::className(),
+                    "name"              => "Активировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback"      => [$this, 'eachMultiActivate'],
+                ],
+
+                "inActivate-multi" =>
+                [
+                    'class'             => AdminMultiModelEditAction::className(),
+                    "name"              => "Деактивировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback"      => [$this, 'eachMultiInActivate'],
+                ]
             ]
         );
     }
+
 }
