@@ -47,7 +47,7 @@ class GridViewSettings extends Component
     public $grid;
 
     //Сортировка
-    public $orderBy                     = "";
+    public $orderBy                     = "id";
     public $order                       = SORT_DESC;
 
     public function init()

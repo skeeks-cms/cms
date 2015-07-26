@@ -17,6 +17,10 @@ use skeeks\cms\modules\admin\widgets\GridView;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'adminController' => $controller,
+        'settingsData' =>
+        [
+            'orderBy' => ''
+        ],
         'columns' => [
 
             [
