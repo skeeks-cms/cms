@@ -78,23 +78,15 @@ $columns = \yii\helpers\ArrayHelper::merge($userColumns, $autoColumns);
 
 ?>
 
-<?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
-    'dataProvider'  => $dataProvider,
-    'filterModel'   => $searchModel,
-    'autoColumns'   => false,
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider'      => $dataProvider,
+    'filterModel'       => $searchModel,
+    'autoColumns'       => false,
+    'adminController'   => $controller,
     'settingsData'  =>
     [
         'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
     ],
-    'columns' => \yii\helpers\ArrayHelper::merge(
-        [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            [
-                'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                'controller'    => $controller
-            ],
-        ], $columns
-    )
+    'columns' => $columns
 ]); ?>
 

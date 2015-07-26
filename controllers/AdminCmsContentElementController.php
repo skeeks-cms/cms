@@ -13,8 +13,10 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -27,6 +29,8 @@ use yii\helpers\ArrayHelper;
  */
 class AdminCmsContentElementController extends AdminModelEditorController
 {
+    use AdminModelEditorStandartControllerTrait;
+
     public function init()
     {
         $this->name                     = "Элементы";
@@ -49,6 +53,22 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'name'          => 'Настройки',
                     "icon"          => "glyphicon glyphicon-cog",
                 ],
+
+                "activate-multi" =>
+                [
+                    'class' => AdminMultiModelEditAction::className(),
+                    "name" => "Активировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiActivate'],
+                ],
+
+                "inActivate-multi" =>
+                [
+                    'class' => AdminMultiModelEditAction::className(),
+                    "name" => "Деактивировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiInActivate'],
+                ]
             ]
         );
     }

@@ -13,17 +13,11 @@ use skeeks\cms\modules\admin\widgets\GridView;
 
     <?php
 
-    echo \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
+    echo \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'adminController' => $controller,
         'columns' => [
-
-            ['class' => 'yii\grid\SerialColumn'],
-
-            [
-                'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-                'controller'    => $controller
-            ],
 
             [
                 'attribute' => 'name',

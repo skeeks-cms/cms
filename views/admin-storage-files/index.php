@@ -32,24 +32,17 @@ JS
     ],
 ]); ?>
 <p></p>
-<?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
 
-    'dataProvider'  => $dataProvider,
-    'filterModel'   => $searchModel,
+    'dataProvider'      => $dataProvider,
+    'filterModel'       => $searchModel,
+    'adminController'   => $controller,
 
     'pjaxOptions' => [
         'id' => 'sx-storage-files'
     ],
 
     'columns' => [
-
-        ['class' => 'yii\grid\CheckboxColumn'],
-        ['class' => 'yii\grid\SerialColumn'],
-
-        [
-            'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-            'controller'    => $controller
-        ],
 
         [
             'class'     => \yii\grid\DataColumn::className(),

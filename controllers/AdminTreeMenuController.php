@@ -9,6 +9,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\TreeMenu;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminTreeMenuController
@@ -24,6 +25,27 @@ class AdminTreeMenuController extends AdminModelEditorController
         parent::init();
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                'index' =>
+                [
+                    "columns"      => [
+                        'name',
+
+                        ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+                        ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
+
+                        ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
+                    ],
+                ],
+            ]
+        );
+    }
 
 
 }
