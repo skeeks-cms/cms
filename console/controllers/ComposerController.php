@@ -145,7 +145,7 @@ class ComposerController extends Controller
      * Установка необходимых composer asset plugin-ов
      * @param string $version
      */
-    public function actionUpdateAssetPlugins($version = "1.0.2")
+    public function actionUpdateAssetPlugins($version = "1.0.3")
     {
         $this->_composerCmd('global require "fxp/composer-asset-plugin:' . $version . '"');
     }
