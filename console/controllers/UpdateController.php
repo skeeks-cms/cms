@@ -55,7 +55,7 @@ class UpdateController extends Controller
      * @var string
      * Версия композер assets, последняя стабильная
      */
-    public $composerAssetPluginV = "1.0.2";
+    public $composerAssetPluginV = "1.0.3";
 
 
     /**
