@@ -136,6 +136,12 @@ return
                 "url"       => ["cms/admin-cms-agent"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clock.png'],
             ],
+
+            [
+                "label"     => "События",
+                "url"       => ["cms/admin-cms-event"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/notice.png'],
+            ],
         ]
     ],
 
