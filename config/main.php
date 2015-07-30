@@ -172,6 +172,16 @@ $config =
             ],
         ],
 
+        'dbSession' =>
+        [
+            'class'         => '\skeeks\cms\base\DbSession',
+        ],
+
+        'session' =>
+        [
+            'class' => '\skeeks\cms\base\Session',
+        ],
+
         'imaging' =>
         [
             'class' => '\skeeks\cms\components\Imaging',
