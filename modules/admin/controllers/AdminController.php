@@ -131,7 +131,11 @@ abstract class AdminController extends Controller
                                 return false;
                             }
 
-                            \Yii::$app->user->identity->updateLastAdminActivity();
+                            if (\Yii::$app->user->identity)
+                            {
+                                \Yii::$app->user->identity->updateLastAdminActivity();
+                            }
+
                             return true;
                         }
                     ]

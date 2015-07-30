@@ -21,18 +21,23 @@ return [
         ],
 
         [
+            'name'          => \skeeks\cms\rbac\CmsManager::ROLE_GUEST,
+            'description'   => 'Неавторизованный пользователь',
+        ],
+
+        [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_ADMIN,
             'description'   => 'Администратор',
 
             'child'         =>
             [
                 //Обладает возможностями всех ролей
-                'roles' =>
+                /*'roles' =>
                 [
                     \skeeks\cms\rbac\CmsManager::ROLE_MANGER,
                     \skeeks\cms\rbac\CmsManager::ROLE_EDITOR,
                     \skeeks\cms\rbac\CmsManager::ROLE_USER,
-                ],
+                ],*/
 
                 //Есть доступ к системе администрирования
                 'permissions' =>
@@ -53,16 +58,16 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_MANGER,
-            'description'   => 'Менеджер',
+            'description'   => 'Менеджер (доступ а администрированию)',
 
             'child'         =>
             [
                 //Обладает возможностями всех ролей
-                'roles' =>
+                /*'roles' =>
                 [
                     \skeeks\cms\rbac\CmsManager::ROLE_EDITOR,
                     \skeeks\cms\rbac\CmsManager::ROLE_USER,
-                ],
+                ],*/
 
                 //Есть доступ к системе администрирования
                 'permissions' =>
@@ -81,15 +86,15 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_EDITOR,
-            'description'   => 'Редактор',
+            'description'   => 'Редактор (доступ а администрированию)',
 
             'child'         =>
             [
                 //Обладает возможностями всех ролей
-                'roles' =>
+                /*'roles' =>
                 [
                     \skeeks\cms\rbac\CmsManager::ROLE_USER,
-                ],
+                ],*/
 
                 //Есть доступ к системе администрирования
                 'permissions' =>
@@ -109,7 +114,7 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_USER,
-            'description'   => 'Пользователь',
+            'description'   => 'Зарегистрированный пользователь',
 
             //Есть доступ к системе администрирования
             'permissions' =>
