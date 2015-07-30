@@ -82,6 +82,9 @@ class Cms extends \skeeks\cms\base\Component
      */
     const EVENT_AFTER_UPDATE = 'cms.event.after.update';
 
+    const SESSION_FILE  = 'file';
+    const SESSION_DB    = 'db';
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -136,6 +139,11 @@ class Cms extends \skeeks\cms\base\Component
      * @var string шаблон
      */
     public $template                        = "default";
+
+    /**
+     * @var string
+     */
+    public $sessionType                     = self::SESSION_FILE;
 
     /**
      * @var string язык по умолчанию
@@ -380,6 +388,7 @@ class Cms extends \skeeks\cms\base\Component
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['hitAgentsInterval'], 'integer', 'min' => 60],
             [['enabledHitAgents'], 'string'],
+            [['sessionType'], 'string'],
         ]);
     }
 
@@ -396,6 +405,7 @@ class Cms extends \skeeks\cms\base\Component
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'enabledHitAgents'          => 'Выполнение агентов на хитах',
             'hitAgentsInterval'         => 'Интервал выполнения агентов на хитах',
+            'sessionType'               => 'Где хранить сессии',
         ]);
     }
 

@@ -51,6 +51,10 @@ foreach (\Yii::$app->cms->templates as $code => $data)
 
 <?= $form->fieldSet('Безопасность'); ?>
     <?= $form->fieldInputInt($model, 'passwordResetTokenExpire')->hint('Другими словами, ссылки на восстановление пароля перестанут работать через указанное время'); ?>
+    <?= $form->fieldSelect($model, 'sessionType', [
+        \skeeks\cms\components\Cms::SESSION_FILE => 'В файлах',
+        \skeeks\cms\components\Cms::SESSION_DB => 'В базе данных',
+    ])->hint('Хранилище сессий'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
