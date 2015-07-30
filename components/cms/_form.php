@@ -57,6 +57,13 @@ foreach (\Yii::$app->cms->templates as $code => $data)
     ])->hint('Хранилище сессий'); ?>
 <?= $form->fieldSetEnd(); ?>
 
+
+<?= $form->fieldSet('Авторизация'); ?>
+    <?= $form->fieldSelectMulti($model, 'registerRoles',
+        \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description')
+    )->hint('Так же после созданию пользователя, ему будут назначены, выбранные группы.'); ?>
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
