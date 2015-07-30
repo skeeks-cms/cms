@@ -43,6 +43,7 @@ class CmsManager extends \yii\rbac\DbManager
     const PERMISSION_ELFINDER_ADDITIONAL_FILES              = 'cms.elfinder-additional-files';
 
 
+    const ROLE_GUEST    = 'guest';
     const ROLE_ROOT     = 'root';
     const ROLE_ADMIN    = 'admin';
     const ROLE_MANGER   = 'manager';
@@ -57,6 +58,7 @@ class CmsManager extends \yii\rbac\DbManager
             static::ROLE_MANGER,
             static::ROLE_EDITOR,
             static::ROLE_USER,
+            static::ROLE_GUEST,
         ];
     }
 
@@ -65,7 +67,6 @@ class CmsManager extends \yii\rbac\DbManager
         return [
             static::PERMISSION_ADMIN_ACCESS,
             static::PERMISSION_CONTROLL_PANEL,
-            static::PERMISSION_ALLOW_EDIT_SYSTEM,
         ];
     }
 }

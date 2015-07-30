@@ -17,6 +17,7 @@ use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
+use skeeks\cms\rbac\CmsManager;
 use yii\helpers\ArrayHelper;
 use yii\rbac\Permission;
 use yii\web\Controller;
@@ -275,15 +276,23 @@ class AdminPermissionController extends AdminModelEditorController
                 $id     = $model->name;
 
                 $model  = $this->findModel($id);
-                if (\Yii::$app->getAuthManager()->remove($model->item))
+                if (!in_array($model->item->name, CmsManager::protectedPermissions()))
                 {
-                    $rr->message = 'Запись успешно удалена';
-                    $rr->success = true;
+                    if (\Yii::$app->getAuthManager()->remove($model->item))
+                    {
+                        $rr->message = 'Запись успешно удалена';
+                        $rr->success = true;
+                    } else
+                    {
+                        $rr->message = 'Не получилось удалить запись';
+                        $rr->success = false;
+                    }
                 } else
                 {
-                    $rr->message = 'Не получилось удалить запись';
+                    $rr->message = 'Эту запись нельзя удалять!';
                     $rr->success = false;
                 }
+
             } catch (\Exception $e)
             {
                 $rr->message = $e->getMessage();
