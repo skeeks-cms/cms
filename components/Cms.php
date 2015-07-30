@@ -27,6 +27,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
@@ -145,10 +146,16 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $sessionType                     = self::SESSION_FILE;
 
+
+    //После регистрации пользователю будут присвоены эти роли
+    public $registerRoles                   = [
+        CmsManager::ROLE_USER
+    ];
+
     /**
      * @var string язык по умолчанию
      */
-    public $languageCode         = "ru";
+    public $languageCode                    = "ru";
 
     /**
      * @var int сбрасывать токен пароля через час
@@ -389,6 +396,7 @@ class Cms extends \skeeks\cms\base\Component
             [['hitAgentsInterval'], 'integer', 'min' => 60],
             [['enabledHitAgents'], 'string'],
             [['sessionType'], 'string'],
+            [['registerRoles'], 'safe'],
         ]);
     }
 
@@ -406,6 +414,7 @@ class Cms extends \skeeks\cms\base\Component
             'enabledHitAgents'          => 'Выполнение агентов на хитах',
             'hitAgentsInterval'         => 'Интервал выполнения агентов на хитах',
             'sessionType'               => 'Где хранить сессии',
+            'registerRoles'             => 'При регистрации добавлять в группу',
         ]);
     }
 
