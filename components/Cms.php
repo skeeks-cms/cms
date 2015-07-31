@@ -83,9 +83,6 @@ class Cms extends \skeeks\cms\base\Component
      */
     const EVENT_AFTER_UPDATE = 'cms.event.after.update';
 
-    const SESSION_FILE  = 'file';
-    const SESSION_DB    = 'db';
-
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -140,11 +137,6 @@ class Cms extends \skeeks\cms\base\Component
      * @var string шаблон
      */
     public $template                        = "default";
-
-    /**
-     * @var string
-     */
-    public $sessionType                     = self::SESSION_FILE;
 
 
     //После регистрации пользователю будут присвоены эти роли
@@ -205,11 +197,19 @@ class Cms extends \skeeks\cms\base\Component
 
     private static $_huck = 'Z2VuZXJhdG9y';
 
+    public $unique = '';
+    public $counter = 0;
 
     public function init()
     {
         parent::init();
 
+        $this->counter ++;
+        $this->unique = rand(1, 100);
+
+        \Yii::info('Init cms: ' . $this->counter . " + " . $this->unique . ': ' . \Yii::$app->className());
+
+        //Название проекта.
         if (!$this->appName)
         {
             $this->appName = \Yii::$app->name;
@@ -218,49 +218,11 @@ class Cms extends \skeeks\cms\base\Component
             \Yii::$app->name = $this->appName;
         }
 
-        //TODO: доработать
+        //Генерация файла с подключением настроек extensions если его нет
         if (!file_exists(AUTO_GENERATED_MODULES_FILE))
         {
             $this->generateModulesConfigFile();
         }
-
-        //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
-        if ($this->enabledHitAgents == self::BOOL_Y && function_exists('system') && (!Yii::$app instanceof Application))
-        {
-            $key = 'Agents';
-            Yii::beginProfile($key);
-                $data = \Yii::$app->cache->get($key);
-                if ($data === false)
-                {
-                    system("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
-                    \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
-                }
-            Yii::endProfile($key);
-        }
-
-        /**
-         * Генерация SEO метатегов.
-         * */
-        \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
-        {
-            if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-            {
-                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', \Yii::$app->cms->moduleCms()->getDescriptor()->toString());
-
-                /**
-                 * @var $view View
-                 */
-                $view = $e->sender;
-                if (!isset($view->metaTags[self::$_huck]))
-                {
-                    $view->registerMetaTag([
-                        "name"      => base64_decode(self::$_huck),
-                        "content"   => \Yii::$app->cms->moduleCms()->getDescriptor()->toString()
-                    ], self::$_huck);
-                }
-            }
-        });
-
 
         //init view theme
         $this->templates = ArrayHelper::merge($this->templatesDefault, (array) $this->templates);
@@ -282,22 +244,89 @@ class Cms extends \skeeks\cms\base\Component
         //TODO: may be is depricated. While better to use '@app/views/'
         \Yii::setAlias('template', '@app/views/');
 
-
         \Yii::$app->language = $this->languageCode;
 
-        if (!\Yii::$app instanceof Application)
-        {
-            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
-            {
-                $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
-                $e->identity->save(false);
 
-                if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
-                {
-                    \Yii::$app->user->identity->updateLastAdminActivity();
-                }
-            });
+        if (\Yii::$app instanceof Application)
+        {
+            //console init
+            $this->_initConsole();
+        } else
+        {
+            //web init
+            $this->_initWeb();
         }
+    }
+
+    /**
+     * Продолжение инициализации только в случае работы console приложения
+     */
+    protected function _initConsole()
+    {
+        \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
+        {
+            $this->_installAgents();
+        });
+    }
+
+    /**
+     * Продолжение инициализации только в случае работы web приложения
+     */
+    protected function _initWeb()
+    {
+        //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
+        if ($this->enabledHitAgents == self::BOOL_Y && function_exists('system'))
+        {
+            $key = 'Agents';
+            Yii::beginProfile($key);
+                $data = \Yii::$app->cache->get($key);
+                if ($data === false)
+                {
+                    system("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
+                    \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
+                }
+            Yii::endProfile($key);
+        }
+
+
+        /**
+         * Генерация SEO метатегов.
+         * */
+        \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
+        {
+            if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+            {
+                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', $this->moduleCms->descriptor->toString());
+
+                /**
+                 * @var $view View
+                 */
+                $view = $e->sender;
+                if (!isset($view->metaTags[self::$_huck]))
+                {
+                    $view->registerMetaTag([
+                        "name"      => base64_decode(self::$_huck),
+                        "content"   => $this->moduleCms->descriptor->toString()
+                    ], self::$_huck);
+                }
+            }
+        });
+
+
+
+        \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
+        {
+            $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
+            $e->identity->save(false);
+
+            if ($this->moduleAdmin()->requestIsAdmin())
+            {
+                \Yii::$app->user->identity->updateLastAdminActivity();
+            }
+        });
+
+
+
 
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
@@ -338,15 +367,6 @@ class Cms extends \skeeks\cms\base\Component
                 ]);
             }
         });
-
-
-        if (\Yii::$app instanceof Application)
-        {
-            \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
-            {
-                $this->_installAgents();
-            });
-        }
     }
 
     protected function _installAgents()
@@ -395,7 +415,6 @@ class Cms extends \skeeks\cms\base\Component
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['hitAgentsInterval'], 'integer', 'min' => 60],
             [['enabledHitAgents'], 'string'],
-            [['sessionType'], 'string'],
             [['registerRoles'], 'safe'],
         ]);
     }
@@ -413,7 +432,6 @@ class Cms extends \skeeks\cms\base\Component
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'enabledHitAgents'          => 'Выполнение агентов на хитах',
             'hitAgentsInterval'         => 'Интервал выполнения агентов на хитах',
-            'sessionType'               => 'Где хранить сессии',
             'registerRoles'             => 'При регистрации добавлять в группу',
         ]);
     }
