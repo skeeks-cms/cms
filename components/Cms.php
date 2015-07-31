@@ -14,7 +14,9 @@ use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\events\LoginEvent;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\mail\Message;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsEvent;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
@@ -84,6 +86,11 @@ class Cms extends \skeeks\cms\base\Component
     const EVENT_AFTER_UPDATE = 'cms.event.after.update';
 
     /**
+     * Событие приложения (записывается в базу данных и настраивается)
+     */
+    const EVENT_APP = 'cms.event.app';
+
+    /**
      * Можно задать название и описание компонента
      * @return array
      */
@@ -116,7 +123,12 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
      */
-    public $notifyAdminEmails           = 'admin@skeeks.com';
+    public $notifyAdminEmailsHidden     = '';
+
+    /**
+     * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
+     */
+    public $notifyAdminEmails           = '';
 
     /**
      * @var string
@@ -197,17 +209,9 @@ class Cms extends \skeeks\cms\base\Component
 
     private static $_huck = 'Z2VuZXJhdG9y';
 
-    public $unique = '';
-    public $counter = 0;
-
     public function init()
     {
         parent::init();
-
-        $this->counter ++;
-        $this->unique = rand(1, 100);
-
-        \Yii::info('Init cms: ' . $this->counter . " + " . $this->unique . ': ' . \Yii::$app->className());
 
         //Название проекта.
         if (!$this->appName)
@@ -247,6 +251,10 @@ class Cms extends \skeeks\cms\base\Component
         \Yii::$app->language = $this->languageCode;
 
 
+        //Отлов событий отправки сообщений с сайта, и их модификация.
+        \yii\base\Event::on(\yii\mail\BaseMailer::className(), \yii\mail\BaseMailer::EVENT_BEFORE_SEND, [$this, 'beforeSendEmail']);
+
+
         if (\Yii::$app instanceof Application)
         {
             //console init
@@ -256,6 +264,41 @@ class Cms extends \skeeks\cms\base\Component
             //web init
             $this->_initWeb();
         }
+    }
+
+    /**
+     * Перехват отправки всех email с сайта.
+     *
+     * @param \yii\mail\MailEvent $event
+     */
+    public function beforeSendEmail(\yii\mail\MailEvent $event)
+    {
+        if ($this->notifyAdminEmailsHiddenToArray())
+        {
+            $event->message->setCc($this->notifyAdminEmailsHiddenToArray());
+        }
+
+        if ($this->notifyAdminEmailsToArray())
+        {
+            $event->message->setCc($this->notifyAdminEmailsToArray());
+        }
+
+        /*if ($event->message instanceof Message)
+        {
+            if ($event->message->eventName)
+            {
+                $modelEvent = CmsEvent::findOne($event->message->eventName);
+                if (!$modelEvent)
+                {
+                    $modelEvent = new CmsEvent([
+                        'event_name'    => $event->message->eventName,
+                        'name'          => $event->message->eventDesctiption
+                    ]);
+
+                    $modelEvent->save();
+                }
+            }
+        }*/
     }
 
     /**
@@ -409,7 +452,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'notifyAdminEmailsHidden', 'appName', 'template', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
@@ -423,6 +466,7 @@ class Cms extends \skeeks\cms\base\Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'adminEmail'                => 'Основной Email Администратора сайта',
+            'notifyAdminEmailsHidden'   => 'Email адреса уведомлений (скрытая копия)',
             'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
@@ -709,9 +753,17 @@ $fileContent .= '];';
     /**
      * @return array
      */
-    public function notifyAdminEmails()
+    public function notifyAdminEmailsToArray()
     {
-        return explode(",", $this->notifyAdminEmails);
+        return $this->notifyAdminEmails ? explode(",", $this->notifyAdminEmails) : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function notifyAdminEmailsHiddenToArray()
+    {
+        return $this->notifyAdminEmailsHidden ? explode(",", $this->notifyAdminEmailsHidden) : [];
     }
 
     /**
