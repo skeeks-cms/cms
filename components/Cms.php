@@ -145,11 +145,6 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userPropertyTypes       = [];
 
-    /**
-     * @var string шаблон
-     */
-    public $template                        = "default";
-
 
     //После регистрации пользователю будут присвоены эти роли
     public $registerRoles                   = [
@@ -198,6 +193,40 @@ class Cms extends \skeeks\cms\base\Component
      * @var array Возможные шаблоны сайта
      */
     public $templates       = [];
+    /**
+     * @var string шаблон
+     */
+    public $template                        = "default";
+
+
+    /**
+     * @var array Возможные шаблоны email
+     */
+    public $emailTemplatesDefault       =
+    [
+        'default' =>
+        [
+            'name'          => 'Базовый шаблон (по умолчанию)',
+            'pathMap'       =>
+            [
+                '@app/mail' =>
+                [
+                    '@app/mail',
+                    '@skeeks/cms/mail',
+                ],
+            ]
+        ]
+    ];
+    /**
+     * @var array Возможные шаблоны email
+     */
+    public $emailTemplates       = [];
+
+    /**
+     * @var string шаблон
+     */
+    public $emailTemplate                        = "default";
+
 
     /**
      * @return CmsSite
@@ -248,8 +277,9 @@ class Cms extends \skeeks\cms\base\Component
         //TODO: may be is depricated. While better to use '@app/views/'
         \Yii::setAlias('template', '@app/views/');
 
-        \Yii::$app->language = $this->languageCode;
+        $this->emailTemplates = ArrayHelper::merge($this->emailTemplatesDefault, (array) $this->emailTemplates);
 
+        \Yii::$app->language = $this->languageCode;
 
         //Отлов событий отправки сообщений с сайта, и их модификация.
         \yii\base\Event::on(\yii\mail\BaseMailer::className(), \yii\mail\BaseMailer::EVENT_BEFORE_SEND, [$this, 'beforeSendEmail']);
@@ -282,6 +312,8 @@ class Cms extends \skeeks\cms\base\Component
         {
             $event->message->setCc($this->notifyAdminEmailsToArray());
         }
+
+
 
         /*if ($event->message instanceof Message)
         {
@@ -455,6 +487,7 @@ class Cms extends \skeeks\cms\base\Component
             [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'notifyAdminEmailsHidden', 'appName', 'template', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
+            [['emailTemplate'], 'string'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['hitAgentsInterval'], 'integer', 'min' => 60],
             [['enabledHitAgents'], 'string'],
@@ -472,6 +505,7 @@ class Cms extends \skeeks\cms\base\Component
             'appName'                   => 'Название проекта',
             'template'                  => 'Шаблон',
             'templates'                 => 'Возможные шаблон',
+            'emailTemplate'             => 'Шаблон для email',
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'enabledHitAgents'          => 'Выполнение агентов на хитах',
