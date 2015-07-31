@@ -112,11 +112,10 @@ class SignupForm extends Model
 
                 if ($user)
                 {
-
                     \Yii::$app->mailer->compose('registerByEmail', [
-                            'user'      => $user,
-                            'password'  => $password
-                        ])
+                        'user'      => $user,
+                        'password'  => $password
+                    ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                         ->setTo($user->email)
                         ->setSubject('Регистрация на сайте ' . \Yii::$app->cms->appName)

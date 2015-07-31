@@ -61,3 +61,16 @@ use yii\authclient\Collection;
  */
 class Application
 {}
+
+
+namespace yii\mail;
+/**
+ * Class MailEvent
+ */
+class MailEvent
+{
+    /**
+     * @var \skeeks\cms\mail\Message the mail message being send.
+     */
+    public $message;
+}

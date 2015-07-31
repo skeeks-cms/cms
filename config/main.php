@@ -38,8 +38,8 @@ $config =
 
 
         'mailer' => [
-            'class' => 'skeeks\cms\mail\Mailer',
-            'viewPath' => '@skeeks/cms/mail/',
+            'class'         => 'skeeks\cms\mail\Mailer',
+            'viewPath'      => '@skeeks/cms/mail/',
         ],
 
 
