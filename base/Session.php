@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\base;
 use skeeks\cms\components\Cms;
+use skeeks\cms\components\CmsSettings;
 use yii\web\DbSession;
 
 /**
@@ -22,7 +23,7 @@ class Session extends \yii\web\Session
 
     public function init()
     {
-        if (\Yii::$app->cms->sessionType == Cms::SESSION_DB)
+        if (\Yii::$app->cmsSettings->sessionType == CmsSettings::SESSION_DB)
         {
             $this->dbSession = \Yii::$app->dbSession;
         } else
