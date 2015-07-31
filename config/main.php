@@ -20,6 +20,16 @@ $config =
 
     'components' => [
 
+        'db' => [
+            'class' => 'yii\db\Connection',
+            //'dsn' => 'mysql:host=mysql.skeeks.com;dbname=s2_vz1005_demo-cms',
+            //'username' => 's2_vz1016',
+            //'password' => 'dryagtepEjsiocakVenAvyeyb',
+            'charset' => 'utf8',
+            'enableSchemaCache' => true,
+            'schemaCacheDuration' => 3600,
+        ],
+
         'user' => [
             'class'         => '\yii\web\User',
             'identityClass' => 'skeeks\cms\models\User',
