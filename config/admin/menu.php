@@ -142,10 +142,14 @@ return
                 "url"       => ["cms/admin-cms-event"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/notice.png'],
             ],
+
+            [
+                "label"     => "Шаблоны email",
+                "url"       => ["cms/admin-cms-event-email-template"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/notice.png'],
+            ],
         ]
     ],
-
-
 
 
     'access' =>
