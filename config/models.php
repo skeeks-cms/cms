@@ -10,67 +10,11 @@
  */
 return
 [
-    'publication' =>
-    [
-        'modelClass'                    => 'skeeks\cms\models\Publication',
-        'name'                          => 'Публикация',
-        'adminControllerRoute'          => 'cms/admin-publication',
-
-        'types'                 =>
-        [
-            /*'news' =>
-            [
-                'name'      => 'Новость'
-            ],
-
-            'article' =>
-            [
-                'name'      => 'Статья',
-            ],*/
-        ],
-    ],
-
     'tree' =>
     [
         'modelClass'                    => 'skeeks\cms\models\Tree',
         'name'                          => 'Страница',
         'adminControllerRoute'          => 'cms/admin-tree',
-
-        /*'types'                 =>
-        [
-            'homePage' =>
-            [
-                'name'          => 'Главная страница',
-                'actionView'    => 'home',
-                'layout'        => 'site2'
-            ],
-
-            'secondPage' =>
-            [
-                'name'          => 'Вторая страница',
-                'actionView'    => 'second'
-            ],
-
-            'demo' =>
-            [
-                'name'      => 'Демо нода',
-                'enabled'   => false
-            ]
-        ],
-
-        'actionViews'                 =>
-        [
-            'home' =>
-            [
-                'name' => 'Главная страница'
-            ],
-
-            'second' =>
-            [
-                'name'      => 'Вторая страница',
-            ],
-        ]*/
-
     ],
 
     'user' =>
