@@ -98,6 +98,7 @@ class User
         $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE,    [$this, "checkDataBeforeUpdate"]);
 
         $this->on(BaseActiveRecord::EVENT_AFTER_INSERT,    [$this, "checkDataAfterSave"]);
+        $this->on(BaseActiveRecord::EVENT_AFTER_INSERT,    [$this, "checkDataAfterInsert"]);
         $this->on(BaseActiveRecord::EVENT_AFTER_UPDATE,    [$this, "checkDataAfterSave"]);
 
         $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
@@ -154,6 +155,24 @@ class User
             {
                 $email->user_id     = $this->id;
                 $email->save();
+            }
+        }
+    }
+
+
+    /**
+     * После вставки пользователя, назначим ему необходимые роли
+     */
+    public function checkDataAfterInsert()
+    {
+        if (\Yii::$app->cms->registerRoles)
+        {
+            foreach (\Yii::$app->cms->registerRoles as $roleName)
+            {
+                if ($role = \Yii::$app->authManager->getRole($roleName))
+                {
+                    \Yii::$app->authManager->assign($role, $this->id);
+                }
             }
         }
     }

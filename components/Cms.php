@@ -14,7 +14,9 @@ use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\events\LoginEvent;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\mail\Message;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsEvent;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
@@ -27,6 +29,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
@@ -83,6 +86,11 @@ class Cms extends \skeeks\cms\base\Component
     const EVENT_AFTER_UPDATE = 'cms.event.after.update';
 
     /**
+     * Событие приложения (записывается в базу данных и настраивается)
+     */
+    const EVENT_APP = 'cms.event.app';
+
+    /**
      * Можно задать название и описание компонента
      * @return array
      */
@@ -115,7 +123,12 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
      */
-    public $notifyAdminEmails           = 'admin@skeeks.com';
+    public $notifyAdminEmailsHidden     = '';
+
+    /**
+     * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
+     */
+    public $notifyAdminEmails           = '';
 
     /**
      * @var string
@@ -132,15 +145,16 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userPropertyTypes       = [];
 
-    /**
-     * @var string шаблон
-     */
-    public $template                        = "default";
+
+    //После регистрации пользователю будут присвоены эти роли
+    public $registerRoles                   = [
+        CmsManager::ROLE_USER
+    ];
 
     /**
      * @var string язык по умолчанию
      */
-    public $languageCode         = "ru";
+    public $languageCode                    = "ru";
 
     /**
      * @var int сбрасывать токен пароля через час
@@ -179,6 +193,40 @@ class Cms extends \skeeks\cms\base\Component
      * @var array Возможные шаблоны сайта
      */
     public $templates       = [];
+    /**
+     * @var string шаблон
+     */
+    public $template                        = "default";
+
+
+    /**
+     * @var array Возможные шаблоны email
+     */
+    public $emailTemplatesDefault       =
+    [
+        'default' =>
+        [
+            'name'          => 'Базовый шаблон (по умолчанию)',
+            'pathMap'       =>
+            [
+                '@app/mail' =>
+                [
+                    '@app/mail',
+                    '@skeeks/cms/mail',
+                ],
+            ]
+        ]
+    ];
+    /**
+     * @var array Возможные шаблоны email
+     */
+    public $emailTemplates       = [];
+
+    /**
+     * @var string шаблон
+     */
+    public $emailTemplate                        = "default";
+
 
     /**
      * @return CmsSite
@@ -190,11 +238,11 @@ class Cms extends \skeeks\cms\base\Component
 
     private static $_huck = 'Z2VuZXJhdG9y';
 
-
     public function init()
     {
         parent::init();
 
+        //Название проекта.
         if (!$this->appName)
         {
             $this->appName = \Yii::$app->name;
@@ -203,49 +251,11 @@ class Cms extends \skeeks\cms\base\Component
             \Yii::$app->name = $this->appName;
         }
 
-        //TODO: доработать
+        //Генерация файла с подключением настроек extensions если его нет
         if (!file_exists(AUTO_GENERATED_MODULES_FILE))
         {
             $this->generateModulesConfigFile();
         }
-
-        //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
-        if ($this->enabledHitAgents == self::BOOL_Y && function_exists('system') && (!Yii::$app instanceof Application))
-        {
-            $key = 'Agents';
-            Yii::beginProfile($key);
-                $data = \Yii::$app->cache->get($key);
-                if ($data === false)
-                {
-                    system("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
-                    \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
-                }
-            Yii::endProfile($key);
-        }
-
-        /**
-         * Генерация SEO метатегов.
-         * */
-        \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
-        {
-            if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-            {
-                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', \Yii::$app->cms->moduleCms()->getDescriptor()->toString());
-
-                /**
-                 * @var $view View
-                 */
-                $view = $e->sender;
-                if (!isset($view->metaTags[self::$_huck]))
-                {
-                    $view->registerMetaTag([
-                        "name"      => base64_decode(self::$_huck),
-                        "content"   => \Yii::$app->cms->moduleCms()->getDescriptor()->toString()
-                    ], self::$_huck);
-                }
-            }
-        });
-
 
         //init view theme
         $this->templates = ArrayHelper::merge($this->templatesDefault, (array) $this->templates);
@@ -267,22 +277,131 @@ class Cms extends \skeeks\cms\base\Component
         //TODO: may be is depricated. While better to use '@app/views/'
         \Yii::setAlias('template', '@app/views/');
 
+        $this->emailTemplates = ArrayHelper::merge($this->emailTemplatesDefault, (array) $this->emailTemplates);
 
         \Yii::$app->language = $this->languageCode;
 
-        if (!\Yii::$app instanceof Application)
-        {
-            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
-            {
-                $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
-                $e->identity->save(false);
+        //Отлов событий отправки сообщений с сайта, и их модификация.
+        \yii\base\Event::on(\yii\mail\BaseMailer::className(), \yii\mail\BaseMailer::EVENT_BEFORE_SEND, [$this, 'beforeSendEmail']);
 
-                if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
-                {
-                    \Yii::$app->user->identity->updateLastAdminActivity();
-                }
-            });
+
+        if (\Yii::$app instanceof Application)
+        {
+            //console init
+            $this->_initConsole();
+        } else
+        {
+            //web init
+            $this->_initWeb();
         }
+    }
+
+    /**
+     * Перехват отправки всех email с сайта.
+     *
+     * @param \yii\mail\MailEvent $event
+     */
+    public function beforeSendEmail(\yii\mail\MailEvent $event)
+    {
+        if ($this->notifyAdminEmailsHiddenToArray())
+        {
+            $event->message->setCc($this->notifyAdminEmailsHiddenToArray());
+        }
+
+        if ($this->notifyAdminEmailsToArray())
+        {
+            $event->message->setCc($this->notifyAdminEmailsToArray());
+        }
+
+
+
+        /*if ($event->message instanceof Message)
+        {
+            if ($event->message->eventName)
+            {
+                $modelEvent = CmsEvent::findOne($event->message->eventName);
+                if (!$modelEvent)
+                {
+                    $modelEvent = new CmsEvent([
+                        'event_name'    => $event->message->eventName,
+                        'name'          => $event->message->eventDesctiption
+                    ]);
+
+                    $modelEvent->save();
+                }
+            }
+        }*/
+    }
+
+    /**
+     * Продолжение инициализации только в случае работы console приложения
+     */
+    protected function _initConsole()
+    {
+        \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
+        {
+            $this->_installAgents();
+        });
+    }
+
+    /**
+     * Продолжение инициализации только в случае работы web приложения
+     */
+    protected function _initWeb()
+    {
+        //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
+        if ($this->enabledHitAgents == self::BOOL_Y && function_exists('system'))
+        {
+            $key = 'Agents';
+            Yii::beginProfile($key);
+                $data = \Yii::$app->cache->get($key);
+                if ($data === false)
+                {
+                    system("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
+                    \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
+                }
+            Yii::endProfile($key);
+        }
+
+
+        /**
+         * Генерация SEO метатегов.
+         * */
+        \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
+        {
+            if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+            {
+                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', $this->moduleCms->descriptor->toString());
+
+                /**
+                 * @var $view View
+                 */
+                $view = $e->sender;
+                if (!isset($view->metaTags[self::$_huck]))
+                {
+                    $view->registerMetaTag([
+                        "name"      => base64_decode(self::$_huck),
+                        "content"   => $this->moduleCms->descriptor->toString()
+                    ], self::$_huck);
+                }
+            }
+        });
+
+
+
+        \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
+        {
+            $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
+            $e->identity->save(false);
+
+            if ($this->moduleAdmin()->requestIsAdmin())
+            {
+                \Yii::$app->user->identity->updateLastAdminActivity();
+            }
+        });
+
+
+
 
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
@@ -323,15 +442,6 @@ class Cms extends \skeeks\cms\base\Component
                 ]);
             }
         });
-
-
-        if (\Yii::$app instanceof Application)
-        {
-            \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
-            {
-                $this->_installAgents();
-            });
-        }
     }
 
     protected function _installAgents()
@@ -374,12 +484,14 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'appName', 'template', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'notifyAdminEmailsHidden', 'appName', 'template', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
+            [['emailTemplate'], 'string'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['hitAgentsInterval'], 'integer', 'min' => 60],
             [['enabledHitAgents'], 'string'],
+            [['registerRoles'], 'safe'],
         ]);
     }
 
@@ -387,15 +499,18 @@ class Cms extends \skeeks\cms\base\Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'adminEmail'                => 'Основной Email Администратора сайта',
+            'notifyAdminEmailsHidden'   => 'Email адреса уведомлений (скрытая копия)',
             'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
             'template'                  => 'Шаблон',
             'templates'                 => 'Возможные шаблон',
+            'emailTemplate'             => 'Шаблон для email',
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'enabledHitAgents'          => 'Выполнение агентов на хитах',
             'hitAgentsInterval'         => 'Интервал выполнения агентов на хитах',
+            'registerRoles'             => 'При регистрации добавлять в группу',
         ]);
     }
 
@@ -672,9 +787,17 @@ $fileContent .= '];';
     /**
      * @return array
      */
-    public function notifyAdminEmails()
+    public function notifyAdminEmailsToArray()
     {
-        return explode(",", $this->notifyAdminEmails);
+        return $this->notifyAdminEmails ? explode(",", $this->notifyAdminEmails) : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function notifyAdminEmailsHiddenToArray()
+    {
+        return $this->notifyAdminEmailsHidden ? explode(",", $this->notifyAdminEmailsHidden) : [];
     }
 
     /**

@@ -15,6 +15,7 @@ use skeeks\cms\_ide\UserIde;
 use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsSearchComponent;
+use skeeks\cms\components\CmsSettings;
 use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ControlToolbar;
 use skeeks\cms\components\CurrentSite;
@@ -51,6 +52,7 @@ use yii\authclient\Collection;
  * @property DbDumpComponent                $dbDump
  * @property CmsSearchComponent             $cmsSearch
  * @property MarketplaceApi                 $cmsMarkeplace
+ * @property CmsSettings                    $cmsSettings
  *
  * @property \yii\web\User|UserIde                 $user
  *
@@ -59,3 +61,16 @@ use yii\authclient\Collection;
  */
 class Application
 {}
+
+
+namespace yii\mail;
+/**
+ * Class MailEvent
+ */
+class MailEvent
+{
+    /**
+     * @var \skeeks\cms\mail\Message the mail message being send.
+     */
+    public $message;
+}

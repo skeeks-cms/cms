@@ -103,7 +103,7 @@ class SignupForm extends Model
 
             } else if ($this->scenario == self::SCENARION_ONLYEMAIL)
             {
-                $password = \Yii::$app->security->generateRandomString(6);
+                $password               = \Yii::$app->security->generateRandomString(6);
                 $user->email            = $this->email;
                 $user->generateUsername();
                 $user->setPassword($password);
@@ -113,9 +113,9 @@ class SignupForm extends Model
                 if ($user)
                 {
                     \Yii::$app->mailer->compose('registerByEmail', [
-                            'user'      => $user,
-                            'password'  => $password
-                        ])
+                        'user'      => $user,
+                        'password'  => $password
+                    ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                         ->setTo($user->email)
                         ->setSubject('Регистрация на сайте ' . \Yii::$app->cms->appName)

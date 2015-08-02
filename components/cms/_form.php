@@ -17,14 +17,19 @@ foreach (\Yii::$app->cms->templates as $code => $data)
 {
     $templates[$code] = \yii\helpers\ArrayHelper::getValue($data, 'name');
 }
+
+$emailTemplates = [];
+
+foreach (\Yii::$app->cms->emailTemplates as $code => $data)
+{
+    $emailTemplates[$code] = \yii\helpers\ArrayHelper::getValue($data, 'name');
+}
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
 
 <?= $form->fieldSet('Основное'); ?>
     <?= $form->field($model, 'appName')->textInput()->hint(''); ?>
-    <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта (отправитель по умолчанию).'); ?>
-    <?= $form->field($model, 'notifyAdminEmails')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.'); ?>
 
     <?= $form->field($model, 'noImageUrl')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\OneImage::className()
@@ -35,6 +40,15 @@ foreach (\Yii::$app->cms->templates as $code => $data)
 <?= $form->fieldSet('Агенты'); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledHitAgents')->hint('Если вы отключаете выполнение агентов на хитах, то не забудте включить их в задание cron'); ?>
     <?= $form->fieldInputInt($model, 'hitAgentsInterval')->hint('Если агенты выполняются на хитах, то их выполнение будет осуществляться с заданным переидом (сек.)'); ?>
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Email'); ?>
+    <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.'); ?>
+    <?= $form->field($model, 'notifyAdminEmailsHidden')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Скрытая копия!'); ?>
+    <?= $form->field($model, 'notifyAdminEmails')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Эти email адреса будут отображаться в открытой копии.'); ?>
+
+    <?= $form->fieldSelect($model, 'emailTemplate', $emailTemplates); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Шаблоны/отображение'); ?>
@@ -51,6 +65,13 @@ foreach (\Yii::$app->cms->templates as $code => $data)
 
 <?= $form->fieldSet('Безопасность'); ?>
     <?= $form->fieldInputInt($model, 'passwordResetTokenExpire')->hint('Другими словами, ссылки на восстановление пароля перестанут работать через указанное время'); ?>
+<?= $form->fieldSetEnd(); ?>
+
+
+<?= $form->fieldSet('Авторизация'); ?>
+    <?= $form->fieldSelectMulti($model, 'registerRoles',
+        \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description')
+    )->hint('Так же после созданию пользователя, ему будут назначены, выбранные группы.'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
