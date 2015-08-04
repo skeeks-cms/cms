@@ -105,7 +105,7 @@ class HasFiles extends HasLinkedModels
                         'name'      => 'Главное изображение',
                         'config'    =>
                         [
-                            static::MAX_SIZE            => 10*1024*1024, //10Mb
+                            static::MAX_SIZE            => 50*1024*1024, //50Mb
                             static::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
                             static::MAX_COUNT_FILES     => 1,
                             static::ACCEPT_MIME_TYPE    => "image/*",
@@ -117,9 +117,9 @@ class HasFiles extends HasLinkedModels
                         'name'      => 'Изображения',
                         'config' =>
                         [
-                            static::MAX_SIZE            => 10*1024*1024, //10Mb
+                            static::MAX_SIZE            => 50*1024*1024, //50Mb
                             static::ALLOWED_EXTENSIONS  => ['jpg', 'jpeg', 'png', 'gif'],
-                            static::MAX_COUNT_FILES     => 50,
+                            static::MAX_COUNT_FILES     => 250,
                             static::ACCEPT_MIME_TYPE    => "image/*",
                         ]
                     ],
@@ -129,8 +129,8 @@ class HasFiles extends HasLinkedModels
                         'name'      => 'Файлы',
                         'config'    =>
                         [
-                            static::MAX_SIZE            => 10*1024*1024, //10Mb
-                            static::MAX_COUNT_FILES     => 50,
+                            static::MAX_SIZE            => 2000*1024*1024, //2000Mb
+                            static::MAX_COUNT_FILES     => 250,
                         ]
                     ]
                 ],
