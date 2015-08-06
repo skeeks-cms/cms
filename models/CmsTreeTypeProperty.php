@@ -83,7 +83,8 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
     {
         return array_merge(parent::rules(), [
             [['tree_type_id'], 'integer'],
-            [['code'], 'unique'],
+            //[['code'], 'unique'],
+            [['code', 'tree_type_id'], 'unique', 'targetAttribute' => ['tree_type_id', 'code'], 'message' => 'Для данного типа раздела этот код уже занят.'],
         ]);
     }
 }
