@@ -16,7 +16,8 @@ use skeeks\cms\models\Tree;
  * @method ActiveRecord         findRoots()
  * @method ActiveRecord         findChildrens()
  * @method Tree                 findParent()
- * @method ActiveRecord         processAddNode(ActiveRecord $target)
+ * @method ActiveRecord         processAddNode(Tree $tree)
+ * @method ActiveRecord         processCreateNode(Tree $tree)
  * @method ActiveRecord         generateSeoPageName()
  * @method bool                 isRoot()
  *
