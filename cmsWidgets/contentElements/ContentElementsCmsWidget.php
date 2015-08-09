@@ -203,6 +203,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
                     ]
                 );
+
+                $query->groupBy([CmsContentElement::tableName() . '.id']);
             }
 
         }
