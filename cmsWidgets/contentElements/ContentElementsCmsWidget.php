@@ -203,8 +203,6 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
                     ]
                 );
-
-                $query->groupBy([CmsContentElement::tableName() . '.id']);
             }
 
         }
@@ -224,6 +222,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 ]
             );
         }
+
+        $this->dataProvider->query->groupBy([CmsContentElement::tableName() . '.id']);
 
         if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
         {
