@@ -77,7 +77,7 @@ class DbDumpComponent extends Component
         $file       = $this->backupDir->newFile($dsn->dbname . "__" . date('Y-m-d_H:i:s') . ".sql");
         $filePath   = $file->getPath();
 
-        $cmd = "mysqldump -h{$dsn->host} -u {$dsn->username} -p{$dsn->password} {$dsn->dbname} > {$filePath}";
+        $cmd = "mysqldump -h{$dsn->host} -u {$dsn->username} -p'{$dsn->password}' {$dsn->dbname} > {$filePath}";
 
         system($cmd);
     }
@@ -101,7 +101,7 @@ class DbDumpComponent extends Component
         $filePath = $file->getPath();
 
         $dsn = new DbDsnHelper($this->connection);
-        $cmd = "mysql -h{$dsn->host} -u{$dsn->username} -p{$dsn->password} {$dsn->dbname} < {$filePath}";
+        $cmd = "mysql -h{$dsn->host} -u{$dsn->username} -p'{$dsn->password}' {$dsn->dbname} < {$filePath}";
 
         echo $cmd;
         system($cmd);
