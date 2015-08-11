@@ -75,18 +75,34 @@ class SeoPageName extends AttributeBehavior
             //Нужно чтобы поле было уникальным
             if ($this->uniqeue)
             {
-                //Значит неуникально
-                if ($founded = $this->owner->find()->where([
-                    $this->generatedAttribute => $seoPageName
-                ])->andWhere(["!=", "id", $this->owner->id])->one())
+
+                if (!$this->owner->isNewRecord)
                 {
-                    if ($last = $this->owner->find()->orderBy('id DESC')->one())
+                    //Значит неуникально
+                    if ($founded = $this->owner->find()->where([
+                        $this->generatedAttribute => $seoPageName
+                    ])->andWhere(["!=", "id", $this->owner->id])->one())
                     {
-                        $seoPageName = $seoPageName . '-' . $last->id;
-                        return $filter->filter($seoPageName);
+                        if ($last = $this->owner->find()->orderBy('id DESC')->one())
+                        {
+                            $seoPageName = $seoPageName . '-' . $last->id;
+                            return $filter->filter($seoPageName);
+                        }
+                    }
+                } else
+                {
+                    //Значит неуникально
+                    if ($founded = $this->owner->find()->where([
+                        $this->generatedAttribute => $seoPageName
+                    ])->one())
+                    {
+                        if ($last = $this->owner->find()->orderBy('id DESC')->one())
+                        {
+                            $seoPageName = $seoPageName . '-' . $last->id;
+                            return $filter->filter($seoPageName);
+                        }
                     }
                 }
-
             }
 
             return $seoPageName;
