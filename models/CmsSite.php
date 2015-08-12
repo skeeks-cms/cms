@@ -63,8 +63,8 @@ class CmsSite extends Core
         parent::init();
 
         $this->on(BaseActiveRecord::EVENT_AFTER_INSERT, [$this, 'createTreeAfterInsert']);
-        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'afterBeforeChecks']);
-        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'afterBeforeChecks']);
+        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'beforeInsertChecks']);
+        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'beforeUpdateChecks']);
 
     }
 
@@ -72,13 +72,36 @@ class CmsSite extends Core
      * @param Event $e
      * @throws Exception
      */
-    public function afterBeforeChecks(Event $e)
+    public function beforeUpdateChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
         if ($this->def == Cms::BOOL_Y)
         {
-            static::updateAll(['def' => Cms::BOOL_N]);
-            $this->active = Cms::BOOL_Y; //сайт по умолчанию всегда активный
+            static::updateAll(
+                [
+                    'def' => Cms::BOOL_N
+                ],
+                ['!=', 'id', $this->id]
+            );
+
+            $this->active   = Cms::BOOL_Y; //сайт по умолчанию всегда активный
+        }
+
+    }
+    /**
+     * @param Event $e
+     * @throws Exception
+     */
+    public function beforeInsertChecks(Event $e)
+    {
+        //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
+        if ($this->def == Cms::BOOL_Y)
+        {
+            static::updateAll([
+                'def' => Cms::BOOL_N
+            ]);
+
+            $this->active   = Cms::BOOL_Y; //сайт по умолчанию всегда активный
         }
 
     }
