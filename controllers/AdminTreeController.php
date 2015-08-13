@@ -13,6 +13,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -73,7 +74,8 @@ class AdminTreeController extends AdminModelEditorController
     public function indexData()
     {
         $tree = new Tree();
-        $models = $tree->findRoots()->all();
+
+        $models = $tree->findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_DESC])->all();
 
         return
         [

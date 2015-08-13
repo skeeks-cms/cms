@@ -11,10 +11,11 @@
 namespace skeeks\cms\models\behaviors\traits;
 use skeeks\cms\base\behaviors\ActiveRecord;
 use skeeks\cms\models\Tree;
+use yii\db\ActiveQuery;
 
 /**
- * @method ActiveRecord         findRoots()
- * @method ActiveRecord         findChildrens()
+ * @method ActiveQuery          findRoots()
+ * @method ActiveQuery          findChildrens()
  * @method Tree                 findParent()
  * @method ActiveRecord         processAddNode(Tree $tree)
  * @method ActiveRecord         processCreateNode(Tree $tree)
