@@ -51,6 +51,7 @@ use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeColor;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
+use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
 use skeeks\cms\widgets\Infoblock;
 use skeeks\cms\widgets\StaticBlock;
 use skeeks\sx\File;
@@ -906,7 +907,8 @@ $fileContent .= '];';
         return (array) ArrayHelper::merge([
             UserPropertyTypeDate::className() => (new UserPropertyTypeDate())->name,
             UserPropertyTypeComboText::className() => (new UserPropertyTypeComboText())->name,
-            UserPropertyTypeColor::className() => (new UserPropertyTypeColor())->name
+            UserPropertyTypeColor::className() => (new UserPropertyTypeColor())->name,
+            UserPropertyTypeSelectFile::className() => (new UserPropertyTypeSelectFile())->name
         ], (array) $this->userPropertyTypes);
     }
 
