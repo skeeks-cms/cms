@@ -66,6 +66,7 @@ use yii\helpers\ArrayHelper;
  * @property Tree                       $parentTree
  * @property Tree[]                     $parentTrees
  * @property CmsSite                    $site
+ * @property CmsSite                    $cmsSiteRelation
  * @property CmsTreeType                $treeType
  * @property CmsTreeProperty[]          $cmsTreeProperties
  */
@@ -273,6 +274,14 @@ class Tree extends Core
     {
         //return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
         return CmsSite::getByCode($this->site_code);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCmsSiteRelation()
+    {
+        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
     }
 
     /**
