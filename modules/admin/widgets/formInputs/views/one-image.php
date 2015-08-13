@@ -112,7 +112,7 @@ $this->registerJs(<<<JS
         */
         createFileManager: function()
         {
-            this.WindowFileManager = new sx.classes.WindowOriginal(this.get('selectFileUrl'));
+            this.WindowFileManager = new sx.classes.WindowOriginal(this.get('selectFileUrl'), 'sx-select-file-manager');
             this.WindowFileManager.open();
 
             return this;

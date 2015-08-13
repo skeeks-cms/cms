@@ -64,9 +64,9 @@ use yii\web\ErrorHandler;
  * @property CmsContent $cmsContent
  * @property Tree $cmsTree
 
- * @property CmsContentElementProperty[]    relatedElementProperties
- * @property CmsContentProperty[]           relatedProperties
- * @property CmsContentElementTree[]        cmsContentElementTrees
+ * @property CmsContentElementProperty[]    $relatedElementProperties
+ * @property CmsContentProperty[]           $relatedProperties
+ * @property CmsContentElementTree[]        $cmsContentElementTrees
  * @property CmsContentElementProperty[]    $cmsContentElementProperties
  */
 class CmsContentElement extends RelatedElementModel
