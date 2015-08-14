@@ -252,7 +252,11 @@ class RelatedPropertiesModel extends Model
 
                     foreach ($property->enums as $enum)
                     {
-                        $result[$enum->code] = $enum->value;
+                        if (in_array($enum->id, $value))
+                        {
+                            $result[$enum->code] = $enum->value;
+                        }
+
                     }
 
                     return $result;
