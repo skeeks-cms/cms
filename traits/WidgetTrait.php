@@ -28,7 +28,7 @@ trait WidgetTrait
      * @var string the prefix to the automatically generated widget IDs.
      * @see getId()
      */
-    public static $autoIdPrefix = 'w';
+    public static $autoIdPrefix = 'skeeks';
     /**
      * @var Widget[] the widgets that are currently being rendered (not ended). This property
      * is maintained by [[begin()]] and [[end()]] methods.

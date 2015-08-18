@@ -64,10 +64,11 @@ use yii\web\ErrorHandler;
  * @property CmsContent $cmsContent
  * @property Tree $cmsTree
 
- * @property CmsContentElementProperty[]    relatedElementProperties
- * @property CmsContentProperty[]           relatedProperties
- * @property CmsContentElementTree[]        cmsContentElementTrees
+ * @property CmsContentElementProperty[]    $relatedElementProperties
+ * @property CmsContentProperty[]           $relatedProperties
+ * @property CmsContentElementTree[]        $cmsContentElementTrees
  * @property CmsContentElementProperty[]    $cmsContentElementProperties
+ * @property CmsContentProperty[]           $cmsContentProperties
  */
 class CmsContentElement extends RelatedElementModel
 {
@@ -215,6 +216,15 @@ class CmsContentElement extends RelatedElementModel
     public function getCmsContentElementProperties()
     {
         return $this->hasMany(CmsContentElementProperty::className(), ['element_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentProperties()
+    {
+        return $this->hasMany(CmsContentProperty::className(), ['id' => 'property_id'])
+                    ->via('cmsContentElementProperties');
     }
 
     /**

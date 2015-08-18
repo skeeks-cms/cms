@@ -48,8 +48,10 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
+use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeColor;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
+use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
 use skeeks\cms\widgets\Infoblock;
 use skeeks\cms\widgets\StaticBlock;
 use skeeks\sx\File;
@@ -170,6 +172,21 @@ class Cms extends \skeeks\cms\base\Component
      * @var int Интервал выполенения агентов на хитах
      */
     public $hitAgentsInterval               = 60;
+
+
+
+    /**
+     * @var bool Включить http вторизацию на сайте
+     */
+    public $enabledHttpAuth                = self::BOOL_N;
+
+    /**
+     * @var bool Включить http авторизацию только для админки
+     */
+    public $enabledHttpAuthAdmin           = self::BOOL_N;
+
+    public $httpAuthLogin                  = "";
+    public $httpAuthPassword               = "";
 
     /**
      * @var array Возможные шаблоны сайта
@@ -349,6 +366,11 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected function _initWeb()
     {
+        if ($this->enabledHttpAuth == self::BOOL_Y)
+        {
+            $this->_goHttpAuth();
+        }
+
         //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
         if ($this->enabledHitAgents == self::BOOL_Y && function_exists('system'))
         {
@@ -405,6 +427,12 @@ class Cms extends \skeeks\cms\base\Component
 
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
+            //Если http авторизация на сайте отключена а в админке включена
+            if ($this->enabledHttpAuth  == self::BOOL_N && $this->enabledHttpAuthAdmin == self::BOOL_Y && $this->moduleAdmin()->requestIsAdmin())
+            {
+                $this->_goHttpAuth();
+            }
+
             if ($e->controller instanceof AdminModelEditorController)
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
@@ -442,6 +470,39 @@ class Cms extends \skeeks\cms\base\Component
                 ]);
             }
         });
+    }
+
+
+    protected function _goHttpAuth()
+    {
+        if (!isset($_SERVER['PHP_AUTH_PW']))
+        {
+            $this->_authentificateHttp();
+        }
+
+        if(!@$_SERVER['PHP_AUTH_PW'])
+        {
+            $this->_authentificateHttp();
+        }
+
+        else
+        {
+            if (@$_SERVER['PHP_AUTH_USER'] != $this->httpAuthLogin || @$_SERVER['PHP_AUTH_PW'] != $this->httpAuthPassword)
+            {
+                $this->_authentificateHttp();
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    protected function _authentificateHttp()
+    {
+        Header("WWW-Authenticate: Basic realm=\"SkeekS CMS\"");
+        Header("HTTP/1.0 401 Unauthorized");
+        echo "SkeekS CMS Authorization required.";
+        exit;
     }
 
     protected function _installAgents()
@@ -492,6 +553,10 @@ class Cms extends \skeeks\cms\base\Component
             [['hitAgentsInterval'], 'integer', 'min' => 60],
             [['enabledHitAgents'], 'string'],
             [['registerRoles'], 'safe'],
+            [['enabledHttpAuthAdmin'], 'string'],
+            [['enabledHttpAuth'], 'string'],
+            [['httpAuthLogin'], 'string'],
+            [['httpAuthPassword'], 'string'],
         ]);
     }
 
@@ -511,6 +576,10 @@ class Cms extends \skeeks\cms\base\Component
             'enabledHitAgents'          => 'Выполнение агентов на хитах',
             'hitAgentsInterval'         => 'Интервал выполнения агентов на хитах',
             'registerRoles'             => 'При регистрации добавлять в группу',
+            'enabledHttpAuth'           => 'Использовать http авторизацию на сайте',
+            'enabledHttpAuthAdmin'      => 'Использовать http авторизацию в административной части',
+            'httpAuthLogin'             => 'Логин',
+            'httpAuthPassword'          => 'Пароль',
         ]);
     }
 
@@ -836,8 +905,10 @@ $fileContent .= '];';
     public function userPropertyTypes()
     {
         return (array) ArrayHelper::merge([
-            UserPropertyTypeDate::className() => (new UserPropertyTypeDate)->name,
-            UserPropertyTypeComboText::className() => (new UserPropertyTypeComboText)->name
+            UserPropertyTypeDate::className() => (new UserPropertyTypeDate())->name,
+            UserPropertyTypeComboText::className() => (new UserPropertyTypeComboText())->name,
+            UserPropertyTypeColor::className() => (new UserPropertyTypeColor())->name,
+            UserPropertyTypeSelectFile::className() => (new UserPropertyTypeSelectFile())->name
         ], (array) $this->userPropertyTypes);
     }
 

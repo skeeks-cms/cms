@@ -65,6 +65,13 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
 
 <?= $form->fieldSet('Безопасность'); ?>
     <?= $form->fieldInputInt($model, 'passwordResetTokenExpire')->hint('Другими словами, ссылки на восстановление пароля перестанут работать через указанное время'); ?>
+
+    <hr />
+    <?= $form->fieldRadioListBoolean($model, 'enabledHttpAuth')->hint('Очень осторожно включайте эту настройку! Вы не сможете попасть ни на одну страницу сайта, без логина и пароля указанного ниже.'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledHttpAuthAdmin'); ?>
+    <?= $form->field($model, 'httpAuthLogin')->textInput(); ?>
+    <?= $form->field($model, 'httpAuthPassword')->textInput(); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 
@@ -72,6 +79,9 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     <?= $form->fieldSelectMulti($model, 'registerRoles',
         \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description')
     )->hint('Так же после созданию пользователя, ему будут назначены, выбранные группы.'); ?>
+
+
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

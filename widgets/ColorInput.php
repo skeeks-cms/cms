@@ -19,6 +19,33 @@ use \kartik\color\ColorInputAsset;
  */
 class ColorInput extends \kartik\color\ColorInput
 {
+    const SAVE_VALUE_TO_STRING          = 'toString';
+    const SAVE_VALUE_TO_HEX             = 'toHex';
+    const SAVE_VALUE_TO_HEX_STRING      = 'toHexString';
+    const SAVE_VALUE_TO_RGB             = 'toRgb';
+    const SAVE_VALUE_TO_RGB_STRING      = 'toRgbString';
+    const SAVE_VALUE_TO_HSV             = 'toHsv';
+    const SAVE_VALUE_TO_HSV_STRING      = 'toHsvString';
+    const SAVE_VALUE_TO_HSL             = 'toHsl';
+    const SAVE_VALUE_TO_HSL_STRING      = 'toHslString';
+    const SAVE_VALUE_TO_NAME            = 'toName';
+
+    /**
+     * @var array
+     */
+    static public $possibleSaveAs =
+    [
+        self::SAVE_VALUE_TO_STRING => 'Стандартно — #ff0000',
+        //self::SAVE_VALUE_TO_HEX => 'toHex — ff0000',
+        self::SAVE_VALUE_TO_HEX_STRING => 'toHexString — #ff0000',
+        //self::SAVE_VALUE_TO_RGB => 'toRgb — {"r":255,"g":0,"b":0}',
+        self::SAVE_VALUE_TO_RGB_STRING => 'toRgbString — rgb(255, 0, 0)',
+        //self::SAVE_VALUE_TO_HSV => 'toHsv — {"h":0,"s":1,"v":1}',
+        self::SAVE_VALUE_TO_HSV_STRING => 'toHsvString — hsv(0, 100%, 100%)',
+        //self::SAVE_VALUE_TO_HSL => 'toHsl — {"h":0,"s":1,"l":0.5}',
+        self::SAVE_VALUE_TO_HSL_STRING => 'toHslString — hsl(0, 100%, 50%)',
+        self::SAVE_VALUE_TO_NAME => 'toName — red',
+    ];
     /**
      *
      *
@@ -34,7 +61,7 @@ class ColorInput extends \kartik\color\ColorInput
      *
      * @var string
      */
-    public $saveValueAs = 'toString';
+    public $saveValueAs = self::SAVE_VALUE_TO_STRING;
 
     /**
      *

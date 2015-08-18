@@ -20,7 +20,7 @@ use \skeeks\cms\validators\HasBehavior;
             'items' => \yii\helpers\ArrayHelper::map(
                 \Yii::$app->cms->findUser()->all(),
                 'id',
-                'username'
+                'displayName'
             ),
         ]);
     ?>

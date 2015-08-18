@@ -35,6 +35,11 @@ class OneImage extends InputWidget
      */
     public $selectFileUrl = '';
 
+    /**
+     * @var null
+     */
+    public $filesModel = null;
+
     public function init()
     {
         parent::init();
@@ -43,9 +48,15 @@ class OneImage extends InputWidget
         {
             $additionalData = [];
 
-            if (Validate::isValid(new HasBehavior(HasFiles::className()), $this->model) && !$this->model->isNewRecord)
+            $modelForFile = $this->model;
+
+            if ($this->filesModel)
             {
-                $additionalData = $this->model->getRef()->toArray();
+                $modelForFile = $this->filesModel;
+            }
+            if (Validate::isValid(new HasBehavior(HasFiles::className()), $modelForFile) && !$modelForFile->isNewRecord)
+            {
+                $additionalData = $modelForFile->getRef()->toArray();
             }
 
             $additionalData['callbackEvent'] = $this->getCallbackEvent();
