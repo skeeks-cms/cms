@@ -184,6 +184,11 @@ abstract class RelatedPropertyModel extends Core
     {
         $elementClass   = $this->component;
 
+        if (!class_exists($elementClass))
+        {
+            return false;
+        }
+
         /**
          * @var $propertyType PropertyType
          */
