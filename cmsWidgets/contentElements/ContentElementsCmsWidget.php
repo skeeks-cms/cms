@@ -33,6 +33,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $enabledPjaxPagination       = CMS::BOOL_Y;
 
     public $pageSize                    = 10;
+    public $pageSizeLimitMin            = 1;
+    public $pageSizeLimitMax            = 50;
     public $pageParamName               = 'page';
 
     //Сортировка
@@ -75,6 +77,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
             'enabledPjaxPagination'     => 'Включить ajax навигацию',
             'pageParamName'             => 'Названия парамтера страниц, при постраничной навигации',
             'pageSize'                  => 'Количество записей на одной странице',
+            'pageSizeLimitMin'          => 'Минимально допустимое значение при постраничной навигации',
+            'pageSizeLimitMax'          => 'Максимально допустимое значение при постраничной навигации',
 
             'orderBy'                   => 'По какому параметру сортировать',
             'order'                     => 'Направление сортировки',
@@ -108,6 +112,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
             [['label'], 'string'],
             [['enabledSearchParams'], 'string'],
             [['limit'], 'integer'],
+            [['pageSizeLimitMin'], 'integer'],
+            [['pageSizeLimitMax'], 'integer'],
             [['active'], 'string'],
             [['createdBy'], 'safe'],
             [['content_ids'], 'safe'],
@@ -253,6 +259,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
         {
             $this->dataProvider->getPagination()->defaultPageSize   = $this->pageSize;
             $this->dataProvider->getPagination()->pageParam         = $this->pageParamName;
+            $this->dataProvider->getPagination()->pageSizeLimit         = [(int) $this->pageSizeLimitMin, (int) $this->pageSizeLimitMax];
         } else
         {
             $this->dataProvider->pagination = false;
