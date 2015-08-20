@@ -24,7 +24,9 @@ use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\models\UserAuthClient;
+use yii\authclient\BaseOAuth;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 use \Yii;
@@ -85,8 +87,14 @@ class AuthController extends Controller
     }
 
 
+    /**
+     * @param BaseOAuth $client
+     * @throws \yii\db\Exception
+     */
     public function onAuthSuccess($client)
     {
+        \Yii::info('start auth client: ' . $client->getId(), 'authClient');
+
         $attributes = $client->getUserAttributes();
 
         /* @var $userAuthClient UserAuthClient */
@@ -104,14 +112,19 @@ class AuthController extends Controller
                 $userAuthClient->save();
 
                 $user = $userAuthClient->user;
-                Yii::$app->user->login($user);
+                \Yii::$app->user->login($user);
+
             } else
             { // signup
                 if (isset($attributes['email']) && User::find()->where(['email' => $attributes['email']])->exists())
                 {
+                    $error = Yii::t('app', "User with the same email as in {client} account already exists but isn't linked to it. Login using email first to link it.", ['client' => $client->getTitle()]);
+
                     Yii::$app->getSession()->setFlash('error', [
-                        Yii::t('app', "User with the same email as in {client} account already exists but isn't linked to it. Login using email first to link it.", ['client' => $client->getTitle()]),
+                        $error
                     ]);
+
+                    \Yii::error($error, 'authClient');
                 } else {
 
                     /**
@@ -139,14 +152,17 @@ class AuthController extends Controller
                             'provider_identifier' => (string)$attributes['id'],
                             'provider_data' => $attributes,
                         ]);
-                        if ($auth->save()) {
+                        if ($auth->save())
+                        {
                             $transaction->commit();
                             Yii::$app->user->login($user);
-                        } else {
-                            print_r($auth->getErrors());
+                        } else
+                        {
+                            \Yii::error(Json::encode($auth->getErrors()), 'authClient');
                         }
-                    } else {
-                        print_r($user->getErrors());
+                    } else
+                    {
+                        \Yii::error(Json::encode($user->getErrors()), 'authClient');
                     }
                 }
             }
