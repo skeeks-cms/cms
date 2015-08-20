@@ -13,6 +13,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\actions\LogoutAction;
 use skeeks\cms\base\Controller;
+use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\AjaxRequestResponse;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -21,11 +22,13 @@ use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
 use skeeks\cms\models\forms\SignupForm;
 use skeeks\cms\models\User;
+use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\models\UserAuthClient;
 use yii\authclient\BaseOAuth;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
@@ -97,13 +100,15 @@ class AuthController extends Controller
 
         $attributes = $client->getUserAttributes();
 
+
         /* @var $userAuthClient UserAuthClient */
         $userAuthClient = UserAuthClient::find()->where([
-            'provider' => $client->getId(),
-            'provider_identifier' => $attributes['id'],
+            'provider'              => $client->getId(),
+            'provider_identifier'   => ArrayHelper::getValue($attributes, 'id'),
         ])->one();
 
-        if (Yii::$app->user->isGuest)
+
+        if (\Yii::$app->user->isGuest)
         {
             if ($userAuthClient)
             { // login
@@ -125,44 +130,69 @@ class AuthController extends Controller
                     ]);
 
                     \Yii::error($error, 'authClient');
-                } else {
+                } else
+                {
 
                     /**
                      * @var User $user
                      */
                     $userClassName          = \Yii::$app->cms->getUserClassName();
-                    $user                   = new $userClassName([
-                        'username'      => $attributes['login'],
-                        'email'         => $attributes['email']
-                    ]);
 
-                    $password = \Yii::$app->security->generateRandomString(6);
-                    $user->generateUsername();
-                    $user->setPassword($password);
-                    $user->generateAuthKey();
-                    $user->generatePasswordResetToken();
-                    $user->save();
-
-                    $transaction = $user->getDb()->beginTransaction();
-                    if ($user->save())
+                    //Если сеть прислала email пользователя, и этот email уже есть упользователя нашего сайта, привязываем его к этому юзеру, если нет, создаем нового.
+                    if ($userEmail = ArrayHelper::getValue($attributes, 'email'))
                     {
-                        $auth = new UserAuthClient([
-                            'user_id' => $user->id,
-                            'provider' => $client->getId(),
-                            'provider_identifier' => (string)$attributes['id'],
-                            'provider_data' => $attributes,
-                        ]);
-                        if ($auth->save())
+                        /**
+                         * @var UserEmail $userEmailModel
+                         */
+                        $userEmailModel = UserEmail::find()->where(['value' => $userEmail])->andWhere(['approved' => Cms::BOOL_Y])->one();
+                        if ($userEmailModel)
                         {
-                            $transaction->commit();
-                            Yii::$app->user->login($user);
-                        } else
-                        {
-                            \Yii::error(Json::encode($auth->getErrors()), 'authClient');
+                            $user = $userEmailModel->user;
                         }
+
+                        if (!$user)
+                        {
+                            $user                   = new $userClassName();
+                            $user->email = $userEmail;
+
+                            if ($userLogin = ArrayHelper::getValue($attributes, 'login'))
+                            {
+                                $user->username = $userLogin;
+                            } else
+                            {
+                                $user->generateUsername();
+                            }
+
+                            $password = \Yii::$app->security->generateRandomString(6);
+
+                            $user->setPassword($password);
+                            $user->generateAuthKey();
+                            $user->generatePasswordResetToken();
+
+                            if (!$user->save())
+                            {
+                                \Yii::error("Не удалось создать пользователя: " . serialize($user->getErrors()), 'authClient');
+                                return false;
+                            }
+                        }
+                    }
+
+
+                    //$transaction = $user->getDb()->beginTransaction();
+
+                    $auth = new UserAuthClient([
+                        'user_id' => $user->id,
+                        'provider' => $client->getId(),
+                        'provider_identifier' => (string)$attributes['id'],
+                        'provider_data' => $attributes,
+                    ]);
+                    if ($auth->save())
+                    {
+                        //$transaction->commit();
+                        Yii::$app->user->login($user);
                     } else
                     {
-                        \Yii::error(Json::encode($user->getErrors()), 'authClient');
+                        \Yii::error("Не удалось создать социальный профиль", 'authClient');
                     }
                 }
             }
@@ -185,6 +215,7 @@ class AuthController extends Controller
                 $userAuthClient->save();
             }
         }
+
     }
 
     /**

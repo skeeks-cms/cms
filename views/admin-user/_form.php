@@ -13,7 +13,7 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet('Общая ниформация')?>
+<?= $form->fieldSet('Общая информация')?>
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
