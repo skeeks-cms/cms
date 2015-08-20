@@ -20,7 +20,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
         <?= $form->fieldSet('GitHub'); ?>
 
-            <p>Создайте приложение на странице: <?= Html::a('https://github.com/settings/applications', 'https://github.com/settings/applications'); ?>, и получите его настройки.</p>
+            <p>Создайте приложение на странице: <?= Html::a('https://github.com/settings/applications', 'https://github.com/settings/applications', [
+                    'target' => '_blank'
+                ]); ?>, и получите его настройки.</p>
             <hr />
 
             <?= $form->field($model, 'githubEnabled')->radioList(\Yii::$app->formatter->booleanFormat); ?>
@@ -28,6 +30,21 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             <?= $form->field($model, 'githubClientId')->textInput(['placeholder' => 'c692de6c3c3247e39cf4']); ?>
             <?= $form->field($model, 'githubClientSecret')->textInput(['placeholder' => 'f01f7bc7d41f38e4049d15786c0f1b93a5e96e90']); ?>
             <?= $form->field($model, 'githubClass')->textInput(['placeholder' => 'yii\authclient\clients\GitHub'])->hint('Необязательный параметр, если не заполнен будет использован yii\authclient\clients\GitHub'); ?>
+
+        <?= $form->fieldSetEnd(); ?>
+
+        <?= $form->fieldSet('Vk'); ?>
+
+            <p>Создайте приложение на странице: <?= Html::a('http://vk.com/editapp?act=create', 'http://vk.com/editapp?act=create', [
+                    'target' => '_blank'
+                ]); ?>, и получите его настройки.</p>
+            <hr />
+
+            <?= $form->field($model, 'vkEnabled')->radioList(\Yii::$app->formatter->booleanFormat); ?>
+
+            <?= $form->field($model, 'vkClientId')->textInput(['placeholder' => '5040380']); ?>
+            <?= $form->field($model, 'vkClientSecret')->textInput(['placeholder' => 'sxAWws6ATNj5vDabPysA']); ?>
+            <?= $form->field($model, 'vkClass')->textInput(['placeholder' => 'yii\authclient\clients\VKontakte'])->hint('Необязательный параметр, если не заполнен будет использован yii\authclient\clients\VKontakte'); ?>
 
         <?= $form->fieldSetEnd(); ?>
 
