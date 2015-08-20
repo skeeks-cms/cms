@@ -26,6 +26,12 @@ class AuthClientSettings extends \skeeks\cms\base\Component
     public $githubClientSecret  = '';
     public $githubClass         = '';
 
+    //Настройки для vk
+    public $vkEnabled       = true;
+    public $vkClientId      = '';
+    public $vkClientSecret  = '';
+    public $vkClass         = '';
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -58,6 +64,11 @@ class AuthClientSettings extends \skeeks\cms\base\Component
             [['githubClientId'], 'string'],
             [['githubClientSecret'], 'string'],
             [['githubClass'], 'string'],
+
+            [['vkEnabled'], 'boolean'],
+            [['vkClientId'], 'integer'],
+            [['vkClientSecret'], 'string'],
+            [['vkClass'], 'string'],
         ]);
     }
 
@@ -73,6 +84,11 @@ class AuthClientSettings extends \skeeks\cms\base\Component
             'githubClientId'                => 'clientId',
             'githubClientSecret'            => 'clientSecret',
             'githubClass'                   => 'Обработчик',
+
+            'vkEnabled'                 => 'Включить авторизацию через vk',
+            'vkClientId'                => 'clientId',
+            'vkClientSecret'            => 'clientSecret',
+            'vkClass'                   => 'Обработчик',
         ]);
     }
 
@@ -98,6 +114,28 @@ class AuthClientSettings extends \skeeks\cms\base\Component
         return $this;
     }
 
+
+    /**
+     *
+     * Инициализация гитхаб провайдера
+     *
+     * @param array $data
+     * @return $this
+     */
+    protected function _initVkData(&$data = [])
+    {
+        if ($this->vkEnabled && $this->vkClientId && $this->vkClientSecret)
+        {
+            $data['vkontakte'] = [
+                  'class'           => $this->vkClass ? $this->vkClass : 'yii\authclient\clients\VKontakte',
+                  'clientId'        => $this->vkClientId,
+                  'clientSecret'    => $this->vkClientSecret,
+            ];
+        }
+
+        return $this;
+    }
+
     /**
      * @return array
      */
@@ -106,6 +144,7 @@ class AuthClientSettings extends \skeeks\cms\base\Component
         $result = [];
 
         $this->_initGitHubData($result);
+        $this->_initVkData($result);
 
         return $result;
     }

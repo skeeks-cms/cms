@@ -149,31 +149,36 @@ class AuthController extends Controller
                         {
                             $user = $userEmailModel->user;
                         }
+                    }
 
-                        if (!$user)
+                    if (!$user)
+                    {
+                        $user                   = new $userClassName();
+
+                        if ($userEmail)
                         {
-                            $user                   = new $userClassName();
                             $user->email = $userEmail;
+                        }
 
-                            if ($userLogin = ArrayHelper::getValue($attributes, 'login'))
-                            {
-                                $user->username = $userLogin;
-                            } else
-                            {
-                                $user->generateUsername();
-                            }
 
-                            $password = \Yii::$app->security->generateRandomString(6);
+                        if ($userLogin = ArrayHelper::getValue($attributes, 'login'))
+                        {
+                            $user->username = $userLogin;
+                        } else
+                        {
+                            $user->generateUsername();
+                        }
 
-                            $user->setPassword($password);
-                            $user->generateAuthKey();
-                            $user->generatePasswordResetToken();
+                        $password = \Yii::$app->security->generateRandomString(6);
 
-                            if (!$user->save())
-                            {
-                                \Yii::error("Не удалось создать пользователя: " . serialize($user->getErrors()), 'authClient');
-                                return false;
-                            }
+                        $user->setPassword($password);
+                        $user->generateAuthKey();
+                        $user->generatePasswordResetToken();
+
+                        if (!$user->save())
+                        {
+                            \Yii::error("Не удалось создать пользователя: " . serialize($user->getErrors()), 'authClient');
+                            return false;
                         }
                     }
 
@@ -192,7 +197,7 @@ class AuthController extends Controller
                         Yii::$app->user->login($user);
                     } else
                     {
-                        \Yii::error("Не удалось создать социальный профиль", 'authClient');
+                        \Yii::error("Не удалось создать социальный профиль: " . serialize($auth->getErrors()), 'authClient');
                     }
                 }
             }
