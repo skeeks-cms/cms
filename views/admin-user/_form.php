@@ -18,6 +18,11 @@ use common\models\User;
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
+    <?= $form->field($model, 'gender')->radioList([
+        'men' => 'Муж',
+        'women' => 'Жен',
+    ]); ?>
+
     <?= $form->field($model, 'image')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
         [
@@ -76,6 +81,7 @@ use common\models\User;
     <?= $form->field($model, 'status_of_life')->textarea(); ?>
 <?= $form->fieldSetEnd(); ?>
 
+
 <?= $form->fieldSet('Фотоальбом')?>
     <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
     <?= $form->field($model, 'images')->widget(
@@ -84,6 +90,28 @@ use common\models\User;
             'fileGroup' => 'images',
         ]
     )->label('Фото');; ?>
+<?= $form->fieldSetEnd(); ?>
+
+
+
+<?= $form->fieldSet('Социальные профили')?>
+
+
+    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+        'label'             => "Социальные профили",
+        'hint'              => "",
+        'parentModel'       => $model,
+        'relation'          => [
+            'user_id' => 'id'
+        ],
+        'controllerRoute'   => 'cms/admin-user-auth-client',
+        'gridViewOptions'   => [
+            'columns' => [
+                'displayName'
+            ],
+        ],
+    ]); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

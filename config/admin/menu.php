@@ -180,12 +180,12 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/phone.png']
             ],
 
-            /*[
-                "label"     => "Управление группами пользователей",
-                "url"       => ["cms/admin-user-group"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
-                'enabled'   => true
-            ],*/
+            [
+                "label"     => "Социальные профили",
+                "url"       => ["cms/admin-user-auth-client"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/phone.png']
+            ],
+
 
             [
                 "label"     => "Роли",
