@@ -189,6 +189,13 @@ class Cms extends \skeeks\cms\base\Component
     public $httpAuthPassword               = "";
 
     /**
+     * Настройки дебага
+     * @var string
+     */
+    public $debugEnabled                   = self::BOOL_N;
+    public $debugAllowedIPs                = "*";
+
+    /**
      * @var array Возможные шаблоны сайта
      */
     public $templatesDefault       =
@@ -366,6 +373,16 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected function _initWeb()
     {
+        if ($this->debugEnabled === self::BOOL_Y)
+        {
+            /**
+             * @var $debugModule \yii\debug\Module
+             */
+            $debugModule = \Yii::$app->getModule('debug');
+            $debugModule->allowedIPs = explode(',', $this->debugAllowedIPs);
+            $debugModule->bootstrap(\Yii::$app);
+        }
+
         if ($this->enabledHttpAuth == self::BOOL_Y)
         {
             $this->_goHttpAuth();
@@ -557,6 +574,8 @@ class Cms extends \skeeks\cms\base\Component
             [['enabledHttpAuth'], 'string'],
             [['httpAuthLogin'], 'string'],
             [['httpAuthPassword'], 'string'],
+            [['debugEnabled'], 'string'],
+            [['debugAllowedIPs'], 'string'],
         ]);
     }
 
@@ -580,6 +599,8 @@ class Cms extends \skeeks\cms\base\Component
             'enabledHttpAuthAdmin'      => 'Использовать http авторизацию в административной части',
             'httpAuthLogin'             => 'Логин',
             'httpAuthPassword'          => 'Пароль',
+            'debugEnabled'              => 'Включение режима отладки',
+            'debugAllowedIPs'           => 'Включение режима отладки для ip адресов',
         ]);
     }
 

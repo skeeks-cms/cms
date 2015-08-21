@@ -255,6 +255,7 @@ $config =
         [
             'class' => 'yii\gii\Module',
         ],
+
         'debug' =>
         [
             'class' => 'yii\debug\Module',
