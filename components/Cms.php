@@ -194,6 +194,12 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $debugEnabled                   = self::BOOL_N;
     public $debugAllowedIPs                = "*";
+    /**
+     * Настройки генератора кода
+     * @var string
+     */
+    public $giiEnabled                   = self::BOOL_N;
+    public $giiAllowedIPs                = "*";
 
     /**
      * @var array Возможные шаблоны сайта
@@ -576,6 +582,8 @@ class Cms extends \skeeks\cms\base\Component
             [['httpAuthPassword'], 'string'],
             [['debugEnabled'], 'string'],
             [['debugAllowedIPs'], 'string'],
+            [['giiEnabled'], 'string'],
+            [['giiAllowedIPs'], 'string'],
         ]);
     }
 
@@ -601,6 +609,8 @@ class Cms extends \skeeks\cms\base\Component
             'httpAuthPassword'          => 'Пароль',
             'debugEnabled'              => 'Включение режима отладки',
             'debugAllowedIPs'           => 'Включение режима отладки для ip адресов',
+            'giiEnabled'                => 'Генератор кода включен',
+            'giiAllowedIPs'             => 'Включение генератора кода для ip адресов',
         ]);
     }
 

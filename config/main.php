@@ -253,7 +253,7 @@ $config =
 
         'gii' =>
         [
-            'class' => 'yii\gii\Module',
+            'class' => 'skeeks\cms\components\GiiModule',
         ],
 
         'debug' =>
