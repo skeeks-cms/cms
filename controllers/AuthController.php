@@ -100,19 +100,17 @@ class AuthController extends Controller
 
         $attributes = $client->getUserAttributes();
 
-
         /* @var $userAuthClient UserAuthClient */
         $userAuthClient = UserAuthClient::find()->where([
             'provider'              => $client->getId(),
             'provider_identifier'   => ArrayHelper::getValue($attributes, 'id'),
         ])->one();
 
-
         if (\Yii::$app->user->isGuest)
         {
             if ($userAuthClient)
-            { // login
-
+            {
+                // Все просто идет авторизация
                 $userAuthClient->provider_data = $attributes;
                 $userAuthClient->save();
 
@@ -120,85 +118,102 @@ class AuthController extends Controller
                 \Yii::$app->user->login($user);
 
             } else
-            { // signup
-                if (isset($attributes['email']) && User::find()->where(['email' => $attributes['email']])->exists())
+            {
+                // Регистрация
+
+                /**
+                 * @var $user User
+                 */
+                $user = null;
+                //Если соц сеть вернула нам email то на него можно опираться.
+                if ($emailFromAuthClient = ArrayHelper::getValue($attributes, 'email'))
                 {
-                    $error = Yii::t('app', "User with the same email as in {client} account already exists but isn't linked to it. Login using email first to link it.", ['client' => $client->getTitle()]);
-
-                    Yii::$app->getSession()->setFlash('error', [
-                        $error
-                    ]);
-
-                    \Yii::error($error, 'authClient');
-                } else
-                {
-
-                    /**
-                     * @var User $user
-                     */
-                    $userClassName          = \Yii::$app->cms->getUserClassName();
-
-                    //Если сеть прислала email пользователя, и этот email уже есть упользователя нашего сайта, привязываем его к этому юзеру, если нет, создаем нового.
-                    if ($userEmail = ArrayHelper::getValue($attributes, 'email'))
+                    //Нашли email
+                    $userEmailModel = UserEmail::find()->where(['value' => $emailFromAuthClient])->andWhere(['approved' => Cms::BOOL_Y])->one();
+                    if ($userEmailModel)
                     {
-                        /**
-                         * @var UserEmail $userEmailModel
-                         */
-                        $userEmailModel = UserEmail::find()->where(['value' => $userEmail])->andWhere(['approved' => Cms::BOOL_Y])->one();
-                        if ($userEmailModel)
+                        if ($userEmailModel->user)
                         {
                             $user = $userEmailModel->user;
                         }
                     }
+                }
 
-                    if (!$user)
+                if (!$user)
+                {
+                    $userClassName = \Yii::$app->cms->getUserClassName();
+                    $user                   = new $userClassName();
+                    $user->populate();
+
+                    if (!$user->save())
                     {
-                        $user                   = new $userClassName();
+                        \Yii::error("Не удалось создать пользователя: " . serialize($user->getErrors()), 'authClient');
+                        return false;
+                    }
 
-                        if ($userEmail)
-                        {
-                            $user->email = $userEmail;
-                        }
-
-
-                        if ($userLogin = ArrayHelper::getValue($attributes, 'login'))
-                        {
-                            $user->username = $userLogin;
-                        } else
-                        {
-                            $user->generateUsername();
-                        }
-
-                        $password = \Yii::$app->security->generateRandomString(6);
-
-                        $user->setPassword($password);
-                        $user->generateAuthKey();
-                        $user->generatePasswordResetToken();
-
+                    //Тут можно обновить данные пользователя.
+                    if ($login = ArrayHelper::getValue($attributes, 'login'))
+                    {
+                        $user->username = $login;
                         if (!$user->save())
                         {
-                            \Yii::error("Не удалось создать пользователя: " . serialize($user->getErrors()), 'authClient');
-                            return false;
+                            \Yii::error("Не удалось обновить данные пользователя: " . serialize($user->getErrors()), 'authClient');
                         }
                     }
 
-
-                    //$transaction = $user->getDb()->beginTransaction();
-
-                    $auth = new UserAuthClient([
-                        'user_id' => $user->id,
-                        'provider' => $client->getId(),
-                        'provider_identifier' => (string)$attributes['id'],
-                        'provider_data' => $attributes,
-                    ]);
-                    if ($auth->save())
+                    if ($login = ArrayHelper::getValue($attributes, 'email'))
                     {
-                        //$transaction->commit();
-                        Yii::$app->user->login($user);
-                    } else
-                    {
-                        \Yii::error("Не удалось создать социальный профиль: " . serialize($auth->getErrors()), 'authClient');
+                        $user->username = $login;
+                        if (!$user->save())
+                        {
+                            \Yii::error("Не удалось обновить данные пользователя: " . serialize($user->getErrors()), 'authClient');
+                        }
                     }
+
+                    if ($email = ArrayHelper::getValue($attributes, 'email'))
+                    {
+                        $user->email = $email;
+                        if (!$user->save())
+                        {
+                            \Yii::error("Не удалось обновить данные пользователя: " . serialize($user->getErrors()), 'authClient');
+                        }
+                    }
+
+                    if ($name = ArrayHelper::getValue($attributes, 'name'))
+                    {
+                        $user->name = $name;
+                        if (!$user->save())
+                        {
+                            \Yii::error("Не удалось обновить данные пользователя: " . serialize($user->getErrors()), 'authClient');
+                        }
+                    }
+
+                    if ($firstName = ArrayHelper::getValue($attributes, 'first_name') || $lastName = ArrayHelper::getValue($attributes, 'last_name'))
+                    {
+                        $user->name = $lastName . " " . $firstName;
+                        if (!$user->save())
+                        {
+                            \Yii::error("Не удалось обновить данные пользователя: " . serialize($user->getErrors()), 'authClient');
+                        }
+                    }
+                }
+
+
+                //$transaction = $user->getDb()->beginTransaction();
+
+                $auth = new UserAuthClient([
+                    'user_id'               => $user->id,
+                    'provider'              => $client->getId(),
+                    'provider_identifier'   => (string)$attributes['id'],
+                    'provider_data'         => $attributes,
+                ]);
+                if ($auth->save())
+                {
+                    //$transaction->commit();
+                    Yii::$app->user->login($user);
+                } else
+                {
+                    \Yii::error("Не удалось создать социальный профиль: " . serialize($auth->getErrors()), 'authClient');
                 }
             }
         } else
@@ -207,10 +222,10 @@ class AuthController extends Controller
             { // add auth provider
 
                 $userAuthClient = new UserAuthClient([
-                    'user_id' => Yii::$app->user->id,
-                    'provider' => $client->getId(),
-                    'provider_identifier' => $attributes['id'],
-                    'provider_data' => $attributes,
+                    'user_id'               => Yii::$app->user->id,
+                    'provider'              => $client->getId(),
+                    'provider_identifier'   => $attributes['id'],
+                    'provider_data'         => $attributes,
                 ]);
 
                 $userAuthClient->save();

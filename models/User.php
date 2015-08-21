@@ -60,6 +60,8 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $lastActivityAgo
  * @property string $lastAdminActivityAgo
  *
+ * @property UserEmail $userEmail
+ *
  * @property string $displayName
  *
  * @property UserAuthclient[] $userAuthclients
@@ -119,10 +121,6 @@ class User
         {
             throw new Exception('Нельзя удалять самого себя');
         }
-
-        /*$userEmail = UserEmail::find()->where(['value' => $this->email])->one();
-        $userEmail->user_id = null;
-        $userEmail->save();*/
     }
     /**
      * @throws Exception
@@ -137,11 +135,6 @@ class User
                 $userEmail->delete();
             }
         }
-
-
-        /*$userEmail = UserEmail::find()->where(['value' => $this->email])->one();
-        $userEmail->user_id = null;
-        $userEmail->save();*/
     }
 
 
@@ -211,7 +204,7 @@ class User
             {
                 Validate::ensure(new UserEmailValidator(), $this);
 
-                if (!$myEmail = $this->findEmail()->where(["value" => $this->email])->one())
+                if (!$myEmail = $this->getUserEmail()->where(["value" => $this->email])->one())
                 {
                     $email = new UserEmail([
                         'value' => $this->email,
@@ -434,25 +427,6 @@ class User
     }
 
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getComments()
-    {
-        return $this->hasMany(Comment::className(), ['created_by' => 'id']);
-    }
-
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPublications()
-    {
-        return $this->hasMany(Publication::className(), ['created_by' => 'id']);
-    }
-
-
 
     /**
      * @return \yii\db\ActiveQuery
@@ -466,54 +440,9 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscribes()
-    {
-        return $this->hasMany(Subscribe::className(), ['created_by' => 'id']);
-    }
-
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getUserAuthclients()
     {
         return $this->hasMany(UserAuthclient::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getVotes()
-    {
-        return $this->hasMany(Vote::className(), ['created_by' => 'id']);
-    }
-
-
-
-
-    /**
-     * @param $name
-     * @return \yii\db\ActiveQuery|null
-     */
-    public function getSubscribesModels($name)
-    {
-        $subscribes = $this->getSubscribes()->where(["linked_to_model" => $name::className()])->all();
-        if ($subscribes)
-        {
-            $ids = [];
-            foreach ($subscribes as $subscribe)
-            {
-                $ids[] = $subscribe->getAttribute("linked_to_value");
-            }
-
-            if ($ids)
-            {
-                return $name::find()->where(["id" => $ids]);
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -523,6 +452,7 @@ class User
     {
         return $this->name ? $this->name : $this->username;
     }
+
 
     public function getPageUrl($action = 'view', $params = [])
     {
@@ -535,23 +465,16 @@ class User
         return \Yii::$app->urlManager->createUrl($params);
     }
 
+
+
+
+
     /**
      * @inheritdoc
      */
     public static function findIdentity($id)
     {
         return static::findOne(['id' => $id, 'active' => Cms::BOOL_Y]);
-
-        /*try
-        {
-            return static::findOne(['id' => $id, 'active' => Cms::BOOL_Y]);
-        } catch(\yii\db\Exception $e)
-        {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                throw new NotConnectedToDbException;
-            }
-        }*/
     }
 
     /**
@@ -642,6 +565,21 @@ class User
         return $timestamp + $expire >= time();
     }
 
+
+    /**
+     * Заполнить модель недостающими данными, которые необходимы для сохранения пользователя
+     * @return $this
+     */
+    public function populate()
+    {
+        $password               = \Yii::$app->security->generateRandomString(6);
+
+        $this->generateUsername();
+        $this->setPassword($password);
+        $this->generateAuthKey();
+
+        return $this;
+    }
     /**
      * @inheritdoc
      */
@@ -732,7 +670,7 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function findEmail()
+    public function getUserEmail()
     {
         return $this->hasOne(UserEmail::className(), ['user_id' => 'id']);
     }
