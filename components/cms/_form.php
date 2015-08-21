@@ -116,6 +116,23 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
 
 <?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet('Разработка'); ?>
+    <? \yii\bootstrap\Alert::begin([
+        'options' => [
+          'class' => 'alert-warning',
+      ],
+    ]); ?>
+    Обратите внимание на эти настройки
+    <? \yii\bootstrap\Alert::end()?>
+    <?= $form->fieldRadioListBoolean($model, 'giiEnabled'); ?>
+    <?= $form->field($model, 'giiAllowedIPs')->textarea([
+        'placeholder' => '80.243.13.242,127.*'
+    ])->hint('Укажите ip адреса для которых будет включен генератор кода через запятую.'); ?>
+    <p><b>Ваш ip:</b> <?= \Yii::$app->getRequest()->getUserIP(); ?></p>
+
+
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
