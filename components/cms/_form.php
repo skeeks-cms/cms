@@ -133,6 +133,37 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
 
 <?= $form->fieldSetEnd(); ?>
 
+
+<?= $form->fieldSet('Доступ'); ?>
+
+     <? \yii\bootstrap\Alert::begin([
+        'options' => [
+          'class' => 'alert-warning',
+      ],
+    ]); ?>
+    <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
+    <? \yii\bootstrap\Alert::end()?>
+
+    <h3><b>Файловый менеджер</b></h3>
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+        'label'                 => 'Доступ к личным файлам',
+    ]); ?>
+
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+        'label'                 => 'Доступ к общим файлам',
+    ]); ?>
+
+
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
+        'label'                 => 'Доступ ко всем файлам',
+    ]); ?>
+
+
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
