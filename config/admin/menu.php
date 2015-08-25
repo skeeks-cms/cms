@@ -302,5 +302,17 @@ return
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update-2.png']
             ],
         ]
+    ],
+
+
+    'other' =>
+    [
+        'label'     => 'Дополнительно',
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+
+        'items' =>
+        [
+
+        ]
     ]
 ];
