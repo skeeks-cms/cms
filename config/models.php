@@ -35,18 +35,6 @@ return
         'name' => 'Файл хранилища'
     ],
 
-    'infoblock'   =>
-    [
-        'modelClass'    => 'skeeks\cms\models\Infoblock',
-        'name'          => 'Инфоблок'
-    ],
-
-    'staticBlock'   =>
-    [
-        'modelClass'    => 'skeeks\cms\models\StaticBlock',
-        'name'          => 'Инфоблок'
-    ],
-
     'cmsContentElement'   =>
     [
         'modelClass'    => 'skeeks\cms\models\CmsContentElement',

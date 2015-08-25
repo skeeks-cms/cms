@@ -41,7 +41,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ]
     )->hint('Режим редактирования сайта по умолчаню, изначально.'); ?>
 
-    <?= $form->field($model, 'infoblockEditBorderColor')->textInput()->hint('Цвет рамки вокруг инфоблоков в режиме редактирования'); ?>
+    <?= $form->field($model, 'infoblockEditBorderColor')->widget(
+        \skeeks\cms\widgets\ColorInput::className()
+    )->hint('Цвет рамки вокруг инфоблоков в режиме редактирования'); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Доступ'); ?>
+
+
 
 <?= $form->fieldSetEnd(); ?>
 

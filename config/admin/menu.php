@@ -71,13 +71,6 @@ return
                 "url"       => ["cms/admin-storage-files/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
-
-            /*[
-                "label"     => "Инфоблоки",
-                "url"       => ["cms/admin-infoblock"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png']
-            ],*/
-
         ]
     ],
 
