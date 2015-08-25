@@ -49,6 +49,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Доступ'); ?>
 
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+        'label'                 => 'Доступ к панеле разрешен',
+    ]); ?>
 
 
 <?= $form->fieldSetEnd(); ?>

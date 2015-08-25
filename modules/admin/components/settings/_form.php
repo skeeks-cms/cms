@@ -60,6 +60,17 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 
+<?= $form->fieldSet('Доступ'); ?>
+
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
+        'label'                 => 'Доступ к административной части',
+    ]); ?>
+
+
+<?= $form->fieldSetEnd(); ?>
+
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
