@@ -50,7 +50,7 @@
                     } else {
                       $(this).parent().addClass("opened");
                     }
-                    $(this).parent().find("ul").first().slideToggle("slow", function() {
+                    $(this).parent().find("ul").first().slideToggle("fast", function() {
                       //dropSidebarShadow();
                     });
                     $(this).parent().parent().find("ul").each(function() {
@@ -59,7 +59,7 @@
                       }
                     });
                     if (!$(this).parent().parent().parent().hasClass("opened")) {
-                      $(".nav a").not(this).parent().find("ul").slideUp("slow", function() {
+                      $(".nav a").not(this).parent().find("ul").slideUp("fast", function() {
                         $(this).parent().removeClass("opened").find(".opened").each(function() {
                           $(this).removeClass("opened");
                         });
@@ -67,7 +67,7 @@
                     }
                   } else {
                     if (!$(this).parent().parent().parent().hasClass("opened")) {
-                      $(".nav a").not(this).parent().find("ul").slideUp("slow", function() {
+                      $(".nav a").not(this).parent().find("ul").slideUp("fast", function() {
                         $(this).parent().removeClass("opened").find(".opened").each(function() {
                           $(this).removeClass("opened");
                         });
