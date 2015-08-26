@@ -8,12 +8,15 @@
 namespace skeeks\cms\models\user;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\User;
 use Yii;
 use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
 use \yii\db\ActiveRecord;
 
 /**
+ * @property User $user
+ *
  * Class UserEmail
  * @package skeeks\cms\models\user
  */
@@ -83,27 +86,12 @@ class UserEmail extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function findUser()
+    public function getUser()
     {
         $userClass = \Yii::$app->user->identityClass;
         return $this->hasOne($userClass::className(), ['id' => 'user_id']);
     }
 
-    /**
-     * @return array|null|ActiveRecord
-     */
-    public function fetchUser()
-    {
-        return $this->findUser()->one();
-    }
-
-    /**
-     * @return array|null|ActiveRecord
-     */
-    public function getUser()
-    {
-        return $this->fetchUser();
-    }
 
     /**
      * Этот email является главным?
@@ -112,9 +100,9 @@ class UserEmail extends ActiveRecord
      */
     public function isMain()
     {
-        if ($user = $this->getUser())
+        if ($this->user)
         {
-            if ($user->email == $this->value)
+            if ($this->user->email == $this->value)
             {
                 return true;
             }
@@ -131,7 +119,7 @@ class UserEmail extends ActiveRecord
      */
     public function setMainForUser()
     {
-        if (!$user = $this->getUser())
+        if (!$this->user)
         {
             throw new Exception("Email не привязан к пользователю");
         }
@@ -141,9 +129,9 @@ class UserEmail extends ActiveRecord
             return $this;
         }
 
-        $user->email    = $this->value;
-        $user->scenario = "update";
-        if (!$user->save())
+        $this->user->email    = $this->value;
+        $this->user->scenario = "update";
+        if (!$this->user->save())
         {
             throw new Exception("Не удалось сохранить данные пользователя");
         }

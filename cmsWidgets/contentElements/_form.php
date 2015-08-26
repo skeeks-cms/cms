@@ -17,6 +17,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         <?= $form->fieldRadioListBoolean($model, 'enabledPaging', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldInputInt($model, 'pageSize'); ?>
+        <?= $form->fieldInputInt($model, 'pageSizeLimitMin'); ?>
+        <?= $form->fieldInputInt($model, 'pageSizeLimitMax'); ?>
         <?= $form->field($model, 'pageParamName')->textInput(); ?>
 
     <?= $form->fieldSetEnd(); ?>

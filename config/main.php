@@ -225,7 +225,22 @@ $config =
         'cmsMarkeplace' =>
         [
             'class' => '\skeeks\cms\components\marketplace\MarketplaceApi',
-        ]
+        ],
+
+
+        'authClientCollection' =>
+        [
+            'class' => 'skeeks\cms\authclient\Collection',
+
+            'clients' =>
+            []
+        ],
+
+        'authClientSettings' =>
+        [
+            'class' => 'skeeks\cms\authclient\AuthClientSettings',
+        ],
+
     ],
 
 
@@ -238,8 +253,9 @@ $config =
 
         'gii' =>
         [
-            'class' => 'yii\gii\Module',
+            'class' => 'skeeks\cms\components\GiiModule',
         ],
+
         'debug' =>
         [
             'class' => 'yii\debug\Module',

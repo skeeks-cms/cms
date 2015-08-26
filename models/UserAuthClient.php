@@ -63,7 +63,7 @@ class UserAuthclient extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User ID'),
+            'user_id' => Yii::t('app', 'Пользователь'),
             'provider' => Yii::t('app', 'Provider'),
             'provider_identifier' => Yii::t('app', 'Provider Identifier'),
             'provider_data' => Yii::t('app', 'Provider Data'),
@@ -78,5 +78,13 @@ class UserAuthclient extends ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->provider . " [{$this->provider_identifier}]";
     }
 }

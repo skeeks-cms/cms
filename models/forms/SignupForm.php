@@ -103,11 +103,8 @@ class SignupForm extends Model
 
             } else if ($this->scenario == self::SCENARION_ONLYEMAIL)
             {
-                $password               = \Yii::$app->security->generateRandomString(6);
+                $user->populate();
                 $user->email            = $this->email;
-                $user->generateUsername();
-                $user->setPassword($password);
-                $user->generateAuthKey();
                 $user->save();
 
                 if ($user)

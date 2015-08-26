@@ -52,8 +52,6 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeColor;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
-use skeeks\cms\widgets\Infoblock;
-use skeeks\cms\widgets\StaticBlock;
 use skeeks\sx\File;
 use skeeks\sx\models\IdentityMap;
 use Yii;
@@ -187,6 +185,19 @@ class Cms extends \skeeks\cms\base\Component
 
     public $httpAuthLogin                  = "";
     public $httpAuthPassword               = "";
+
+    /**
+     * Настройки дебага
+     * @var string
+     */
+    public $debugEnabled                   = self::BOOL_N;
+    public $debugAllowedIPs                = "*";
+    /**
+     * Настройки генератора кода
+     * @var string
+     */
+    public $giiEnabled                   = self::BOOL_N;
+    public $giiAllowedIPs                = "*";
 
     /**
      * @var array Возможные шаблоны сайта
@@ -366,6 +377,16 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected function _initWeb()
     {
+        if ($this->debugEnabled === self::BOOL_Y)
+        {
+            /**
+             * @var $debugModule \yii\debug\Module
+             */
+            $debugModule = \Yii::$app->getModule('debug');
+            $debugModule->allowedIPs = explode(',', $this->debugAllowedIPs);
+            $debugModule->bootstrap(\Yii::$app);
+        }
+
         if ($this->enabledHttpAuth == self::BOOL_Y)
         {
             $this->_goHttpAuth();
@@ -557,6 +578,10 @@ class Cms extends \skeeks\cms\base\Component
             [['enabledHttpAuth'], 'string'],
             [['httpAuthLogin'], 'string'],
             [['httpAuthPassword'], 'string'],
+            [['debugEnabled'], 'string'],
+            [['debugAllowedIPs'], 'string'],
+            [['giiEnabled'], 'string'],
+            [['giiAllowedIPs'], 'string'],
         ]);
     }
 
@@ -580,6 +605,10 @@ class Cms extends \skeeks\cms\base\Component
             'enabledHttpAuthAdmin'      => 'Использовать http авторизацию в административной части',
             'httpAuthLogin'             => 'Логин',
             'httpAuthPassword'          => 'Пароль',
+            'debugEnabled'              => 'Включение режима отладки',
+            'debugAllowedIPs'           => 'Включение режима отладки для ip адресов',
+            'giiEnabled'                => 'Генератор кода включен',
+            'giiAllowedIPs'             => 'Включение генератора кода для ip адресов',
         ]);
     }
 

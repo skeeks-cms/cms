@@ -35,9 +35,18 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
         \skeeks\cms\modules\admin\widgets\formInputs\OneImage::className()
     )->hint('Это изображение показывается в тех случаях, когда не найдено основное.'); ?>
 
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Агенты'); ?>
+    <? \yii\bootstrap\Alert::begin([
+        'options' => [
+          'class' => 'alert-warning',
+      ],
+    ]); ?>
+    <b>Внимание!</b> По возможности, используйте работу агентов на хитах, это увеличит производительность вашего сайта.
+    <? \yii\bootstrap\Alert::end()?>
+
     <?= $form->fieldRadioListBoolean($model, 'enabledHitAgents')->hint('Если вы отключаете выполнение агентов на хитах, то не забудте включить их в задание cron'); ?>
     <?= $form->fieldInputInt($model, 'hitAgentsInterval')->hint('Если агенты выполняются на хитах, то их выполнение будет осуществляться с заданным переидом (сек.)'); ?>
 <?= $form->fieldSetEnd(); ?>
@@ -67,6 +76,14 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     <?= $form->fieldInputInt($model, 'passwordResetTokenExpire')->hint('Другими словами, ссылки на восстановление пароля перестанут работать через указанное время'); ?>
 
     <hr />
+    <? \yii\bootstrap\Alert::begin([
+        'options' => [
+          'class' => 'alert-warning',
+      ],
+    ]); ?>
+    <b>Внимание!</b> аккуратно используйте эту настройку.
+    <? \yii\bootstrap\Alert::end()?>
+
     <?= $form->fieldRadioListBoolean($model, 'enabledHttpAuth')->hint('Очень осторожно включайте эту настройку! Вы не сможете попасть ни на одну страницу сайта, без логина и пароля указанного ниже.'); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledHttpAuthAdmin'); ?>
     <?= $form->field($model, 'httpAuthLogin')->textInput(); ?>
@@ -80,6 +97,69 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
         \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description')
     )->hint('Так же после созданию пользователя, ему будут назначены, выбранные группы.'); ?>
 
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Отладка'); ?>
+    <? \yii\bootstrap\Alert::begin([
+        'options' => [
+          'class' => 'alert-warning',
+      ],
+    ]); ?>
+    <b>Внимание!</b> Помните, в режиме отладки ваш сайт работает медленнее. Не включайте отладку на рабочих сайтах.
+    <? \yii\bootstrap\Alert::end()?>
+    <?= $form->fieldRadioListBoolean($model, 'debugEnabled'); ?>
+    <?= $form->field($model, 'debugAllowedIPs')->textarea([
+        'placeholder' => '80.243.13.242,127.*'
+    ])->hint('Укажите ip адреса для которых будет показана отладочная панель дебага через запятую.'); ?>
+    <p><b>Ваш ip:</b> <?= \Yii::$app->getRequest()->getUserIP(); ?></p>
+
+
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Разработка'); ?>
+    <? \yii\bootstrap\Alert::begin([
+        'options' => [
+          'class' => 'alert-warning',
+      ],
+    ]); ?>
+    Обратите внимание на эти настройки
+    <? \yii\bootstrap\Alert::end()?>
+    <?= $form->fieldRadioListBoolean($model, 'giiEnabled'); ?>
+    <?= $form->field($model, 'giiAllowedIPs')->textarea([
+        'placeholder' => '80.243.13.242,127.*'
+    ])->hint('Укажите ip адреса для которых будет включен генератор кода через запятую.'); ?>
+    <p><b>Ваш ip:</b> <?= \Yii::$app->getRequest()->getUserIP(); ?></p>
+
+
+<?= $form->fieldSetEnd(); ?>
+
+
+<?= $form->fieldSet('Доступ'); ?>
+
+     <? \yii\bootstrap\Alert::begin([
+        'options' => [
+          'class' => 'alert-warning',
+      ],
+    ]); ?>
+    <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
+    <? \yii\bootstrap\Alert::end()?>
+
+    <h3><b>Файловый менеджер</b></h3>
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+        'label'                 => 'Доступ к личным файлам',
+    ]); ?>
+
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+        'label'                 => 'Доступ к общим файлам',
+    ]); ?>
+
+
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
+        'label'                 => 'Доступ ко всем файлам',
+    ]); ?>
 
 
 <?= $form->fieldSetEnd(); ?>

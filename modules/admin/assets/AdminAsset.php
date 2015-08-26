@@ -59,6 +59,11 @@ class AdminAsset extends AssetBundle
      */
     public function registerAssetFiles($view)
     {
+        if (\Yii::$app->request->isPjax)
+        {
+            return parent::registerAssetFiles($view);
+        }
+
         parent::registerAssetFiles($view);
 
         $options =

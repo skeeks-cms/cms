@@ -41,7 +41,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ]
     )->hint('Режим редактирования сайта по умолчаню, изначально.'); ?>
 
-    <?= $form->field($model, 'infoblockEditBorderColor')->textInput()->hint('Цвет рамки вокруг инфоблоков в режиме редактирования'); ?>
+    <?= $form->field($model, 'infoblockEditBorderColor')->widget(
+        \skeeks\cms\widgets\ColorInput::className()
+    )->hint('Цвет рамки вокруг инфоблоков в режиме редактирования'); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Доступ'); ?>
+
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+        'label'                 => 'Доступ к панеле разрешен',
+    ]); ?>
+
 
 <?= $form->fieldSetEnd(); ?>
 

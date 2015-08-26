@@ -17,8 +17,6 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
-use skeeks\cms\widgets\Infoblock;
-use skeeks\cms\widgets\StaticBlock;
 use skeeks\sx\File;
 use skeeks\sx\models\IdentityMap;
 use Yii;

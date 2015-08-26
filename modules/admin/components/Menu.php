@@ -75,6 +75,8 @@ class Menu
             }
         }
 
+        ArrayHelper::multisort($this->groups, 'priority');
+
         $this->isLoaded = true;
 
         return (array) $this->groups;

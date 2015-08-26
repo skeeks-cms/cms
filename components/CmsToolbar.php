@@ -268,7 +268,8 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
      */
     protected function checkAccess()
     {
-        if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS) && \Yii::$app->user->can(CmsManager::PERMISSION_CONTROLL_PANEL))
+        //\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS) version > 2.0.13
+        if (\Yii::$app->user->can(CmsManager::PERMISSION_CONTROLL_PANEL))
         {
             if (!\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
             {
