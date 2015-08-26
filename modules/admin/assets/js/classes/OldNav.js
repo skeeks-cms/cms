@@ -62,7 +62,10 @@
                 }
               });
 
-                $("li.active", $("ul.nav-sidebar")).parent().parent().children('a').click();
+                //$("li.active", $("ul.nav-sidebar")).parent().parent().children('a').click();
+                var jQueryLi = $("li.active", $("ul.nav-sidebar")).parent().parent('li');
+                jQueryLi.addClass('opened');
+                jQueryLi.find("ul").slideDown();
 
 
               //dropSidebarShadow();
