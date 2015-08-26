@@ -128,7 +128,7 @@ JS
 
             <? if ($items = \Yii::$app->adminMenu->getItems()) : ?>
                 <? foreach ($items as $adminMenuItem) : ?>
-                    <? if ($adminMenuItem->isAllowShow()) : ?>
+                    <? if ($adminMenuItem->isAllowShow() && $adminMenuItem->items) : ?>
                         <div class="sidebar-menu" id="<?= $adminMenuItem->code; ?>">
                             <div class="sx-head" title="<?= $adminMenuItem->label; ?>">
                                 <? if ($imgUrl = $adminMenuItem->getImgUrl()) : ?>

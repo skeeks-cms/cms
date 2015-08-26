@@ -308,11 +308,15 @@ return
     'other' =>
     [
         'label'     => 'Дополнительно',
-        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/other.png'],
 
         'items' =>
         [
-
+            [
+                "label"     => "Чистка временных данных",
+                "url"       => ["admin/clear"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clear.png'],
+            ],
         ]
     ]
 ];
