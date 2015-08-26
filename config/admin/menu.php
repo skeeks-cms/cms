@@ -46,6 +46,7 @@ return
 [
     'content' =>
     [
+        'priority'  => 0,
         'label'     => 'Контент',
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
 
@@ -73,6 +74,7 @@ return
 
     'settings' =>
     [
+        'priority'  => 10,
         'label'     => 'Настройки',
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
 
@@ -272,6 +274,7 @@ return
 
     'marketplace' =>
     [
+        'priority'  => 20,
         'label'     => 'Маркетплейс',
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png'],
 
@@ -307,6 +310,7 @@ return
 
     'other' =>
     [
+        'priority'  => 100,
         'label'     => 'Дополнительно',
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/other.png'],
 
