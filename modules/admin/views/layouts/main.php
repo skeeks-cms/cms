@@ -128,7 +128,7 @@ JS
 
             <? if ($items = \Yii::$app->adminMenu->getItems()) : ?>
                 <? foreach ($items as $adminMenuItem) : ?>
-                    <? if ($adminMenuItem->isAllowShow()) : ?>
+                    <? if ($adminMenuItem->isAllowShow() && $adminMenuItem->items) : ?>
                         <div class="sidebar-menu" id="<?= $adminMenuItem->code; ?>">
                             <div class="sx-head" title="<?= $adminMenuItem->label; ?>">
                                 <? if ($imgUrl = $adminMenuItem->getImgUrl()) : ?>
@@ -146,13 +146,37 @@ JS
                                 <? foreach ($subAdminMenuItems as $subAdminMenuItem) : ?>
                                     <? if ($subAdminMenuItem->isAllowShow()) : ?>
                                         <li <?= $subAdminMenuItem->isActive() ? 'class="active"' : '' ?>>
-                                            <a href="<?= $subAdminMenuItem->getUrl() ?>" title="<?= $subAdminMenuItem->label; ?>" class="sx-test">
+                                            <a href="<?= $subAdminMenuItem->getUrl() ? $subAdminMenuItem->getUrl() : "#" ?>" title="<?= $subAdminMenuItem->label; ?>" class="sx-test">
                                                 <span class="sx-icon">
                                                     <img src="<?= $subAdminMenuItem->getImgUrl(); ?>" />
                                                 </span>
                                                 <span class="txt"><?= $subAdminMenuItem->label; ?></span>
+                                                <? if ($subAdminMenuItem->items) : ?>
+                                                    <span class="caret"></span>
+                                                <? endif; ?>
                                             </a>
+
+
+                                                <? if ($sub3AdminMenuItems = $subAdminMenuItem->items) : ?>
+                                                    <ul class="nav nav-sidebar">
+                                                    <? foreach ($sub3AdminMenuItems as $sub3AdminMenuItem) : ?>
+                                                        <? if ($sub3AdminMenuItem->isAllowShow()) : ?>
+                                                            <li <?= $sub3AdminMenuItem->isActive() ? 'class="active"' : '' ?>>
+                                                                <a href="<?= $sub3AdminMenuItem->getUrl() ?>" title="<?= $sub3AdminMenuItem->label; ?>" class="sx-test">
+                                                                    <span class="sx-icon">
+                                                                        <img src="<?= $sub3AdminMenuItem->getImgUrl(); ?>" />
+                                                                    </span>
+                                                                    <span class="txt"><?= $sub3AdminMenuItem->label; ?></span>
+                                                                </a>
+                                                            </li>
+                                                        <? endif; ?>
+                                                    <? endforeach; ?>
+                                                    </ul>
+                                                <? endif; ?>
+
                                         </li>
+
+
                                     <? endif; ?>
                                 <? endforeach; ?>
                                 </ul>

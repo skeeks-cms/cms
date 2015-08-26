@@ -14,60 +14,45 @@
      */
     sx.classes.MainNav = sx.classes.Component.extend({
 
-        _init: function()
-        {},
-
         _onDomReady: function()
         {
-            if (window.opener)
-            {
-                //$("body").addClass("empty");
-            }
 
-            $("ul.nav-sidebar").find("a").each(function() {
-                /** @type {string} */
-                var line = String(window.location);
-                if (line.substr(line.length - 1) == "#") {
-                  /** @type {string} */
-                  line = line.slice(0, -1);
-                }
-                if ($($(this))[0].href == line) {
-                  $(this).parent().addClass("active");
-                  $(this).parents("ul").add(this).each(function() {
-                    $(this).show().parent().addClass("opened");
-                  });
-                }
-              });
-              $(".nav-sidebar").on("click", "a", function(types) {
+            $(".nav-sidebar").on("click", "a", function(types) {
                 if ($.ajaxLoad) {
                   types.preventDefault();
                 }
                 if (!$(this).parent().hasClass("hover"))
                 {
-                  if ($(this).parent().find("ul").size() != 0) {
-                    if ($(this).parent().hasClass("opened")) {
+                  if ($(this).parent().find("ul").size() != 0)
+                  {
+                    if ($(this).parent().hasClass("opened"))
+                    {
                       $(this).parent().removeClass("opened");
-                    } else {
+                    } else
+                    {
                       $(this).parent().addClass("opened");
                     }
-                    $(this).parent().find("ul").first().slideToggle("slow", function() {
+                    $(this).parent().find("ul").first().slideToggle("fast", function() {
                       //dropSidebarShadow();
                     });
-                    $(this).parent().parent().find("ul").each(function() {
-                      if (!$(this).parent().hasClass("opened")) {
+                    $(this).parent().parent().find("ul").each(function()
+                    {
+                      if (!$(this).parent().hasClass("opened"))
+                      {
                         $(this).slideUp();
                       }
                     });
                     if (!$(this).parent().parent().parent().hasClass("opened")) {
-                      $(".nav a").not(this).parent().find("ul").slideUp("slow", function() {
+                      $(".nav a").not(this).parent().find("ul").slideUp("fast", function() {
                         $(this).parent().removeClass("opened").find(".opened").each(function() {
                           $(this).removeClass("opened");
                         });
                       });
                     }
-                  } else {
+                  } else
+                  {
                     if (!$(this).parent().parent().parent().hasClass("opened")) {
-                      $(".nav a").not(this).parent().find("ul").slideUp("slow", function() {
+                      $(".nav a").not(this).parent().find("ul").slideUp("fast", function() {
                         $(this).parent().removeClass("opened").find(".opened").each(function() {
                           $(this).removeClass("opened");
                         });
@@ -76,30 +61,9 @@
                   }
                 }
               });
-              $(".nav-sidebar > li").hover(function() {
-                if ($("body").hasClass("sidebar-minified")) {
-                  $(this).addClass("opened hover");
-                }
-              }, function() {
-                if ($("body").hasClass("sidebar-minified")) {
-                  $(this).removeClass("opened hover");
-                }
-              });
 
+                $("li.active", $("ul.nav-sidebar")).parent().parent().children('a').click();
 
-
-              $("#sidebar-menu").click(function() {
-                $(".sidebar").trigger("open");
-              });
-              $("#sidebar-minify").click(function() {
-                if ($("body").hasClass("sidebar-minified")) {
-                  $("body").removeClass("sidebar-minified");
-                  $("#sidebar-minify i").removeClass("fa-list").addClass("fa-ellipsis-v");
-                } else {
-                  $("body").addClass("sidebar-minified");
-                  $("#sidebar-minify i").removeClass("fa-ellipsis-v").addClass("fa-list");
-                }
-              });
 
               //dropSidebarShadow();
               //$(".sidebar").mmenu();
