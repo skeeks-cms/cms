@@ -590,10 +590,28 @@ class RbacController extends Controller
             {
                 foreach ($group['items'] as $itemData)
                 {
+
+                    if (!is_array($itemData))
+                    {
+                        continue;
+                    }
+
+                    if (!isset($itemData['url']))
+                    {
+                        continue;
+                    }
+
+                    $url = $itemData['url'][0];
+
+                    if (!is_array($url))
+                    {
+                        continue;
+                    }
+
                     /**
                      * @var $controller \yii\web\Controller
                      */
-                    list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
+                    list($controller, $route) = \Yii::$app->createController($url);
 
 
                     //print_r("---------");
