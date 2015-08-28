@@ -8,7 +8,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\user\UserEmail;
-use skeeks\cms\models\UserAuthclient;
+use skeeks\cms\models\UserAuthClient;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use yii\helpers\ArrayHelper;
 
@@ -22,7 +22,7 @@ class AdminUserAuthClientController extends AdminModelEditorController
     {
         $this->name                   = "Управление социальными профилями";
         $this->modelShowAttribute      = "displayName";
-        $this->modelClassName          = UserAuthclient::className();
+        $this->modelClassName          = UserAuthClient::className();
 
         parent::init();
 
@@ -33,23 +33,23 @@ class AdminUserAuthClientController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(), [
 
             'index' =>
-                [
-                    "columns"      => [
-                        'displayName',
+            [
+                "columns"      => [
+                    'displayName',
 
-                        [
-                            'class'         => \skeeks\cms\grid\UserColumnData::className(),
-                            'attribute'     => "user_id"
-                        ],
-
-                        [
-                            'class'         => \skeeks\cms\grid\DateTimeColumnData::className(),
-                            'attribute'     => "created_at"
-                        ],
-
-
+                    [
+                        'class'         => \skeeks\cms\grid\UserColumnData::className(),
+                        'attribute'     => "user_id"
                     ],
+
+                    [
+                        'class'         => \skeeks\cms\grid\DateTimeColumnData::className(),
+                        'attribute'     => "created_at"
+                    ],
+
+
                 ],
+            ],
 
             'create' =>
             [

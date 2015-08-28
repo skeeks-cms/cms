@@ -64,7 +64,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  *
  * @property string $displayName
  *
- * @property UserAuthclient[] $userAuthclients
+ * @property UserAuthClient[] $userAuthClients
  */
 class User
     extends Core
@@ -440,9 +440,9 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUserAuthclients()
+    public function getUserAuthClients()
     {
-        return $this->hasMany(UserAuthclient::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserAuthClient::className(), ['user_id' => 'id']);
     }
 
     /**
