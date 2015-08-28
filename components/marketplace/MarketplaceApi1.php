@@ -15,7 +15,7 @@ use yii\helpers\Json;
  * @property string $url;
  * @property string $baseUrl;
  *
- * Class MarketPlaceApi
+ * Class MarketplaceApi
  * @package skeeks\cms\components\marketplace
  */
 class MarketplaceApi extends Component
