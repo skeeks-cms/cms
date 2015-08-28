@@ -35,8 +35,9 @@ class SeoController extends Controller
      */
     public function actionSitemap()
     {
-        $trees = Tree::find()->where(['site_code' => \Yii::$app->cms->site->code])->orderBy(['level' => SORT_ASC, 'priority' => SORT_DESC])->all();
+        ini_set("memory_limit","512M");
 
+        $trees = Tree::find()->where(['site_code' => \Yii::$app->cms->site->code])->orderBy(['level' => SORT_ASC, 'priority' => SORT_DESC])->all();
 
         if ($trees)
         {
