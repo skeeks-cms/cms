@@ -277,7 +277,7 @@ class User
             ['active', 'default', 'value' => Cms::BOOL_Y],
 
             [['username', 'auth_key', 'password_hash'], 'required'],
-            [['created_at', 'updated_at', 'group_id'], 'integer'],
+            [['created_at', 'updated_at'], 'integer'],
 
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
