@@ -69,6 +69,8 @@ class AdminOneModelUpdateAction extends AdminOneModelEditAction
                     );
                 }
 
+                $model->refresh();
+
             } else
             {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
