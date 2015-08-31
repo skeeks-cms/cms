@@ -155,6 +155,12 @@ return
                     ],
 
                     [
+                        "label"     => "Свойства пользователей",
+                        "url"       => ["cms/admin-cms-user-universal-property"],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png']
+                    ],
+
+                    [
                         "label"     => "База email адресов",
                         "url"       => ["cms/admin-user-email"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/email-2.png']

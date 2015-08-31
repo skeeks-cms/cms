@@ -18,6 +18,8 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\validators\string\LoginValidator;
 use skeeks\cms\validators\user\UserEmailValidator;
@@ -71,6 +73,7 @@ class User
     implements IdentityInterface
 {
     use behaviors\traits\HasFiles;
+    use HasRelatedPropertiesTrait;
 
     /**
      * @inheritdoc
@@ -245,6 +248,15 @@ class User
                     ],
                 ]
             ],
+
+
+            HasRelatedProperties::className() =>
+            [
+                'class'                             => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName'   => CmsUserProperty::className(),
+                'relatedPropertyClassName'          => CmsUserUniversalProperty::className(),
+            ],
+
         ]);
     }
 
