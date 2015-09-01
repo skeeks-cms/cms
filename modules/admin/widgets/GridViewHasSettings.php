@@ -445,7 +445,6 @@ JS
                 $data[$code] = 'Главное изображение';
             } else if ($column instanceof DataColumn)
             {
-
                 if ($column->label === null)
                 {
                     $provider = $this->dataProvider;
@@ -454,7 +453,8 @@ JS
                         /* @var $model Model */
                         $model = new $provider->query->modelClass;
                         $label = $model->getAttributeLabel($column->attribute);
-                    } else {
+                    } else
+                    {
                         $models = $provider->getModels();
                         if (($model = reset($models)) instanceof Model) {
                             /* @var $model Model */
