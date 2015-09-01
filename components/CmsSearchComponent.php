@@ -72,6 +72,8 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
 
     public $searchQueryParamName = "q";
 
+    public $phraseLiveTime = 0;
+
 
     public function rules()
     {
@@ -79,7 +81,8 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
             [['searchQueryParamName'], 'string'],
             [['enabledElementProperties'], 'string'],
             [['enabledElementPropertiesSearchable'], 'string'],
-            [['searchFields'], 'safe'],
+            [['phraseLiveTime'], 'integer'],
+            [['searchElementFields'], 'safe'],
             [['searchElementContentIds'], 'safe'],
         ]);
     }
@@ -92,6 +95,7 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
             'enabledElementProperties'              => 'Искать среди дополнительных полей элементов',
             'enabledElementPropertiesSearchable'    => 'Учитывать настройки дополнительных полей при поиске по ним',
             'searchElementContentIds'               => 'Искать элементы контента следующих типов',
+            'phraseLiveTime'                        => 'Время хранения поисковых запросов',
         ]);
     }
 
@@ -165,10 +169,17 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
      */
     public function logResult(ActiveDataProvider $dataProvider)
     {
+        $pages = 1;
+
+        if ($dataProvider->totalCount > $dataProvider->pagination->pageSize)
+        {
+            $pages = round($dataProvider->totalCount / $dataProvider->pagination->pageSize);
+        }
+
         $searchPhrase = new CmsSearchPhrase([
             'phrase'        => $this->searchQuery,
             'result_count'  => $dataProvider->totalCount,
-            'pages'         => $dataProvider->pagination->totalCount,
+            'pages'         => $pages,
         ]);
 
         $searchPhrase->save();

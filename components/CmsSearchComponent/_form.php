@@ -17,6 +17,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet('Основное'); ?>
     <?= $form->field($model, 'searchQueryParamName')->textInput()
             ->hint('Название параметра для адресной строки'); ?>
+
+
+    <?= $form->fieldInputInt($model, 'phraseLiveTime')
+            ->hint('Если указано 0 то поисковые запросы не будут удалятся никогда'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Поиск элементов'); ?>

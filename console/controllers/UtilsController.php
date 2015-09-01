@@ -10,6 +10,7 @@ namespace skeeks\cms\console\controllers;
 use skeeks\cms\base\console\Controller;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsSearchPhrase;
 use skeeks\sx\Dir;
 use Yii;
 use yii\base\Event;
@@ -94,6 +95,22 @@ class UtilsController extends Controller
         $dir = new Dir(\Yii::getAlias($dirPath));
         $dir->clear();
         $this->_checkIsEmptyDir($dir);
+    }
+
+
+    /**
+     * Удаление старых поисковых запросов
+     */
+    public function actionClearSearchPhrase()
+    {
+        if (\Yii::$app->cmsSearch->phraseLiveTime)
+        {
+            $deleted = CmsSearchPhrase::deleteAll([
+                '<=', 'created_at', \Yii::$app->formatter->asTimestamp(time()) - (int) \Yii::$app->cmsSearch->phraseLiveTime
+            ]);
+
+            \Yii::info("Удалено поисковых запросов: " . $deleted);
+        }
     }
 
     /**
