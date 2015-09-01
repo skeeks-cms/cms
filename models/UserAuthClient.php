@@ -15,10 +15,10 @@ use Yii;
 use \yii\db\ActiveRecord;
 
 /**
- * Class UserAuthclient
+ * Class UserAuthClient
  * @package skeeks\module\cms\user\model
  */
-class UserAuthclient extends ActiveRecord
+class UserAuthClient extends ActiveRecord
 {
     /**
      * @inheritdoc

@@ -155,6 +155,12 @@ return
                     ],
 
                     [
+                        "label"     => "Свойства пользователей",
+                        "url"       => ["cms/admin-cms-user-universal-property"],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png']
+                    ],
+
+                    [
                         "label"     => "База email адресов",
                         "url"       => ["cms/admin-user-email"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/email-2.png']
@@ -190,6 +196,45 @@ return
                     ],
                 ],
             ],
+
+
+            [
+
+                "label"     => "Поиск",
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/search.png'],
+
+                'items' =>
+                [
+                    [
+                        "label" => "Настройки",
+                        "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\components\CmsSearchComponent'],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                        {
+                            return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                        },
+                    ],
+
+                    [
+                        "label"     => "Статистика",
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/statistics.png'],
+
+                        'items' =>
+                        [
+                            [
+                                "label" => "Список переходов",
+                                "url"   => ["cms/admin-search-phrase"],
+                            ],
+
+                            [
+                                "label" => "Список фраз",
+                                "url"   => ["cms/admin-search-phrase-group"],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+
 
 
             [

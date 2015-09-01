@@ -37,6 +37,13 @@ trait ActiveFormAjaxSubmitTrait
                         return false;
                     });
 
+                    $('#{$this->id}').on('ajaxComplete', function (event, jqXHR, textStatus) {
+                        if (jqXHR.status == 403)
+                        {
+                            sx.notify.error(jqXHR.responseJSON.message);
+                        }
+                    });
+
                     $('#{$this->id}').on('afterValidate', function (event, messages) {
 
                         if (event.result === false)
@@ -70,6 +77,9 @@ JS
                     $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
                         return false;
                     });
+
+
+
 
                     $('#{$this->id}').on('afterValidate', function (event, messages) {
 

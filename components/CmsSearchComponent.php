@@ -15,9 +15,11 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsSearchPhrase;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
+use yii\data\ActiveDataProvider;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -70,6 +72,8 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
 
     public $searchQueryParamName = "q";
 
+    public $phraseLiveTime = 0;
+
 
     public function rules()
     {
@@ -77,7 +81,8 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
             [['searchQueryParamName'], 'string'],
             [['enabledElementProperties'], 'string'],
             [['enabledElementPropertiesSearchable'], 'string'],
-            [['searchFields'], 'safe'],
+            [['phraseLiveTime'], 'integer'],
+            [['searchElementFields'], 'safe'],
             [['searchElementContentIds'], 'safe'],
         ]);
     }
@@ -90,6 +95,7 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
             'enabledElementProperties'              => 'Искать среди дополнительных полей элементов',
             'enabledElementPropertiesSearchable'    => 'Учитывать настройки дополнительных полей при поиске по ним',
             'searchElementContentIds'               => 'Искать элементы контента следующих типов',
+            'phraseLiveTime'                        => 'Время хранения поисковых запросов',
         ]);
     }
 
@@ -156,5 +162,26 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
         }
 
         return $this;
+    }
+
+    /**
+     * @param ActiveDataProvider $dataProvider
+     */
+    public function logResult(ActiveDataProvider $dataProvider)
+    {
+        $pages = 1;
+
+        if ($dataProvider->totalCount > $dataProvider->pagination->pageSize)
+        {
+            $pages = round($dataProvider->totalCount / $dataProvider->pagination->pageSize);
+        }
+
+        $searchPhrase = new CmsSearchPhrase([
+            'phrase'        => $this->searchQuery,
+            'result_count'  => $dataProvider->totalCount,
+            'pages'         => $pages,
+        ]);
+
+        $searchPhrase->save();
     }
 }

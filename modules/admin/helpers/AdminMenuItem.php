@@ -52,6 +52,11 @@ class AdminMenuItem extends Component
     public $priority = 0;
 
     /**
+     * @var null
+     */
+    public $activeCallback = null;
+
+    /**
      * @var AdminMenuItem|null
      */
     public $parent = null;
@@ -73,11 +78,28 @@ class AdminMenuItem extends Component
      */
     public function isActive()
     {
+        if ($this->activeCallback && is_callable($this->activeCallback))
+        {
+            $callback = $this->activeCallback;
+            return (bool) $callback($this);
+        }
+
         if (is_array($this->url))
         {
             if (strpos('-' . \Yii::$app->controller->route . '/', $this->url[0] . '/'))
             {
                 return true;
+            }
+        }
+
+        if ($this->items)
+        {
+            foreach ($this->items as $item)
+            {
+                if ($item->isActive())
+                {
+                    return true;
+                }
             }
         }
 

@@ -13,6 +13,7 @@ namespace skeeks\cms\actions;
 
 use skeeks\cms\App;
 use skeeks\cms\exceptions\NotConnectedToDbException;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
 use yii\base\Action;
@@ -75,7 +76,12 @@ class ErrorAction extends \yii\web\ErrorAction
 
         if (Yii::$app->getRequest()->getIsAjax())
         {
-            return "$name: $message";
+            $rr = new RequestResponse();
+
+            $rr->success = false;
+            $rr->message = "$name: $message";
+
+            return (array) $rr;
         } else
         {
             if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())

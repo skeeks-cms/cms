@@ -60,6 +60,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
 
     public $activeQueryCallback;
+    public $dataProviderCallback;
 
 
     static public function descriptorConfig()
@@ -235,6 +236,12 @@ class ContentElementsCmsWidget extends WidgetRenderable
         {
             $callback = $this->activeQueryCallback;
             $callback($this->dataProvider->query);
+        }
+
+        if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
+        {
+            $callback = $this->dataProviderCallback;
+            $callback($this->dataProvider);
         }
 
         return parent::_run();

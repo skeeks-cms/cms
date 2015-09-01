@@ -31,9 +31,10 @@ $config =
         ],
 
         'user' => [
-            'class'         => '\yii\web\User',
-            'identityClass' => 'skeeks\cms\models\User',
-            'enableAutoLogin' => true,
+            'class'             => '\yii\web\User',
+            'identityClass'     => 'skeeks\cms\models\CmsUser',
+            'enableAutoLogin'   => true,
+            'loginUrl'          => ['cms/auth/login'],
         ],
 
 

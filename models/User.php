@@ -18,6 +18,8 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\validators\string\LoginValidator;
 use skeeks\cms\validators\user\UserEmailValidator;
@@ -64,13 +66,14 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  *
  * @property string $displayName
  *
- * @property UserAuthclient[] $userAuthclients
+ * @property UserAuthClient[] $userAuthClients
  */
 class User
     extends Core
     implements IdentityInterface
 {
     use behaviors\traits\HasFiles;
+    use HasRelatedPropertiesTrait;
 
     /**
      * @inheritdoc
@@ -245,6 +248,15 @@ class User
                     ],
                 ]
             ],
+
+
+            HasRelatedProperties::className() =>
+            [
+                'class'                             => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName'   => CmsUserProperty::className(),
+                'relatedPropertyClassName'          => CmsUserUniversalProperty::className(),
+            ],
+
         ]);
     }
 
@@ -277,7 +289,7 @@ class User
             ['active', 'default', 'value' => Cms::BOOL_Y],
 
             [['username', 'auth_key', 'password_hash'], 'required'],
-            [['created_at', 'updated_at', 'group_id'], 'integer'],
+            [['created_at', 'updated_at'], 'integer'],
 
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
@@ -440,9 +452,9 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUserAuthclients()
+    public function getUserAuthClients()
     {
-        return $this->hasMany(UserAuthclient::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserAuthClient::className(), ['user_id' => 'id']);
     }
 
     /**
