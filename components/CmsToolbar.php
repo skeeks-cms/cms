@@ -37,7 +37,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Панель инструментов публичного раздела',
+            'name'          => 'Панель быстрого управления',
         ]);
     }
 
