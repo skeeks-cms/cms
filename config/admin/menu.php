@@ -6,6 +6,10 @@
  * @date 12.03.2015
  */
 
+/**
+ * Меню контента
+ * @return array
+ */
 function contentMenu()
 {
     $result = [];
@@ -41,6 +45,29 @@ function contentMenu()
 
     return $result;
 };
+
+function componentsMenu()
+{
+    $result = [];
+
+    foreach (\Yii::$app->getComponents(true) as $id => $data)
+    {
+        $loadedComponent = \Yii::$app->get($id);
+        if ($loadedComponent instanceof \skeeks\cms\base\Component)
+        {
+            $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent([
+                'label'     => $loadedComponent->descriptor->name,
+                'url'   => ["cms/admin-settings", "component" => $loadedComponent->className()],
+                /*"activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                {
+                    return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                },*/
+            ]);
+        }
+    }
+
+    return $result;
+}
 
 return
 [
@@ -128,6 +155,7 @@ return
                         "label"     => "Настройки модулей",
                         "url"       => ["cms/admin-settings"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        'items'     => componentsMenu()
                     ],
 
                     [

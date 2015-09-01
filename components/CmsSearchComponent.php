@@ -44,7 +44,7 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Поиск по сайту',
+            'name'          => 'Поиск',
         ]);
     }
 

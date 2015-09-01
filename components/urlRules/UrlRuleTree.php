@@ -26,7 +26,7 @@ class UrlRuleTree
     /**
      *
      * Добавлять слэш на конце или нет
-     *
+     * TODO: is depricated > 2.0.14
      * @var bool
      */
     public $useLastDelimetr = true;
@@ -37,8 +37,6 @@ class UrlRuleTree
         {
             $this->name = __CLASS__;
         }
-
-
     }
 
     static public $models = [];
@@ -115,7 +113,7 @@ class UrlRuleTree
 
     protected function _go($normalizeDir = null)
     {
-        if ($this->useLastDelimetr)
+        if (\Yii::$app->seo->useLastDelimetrTree)
         {
             $normalizeDir = substr($normalizeDir, 0, (strlen($normalizeDir) - 1));
         }
@@ -194,7 +192,7 @@ class UrlRuleTree
         $filter             = new NormalizeDir();
         $pathInfoNormal     = $filter->filter($pathInfo);
 
-        if ($this->useLastDelimetr)
+        if (\Yii::$app->seo->useLastDelimetrTree)
         {
             return $pathInfoNormal . DIRECTORY_SEPARATOR;
         } else
