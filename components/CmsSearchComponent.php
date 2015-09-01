@@ -15,9 +15,11 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsSearchPhrase;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
+use yii\data\ActiveDataProvider;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -156,5 +158,19 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
         }
 
         return $this;
+    }
+
+    /**
+     * @param ActiveDataProvider $dataProvider
+     */
+    public function logResult(ActiveDataProvider $dataProvider)
+    {
+        $searchPhrase = new CmsSearchPhrase([
+            'phrase'        => $this->searchQuery,
+            'result_count'  => $dataProvider->totalCount,
+            'pages'         => $dataProvider->pagination->totalCount,
+        ]);
+
+        $searchPhrase->save();
     }
 }

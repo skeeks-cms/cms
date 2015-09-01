@@ -17,7 +17,7 @@
         _onDomReady: function()
         {
 
-            $(".nav-sidebar").on("click", "a", function(types) {
+            $(".nav-sidebar>li>a").on("click", function(types) {
                 if ($.ajaxLoad) {
                   types.preventDefault();
                 }
@@ -66,6 +66,7 @@
                 var jQueryLi = $("li.active", $("ul.nav-sidebar")).parent().parent('li');
                 jQueryLi.addClass('opened');
                 jQueryLi.find("ul").slideDown();
+
 
 
               //dropSidebarShadow();

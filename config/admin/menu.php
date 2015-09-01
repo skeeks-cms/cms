@@ -199,6 +199,45 @@ return
 
 
             [
+
+                "label"     => "Поиск",
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/search.png'],
+
+                'items' =>
+                [
+                    [
+                        "label" => "Настройки",
+                        "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\components\CmsSearchComponent'],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                        {
+                            return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                        },
+                    ],
+
+                    [
+                        "label"     => "Статистика",
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/statistics.png'],
+
+                        'items' =>
+                        [
+                            [
+                                "label" => "Список переходов",
+                                "url"   => ["cms/admin-search-phrase"],
+                            ],
+
+                            [
+                                "label" => "Список фраз",
+                                "url"   => ["cms/admin-search-phrase-group"],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+
+
+
+            [
                 'label'     => 'Инструменты',
                 'priority'  => 0,
                 'enabled'   => true,
