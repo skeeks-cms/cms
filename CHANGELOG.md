@@ -3,6 +3,7 @@
 
 2.0.15.pre
 -----------------
+  * Доработка ajax менеджера
   * Исправлены include_once пути к подключаемым файлам
   * is depricated params in UrlRuleContentElement and UrlRuleTree !!!
   * Переименованные некоторые компоненты

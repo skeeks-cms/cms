@@ -56,6 +56,14 @@
             });
 
             this.get("ajaxQuery").execute();
+        },
+
+        /**
+         * @returns {sx.classes.shop._App.ajaxQuery|*}
+         */
+        getAjaxQuery: function()
+        {
+            return this.get("ajaxQuery");
         }
     });
 
