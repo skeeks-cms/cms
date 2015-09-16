@@ -72,7 +72,7 @@ if (is_array($model) || is_object($model))
 
 
 }
-$userColumns = include_once "_columns.php";
+$userColumns = include_once __DIR__ . "/_columns.php";
 
 $columns = \yii\helpers\ArrayHelper::merge($userColumns, $autoColumns);
 

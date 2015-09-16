@@ -39,7 +39,7 @@ class AuthClientSettings extends \skeeks\cms\base\Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Настройки авторизации через социальные сети',
+            'name'          => 'Авторизация через соц. сети',
         ]);
     }
 

@@ -14,7 +14,7 @@ use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
-/**
+/**asd
  * Class UrlRuleContentElement
  * @package skeeks\cms\components\urlRules
  */
@@ -25,9 +25,11 @@ class UrlRuleContentElement
      *
      * Добавлять слэш на конце или нет
      *
+     * TODO: is depricated > 2.0.14
      * @var bool
      */
     public $useLastDelimetr = true;
+
 
     public function init()
     {
@@ -76,7 +78,7 @@ class UrlRuleContentElement
                 $url = $contentElement->cmsTree->dir . DIRECTORY_SEPARATOR;
             }
 
-            $url .= $contentElement->id . '-' . $contentElement->code . ($this->useLastDelimetr ? DIRECTORY_SEPARATOR : "");
+            $url .= $contentElement->id . '-' . $contentElement->code . ((bool) \Yii::$app->seo->useLastDelimetrContentElements ? DIRECTORY_SEPARATOR : "");
 
             if (isset($params['code']))
             {
@@ -145,7 +147,7 @@ class UrlRuleContentElement
         $filter             = new NormalizeDir();
         $pathInfoNormal     = $filter->filter($pathInfo);
 
-        if ($this->useLastDelimetr)
+        if ((bool) \Yii::$app->seo->useLastDelimetrContentElements)
         {
             return $pathInfoNormal . DIRECTORY_SEPARATOR;
         } else

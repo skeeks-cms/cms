@@ -88,7 +88,7 @@
          */
         _loadQueque: function()
         {
-            console.info('_loadQueque');
+            //console.info('_loadQueque');
             this.queue = this.getTasks();
             return this;
         },
@@ -100,7 +100,7 @@
          */
         _initNextTask: function()
         {
-            console.info('init next task');
+            //console.info('init next task');
 
             //Следующая задача, делается выполняемой сайчас.
             this.executingTask = _.first(this.queue);
@@ -120,7 +120,7 @@
          */
         _runProcessing: function()
         {
-            console.info('Task manager _runProcessing');
+            //console.info('Task manager _runProcessing');
 
             var self = this;
 
@@ -133,7 +133,7 @@
             //В очереди больше нет задач, нужно все остановить.
             if (!this.countQuequeTasks())
             {
-                console.info('В очереди больше нет задач, остановка.');
+                //console.info('В очереди больше нет задач, остановка.');
 
                 this.stop();
                 return this;
@@ -146,7 +146,7 @@
             //Если больше
             if (!this.executingTask)
             {
-                console.info('Не определена выполняемая задача, остановка');
+                //console.info('Не определена выполняемая задача, остановка');
 
                 this.stop();
                 return this;
