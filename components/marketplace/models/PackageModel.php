@@ -63,7 +63,7 @@ class PackageModel extends Model
         $extensionCodes = ArrayHelper::map(\Yii::$app->extensions, 'name', 'name');
 
         $result = \Yii::$app->cmsMarkeplace->get(['packages', [
-            'onlyPackages'  => $extensionCodes,
+            //'codes'  => $extensionCodes,
             'per-page'      => 200
         ]]);
 
