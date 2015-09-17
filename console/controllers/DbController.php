@@ -16,6 +16,7 @@ use skeeks\sx\Dir;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
+use yii\helpers\FileHelper;
 
 /**
  * Работа с базоый данных mysql
@@ -59,11 +60,11 @@ class DbController extends Controller
         \Yii::$app->db->getSchema()->refresh();
     }
 
-
     /**
-     * Проведение всех миграций всех подключенных расширений
+     * TODO: is depricated
+     * @throws \yii\base\NotSupportedException
      */
-    public function actionApplyMigrations()
+    public function actioV1ApplyMigrations()
     {
         $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations --interactive=0" ;
         $this->systemCmdRoot($cmd);
@@ -78,8 +79,42 @@ class DbController extends Controller
         }
 
         \Yii::$app->db->getSchema()->refresh();
+    }
 
-        /*$this->systemCmdRoot("php yii migrate --interactive=0");*/
+    /**
+     * Проведение всех миграций всех подключенных расширений
+     */
+    public function actionApplyMigrations()
+    {
+        $tmpMigrateDir = \Yii::getAlias('@runtime/db-migrate');
+
+        FileHelper::removeDirectory($tmpMigrateDir);
+        FileHelper::createDirectory($tmpMigrateDir);
+
+        if (!is_dir($tmpMigrateDir))
+        {
+            $this->stdoutN('could not create a temporary directory migration');
+        }
+
+        $this->stdoutN('Tmp migrate dir is ready');
+        $this->stdoutN('Copy migrate files');
+
+        if ($dirs = $this->_findMigrationDirs())
+        {
+            foreach ($dirs as $path)
+            {
+                FileHelper::copyDirectory($path, $tmpMigrateDir);
+            }
+        }
+
+
+        $cmd = "php yii migrate --migrationPath=" . $tmpMigrateDir . '  --interactive=0';
+        $this->systemCmdRoot($cmd);
+
+        /*$cmd = "php yii migrate --interactive=0";
+        $this->systemCmdRoot($cmd);*/
+
+        \Yii::$app->db->getSchema()->refresh();
     }
 
     /**
