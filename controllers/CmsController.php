@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\App;
 use skeeks\cms\base\Controller;
 use skeeks\cms\exceptions\NotConnectedToDbException;
+use skeeks\cms\helpers\RequestResponse;
 use yii\db\Exception;
 
 /**
@@ -37,6 +38,45 @@ class CmsController extends Controller
         \Yii::$app->cmsToolbar->enabled = false;
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
+        $connectToDbForm = new \skeeks\cms\models\forms\ConnectToDbForm();
+
+        $rr = new RequestResponse();
+
+        /*if ($rr->isRequestOnValidateAjaxForm())
+        {
+            return $rr->ajaxValidateForm($connectToDbForm);
+        }*/
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($connectToDbForm->load(\Yii::$app->request->post()))
+            {
+                if ($connectToDbForm->hasConnect())
+                {
+                    if ($connectToDbForm->write())
+                    {
+                        $rr->success = true;
+                        $rr->message = "Файл с настройками создан";
+                    } else
+                    {
+                        $rr->success = false;
+                        $rr->message = "Не удалось записать настройки в файл";
+                    }
+
+                } else
+                {
+                    $rr->success = false;
+                    $rr->message = "Не удалось подключиться к базе данных";
+                }
+            } else
+            {
+                $rr->success = false;
+                $rr->message = "Некорректные настройки подключения к базе";
+            }
+
+            return $rr;
+        }
+
         try
         {
             \Yii::$app->db->open();
@@ -45,6 +85,7 @@ class CmsController extends Controller
             if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
             {
                 return $this->render('not-connected-to-db', [
+                    'connectToDbForm' => $connectToDbForm
                 ]);
             }
         }
