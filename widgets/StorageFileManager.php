@@ -141,7 +141,7 @@ HTML;
             "focusClass"        => 'active',
             "disabledClass"     => 'disabled',
             "responseType"      => 'json',
-            "multiplie"          => true,
+            "multiple"          => true,
 
         ];
 
@@ -180,7 +180,7 @@ HTML;
                 "focusClass"        => 'active',
                 "disabledClass"     => 'disabled',
                 "responseType"      => 'json',
-                "multiplie"          => true,
+                "multiple"          => true,
 
             ];
 
