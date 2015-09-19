@@ -13,11 +13,14 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\helpers\ModelRef;
 use skeeks\sx\models\Ref;
 use Yii;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\searchs\StorageFile as StorageFileSearch;
+use yii\db\ActiveRecord;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -249,5 +252,84 @@ class StorageFilesController extends Controller
         }
 
         return $response;
+    }
+
+
+    /**
+     * Прикрепить к моделе другой файл
+     * @see skeeks\cms\widgets\formInputs\StorageImage
+     * @return RequestResponse
+     */
+    public function actionLinkToModel()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost())
+        {
+            try
+            {
+                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelAttribute'))
+                {
+                    throw new \yii\base\Exception("Не достаточно входных данных");
+                }
+
+                $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
+                if (!$file)
+                {
+                    throw new \yii\base\Exception("Возможно файл уже удален или не загрузился");
+                }
+
+                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
+                {
+                    throw new \yii\base\Exception("Невозможно привязать файл к этой моделе");
+                }
+
+                $className = \Yii::$app->request->post('modelClassName');
+                /**
+                 * @var $model ActiveRecord
+                 */
+                $model = $className::findOne(\Yii::$app->request->post('modelId'));
+                if (!$model)
+                {
+                    throw new \yii\base\Exception("Модель к которой необходимо привязать файл не найдена");
+                }
+
+                if (!$model->hasAttribute(\Yii::$app->request->post('modelAttribute')))
+                {
+                    throw new \yii\base\Exception("У модели не найден атрибут привязки файла: " . \Yii::$app->request->post('modelAttribute'));
+                }
+
+                //Удаление старого файла
+                if ($oldFileId = $model->{\Yii::$app->request->post('modelAttribute')})
+                {
+                    /**
+                     * @var $oldFile CmsStorageFile
+                     * @var $file CmsStorageFile
+                     */
+                    $oldFile = CmsStorageFile::findOne($oldFileId);
+                    $oldFile->delete();
+                }
+
+                $model->{\Yii::$app->request->post('modelAttribute')} = $file->id;
+                if (!$model->save(false))
+                {
+                    throw new \yii\base\Exception("Не удалось сохранить модель");
+                }
+
+                $file->name = $model->name;
+                $file->save(false);
+
+                $rr->success = true;
+                $rr->message = "";
+
+            } catch(\Exception $e)
+            {
+                $rr->success = false;
+                $rr->message = $e->getMessage();
+            }
+
+        }
+
+        return $rr;
     }
 }

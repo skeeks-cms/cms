@@ -368,7 +368,7 @@
                 document.getElementById('source-simpleUpload')
             ]);
 
-            this.uploaderObj = new ss.SimpleUpload(_.extend(this.get("options"), {
+            this.uploaderObj = new ss.SimpleUpload(_.extend({
                 queue: true,
                 debug: false,
                 maxUploads: 1,
@@ -461,7 +461,7 @@
                         self.triggerCompleteUpload({});
                     }
                 }
-            }));
+            }, this.get("options")));
 
 
             if (self.uploaderObj)
