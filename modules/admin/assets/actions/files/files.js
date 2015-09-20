@@ -300,7 +300,7 @@
                 ajax.onComplete(function (e, data)
                 {
                     self.triggerCompleteUploadFile({
-                        'response': data
+                        'response': data.jqXHR.responseJSON
                     });
 
                     self.queue = self.queue - 1;
