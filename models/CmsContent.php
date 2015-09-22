@@ -11,7 +11,6 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -33,7 +32,6 @@ use Yii;
  * @property string $active
  * @property integer $priority
  * @property string $description
- * @property string $files
  * @property string $content_type
  * @property string $index_for_search
  * @property string $tree_chooser
@@ -48,7 +46,6 @@ use Yii;
 class CmsContent extends Core
 {
     use ValidateRulesTrait;
-    use \skeeks\cms\models\behaviors\traits\HasFiles;
 
     /**
      * @inheritdoc
@@ -56,16 +53,6 @@ class CmsContent extends Core
     public static function tableName()
     {
         return '{{%cms_content}}';
-    }
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(), [
-            HasFiles::className() => HasFiles::className(),
-        ]);
     }
 
     /**
@@ -84,7 +71,6 @@ class CmsContent extends Core
             'active' => Yii::t('app', 'Active'),
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
-            'files' => Yii::t('app', 'Files'),
             'content_type' => Yii::t('app', 'Content Type'),
             'index_for_search' => Yii::t('app', 'Индексировать для модуля поиска'),
             'tree_chooser' => Yii::t('app', 'Интерфейс привязки элемента к разделам'),
@@ -102,7 +88,7 @@ class CmsContent extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
             [['name', 'content_type', 'code'], 'required'],
-            [['description', 'files'], 'string'],
+            [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],

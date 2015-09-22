@@ -9,7 +9,6 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -31,7 +30,6 @@ use Yii;
  * @property string $active
  * @property integer $priority
  * @property string $description
- * @property string $files
  * @property string $index_for_search
  * @property string $name_meny
  * @property string $name_one
@@ -53,16 +51,6 @@ class CmsTreeType extends Core
     }
 
     /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(), [
-            HasFiles::className() => HasFiles::className(),
-        ]);
-    }
-
-    /**
      * @inheritdoc
      */
     public function attributeLabels()
@@ -78,7 +66,6 @@ class CmsTreeType extends Core
             'active' => Yii::t('app', 'Active'),
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
-            'files' => Yii::t('app', 'Files'),
             'index_for_search' => Yii::t('app', 'Index For Search'),
             'name_meny' => Yii::t('app', 'Name Meny'),
             'name_one' => Yii::t('app', 'Name One'),
@@ -93,7 +80,7 @@ class CmsTreeType extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
             [['name', 'code'], 'required'],
-            [['description', 'files'], 'string'],
+            [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['active', 'index_for_search'], 'string', 'max' => 1],
