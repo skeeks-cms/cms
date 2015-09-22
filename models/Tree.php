@@ -15,6 +15,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
@@ -57,9 +58,14 @@ use yii\helpers\ArrayHelper;
  * @property string $site_code
  * @property string $description_short_type
  * @property string $description_full_type
+ * @property integer $image_full_id
+ * @property integer $image_id
  *
  * @property string $absoluteUrl
  * @property string $url
+ *
+ * @property CmsStorageFile $image
+ * @property CmsStorageFile $imageFull
  *
  * @property CmsContentElement[]        $cmsContentElements
  * @property CmsContentElementTree[]    $cmsContentElementTrees
@@ -91,6 +97,13 @@ class Tree extends Core
         $behaviors = parent::behaviors();
 
         return ArrayHelper::merge(parent::behaviors(), [
+            HasStorageFile::className() =>
+            [
+                'class'     => HasStorageFile::className(),
+                'fields'    => ['image_id', 'image_full_id']
+            ],
+
+
             HasFiles::className() =>
             [
                 'class' => HasFiles::className()
@@ -172,6 +185,8 @@ class Tree extends Core
             'description_full' => Yii::t('app', 'Description Full'),
             'description_short_type' => Yii::t('app', 'Description Short Type'),
             'description_full_type' => Yii::t('app', 'Description Full Type'),
+            'image_id' => Yii::t('app', 'Главное фото (для анонса)'),
+            'image_full_id' => Yii::t('app', 'Главное фото'),
         ]);
     }
 
@@ -185,7 +200,7 @@ class Tree extends Core
             [['description_short', 'description_full'], 'string'],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             [['redirect'], 'string'],
-            [['priority', 'tree_type_id'], 'integer'],
+            [['priority', 'tree_type_id', 'image_id', 'image_full_id'], 'integer'],
             [['tree_menu_ids'], 'safe'],
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
@@ -328,4 +343,20 @@ class Tree extends Core
         return $this->treeType->cmsTreeTypeProperties;
     }
 
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->hasOne(StorageFile::className(), ['id' => 'image_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFullImage()
+    {
+        return $this->hasOne(StorageFile::className(), ['id' => 'image_full_id']);
+    }
 }

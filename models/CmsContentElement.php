@@ -16,6 +16,7 @@ use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasTrees;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
@@ -48,6 +49,8 @@ use yii\web\ErrorHandler;
  * @property string $description_full
  * @property string $files
  * @property integer $content_id
+ * @property integer $image_id
+ * @property integer $image_full_id
  * @property integer $tree_id
  * @property integer $show_counter
  * @property integer $show_counter_start
@@ -69,6 +72,9 @@ use yii\web\ErrorHandler;
  * @property CmsContentElementTree[]        $cmsContentElementTrees
  * @property CmsContentElementProperty[]    $cmsContentElementProperties
  * @property CmsContentProperty[]           $cmsContentProperties
+ *
+ * @property CmsStorageFile $image
+ * @property CmsStorageFile $imageFull
  */
 class CmsContentElement extends RelatedElementModel
 {
@@ -93,6 +99,12 @@ class CmsContentElement extends RelatedElementModel
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
             HasFiles::className() => HasFiles::className(),
+
+            HasStorageFile::className() =>
+            [
+                'class'     => HasStorageFile::className(),
+                'fields'    => ['image_id', 'image_full_id']
+            ],
 
             HasRelatedProperties::className() =>
             [
@@ -145,6 +157,8 @@ class CmsContentElement extends RelatedElementModel
             'meta_description' => Yii::t('app', 'Meta Description'),
             'description_short_type' => Yii::t('app', 'Description Short Type'),
             'description_full_type' => Yii::t('app', 'Description Full Type'),
+            'image_id' => Yii::t('app', 'Главное фото (для анонса)'),
+            'image_full_id' => Yii::t('app', 'Главное фото'),
         ]);
     }
 
@@ -154,7 +168,7 @@ class CmsContentElement extends RelatedElementModel
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'published_at', 'published_to', 'priority', 'content_id', 'tree_id', 'show_counter', 'show_counter_start'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'published_at', 'published_to', 'priority', 'content_id', 'tree_id', 'show_counter', 'show_counter_start', 'image_id', 'image_full_id'], 'integer'],
             [['name'], 'required'],
             [['files'], 'safe'],
             [['description_short', 'description_full'], 'string'],
@@ -172,6 +186,8 @@ class CmsContentElement extends RelatedElementModel
             ['description_full_type', 'string'],
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
+
+
         ]);
     }
 
@@ -249,5 +265,22 @@ class CmsContentElement extends RelatedElementModel
         }
 
         return $this->getUrl();
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->hasOne(StorageFile::className(), ['id' => 'image_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFullImage()
+    {
+        return $this->hasOne(StorageFile::className(), ['id' => 'image_full_id']);
     }
 }

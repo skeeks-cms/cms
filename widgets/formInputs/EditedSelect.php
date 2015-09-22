@@ -10,7 +10,6 @@
 namespace skeeks\cms\widgets\formInputs;
 
 use skeeks\cms\Exception;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\Publication;
 use skeeks\cms\modules\admin\widgets\Pjax;
 use skeeks\cms\validators\HasBehavior;
