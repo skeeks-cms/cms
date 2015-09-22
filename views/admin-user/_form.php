@@ -23,12 +23,9 @@ use common\models\User;
         'women' => 'Жен',
     ]); ?>
 
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Фото'); ?>
+    <?= $form->field($model, 'image_id')->widget(
+        \skeeks\cms\widgets\formInputs\StorageImage::className()
+    ); ?>
 
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
@@ -80,18 +77,6 @@ use common\models\User;
     <?= $form->field($model, 'info')->textarea(); ?>
     <?= $form->field($model, 'status_of_life')->textarea(); ?>
 <?= $form->fieldSetEnd(); ?>
-
-
-<?= $form->fieldSet('Фотоальбом')?>
-    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'images',
-        ]
-    )->label('Фото');; ?>
-<?= $form->fieldSetEnd(); ?>
-
 
 
 <?= $form->fieldSet('Социальные профили')?>
