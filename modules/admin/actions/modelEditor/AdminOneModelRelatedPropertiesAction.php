@@ -8,7 +8,6 @@
 namespace skeeks\cms\modules\admin\actions\modelEditor;
 
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;

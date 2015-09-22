@@ -7,7 +7,7 @@
  */
 return [
     [
-        'class' => \skeeks\cms\grid\ImageColumn::className(),
+        'class' => \skeeks\cms\grid\ImageColumn2::className(),
     ],
 
     'name',

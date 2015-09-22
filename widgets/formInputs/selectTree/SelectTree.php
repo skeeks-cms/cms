@@ -12,7 +12,6 @@ namespace skeeks\cms\widgets\formInputs\selectTree;
 
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\Module;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
