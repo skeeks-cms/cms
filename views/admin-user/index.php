@@ -20,7 +20,12 @@
     'filterModel'   => $searchModel,
     'adminController'   => $controller,
     'columns' => [
-        ['class' => \skeeks\cms\grid\ImageColumn::className()],
+
+        [
+            'class'             => \skeeks\cms\grid\ImageColumn2::className(),
+            'attribute'         => 'image_id',
+            'relationName'      => 'image',
+        ],
 
         'username',
         'name',
