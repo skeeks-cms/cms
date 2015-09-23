@@ -14,9 +14,9 @@ namespace skeeks\cms\models;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\SeoPageName;
@@ -40,7 +40,6 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property string $description_short
  * @property string $description_full
- * @property string $files
  * @property string $code
  * @property integer $pid
  * @property string $pids
@@ -68,6 +67,12 @@ use yii\helpers\ArrayHelper;
  * @property CmsStorageFile $image
  * @property CmsStorageFile $imageFull
  *
+ * @property CmsTreeFile[] $cmsTreeFiles
+ * @property CmsTreeImage[] $cmsTreeImages
+ *
+ * @property CmsStorageFile[] $files
+ * @property CmsStorageFile[] $images
+ *
  * @property CmsContentElement[]        $cmsContentElements
  * @property CmsContentElementTree[]    $cmsContentElementTrees
  * @property Tree                       $parentTree
@@ -82,7 +87,6 @@ class Tree extends Core
     use TreeBehaviorTrait;
     use HasUrlTrait;
     use HasRelatedPropertiesTrait;
-    use \skeeks\cms\models\behaviors\traits\HasFiles;
 
     /**
      * @inheritdoc
@@ -98,21 +102,24 @@ class Tree extends Core
         $behaviors = parent::behaviors();
 
         return ArrayHelper::merge(parent::behaviors(), [
+
             HasStorageFile::className() =>
             [
                 'class'     => HasStorageFile::className(),
                 'fields'    => ['image_id', 'image_full_id']
             ],
 
-
-            HasFiles::className() =>
+            HasStorageFileMulti::className() =>
             [
-                'class' => HasFiles::className()
+                'class'         => HasStorageFileMulti::className(),
+                'relations'     => ['images', 'files']
             ],
+
             TreeBehavior::className() =>
             [
                 'class' => TreeBehavior::className()
             ],
+
             Implode::className() =>
             [
                 'class' => Implode::className(),
@@ -120,6 +127,7 @@ class Tree extends Core
                     "tree_menu_ids"
                 ]
             ],
+
             HasRelatedProperties::className() =>
             [
                 'class' => HasRelatedProperties::className(),
@@ -127,7 +135,6 @@ class Tree extends Core
                 'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
             ],
         ]);
-        //$result[] = SeoPageName::className();
     }
 
     public function init()
@@ -188,6 +195,8 @@ class Tree extends Core
             'description_full_type' => Yii::t('app', 'Description Full Type'),
             'image_id' => Yii::t('app', 'Главное фото (для анонса)'),
             'image_full_id' => Yii::t('app', 'Главное фото'),
+            'images' => Yii::t('app', 'Изображения'),
+            'files' => Yii::t('app', 'Файлы'),
         ]);
     }
 
@@ -362,94 +371,38 @@ class Tree extends Core
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     /**
-     * TODO: is depricated 2.1.0
-     *
-     * Есть ли у модели главное изображение?
-     * Не делает запрос в базу.
-     *
-     * @return bool
+     * @return \yii\db\ActiveQuery
      */
-    public function hasMainImage()
+    public function getImages()
     {
-        return (bool) $this->image;
+        return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
+            ->via('cmsTreeImages');
     }
 
     /**
-     * TODO: is depricated 2.1.0
-     *
-     * Получить адрес главного изображения.
-     * Не делает запрос в базу.
-     *
-     * @return string
+     * @return \yii\db\ActiveQuery
      */
-    public function getMainImageSrc()
+    public function getFiles()
     {
-        if ($this->image)
-        {
-            return $this->image->src;
-        }
-
-
-        return null;
-    }
-
-    /**
-     * TODO: is depricated 2.1.0
-     *
-     * @param int $width
-     * @param int $height
-     * @param $mode
-     * @return mixed|null|string
-     */
-    public function getPreviewMainImageSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
-    {
-        if ($this->image)
-        {
-            return \Yii::$app->imaging->getImagingUrl($this->image->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
-                'w'    => $width,
-                'h'    => $height,
-                'm'    => $mode,
-            ]));
-        }
-
-        return null;
+        return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
+            ->via('cmsTreeFiles');
     }
 
 
     /**
-     * TODO: is depricated 2.1.0
-     *
-     * Получить адрес главного изображения.
-     * Не делает запрос в базу.
-     *
-     * @return string
+     * @return \yii\db\ActiveQuery
      */
-    public function getMainImageSrcOld()
+    public function getCmsTreeFiles()
     {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
+        return $this->hasMany(CmsTreeFile::className(), ['tree_id' => 'id']);
+    }
 
-        if ($mainImage)
-        {
-            if ($mainImage->getFirstSrc())
-            {
-                return $mainImage->getFirstSrc();
-            }
-        }
-
-
-        return null;
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeImages()
+    {
+        return $this->hasMany(CmsTreeImage::className(), ['tree_id' => 'id']);
     }
 }
