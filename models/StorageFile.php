@@ -14,7 +14,6 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
 use skeeks\cms\validators\HasBehavior;

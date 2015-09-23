@@ -119,10 +119,10 @@ HTML;
 
         if ($this->model)
         {
-            $urlData = ArrayHelper::merge($urlData, [
+            /*$urlData = ArrayHelper::merge($urlData, [
                 "linked_to_model"   => $this->model->getRef()->getCode(),
                 "linked_to_value"   => $this->model->getRef()->getValue(),
-            ]);
+            ]);*/
         }
 
         if ($this->fileGroup)
