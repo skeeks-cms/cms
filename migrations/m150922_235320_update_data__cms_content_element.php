@@ -20,7 +20,7 @@ class m150922_235320_update_data__cms_content_element extends Migration
             foreach ($models as $model)
             {
                 //$user->getFiles()
-                $imageSrc = $model->getMainImageSrc();
+                $imageSrc = $model->getMainImageSrcOld();
                 if ($imageSrc)
                 {
                     $storageFile = \skeeks\cms\models\CmsStorageFile::find()->where(['src' => $imageSrc])->one();

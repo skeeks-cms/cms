@@ -353,4 +353,30 @@ class CmsContentElement extends RelatedElementModel
 
         return null;
     }
+
+
+
+    /**
+     * TODO: is depricated 2.1.0
+     *
+     * Получить адрес главного изображения.
+     * Не делает запрос в базу.
+     *
+     * @return string
+     */
+    public function getMainImageSrcOld()
+    {
+        $mainImage = $this->getFilesGroups()->getComponent('image');
+
+        if ($mainImage)
+        {
+            if ($mainImage->getFirstSrc())
+            {
+                return $mainImage->getFirstSrc();
+            }
+        }
+
+
+        return null;
+    }
 }
