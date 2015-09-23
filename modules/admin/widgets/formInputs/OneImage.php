@@ -59,6 +59,11 @@ class OneImage extends InputWidget
                 $additionalData = $modelForFile->getRef()->toArray();
             }*/
 
+            $additionalData = [
+                'className' => $modelForFile->className(),
+                'pk'        => $modelForFile->primaryKey,
+            ];
+
             $additionalData['callbackEvent'] = $this->getCallbackEvent();
 
             $this->selectFileUrl = \skeeks\cms\helpers\UrlHelper::construct('cms/tools/select-file', $additionalData)

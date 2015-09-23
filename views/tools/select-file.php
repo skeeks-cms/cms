@@ -6,6 +6,7 @@
  * @date 28.04.2015
  */
 /* @var $this yii\web\View */
+/* @var $model \yii\db\ActiveRecord */
 
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
@@ -72,7 +73,33 @@ JS
 
 <? if ($model) : ?>
     <?= $form->fieldSet('Файлы привязанные к записи'); ?>
-        <?= \skeeks\cms\modules\admin\widgets\StorageFilesForModel::widget([
+
+
+        <? foreach($model->getBehaviors() as $behavior) : ?>
+            <? \yii\bootstrap\ActiveForm::begin(); ?>
+            <? if ($behavior instanceof \skeeks\cms\models\behaviors\HasStorageFile)  : ?>
+                <? foreach($behavior->fields as $fieldName) : ?>
+
+                    <?= $form->field($model, $fieldName)->widget(
+                        \skeeks\cms\widgets\formInputs\StorageImage::className()
+                    ); ?>
+
+                <? endforeach; ?>
+
+            <? elseif ($behavior instanceof \skeeks\cms\models\behaviors\HasStorageFileMulti) : ?>
+                <? foreach($behavior->relations as $relationName) : ?>
+
+                    <?= $form->field($model, $relationName)->widget(
+                        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+                    ); ?>
+
+                <? endforeach; ?>
+            <? endif; ?>
+            <? \yii\bootstrap\ActiveForm::end(); ?>
+        <? endforeach; ?>
+
+
+        <?/*= \skeeks\cms\modules\admin\widgets\StorageFilesForModel::widget([
             'model' => $model,
             'gridColumns' =>
             [
@@ -165,7 +192,7 @@ CSS
                     'attribute' => 'size'
                 ],
             ]
-        ]); ?>
+        ]); */?>
     <?= $form->fieldSetEnd(); ?>
 <? endif; ?>
 
