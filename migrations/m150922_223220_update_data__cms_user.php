@@ -19,6 +19,11 @@ class m150922_223220_update_data__cms_user extends Migration
              */
             foreach ($users as $user)
             {
+                if (!method_exists($user, 'getMainImageSrc'))
+                {
+                    continue;
+                }
+
                 //$user->getFiles()
                 $imageSrc = $user->getMainImageSrc();
                 if ($imageSrc)

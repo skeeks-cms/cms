@@ -19,6 +19,11 @@ class m150922_234220_update_data__cms_tree extends Migration
              */
             foreach ($models as $model)
             {
+                if (!method_exists($model, 'getMainImageSrc'))
+                {
+                    continue;
+                }
+
                 //$user->getFiles()
                 $imageSrc = $model->getMainImageSrcOld();
                 if ($imageSrc)

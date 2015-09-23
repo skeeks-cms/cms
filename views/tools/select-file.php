@@ -309,7 +309,6 @@ JS
                     'class' => \skeeks\cms\grid\LinkedToType::className(),
                     'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->all(), 'linked_to_model', 'linked_to_model'),
                 ],
-                ['class' => \skeeks\cms\grid\LinkedToModel::className()],
 
                 ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
                 //['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],

@@ -148,14 +148,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Изображения'); ?>
 
-
-    <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
     <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'images',
-        ]
-    )->label('Изображения');; ?>
+        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    ); ?>
+
+<?= $form->fieldSetEnd()?>
+
+
+<?= $form->fieldSet('Файлы'); ?>
+
+    <?= $form->field($model, 'files')->widget(
+        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    ); ?>
+
 <?= $form->fieldSetEnd()?>
 
 

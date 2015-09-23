@@ -8,7 +8,6 @@
 namespace skeeks\cms\modules\admin\widgets\formInputs;
 
 use skeeks\cms\Exception;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\Publication;
 use skeeks\cms\modules\admin\Module;
 use skeeks\cms\validators\HasBehavior;
@@ -54,10 +53,11 @@ class OneImage extends InputWidget
             {
                 $modelForFile = $this->filesModel;
             }
-            if (Validate::isValid(new HasBehavior(HasFiles::className()), $modelForFile) && !$modelForFile->isNewRecord)
+
+            /*if (Validate::isValid(new HasBehavior(HasFiles::className()), $modelForFile) && !$modelForFile->isNewRecord)
             {
                 $additionalData = $modelForFile->getRef()->toArray();
-            }
+            }*/
 
             $additionalData['callbackEvent'] = $this->getCallbackEvent();
 

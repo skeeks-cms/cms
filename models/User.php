@@ -16,7 +16,6 @@ use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\exceptions\NotConnectedToDbException;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
@@ -73,7 +72,6 @@ class User
     extends Core
     implements IdentityInterface
 {
-    use behaviors\traits\HasFiles;
     use HasRelatedPropertiesTrait;
 
     /**
@@ -243,19 +241,6 @@ class User
                 'class'     => HasStorageFile::className(),
                 'fields'    => ['image_id']
             ],
-
-            behaviors\HasFiles::className() =>
-            [
-                "class"  => behaviors\HasFiles::className(),
-                "groups" =>
-                [
-                    "image" =>
-                    [
-                        'name'      => 'Аватар',
-                    ],
-                ]
-            ],
-
 
             HasRelatedProperties::className() =>
             [
