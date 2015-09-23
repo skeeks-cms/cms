@@ -49,6 +49,10 @@ class Ckeditor extends CKEditorWidget
             {
                 $additionalData = $this->relatedModel->getRef()->toArray();
             }*/
+            $additionalData = [
+                'className' => $this->relatedModel->className(),
+                'pk'        => $this->relatedModel->primaryKey,
+            ];
         }
 
         $this->clientOptions['filebrowserImageBrowseUrl'] = UrlHelper::construct('cms/tools/select-file', $additionalData)
