@@ -7,6 +7,7 @@
  */
 use yii\db\Schema;
 use yii\db\Migration;
+use yii\helpers\Json;
 
 class m150923_173220_update_data__images_and_files extends Migration
 {
