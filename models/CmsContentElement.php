@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\models;
 
+use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;

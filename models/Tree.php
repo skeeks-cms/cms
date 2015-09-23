@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models;
 
+use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasFiles;
