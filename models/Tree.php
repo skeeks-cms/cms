@@ -359,4 +359,71 @@ class Tree extends Core
     {
         return $this->hasOne(StorageFile::className(), ['id' => 'image_full_id']);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * TODO: is depricated 2.1.0
+     *
+     * Есть ли у модели главное изображение?
+     * Не делает запрос в базу.
+     *
+     * @return bool
+     */
+    public function hasMainImage()
+    {
+        return (bool) $this->image;
+    }
+
+    /**
+     * TODO: is depricated 2.1.0
+     *
+     * Получить адрес главного изображения.
+     * Не делает запрос в базу.
+     *
+     * @return string
+     */
+    public function getMainImageSrc()
+    {
+        if ($this->image)
+        {
+            return $this->image->src;
+        }
+
+
+        return null;
+    }
+
+    /**
+     * TODO: is depricated 2.1.0
+     *
+     * @param int $width
+     * @param int $height
+     * @param $mode
+     * @return mixed|null|string
+     */
+    public function getPreviewMainImageSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
+    {
+        if ($this->image)
+        {
+            return \Yii::$app->imaging->getImagingUrl($this->image->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+                'w'    => $width,
+                'h'    => $height,
+                'm'    => $mode,
+            ]));
+        }
+
+        return null;
+    }
 }

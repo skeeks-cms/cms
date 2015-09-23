@@ -1,5 +1,7 @@
 <?php
 /**
+ * TODO: is depricated 2.1.0
+ *
  * HasFiles
  *
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -322,6 +324,43 @@ class HasFiles extends HasLinkedModels
 
 
 
+    /**
+     * Получить src[] изображений
+     * Не делает запрос в базу.
+     *
+     * @return array
+     */
+    public function getImagesSrc()
+    {
+        if ($this->getFilesGroups())
+        {
+            return (array) $this->getFilesGroups()->getComponent('images')->items;
+        }
+
+        return [];
+    }
+
+
+    /**
+     * Получить src[] изображений
+     * Не делает запрос в базу.
+     *
+     * @return array
+     */
+    public function getFilesSrc()
+    {
+        if ($this->getFilesGroups())
+        {
+            return (array) $this->getFilesGroups()->getComponent('files')->items;
+        }
+
+        return [];
+    }
+
+
+
+
+
 
 
 
@@ -368,39 +407,6 @@ class HasFiles extends HasLinkedModels
     }
 
     /**
-     * Получить src[] изображений
-     * Не делает запрос в базу.
-     *
-     * @return array
-     */
-    public function getImagesSrc()
-    {
-        if ($this->getFilesGroups())
-        {
-            return (array) $this->getFilesGroups()->getComponent('images')->items;
-        }
-
-        return [];
-    }
-
-
-    /**
-     * Получить src[] изображений
-     * Не делает запрос в базу.
-     *
-     * @return array
-     */
-    public function getFilesSrc()
-    {
-        if ($this->getFilesGroups())
-        {
-            return (array) $this->getFilesGroups()->getComponent('files')->items;
-        }
-
-        return [];
-    }
-
-    /**
      * @return array
      */
     public function getMainImagesSrc()
@@ -433,119 +439,4 @@ class HasFiles extends HasLinkedModels
 
         return null;
     }
-
-
-
-
-
-
-
-    /**
-     * @param $optionName
-     * @param $fieldName
-     * @param null $defaultValue
-     * @return mixed
-     * @throws Exception
-     */
-    /*public function getOptionForField($optionName, $fieldName, $defaultValue = null)
-    {
-        if (!$this->hasField($fieldName))
-        {
-            throw new Exception("Для данного бехевера не описано это поле");
-        }
-
-        $config = $this->getFieldConfig($fieldName);
-        return \yii\helpers\ArrayHelper::getValue($config, $optionName, $defaultValue);
-    }*/
-
-
-    /**
-     * Применяется ли к полю
-     * @param string $fieldName
-     * @return bool
-     */
-    /*public function hasField($fieldName)
-    {
-        return isset($this->fields[$fieldName]);
-    }*/
-
-    /**
-     * Берем настройки для поля
-     * @param string $fieldName
-     * @return array
-     */
-    /*public function getFieldConfig($fieldName)
-    {
-        return $this->hasField($fieldName) ? (array) $this->fields[$fieldName] : [];
-    }*/
-
-
-
-
-
-
-
-    /**
-     * @param StorageFile $file
-     * @param $fieldName
-     * @return $this
-     */
-    /*protected function _appendFile(StorageFile $file, $fieldName)
-    {
-        $files              = $this->getFiles($fieldName);
-        $files[]            = $file->src;
-        $this->owner->setAttribute($fieldName, array_unique($files));
-
-        $this->owner->save(false);
-        return $this;
-    }*/
-
-    /**
-     *
-     * Вставка файла в нужное поле
-     *
-     * Привязывается файл к этой сущьности
-     * Вставляется src в поле сущьности
-     *
-     * @param StorageFile $file
-     * @param $fieldName
-     * @return $this
-     */
-    /*public function appendFile(StorageFile $file, $fieldName)
-    {
-        //Вяжем файл к этой сущьности
-        $file->setAttributes($this->owner->getRef()->toArray(), false);
-        $file->save(false);
-        $this->_appendFile($file, $fieldName);
-
-        return $this;
-    }*/
-
-    /**
-     * @param $fieldName
-     * @param $src
-     * @return $this
-     */
-    /*public function detachFile($fieldName, $src)
-    {
-        $files  = $this->getFiles($fieldName);
-
-        $result = [];
-        if ($files)
-        {
-            foreach ($files as $fileSrc)
-            {
-                if ($fileSrc != $src)
-                {
-                    $result[] = $fileSrc;
-                }
-            }
-
-            $this->owner->setAttribute($fieldName, $result);
-            $this->owner->save(false);
-        }
-
-        return $this;
-    }*/
-
 }
