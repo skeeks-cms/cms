@@ -13,7 +13,7 @@
 <div class="row margin-bottom-20">
     <div class="col-sm-4 sm-margin-bottom-20">
         <? if ($model->getMainImageSrc()) : ?>
-            <img src="<?= \Yii::$app->imaging->getImagingUrl($model->getMainImageSrc(),
+            <img src="<?= \Yii::$app->imaging->getImagingUrl($model->image->src,
             new \skeeks\cms\components\imaging\filters\Thumbnail([
                 'w'    => 409,
                 'h'    => 258,

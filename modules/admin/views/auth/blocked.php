@@ -74,7 +74,7 @@ $logoutUrl = \skeeks\cms\helpers\UrlHelper::construct("admin/auth/logout")->enab
 
                                 <div class="row">
                                     <div class="col-lg-3">
-                                        <img src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->user->identity->getMainImageSrc()); ?>" style="width: 100%;"/>
+                                        <img src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->user->identity->image->src); ?>" style="width: 100%;"/>
                                     </div>
                                     <div class="col-lg-9">
                                         <?= $form->field($model, 'password')->passwordInput([

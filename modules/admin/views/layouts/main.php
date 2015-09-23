@@ -81,7 +81,7 @@ JS
 
         <li class="dropdown sx-left-border">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="Ваш профиль">
-                <? if (Yii::$app->cms->getAuthUser()->hasMainImage()) : ?>
+                <? if (Yii::$app->cms->getAuthUser()->image) : ?>
                     <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
                 <? else : ?>
                     <img src="<?= Yii::$app->cms->moduleAdmin()->noImage; ?>" width="49" height="49"/>
