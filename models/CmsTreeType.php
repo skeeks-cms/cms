@@ -40,7 +40,6 @@ use Yii;
 class CmsTreeType extends Core
 {
     use ValidateRulesTrait;
-    use \skeeks\cms\models\behaviors\traits\HasFiles;
 
     /**
      * @inheritdoc
