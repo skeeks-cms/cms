@@ -21,6 +21,7 @@ use yii\helpers\Json;
  * @property string $name
  * @property string $packagistCode
  * @property string $imageSrc
+ * @property string $imagesSrc
  * @property string $url
  * @property string $authorName
  * @property string $authorImage
