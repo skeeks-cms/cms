@@ -16,8 +16,8 @@ $extension = $packageModel->createCmsExtension();
 ?>
 <div class="row">
     <div class="col-lg-2">
-        <a href="<?= $packageModel->image; ?>" class="sx-img-link-hover sx-border-1px sx-fancybox">
-            <img src="<?= $packageModel->image; ?>" style="width: 100%" />
+        <a href="<?= $packageModel->imageSrc; ?>" class="sx-img-link-hover sx-border-1px sx-fancybox">
+            <img src="<?= $packageModel->imageSrc; ?>" style="width: 100%" />
         </a>
     </div>
     <div class="col-lg-8">

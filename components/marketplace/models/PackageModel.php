@@ -20,7 +20,7 @@ use yii\helpers\Json;
  * @property integer $created_at
  * @property string $name
  * @property string $packagistCode
- * @property string $image
+ * @property string $imageSrc
  * @property string $url
  * @property string $authorName
  * @property string $authorImage
