@@ -19,6 +19,7 @@ use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\validators\string\LoginValidator;
@@ -53,15 +54,15 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $city
  * @property string $address
  * @property string $info
- * @property string $image
- * @property string $image_cover
  * @property integer $logged_at
  * @property string $gender
+ * @property integer $image_id
  *
  *
  * @property string $lastActivityAgo
  * @property string $lastAdminActivityAgo
- *
+ * @property CmsStorageFile $image
+
  * @property UserEmail $userEmail
  *
  * @property string $displayName
@@ -237,6 +238,12 @@ class User
 
             TimestampBehavior::className(),
 
+            HasStorageFile::className() =>
+            [
+                'class'     => HasStorageFile::className(),
+                'fields'    => ['image_id']
+            ],
+
             behaviors\HasFiles::className() =>
             [
                 "class"  => behaviors\HasFiles::className(),
@@ -289,7 +296,7 @@ class User
             ['active', 'default', 'value' => Cms::BOOL_Y],
 
             [['username', 'auth_key', 'password_hash'], 'required'],
-            [['created_at', 'updated_at'], 'integer'],
+            [['created_at', 'updated_at', 'image_id'], 'integer'],
 
             [['info', 'gender', 'status_of_life'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
@@ -363,6 +370,7 @@ class User
             'last_activity_at' => Yii::t('app', 'Время последней активности'),
             'last_admin_activity_at' => Yii::t('app', 'Время последней активности в админке'),
             'status_of_life' => Yii::t('app', 'Статус'),
+            'image_id' => Yii::t('app', 'Фото'),
         ];
     }
 
@@ -438,6 +446,15 @@ class User
         return $this;
     }
 
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->hasOne(StorageFile::className(), ['id' => 'image_id']);
+    }
 
 
     /**
@@ -696,7 +713,14 @@ class User
      */
     public function getAvatarSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
     {
-        return $this->getPreviewMainImageSrc($width, $height, $mode);
+        if ($this->image)
+        {
+            return \Yii::$app->imaging->getImagingUrl($this->image->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+                'w'    => $width,
+                'h'    => $height,
+                'm'    => $mode,
+            ]));
+        }
     }
 
 }

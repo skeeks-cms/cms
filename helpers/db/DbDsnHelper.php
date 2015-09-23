@@ -19,6 +19,8 @@ use yii\helpers\BaseUrl;
 use yii\helpers\Url;
 
 /**
+ * @property string $dsnString
+ *
  * Class DbHelper
  * @package skeeks\cms\helpers\db
  */
@@ -49,6 +51,26 @@ class DbDsnHelper
         $this->_parse();
     }
 
+    /**
+     * @return string
+     */
+    public function getDsnString()
+    {
+        return "mysql:host={$this->host};dbname={$this->dbname}";
+    }
+
+    /**
+     * @return Connection
+     */
+    public function createConnection()
+    {
+        return new Connection([
+            'dsn' => $this->getDsnString(),
+            'username' => $this->username,
+            'password' => $this->password,
+            'charset' => $this->charset,
+        ]);
+    }
     /**
      * @return $this
      */

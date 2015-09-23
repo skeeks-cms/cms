@@ -9,7 +9,6 @@ namespace skeeks\cms\widgets\formInputs\comboText;
 
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use skeeks\widget\codemirror\CodemirrorWidget;

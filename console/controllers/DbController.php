@@ -107,6 +107,12 @@ class DbController extends Controller
             }
         }
 
+        $appMigrateDir = \Yii::getAlias("@console/migrations");
+        if (is_dir($appMigrateDir))
+        {
+            FileHelper::copyDirectory($appMigrateDir, $tmpMigrateDir);
+        }
+
 
         $cmd = "php yii migrate --migrationPath=" . $tmpMigrateDir . '  --interactive=0';
         $this->systemCmdRoot($cmd);

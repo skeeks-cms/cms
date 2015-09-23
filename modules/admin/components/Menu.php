@@ -59,6 +59,10 @@ class Menu
             return (array) $this->groups;
         }
 
+
+        $paths[] = \Yii::getAlias('@common/config/admin/menu.php');
+        $paths[] = \Yii::getAlias('@app/config/admin/menu.php');
+
         foreach (\Yii::$app->extensions as $code => $data)
         {
             if ($data['alias'])
@@ -74,6 +78,16 @@ class Menu
                 }
             }
         }
+
+        foreach ($paths as $path)
+        {
+            if (file_exists($path))
+            {
+                $menuGroups = (array) include_once $path;
+                $this->groups = ArrayHelper::merge($this->groups, $menuGroups);
+            }
+        }
+
 
         ArrayHelper::multisort($this->groups, 'priority');
 

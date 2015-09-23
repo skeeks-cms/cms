@@ -21,13 +21,6 @@ use common\models\User;
         </div>
     <? endif; ?>
 
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Изображение'); ?>
-
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput(); ?>
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>

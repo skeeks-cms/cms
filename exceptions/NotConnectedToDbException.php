@@ -15,5 +15,5 @@ use yii\base\UserException;
  */
 class NotConnectedToDbException extends UserException
 {
-    static public $invalidConnectionCodes = [1049, 2002, 1045, 1146];
+    static public $invalidConnectionCodes = [1049, 2002, 1045, 1146, 2002];
 }

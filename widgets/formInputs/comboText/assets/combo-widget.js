@@ -164,7 +164,6 @@
 
         _init: function()
         {
-            console.log('init');
             this.ControllCkeditor   = new sx.classes.combotext.controlls.Ckeditor(this);
             this.ControllCodemirror   = new sx.classes.combotext.controlls.Codemirror(this);
             this.currentControll    = null;

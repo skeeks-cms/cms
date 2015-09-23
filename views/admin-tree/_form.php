@@ -80,6 +80,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?= $form->fieldSet('Анонс'); ?>
+
+    <?= $form->field($model, 'image_id')->widget(
+        \skeeks\cms\widgets\formInputs\StorageImage::className()
+    ); ?>
+
     <div data-listen="isLink" data-show="0" class="sx-hide">
         <?= $form->field($model, 'description_short')->widget(
             \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
@@ -118,6 +123,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Подробно'); ?>
 
+    <?= $form->field($model, 'image_full_id')->widget(
+        \skeeks\cms\widgets\formInputs\StorageImage::className()
+    ); ?>
+
 <div data-listen="isLink" data-show="0" class="sx-hide">
 
     <?= $form->field($model, 'description_full')->widget(
@@ -138,12 +147,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?= $form->fieldSet('Изображения'); ?>
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Главное изображение'); ?>
+
 
     <?/*= $form->field($model, 'files')->widget(\skeeks\cms\widgets\formInputs\StorageImages::className())->label(false); */?>
     <?= $form->field($model, 'images')->widget(

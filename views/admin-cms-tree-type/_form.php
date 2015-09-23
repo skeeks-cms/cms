@@ -14,12 +14,6 @@ use common\models\User;
 
 <?= $form->fieldSet('Основное'); ?>
 
-    <?= $form->field($model, 'image')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\StorageImages::className(),
-        [
-            'fileGroup' => 'image',
-        ]
-    )->label('Изображение'); ?>
 
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput(); ?>

@@ -10,7 +10,6 @@ namespace skeeks\cms\widgets\formInputs\componentSettings;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\modules\admin\Module;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;

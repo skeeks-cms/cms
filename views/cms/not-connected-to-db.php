@@ -20,55 +20,6 @@
 use yii\helpers\Html;
 use \skeeks\cms\modules\admin\widgets\ActiveForm;
 
-$this->registerCss(<<<CSS
-.sx-auth
-{
-    display: none;
-}
-    .sx-auth .sx-panel
-    {
-        margin-top: 20%;
-        border-radius: 6px;
-        border-width: 3px;
-        border-color: rgba(32, 168, 216, 0.25);
-        box-shadow: 0 11px 51px 9px rgba(0,0,0,.55);
-        padding: 10px;
-    }
-
-    .sx-auth form input
-    {
-        height: 45px;
-        font-size: 25px;
-        border-radius: 6px;
-        border-width: 2px;
-    }
-    .sx-auth form button
-    {
-        font-size: 20px;
-    }
-    .sx-auth form label
-    {
-        font-size: 16px;
-    }
-
-    .sx-auth form .sx-submit-group
-    {
-        text-align: center;
-    }
-
-    .sx-act-controll
-    {
-        border-bottom: 1px dashed;
-        text-decoration: none;
-    }
-
-    .sx-act-controll:hover
-    {
-        border-bottom: 1px dashed;
-        text-decoration: none;
-    }
-CSS
-);
 
 
 $this->registerJs(<<<JS
@@ -93,9 +44,7 @@ $this->registerJs(<<<JS
         sx.classes.ConnectDb = sx.classes.Component.extend({
 
             _init: function()
-            {
-
-            },
+            {},
 
             _onDomReady: function()
             {
@@ -123,7 +72,7 @@ JS
 );
 ?>
 
-<div class="main sx-auth">
+<div class="main sx-content-block sx-windowReady-fadeIn">
     <div class="col-lg-4"></div>
 
     <div class="col-lg-4">
@@ -131,14 +80,19 @@ JS
             <div class="panel-body">
                 <div class="panel-content">
 
-                    <div class="sx-act sx-act-reset-password">
+                    <div class="sx-act-reset-password">
                         <div class="alert alert-danger" role="alert">
-                            Нет подключения к базе данных
+                            Настройте подключение к базе данных
+                        </div>
+
+                        <div class="alert alert-info" role="alert">
+                            Путь к файлу настроек: <?= \Yii::getAlias('@common/config/db.php'); ?>
                         </div>
 
                         <? if (YII_ENV != "prod") : ?>
-                            <? $connectToDbForm = new \skeeks\cms\models\forms\ConnectToDbForm(); ?>
-                            <? $form = ActiveForm::begin(); ?>
+                            <? $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                'enableAjaxValidation'         => false
+                            ]); ?>
                                 <?= $form->field($connectToDbForm, 'host')->textInput(); ?>
                                 <?= $form->field($connectToDbForm, 'dbname')->textInput(); ?>
                                 <?= $form->field($connectToDbForm, 'username')->textInput(); ?>
@@ -154,7 +108,7 @@ JS
                                         <i class="glyphicon glyphicon-save"></i> Сохранить и продолжить
                                     </button>
                                 </div>
-                            <? ActiveForm::end(); ?>
+                            <? \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
                         <? endif; ?>
 
                     </div>
