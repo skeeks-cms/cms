@@ -7,14 +7,12 @@
  */
 namespace skeeks\cms\base;
 
-use \yii\base\Component;
-
 /**
  * Class ComponentDescriptor
  * @package skeeks\cms\base
  */
 class ComponentDescriptor
-    extends Component
+    extends \yii\base\Component
 {
     public $version                 = "1.0.0";
     public $startDevelopmentDate    = "2010-01-01";
