@@ -34,26 +34,42 @@ class m150923_173220_update_data__images_and_files extends Migration
                     continue;
                 }
 
-                if ($images = \yii\helpers\ArrayHelper::getValue($row, 'files.images'))
+                $files = \yii\helpers\ArrayHelper::getValue($row, 'files');
+                if (!$files)
                 {
+                    continue;
+                }
+
+                $files = Json::decode($files);
+
+                if ($images = \yii\helpers\ArrayHelper::getValue($files, 'images'))
+                {
+
                     foreach ($images as $src)
                     {
                         $storageFile = \skeeks\cms\models\StorageFile::find()->where(['src' => $src])->one();
+
                         if ($storageFile)
                         {
-                            $model->link('images', $storageFile);
+                            if ( !$model->getCmsTreeImages()->andWhere(['storage_file_id' => $storageFile->id])->one() )
+                            {
+                                $model->link('images', $storageFile);
+                            }
                         }
                     }
                 }
 
-                if ($files = \yii\helpers\ArrayHelper::getValue($row, 'files.files'))
+                if ($files = \yii\helpers\ArrayHelper::getValue($files, 'files'))
                 {
                     foreach ($files as $src)
                     {
                         $storageFile = \skeeks\cms\models\StorageFile::find()->where(['src' => $src])->one();
                         if ($storageFile)
                         {
-                            $model->link('files', $storageFile);
+                            if ( !$model->getCmsTreeFiles()->andWhere(['storage_file_id' => $storageFile->id])->one() )
+                            {
+                                $model->link('files', $storageFile);
+                            }
                         }
                     }
                 }
@@ -84,26 +100,40 @@ class m150923_173220_update_data__images_and_files extends Migration
                     continue;
                 }
 
-                if ($images = \yii\helpers\ArrayHelper::getValue($row, 'files.images'))
+                $files = \yii\helpers\ArrayHelper::getValue($row, 'files');
+                if (!$files)
+                {
+                    continue;
+                }
+
+                $files = Json::decode($files);
+
+                if ($images = \yii\helpers\ArrayHelper::getValue($files, 'images'))
                 {
                     foreach ($images as $src)
                     {
                         $storageFile = \skeeks\cms\models\StorageFile::find()->where(['src' => $src])->one();
                         if ($storageFile)
                         {
-                            $model->link('images', $storageFile);
+                            if ( !$model->getCmsContentElementImages()->andWhere(['storage_file_id' => $storageFile->id])->one() )
+                            {
+                                $model->link('images', $storageFile);
+                            }
                         }
                     }
                 }
 
-                if ($files = \yii\helpers\ArrayHelper::getValue($row, 'files.files'))
+                if ($files = \yii\helpers\ArrayHelper::getValue($files, 'files'))
                 {
                     foreach ($files as $src)
                     {
                         $storageFile = \skeeks\cms\models\StorageFile::find()->where(['src' => $src])->one();
                         if ($storageFile)
                         {
-                            $model->link('files', $storageFile);
+                            if ( !$model->getCmsContentElementFiles()->andWhere(['storage_file_id' => $storageFile->id])->one() )
+                            {
+                                $model->link('files', $storageFile);
+                            }
                         }
                     }
                 }
