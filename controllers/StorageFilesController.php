@@ -15,7 +15,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsStorageFile;
-use skeeks\cms\models\helpers\ModelRef;
 use skeeks\sx\models\Ref;
 use Yii;
 use skeeks\cms\models\StorageFile;
@@ -132,21 +131,7 @@ class StorageFilesController extends Controller
                 ]
             ));
 
-            //Если указана универсальная модель привязки файла
-            if ($request->get("linked_to_model") && $request->get("linked_to_value")) {
 
-                $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
-
-                /**
-                 * @var \common\models\Game $model
-                 */
-                if (!$model = $ref->findModel()) {
-                    throw new Exception("Не найдена сущьность к которой обавляется файл");
-                }
-
-                $storageFile->linkToModel($model);
-                $storageFile->name = $model->name;
-            }
 
             if ($request->get('modelData') && is_array($request->get('modelData')))
             {
@@ -203,21 +188,7 @@ class StorageFilesController extends Controller
                 ]
             ));
 
-            //Если указана универсальная модель привязки файла
-            if ($request->get("linked_to_model") && $request->get("linked_to_value")) {
 
-                $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
-
-                /**
-                 * @var \common\models\Game $model
-                 */
-                if (!$model = $ref->findModel()) {
-                    throw new Exception("Не найдена сущьность к которой обавляется файл");
-                }
-
-                $storageFile->linkToModel($model);
-                $storageFile->name = $model->name;
-            }
 
             if ($request->post('modelData') && is_array($request->post('modelData')))
             {

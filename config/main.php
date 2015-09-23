@@ -138,13 +138,6 @@ $config =
             ],
         ],
 
-        'registeredModels' =>
-        [
-            'class' => 'skeeks\cms\components\RegisteredModels',
-            //Модели к которым можно крепить другие, то есть эти модели имеют ссылку на себя объект Ref
-            'components' => include_once __DIR__ . '/models.php'
-        ],
-
         //Админское меню
         'adminMenu' =>
         [

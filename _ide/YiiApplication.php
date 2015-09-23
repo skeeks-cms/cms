@@ -26,7 +26,6 @@ use skeeks\cms\components\Langs;
 use skeeks\cms\components\marketplace\MarketplaceApi;
 use skeeks\cms\components\PublicationTypes;
 use skeeks\cms\components\RegisteredActionViews;
-use skeeks\cms\components\RegisteredModels;
 use skeeks\cms\components\RegisteredModelTypes;
 use skeeks\cms\components\Seo;
 use skeeks\cms\components\storage\Storage;
@@ -39,7 +38,6 @@ use skeeks\cms\authclient\CollectionSettings;
 
 /**
  *
- * @property RegisteredModels               $registeredModels
  * @property Storage                        $storage
  * @property Menu                           $adminMenu
  * @property Cms                            $cms

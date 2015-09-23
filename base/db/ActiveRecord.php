@@ -11,8 +11,6 @@
 
 namespace skeeks\cms\base\db;
 
-use skeeks\cms\models\behaviors\HasModelRef;
-//use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\sx\models\Ref;
 use \yii\db\ActiveRecord as YiiActiveRecord;
@@ -26,14 +24,6 @@ use \yii\db\ActiveRecord as YiiActiveRecord;
 class ActiveRecord
     extends YiiActiveRecord
 {
-    /**
-     * @return \skeeks\cms\models\ModelDescriptor
-     */
-    public function getDescriptor()
-    {
-        return \Yii::$app->registeredModels->getDescriptor($this->className());
-    }
-
     /**
      * @return CmsActiveQuery
      */

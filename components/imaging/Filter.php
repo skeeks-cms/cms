@@ -31,26 +31,10 @@ abstract class Filter extends Component
     }
 
     /**
-     * @return \skeeks\cms\models\ModelDescriptor
-     */
-    public function getDescriptor()
-    {
-        return \Yii::$app->registeredModels->getDescriptor($this->className());
-    }
-
-    /**
      * @return string
      */
     public function getId()
     {
-        if ($this->getDescriptor())
-        {
-            if ($this->getDescriptor()->id)
-            {
-                return (string) $this->getDescriptor()->id;
-            }
-        }
-
         return str_replace("\\", '-', $this->className());
     }
 
