@@ -124,7 +124,6 @@ class StorageFile extends Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            CanBeLinkedToModel::className() => CanBeLinkedToModel::className(),
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className()
         ]);
     }
@@ -138,52 +137,6 @@ class StorageFile extends Core
         return static::findOne(['src' => $src]);
     }
 
-    /**
-     * Найти сущьность к которой привязан файл.
-     *
-     * @return null|ActiveRecord
-     */
-    public function getLinkedToModel()
-    {
-        return $this->findLinkedToModel();
-    }
-
-    /**
-     * Ресурсозатратно, но пока так...
-     * Получение всех групп к которым привязан файл.
-     *
-     * @return ModelFilesGroup[]
-     */
-    public function getFilesGroups()
-    {
-        $result = [];
-        //Если этот файл вообще имеет привязку
-        if ($this->isLinked())
-        {
-            //Найдена модель к которой привязан файл
-            if ($toModel = $this->getLinkedToModel())
-            {
-                if (Validate::validate(new HasBehavior(HasFiles::className()), $toModel)->isValid())
-                {
-                    if ($groups = $toModel->getFilesGroups()->all())
-                    {
-                        /**
-                         * @var $filesGroup ModelFilesGroup
-                         */
-                        foreach ($groups as $key => $filesGroup)
-                        {
-                            if ($filesGroup->hasFile($this))
-                            {
-                                $result[$key] = $filesGroup;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $result;
-    }
     /**
      * @return bool|int
      * @throws \Exception

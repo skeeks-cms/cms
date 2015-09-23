@@ -332,4 +332,81 @@ class StorageFilesController extends Controller
 
         return $rr;
     }
+
+    /**
+     * Прикрепить к моделе другой файл
+     * @see skeeks\cms\widgets\formInputs\StorageImage
+     * @return RequestResponse
+     */
+    public function actionLinkToModels()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost())
+        {
+            try
+            {
+                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelRelation'))
+                {
+                    throw new \yii\base\Exception("Не достаточно входных данных");
+                }
+
+                $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
+                if (!$file)
+                {
+                    throw new \yii\base\Exception("Возможно файл уже удален или не загрузился");
+                }
+
+                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
+                {
+                    throw new \yii\base\Exception("Невозможно привязать файл к этой моделе");
+                }
+
+                $className = \Yii::$app->request->post('modelClassName');
+                /**
+                 * @var $model ActiveRecord
+                 */
+                $model = $className::findOne(\Yii::$app->request->post('modelId'));
+                if (!$model)
+                {
+                    throw new \yii\base\Exception("Модель к которой необходимо привязать файл не найдена");
+                }
+
+                if (!$model->hasProperty(\Yii::$app->request->post('modelRelation')))
+                {
+                    throw new \yii\base\Exception("У модели не найден атрибут привязки к файлам modelRelation: " . \Yii::$app->request->post('modelRelation'));
+                }
+
+                try
+                {
+                    $model->link(\Yii::$app->request->post('modelRelation'), $file);
+
+                    if (!$file->name)
+                    {
+                        $file->name = $model->name;
+                        $file->save(false);
+                    }
+
+                    $rr->success = true;
+                    $rr->message = "";
+                } catch(\Exception $e)
+                {
+                    $rr->success = false;
+                    $rr->message = $e->getMessage();
+                }
+
+
+
+
+
+            } catch(\Exception $e)
+            {
+                $rr->success = false;
+                $rr->message = $e->getMessage();
+            }
+
+        }
+
+        return $rr;
+    }
 }

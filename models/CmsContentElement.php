@@ -12,12 +12,12 @@ use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\HasTrees;
 use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
@@ -26,7 +26,6 @@ use skeeks\cms\models\behaviors\traits\HasTreesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -48,7 +47,6 @@ use yii\web\ErrorHandler;
  * @property string $code
  * @property string $description_short
  * @property string $description_full
- * @property string $files
  * @property integer $content_id
  * @property integer $image_id
  * @property integer $image_full_id
@@ -76,10 +74,16 @@ use yii\web\ErrorHandler;
  *
  * @property CmsStorageFile $image
  * @property CmsStorageFile $imageFull
+ *
+ * @property CmsContentElementFile[] $cmsContentElementFiles
+ * @property CmsContentElementImage[] $cmsContentElementImages
+ *
+ * @property CmsStorageFile[] $files
+ * @property CmsStorageFile[] $images
+ *
  */
 class CmsContentElement extends RelatedElementModel
 {
-    use \skeeks\cms\models\behaviors\traits\HasFiles;
     use HasRelatedPropertiesTrait;
     use HasTreesTrait;
     use HasUrlTrait;
@@ -99,12 +103,16 @@ class CmsContentElement extends RelatedElementModel
     {
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
-            HasFiles::className() => HasFiles::className(),
 
             HasStorageFile::className() =>
             [
                 'class'     => HasStorageFile::className(),
                 'fields'    => ['image_id', 'image_full_id']
+            ],
+            HasStorageFileMulti::className() =>
+            [
+                'class'     => HasStorageFileMulti::className(),
+                'relations'    => ['images', 'files']
             ],
 
             HasRelatedProperties::className() =>
@@ -148,7 +156,6 @@ class CmsContentElement extends RelatedElementModel
             'code' => Yii::t('app', 'Code'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
-            'files' => Yii::t('app', 'Files'),
             'content_id' => Yii::t('app', 'Контент'),
             'tree_id' => Yii::t('app', 'Основной раздел'),
             'show_counter' => Yii::t('app', 'Show Counter'),
@@ -160,6 +167,9 @@ class CmsContentElement extends RelatedElementModel
             'description_full_type' => Yii::t('app', 'Description Full Type'),
             'image_id' => Yii::t('app', 'Главное фото (для анонса)'),
             'image_full_id' => Yii::t('app', 'Главное фото'),
+
+            'images' => Yii::t('app', 'Изображения'),
+            'files' => Yii::t('app', 'Файлы'),
         ]);
     }
 
@@ -171,7 +181,6 @@ class CmsContentElement extends RelatedElementModel
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'published_at', 'published_to', 'priority', 'content_id', 'tree_id', 'show_counter', 'show_counter_start', 'image_id', 'image_full_id'], 'integer'],
             [['name'], 'required'],
-            [['files'], 'safe'],
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
@@ -288,95 +297,42 @@ class CmsContentElement extends RelatedElementModel
 
 
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElementFiles()
+    {
+        return $this->hasMany(CmsContentElementFile::className(), ['content_element_id' => 'id']);
+    }
 
-
-
-
-
-
-
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElementImages()
+    {
+        return $this->hasMany(CmsContentElementImage::className(), ['content_element_id' => 'id']);
+    }
 
 
 
 
 
     /**
-     * TODO: is depricated 2.1.0
-     *
-     * Есть ли у модели главное изображение?
-     * Не делает запрос в базу.
-     *
-     * @return bool
+     * @return \yii\db\ActiveQuery
      */
-    public function hasMainImage()
+    public function getImages()
     {
-        return (bool) $this->image;
+        return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
+            ->via('cmsContentElementImages');
     }
 
     /**
-     * TODO: is depricated 2.1.0
-     *
-     * Получить адрес главного изображения.
-     * Не делает запрос в базу.
-     *
-     * @return string
+     * @return \yii\db\ActiveQuery
      */
-    public function getMainImageSrc()
+    public function getFiles()
     {
-        if ($this->image)
-        {
-            return $this->image->src;
-        }
-
-
-        return null;
+        return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
+            ->via('cmsContentElementFiles');
     }
 
-    /**
-     * TODO: is depricated 2.1.0
-     *
-     * @param int $width
-     * @param int $height
-     * @param $mode
-     * @return mixed|null|string
-     */
-    public function getPreviewMainImageSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
-    {
-        if ($this->image)
-        {
-            return \Yii::$app->imaging->getImagingUrl($this->image->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
-                'w'    => $width,
-                'h'    => $height,
-                'm'    => $mode,
-            ]));
-        }
-
-        return null;
-    }
-
-
-
-    /**
-     * TODO: is depricated 2.1.0
-     *
-     * Получить адрес главного изображения.
-     * Не делает запрос в базу.
-     *
-     * @return string
-     */
-    public function getMainImageSrcOld()
-    {
-        $mainImage = $this->getFilesGroups()->getComponent('image');
-
-        if ($mainImage)
-        {
-            if ($mainImage->getFirstSrc())
-            {
-                return $mainImage->getFirstSrc();
-            }
-        }
-
-
-        return null;
-    }
 }
