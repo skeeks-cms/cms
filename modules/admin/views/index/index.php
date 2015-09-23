@@ -43,7 +43,7 @@ $usedSpacePercent = 100 - $freeSpacePercent;
 
         <li>
             <i class="icon-users"></i>
-            <div class="number"><?= count(\skeeks\cms\models\User::find()->all()); ?></div>
+            <div class="number"><a href="<?= \skeeks\cms\helpers\UrlHelper::construct('/cms/admin-user')->enableAdmin()->toString(); ?>"><?= \skeeks\cms\models\User::find()->count(); ?></a></div>
             <div class="title">Количество пользователей</div>
 
         </li>
