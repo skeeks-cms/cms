@@ -69,12 +69,16 @@ class HasTrees extends ActiveRecord
 
             foreach ($ids as $treeId)
             {
-                $elementTree = new $className([
-                    'element_id'    => $this->owner->id,
-                    'tree_id'       => $treeId,
-                ]);
+                if ($treeId)
+                {
+                    $elementTree = new $className([
+                        'element_id'    => $this->owner->id,
+                        'tree_id'       => $treeId,
+                    ]);
 
-                $elementTree->save(false);
+                    $elementTree->save(false);
+                }
+
             }
         }
     }
