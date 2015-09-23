@@ -46,6 +46,12 @@ class HasTrees extends ActiveRecord
      */
     public function afterSaveTree($event)
     {
+        if ($this->owner->_tree_ids === null)
+        {
+            return $this;
+        }
+
+
         $savedValues = [];
         //Смотрим какие разделы привязаны
         //TODO: доработать, не удалять каждый раз
@@ -68,7 +74,7 @@ class HasTrees extends ActiveRecord
                     'tree_id'       => $treeId,
                 ]);
 
-                $elementTree->save();
+                $elementTree->save(false);
             }
         }
     }
