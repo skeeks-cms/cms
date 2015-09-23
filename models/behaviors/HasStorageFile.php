@@ -25,6 +25,13 @@ class HasStorageFile extends Behavior
      */
     public $fields = ['image_id'];
 
+    /**
+     * При удалении сущьности удалять все привязанные файлы?
+     *
+     * @var string
+     */
+    public $onDeleteCascade = true;
+
     public function events()
     {
         return [
@@ -38,6 +45,11 @@ class HasStorageFile extends Behavior
      */
     public function deleteStorgaFile()
     {
+        if (!$this->onDeleteCascade)
+        {
+            return $this;
+        }
+
         foreach ($this->fields as $fieldValue)
         {
             if ($fileId = $this->owner->{$fieldValue})
