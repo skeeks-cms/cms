@@ -12,6 +12,7 @@ use skeeks\cms\models\Publication;
 use skeeks\cms\modules\admin\Module;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
+use yii\db\ActiveRecord;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\Application;
@@ -54,15 +55,15 @@ class OneImage extends InputWidget
                 $modelForFile = $this->filesModel;
             }
 
-            /*if (Validate::isValid(new HasBehavior(HasFiles::className()), $modelForFile) && !$modelForFile->isNewRecord)
+            if ($modelForFile instanceof ActiveRecord && !$modelForFile->isNewRecord)
             {
-                $additionalData = $modelForFile->getRef()->toArray();
-            }*/
+                $additionalData = [
+                    'className' => $modelForFile->className(),
+                    'pk'        => $modelForFile->primaryKey,
+                ];
 
-            $additionalData = [
-                'className' => $modelForFile->className(),
-                'pk'        => $modelForFile->primaryKey,
-            ];
+            }
+
 
             $additionalData['callbackEvent'] = $this->getCallbackEvent();
 
