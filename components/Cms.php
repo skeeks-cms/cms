@@ -23,7 +23,6 @@ use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelFilesAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
@@ -452,18 +451,6 @@ class Cms extends \skeeks\cms\base\Component
             if ($this->enabledHttpAuth  == self::BOOL_N && $this->enabledHttpAuthAdmin == self::BOOL_Y && $this->moduleAdmin()->requestIsAdmin())
             {
                 $this->_goHttpAuth();
-            }
-
-            if ($e->controller instanceof AdminModelEditorController)
-            {
-                $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
-                    'files' =>
-                        [
-                            'class'         => AdminOneModelFilesAction::className(),
-                            'name'          => 'Файлы',
-                            "icon"          => "glyphicon glyphicon-cloud",
-                        ],
-                ]);
             }
 
             if ($e->controller instanceof AdminModelEditorController)

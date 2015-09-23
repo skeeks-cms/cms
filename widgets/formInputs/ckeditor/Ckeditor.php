@@ -9,7 +9,6 @@ namespace skeeks\cms\widgets\formInputs\ckeditor;
 
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasFiles;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use skeeks\yii2\ckeditor\CKEditorWidget;
@@ -46,10 +45,10 @@ class Ckeditor extends CKEditorWidget
         $additionalData = [];
         if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord))
         {
-            if (Validate::isValid(new HasBehavior(HasFiles::className()), $this->relatedModel))
+            /*if (Validate::isValid(new HasBehavior(HasFiles::className()), $this->relatedModel))
             {
                 $additionalData = $this->relatedModel->getRef()->toArray();
-            }
+            }*/
         }
 
         $this->clientOptions['filebrowserImageBrowseUrl'] = UrlHelper::construct('cms/tools/select-file', $additionalData)
