@@ -13,7 +13,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\imaging\Filter;
 use skeeks\cms\Exception;
-use skeeks\cms\models\helpers\ModelRef;
 use skeeks\sx\Dir;
 use skeeks\sx\File;
 use skeeks\sx\models\Ref;
@@ -107,14 +106,7 @@ class ImagingController extends Controller
             }
         }
 
-        $filterDescription = \Yii::$app->registeredModels->getComponent((string) $filterCode);
-
-        if (!$filterDescription) {
-            $filterClass = str_replace("-", "\\", $filterCode);
-        } else
-        {
-            $filterClass = $filterDescription->modelClass;
-        }
+        $filterClass = str_replace("-", "\\", $filterCode);
 
 
         if (!class_exists($filterClass))

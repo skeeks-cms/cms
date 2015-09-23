@@ -12,6 +12,9 @@ use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\helpers\Tree;
+use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
@@ -209,23 +212,33 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         {
             if ($editModel = \Yii::$app->controller->action->model)
             {
-                if ($descriptor = \Yii::$app->registeredModels->getDescriptor($editModel->className()))
+                $adminControllerRoute = '';
+
+                if ($editModel instanceof CmsContentElement)
                 {
-                    if ($descriptor->adminControllerRoute)
-                    {
-
-                        /**
-                         * @var $controller AdminModelEditorController
-                         */
-                        $controller = \Yii::$app->createController($descriptor->adminControllerRoute)[0];
-
-                        $urlEditModel = UrlHelper::construct($descriptor->adminControllerRoute . '/update', [$controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}])->enableAdmin()
-                            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                            //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
-                            ;
-                    }
-
+                    $adminControllerRoute = 'cms/admin-cms-content-element';
+                } else if ($editModel instanceof \skeeks\cms\models\Tree)
+                {
+                    $adminControllerRoute = 'cms/admin-tree';
+                } else if ($editModel instanceof User)
+                {
+                    $adminControllerRoute = 'cms/admin-user';
                 }
+
+                if ($adminControllerRoute)
+                {
+
+                    /**
+                     * @var $controller AdminModelEditorController
+                     */
+                    $controller = \Yii::$app->createController($adminControllerRoute)[0];
+
+                    $urlEditModel = UrlHelper::construct($adminControllerRoute . '/update', [$controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}])->enableAdmin()
+                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                        //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                        ;
+                }
+
             }
         }
 

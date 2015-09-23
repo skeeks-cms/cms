@@ -53,12 +53,12 @@ class ToolsController extends Controller
         \Yii::$app->cmsToolbar->enabled = 0;
 
         $model = null;
-        if (\Yii::$app->request->get('linked_to_model') && \Yii::$app->request->get('linked_to_value') )
+        /*if (\Yii::$app->request->get('linked_to_model') && \Yii::$app->request->get('linked_to_value') )
         {
             $className = \Yii::$app->registeredModels->getClassNameByCode(\Yii::$app->request->get('linked_to_model'));
             $ref = new Ref($className, \Yii::$app->request->get('linked_to_value'));
             $model = $ref->findModel();
-        }
+        }*/
 
 
         return $this->render($this->action->id, [
