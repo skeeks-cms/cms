@@ -21,15 +21,6 @@ use yii\helpers\Url;
 class UrlRuleContentElement
     extends \yii\web\UrlRule
 {
-    /**
-     *
-     * Добавлять слэш на конце или нет
-     *
-     * TODO: is depricated > 2.0.14
-     * @var bool
-     */
-    public $useLastDelimetr = true;
-
 
     public function init()
     {
