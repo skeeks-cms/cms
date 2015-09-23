@@ -17,7 +17,6 @@ use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\db\BaseActiveRecord;
 use yii\widgets\ActiveForm;
