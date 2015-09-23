@@ -112,9 +112,9 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSet('Файлы'); ?>
 
-    <?/*= $form->field($model, 'files')->widget(
+    <?= $form->field($model, 'files')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
-    ); */?>
+    ); ?>
 
 <?= $form->fieldSetEnd()?>
 
