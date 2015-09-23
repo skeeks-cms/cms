@@ -52,7 +52,7 @@ $extension = $packageModel->createCmsExtension();
         <p><?= $packageModel->description_short; ?></p>
     </div>
 </div>
-<? if ($images = $packageModel->images) : ?>
+<? if ($images = $packageModel->imagesSrc) : ?>
     <div class="row" style="margin-top: 15px;">
         <div class="col-lg-12">
         <h2>Фото и скриншоты</h2>
@@ -105,7 +105,7 @@ $extension = $packageModel->createCmsExtension();
               <?= $form->fieldSetEnd(); ?>
           <? endif; ?>
 
-          <? if ($images = $packageModel->images) : ?>
+          <? if ($images = $packageModel->imagesSrc) : ?>
               <?= $form->fieldSet('Фото и скриншоты'); ?>
                 <div class="row" style="margin-top: 15px;">
                     <div class="col-lg-12">
