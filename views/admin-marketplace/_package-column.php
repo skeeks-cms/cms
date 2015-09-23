@@ -12,7 +12,7 @@
 
     <a data-pjax="0" href="<?= $model->adminUrl->toString(); ?>" class="sx-img-link-hover sx-border-1px">
 
-        <?= \yii\helpers\Html::img($model->image, [
+        <?= \yii\helpers\Html::img($model->imageSrc, [
             'width' => '100'
         ]); ?>
 
