@@ -29,9 +29,11 @@ use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\validators\EmailValidator;
+use yii\validators\UniqueValidator;
 use yii\web\IdentityInterface;
 
 use skeeks\cms\models\behaviors\HasSubscribes;
@@ -44,29 +46,41 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $auth_key
  * @property string $password_hash
  * @property string $password_reset_token
- * @property string $email
- * @property integer $status
  * @property integer $created_at
- * @property integer $last_activity_at
  * @property integer $updated_at
  * @property string $name
+ * @property integer $image_id
  * @property string $city
  * @property string $address
  * @property string $info
- * @property integer $logged_at
+ * @property string $files
+ * @property string $status_of_life
  * @property string $gender
- * @property integer $image_id
- *
+ * @property string $active
+ * @property integer $updated_by
+ * @property integer $created_by
+ * @property integer $logged_at
+ * @property integer $last_activity_at
+ * @property integer $last_admin_activity_at
  *
  * @property string $lastActivityAgo
  * @property string $lastAdminActivityAgo
+ *
  * @property CmsStorageFile $image
 
- * @property UserEmail $userEmail
+ * @property string         $email
+ * @property string         $phone
+ *
+ * @property CmsUserEmail         $cmsUserEmail
+ * @property CmsUserEmail         $cmsUserPhone
+ *
+ * @property CmsUserEmail[]     $cmsUserEmails
+ * @property CmsUserPhone[]     $cmsUserPhones
+ * @property UserAuthClient[]   $cmsUserAuthClients
+
  *
  * @property string $displayName
  *
- * @property UserAuthClient[] $userAuthClients
  */
 class User
     extends Core
@@ -98,62 +112,30 @@ class User
     {
         parent::init();
 
-        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT,    [$this, "checkDataBeforeInsert"]);
-        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE,    [$this, "checkDataBeforeUpdate"]);
+        $this->on(self::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
+        $this->on(self::EVENT_AFTER_INSERT,    [$this, "checkDataAfterInsert"]);
 
-        $this->on(BaseActiveRecord::EVENT_AFTER_INSERT,    [$this, "checkDataAfterSave"]);
-        $this->on(BaseActiveRecord::EVENT_AFTER_INSERT,    [$this, "checkDataAfterInsert"]);
-        $this->on(BaseActiveRecord::EVENT_AFTER_UPDATE,    [$this, "checkDataAfterSave"]);
-
-        $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
-        $this->on(BaseActiveRecord::EVENT_AFTER_DELETE,    [$this, "checkDataAfterDelete"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_cmsSaveEmail"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_cmsSavePhone"]);
+        $this->on(self::EVENT_AFTER_INSERT,     [$this, "_cmsSaveEmail"]);
+        $this->on(self::EVENT_AFTER_INSERT,     [$this, "_cmsSavePhone"]);
     }
 
     /**
      * @throws Exception
      */
-    public function checkDataBeforeDelete()
+    public function checkDataBeforeDelete($e)
     {
         if (in_array($this->username, static::getProtectedUsernames()))
         {
             throw new Exception('Этого пользователя нельзя удалить');
         }
 
-        if ($this->id == \Yii::$app->cms->getAuthUser()->id)
+        if ($this->id == \Yii::$app->user->identity->id)
         {
             throw new Exception('Нельзя удалять самого себя');
         }
     }
-    /**
-     * @throws Exception
-     */
-    public function checkDataAfterDelete()
-    {
-        $userEmails = UserEmail::find()->where(['user_id' => $this->id])->all();
-        if ($userEmails)
-        {
-            foreach ($userEmails as $userEmail)
-            {
-                $userEmail->delete();
-            }
-        }
-    }
-
-
-    public function checkDataAfterSave()
-    {
-        if ($this->email)
-        {
-            $email              = UserEmail::find()->where(['value' => $this->email])->one();
-
-            if ($email)
-            {
-                $email->user_id     = $this->id;
-                $email->save();
-            }
-        }
-    }
-
 
     /**
      * После вставки пользователя, назначим ему необходимые роли
@@ -172,59 +154,62 @@ class User
         }
     }
 
-    public function checkDataBeforeInsert()
+
+    /**
+     * После вставки пользователя, назначим ему необходимые роли
+     */
+    public function _cmsSaveEmail()
     {
-        //Если установлен email новому пользователю
-        if ($this->email)
+        if ($this->_email)
         {
-            //Проверим
-            Validate::ensure(new UserEmailValidator(), $this);
-
-            //Создаем mail
-            $email = new UserEmail([
-                'value' => $this->email
-            ]);
-
-            $email->scenario = "nouser";
-
-            if (!$email->save())
+            if ($this->cmsUserEmail)
             {
-                throw new ErrorException("Email не удалось добавить");
-            };
-        } else
-        {
-            $this->email = null;
-        }
-    }
+                $this->cmsUserEmail->value  = $this->_email;
+                $this->cmsUserEmail->def    = Cms::BOOL_Y;
 
-    public function checkDataBeforeUpdate()
-    {
-        if ($this->email)
-        {
-            //Если email изменен
-            if ($this->oldAttributes['email'] != $this->email)
+                $this->cmsUserEmail->save();
+            } else
             {
-                Validate::ensure(new UserEmailValidator(), $this);
+                $cmsUserEmail = new CmsUserEmail([
+                    'value' => $this->_email,
+                    'def'   => Cms::BOOL_Y,
+                ]);
 
-                if (!$myEmail = $this->getUserEmail()->where(["value" => $this->email])->one())
-                {
-                    $email = new UserEmail([
-                        'value' => $this->email,
-                        'user_id' => $this->id
-                    ]);
+                $cmsUserEmail->save();
 
-                    if (!$email->save())
-                    {
-                        throw new ErrorException("Email не удалось добавить");
-                    };
-                }
-
+                $cmsUserEmail->link('user', $this);
             }
-        } else
-        {
-            $this->email = null;
         }
     }
+
+
+    /**
+     * После вставки пользователя, назначим ему необходимые роли
+     */
+    public function _cmsSavePhone()
+    {
+        if ($this->_phone)
+        {
+            if ($this->cmsUserPhone)
+            {
+                $this->cmsUserPhone->value  = $this->_phone;
+                $this->cmsUserPhone->def    = Cms::BOOL_Y;
+
+                $this->cmsUserPhone->save();
+            } else
+            {
+                $cmsUserPhone = new CmsUserPhone([
+                    'value' => $this->_phone,
+                    'def'   => Cms::BOOL_Y,
+                ]);
+
+                $cmsUserPhone->save();
+
+                $cmsUserPhone->link('user', $this);
+            }
+        }
+    }
+
 
 
     /**
@@ -287,10 +272,28 @@ class User
             [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
 
-            //[['email'], 'required'],
-            [['email'], 'unique'],
+            [['phone'], 'string'],
+
+            [['phone'], 'unique', 'targetClass' => CmsUserPhone::className(), 'targetAttribute' => 'value',
+                'filter' => function(ActiveQuery $query)
+                {
+                    if ($this->cmsUserPhone)
+                    {
+                        $query->andWhere(['!=', 'id', $this->cmsUserPhone->id]);
+                    }
+                }
+            ],
+            [['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value',
+                'filter' => function(ActiveQuery $query)
+                {
+                    if ($this->cmsUserEmail)
+                    {
+                        $query->andWhere(['!=', 'id', $this->cmsUserEmail->id]);
+                    }
+                }
+            ],
+
             [['email'], 'email'],
-            [['email'], 'validateEmails'],
 
             [['username'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 12],
@@ -316,19 +319,6 @@ class User
         }
     }
 
-    /**
-     * Проверка базы email адресов
-     * @param $attribute
-     */
-    public function validateEmails($attribute)
-    {
-        $validate = Validate::validate(new UserEmailValidator(), $this);
-
-        if ($validate->isInvalid())
-        {
-            $this->addError($attribute, $validate->getErrorMessage());
-        }
-    }
 
     /**
      * @inheritdoc
@@ -518,7 +508,18 @@ class User
      */
     public static function findByEmail($email)
     {
-        return static::findOne(['email' => $email, 'active' => Cms::BOOL_Y]);
+        /**
+         * @var $cmsUserEmail CmsUserEmail
+         */
+        if ($cmsUserEmail = CmsUserEmail::find()->where(['value' => $email])->one())
+        {
+            if ($cmsUserEmail->user->active)
+            {
+                return $cmsUserEmail->user;
+            }
+        }
+
+        return null;
     }
 
 
@@ -675,21 +676,6 @@ class User
         $this->password_reset_token = null;
     }
 
-
-
-
-
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserEmail()
-    {
-        return $this->hasOne(UserEmail::className(), ['user_id' => 'id']);
-    }
-
-
     /**
      * @param int $width
      * @param int $height
@@ -708,4 +694,96 @@ class User
         }
     }
 
+
+    private $_email;
+    private $_phone;
+
+
+    /**
+     * @return string
+     */
+    public function setEmail($value)
+    {
+        $this->_email = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function setPhone($value)
+    {
+        $this->_phone = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCmsUserEmail()
+    {
+        return $this->getCmsUserEmails()->andWhere(['def' => Cms::BOOL_Y])->one();
+    }
+
+    /**
+     * @return string
+     */
+    public function getCmsUserPhone()
+    {
+        return $this->getCmsUserPhones()->andWhere(['def' => Cms::BOOL_Y])->one();
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        if ($this->_email)
+        {
+            return $this->_email;
+        }
+
+        return $this->cmsUserEmail ? $this->cmsUserEmail->value : "";
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhone()
+    {
+        if ($this->_phone)
+        {
+            return $this->_phone;
+        }
+
+        return $this->cmsUserPhone ? $this->cmsUserPhone->value : "";
+    }
+
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsUserAuthclients()
+    {
+        return $this->hasMany(CmsUserAuthclient::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsUserEmails()
+    {
+        return $this->hasMany(CmsUserEmail::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsUserPhones()
+    {
+        return $this->hasMany(CmsUserPhone::className(), ['user_id' => 'id']);
+    }
 }

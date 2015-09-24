@@ -7,7 +7,7 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\models\user\UserEmail;
+use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 
 /**
@@ -20,7 +20,7 @@ class AdminUserEmailController extends AdminModelEditorController
     {
         $this->name                   = "Управление email адресами";
         $this->modelShowAttribute      = "value";
-        $this->modelClassName          = UserEmail::className();
+        $this->modelClassName          = CmsUserEmail::className();
 
         parent::init();
 

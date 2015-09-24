@@ -7,8 +7,7 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\models\user\UserEmail;
-use skeeks\cms\models\user\UserPhone;
+use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 
 /**
@@ -21,7 +20,7 @@ class AdminUserPhoneController extends AdminModelEditorController
     {
         $this->name                   = "Управление телефонами";
         $this->modelShowAttribute      = "value";
-        $this->modelClassName          = UserPhone::className();
+        $this->modelClassName          = CmsUserPhone::className();
 
         parent::init();
 
