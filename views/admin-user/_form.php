@@ -19,7 +19,7 @@ use common\models\User;
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'gender')->radioList([
-        'men' => 'Муж',
+        'men'   => 'Муж',
         'women' => 'Жен',
     ]); ?>
 
@@ -32,8 +32,9 @@ use common\models\User;
 
 
     <?= $form->field($model, 'email')->textInput(); ?>
+    <?= $form->field($model, 'phone')->textInput(); ?>
 
-<?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+<?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
     'label'             => "Дополнительные email",
     'hint'              => "Можно привязать несколько email адресов к аккаунту.",
     'parentModel'       => $model,
@@ -51,22 +52,12 @@ use common\models\User;
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
-                'value'     => function(\skeeks\cms\models\user\UserEmail $model)
-                {
-                    if ($model->isMain())
-                    {
-                        return "да";
-                    }
-
-                    return '-';
-                },
-                'format' => 'html',
-                'label' => 'Основной'
+                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute'     => "def"
             ],
         ],
     ],
-]); ?>
+]); */?>
 
 
 <?= $form->fieldSetEnd(); ?>
