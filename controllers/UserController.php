@@ -9,6 +9,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\actions\user\UserAction;
 use skeeks\cms\base\Controller;
+use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
@@ -17,6 +18,7 @@ use skeeks\cms\models\searchs\User as UserSearch;
 use \skeeks\cms\App;
 use yii\helpers\ArrayHelper;
 use yii\rest\UpdateAction;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class UserController
@@ -38,6 +40,7 @@ class UserController extends Controller
      * @var array
      */
     public $eventActions = [];
+
 
     /**
      * @var User
@@ -127,32 +130,30 @@ class UserController extends Controller
 
     /**
      * @param $username
-     * @return array
-     * @throws \skeeks\cms\components\Exception
+     * @throws \yii\db\Exception
      */
-    protected function _user($username)
+    public function initUser($username)
     {
-        $model      = null;
-        $personal   = false;
-        //Если пользователь авторизован
-        if (\Yii::$app->cms->getAuthUser())
-        {
-            //Если это личный профиль
-            if (\Yii::$app->cms->getAuthUser()->username == $username)
-            {
-                $model = \Yii::$app->cms->getAuthUser();
-                $personal = true;
-            }
-        }
+        $this->user = \Yii::$app->cms->findUser()->where([
+            "username"  => $username,
+            'active'    => Cms::BOOL_Y
+        ])->one();
 
-        if (!$model)
+        if (!$this->user)
         {
-            $model = \Yii::$app->cms->findUser()->where(["username" => $username])->one(); //(["username" => $username]);
+            throw new NotFoundHttpException;
         }
+    }
 
+    /**
+     * @return array
+     */
+    public function getViewParams()
+    {
         return [
-            'model'         => $model,
-            'personal'      => $personal,
+            'action'        => $this->action,
+            'controller'    => $this,
+            'model'         => $this->user
         ];
     }
 
@@ -163,10 +164,10 @@ class UserController extends Controller
      */
     public function actionChangePassword($username)
     {
-        $data = $this->_user($username);
+        $this->initUser($username);
 
         $modelForm = new PasswordChangeForm([
-            'user' => $data['model']
+            'user' => $this->user
         ]);
 
         $rr = new RequestResponse();
@@ -190,7 +191,7 @@ class UserController extends Controller
             return $rr;
         }
 
-        return $this->render($this->action->id, $data);
+        return $this->render($this->action->id, $this->getViewParams());
     }
 
 
@@ -200,8 +201,8 @@ class UserController extends Controller
      */
     public function actionEditInfo($username)
     {
-        $data = $this->_user($username);
-        $model = $data['model'];
+        $this->initUser($username);
+        $model = $this->user;
 
         $rr = new RequestResponse();
 
@@ -224,7 +225,7 @@ class UserController extends Controller
             return $rr;
         }
 
-        return $this->render($this->action->id, $data);
+        return $this->render($this->action->id, $this->getViewParams());
     }
 
 }
