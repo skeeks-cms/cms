@@ -50,6 +50,11 @@ function componentsMenu()
 {
     $result = [];
 
+    if (\Yii::$app instanceof \yii\console\Application)
+    {
+        return $result;
+    }
+
     foreach (\Yii::$app->getComponents(true) as $id => $data)
     {
         $loadedComponent = \Yii::$app->get($id);
