@@ -14,6 +14,7 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\rbac\AuthorRule;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\Json;
