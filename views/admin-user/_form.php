@@ -33,18 +33,22 @@ use common\models\User;
     <?= $form->field($model, 'email')->textInput(); ?>
 
     <? if ($model->email) : ?>
-        <? \yii\bootstrap\Alert::begin([
-            'options' => [
-              'class' => 'alert-warning',
-          ],
-        ]); ?>
+
             <? if ($model->cmsUserEmail->approved !== \skeeks\cms\components\Cms::BOOL_Y) : ?>
-                Email не подтвержден
+
+                <? \yii\bootstrap\Alert::begin([
+                    'options' => [
+                      'class' => 'alert-warning',
+                  ],
+                ]); ?>
+
+                    Email не подтвержден
+                <? \yii\bootstrap\Alert::end(); ?>
+
             <? else : ?>
-                Email подтвержден
+
             <? endif; ?>
 
-        <? \yii\bootstrap\Alert::end(); ?>
     <? endif; ?>
 
     <?= $form->field($model, 'phone')->textInput([

@@ -52,6 +52,44 @@ class CmsUserEmail extends ActiveRecord
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+    }
+
+    /**
+     * @param $event
+     */
+    public function beforeSaveEvent($event)
+    {
+        if ($this->def == Cms::BOOL_N)
+        {
+            if ($this->user_id)
+            {
+                if (!static::find()->where(['def' => Cms::BOOL_Y])->andWhere(['!=', 'id', $this->id])->andWhere(['user_id' => $this->user_id])->count())
+                {
+                    $this->def = Cms::BOOL_Y;
+                }
+            }
+        } else if ($this->def == Cms::BOOL_Y)
+        {
+            if ($this->user_id)
+            {
+                static::updateAll(['def' => Cms::BOOL_N], [
+                    'and',
+                    ['user_id' => $this->user_id],
+                    ['!=', 'id', $this->id]
+                ]);
+            }
+        }
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -67,6 +105,7 @@ class CmsUserEmail extends ActiveRecord
     }
 
 
+
     /**
      * @inheritdoc
      */
@@ -79,7 +118,7 @@ class CmsUserEmail extends ActiveRecord
             'approved' => "Подтвержден",
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'def' => 'Def',
+            'def' => Yii::t('app', 'Основной'),
         ];
     }
 
