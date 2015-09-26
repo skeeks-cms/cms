@@ -48,7 +48,8 @@
         "bower-asset/jq-fullscreen": "*",
         "skeeks/yii2-kartik-markdown": "*",
         "kartik-v/yii2-widget-colorinput": "*",
-        "kartik-v/yii2-widget-touchspin": "*"
+        "kartik-v/yii2-widget-touchspin": "*",
+        "giggsey/libphonenumber-for-php": "~7.0"
     },
     "minimum-stability" : "dev",
     "prefer-stable" : true,
