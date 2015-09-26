@@ -27,6 +27,20 @@ class ModelStorageFiles extends InputWidget
      */
     public $clientOptions = [];
 
+
+    public $viewItemTemplate = null;
+
+    /**
+     * @param $cmsStorageFile
+     * @return string
+     */
+    public function renderItem($cmsStorageFile)
+    {
+        return $this->render($this->viewItemTemplate, [
+            'model' => $cmsStorageFile
+        ]);
+    }
+
     /**
      * @inheritdoc
      */

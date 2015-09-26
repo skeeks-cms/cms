@@ -88,29 +88,34 @@ JS
                 <? foreach ($files as $imageFile) : ?>
                     <? if ( $imageFile instanceof \skeeks\cms\models\StorageFile) : ?>
                         <div class="sx-image">
-                            <? if ($imageFile->isImage()) : ?>
-                                <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
-                                    <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
-                                </a>
+                            <? if (!$widget->viewItemTemplate) : ?>
+
+                                <? if ($imageFile->isImage()) : ?>
+                                    <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
+                                        <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
+                                    </a>
+                                <? else : ?>
+                                    <?= $imageFile->name ? $imageFile->name : $imageFile->original_name; ?>
+                                <? endif; ?>
+
+                                <div class="sx-controlls">
+                                    <?
+                                    $controllerTmp = clone $controller;
+                                    $controllerTmp->setModel($imageFile);
+
+                                    echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
+                                        "controller"            => $controllerTmp,
+                                        "isOpenNewWindow"       => true,
+                                        "clientOptions"         =>
+                                        [
+                                            'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
+                                        ],
+                                    ]);
+                                    ?>
+                                </div>
                             <? else : ?>
-                                <?= $imageFile->name ? $imageFile->name : $imageFile->original_name; ?>
+                                <?= $widget->renderItem($imageFile); ?>
                             <? endif; ?>
-
-                            <div class="sx-controlls">
-                                <?
-                                $controllerTmp = clone $controller;
-                                $controllerTmp->setModel($imageFile);
-
-                                echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
-                                    "controller"            => $controllerTmp,
-                                    "isOpenNewWindow"       => true,
-                                    "clientOptions"         =>
-                                    [
-                                        'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
-                                    ],
-                                ]);
-                                ?>
-                            </div>
                         </div>
                     <? endif; ?>
                 <? endforeach; ?>
