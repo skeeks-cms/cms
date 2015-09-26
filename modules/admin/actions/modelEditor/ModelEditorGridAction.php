@@ -37,6 +37,14 @@ class ModelEditorGridAction extends AdminModelEditorAction
     public $columns = [];
 
     /**
+     * @var callable
+     */
+    public $dataProviderCallback    = null;
+
+    public $filter          = null;
+
+
+    /**
      * @return string
      */
     public function run()
@@ -47,11 +55,25 @@ class ModelEditorGridAction extends AdminModelEditorAction
         {
             $search         = new Search($this->controller->modelClassName);
             $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-            $searchModel    = $search->getLoadedModel();
+            $searchModel    = $search->loadedModel;
         } else
         {
             $searchModel    = new $modelSeacrhClass();
             $dataProvider   = $searchModel->search(\Yii::$app->request->queryParams);
+        }
+
+        //Дополнительная обработка Дата провайдера
+        if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
+        {
+            $dataProviderCallback = $this->dataProviderCallback;
+            $dataProviderCallback($dataProvider);
+        }
+
+        //Дополнительная обработка Дата провайдера
+        if ($this->filter && is_callable($this->filter))
+        {
+            $filter = $this->filter;
+            $filter($dataProvider, \Yii::$app->request->queryParams);
         }
 
         $this->viewParams =
