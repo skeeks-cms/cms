@@ -5,7 +5,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
-/* @var $model \yii\db\ActiveRecord */
+/* @var $model \skeeks\cms\models\CmsUser */
 /* @var $console \skeeks\cms\controllers\AdminUserController */
 ?>
 
@@ -19,7 +19,7 @@ use common\models\User;
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'gender')->radioList([
-        'men' => 'Муж',
+        'men'   => 'Муж',
         'women' => 'Жен',
     ]); ?>
 
@@ -30,10 +30,28 @@ use common\models\User;
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
 
-
     <?= $form->field($model, 'email')->textInput(); ?>
 
-<?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+    <? if ($model->email) : ?>
+        <? \yii\bootstrap\Alert::begin([
+            'options' => [
+              'class' => 'alert-warning',
+          ],
+        ]); ?>
+            <? if ($model->cmsUserEmail->approved !== \skeeks\cms\components\Cms::BOOL_Y) : ?>
+                Email не подтвержден
+            <? else : ?>
+                Email подтвержден
+            <? endif; ?>
+
+        <? \yii\bootstrap\Alert::end(); ?>
+    <? endif; ?>
+
+    <?= $form->field($model, 'phone')->textInput([
+        'placeholder' => '+7 903 722-28-73'
+    ])->hint('Формат ввода телефона: +7 903 722-28-73'); ?>
+
+<?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
     'label'             => "Дополнительные email",
     'hint'              => "Можно привязать несколько email адресов к аккаунту.",
     'parentModel'       => $model,
@@ -51,22 +69,12 @@ use common\models\User;
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
-                'value'     => function(\skeeks\cms\models\user\UserEmail $model)
-                {
-                    if ($model->isMain())
-                    {
-                        return "да";
-                    }
-
-                    return '-';
-                },
-                'format' => 'html',
-                'label' => 'Основной'
+                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute'     => "def"
             ],
         ],
     ],
-]); ?>
+]); */?>
 
 
 <?= $form->fieldSetEnd(); ?>

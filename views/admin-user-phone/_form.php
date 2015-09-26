@@ -6,7 +6,10 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 /* @var $model \yii\db\ActiveRecord */
 ?>
 <?php $form = ActiveForm::begin(); ?>
-    <?= $form->field($model, 'value')->textInput(['maxlength' => 255]) ?>
+
+    <?= $form->field($model, 'value')->textInput([
+        'placeholder' => '+7 903 722-28-73'
+    ])->hint('Формат ввода телефона: +7 903 722-28-73'); ?>
 
     <? if (\Yii::$app->request->get('user_id')) : ?>
         <?= $form->field($model, 'user_id')->hiddenInput(['value' => \Yii::$app->request->get('user_id')])->label(false) ?>

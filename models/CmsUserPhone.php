@@ -1,25 +1,35 @@
 <?php
 /**
- * UserPhone
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 27.01.2015
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 28.02.2015
  */
-namespace skeeks\cms\models\user;
+namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\User;
+use skeeks\cms\validators\PhoneValidator;
 use Yii;
+use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
 use \yii\db\ActiveRecord;
 
 /**
- * Class UserPhone
- * @package skeeks\cms\models\user
+ * This is the model class for table "cms_user_phone".
+ *
+ * @property integer $id
+ * @property integer $user_id
+ * @property string $value
+ * @property string $approved
+ * @property string $def
+ * @property string $approved_key
+ * @property integer $created_at
+ * @property integer $updated_at
+ *
+ * @property CmsUser $user
  */
-class UserPhone extends ActiveRecord
+class CmsUserPhone extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -28,6 +38,7 @@ class UserPhone extends ActiveRecord
     {
         return '{{%cms_user_phone}}';
     }
+
 
     /**
      * @inheritdoc
@@ -45,13 +56,17 @@ class UserPhone extends ActiveRecord
     public function rules()
     {
         return [
-            [['value'], 'required'],
             [['user_id', 'created_at', 'updated_at'], 'integer'],
-            [['value', 'approved_key'], 'string'],
-            [['approved'], 'string'],
+            [['value'], 'required'],
+            [['value'], PhoneValidator::className()],
+            [['value', 'approved_key'], 'string', 'max' => 255],
+            [['approved', 'def'], 'string', 'max' => 1],
+            [['value'], 'unique'],
             [['approved'], 'default', 'value' => Cms::BOOL_N],
+            [['def'], 'default', 'value' => Cms::BOOL_N],
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -61,13 +76,11 @@ class UserPhone extends ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'Пользователь'),
-            'provider' => Yii::t('app', 'Provider'),
-            'provider_identifier' => Yii::t('app', 'Provider Identifier'),
-            'provider_data' => Yii::t('app', 'Provider Data'),
+            'value' => "Номер телефона",
+            'approved' => "Подтвержден",
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'approved' => "Подтвержден",
-            'value' => "Телефон",
+            'def' => 'Def',
         ];
     }
 
@@ -76,6 +89,6 @@ class UserPhone extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(CmsUser::className(), ['id' => 'user_id']);
     }
 }

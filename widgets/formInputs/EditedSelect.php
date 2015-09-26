@@ -138,7 +138,7 @@ HTML;
 
                     $(this.getWrapper()).on('click', '.sx-btn-update', function()
                     {
-                        var windowWidget = new sx.classes.Window($(this).attr('href') + '&id=' + $('select', self.getWrapper()).val());
+                        var windowWidget = new sx.classes.Window($(this).attr('href') + '&pk=' + $('select', self.getWrapper()).val());
 
                         windowWidget.bind('close', function(e, data)
                         {

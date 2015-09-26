@@ -12,6 +12,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\sx\models\Ref;
 use Yii;
+use yii\db\ActiveRecord;
 use yii\web\Response;
 
 
@@ -53,12 +54,15 @@ class ToolsController extends Controller
         \Yii::$app->cmsToolbar->enabled = 0;
 
         $model = null;
-        /*if (\Yii::$app->request->get('linked_to_model') && \Yii::$app->request->get('linked_to_value') )
+        $className = \Yii::$app->request->get('className');
+        $pk = \Yii::$app->request->get('pk');
+
+        if ($className && $pk)
         {
-            $className = \Yii::$app->registeredModels->getClassNameByCode(\Yii::$app->request->get('linked_to_model'));
-            $ref = new Ref($className, \Yii::$app->request->get('linked_to_value'));
-            $model = $ref->findModel();
-        }*/
+            if ($model = $className::findOne($pk))
+            {
+            }
+        }
 
 
         return $this->render($this->action->id, [
