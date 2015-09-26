@@ -21,8 +21,7 @@ use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
-use skeeks\cms\validators\string\LoginValidator;
-use skeeks\cms\validators\user\UserEmailValidator;
+use skeeks\cms\validators\PhoneValidator;
 use skeeks\sx\validate\Validate;
 use Yii;
 use yii\base\ErrorException;
@@ -273,6 +272,7 @@ class User
             [['auth_key'], 'string', 'max' => 32],
 
             [['phone'], 'string'],
+            [['phone'], PhoneValidator::className()],
 
             [['phone'], 'unique', 'targetClass' => CmsUserPhone::className(), 'targetAttribute' => 'value',
                 'filter' => function(ActiveQuery $query)
@@ -298,27 +298,13 @@ class User
             [['username'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 12],
             [['username'], 'unique'],
-            [['username'], 'validateLogin'],
+            [['username'], \skeeks\cms\validators\LoginValidator::className()],
 
             [['logged_at'], 'integer'],
             [['last_activity_at'], 'integer'],
             [['last_admin_activity_at'], 'integer'],
         ];
     }
-
-    /**
-     * @param $attribute
-     */
-    public function validateLogin($attribute)
-    {
-        $validate = Validate::validate(new LoginValidator(), $this->$attribute);
-
-        if ($validate->isInvalid())
-        {
-            $this->addError($attribute, $validate->getErrorMessage());
-        }
-    }
-
 
     /**
      * @inheritdoc

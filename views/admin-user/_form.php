@@ -33,20 +33,24 @@ use common\models\User;
 
     <?= $form->field($model, 'email')->textInput(); ?>
 
-    <? \yii\bootstrap\Alert::begin([
-        'options' => [
-          'class' => 'alert-warning',
-      ],
-    ]); ?>
-        <? if (!$model->cmsUserEmail->approved) : ?>
-            Email не подтвержден
-        <? else : ?>
-            Email подтвержден
-        <? endif; ?>
+    <? if ($model->email) : ?>
+        <? \yii\bootstrap\Alert::begin([
+            'options' => [
+              'class' => 'alert-warning',
+          ],
+        ]); ?>
+            <? if ($model->cmsUserEmail->approved !== \skeeks\cms\components\Cms::BOOL_Y) : ?>
+                Email не подтвержден
+            <? else : ?>
+                Email подтвержден
+            <? endif; ?>
 
-    <? \yii\bootstrap\Alert::end(); ?>
+        <? \yii\bootstrap\Alert::end(); ?>
+    <? endif; ?>
 
-    <?= $form->field($model, 'phone')->textInput(); ?>
+    <?= $form->field($model, 'phone')->textInput([
+        'placeholder' => '+7 903 722-28-73'
+    ])->hint('Формат ввода телефона: +7 903 722-28-73'); ?>
 
 <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
     'label'             => "Дополнительные email",

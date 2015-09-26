@@ -9,6 +9,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\User;
+use skeeks\cms\validators\PhoneValidator;
 use Yii;
 use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
@@ -57,6 +58,7 @@ class CmsUserPhone extends ActiveRecord
         return [
             [['user_id', 'created_at', 'updated_at'], 'integer'],
             [['value'], 'required'],
+            [['value'], PhoneValidator::className()],
             [['value', 'approved_key'], 'string', 'max' => 255],
             [['approved', 'def'], 'string', 'max' => 1],
             [['value'], 'unique'],
@@ -74,7 +76,7 @@ class CmsUserPhone extends ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'Пользователь'),
-            'value' => "Email",
+            'value' => "Номер телефона",
             'approved' => "Подтвержден",
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
