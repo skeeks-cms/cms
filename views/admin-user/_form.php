@@ -30,7 +30,6 @@ use common\models\User;
     <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
 
-
     <?= $form->field($model, 'email')->textInput(); ?>
 
     <? if ($model->email) : ?>

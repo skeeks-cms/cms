@@ -74,6 +74,12 @@ JS
 <? if ($model) : ?>
     <?= $form->fieldSet('Файлы привязанные к записи'); ?>
 
+        <? \yii\bootstrap\Alert::begin(['options' => [
+          'class' => 'alert-info',
+        ]]); ?>
+            В этой вкладке показаны все файлы и изображения которые привязаны к текущему элементу.
+        <? \yii\bootstrap\Alert::end(); ?>
+
 
         <? foreach($model->getBehaviors() as $behavior) : ?>
             <? \yii\bootstrap\ActiveForm::begin(); ?>
@@ -81,7 +87,10 @@ JS
                 <? foreach($behavior->fields as $fieldName) : ?>
 
                     <?= $form->field($model, $fieldName)->widget(
-                        \skeeks\cms\widgets\formInputs\StorageImage::className()
+                        \skeeks\cms\widgets\formInputs\StorageImage::className(),
+                        [
+                            'viewItemTemplate' => '@skeeks/cms/views/tools/one-file'
+                        ]
                     ); ?>
 
                 <? endforeach; ?>
@@ -90,7 +99,10 @@ JS
                 <? foreach($behavior->relations as $relationName) : ?>
 
                     <?= $form->field($model, $relationName)->widget(
-                        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+                        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
+                        [
+                            'viewItemTemplate' => '@skeeks/cms/views/tools/one-file'
+                        ]
                     ); ?>
 
                 <? endforeach; ?>

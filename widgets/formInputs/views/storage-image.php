@@ -86,24 +86,29 @@ JS
         <div class="row col-md-12">
             <? if ($imageFile = $widget->image) : ?>
                 <div class="sx-image">
-                    <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
-                        <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
-                    </a>
-                    <div class="sx-controlls">
-                        <?
-                        $controllerTmp = clone $controller;
-                        $controllerTmp->setModel($imageFile);
+                    <? if (!$widget->viewItemTemplate) : ?>
+                        <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
+                            <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
+                        </a>
+                        <div class="sx-controlls">
+                            <?
+                            $controllerTmp = clone $controller;
+                            $controllerTmp->setModel($imageFile);
 
-                        echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
-                            "controller"            => $controllerTmp,
-                            "isOpenNewWindow"       => true,
-                            "clientOptions"         =>
-                            [
-                                'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
-                            ],
-                        ]);
-                        ?>
-                    </div>
+                            echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
+                                "controller"            => $controllerTmp,
+                                "isOpenNewWindow"       => true,
+                                "clientOptions"         =>
+                                [
+                                    'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
+                                ],
+                            ]);
+                            ?>
+                        </div>
+                    <? else : ?>
+                        <?= $widget->renderItem($imageFile); ?>
+                    <? endif; ?>
+
                 </div>
             <? endif; ?>
         </div>
