@@ -22,6 +22,7 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 
     <?= $form->fieldRadioListBoolean($model, 'approved'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'def'); ?>
 
     <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

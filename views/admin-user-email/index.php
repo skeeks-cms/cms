@@ -29,6 +29,11 @@
         [
             'class' => \skeeks\cms\grid\BooleanColumn::className(),
             'attribute' => 'approved',
+        ],
+
+        [
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute' => 'def',
         ]
     ],
 ]); ?>
