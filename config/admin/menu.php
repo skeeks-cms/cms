@@ -35,6 +35,7 @@ function contentMenu()
                     [
                         'label' => $content->name,
                         'url'   => ["cms/admin-cms-content-element/index", "content_id" => $content->id, "content_type" => $contentType->code],
+
                     ];
                 }
             }
@@ -309,11 +310,11 @@ return
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
                     ],
 
-                    [
+                    /*[
                         "label"     => "Обновления",
                         "url"       => ["admin/update"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update.png'],
-                    ],
+                    ],*/
 
                     [
                         "label"     => "Ssh console",

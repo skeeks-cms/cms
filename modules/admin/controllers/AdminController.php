@@ -33,7 +33,8 @@ use yii\helpers\Inflector;
 use yii\web\ForbiddenHttpException;
 
 /**
- * @property AdminAction[]    $actions
+ * @property AdminAction[]      $actions
+ * @property string             $permissionName
  *
  * Class AdminController
  * @package skeeks\cms\modules\admin\controllers
@@ -65,6 +66,15 @@ abstract class AdminController extends Controller
      * @var array
      */
     public $eventActions = [];
+
+
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return $this->getUniqueId();
+    }
 
     /**
      * Проверка доступа к админке
@@ -100,10 +110,7 @@ abstract class AdminController extends Controller
                         'allow'         => true,
                         'matchCallback' => function($rule, $action)
                         {
-                            //Смотрим зарегистрирована ли привилегия этого контроллера, если да то проверим ее
-                            $acttionPermissionName = \Yii::$app->cms->moduleAdmin()->getPermissionCode($action->controller->getUniqueId());
-
-                            if ($permission = \Yii::$app->authManager->getPermission($acttionPermissionName))
+                            if ($permission = \Yii::$app->authManager->getPermission($this->permissionName))
                             {
                                 if (!\Yii::$app->user->can($permission->name))
                                 {

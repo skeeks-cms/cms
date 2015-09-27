@@ -144,20 +144,25 @@ class AdminMenuItem extends Component
     {
         if (is_array($this->url))
         {
-            /**
-             * @var $controller \yii\web\Controller
-             */
-            list($controller, $route) = \Yii::$app->createController($this->url[0]);
+            $controller = null;
+
+            try
+            {
+                /**
+                 * @var $controller \yii\web\Controller
+                 */
+                list($controller, $route) = \Yii::$app->createController($this->url[0]);
+            } catch (\Exception $e)
+            {}
+
 
             if (!$controller)
             {
-                return false;
+                return true;
             }
 
 
-            $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
-
-            if ($permission = \Yii::$app->authManager->getPermission($permissionCode))
+            if ($permission = \Yii::$app->authManager->getPermission($controller->permissionName))
             {
                 if (\Yii::$app->user->can($permission->name))
                 {

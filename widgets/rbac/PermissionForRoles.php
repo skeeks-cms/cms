@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\widgets\rbac;
 use skeeks\cms\components\Cms;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\Widget;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -25,11 +26,41 @@ class PermissionForRoles extends Widget
      * @var string Привилегия которую необходимо назначать, и настраивать.
      */
     public $permissionName        = "";
+    public $permissionDescription = "";
     public $label                 = "";
+    public $items                 = [];
+
+    /**
+     * @var bool Проверят разрешение и создавать если его нет
+     */
+    public $createPermission      = true;
+
 
     public function init()
     {
         parent::init();
+
+        if (!$this->items)
+        {
+            $this->items = \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description');
+        }
+
+        if ($this->createPermission)
+        {
+            if (!\Yii::$app->authManager->getPermission($this->permissionName))
+            {
+                $permission = \Yii::$app->authManager->createPermission($this->permissionName);
+                $permission->description = $this->permissionDescription;
+
+                \Yii::$app->authManager->add($permission);
+
+                if ($root = \Yii::$app->authManager->getRole(CmsManager::ROLE_ROOT))
+                {
+                    \Yii::$app->authManager->addChild($root, $permission);
+                }
+            }
+        }
+
     }
 
     public function run()
