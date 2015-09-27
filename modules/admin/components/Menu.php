@@ -54,6 +54,8 @@ class Menu
 
     public function getData()
     {
+        \Yii::beginProfile('admin-menu');
+
         if ($this->isLoaded)
         {
             return (array) $this->groups;
@@ -93,61 +95,11 @@ class Menu
 
         $this->isLoaded = true;
 
+        \Yii::endProfile('admin-menu');
+
         return (array) $this->groups;
     }
 
-    /**
-        Получение только доступного меню
-     * @return array
-     */
-    public function getAllowData()
-    {
-        $groups = [];
-
-        foreach ($this->getData() as $groupCode => $groupData)
-        {
-            if (is_callable($groupData))
-            {
-                $groups = ArrayHelper::merge($groups, $groupData());
-
-            } else if ($groupData['items'])
-            {
-                $items = [];
-                foreach ($groupData['items'] as $itemCode => $itemData)
-                {
-                    /**
-                     * @var $controller \yii\web\Controller
-                     */
-                    list($controller, $route) = \Yii::$app->createController($itemData['url'][0]);
-
-                    if (!$controller)
-                    {
-                        continue;
-                    }
-
-                    $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
-                    if ($permission = \Yii::$app->authManager->getPermission($permissionCode))
-                    {
-                        if (\Yii::$app->user->can($permission->name))
-                        {
-                            $items[$itemCode] = $itemData;
-                        }
-                    } else
-                    {
-                        $items[$itemCode] = $itemData;
-                    }
-                }
-
-                if ($items)
-                {
-                    $groupData['items'] = $items;
-                    $groups[$groupCode] = $groupData;
-                }
-            }
-        }
-
-        return $groups;
-    }
 
     /**
      * @return AdminMenuItem[]

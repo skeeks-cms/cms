@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\sx\models\Ref;
 use Yii;
 use yii\web\Response;
@@ -46,6 +47,8 @@ class RbacController extends Controller
         }
 
         $rolesValues = (array) \Yii::$app->request->post('roles');
+        $rolesValues[] = CmsManager::ROLE_ROOT; //у root пользователя нельзя отобрать права
+
         foreach (\Yii::$app->authManager->getRoles() as $role)
         {
             if (in_array($role->name, $rolesValues))

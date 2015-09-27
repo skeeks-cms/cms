@@ -22,7 +22,7 @@
         'multiple'          => true,
         'name'              => 'sx-permission-' . $widget->permissionName,
         'value'             => $widget->permissionRoles,
-        'items'             => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description')
+        'items'             => $widget->items
     ]); ?>
 
     <? $this->registerJs(<<<JS

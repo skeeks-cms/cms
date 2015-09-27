@@ -125,20 +125,4 @@ class Module extends CmsModule
 
         return false;
     }
-
-
-
-    /**
-     * @param string $route
-     * @return string
-     */
-    public function getPermissionCode($route = '')
-    {
-        return $route;
-    }
-
-    public function getPermissionCodeOwn($route = '')
-    {
-        return $this->getPermissionCode($route) . '/own';
-    }
 }
