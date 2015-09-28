@@ -27,7 +27,6 @@ $this->registerJs(<<<JS
     new sx.classes.UserLastActivity({$userLastActivity});
 JS
 )
-
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -75,9 +74,12 @@ JS
             </a>
         </li>
 
+        <? if (\Yii::$app->user->can('cms/admin-settings')) : ?>
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
             <a href="<?= UrlHelper::construct('cms/admin-settings')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Настройки проекта"><i class="glyphicon glyphicon-cog"></i></a>
         </li>
+        <? endif; ?>
+
 
         <li class="dropdown sx-left-border">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="Ваш профиль">
@@ -126,88 +128,7 @@ JS
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
-            <? if ($items = \Yii::$app->adminMenu->getItems()) : ?>
-                <? foreach ($items as $adminMenuItem) : ?>
-                    <? if ($adminMenuItem->isAllowShow() && $adminMenuItem->items) : ?>
-                        <div class="sidebar-menu" id="<?= $adminMenuItem->code; ?>">
-                            <div class="sx-head" title="<?= $adminMenuItem->label; ?>">
-                                <? if ($imgUrl = $adminMenuItem->getImgUrl()) : ?>
-                                    <span class="sx-icon">
-                                        <img src="<?= $imgUrl; ?>" />
-                                    </span>
-                                <? else : ?>
-                                    <i class="icon icon-arrow-up" style=""></i>
-                                <? endif; ?>
-                                <?= $adminMenuItem->label; ?>
-                            </div>
-
-                            <? if ($subAdminMenuItems = $adminMenuItem->items) : ?>
-                                <ul class="nav nav-sidebar">
-                                <? foreach ($subAdminMenuItems as $subAdminMenuItem) : ?>
-                                    <? if ($subAdminMenuItem->isAllowShow()) : ?>
-                                        <li <?= $subAdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                            <a href="<?= $subAdminMenuItem->getUrl() ? $subAdminMenuItem->getUrl() : "#" ?>" title="<?= $subAdminMenuItem->label; ?>" class="sx-test">
-                                                <span class="sx-icon">
-                                                    <img src="<?= $subAdminMenuItem->getImgUrl(); ?>" />
-                                                </span>
-                                                <span class="txt"><?= $subAdminMenuItem->label; ?></span>
-                                                <? if ($subAdminMenuItem->items) : ?>
-                                                    <span class="caret"></span>
-                                                <? endif; ?>
-                                            </a>
-
-
-                                                <? if ($sub3AdminMenuItems = $subAdminMenuItem->items) : ?>
-                                                    <ul class="nav nav-sidebar">
-                                                    <? foreach ($sub3AdminMenuItems as $sub3AdminMenuItem) : ?>
-                                                        <? if ($sub3AdminMenuItem->isAllowShow()) : ?>
-                                                            <li <?= $sub3AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                                <a href="<?= $sub3AdminMenuItem->getUrl() ? $sub3AdminMenuItem->getUrl() : "#" ?>" title="<?= $sub3AdminMenuItem->label; ?>" class="sx-test">
-                                                                    <span class="sx-icon">
-                                                                        <img src="<?= $sub3AdminMenuItem->getImgUrl(); ?>" />
-                                                                    </span>
-                                                                    <span class="txt"><?= $sub3AdminMenuItem->label; ?></span>
-                                                                    <? if ($sub3AdminMenuItem->items) : ?>
-                                                                        <span class="caret"></span>
-                                                                    <? endif; ?>
-                                                                </a>
-
-
-                                                                <? if ($sub4AdminMenuItems = $sub3AdminMenuItem->items) : ?>
-                                                                    <ul class="nav nav-sidebar">
-                                                                    <? foreach ($sub4AdminMenuItems as $sub4AdminMenuItem) : ?>
-                                                                        <? if ($sub4AdminMenuItem->isAllowShow()) : ?>
-                                                                            <li <?= $sub4AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                                                <a href="<?= $sub4AdminMenuItem->getUrl() ?>" title="<?= $sub4AdminMenuItem->label; ?>" class="sx-test">
-                                                                                    <span class="sx-icon">
-                                                                                        <img src="<?= $sub4AdminMenuItem->getImgUrl(); ?>" />
-                                                                                    </span>
-                                                                                    <span class="txt"><?= $sub4AdminMenuItem->label; ?></span>
-                                                                                </a>
-                                                                            </li>
-                                                                        <? endif; ?>
-                                                                    <? endforeach; ?>
-                                                                    </ul>
-                                                                <? endif; ?>
-
-
-                                                            </li>
-                                                        <? endif; ?>
-                                                    <? endforeach; ?>
-                                                    </ul>
-                                                <? endif; ?>
-
-                                        </li>
-
-
-                                    <? endif; ?>
-                                <? endforeach; ?>
-                                </ul>
-                            <? endif; ?>
-                        </div>
-                    <? endif; ?>
-                <? endforeach; ?>
-            <? endif; ?>
+            <?= $this->render('_admin-menu'); ?>
 
         </div>
     </div>
@@ -234,6 +155,48 @@ JS
                     ]) ?>
                 </h2>
                 <div class="panel-actions">
+
+                    <? if (\Yii::$app->user->can('admin/admin-role') && \Yii::$app->controller instanceof \skeeks\cms\modules\admin\controllers\AdminController) : ?>
+
+                        <a href="#sx-permissions-for-controller" class="sx-fancybox">
+                            <i class="glyphicon glyphicon-exclamation-sign" data-sx-widget="tooltip-b" data-original-title="Настройки доступа к этому разделу" style="color: white;"></i>
+                        </a>
+
+                        <div style="display: none;">
+                            <div id="sx-permissions-for-controller" style="min-height: 300px;">
+
+                                <?
+                                $adminPermission = \Yii::$app->authManager->getPermission(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS);
+                                $items = [];
+                                foreach (\Yii::$app->authManager->getRoles() as $role)
+                                {
+                                    if (\Yii::$app->authManager->hasChild($role, $adminPermission))
+                                    {
+                                        $items[] = $role;
+                                    }
+                                }
+                                ?>
+                                <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+                                    'permissionName'        => \Yii::$app->controller->permissionName,
+                                    'permissionDescription' => "Администрирование | " . \Yii::$app->controller->name,
+                                    'label'                 => "Настройки доступа к разделу: " . \Yii::$app->controller->name,
+                                    'items'                 => \yii\helpers\ArrayHelper::map($items, 'name', 'description'),
+                                ]); ?>
+                                Укажите пользователи каких групп получат доступ.
+                                <hr />
+                                <? \yii\bootstrap\Alert::begin([
+                                    'options' => [
+                                      'class' => 'alert-info',
+                                    ],
+                                ])?>
+                                    <p>Код привилегии: <b><?= \Yii::$app->controller->permissionName; ?></b></p>
+                                    <p>В списке показаны только те группы, которые имеют доступ к системе администрирования.</p>
+                                <? \yii\bootstrap\Alert::end()?>
+                            </div>
+                        </div>
+
+                    <? endif; ?>
+
                 </div>
             </div><!-- End .panel-heading -->
             <div class="panel-body">

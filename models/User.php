@@ -263,6 +263,8 @@ class User
     {
         return [
             ['active', 'default', 'value' => Cms::BOOL_Y],
+            ['gender', 'default', 'value' => 'men'],
+            ['gender', 'in', 'range' => ['men', 'women']],
 
             [['username', 'auth_key', 'password_hash'], 'required'],
             [['created_at', 'updated_at', 'image_id'], 'integer'],

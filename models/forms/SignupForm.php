@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\models\forms;
 
+use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\models\User;
 use yii\base\Model;
 use Yii;
@@ -69,7 +70,9 @@ class SignupForm extends Model
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => 'Этот Email уже занят другим пользователем.'],
+            //['email', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => 'Этот Email уже занят другим пользователем.'],
+
+            [['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value'],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],

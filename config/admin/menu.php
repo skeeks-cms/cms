@@ -35,6 +35,7 @@ function contentMenu()
                     [
                         'label' => $content->name,
                         'url'   => ["cms/admin-cms-content-element/index", "content_id" => $content->id, "content_type" => $contentType->code],
+
                     ];
                 }
             }
@@ -49,6 +50,11 @@ function contentMenu()
 function componentsMenu()
 {
     $result = [];
+
+    if (\Yii::$app instanceof \yii\console\Application)
+    {
+        return $result;
+    }
 
     foreach (\Yii::$app->getComponents(true) as $id => $data)
     {
@@ -304,11 +310,11 @@ return
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
                     ],
 
-                    [
+                    /*[
                         "label"     => "Обновления",
                         "url"       => ["admin/update"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update.png'],
-                    ],
+                    ],*/
 
                     [
                         "label"     => "Ssh console",

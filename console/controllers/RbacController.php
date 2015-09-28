@@ -14,6 +14,7 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\rbac\AuthorRule;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\Json;
@@ -621,12 +622,10 @@ class RbacController extends Controller
                     {
                         if ($controller instanceof AdminController)
                         {
-                            $permissionCode = \Yii::$app->cms->moduleAdmin()->getPermissionCode($controller->getUniqueId());
-
                             //Привилегия доступу к админке
-                            if (!$adminAccess = $auth->getPermission($permissionCode))
+                            if (!$adminAccess = $auth->getPermission($controller->permissionName))
                             {
-                                $adminAccess = $auth->createPermission($permissionCode);
+                                $adminAccess = $auth->createPermission($controller->permissionName);
                                 $adminAccess->description = 'Администрирование | ' . $controller->name;
                                 $auth->add($adminAccess);
                             }

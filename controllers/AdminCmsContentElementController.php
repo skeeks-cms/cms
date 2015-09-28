@@ -73,7 +73,24 @@ class AdminCmsContentElementController extends AdminModelEditorController
         );
     }
 
+    /**
+     * @var CmsContent
+     */
     public $content;
+
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        if ($this->content)
+        {
+            $this->name = $this->content->name;
+            return $this->getUniqueId() . "__" . $this->content->id;
+        }
+
+        return parent::getPermissionName();
+    }
 
     public function beforeAction($action)
     {
@@ -87,6 +104,9 @@ class AdminCmsContentElementController extends AdminModelEditorController
             if ($this->content->name_meny)
             {
                 $this->name = $this->content->name_meny;
+            } else
+            {
+                $this->name = $this->content->name;
             }
         }
 

@@ -121,6 +121,17 @@ return [
             [
                 \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
             ],
+        ],
+
+        [
+            'name'          => \skeeks\cms\rbac\CmsManager::ROLE_APPROVED,
+            'description'   => 'Подтвержденный пользователь',
+
+            //Есть доступ к системе администрирования
+            'permissions' =>
+            [
+                \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+            ],
         ]
     ],
 
