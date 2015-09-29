@@ -120,7 +120,8 @@ class AdminSettings extends Component
 
         if ($this->enableCustomPromt == Cms::BOOL_Y)
         {
-            $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Promt.js');
+            $file = AdminAsset::getAssetUrl('js/classes/modal/Promt.js');
+            //$file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Promt.js');
             \Yii::$app->view->registerJsFile($file,
             [
                 'depends' => [AdminAsset::className()]
@@ -129,7 +130,8 @@ class AdminSettings extends Component
 
         if ($this->enableCustomConfirm == Cms::BOOL_Y)
         {
-            $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Confirm.js');
+            $file = AdminAsset::getAssetUrl('js/classes/modal/Confirm.js');
+            //$file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Confirm.js');
             \Yii::$app->view->registerJsFile($file,
             [
                 'depends' => [AdminAsset::className()]
