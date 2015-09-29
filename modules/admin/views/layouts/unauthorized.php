@@ -23,7 +23,7 @@ use skeeks\cms\helpers\UrlHelper;
 \Yii::$app->admin->registerAsset($this);
 
 $urlBg = \Yii::$app->assetManager->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/bg/582738_www.Gde-Fon.com.jpg');
-$blockerLoader = \Yii::$app->getAssetManager()->getAssetUrl(\skeeks\cms\modules\admin\assets\AdminAsset::register($this), 'images/loaders/circulare-blue-24_24.GIF');
+$blockerLoader = \Yii::$app->getAssetManager()->getAssetUrl(\Yii::$app->getAssetManager()->getBundle(\skeeks\cms\modules\admin\assets\AdminAsset::className()), 'images/loaders/circulare-blue-24_24.GIF');
 
 $this->registerCss(<<<CSS
     body.sx-styled

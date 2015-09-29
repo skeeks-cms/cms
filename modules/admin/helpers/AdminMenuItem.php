@@ -225,7 +225,7 @@ class AdminMenuItem extends Component
         } if (is_array($this->img))
         {
             list($assetClassName, $localPath) = $this->img;
-            return (string) \Yii::$app->getAssetManager()->getAssetUrl($assetClassName::register(\Yii::$app->view), $localPath);
+            return (string) \Yii::$app->getAssetManager()->getAssetUrl(\Yii::$app->assetManager->getBundle($assetClassName), $localPath);
         } if (is_string($this->img))
         {
             return (string) $this->img;
