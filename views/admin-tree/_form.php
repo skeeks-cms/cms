@@ -50,7 +50,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-    <?= Html::checkbox("isLink", $model->isLink(), [
+    <?= Html::checkbox("isLink", (bool) $model->redirect, [
         'value'     => '1',
         'label'     => 'Этот раздел является ссылкой',
         'class'     => 'smartCheck',
