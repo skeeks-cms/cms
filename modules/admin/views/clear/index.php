@@ -67,20 +67,21 @@ $data = \yii\helpers\Json::encode([
             {
                 var ajax = sx.ajax.preparePostQuery(this.get("backend"));
 
-                new sx.classes.AjaxHandlerNotify(ajax);
+                new sx.classes.AjaxHandlerStandartRespose(ajax);
                 new sx.classes.AjaxHandlerNoLoader(ajax);
+
                 new sx.classes.AjaxHandlerBlocker(ajax, {
                     'wrapper': '.sx-panel .panel-content'
                 });
 
-                ajax.onError(function(e, data)
+                /*ajax.onError(function(e, data)
                 {
                     sx.notify.info("Подождите сейчас страница будет перезагружена");
                     _.delay(function()
                     {
                         window.location.reload();
                     }, 2000);
-                })
+                })*/
 
                 ajax.execute();
             },

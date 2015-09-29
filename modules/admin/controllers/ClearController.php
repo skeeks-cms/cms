@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\controllers;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
@@ -57,12 +58,6 @@ class ClearController extends AdminController
                 'dir'       => new Dir(\Yii::getAlias('@console/runtime'), false)
             ],
 
-            [
-                'label'     => 'frontend временные файлы',
-                'dir'       => new Dir(\Yii::getAlias('@frontend/runtime'), false)
-            ],
-
-
 
             [
                 'label'     => 'runtime (текущий сайт)',
@@ -91,7 +86,8 @@ class ClearController extends AdminController
 
         ];
 
-        if (\Yii::$app->request->isPost)
+        $rr = new RequestResponse();
+        if ($rr->isRequestAjaxPost())
         {
             foreach ($clearDirs as $data)
             {
@@ -101,14 +97,17 @@ class ClearController extends AdminController
                     if ($dir->isExist())
                     {
                         $dir->clear();
-
                     }
                 }
             }
 
-            \Yii::$app->getSession()->setFlash('success', 'Кэш успешно очищен');
+            \Yii::$app->db->getSchema()->refresh();
             \Yii::$app->cache->flush();
             \Yii::$app->cms->generateModulesConfigFile();
+
+            $rr->success = true;
+            $rr->message = 'Кэш очищен';
+            return $rr;
         }
 
         return $this->render('index', [
