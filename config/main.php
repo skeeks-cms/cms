@@ -37,6 +37,14 @@ $config =
             'loginUrl'          => ['cms/auth/login'],
         ],
 
+        'i18n' => [
+            'translations' => [
+                '*' => [
+                    'class' => 'yii\i18n\PhpMessageSource'
+                ],
+            ],
+        ],
+
 
         'mailer' => [
             'class'         => 'skeeks\cms\mail\Mailer',
