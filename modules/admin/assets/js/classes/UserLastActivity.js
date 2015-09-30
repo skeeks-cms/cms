@@ -6,53 +6,62 @@
  */
 (function(sx, $, _)
 {
-
     sx.classes.UserLastActivity = sx.classes.Component.extend({
 
         _init: function()
         {
-            //TODO: добавить какой нибудь хендлер correct time
             var self = this;
-            var remind1 = (this.get('timeLeft') - 30) * 1000
-            var remind2 = (this.get('timeLeft') - 20) * 1000
-            var remind3 = (this.get('timeLeft') - 10) * 1000
 
-            _.delay(function()
-            {
-                self.remind1();
-            }, remind1);
-
-            _.delay(function()
-            {
-                self.remind2();
-            }, remind2);
-
-            _.delay(function()
-            {
-                self.remind3();
-            }, remind3);
+            setInterval(function(){
+                self.check();
+            }, Number( this.get('delay', 5000) ) );
         },
 
-        remind1: function()
+        check: function()
         {
-            sx.notify.info('Вы будете заблокированы через 30 секунд, так как давно не проявляете активность.');
+            if (this.getLeftTime() < 30 && this.getLeftTime() > 0)
+            {
+                //TODO: добавить ajax запрос. На обновление состояния текущего объекта. Пользователь мог проявлять активность в сосендней вкладке.
+                sx.notify.info('Вы будете заблокированы через ' + this.getLeftTime() + ' секунд, так как давно не проявляете активность.');
+            }
         },
 
-        remind2: function()
+        /**
+         * Время сейчас
+         * @returns {number}
+         */
+        getNowTime: function()
         {
-            sx.notify.info('Вы будете заблокированы через 20 секунд, так как давно не проявляете активность.');
+            return Math.floor(Date.now() / 1000);
         },
 
-        remind3: function()
+        /**
+         * Время прошедшее
+         * @returns {number}
+         */
+        getPassedTime: function()
         {
-            sx.notify.info('Вы будете заблокированы через 10 секунд, так как давно не проявляете активность.');
+            return (this.getNowTime()  - Number(this.get('startTime')));
         },
 
-        _onDomReady: function()
-        {},
+        /**
+         * Время осталось
+         * @returns {number}
+         */
+        getLeftTime: function()
+        {
+            return (this.getBlockedAfterTime()  - this.getPassedTime());
+        },
 
-        _onWindowReady: function()
-        {}
+        /**
+         * Заблокировать через
+         * @returns {number}
+         */
+        getBlockedAfterTime: function()
+        {
+            return Number(this.get('blockedAfterTime'));
+        },
+
     });
 
 })(sx, sx.$, sx._);
