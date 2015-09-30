@@ -103,6 +103,35 @@ class AdminSettings extends Component
     }
 
     /**
+     * @param View|null $view
+     */
+    public function initJs(View $view = null)
+    {
+        $options =
+        [
+            'BlockerImageLoader'        => AdminAsset::getAssetUrl('images/loaders/circulare-blue-24_24.GIF'),
+            'disableCetainLink'         => false,
+            'globalAjaxLoader'          => true,
+            'menu'                      => [],
+        ];
+
+        $options = \yii\helpers\Json::encode($options);
+
+        \Yii::$app->view->registerJs(<<<JS
+        (function(sx, $, _)
+        {
+            /**
+            * Запускаем глобальный класс админки
+            * @type {Admin}
+            */
+            sx.App = new sx.classes.Admin($options);
+
+        })(sx, sx.$, sx._);
+JS
+        );
+    }
+
+    /**
      * Регистрация дополнительных asset
      * @param View $view
      * @return $this

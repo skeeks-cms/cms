@@ -11,7 +11,7 @@ use skeeks\cms\helpers\UrlHelper;
 /* @var $content string */
 
 AdminAsset::register($this);
-\Yii::$app->admin->registerAsset($this);
+\Yii::$app->admin->registerAsset($this)->initJs();
 
 $sidebarHidden = \Yii::$app->user->getIsGuest();
 

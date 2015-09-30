@@ -65,29 +65,6 @@ class AdminAsset extends AssetBundle
         }
 
         parent::registerAssetFiles($view);
-
-        $options =
-        [
-            'BlockerImageLoader'        => \Yii::$app->getAssetManager()->getAssetUrl($this, 'images/loaders/circulare-blue-24_24.GIF'),
-            'disableCetainLink'         => false,
-            'globalAjaxLoader'          => true,
-            'menu'                      => [],
-        ];
-
-        $options = Json::encode($options);
-
-        $view->registerJs(<<<JS
-(function(sx, $, _)
-{
-    /**
-     * Запускаем глобальный класс админки
-     * @type {Admin}
-     */
-    sx.App = new sx.classes.Admin($options);
-
-})(sx, sx.$, sx._);
-JS
-);
     }
 }
 
