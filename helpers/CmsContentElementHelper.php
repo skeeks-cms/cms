@@ -45,7 +45,7 @@ abstract class CmsContentElementHelper extends Component
     /**
      * @param CmsContentElement $model
      * @param array $data
-     * @return self
+     * @return static
      */
     static public function instance($model, $data = [])
     {

@@ -62,7 +62,8 @@ abstract class RelatedElementPropertyModel extends Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'element_id', 'value_enum'], 'integer'],
             [['value'], 'required'],
             [['value_num'], 'number'],
-            [['value', 'description'], 'string', 'max' => 255]
+            [['description'], 'string', 'max' => 255],
+            [['value'], 'string']
         ]);
     }
 
