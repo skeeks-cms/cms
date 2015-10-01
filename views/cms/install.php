@@ -104,7 +104,7 @@ JS
             <div class="panel-body">
                 <div class="panel-content">
 
-                    <div class="sx-act sx-act-reset-password">
+                    <div class="">
                         <?= $message; ?>
                     </div>
 

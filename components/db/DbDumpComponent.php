@@ -106,4 +106,11 @@ class DbDumpComponent extends Component
         echo $cmd;
         system($cmd);
     }
+    /**
+     * @return string
+     */
+    public function dumpNewInstall($fileName)
+    {
+        system('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
+    }
 }
