@@ -10,6 +10,8 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\modules\admin\widgets\UserLastActivityWidget;
 use skeeks\sx\models\Ref;
 use Yii;
 use yii\db\ActiveRecord;
@@ -68,6 +70,44 @@ class ToolsController extends Controller
         return $this->render($this->action->id, [
             'model' => $model
         ]);
+    }
+
+    /**
+     * Данные о текущем пользователе
+     * @return RequestResponse
+     */
+    public function actionGetUser()
+    {
+        $rr = new RequestResponse();
+
+        $rr->data = [
+            'identity'  => \Yii::$app->user->identity,
+            'user'      => \Yii::$app->user,
+        ];
+
+        return $rr;
+    }
+
+    /**
+     * Данные о текущем пользователе
+     * @return RequestResponse
+     */
+    public function actionAdminLastActivity()
+    {
+        $rr = new RequestResponse();
+
+        if (!\Yii::$app->user->isGuest)
+        {
+            $rr->data = (new UserLastActivityWidget())->getOptions();
+        } else
+        {
+            $rr->data = [
+                'isGuest' => true
+            ];
+        }
+
+
+        return $rr;
     }
 
 }
