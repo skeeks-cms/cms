@@ -87,6 +87,9 @@ class DbDumpComponent extends Component
      */
     public function dumpRestore($fileName)
     {
+        ignore_user_abort(true);
+        set_time_limit(0);
+
         if (!$this->backupDir->isExist())
         {
             throw new \InvalidArgumentException("Бэкап файлов не найдено" . $this->backupDir->getPath());
@@ -105,12 +108,19 @@ class DbDumpComponent extends Component
 
         echo $cmd;
         system($cmd);
+
+        \Yii::$app->db->schema->refresh();
     }
     /**
      * @return string
      */
     public function dumpNewInstall($fileName)
     {
+        ignore_user_abort(true);
+        set_time_limit(0);
+
         system('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
+
+        \Yii::$app->db->schema->refresh();
     }
 }

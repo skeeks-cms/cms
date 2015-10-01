@@ -121,7 +121,11 @@ class CmsController extends Controller
             //Если в базе нет таблиц
             if (!\Yii::$app->db->schema->getTableSchemas('', true))
             {
+                ignore_user_abort(true);
+                set_time_limit(0);
+
                 $name = \Yii::$app->request->post('name');
+
                 if ($name)
                 {
                     \Yii::$app->dbDump->dumpRestore($name);
@@ -130,6 +134,7 @@ class CmsController extends Controller
                     \Yii::$app->dbDump->dumpNewInstall();
                 }
 
+                \Yii::$app->db->schema->refresh();
 
                 $rr->success = true;
                 $rr->message = "Успешно установлено";

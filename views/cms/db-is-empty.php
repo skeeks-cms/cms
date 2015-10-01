@@ -45,7 +45,9 @@ $this->registerJs(<<<JS
 
             execute: function(name)
             {
-                var ajaxQuery = sx.ajax.preparePostQuery(this.get('backendDbRestore'));
+                var ajaxQuery = sx.ajax.preparePostQuery(this.get('backendDbRestore'), {
+                    'name' : name
+                });
 
                 new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
                 var ajaxHandler = new sx.classes.AjaxHandlerBlocker(ajaxQuery, {
