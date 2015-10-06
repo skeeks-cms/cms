@@ -82,7 +82,7 @@ JS
 
                     <div class="sx-act-reset-password">
                         <div class="alert alert-danger" role="alert">
-                            Настройте подключение к базе данных
+                            Настройте подключение к базе данных!
                         </div>
 
                         <div class="alert alert-info" role="alert">
@@ -91,7 +91,17 @@ JS
 
                         <? if (YII_ENV != "prod") : ?>
                             <? $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                'enableAjaxValidation'         => false
+                                'enableAjaxValidation'         => false,
+                                'afterValidateCallback'        => new \yii\web\JsExpression(<<<JS
+    function(Jform, ajax)
+    {
+        ajax.bind('success', function()
+        {
+            window.location.reload();
+        });
+    }
+JS
+)
                             ]); ?>
                                 <?= $form->field($connectToDbForm, 'host')->textInput(); ?>
                                 <?= $form->field($connectToDbForm, 'dbname')->textInput(); ?>

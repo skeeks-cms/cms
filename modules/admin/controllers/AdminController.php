@@ -24,6 +24,7 @@ use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\base\InlineAction;
 use yii\base\Model;
 use yii\behaviors\BlameableBehavior;
@@ -160,6 +161,10 @@ abstract class AdminController extends Controller
         try
         {
             \Yii::$app->db->open();
+            if (!\Yii::$app->db->schema->getTableNames())
+            {
+                throw new NotConnectedToDbException;
+            }
 
         } catch(\yii\db\Exception $e)
         {

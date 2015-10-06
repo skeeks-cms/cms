@@ -67,7 +67,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsStorageFile $image
  * @property CmsStorageFile $imageFull
  *
- * @property CmsTreeFile[] $cmsTreeFiles
+ * @property CmsTreeFile[]  $cmsTreeFiles
  * @property CmsTreeImage[] $cmsTreeImages
  *
  * @property CmsStorageFile[] $files
@@ -75,12 +75,17 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsContentElement[]        $cmsContentElements
  * @property CmsContentElementTree[]    $cmsContentElementTrees
- * @property Tree                       $parentTree
- * @property Tree[]                     $parentTrees
  * @property CmsSite                    $site
  * @property CmsSite                    $cmsSiteRelation
  * @property CmsTreeType                $treeType
  * @property CmsTreeProperty[]          $cmsTreeProperties
+ *
+ * @property Tree                       $parent
+ * @property Tree[]                     $parents
+ * @property Tree[]                     $children
+ * @property Tree                       $root
+ * @property Tree                       $prev
+ * @property Tree                       $next
  */
 class Tree extends Core
 {
@@ -149,17 +154,17 @@ class Tree extends Core
     {
         if (!$this->site_code)
         {
-            if ($this->parentTree)
+            if ($this->parent)
             {
-                $this->site_code = $this->parentTree->site_code;
+                $this->site_code = $this->parent->site_code;
             }
         }
 
         if (!$this->tree_type_id)
         {
-            if ($this->parentTree)
+            if ($this->parent)
             {
-                $this->tree_type_id = $this->parentTree->tree_type_id;
+                $this->tree_type_id = $this->parent->tree_type_id;
             }
         }
     }
@@ -233,64 +238,29 @@ class Tree extends Core
      */
     public function getUrl()
     {
-        if ($this->isLink())
+        if ($this->redirect)
         {
-            if ($this->redirect)
-            {
-                return $this->redirect;
-            }
+            return $this->redirect;
         }
 
         if ($this->site)
         {
             if ($this->getDir())
             {
-                return $this->site->getUrl() . DIRECTORY_SEPARATOR . $this->getDir() . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
+                return $this->site->url . DIRECTORY_SEPARATOR . $this->dir . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
             } else {
-                return $this->site->getUrl();
+                return $this->site->url;
             }
         } else {
-            if ($this->getDir()) {
-                return \Yii::$app->request->getHostInfo() . DIRECTORY_SEPARATOR . $this->getDir() . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
+            if ($this->dir) {
+                return \Yii::$app->request->getHostInfo() . DIRECTORY_SEPARATOR . $this->dir . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
             } else {
                 return \Yii::$app->request->getHostInfo();
             }
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getParentTrees()
-    {
-        if ($parents = $this->findParents())
-        {
-            return $parents->all();
-        }
 
-        return [];
-    }
-
-
-
-    /**
-     * Эта страница является ссылкой?
-     *
-     * @return bool
-     */
-    public function isLink()
-    {
-        return (bool) ($this->redirect);
-    }
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getParentTree()
-    {
-        return $this->hasOne(static::className(), ['id' => 'pid']);
-    }
 
     /**
      * @return CmsSite
@@ -405,4 +375,212 @@ class Tree extends Core
     {
         return $this->hasMany(CmsTreeImage::className(), ['tree_id' => 'id']);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+        //Работа с деревом
+
+    /**
+     * @param null $depth
+     * @return array
+     */
+    public function getParentsIds($depth = null)
+    {
+        return (array) $this->pids;
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParent()
+    {
+        return $this->hasOne(static::className(), ['id' => 'pid']);
+    }
+
+    /**
+     *
+     * To get root of a node:
+     *
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRoot()
+    {
+        $tableName = $this->tableName();
+        $id = $this->getParentsIds();
+        $id = $id[0];
+        $query = $this->find()
+            ->andWhere(["{$tableName}.[[" . $this->primaryKey()[0] . "]]" => $id]);
+        $query->multiple = false;
+        return $query;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRoot()
+    {
+        return (bool) ($this->level == 0);
+    }
+
+    /**
+     * @param int|null $depth
+     * @return \yii\db\ActiveQuery
+     * @throws Exception
+     */
+    public function getParents($depth = null)
+    {
+        $tableName = $this->tableName();
+        $ids = $this->getParentsIds($depth);
+        $query = $this->find()
+            ->andWhere(["{$tableName}.[[" . $this->primaryKey()[0] . "]]" => $ids]);
+        $query->multiple = true;
+        return $query;
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildren()
+    {
+        $result = $this->hasMany($this->className(), ["pid" => "id"]);
+        $result->orderBy(["priority" => SORT_DESC]);
+
+        return $result;
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     * @throws NotSupportedException
+     */
+    public function getPrev()
+    {
+        $tableName = $this->tableName();
+        $query = $this->find()
+            ->andWhere([
+                'and',
+                ["{$tableName}.[[pid]]" => $this->pid],
+                ['<', "{$tableName}.[[priority]]", $this->priority],
+            ])
+            ->orderBy(["{$tableName}.[[priority]]" => SORT_DESC])
+            ->limit(1);
+        $query->multiple = false;
+        return $query;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     * @throws NotSupportedException
+     */
+    public function getNext()
+    {
+        $tableName = $this->tableName();
+        $query = $this->find()
+            ->andWhere([
+                'and',
+                ["{$tableName}.[[pid]]" => $this->pid],
+                ['>', "{$tableName}.[[priority]]", $this->priority],
+            ])
+            ->orderBy(["{$tableName}.[[priority]]" => SORT_ASC])
+            ->limit(1);
+        $query->multiple = false;
+        return $query;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //TODO: is depricated 2.3.3
+
+    /**
+     *
+     * Корневые разделы дерева.
+     *
+     * @return ActiveQuery
+     */
+	public function findRoots()
+	{
+		return $this->owner->find()->where([$this->levelAttrName => 0])->orderBy(["priority" => SORT_DESC]);
+	}
+
+    /**
+     * Эта страница является ссылкой?
+     *
+     * @return bool
+     */
+    public function isLink()
+    {
+        return (bool) ($this->redirect);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParentTree()
+    {
+        return $this->hasOne(static::className(), ['id' => 'pid']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getParentTrees()
+    {
+        if ($parents = $this->findParents())
+        {
+            return $parents->all();
+        }
+
+        return [];
+    }
+
+
+    /**
+     * @return array|null|ActiveQuery
+     */
+    public function findParents()
+    {
+        if ($this->isNewRecord)
+        {
+            return null;
+        }
+
+        if (!$this->pid || $this->isRoot())
+        {
+            return null;
+        }
+
+        $find = $this->find()->orderBy([$this->levelAttrName => SORT_ASC]);
+        if ($pids = $this->pids)
+        {
+            $find->andWhere([$this->primaryKey()[0] => $pids]);
+        }
+
+        return $find;
+    }
 }
+
+
+

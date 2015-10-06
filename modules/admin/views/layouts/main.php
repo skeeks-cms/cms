@@ -11,22 +11,10 @@ use skeeks\cms\helpers\UrlHelper;
 /* @var $content string */
 
 AdminAsset::register($this);
-\Yii::$app->admin->registerAsset($this);
+\Yii::$app->admin->registerAsset($this)->initJs();
+\skeeks\cms\modules\admin\widgets\UserLastActivityWidget::widget();
 
 $sidebarHidden = \Yii::$app->user->getIsGuest();
-
-$userLastActivity = [
-    'lastAdminActivityAgo'  => \Yii::$app->user->identity->lastAdminActivityAgo,
-    'blockedTime'           => \Yii::$app->admin->blockedTime,
-    'timeLeft'              => (\Yii::$app->admin->blockedTime - \Yii::$app->user->identity->lastAdminActivityAgo),
-    'startTime'             => \Yii::$app->formatter->asTimestamp(time()),
-];
-$userLastActivity = \yii\helpers\Json::encode($userLastActivity);
-
-$this->registerJs(<<<JS
-    new sx.classes.UserLastActivity({$userLastActivity});
-JS
-)
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -54,6 +42,11 @@ JS
         <li class="visible-md visible-lg visible-sm visible-xs">
             <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]); ?>" data-sx-widget="tooltip-b" data-original-title="На главную страницу админки"><i class="glyphicon glyphicon-home"></i></a>
         </li>
+
+        <li class="visible-md visible-lg visible-sm visible-xs">
+            <a href="/" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
+        </li>
+
     </ul>
 
     <? endif; ?>
@@ -64,15 +57,19 @@ JS
         <? if (!Yii::$app->user->isGuest): ?>
 
 
-        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-            <a href="/" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
-        </li>
+
 
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
             <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="Переключение полноэкранного режима">
                 <i class="glyphicon glyphicon-fullscreen"></i>
             </a>
         </li>
+
+        <? if (\Yii::$app->user->can('admin/clear')) : ?>
+        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+            <a href="<?= UrlHelper::construct('admin/clear')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Очистить кэш и временные файлы"><i class="glyphicon glyphicon-refresh"></i></a>
+        </li>
+        <? endif; ?>
 
         <? if (\Yii::$app->user->can('cms/admin-settings')) : ?>
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">

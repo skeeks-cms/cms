@@ -23,7 +23,7 @@ class RequestResponse extends Model
     const VALIDATION_AJAX_FORM_SYSTEM_NAME = 'sx-validation';
 
     public $success = false;
-    public $message = 'Ошибка';
+    public $message = '';
     public $data    = [];
 
     public $redirect;

@@ -187,17 +187,6 @@ class TreeBehavior extends ActiveRecordBehavior
         Validate::ensure(new HasBehavior(self::className()), $node);
     }
 
-    /**
-     * @param null $depth
-     */
-	public function descendants($depth = null)
-	{}
-
-    /**
-     * @param null $depth
-     */
-	public function ancestors($depth=null)
-	{}
 
     /**
      * Найти непосредственных детей ноды
@@ -221,16 +210,7 @@ class TreeBehavior extends ActiveRecordBehavior
             ->orderBy(["priority" => SORT_DESC]);
 	}
 
-    /**
-     *
-     * Корневые разделы дерева.
-     *
-     * @return ActiveQuery
-     */
-	public function findRoots()
-	{
-		return $this->owner->find()->where([$this->levelAttrName => 0])->orderBy(["priority" => SORT_DESC]);
-	}
+
 
     /**
      * Родительский элемент
@@ -245,31 +225,6 @@ class TreeBehavior extends ActiveRecordBehavior
 
 		return $this->owner->find()->where([$this->owner->primaryKey()[0] => $this->getPid()])->one();
 	}
-
-
-    /**
-     * @return array|null|ActiveQuery
-     */
-    public function findParents()
-    {
-        if ($this->owner->isNewRecord)
-        {
-            return null;
-        }
-
-        if (!$this->hasParent() || $this->isRoot())
-        {
-            return null;
-        }
-
-        $find = $this->owner->find()->orderBy([$this->levelAttrName => SORT_ASC]);
-        if ($pids = $this->getPids())
-        {
-            $find->andWhere([$this->owner->primaryKey()[0] => $pids]);
-        }
-
-        return $find;
-    }
 
 
 

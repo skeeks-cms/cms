@@ -60,7 +60,8 @@ class Module extends CmsModule
         {
             if (!$this->noImage)
             {
-                $this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
+                $this->noImage = AdminAsset::getAssetUrl("images/no-photo.gif");
+                //$this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
             }
 
             \Yii::beginProfile('admin loading');

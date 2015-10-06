@@ -42,7 +42,7 @@ class StorageFilesController extends Controller
                     'upload' => ['post'],
                 ],
             ],
-            'access' => [
+            /*'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
@@ -50,7 +50,7 @@ class StorageFilesController extends Controller
                         'roles' => ['@'],
                     ],
                 ],
-            ],
+            ],*/
         ];
     }
     /**

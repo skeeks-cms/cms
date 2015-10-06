@@ -127,6 +127,7 @@ $this->registerJs(<<<JS
 
             _execute: function(cmd)
             {
+                console.log(this.IframeConsole);
                 this.IframeConsole.input.val(cmd);
                 this.IframeConsole.form.submit();
 
@@ -158,8 +159,6 @@ $this->registerJs(<<<JS
 
             _onDomReady: function()
             {
-
-
                 var self = this;
                 this.IframeConsole = null;
 

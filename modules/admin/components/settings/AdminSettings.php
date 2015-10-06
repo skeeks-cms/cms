@@ -103,6 +103,35 @@ class AdminSettings extends Component
     }
 
     /**
+     * @param View|null $view
+     */
+    public function initJs(View $view = null)
+    {
+        $options =
+        [
+            'BlockerImageLoader'        => AdminAsset::getAssetUrl('images/loaders/circulare-blue-24_24.GIF'),
+            'disableCetainLink'         => false,
+            'globalAjaxLoader'          => true,
+            'menu'                      => [],
+        ];
+
+        $options = \yii\helpers\Json::encode($options);
+
+        \Yii::$app->view->registerJs(<<<JS
+        (function(sx, $, _)
+        {
+            /**
+            * Запускаем глобальный класс админки
+            * @type {Admin}
+            */
+            sx.App = new sx.classes.Admin($options);
+
+        })(sx, sx.$, sx._);
+JS
+        );
+    }
+
+    /**
      * Регистрация дополнительных asset
      * @param View $view
      * @return $this
@@ -120,7 +149,8 @@ class AdminSettings extends Component
 
         if ($this->enableCustomPromt == Cms::BOOL_Y)
         {
-            $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Promt.js');
+            $file = AdminAsset::getAssetUrl('js/classes/modal/Promt.js');
+            //$file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Promt.js');
             \Yii::$app->view->registerJsFile($file,
             [
                 'depends' => [AdminAsset::className()]
@@ -129,7 +159,8 @@ class AdminSettings extends Component
 
         if ($this->enableCustomConfirm == Cms::BOOL_Y)
         {
-            $file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Confirm.js');
+            $file = AdminAsset::getAssetUrl('js/classes/modal/Confirm.js');
+            //$file = \Yii::$app->assetManager->getAssetUrl(AdminAsset::register($view), 'js/classes/modal/Confirm.js');
             \Yii::$app->view->registerJsFile($file,
             [
                 'depends' => [AdminAsset::className()]

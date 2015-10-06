@@ -66,6 +66,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $lastAdminActivityAgo
  *
  * @property CmsStorageFile $image
+ * @property string $avatarSrc
 
  * @property string         $email
  * @property string         $phone

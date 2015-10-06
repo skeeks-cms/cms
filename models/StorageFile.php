@@ -50,6 +50,7 @@ use yii\base\Event;
  * @property integer $image_width
  * @property string $linked_to_model
  * @property string $linked_to_value
+ * @property string $rootSrc
  *
  * @property User $updatedBy
  * @property User $createdBy
@@ -241,5 +242,13 @@ class StorageFile extends Core
     public function getAbsoluteSrc()
     {
         return $this->cluster()->getAbsoluteUrl($this->cluster_file);
+    }
+
+    /**
+     * @return string
+     */
+    public function getRootSrc()
+    {
+        return $this->cluster()->getRootSrc($this->cluster_file);
     }
 }
