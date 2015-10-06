@@ -111,10 +111,27 @@ class UrlHelper
      * @param $route
      * @param array $data
      */
-    public function __construct($route = "", $data = [])
+    public function __construct($route, $data = [])
     {
-        $this->_route   = (string) $route;
-        $this->_data    = (array) $data;
+        if (is_string($route))
+        {
+            $this->_route   = (string) $route;
+            $this->_data    = (array) $data;
+        } else if (is_array($route))
+        {
+            $this->_route   = (string) $route[0];
+
+            unset($route[0]);
+            if ($route)
+            {
+                $this->_data    = array_merge($route, (array) $data);
+            } else
+            {
+                $this->_data    = (array) $data;
+            }
+
+        }
+
     }
 
     /**
