@@ -86,7 +86,7 @@ $this->registerJs(<<<JS
                     'blocker'                           : sx.AppUnAuthorized.PanelBlocker,
                     'blockerSelector'                   : '',
                     'enableBlocker'                     : true,
-                    'redirectDelay'                     : 2000,
+                    'redirectDelay'                     : 500,
                     'allowResponseSuccessMessage'       : false,
                     'allowResponseErrorMessage'         : false,
                 });
