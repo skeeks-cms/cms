@@ -34,7 +34,9 @@ class ComponentSettingsWidget extends InputWidget
     /**
      * @var string ID селекта компонентов
      */
-    public $componentSelectId = "";
+    public $componentSelectId   = "";
+    public $buttonText          = "Настройки свойства";
+    public $buttonClasses       = "sx-btn-edit btn btn-xs btn-default";
 
     /**
 	 * @inheritdoc
@@ -44,7 +46,15 @@ class ComponentSettingsWidget extends InputWidget
         if ($this->hasModel())
         {
             $name   = Html::getInputName($this->model, $this->attribute);
-            $value  = StringHelper::base64EncodeUrl(serialize((array) $this->model->{$this->attribute}));
+
+            if (is_array($this->model->{$this->attribute}))
+            {
+                $value  = StringHelper::base64EncodeUrl(serialize((array) $this->model->{$this->attribute}));
+            } else if(is_string($this->model->{$this->attribute}))
+            {
+                $value = $this->model->{$this->attribute};
+            }
+
 
             $this->options['id'] = Html::getInputId($this->model, $this->attribute);
 
