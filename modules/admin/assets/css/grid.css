@@ -31,6 +31,7 @@
 
     .sx-grid-view .pagination {
         margin-top: 15px;
+        margin-right: 15px;
         margin-bottom: 15px;
     }
 
@@ -38,5 +39,21 @@
         margin-top: 15px;
         margin-bottom: 15px;
     }
+
+
+    .sx-grid-view .sx-per-page {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        height: 31px;
+    }
+
+        .sx-grid-view .sx-per-page select{
+            height: 31px;
+            min-width: 44px;
+        }
+
+        .sx-grid-view .sx-per-page .per-page-label{
+            margin-right: 5px;
+        }
 
 

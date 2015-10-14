@@ -26,11 +26,31 @@ return [
         'class'     => \yii\grid\DataColumn::className(),
         'value'     => function(\skeeks\cms\models\CmsContentElement $model)
         {
+            if (!$model->cmsTree)
+            {
+                return null;
+            }
 
-            return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$model->cmsTree->name}</a></small>";
+            $path = [];
 
+            if ($model->cmsTree->parents)
+            {
+                foreach ($model->cmsTree->parents as $parent)
+                {
+                    if ($parent->isRoot())
+                    {
+                        $path[] =  "[" . $parent->site->name . "] " . $parent->name;
+                    } else
+                    {
+                        $path[] =  $parent->name;
+                    }
+                }
+            }
+            $path = implode(" / ", $path);
+            return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
         },
         'format'    => 'raw',
+        'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
         'attribute' => 'tree_id'
     ],
 

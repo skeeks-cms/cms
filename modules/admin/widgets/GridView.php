@@ -80,8 +80,10 @@ class GridView extends \yii\grid\GridView
                       <div class='row'>
                           <div class='col-md-12'>
                       \n<div class='pull-left'>{pager}</div>
+                      \n<div class='pull-left'>{perPage}</div>
                       \n<!--<div class='pull-left'>{sorter}</div>-->
-                        <div class='pull-right'>{summary}</div></div></div>";
+                        <div class='pull-right'>{summary}</div></div>
+                      </div>";
 
 
     /**
@@ -117,6 +119,8 @@ class GridView extends \yii\grid\GridView
                 return $this->renderBeforeTable();
             case "{afterTable}":
                 return $this->renderAfterTable();
+            case "{perPage}":
+                return $this->renderPerPage();
             default:
                 return parent::renderSection($name);
         }
@@ -140,6 +144,69 @@ class GridView extends \yii\grid\GridView
             return "";
         }
 
+    }
+
+    /**
+     * @return string
+     */
+    public function renderPerPage()
+    {
+        $pagination = $this->dataProvider->getPagination();
+
+        $min = $pagination->pageSizeLimit[0];
+        $max = $pagination->pageSizeLimit[1];
+
+        $items = [];
+        for ($i >= $min; $i <= $max; $i++)
+        {
+            $items[] = $i;
+        }
+
+        $id = $this->id . "-per-page";
+
+        $get = \Yii::$app->request->get();
+        ArrayHelper::remove($get, $pagination->pageSizeParam);
+        $get[$pagination->pageSizeParam] = "";
+
+        $url = '/' .  \Yii::$app->request->pathInfo . "?" . http_build_query($get);
+
+        $this->view->registerJs(<<<JS
+(function(sx, $, _)
+{
+    sx.classes.GridPerPage = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            var self = this;
+            var JSelect = $("#" + this.get('id'));
+            JSelect.on("change", function()
+            {
+                $(this).val();
+
+                var JLink = $("<a>", {
+                    'href' : self.get('url') + $(this).val(),
+                    'style' : 'display: none;',
+                }).text('link');
+
+                $(this).closest('form').append(JLink);
+                JLink.click();
+            });
+        }
+    });
+
+    new sx.classes.GridPerPage({
+        'id' : '{$id}',
+        'url' : '{$url}'
+    });
+})(sx, sx.$, sx._);
+JS
+);
+
+
+        return "<div class='sx-per-page'><form method='get' action='" . $url . "'> <span class='per-page-label'>На странице:</span>"
+                    . Html::dropDownList($pagination->pageSizeParam, [$pagination->pageSize], $items, [
+                    'id' => $id
+                ]) . "</form></div>";
     }
 
     /**
