@@ -151,6 +151,18 @@ class AuthController extends Controller
                         return false;
                     }
 
+
+                    //Тут можно обновить данные пользователя.
+                    if ($login = ArrayHelper::getValue($attributes, 'screen_name'))
+                    {
+                        $user->username = $login;
+                        if (!$user->save())
+                        {
+                            \Yii::error("Не удалось обновить данные пользователя: " . serialize($user->getErrors()), 'authClient');
+                        }
+                    }
+
+
                     //Тут можно обновить данные пользователя.
                     if ($login = ArrayHelper::getValue($attributes, 'login'))
                     {
@@ -188,7 +200,10 @@ class AuthController extends Controller
                         }
                     }
 
-                    if ($firstName = ArrayHelper::getValue($attributes, 'first_name') || $lastName = ArrayHelper::getValue($attributes, 'last_name'))
+                    $firstName = ArrayHelper::getValue($attributes, 'first_name');
+                    $lastName = ArrayHelper::getValue($attributes, 'last_name');
+
+                    if ($firstName || $lastName)
                     {
                         $user->name = $lastName . " " . $firstName;
                         if (!$user->save())
@@ -209,8 +224,20 @@ class AuthController extends Controller
                 ]);
                 if ($auth->save())
                 {
+
                     //$transaction->commit();
                     Yii::$app->user->login($user);
+
+                    if ($photoUrl = ArrayHelper::getValue($attributes, 'photo'))
+                    {
+                        $file = \Yii::$app->storage->upload($photoUrl, [
+                            'name' => $user->name
+                        ]);
+
+                        $user->link('image', $file);
+
+                    }
+
                 } else
                 {
                     \Yii::error("Не удалось создать социальный профиль: " . serialize($auth->getErrors()), 'authClient');
