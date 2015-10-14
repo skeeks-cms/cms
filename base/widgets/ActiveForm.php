@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\base\widgets;
+use skeeks\cms\components\Cms;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveField;
@@ -29,12 +30,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
      */
     public function fieldCheckboxBoolean($model, $attribute, $items = [], $enclosedByLabel = true, $fieldOptions = [])
     {
-        if (!$items)
-        {
-            $items = \Yii::$app->cms->booleanFormat();
-        }
-
-        return $this->field($model, $attribute, $fieldOptions)->checkbox($items, $enclosedByLabel);
+        return $this->field($model, $attribute, $fieldOptions)->checkbox(['uncheck' => Cms::BOOL_N, 'value' => Cms::BOOL_Y], $enclosedByLabel);
     }
 
     /**

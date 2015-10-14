@@ -16,7 +16,9 @@ $clientOptions  = \yii\helpers\Json::encode($options);
     <div class="sx-select-controll">
         <?= $element; ?>
     </div>
-    <a href="#" class="sx-btn-edit btn btn-xs btn-default"><i class="glyphicon glyphicon-cog"></i> Настройки свойства</a>
+    <a href="#" class="<?= $widget->buttonClasses; ?>">
+        <i class="glyphicon glyphicon-cog"></i> <?= $widget->buttonText; ?>
+    </a>
 </div>
 
 <?

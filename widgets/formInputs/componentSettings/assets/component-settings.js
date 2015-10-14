@@ -56,6 +56,15 @@
          */
         update: function()
         {
+            var self = this;
+
+            if (!self.currentComponent)
+            {
+                this.getjBtnEdit().hide();
+            } else
+            {
+                this.getjBtnEdit().show();
+            }
             return this;
         },
 

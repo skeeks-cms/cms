@@ -1,25 +1,21 @@
 <?php
 /**
- * Tree
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 24.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 14.10.2015
  */
-namespace skeeks\cms\models\helpers;
-
+namespace skeeks\cms\helpers;
 /**
- * Class Tree
- * @package skeeks\cms\models\helpers
+ * Class TreeOptions
+ * @package skeeks\cms\helpers
  */
-class Tree extends \skeeks\cms\models\Tree
+class TreeOptions extends \skeeks\cms\models\Tree
 {
     /**
      * @var string символ будет добавляться перед називанием раздела.
      */
-    public $repeat = '— ';
+    public $repeat = '. ';
 
     /**
      * @var array
@@ -70,7 +66,13 @@ class Tree extends \skeeks\cms\models\Tree
             $id     = $child->id;
             if (!$is_filter_set || in_array($id, $filter))
             {
-                $child->name = str_repeat($this->repeat, $level) . $child->name;
+                $name = $child->name;
+                if ($level == 0)
+                {
+                    $name = "[" . $child->site->name . "] " . $child->name;
+                }
+
+                $child->name = str_repeat($this->repeat, $level) . $name;
                 $this->_tmpResult[$id] = $child;
             }
             $this->_buildTreeArrayRecursive($child, $filter);
