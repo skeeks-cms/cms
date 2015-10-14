@@ -17,6 +17,8 @@ use yii\helpers\Json;
 use yii\web\JsExpression;
 
 /**
+ * @property string $gridJsObject
+ *
  * Class GridViewStandart
  * @package skeeks\cms\modules\admin\widgets
  */
@@ -49,6 +51,13 @@ class GridViewStandart extends GridViewHasSettings
     /**
      * @return string
      */
+    public function getGridJsObject()
+    {
+        return "sx.Grid" . $this->id;
+    }
+    /**
+     * @return string
+     */
     public function renderAfterTable()
     {
         $id = $this->id;
@@ -65,38 +74,47 @@ class GridViewStandart extends GridViewHasSettings
             return parent::renderAfterTable();
         }
 
-        $buttons = "";
-        
-        foreach ($multiActions as $action)
-        {
-            $actionsData[$action->id] = $this->getActionData($action);
-
-            $buttons .= <<<HTML
-            <button class="btn btn-default btn-sm sx-grid-multi-btn" data-id="{$action->id}"><i class="{$action->icon}"></i> {$action->name}</button>
-HTML;
-        }
-
-        $this->afterTableLeft = <<<HTML
-    {$checkbox} для всех
-    <span class="sx-grid-multi-controlls">
-        {$buttons}
-    </span>
-HTML;
-
 
         $options = [
             'id'                    => $this->id,
             'enabledPjax'           => $this->enabledPjax,
             'pjaxId'                => $this->pjax->id,
-            'actions'               => $actionsData,
             'requestPkParamName'    => $this->adminController->requestPkParamName
         ];
         $optionsString = Json::encode($options);
 
+        $gridJsObject = $this->getGridJsObject();
+
         $this->view->registerJs(<<<JS
-        new sx.classes.grid.Standart($optionsString);
+        {$gridJsObject} = new sx.classes.grid.Standart($optionsString);
 JS
 );
+
+        $buttons = "";
+
+        $additional = [];
+        foreach ($multiActions as $action)
+        {
+            $additional[]               = $action->registerForGrid($this);
+
+            $buttons .= <<<HTML
+            <button class="btn btn-default btn-sm sx-grid-multi-btn" data-id="{$action->id}">
+                <i class="{$action->icon}"></i> {$action->name}
+            </button>
+HTML;
+        }
+
+        $additional = implode("", $additional);
+        $this->afterTableLeft = <<<HTML
+    {$checkbox} для всех
+    <span class="sx-grid-multi-controlls">
+        {$buttons}
+    </span>
+    <span style="display: none;">{$additional}</span>
+HTML;
+
+
+
 
         $this->view->registerCss(<<<CSS
     .sx-grid-multi-controlls
@@ -110,25 +128,6 @@ CSS
 
 
     }
-
-
-    /**
-     * @param AdminMultiModelEditAction $action
-     * @return array
-     */
-    public function getActionData($action)
-    {
-        $actionData = [
-            "id"                => $action->id,
-            "url"               => (string) $action->url,
-            "confirm"           => $action->confirm,
-            "method"            => $action->method,
-            "request"           => $action->request,
-        ];
-
-        return $actionData;
-    }
-
 
 
 }
