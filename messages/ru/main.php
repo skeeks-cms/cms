@@ -59,4 +59,37 @@ return
     "City"                  =>  "Город",
     "Verification Code"     =>  "Проверочный код",
 
+    "Type"                  => "Тип",
+    "File Type"             => "Тип файла",
+    "File Size"             => "Размер файла",
+    "Extension"             => "Расширение",
+    "Original File Name"    => "Оригинальное название файла",
+    "Name To Save"          => "Название при скачивании",
+    "Image Width"           => "Ширина изображения",
+    "Image Height"          => "Высота изображения",
+    "Linked To Model"       => "Привязка",
+    "Published At"          => "Дата публикации",
+
+    "Files"                 => "Файлы",
+    "Images"                => "Изображения",
+
+    "Host"                  => "Хост",
+    'DB Name'               => 'Имя базы данных',
+    'Username'              => 'Пользователь',
+    'Password'              => 'Пароль',
+    'Charset'               => 'Кодировка',
+    'Enable Schema Cache'   => 'Включить кэширование схемы',
+    'Schema Cache Duration (sec)'   => 'Время кэша структуры (сек)',
+
+    "Rule"                  => "Правило",
+
+    "Last Execution At"     => "Дата последнего запуска",
+    "Next Execution At"     => "Дата и время следующего запуска",
+    "Agent's Function"      => "Функция агента",
+    "Interval (sec)"        => "Интервал (сек.)",
+    "Periodic"              => "Периодический",
+
+
+
+
 ];

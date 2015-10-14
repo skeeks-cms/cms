@@ -52,13 +52,13 @@ class ConnectToDbForm extends Model
     public function attributeLabels()
     {
         return [
-            'host'                  => 'Хост',
-            'dbname'                => 'Имя базы данных',
-            'username'              => 'Пользователь',
-            'password'              => 'Пароль',
-            'charset'               => 'Кодировка',
-            'enableSchemaCache'     => 'Включить кэширование схемы',
-            'schemaCacheDuration'   => 'Время кэша структуры (сек)',
+            'host'                  => 'Host',
+            'dbname'                => 'DB Name',
+            'username'              => 'Username',
+            'password'              => 'Password',
+            'charset'               => 'Charset',
+            'enableSchemaCache'     => 'Enable Schema Cache',
+            'schemaCacheDuration'   => 'Schema Cache Duration (sec)',
         ];
     }
 
