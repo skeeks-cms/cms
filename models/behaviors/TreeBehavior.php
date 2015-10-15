@@ -296,7 +296,7 @@ class TreeBehavior extends ActiveRecordBehavior
         $target->setAttributesForFutureParent($this->owner);
         if (!$target->save(false))
         {
-            throw new Exception("Не удалось создать дочерний элемент: " . Json::encode($target->attributes));
+            throw new Exception(\Yii::t('app',"Failed to create the child element:  ") . Json::encode($target->attributes));
         }
 
         $this->owner->setAttribute($this->hasChildrenAttrName, 1);
@@ -335,7 +335,7 @@ class TreeBehavior extends ActiveRecordBehavior
             $target->setAttributesForFutureParent($this->owner);
             if (!$target->save(false))
             {
-                throw new Exception("Не удалось переместить: " . Json::encode($target->attributes));
+                throw new Exception(\Yii::t('app',"Unable to move: ") . Json::encode($target->attributes));
             }
 
             $this->processNormalize();

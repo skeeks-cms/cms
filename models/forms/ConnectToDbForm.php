@@ -52,13 +52,13 @@ class ConnectToDbForm extends Model
     public function attributeLabels()
     {
         return [
-            'host'                  => 'Host',
-            'dbname'                => 'DB Name',
-            'username'              => 'Username',
-            'password'              => 'Password',
-            'charset'               => 'Charset',
-            'enableSchemaCache'     => 'Enable Schema Cache',
-            'schemaCacheDuration'   => 'Schema Cache Duration (sec)',
+            'host'                  => \Yii::t('app','Host'),
+            'dbname'                => \Yii::t('app','DB Name'),
+            'username'              => \Yii::t('app','Username'),
+            'password'              => \Yii::t('app','Password'),
+            'charset'               => \Yii::t('app','Charset'),
+            'enableSchemaCache'     => \Yii::t('app','Enable Schema Cache'),
+            'schemaCacheDuration'   => \Yii::t('app','Schema Cache Duration (sec)'),
         ];
     }
 

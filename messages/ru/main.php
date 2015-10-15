@@ -124,6 +124,10 @@ return
     "Pages Count"           => "Количество страниц",
 
     "Failed to create a section of the tree" => "Не удалось создать раздел дерева",
+    "Failed to create the child element: " => "Не удалось создать дочерний элемент: ",
+    "Unable to move: "      => "Не удалось переместить: ",
+    "Incorrect password."   => "Некорректный пароль.",
+    "Incorrect username or password." => "Некорректный логин или пароль.",
 
     "Sections"              => "Разделы",
     "Section"               => "Раздел",
@@ -144,4 +148,21 @@ return
     "Last Activity At"      => "Время последней активности",
     "Last Activity In The Admin At" => "Время последней активности в админке",
     "Image"                 => "Фото",
+
+    "Username or Email"     => "Логин или Email",
+    "Remember me"           => "Запомнить меня",
+    "New Password"          => "Новый пароль",
+    "New Password Confirm"  => "Подтверждение пароля",
+    "New passwords do not match" => "Новые пароли не совпадают",
+    "User not found"        => "Пользователь не найден",
+    "The request to change the password for" => "Запрос на смену пароля для ",
+    "This login is already in use by another user." => "Этот логин уже занят другим пользователем.",
+    "Sign up at site "       => "Регистрация на сайте ",
+
+    "This action is designed to work with the controller: " => "Это действие рассчитано для работы с контроллером: ",
+    "Saved"                 => "Сохранено",
+    "Could not save"        => "Не удалось сохранить",
+    "No records found"      => "Записи не найдены",
+    "Mission complete"      => "Задание выполнено",
+
 ];
