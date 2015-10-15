@@ -224,7 +224,6 @@ class AuthController extends Controller
                 ]);
                 if ($auth->save())
                 {
-
                     //$transaction->commit();
                     Yii::$app->user->login($user);
 
@@ -235,7 +234,6 @@ class AuthController extends Controller
                         ]);
 
                         $user->link('image', $file);
-
                     }
 
                 } else
@@ -249,13 +247,18 @@ class AuthController extends Controller
             { // add auth provider
 
                 $userAuthClient = new UserAuthClient([
-                    'user_id'               => Yii::$app->user->id,
+                    'user_id'               => \Yii::$app->user->identity->id,
                     'provider'              => $client->getId(),
-                    'provider_identifier'   => $attributes['id'],
+                    'provider_identifier'   => (string) $attributes['id'],
                     'provider_data'         => $attributes,
                 ]);
 
-                $userAuthClient->save();
+
+                if (!$userAuthClient->save())
+                {
+                    print_r($userAuthClient->getErrors());
+                    die('no');
+                }
             } else
             {
                 $userAuthClient->provider_data = $attributes;

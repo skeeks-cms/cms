@@ -17,6 +17,7 @@ use yii\base\Action;
 use yii\base\InvalidParamException;
 use yii\helpers\Inflector;
 use yii\web\Application;
+use yii\web\NotFoundHttpException;
 use yii\web\ViewAction;
 use Yii;
 use \skeeks\cms\modules\admin\controllers\AdminController;
