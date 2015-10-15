@@ -88,8 +88,8 @@ class CmsTreeType extends Core
             [['code'], 'validateCode'],
             ['priority', 'default', 'value'         => 500],
             ['active', 'default', 'value'           => "Y"],
-            ['name_meny', 'default', 'value'        => "Разделы"],
-            ['name_one', 'default', 'value'         => "Раздел"],
+            ['name_meny', 'default', 'value'        => \Yii::t('app','Sections')],
+            ['name_one', 'default', 'value'         => \Yii::t('app','Section')],
         ]);
     }
 

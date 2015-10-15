@@ -72,7 +72,7 @@ class CmsSiteDomain extends Core
             [['site_code', 'domain'], 'required'],
             [['site_code'], 'string', 'max' => 15],
             [['domain'], 'string', 'max' => 255],
-            [['domain', 'site_code'], 'unique', 'targetAttribute' => ['domain', 'site_code'], 'message' => 'The combination of Site Code and Domain has already been taken.']
+            [['domain', 'site_code'], 'unique', 'targetAttribute' => ['domain', 'site_code'], 'message' => \Yii::t('app','The combination of Site Code and Domain has already been taken.')]
         ]);
     }
 

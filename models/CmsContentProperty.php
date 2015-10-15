@@ -69,7 +69,7 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'content_id' => Yii::t('app', 'Связь с контентом'),
+            'content_id' => Yii::t('app', 'Linked to content'),
         ]);
     }
 
@@ -81,7 +81,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         return array_merge(parent::rules(), [
             [['content_id'], 'integer'],
-            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
+            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('app','For the content of this code is already in use.')],
         ]);
     }
 }

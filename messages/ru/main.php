@@ -63,7 +63,7 @@ return
     "File Type"             => "Тип файла",
     "File Size"             => "Размер файла",
     "Extension"             => "Расширение",
-    "Original File Name"    => "Оригинальное название файла",
+    "Original Filename"    => "Оригинальное название файла",
     "Name To Save"          => "Название при скачивании",
     "Image Width"           => "Ширина изображения",
     "Image Height"          => "Высота изображения",
@@ -72,6 +72,7 @@ return
 
     "Files"                 => "Файлы",
     "Images"                => "Изображения",
+    "Content"               => "Контент",
 
     "Host"                  => "Хост",
     'DB Name'               => 'Имя базы данных',
@@ -88,8 +89,59 @@ return
     "Agent's Function"      => "Функция агента",
     "Interval (sec)"        => "Интервал (сек.)",
     "Periodic"              => "Периодический",
+    "Component"             => "Компонент",
 
+    "The Name One Element"  => "Название одного элемента",
+    "The Name Of The Elements (Plural)" => "Название элементов (множественное число)",
+    "View Mode Sections And Elements" => "Режим просмотра разделов и элементов",
+    "The Interface Binding Element To Sections" => "Интерфейс привязки элемента к разделам",
+    "To Index For Search Module" => "Индексировать для модуля поиска",
 
+    "The Main Section"      => "Основной раздел",
+    "Main Image (preview)"  => "Главное фото (для анонса)",
+    "Main Image"            => "Главное фото",
 
+    "Elements"              => "Элементы",
+    "Element"               => "Элемент",
 
+    "Linked to content"     => "Связь с контентом",
+    "Linked To Section's Type" => "Связь с типом раздела",
+
+    "For the content of this code is already in use." => "Для данного контента этот код уже занят.",
+    "For this section of the code is already in use." => "Для данного раздела этот код уже занят.",
+    "For this section's type of the code is already in use." => "Для данного типа раздела этот код уже занят.",
+    "For this subsection of the code is already in use." => "Для данного подраздела этот код уже занят.",
+
+    "Version"               => "Установленная версия",
+    "Aliases"               => "Алиасы",
+
+    "composer.json not found in the package {name}" => "composer.json не найден в пакете {name}",
+    "This user can not be removed" => "Этого пользователя нельзя удалить",
+    "You can not delete yourself" => "Нельзя удалять самого себя",
+
+    "Search Phrase"         => "Поисковая фраза",
+    "Documents Found"       => "Найдено документов",
+    "Pages Count"           => "Количество страниц",
+
+    "Failed to create a section of the tree" => "Не удалось создать раздел дерева",
+
+    "Sections"              => "Разделы",
+    "Section"               => "Раздел",
+
+    "User"                  => "Пользователь",
+    "Approved"              => "Подтвержден",
+    "Default"               => "Основной",
+    "Phone Number"          => "Номер телефона",
+    "Storage"               => "Хранилище",
+
+    "Menu Positions"        => "Позиции меню",
+
+    "Login"                 => "Логин",
+    "Address"               => "Адрес",
+    "Information"           => "Информация",
+    "Gender"                => "Пол",
+    "Logged At"             => "Время последней авторизации",
+    "Last Activity At"      => "Время последней активности",
+    "Last Activity In The Admin At" => "Время последней активности в админке",
+    "Image"                 => "Фото",
 ];

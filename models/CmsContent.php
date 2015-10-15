@@ -72,11 +72,11 @@ class CmsContent extends Core
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
             'content_type' => Yii::t('app', 'Content Type'),
-            'index_for_search' => Yii::t('app', 'Индексировать для модуля поиска'),
-            'tree_chooser' => Yii::t('app', 'Интерфейс привязки элемента к разделам'),
-            'list_mode' => Yii::t('app', 'Режим просмотра разделов и элементов'),
-            'name_meny' => Yii::t('app', 'Название элементов (множественное число)'),
-            'name_one' => Yii::t('app', 'Название одного элемента'),
+            'index_for_search' => Yii::t('app', 'To Index For Search Module'),
+            'tree_chooser' => Yii::t('app', 'The Interface Binding Element To Sections'),
+            'list_mode' => Yii::t('app', 'View Mode Sections And Elements'),
+            'name_meny' => Yii::t('app', 'The Name Of The Elements (Plural)'),
+            'name_one' => Yii::t('app', 'Name One Element'),
         ]);
     }
 
@@ -98,8 +98,8 @@ class CmsContent extends Core
             [['name_meny', 'name_one'], 'string', 'max' => 100],
             ['priority', 'default', 'value'         => 500],
             ['active', 'default', 'value'           => "Y"],
-            ['name_meny', 'default', 'value'    => "Элементы"],
-            ['name_one', 'default', 'value'     => "Элемент"],
+            ['name_meny', 'default', 'value'    => Yii::t('app', 'Elements')],
+            ['name_one', 'default', 'value'     => Yii::t('app', 'Element')],
         ]);
     }
 

@@ -136,9 +136,9 @@ class CmsExtension extends Model
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name'      => 'Название',
-            'version'   => 'Установленная версия',
-            'alias'     => 'Алиасы',
+            'name'      => \Yii::t('app','Name'),
+            'version'   => \Yii::t('app','Version'),
+            'alias'     => \Yii::t('app','Aliases'),
         ]);
     }
 
@@ -198,7 +198,7 @@ class CmsExtension extends Model
         $file = $this->getFilePath('composer.json');
         if (!$file)
         {
-            throw new \InvalidArgumentException('composer.json не найден в пакете $name');
+            throw new \InvalidArgumentException(\Yii::t('app','composer.json not found in the package {name}',['name' => $name]));
         }
 
         $data = file_get_contents($file);

@@ -115,7 +115,7 @@ class CmsSite extends Core
 
         if (!$tree->save(false))
         {
-            throw new Exception('Не удалось создать раздел дерева');
+            throw new Exception('Failed to create a section of the tree');
         }
     }
 
