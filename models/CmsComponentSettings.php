@@ -327,4 +327,18 @@ class CmsComponentSettings extends Core
     {
         return static::fetchByComponentUserId($component, $user->id);
     }
+
+
+    /**
+     * @param $settingAttribute
+     * @param $value
+     * @return $this
+     */
+    public function setSettingValue($settingAttribute, $settingValue)
+    {
+        $values = $this->value;
+        $values[$settingAttribute] = $settingValue;
+        $this->value = $values;
+        return $this;
+    }
 }

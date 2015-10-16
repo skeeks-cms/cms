@@ -17,6 +17,7 @@ use yii\base\Model;
 use yii\caching\TagDependency;
 use yii\console\Application;
 use yii\db\Exception;
+use yii\helpers\ArrayHelper;
 
 /**
  * @property UrlHelper editUrl
@@ -95,7 +96,8 @@ trait HasComponentDbSettingsTrait
             //Настройки для текущего сайта
             if ($site = \Yii::$app->currentSite->site)
             {
-                $settingsValues = array_merge($settingsValues,
+
+                $settingsValues = ArrayHelper::merge($settingsValues,
                     $this->fetchDefaultSettingsBySiteCode($site->code)
                 );
             }
@@ -103,7 +105,7 @@ trait HasComponentDbSettingsTrait
             //Настройки для текущего пользователя
             if (!\Yii::$app->user->isGuest)
             {
-                $settingsValues = array_merge($settingsValues,
+                $settingsValues = ArrayHelper::merge($settingsValues,
                     $this->fetchDefaultSettingsByUserId(\Yii::$app->user->identity->getId())
                 );
             }
