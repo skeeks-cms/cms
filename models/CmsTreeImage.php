@@ -37,7 +37,7 @@ class CmsTreeImage extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'storage_file_id', 'tree_id', 'priority'], 'integer'],
             [['storage_file_id', 'tree_id'], 'required'],
-            [['storage_file_id', 'tree_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'tree_id'], 'message' => 'The combination of Storage File ID and Tree ID has already been taken.']
+            [['storage_file_id', 'tree_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'tree_id'], 'message' => \Yii::t('app','The combination of Storage File ID and Tree ID has already been taken.')]
         ];
     }
 

@@ -57,7 +57,7 @@ class AdminOneModelUpdateAction extends AdminOneModelEditAction
         {
             if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
-                \Yii::$app->getSession()->setFlash('success', 'Сохранено');
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -73,7 +73,7 @@ class AdminOneModelUpdateAction extends AdminOneModelEditAction
 
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
             }
         }
 

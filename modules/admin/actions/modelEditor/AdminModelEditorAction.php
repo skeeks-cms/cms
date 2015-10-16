@@ -29,7 +29,7 @@ class AdminModelEditorAction extends AdminAction
     {
         if (!$this->controller instanceof AdminModelEditorController)
         {
-            throw new InvalidParamException('Это действие рассчитано для работы с контроллером: ' . AdminModelEditorController::className());
+            throw new InvalidParamException(\Yii::t('app','This action is designed to work with the controller: ') . AdminModelEditorController::className());
         }
 
         parent::init();

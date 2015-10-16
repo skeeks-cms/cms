@@ -34,7 +34,7 @@ class CheckerController extends AdminController
 {
     public function init()
     {
-        $this->name = "Проверка системы";
+        $this->name = \Yii::t('app',"Checking system");
         parent::init();
     }
 
@@ -45,7 +45,7 @@ class CheckerController extends AdminController
             "index" =>
             [
                 "class"        => AdminAction::className(),
-                "name"         => "Тесирование",
+                "name"         => \Yii::t('app',"Testing"),
             ],
         ];
     }
@@ -61,13 +61,13 @@ class CheckerController extends AdminController
                 $className = \Yii::$app->request->post('className');
                 if (!class_exists($className))
                 {
-                    $rr->message = 'Тест не найден';
+                    $rr->message = \Yii::t('app','Test is not found');
                     return (array) $rr;
                 }
 
                 if (!is_subclass_of($className, CheckComponent::className()))
                 {
-                    $rr->message = 'Некорректный тест';
+                    $rr->message = \Yii::t('app','Incorrect test');
                     return (array) $rr;
                 }
 
@@ -88,7 +88,7 @@ class CheckerController extends AdminController
 
                 } catch (\Exception $e)
                 {
-                    $rr->message = 'Тест не выполнен: ' . $e->getMessage();
+                    $rr->message = \Yii::t('app','Test is not done').': ' . $e->getMessage();
                 }
             }
         }

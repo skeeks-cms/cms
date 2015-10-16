@@ -45,7 +45,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint("Этот параметр влияет на адрес страницы, будте внимательно при его редактировании."); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])
+        ->hint(\Yii::t('app', 'Этот параметр влияет на адрес страницы, будте внимательно при его редактировании.')); ?>
 
 
 

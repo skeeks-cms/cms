@@ -63,7 +63,7 @@ class UserAuthClient extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'Пользователь'),
+            'user_id' => Yii::t('app', 'User'),
             'provider' => Yii::t('app', 'Provider'),
             'provider_identifier' => Yii::t('app', 'Provider Identifier'),
             'provider_data' => Yii::t('app', 'Provider Data'),

@@ -53,7 +53,7 @@ abstract class AdminController extends Controller
     /**
      * @var string Понятное название контроллера, будет добавлено в хлебные крошки и title страницы
      */
-    public $name           = 'Название контроллера';
+    public $name           = '';
 
     /**
      * @var null|AdminAction[]
@@ -177,7 +177,7 @@ abstract class AdminController extends Controller
 
         if (!$this->name)
         {
-            $this->name = Inflector::humanize($this->id);
+            $this->name = \Yii::t('app','The name of the controller'); //Inflector::humanize($this->id);
         }
 
         $this->layout = \Yii::$app->cms->moduleAdmin()->layout;

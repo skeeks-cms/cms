@@ -23,7 +23,7 @@ class SshConsoleForm extends Model
     public function attributeLabels()
     {
         return [
-            'command' => 'Комманда'
+            'command' => \Yii::t('app','Command')
         ];
     }
 

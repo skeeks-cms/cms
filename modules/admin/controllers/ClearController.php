@@ -27,7 +27,7 @@ class ClearController extends AdminController
 {
     public function init()
     {
-        $this->name = "Удаление временных файлов";
+        $this->name = \Yii::t('app',"Deleting temporary files");
         parent::init();
     }
 
@@ -38,7 +38,7 @@ class ClearController extends AdminController
             "index" =>
             [
                 "class"        => AdminAction::className(),
-                "name"         => "Чистка временных данных",
+                "name"         => \Yii::t('app',"Clearing temporary data"),
                 "callback"     => [$this, 'actionIndex'],
             ],
         ];
@@ -49,33 +49,33 @@ class ClearController extends AdminController
         $clearDirs =
         [
             [
-                'label'     => 'common временные файлы',
+                'label'     => 'common ' . \Yii::t('app','temporary files'),
                 'dir'       => new Dir(\Yii::getAlias('@common/runtime'), false)
             ],
 
             [
-                'label'     => 'console временные файлы',
+                'label'     => 'console ' . \Yii::t('app','temporary files'),
                 'dir'       => new Dir(\Yii::getAlias('@console/runtime'), false)
             ],
 
 
             [
-                'label'     => 'runtime (текущий сайт)',
+                'label'     => 'runtime (' . \Yii::t('app','current site') . ')',
                 'dir'       => new Dir(\Yii::getAlias('@runtime'), false)
             ],
 
             [
-                'label'     => 'Файлы кэша (текущий сайт)',
+                'label'     => \Yii::t('app','Cache files').' (' . \Yii::t('app','current site') . ')',
                 'dir'       => new Dir(\Yii::getAlias('@runtime/cache'), false)
             ],
 
             [
-                'label'     => 'Файлы дебаг информации (текущий сайт)',
+                'label'     => \Yii::t('app','Files debug information') . ' (' . \Yii::t('app','current site') . ')',
                 'dir'       => new Dir(\Yii::getAlias('@runtime/debug'), false)
             ],
 
             [
-                'label'     => 'Файлы логов (текущий сайт)',
+                'label'     => \Yii::t('app','Log files') . ' (' . \Yii::t('app','current site') . ')',
                 'dir'       => new Dir(\Yii::getAlias('@runtime/logs'), false)
             ],
 
@@ -106,7 +106,7 @@ class ClearController extends AdminController
             \Yii::$app->cms->generateModulesConfigFile();
 
             $rr->success = true;
-            $rr->message = 'Кэш очищен';
+            $rr->message = \Yii::t('app','Cache cleared');
             return $rr;
         }
 

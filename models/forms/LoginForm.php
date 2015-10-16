@@ -55,7 +55,7 @@ class LoginForm extends Model
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password))
             {
-                $this->addError($attribute, 'Некорректный логин или пароль.');
+                $this->addError($attribute, \Yii::t('app','Incorrect username or password.'));
             }
         }
     }

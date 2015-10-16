@@ -47,9 +47,9 @@ class LoginFormUsernameOrEmail extends Model
     public function attributeLabels()
     {
         return [
-            'identifier'    => 'Логин или Email',
-            'password'      => 'Пароль',
-            'rememberMe'    => 'Запомнить меня',
+            'identifier'    => \Yii::t('app','Username or Email'),
+            'password'      => \Yii::t('app','Password'),
+            'rememberMe'    => \Yii::t('app','Remember me'),
         ];
     }
     /**
@@ -66,7 +66,7 @@ class LoginFormUsernameOrEmail extends Model
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password))
             {
-                $this->addError($attribute, 'Некорректный логин или пароль.');
+                $this->addError($attribute, \Yii::t('app','Incorrect username or password.'));
             }
         }
     }

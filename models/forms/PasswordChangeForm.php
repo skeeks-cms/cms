@@ -50,8 +50,8 @@ class PasswordChangeForm extends Model
     public function attributeLabels()
     {
         return [
-            'new_password'          => 'Новый пароль',
-            'new_password_confirm'  => 'Подтверждение пароля',
+            'new_password'          => \Yii::t('app','New Password'),
+            'new_password_confirm'  => \Yii::t('app','New Password Confirm'),
         ];
     }
 
@@ -68,7 +68,7 @@ class PasswordChangeForm extends Model
         //{
             if ($this->new_password_confirm != $this->new_password)
             {
-                $this->addError($attribute, 'Новые пароли не совпадают');
+                $this->addError($attribute, \Yii::t('app','New passwords do not match'));
             }
         //}
     }

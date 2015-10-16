@@ -68,13 +68,13 @@ class CmsAgent extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'last_exec_at' => Yii::t('app', 'Дата последнего запуска'),
-            'next_exec_at' => Yii::t('app', 'Дата и время следующего запуска'),
-            'name' => Yii::t('app', 'Функция агента'),
-            'agent_interval' => Yii::t('app', 'Интервал (сек.)'),
+            'last_exec_at' => Yii::t('app', 'Last Execution At'),
+            'next_exec_at' => Yii::t('app', 'Next Execution At'),
+            'name' => Yii::t('app', "Agent's Function"),
+            'agent_interval' => Yii::t('app', 'Interval (sec)'),
             'priority' => Yii::t('app', 'Priority'),
             'active' => Yii::t('app', 'Active'),
-            'is_period' => Yii::t('app', 'Периодический'),
+            'is_period' => Yii::t('app', 'Periodic'),
             'is_running' => Yii::t('app', 'Is Running'),
             'description' => Yii::t('app', 'Description'),
         ];

@@ -45,8 +45,8 @@ class Module extends CmsModule
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            "name"          => \Yii::$app->cms->moduleCms()->getName() . " — система администрирования",
-            "description"   => "Модуль входит в состав модуля cms, содержит все необходимые элементы для админки",
+            "name"          => \Yii::$app->cms->moduleCms()->getName() . " — " . \Yii::t('app','system administration'),
+            "description"   => \Yii::t('app',"The module is part of the module cms, it contains all the necessary elements for admin"),
         ]);
     }
 

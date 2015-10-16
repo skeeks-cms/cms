@@ -78,7 +78,7 @@ class StorageFile extends Core
             [['cluster_id', 'type', 'mime_type', 'extension'], 'string', 'max' => 16],
             [['name_to_save'], 'string', 'max' => 32],
             [['src'], 'unique'],
-            [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => 'The combination of Cluster ID and Cluster Src has already been taken.'],
+            [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => Yii::t('app','The combination of Cluster ID and Cluster Src has already been taken.')],
         ]);
     }
 
@@ -90,26 +90,26 @@ class StorageFile extends Core
         return array_merge(parent::attributeLabels(), [
             'id' => Yii::t('app', 'ID'),
             'src' => Yii::t('app', 'Src'),
-            'cluster_id' => Yii::t('app', 'Хранилище'),
+            'cluster_id' => Yii::t('app', 'Storage'),
             'cluster_file' => Yii::t('app', 'Cluster File'),
             'created_by' => Yii::t('app', 'Created By'),
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'size' => Yii::t('app', 'Размер файла'),
+            'size' => Yii::t('app', 'File Size'),
             'type' => Yii::t('app', 'Type'),
-            'mime_type' => Yii::t('app', 'Тип файла'),
-            'extension' => Yii::t('app', 'Расширение'),
-            'original_name' => Yii::t('app', 'Оригинальное название файла'),
-            'name_to_save' => Yii::t('app', 'Название при скачивании'),
+            'mime_type' => Yii::t('app', 'File Type'),
+            'extension' => Yii::t('app', 'Extension'),
+            'original_name' => Yii::t('app', 'Original FileName'),
+            'name_to_save' => Yii::t('app', 'Name To Save'),
             'name' => Yii::t('app', 'Name'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
-            'image_height' => Yii::t('app', 'Высота изображения'),
-            'image_width' => Yii::t('app', 'Ширина изображения'),
-            'linked_to_model' => Yii::t('app', 'Привязка'),
+            'image_height' => Yii::t('app', 'Image Height'),
+            'image_width' => Yii::t('app', 'Image Width'),
+            'linked_to_model' => Yii::t('app', 'Linked To Model'),
             'linked_to_value' => Yii::t('app', 'Linked To Value'),
-            'published_at'  => Yii::t('app', 'Дата публикации'),
+            'published_at'  => Yii::t('app', 'Published At'),
         ]);
     }
 

@@ -26,10 +26,10 @@ class EmailConsoleForm extends Model
     public function attributeLabels()
     {
         return [
-            'content'   => 'Тело сообщения',
-            'subject'   => 'Тема сообщения',
-            'to'        => 'Кому',
-            'from'      => 'От кого'
+            'content'   => \Yii::t('app','Content'),
+            'subject'   => \Yii::t('app','Subject'),
+            'to'        => \Yii::t('app','To'),
+            'from'      => \Yii::t('app','From')
         ];
     }
 

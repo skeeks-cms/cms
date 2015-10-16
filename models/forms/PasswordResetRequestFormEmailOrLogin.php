@@ -49,7 +49,7 @@ class PasswordResetRequestFormEmailOrLogin extends Model
     public function attributeLabels()
     {
         return [
-            'identifier'    => 'Логин или Email',
+            'identifier'    => \Yii::t('app','Username or Email'),
         ];
     }
 
@@ -60,7 +60,7 @@ class PasswordResetRequestFormEmailOrLogin extends Model
 
         if (!$user)
         {
-            $this->addError($attr, 'Пользователь не найден');
+            $this->addError($attr, \Yii::t('app','User not found'));
         }
     }
     /**
@@ -100,7 +100,7 @@ class PasswordResetRequestFormEmailOrLogin extends Model
                     ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
-                    ->setSubject('Запрос на смену пароля для ' . \Yii::$app->cms->appName);
+                    ->setSubject(\Yii::t('app','The request to change the password for') . \Yii::$app->cms->appName);
 
                 return $message->send();
             }
