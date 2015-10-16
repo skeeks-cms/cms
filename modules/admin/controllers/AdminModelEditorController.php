@@ -277,8 +277,12 @@ class AdminModelEditorController extends AdminController
         if ($this->_model === null)
         {
             $pk             = \Yii::$app->request->get($this->requestPkParamName);
-            $modelClass     = $this->modelClassName;
-            $this->_model   = $modelClass::findOne($pk);
+            if ($pk)
+            {
+                $modelClass     = $this->modelClassName;
+                $this->_model   = $modelClass::findOne($pk);
+            }
+
         }
 
         return $this->_model;

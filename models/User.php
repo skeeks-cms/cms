@@ -755,9 +755,9 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCmsUserAuthclients()
+    public function getCmsUserAuthClients()
     {
-        return $this->hasMany(CmsUserAuthclient::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserAuthClient::className(), ['user_id' => 'id']);
     }
 
     /**

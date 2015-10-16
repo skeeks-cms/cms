@@ -151,8 +151,8 @@ JS
 );
 ?>
 
-<h1>Управление: <?= $component->descriptor->name; ?></h1>
-    <hr />
+<!--<h1>Управление: <?/*= $component->descriptor->name; */?></h1>
+    <hr />-->
     <div class="row">
         <div class="col-lg-2">
             <ul class="nav nav-pills nav-stacked">

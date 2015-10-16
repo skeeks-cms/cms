@@ -16,7 +16,6 @@ use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\traits\ValidateRulesTrait;
-use skeeks\modules\cms\user\models\User;
 use Yii;
 
 /**

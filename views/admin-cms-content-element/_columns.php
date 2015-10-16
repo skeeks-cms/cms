@@ -64,7 +64,9 @@ return [
             {
                 foreach ($model->cmsContentElementTrees as $contentElementTree)
                 {
-                    $result[] = "<small><a href='{$contentElementTree->tree->url}' target='_blank' data-pjax='0'>{$contentElementTree->tree->name}</a></small>";
+
+                    $site = $contentElementTree->tree->root->site;
+                    $result[] = "<small><a href='{$contentElementTree->tree->url}' target='_blank' data-pjax='0'>[{$site->name}]/.../{$contentElementTree->tree->name}</a></small>";
 
                 }
             }

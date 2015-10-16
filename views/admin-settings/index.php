@@ -16,15 +16,17 @@
     'id' => 'widget-select-component'
 ]) */?>
 <form id="selector-component" action="" method="get" data-pjax>
-    <label>Компонент или модуль</label>
+    <label>Настройки компонента</label>
     <?=
     \skeeks\widget\chosen\Chosen::widget([
         'name' => 'component',
         'items' => $loadedForSelect,
+        'allowDeselect' => false,
         'value' => $component->className()
     ])
     ?>
 </form>
+<hr />
 <iframe data-src="<?= $component->getEditUrl(); ?>" width="100%;" height="200px;" id="sx-test">
 
 </iframe>

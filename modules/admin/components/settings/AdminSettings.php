@@ -9,12 +9,15 @@ namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsLang;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
 
 /**
+ * @property CmsLang $cmsLanguage
+ *
  * Class AdminSettings
  * @package skeeks\cms\modules\admin\components\settings
  */
@@ -217,6 +220,14 @@ JS
             'preset' => $this->ckeditorPreset,
             'clientOptions' => $clientOptions
         ];
+    }
+
+    /**
+     * @return array|null|\yii\db\ActiveRecord
+     */
+    public function getCmsLanguage()
+    {
+        return CmsLang::find()->where(['code' => $this->languageCode])->one();
     }
 
 }

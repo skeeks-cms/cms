@@ -13,8 +13,6 @@ use skeeks\cms\helpers\UrlHelper;
 AdminAsset::register($this);
 \Yii::$app->admin->registerAsset($this)->initJs();
 \skeeks\cms\modules\admin\widgets\UserLastActivityWidget::widget();
-
-$sidebarHidden = \Yii::$app->user->getIsGuest();
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -27,90 +25,16 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
     <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
     <?php $this->head() ?>
 </head>
-<body class="<?= $sidebarHidden ? "sidebar-hidden" : ""?> <?= \Yii::$app->admin->isEmptyLayout() ? "empty" : ""?>">
+<body class="<?= \Yii::$app->user->isGuest ? "sidebar-hidden" : ""?> <?= \Yii::$app->admin->isEmptyLayout() ? "empty" : ""?>">
 
 
 <?php $this->beginBody() ?>
 <div class="navbar sx-navbar" role="navigation">
-    <!--<div class="navbar-header">
-        <?/*= Html::a('<i class="fa fa-lightbulb-o"></i> <!--<span>Logo</span>-->', \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); */?>
-    </div>-->
-
-    <? if (!$sidebarHidden): ?>
-
-    <ul class="nav navbar-nav navbar-actions navbar-left">
-        <li class="visible-md visible-lg visible-sm visible-xs">
-            <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]); ?>" data-sx-widget="tooltip-b" data-original-title="На главную страницу админки"><i class="glyphicon glyphicon-home"></i></a>
-        </li>
-
-        <li class="visible-md visible-lg visible-sm visible-xs">
-            <a href="/" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
-        </li>
-
-    </ul>
-
-    <? endif; ?>
-
-    <ul class="nav navbar-nav navbar-right visible-md visible-lg visible-sm visible-xs sx-top-nav-menu">
-        <!--<li><span class="timer"><i class="icon-clock"></i> <span id="clock"></span></span></li>-->
-        <li class="dropdown visible-md visible-lg"></li>
-        <? if (!Yii::$app->user->isGuest): ?>
-
-
-
-
-        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-            <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="Переключение полноэкранного режима">
-                <i class="glyphicon glyphicon-fullscreen"></i>
-            </a>
-        </li>
-
-        <? if (\Yii::$app->user->can('admin/clear')) : ?>
-        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-            <a href="<?= UrlHelper::construct('admin/clear')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Очистить кэш и временные файлы"><i class="glyphicon glyphicon-refresh"></i></a>
-        </li>
-        <? endif; ?>
-
-        <? if (\Yii::$app->user->can('cms/admin-settings')) : ?>
-        <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-            <a href="<?= UrlHelper::construct('cms/admin-settings')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Настройки проекта"><i class="glyphicon glyphicon-cog"></i></a>
-        </li>
-        <? endif; ?>
-
-
-        <li class="dropdown sx-left-border">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="Ваш профиль">
-                <? if (Yii::$app->cms->getAuthUser()->image) : ?>
-                    <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
-                <? else : ?>
-                    <img src="<?= Yii::$app->cms->moduleAdmin()->noImage; ?>" width="49" height="49"/>
-                <? endif; ?>
-            </a>
-            <!--sx-dropdown-menu-left-->
-            <ul class="dropdown-menu ">
-                <li class="dropdown-menu-header text-center">
-                    <strong><?= Yii::$app->cms->getAuthUser()->username ?></strong>
-                </li>
-                <li><a href="<?= UrlHelper::construct("cms/admin-profile/update")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
-                <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
-                <li class="divider"></li>
-                <li>
-                    <?= Html::a('<i class="fa fa-shield"></i> Заблокировать', UrlHelper::construct("admin/auth/lock")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
-                </li>
-                <li>
-                    <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
-                </li>
-            </ul>
-        </li>
-
-        <? endif; ?>
-    </ul>
-
+    <?= $this->render('_header'); ?>
 </div>
 
-<? if (!$sidebarHidden): ?>
+<? if (!\Yii::$app->user->isGuest): ?>
 
-<?/* if ($this->beginCache('test', ['variations' => [Yii::$app->language, \Yii::$app->cms->getAuthUser()->id]])) : */?>
 <!-- start: Main Menu -->
 <div class="sidebar sx-sidebar">
 
@@ -130,16 +54,12 @@ $sidebarHidden = \Yii::$app->user->getIsGuest();
         </div>
     </div>
 </div>
-<?/*= $this->endCache();*/?>
-<?/* endif; */?>
 <!-- end: Main Menu -->
 <? endif; ?>
 
 
 
 <div class="main">
-
-
     <div class="col-lg-12">
         <div class="panel panel-primary sx-panel sx-panel-content">
             <div class="panel-heading sx-no-icon">

@@ -13,14 +13,18 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiDialogModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\ActionEvent;
+use yii\bootstrap\ActiveForm;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -47,6 +51,24 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
+
+                'index' =>
+                [
+                    "dataProviderCallback" => function(ActiveDataProvider $dataProvider)
+                    {
+                        $query = $dataProvider->query;
+                        /**
+                         * @var ActiveQuery $query
+                         */
+                        //$query->select(['app_company.*', 'count(`app_company_officer_user`.`id`) as countOfficer']);
+
+                        $query->with('image');
+                        $query->with('cmsTree');
+                        $query->with('cmsContentElementTrees');
+                        $query->with('cmsContentElementTrees.tree');
+                    },
+                ],
+
                 'settings' =>
                 [
                     'class'         => AdminModelEditorAction::className(),
@@ -68,9 +90,84 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     "name" => "Деактивировать",
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
-                ]
+                ],
+
+                "change-tree-multi" =>
+                [
+                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    "name"              => "Основной раздел",
+                    "viewDialog"        => "change-tree-form",
+                    "eachCallback"      => [$this, 'eachMultiChangeTree'],
+                ],
+
+                "change-trees-multi" =>
+                [
+                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    "name"              => "Дополнительные разделы",
+                    "viewDialog"        => "change-trees-form",
+                    "eachCallback"      => [$this, 'eachMultiChangeTrees'],
+                ],
             ]
         );
+    }
+
+
+    /**
+     * @param CmsContentElement $model
+     * @param $action
+     * @return bool
+     */
+    public function eachMultiChangeTree($model, $action)
+    {
+        try
+        {
+            $formData = [];
+            parse_str(\Yii::$app->request->post('formData'), $formData);
+            $tmpModel = new CmsContentElement();
+            $tmpModel->load($formData);
+            if ($tmpModel->tree_id && $tmpModel->tree_id != $model->tree_id)
+            {
+                $model->tree_id = $tmpModel->tree_id;
+                return $model->save(false);
+            }
+
+            return false;
+        } catch (\Exception $e)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * @param CmsContentElement $model
+     * @param $action
+     * @return bool
+     */
+    public function eachMultiChangeTrees($model, $action)
+    {
+        try
+        {
+            $formData = [];
+            parse_str(\Yii::$app->request->post('formData'), $formData);
+            $tmpModel = new CmsContentElement();
+            $tmpModel->load($formData);
+
+            if (ArrayHelper::getValue($formData, 'removeCurrent'))
+            {
+                $model->treeIds = [];
+            }
+
+            if ($tmpModel->treeIds)
+            {
+                $model->treeIds = array_merge($model->treeIds, $tmpModel->treeIds);
+                $model->treeIds = array_unique($model->treeIds);
+            }
+
+            return $model->save(false);
+        } catch (\Exception $e)
+        {
+            return false;
+        }
     }
 
     /**
