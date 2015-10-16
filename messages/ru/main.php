@@ -284,7 +284,6 @@ return
     "not specified"         => "не определен",
     "{controller} must be inherited from" => "{controller} должен быть наследован от",
 
-    "Content body"          => "Тело сообщения",
     "Subject"               => "Тема сообщения",
     "To"                    => "Кому",
     "From"                  => "От кого",
