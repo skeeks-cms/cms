@@ -15,6 +15,7 @@
 ]); ?>
 
 
+
     <div class="sx-box sx-mb-10 sx-p-10">
         <? if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentDefault($component)) : ?>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeDefault(); return false;">
