@@ -93,7 +93,7 @@ class AuthController extends AdminController
 
     public function actionLock()
     {
-        $this->view->title = 'Режим блокировки';
+        $this->view->title = \Yii::t('app','Lock Mode');
         \Yii::$app->user->identity->lockAdmin();
 
         if ($ref = UrlHelper::getCurrent()->getRef())
@@ -107,7 +107,7 @@ class AuthController extends AdminController
 
     public function actionResetPassword()
     {
-        $this->view->title = 'Восстановление пароля';
+        $this->view->title = \Yii::t('app','Password recovery');
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         if (!\Yii::$app->user->isGuest)
@@ -139,14 +139,14 @@ class AuthController extends AdminController
                 \Yii::$app->mailer->compose('newPassword', ['user' => $user, 'password' => $password])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
-                    ->setSubject('Новый пароль для ' . \Yii::$app->cms->appName)
+                    ->setSubject(\Yii::t('app','New password') . ' ' . \Yii::$app->cms->appName)
                     ->send();
 
-                $message = 'Новый пароль отправлен на ваш e-mail';
+                $message = \Yii::t('app','New password sent to your e-mail');
             }
         } else
         {
-            $message = 'Ссылка устарела, попробуйте запросить восстановление пароля еще раз.';
+            $message = \Yii::t('app','Link outdated, try to request a password recovery again.');
         }
 
 
@@ -157,7 +157,7 @@ class AuthController extends AdminController
 
     public function actionBlocked()
     {
-        $this->view->title = 'Режим блокировки';
+        $this->view->title = \Yii::t('app','Lock Mode');
 
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
@@ -194,7 +194,7 @@ class AuthController extends AdminController
             } else
             {
                 $rr->success = false;
-                $rr->message = "Не получилось авторизоваться";
+                $rr->message = \Yii::t('app',"Failed log in");
             }
 
             return $rr;
@@ -208,7 +208,7 @@ class AuthController extends AdminController
 
     public function actionAuth()
     {
-        $this->view->title = 'Авторизация';
+        $this->view->title = \Yii::t('app','Authorization');
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
 
         $goUrl = "";
@@ -254,7 +254,7 @@ class AuthController extends AdminController
                 } else
                 {
                     $rr->success = false;
-                    $rr->message = "Неудачная попытка авторизации";
+                    $rr->message = \Yii::t('app',"Unsuccessful attempt authorization");
                     return (array) $rr;
                 }
             }
@@ -274,12 +274,12 @@ class AuthController extends AdminController
                 if ($passwordResetModel->load(\Yii::$app->request->post()) && $passwordResetModel->sendEmail())
                 {
                     $rr->success = true;
-                    $rr->message = "Проверьте ваш email";
+                    $rr->message = \Yii::t('app',"Check your email address");
                     return (array) $rr;
                 } else
                 {
                     $rr->success = false;
-                    $rr->message = "Не получилось отправить email";
+                    $rr->message = \Yii::t('app',"Failed send email");
                     return (array) $rr;
                 }
             }

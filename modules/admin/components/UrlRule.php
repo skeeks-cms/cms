@@ -36,7 +36,7 @@ class UrlRule
 
         if (!$this->adminPrefix)
         {
-            throw new InvalidConfigException("Некорректно сконфигурирован модуль admin для skeeks cms");
+            throw new InvalidConfigException(\Yii::t('app',"Incorrectly configured module {admin} to {skeeks_cms}",["admin" => "admin", "skeeks_cms" => "skeeks cms"]));
         }
     }
 

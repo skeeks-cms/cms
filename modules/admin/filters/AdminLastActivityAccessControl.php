@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (ï¿½ï¿½ï¿½ï¿½ï¿½)
  * @date 31.05.2015
  */
 namespace skeeks\cms\modules\admin\filters;
@@ -46,7 +46,7 @@ class AdminLastActivityAccessControl extends \yii\filters\AccessControl
 
         } else
         {
-            throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
+            throw new ForbiddenHttpException(\Yii::t('yii', \Yii::t('app','You are not allowed to perform this action.')));
         }
     }
 }

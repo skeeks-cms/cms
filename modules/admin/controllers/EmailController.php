@@ -32,7 +32,7 @@ class EmailController extends AdminController
 {
     public function init()
     {
-        $this->name = "Тестирование отправки email сообщений с сайта";
+        $this->name = \Yii::t('app',"Testing send email messages from site");
 
         parent::init();
     }
@@ -44,7 +44,7 @@ class EmailController extends AdminController
             "index" =>
             [
                 "class"        => AdminAction::className(),
-                "name"         => "Тестирование отправки email",
+                "name"         => \Yii::t('app',"Testing sending email"),
                 "callback"     => [$this, 'actionIndex'],
             ],
         ];
@@ -65,12 +65,12 @@ class EmailController extends AdminController
 
         if ($model->load(\Yii::$app->request->post()) && $model->execute())
         {
-            $result         = "Отправлено";
+            $result         = \Yii::t('app',"Submitted");
         } else
         {
             if (\Yii::$app->request->post())
             {
-                $result         = "Не отправлено";
+                $result         = \Yii::t('app',"Not sent");
             }
         }
 

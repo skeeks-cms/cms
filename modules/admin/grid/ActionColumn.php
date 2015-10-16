@@ -41,12 +41,12 @@ class ActionColumn extends DataColumn
 
         if (!$this->controller)
         {
-            throw new InvalidConfigException("controller - не определен.");
+            throw new InvalidConfigException("controller - " .\Yii::t('app',"not specified").".");
         }
 
         if (!$this->controller instanceof AdminModelEditorController)
         {
-            throw new InvalidConfigException("controller должен быть наследован от: " . AdminModelEditorController::className());
+            throw new InvalidConfigException(\Yii::t('app',"{controller} must be inherited from") . ": " . AdminModelEditorController::className());
         }
     }
 

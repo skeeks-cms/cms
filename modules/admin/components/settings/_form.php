@@ -38,7 +38,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldSelect($model, 'ckeditorPreset', \skeeks\yii2\ckeditor\CKEditorPresets::allowPresets()); ?>
     <?= $form->fieldSelect($model, 'ckeditorSkin', \skeeks\yii2\ckeditor\CKEditorPresets::skins()); ?>
     <?= $form->fieldInputInt($model, 'ckeditorHeight'); ?>
-    <?= $form->fieldRadioListBoolean($model, 'ckeditorCodeSnippetGeshi')->hint(\Yii::t('app','It will be activated this plugin').' http://ckeditor.com/addon/codesnippetgeshi'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'ckeditorCodeSnippetGeshi')->hint(\Yii::t('app','It will be activated this plugin') . ' http://ckeditor.com/addon/codesnippetgeshi'); ?>
     <?= $form->fieldSelect($model, 'ckeditorCodeSnippetTheme', [
         'monokai_sublime' => 'monokai_sublime',
         'default' => 'default',
@@ -52,10 +52,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         'atelier-heath.light' => 'atelier-heath.light',
         'atelier-lakeside.dark' => 'atelier-lakeside.dark',
         'atelier-lakeside.light' => 'atelier-lakeside.light',
-    ])->hint('https://highlightjs.org/static/demo/ - темы'); ?>
+    ])->hint('https://highlightjs.org/static/demo/ - ' . \Yii::t('app','topics')); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Безопасность'); ?>
+<?= $form->fieldSet(\Yii::t('app','Security')); ?>
     <?= $form->fieldInputInt($model, 'blockedTime')->hint(\Yii::t('app','If a user, for a specified time, not active in the admin panel, it will be prompted for a password.')); ?>
 <?= $form->fieldSetEnd(); ?>
 
@@ -100,12 +100,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED_OWN,
-        'label'                 => 'Возможность обновления служебной информации записей',
+        'label'                 => \Yii::t('app','The ability to update service information at records'),
     ]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
-        'label'                 => 'Возможность удаления  своих записей',
+        'label'                 => \Yii::t('app','Ability to delete own records'),
     ]); ?>
 
 
