@@ -15,12 +15,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app','Main')); ?>
     <?= $form->fieldRadioListBoolean($model, 'enableCustomConfirm') ?>
     <?= $form->fieldRadioListBoolean($model, 'enableCustomPromt') ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Языковые настройки'); ?>
+<?= $form->fieldSet(\Yii::t('app','Language settings')); ?>
     <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsLang::find()->active()->all(),
         'code',
@@ -28,17 +28,17 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     )); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Настройка таблиц'); ?>
+<?= $form->fieldSet(\Yii::t('app','Setting tables')); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
     <?= $form->fieldInputInt($model, 'pageSize'); ?>
     <?= $form->field($model, 'pageParamName')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Настройка визуального редактора'); ?>
+<?= $form->fieldSet(\Yii::t('app','Setting the visual editor')); ?>
     <?= $form->fieldSelect($model, 'ckeditorPreset', \skeeks\yii2\ckeditor\CKEditorPresets::allowPresets()); ?>
     <?= $form->fieldSelect($model, 'ckeditorSkin', \skeeks\yii2\ckeditor\CKEditorPresets::skins()); ?>
     <?= $form->fieldInputInt($model, 'ckeditorHeight'); ?>
-    <?= $form->fieldRadioListBoolean($model, 'ckeditorCodeSnippetGeshi')->hint('Будет задействован этот плагин http://ckeditor.com/addon/codesnippetgeshi'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'ckeditorCodeSnippetGeshi')->hint(\Yii::t('app','It will be activated this plugin').' http://ckeditor.com/addon/codesnippetgeshi'); ?>
     <?= $form->fieldSelect($model, 'ckeditorCodeSnippetTheme', [
         'monokai_sublime' => 'monokai_sublime',
         'default' => 'default',
@@ -56,46 +56,46 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Безопасность'); ?>
-    <?= $form->fieldInputInt($model, 'blockedTime')->hint('Если пользователь, в течение указанного времени, не проявит активность в админ панели, у него будет запрошен пароль.'); ?>
+    <?= $form->fieldInputInt($model, 'blockedTime')->hint(\Yii::t('app','If a user, for a specified time, not active in the admin panel, it will be prompted for a password.')); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Доступ'); ?>
+<?= $form->fieldSet(\Yii::t('app','Access')); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-        'label'                 => 'Доступ к административной части',
+        'label'                 => \Yii::t('app','Access to the administrate area'),
     ]); ?>
 
 
-    <h3><b>Управление записями</b></h3>
+    <h3><b><?= \Yii::t('app',"Control recodrs")?></b></h3>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
-        'label'                 => 'Возможность создания записей',
+        'label'                 => \Yii::t('app','The ability to create records'),
     ]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
-        'label'                 => 'Возможность обновления записей',
+        'label'                 => \Yii::t('app','The ability to update records'),
     ]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
-        'label'                 => 'Возможность обновления служебной информации записей',
+        'label'                 => \Yii::t('app','The ability to update service information at records'),
     ]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
-        'label'                 => 'Возможность удаления записей',
+        'label'                 => \Yii::t('app','Ability to delete records'),
     ]); ?>
 
 
-    <h3><b>Управление только собственными записями</b></h3>
+    <h3><b><?= \Yii::t('app','Control only own records')?></b></h3>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
-        'label'                 => 'Возможность обновления своих записей',
+        'label'                 => \Yii::t('app','The ability to update their records'),
     ]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([

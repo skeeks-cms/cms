@@ -165,4 +165,23 @@ return
     "No records found"      => "Записи не найдены",
     "Mission complete"      => "Задание выполнено",
 
+    "system administration" => "система администрирования",
+    "The module is part of the module cms, it contains all the necessary elements for admin" => "Модуль входит в состав модуля cms, содержит все необходимые элементы для админки",
+    "Main"                  => "Основное",
+    "Language settings"     => "Языковые настройки",
+    "Setting tables"        => "Настройка таблиц",
+    "Setting the visual editor" => "Настройка визуального редактора",
+    "It will be activated this plugin" => "Будет задейстaвован этот плагин",
+    "If a user, for a specified time, not active in the admin panel, it will be prompted for a password." => "Если пользователь, в течение указанного времени, не проявит активность в админ панели, у него будет запрошен пароль.",
+    "Access"                => "Доступ",
+    "Access to the administrate area" => "Доступ к административной части",
+    "The ability to create records" => "Возможность создания записей",
+    "The ability to update records" => "Возможность обновления записей",
+    "The ability to update service information at records" => "Возможность обновления служебной информации записей",
+    "Ability to delete records" => "Возможность удаления записей",
+
+    "Control recodrs"       => "Управление записями",
+    "Control only own records" => "Управление только собственными записями",
+    "The ability to update their records" => "Возможность обновления своих записей",
+
 ];
