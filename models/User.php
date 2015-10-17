@@ -148,7 +148,14 @@ class User
             {
                 if ($role = \Yii::$app->authManager->getRole($roleName))
                 {
-                    \Yii::$app->authManager->assign($role, $this->id);
+                    try
+                    {
+                        \Yii::$app->authManager->assign($role, $this->id);
+                    } catch(\Exception $e)
+                    {
+
+                    }
+
                 }
             }
         }
@@ -164,10 +171,16 @@ class User
         {
             if ($this->cmsUserEmail)
             {
+
                 $this->cmsUserEmail->value  = $this->_email;
                 $this->cmsUserEmail->def    = Cms::BOOL_Y;
 
-                $this->cmsUserEmail->save();
+                if (!$this->cmsUserEmail->save())
+                {
+                    /*print_r($this->cmsUserEmail->getErrors());
+                    die;*/
+                }
+
             } else
             {
                 $cmsUserEmail = new CmsUserEmail([
@@ -175,7 +188,7 @@ class User
                     'def'   => Cms::BOOL_Y,
                 ]);
 
-                $cmsUserEmail->save();
+                $cmsUserEmail->save(false);
 
                 $cmsUserEmail->link('user', $this);
             }
@@ -707,19 +720,23 @@ class User
     }
 
     /**
-     * @return string
+     * @return $this
      */
     public function getCmsUserEmail()
     {
-        return $this->getCmsUserEmails()->andWhere(['def' => Cms::BOOL_Y])->one();
+        $query = $this->getCmsUserEmails()->andWhere(['def' => Cms::BOOL_Y]);
+        $query->multiple = false;
+        return $query;
     }
 
     /**
-     * @return string
+     * @return $this
      */
     public function getCmsUserPhone()
     {
-        return $this->getCmsUserPhones()->andWhere(['def' => Cms::BOOL_Y])->one();
+        $query = $this->getCmsUserPhones()->andWhere(['def' => Cms::BOOL_Y]);
+        $query->multiple = false;
+        return $query;
     }
 
 

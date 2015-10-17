@@ -17,12 +17,12 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\AjaxRequestResponse;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
 use skeeks\cms\models\forms\SignupForm;
 use skeeks\cms\models\User;
-use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\models\UserAuthClient;
@@ -30,6 +30,7 @@ use yii\authclient\BaseOAuth;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 use \Yii;
@@ -85,6 +86,8 @@ class AuthController extends Controller
             'client' => [
                 'class' => 'yii\authclient\AuthAction',
                 'successCallback' => [$this, 'onAuthSuccess'],
+                'successUrl' => Url::to(['/cms/user/profile']),
+                'cancelUrl' => Url::to(['/cms/user/profile']),
             ],
         ];
     }
@@ -129,7 +132,7 @@ class AuthController extends Controller
                 if ($emailFromAuthClient = ArrayHelper::getValue($attributes, 'email'))
                 {
                     //Нашли email
-                    $userEmailModel = UserEmail::find()->where(['value' => $emailFromAuthClient])->andWhere(['approved' => Cms::BOOL_Y])->one();
+                    $userEmailModel = CmsUserEmail::find()->where(['value' => $emailFromAuthClient])->andWhere(['approved' => Cms::BOOL_Y])->one();
                     if ($userEmailModel)
                     {
                         if ($userEmailModel->user)
@@ -173,14 +176,6 @@ class AuthController extends Controller
                         }
                     }
 
-                    if ($login = ArrayHelper::getValue($attributes, 'email'))
-                    {
-                        $user->username = $login;
-                        if (!$user->save())
-                        {
-                            \Yii::error("Не удалось обновить данные пользователя: " . serialize($user->getErrors()), 'authClient');
-                        }
-                    }
 
                     if ($email = ArrayHelper::getValue($attributes, 'email'))
                     {
@@ -227,13 +222,43 @@ class AuthController extends Controller
                     //$transaction->commit();
                     Yii::$app->user->login($user);
 
-                    if ($photoUrl = ArrayHelper::getValue($attributes, 'photo'))
+                    if (!$user->image)
                     {
-                        $file = \Yii::$app->storage->upload($photoUrl, [
-                            'name' => $user->name
-                        ]);
+                        try
+                        {
+                            if ($photoUrl = ArrayHelper::getValue($attributes, 'photo'))
+                            {
+                                $file = \Yii::$app->storage->upload($photoUrl, [
+                                    'name' => $user->name
+                                ]);
 
-                        $user->link('image', $file);
+                                $user->link('image', $file);
+                            }
+                        } catch(\Exception $e)
+                        {
+
+                        }
+
+                    }
+
+                    if (!$user->image)
+                    {
+                        try
+                        {
+                            if ($photoUrl = ArrayHelper::getValue($attributes, 'avatar_url'))
+                            {
+                                $file = \Yii::$app->storage->upload($photoUrl, [
+                                    'name' => $user->name
+                                ]);
+
+                                $user->link('image', $file);
+                            }
+                        } catch(\Exception $e)
+                        {
+
+                        }
+
+
                     }
 
                 } else

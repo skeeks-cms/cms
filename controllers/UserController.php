@@ -87,6 +87,14 @@ class UserController extends Controller
     }
 
     /**
+     * @return \yii\web\Response
+     */
+    public function actionProfile()
+    {
+        return $this->redirect(\Yii::$app->user->identity->getPageUrl());
+    }
+
+    /**
      * Массив объектов действий доступных для текущего контроллера
      * Используется при построении меню.
      * @see ControllerActions
