@@ -13,6 +13,9 @@ namespace skeeks\cms\modules\datecontrol;
  */
 class Module extends \kartik\datecontrol\Module
 {
+
+    public $controllerNamespace = 'kartik\datecontrol\controllers';
+
     public $displaySettings = [
         \kartik\datecontrol\Module::FORMAT_DATE => 'dd-MM-yyyy',
         \kartik\datecontrol\Module::FORMAT_TIME => 'HH:mm:ss',
