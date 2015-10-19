@@ -38,11 +38,11 @@ AdminAsset::register($this);
 <!-- start: Main Menu -->
 <div class="sidebar sx-sidebar">
 
-    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="Закрыть меню">
+    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="<?=\Yii::t('app','Close menu')?>">
         <i class="glyphicon glyphicon-menu-left"></i>
     </a>
 
-    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-closed" data-sx-widget="tooltip-r" data-original-title="Открыть меню">
+    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-closed" data-sx-widget="tooltip-r" data-original-title="<?=\Yii::t('app','Open menu')?>">
         <i class="glyphicon glyphicon-menu-right"></i>
     </a>
 
@@ -76,7 +76,7 @@ AdminAsset::register($this);
                     <? if (\Yii::$app->user->can('admin/admin-role') && \Yii::$app->controller instanceof \skeeks\cms\modules\admin\controllers\AdminController) : ?>
 
                         <a href="#sx-permissions-for-controller" class="sx-fancybox">
-                            <i class="glyphicon glyphicon-exclamation-sign" data-sx-widget="tooltip-b" data-original-title="Настройки доступа к этому разделу" style="color: white;"></i>
+                            <i class="glyphicon glyphicon-exclamation-sign" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Setting up access to this section')?>" style="color: white;"></i>
                         </a>
 
                         <div style="display: none;">
@@ -95,19 +95,19 @@ AdminAsset::register($this);
                                 ?>
                                 <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
                                     'permissionName'        => \Yii::$app->controller->permissionName,
-                                    'permissionDescription' => "Администрирование | " . \Yii::$app->controller->name,
-                                    'label'                 => "Настройки доступа к разделу: " . \Yii::$app->controller->name,
+                                    'permissionDescription' => \Yii::t('app','Administration')." | " . \Yii::$app->controller->name,
+                                    'label'                 => \Yii::t('app','Setting up access to the section').": " . \Yii::$app->controller->name,
                                     'items'                 => \yii\helpers\ArrayHelper::map($items, 'name', 'description'),
                                 ]); ?>
-                                Укажите пользователи каких групп получат доступ.
+                                <?=\Yii::t('app','Specify which groups of users will have access.')?>
                                 <hr />
                                 <? \yii\bootstrap\Alert::begin([
                                     'options' => [
                                       'class' => 'alert-info',
                                     ],
                                 ])?>
-                                    <p>Код привилегии: <b><?= \Yii::$app->controller->permissionName; ?></b></p>
-                                    <p>В списке показаны только те группы, которые имеют доступ к системе администрирования.</p>
+                                    <p><?=\Yii::t('app','Code privileges')?>: <b><?= \Yii::$app->controller->permissionName; ?></b></p>
+                                    <p><?=\Yii::t('app','The list displays only those groups that have access to the system administration.')?></p>
                                 <? \yii\bootstrap\Alert::end()?>
                             </div>
                         </div>
@@ -141,10 +141,10 @@ AdminAsset::register($this);
     <div class="row">
         <div class="col-sm-5">
             <div class="sx-footer-copyright">
-                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт SkeekS CMS">
+                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site {cms}',['cms' => 'SkeekS CMS'])?>">
                     <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
                 </a>
-                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
+                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site of the developer')?>">SkeekS.com</a>
             </div>
         </div><!--/.col-->
         <div class="col-sm-7 text-right">

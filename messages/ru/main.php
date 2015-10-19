@@ -372,4 +372,13 @@ return
     "Exit"                  => "Выход",
     "To block"              => "Заблокировать",
 
+    "Close menu"            => "Закрыть меню",
+    "Open menu"             => "Открыть меню",
+    "Setting up access to this section" => "Настройки доступа к этому разделу",
+    "Setting up access to the section" => "Настройки доступа к разделу",
+    "Specify which groups of users will have access." => "Укажите пользователи каких групп получат доступ.",
+    "Code privileges"       => "Код привилегии",
+    "The list displays only those groups that have access to the system administration." => "В списке показаны только те группы, которые имеют доступ к системе администрирования.",
+    "Go to site {cms}" => "Перейти на сайт {cms}",
+    "Go to site of the developer" => "Перейти на сайт разработчика системы",
 ];
