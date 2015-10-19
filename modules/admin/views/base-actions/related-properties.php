@@ -13,11 +13,11 @@
     <div class="sx-box-head sx-p-10">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="pull-left">Дополнительные свойства</h2>
+                <h2 class="pull-left"><?=\Yii::t('app','Additional properties')?></h2>
 
                 <a class="btn btn-default pull-right btn-xs" href="#" onclick="sx.dialog({
                     'title': 'Справка',
-                    'content' : '<p>Вы можете создавать самостоятельно любые свойства.</p>'
+                    'content' : '<p><?=\Yii::t('app','You can create your own any properties.')?></p>'
                 }); return false;">
                     <i class="glyphicon glyphicon-question-sign"></i>
                 </a>
@@ -28,7 +28,7 @@
         <? if ($model->relatedProperties) : ?>
             <?= $model->renderRelatedPropertiesForm(); ?>
         <? else : ?>
-            Дополнительные свойства не заданы
+            <?= \Yii::t('app','Additional properties are not set')?>
         <? endif; ?>
     </div>
 </div>

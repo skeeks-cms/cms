@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 64]) ?>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 2])->label('Описание') ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 2])->label(\Yii::t('app','Description')) ?>
 
     <?/*= $form->field($model, 'ruleName')->widget(
         'yii\jui\AutoComplete',
@@ -43,7 +43,7 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
         ])
     ?>
 
-    <?= $form->field($model, 'data')->textarea(['rows' => 6, 'readonly' => 'readonly'])->label('Данные') ?>
+    <?= $form->field($model, 'data')->textarea(['rows' => 6, 'readonly' => 'readonly'])->label(\Yii::t('app','Data')) ?>
 
     <?= $form->buttonsCreateOrUpdate($model); ?>
 

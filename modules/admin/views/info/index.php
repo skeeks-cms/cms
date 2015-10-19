@@ -12,38 +12,38 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use Yii;
 
 $autoModulesFile = (file_exists(AUTO_GENERATED_MODULES_FILE) ? "Да" : "Нет") . " <a class='btn btn-xs btn-default' title='" . AUTO_GENERATED_MODULES_FILE . "'>i</a>
-<a class='btn btn-xs btn-primary' title='" . AUTO_GENERATED_MODULES_FILE . "' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/update-modules-file')->enableAdmin()->toString() . "'>Обновить</a>
+<a class='btn btn-xs btn-primary' title='" . AUTO_GENERATED_MODULES_FILE . "' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/update-modules-file')->enableAdmin()->toString() . "'>".\Yii::t('app','Update')."</a>
 ";
 
 $autoEnvFile = '';
 if (file_exists(APP_ENV_GLOBAL_FILE))
 {
-    $autoEnvFile = 'Да ';
-    $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/remove-env-global-file')->enableAdmin()->toString() . "'>Удалить</a>  ";
+    $autoEnvFile = \Yii::t('app','Yes').' ';
+    $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/remove-env-global-file')->enableAdmin()->toString() . "'>".\Yii::t('app','Delete')."</a>  ";
 } else
 {
-    $autoEnvFile = 'Нет ';
+    $autoEnvFile = \Yii::t('app','No').' ';
 }
-$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'dev'])->enableAdmin()->toString() . "'>Записать dev</a>  ";
-$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'prod'])->enableAdmin()->toString() . "'>Записать prod</a>";
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'dev'])->enableAdmin()->toString() . "'>".\Yii::t('To record')." dev</a>  ";
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'prod'])->enableAdmin()->toString() . "'>".\Yii::t('To record')." prod</a>";
 
 ?>
 <? $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Конфигурация проекта'); ?>
+<?= $form->fieldSet(\Yii::t('app','Project configuration')); ?>
     <?php
     echo $this->render('table', [
         'values' => [
             \Yii::$app->cms->moduleCms()->getName() => \Yii::$app->cms->moduleCms()->descriptor->version,
-            'Yii Version' => $application['yii'],
-            'Название проекта' => $application['name'] . " (<a href='" . \skeeks\cms\helpers\UrlHelper::construct('cms/admin-settings')->enableAdmin()->toString() . "'>изменить</a>)",
-            'Окружение (YII_ENV)' => $application['env'],
-            'Режим разработки (YII_DEBUG)' => $application['debug'] ? 'Да' : 'Нет',
-            'Режим автогенерации путей к модулям CMS (ENABLE_MODULES_CONF)' => ENABLE_MODULES_CONF ? 'Да' : 'Нет',
-            'Автоматически сгенерированный файл с путями модулей cms (AUTO_GENERATED_MODULES_FILE)' => $autoModulesFile,
-            'Папка с файлом путей к модулям' => (is_readable(dirname(AUTO_GENERATED_MODULES_FILE)) ? "Да" : "Не доступна для записи") . " <a class='btn btn-xs btn-default' title='" . dirname(AUTO_GENERATED_MODULES_FILE) . "'>i</a>",
-            'Проверяются переменные окружения (GETENV_POSSIBLE_NAMES)' => GETENV_POSSIBLE_NAMES,
-            'Проверяются переменные окружения (APP_ENV_GLOBAL_FILE)' => $autoEnvFile . " <a class='btn btn-xs btn-default' title='" . APP_ENV_GLOBAL_FILE . "'>i</a>"
+            \Yii::t('app','{yii} Version', ['yii' => 'Yii']) => $application['yii'],
+            \Yii::t('app','Project name') => $application['name'] . " (<a href='" . \skeeks\cms\helpers\UrlHelper::construct('cms/admin-settings')->enableAdmin()->toString() . "'>".\Yii::t('app','edit')."</a>)",
+            \Yii::t('app','Environment ({yii_env})',['yii_env' => 'YII_ENV']) => $application['env'],
+            \Yii::t('app','Development mode ({yii_debug})',['yii_debug' => 'YII_DEBUG']) => $application['debug'] ? \Yii::t('app','Yes') : \Yii::t('app','No'),
+            \Yii::t('app','Mode autogeneration paths to modules {cms} ({e_m_c})',['e_m_c' => 'ENABLE_MODULES_CONF', 'cms' => 'CMS']) => ENABLE_MODULES_CONF ? \Yii::t('app','Yes') : \Yii::t('app','No'),
+            \Yii::t('app','Automatically generated file paths modules {cms} ({agmf})',['cms' => 'cms', 'agmf' => 'AUTO_GENERATED_MODULES_FILE']) => $autoModulesFile,
+            \Yii::t('app','A folder with file paths to the modules') => (is_readable(dirname(AUTO_GENERATED_MODULES_FILE)) ? \Yii::t('app','Yes') : \Yii::t('app',"Is not writable")) . " <a class='btn btn-xs btn-default' title='" . dirname(AUTO_GENERATED_MODULES_FILE) . "'>i</a>",
+            \Yii::t('app',"Checks environment variables").' (GETENV_POSSIBLE_NAMES)' => GETENV_POSSIBLE_NAMES,
+            \Yii::t('app',"Checks environment variables").' (APP_ENV_GLOBAL_FILE)' => $autoEnvFile . " <a class='btn btn-xs btn-default' title='" . APP_ENV_GLOBAL_FILE . "'>i</a>"
 
             ,
         ],
@@ -51,7 +51,7 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
     ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Установленные модули CMS'); ?>
+<?= $form->fieldSet(\Yii::t('app','Installed {cms} modules',['cms' => 'CMS'])); ?>
     <?
     echo \skeeks\cms\modules\admin\widgets\GridView::widget([
         'dataProvider' => new \yii\data\ArrayDataProvider([
@@ -64,12 +64,12 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
 
             [
                 'attribute' => 'name',
-                'label'     => 'Название модуля'
+                'label'     => \Yii::t('app','Module name')
             ],
 
             [
                 'attribute' => 'version',
-                'label'     => 'Версия модуля'
+                'label'     => \Yii::t('app','Module version')
             ],
         ]
     ]);
@@ -77,7 +77,7 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Все расширения и модули Yii'); ?>
+<?= $form->fieldSet(\Yii::t('app','All extensions and modules {yii}',['yii' => 'Yii'])); ?>
     <?if (!empty($extensions)) {
         echo $this->render('table', [
             'values' => $extensions,
@@ -86,7 +86,7 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('PHP конфигурация'); ?>
+<?= $form->fieldSet(\Yii::t('app','{php} configuration',['php' => "PHP"])); ?>
     <?
     echo $this->render('table', [
         'values' => [

@@ -1,7 +1,7 @@
 <?php
 /* @var $this yii\web\View */
 
-$this->title = 'Система управления сайтом';
+$this->title = \Yii::t('app','The site managment system');
 use yii\bootstrap\Alert;
 
 
@@ -23,7 +23,7 @@ $usedSpacePercent = 100 - $freeSpacePercent;
             'options' => [
               'class' => 'alert-info',
           ],
-          'body' => \yii\helpers\Html::tag("div", 'Добро пожаловать! Вы находитесь в системе управления сайтом.'),
+          'body' => \yii\helpers\Html::tag("div", \Yii::t('app','Welcome! You are in the site management system.')),
         ]);
     ?>
 
@@ -33,7 +33,7 @@ $usedSpacePercent = 100 - $freeSpacePercent;
             <li>
                 <i class="icon-pie-chart"></i>
                 <div class="number"><?= round($freeSpacePercent); ?>%</div>
-                <div class="title">Свободное место</div>
+                <div class="title"><?=\Yii::t('app','Free place')?></div>
                 <div class="progress thin">
                     <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $freeSpacePercent; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $freeSpacePercent; ?>%">
                         <span class="sr-only"><?= $freeSpacePercent; ?>% Complete (success)</span>
@@ -44,21 +44,21 @@ $usedSpacePercent = 100 - $freeSpacePercent;
         <li>
             <i class="icon-users"></i>
             <div class="number"><a href="<?= \skeeks\cms\helpers\UrlHelper::construct('/cms/admin-user')->enableAdmin()->toString(); ?>"><?= \skeeks\cms\models\User::find()->count(); ?></a></div>
-            <div class="title">Количество пользователей</div>
+            <div class="title"><?=\Yii::t('app','Number of users')?></div>
 
         </li>
     </ul>
 
 <hr />
-        <h2>Подробнее</h2>
-        <p>Всего на сервере: <?= Yii::$app->formatter->asSize($freeSpace); ?></p>
-        <p>Занято: <?= Yii::$app->formatter->asSize($usedSpace); ?></p>
-        <p>Осталось: <?= Yii::$app->formatter->asSize($freeSpace); ?></p>
+        <h2><?= \Yii::t('app','Read more')?></h2>
+        <p><?= \Yii::t('app','Total at server')?>: <?= Yii::$app->formatter->asSize($freeSpace); ?></p>
+        <p><?= \Yii::t('app','Used')?>: <?= Yii::$app->formatter->asSize($usedSpace); ?></p>
+        <p><?= \Yii::t('app','Free')?>: <?= Yii::$app->formatter->asSize($freeSpace); ?></p>
         <?
 
         $baseOptions =
         [
-          'title' => ['text' => 'В процентном соотношении'],
+          'title' => ['text' => \Yii::t('app','At percent ratio')],
           'chart' => [
               'type' => 'pie',
 
@@ -83,8 +83,8 @@ $usedSpacePercent = 100 - $freeSpacePercent;
                   'name'=> '%',
                   'data'=>
                       [
-                            ['Свободно', $freeSpacePercent],
-                            ['Занято', $usedSpacePercent],
+                            [\Yii::t('app','Free'), $freeSpacePercent],
+                            [\Yii::t('app','Used'), $usedSpacePercent],
                       ]
 
               ],
