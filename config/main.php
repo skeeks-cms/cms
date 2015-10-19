@@ -273,7 +273,7 @@ $config =
         ],
 
         'datecontrol' =>  [
-            'class' => '\skeeks\cms\modules\datecontrol\Module',
+            'class' => 'skeeks\cms\modules\datecontrol\Module',
         ]
     ],
 ];
