@@ -70,11 +70,11 @@ JS
 <? if (!\Yii::$app->user->isGuest): ?>
     <ul class="nav navbar-nav navbar-actions navbar-left">
         <li class="visible-md visible-lg visible-sm visible-xs">
-            <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]); ?>" data-sx-widget="tooltip-b" data-original-title="На главную страницу админки"><i class="glyphicon glyphicon-home"></i></a>
+            <a href="<?= \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]); ?>" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','To main page of admin area')?>"><i class="glyphicon glyphicon-home"></i></a>
         </li>
 
         <li class="visible-md visible-lg visible-sm visible-xs">
-            <a href="/" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
+            <a href="/" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','To main page of site')?>"><i class="glyphicon glyphicon-globe"></i></a>
         </li>
     </ul>
 <? endif; ?>
@@ -86,7 +86,7 @@ JS
 
 
     <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs dropdown">
-        <a class="request-fullscreen toggle-active dropdown-toggle" style="width: auto;" href="#"  data-toggle="dropdown" data-sx-widget="tooltip-b" data-original-title="Язык интерфейса">
+        <a class="request-fullscreen toggle-active dropdown-toggle" style="width: auto;" href="#"  data-toggle="dropdown" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Interface language')?>">
             [<?= \Yii::$app->admin->cmsLanguage->code; ?>] <?= \Yii::$app->admin->cmsLanguage->name; ?> <span class="caret"></span>
         </a>
         <? if ($langs = \skeeks\cms\models\CmsLang::find()->active()->all()) : ?>
@@ -99,26 +99,26 @@ JS
     </li>
 
     <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-        <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="Переключение полноэкранного режима">
+        <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Toggle Full Screen')?>">
             <i class="glyphicon glyphicon-fullscreen"></i>
         </a>
     </li>
 
     <? if (\Yii::$app->user->can('admin/clear')) : ?>
     <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-        <a href="#" onclick="sx.ClearCache.execute(); return false;" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Очистить кэш и временные файлы"><i class="glyphicon glyphicon-refresh"></i></a>
+        <a href="#" onclick="sx.ClearCache.execute(); return false;" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Clear cache and temporary files')?>"><i class="glyphicon glyphicon-refresh"></i></a>
     </li>
     <? endif; ?>
 
     <? if (\Yii::$app->user->can('cms/admin-settings')) : ?>
     <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-        <a href="<?= UrlHelper::construct('cms/admin-settings')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Настройки проекта"><i class="glyphicon glyphicon-cog"></i></a>
+        <a href="<?= UrlHelper::construct('cms/admin-settings')->enableAdmin(); ?>" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Project settings')?>"><i class="glyphicon glyphicon-cog"></i></a>
     </li>
     <? endif; ?>
 
 
     <li class="dropdown sx-left-border">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="Ваш профиль">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Your profile')?>">
             <? if (Yii::$app->cms->getAuthUser()->image) : ?>
                 <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
             <? else : ?>
@@ -130,14 +130,14 @@ JS
             <li class="dropdown-menu-header text-center">
                 <strong><?= Yii::$app->cms->getAuthUser()->username ?></strong>
             </li>
-            <li><a href="<?= UrlHelper::construct("cms/admin-profile/update")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> Профиль</a></li>
+            <li><a href="<?= UrlHelper::construct("cms/admin-profile/update")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> <?=\Yii::t('app','Profile')?></a></li>
             <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->
             <li class="divider"></li>
             <li>
-                <?= Html::a('<i class="fa fa-shield"></i> Заблокировать', UrlHelper::construct("admin/auth/lock")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+                <?= Html::a('<i class="fa fa-shield"></i> '.\Yii::t('app','To block'), UrlHelper::construct("admin/auth/lock")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
             </li>
             <li>
-                <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
+                <?= Html::a('<i class="glyphicon glyphicon-off"></i> '.\Yii::t('app','Exit'), UrlHelper::construct("admin/auth/logout")->enableAdmin()->setCurrentRef(), ["data-method" => "post"])?>
             </li>
         </ul>
     </li>

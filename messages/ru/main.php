@@ -362,4 +362,14 @@ return
     "All extensions and modules {yii}" => "Все расширения и модули {yii}",
     "{php} configuration"   => "{php} конфигурация",
 
+    "To main page of admin area" => "На главную страницу админки",
+    "To main page of site"  => "Открыть сайтовую часть",
+    "Toggle Full Screen"    => "Переключение полноэкранного режима",
+    "Clear cache and temporary files" => "Очистить кэш и временные файлы",
+    "Project settings"      => "Настройки проекта",
+    "Your profile"          => "Ваш профиль",
+    "Profile"               => "Профиль",
+    "Exit"                  => "Выход",
+    "To block"              => "Заблокировать",
+
 ];

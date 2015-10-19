@@ -15,8 +15,8 @@ use Yii;
     <table class="table table-condensed table-bordered table-striped table-hover sx-table" style="table-layout: fixed;">
         <thead>
             <tr>
-                <th>Название</th>
-                <th>Значение</th>
+                <th><?=\Yii::t('app','Name')?></th>
+                <th><?=\Yii::t('app','Value')?></th>
             </tr>
         </thead>
         <tbody>
