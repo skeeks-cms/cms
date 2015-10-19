@@ -31,23 +31,23 @@ use \Yii;
         ]); ?>
 
         <?= $form->field($model, 'subject')->textInput([
-            'placeholder' => 'Тема',
-            'value' => 'Тестовое письмо'
+            'placeholder' => \Yii::t('app','Subject'),
+            'value' => \Yii::t('app','Letter test')
         ]); ?>
 
         <?= $form->field($model, 'content')->textarea([
             'placeholder' => 'Тело сообщения',
-            'value' => 'Тестовое письмо',
+            'value' => \Yii::t('app','Letter test'),
             'rows' => 8
         ]); ?>
 
         <?= Html::tag('div',
-            Html::submitButton("Отправить email", ['class' => 'btn btn-primary']),
+            Html::submitButton(\Yii::t('app',"Send {email}",['email' => "email"]), ['class' => 'btn btn-primary']),
             ['class' => 'form-group']
         ); ?>
 
         <? if ($result) : ?>
-            <h2>Результат отправки: </h2>
+            <h2><?=\Yii::t('app','Result of sending')?>: </h2>
                     <div class="sx-result-container">
                         <pre id="sx-result">
 <p><?= $result; ?></p>
@@ -57,23 +57,23 @@ use \Yii;
 
 
 
-    <h2>Конфигурация cms компонента отправки email: </h2>
+    <h2><?= \Yii::t('app','Configuration of component {cms} sending {email}',['cms' => 'cms', 'email' => 'email'])?>: </h2>
     <div class="sx-result-config">
         <pre id="sx-result">
-<p>Mail component: <?= \Yii::$app->mailer->className(); ?></p>
-<p>Транспорт: <?= (new \ReflectionObject(\Yii::$app->mailer->transport))->getName(); ?></p>
-<p>Транспорт запущен: <?= (int) \Yii::$app->mailer->transport->isStarted(); ?></p>
-<p>Mailer viewPath: <?= \Yii::$app->mailer->viewPath; ?></p>
-<p>Mailer messageClass: <?= \Yii::$app->mailer->messageClass; ?></p>
+<p><?= \Yii::t('app','Mail component')?>: <?= \Yii::$app->mailer->className(); ?></p>
+<p><?= \Yii::t('app','Transport')?>: <?= (new \ReflectionObject(\Yii::$app->mailer->transport))->getName(); ?></p>
+<p><?= \Yii::t('app','Transport running')?>: <?= (int) \Yii::$app->mailer->transport->isStarted(); ?></p>
+<p><?= \Yii::t('app','Mailer viewPath')?>: <?= \Yii::$app->mailer->viewPath; ?></p>
+<p><?= \Yii::t('app','Mailer messageClass')?>: <?= \Yii::$app->mailer->messageClass; ?></p>
         </pre>
     </div>
 
 
-    <h2>Конфигурация php отправки email: </h2>
+    <h2><?=\Yii::t('app','Configuration of {php} sending {email}',['php' => 'php', 'email' => 'email'])?>: </h2>
     <div class="sx-result-config">
         <pre id="sx-result">
-<p>Sendmail Path: <?= ini_get('sendmail_path') ?></p>
-<p>Sendmail From: <?= ini_get('sendmail_from') ?></p>
+<p><?= \Yii::t('app','Sendmail Path')?>: <?= ini_get('sendmail_path') ?></p>
+<p><?= \Yii::t('app','Sendmail From')?>: <?= ini_get('sendmail_from') ?></p>
         </pre>
     </div>
     <? ActiveForm::end() ?>

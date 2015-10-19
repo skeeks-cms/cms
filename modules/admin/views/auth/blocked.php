@@ -89,8 +89,8 @@ $logoutUrl = \skeeks\cms\helpers\UrlHelper::construct("admin/auth/logout")->enab
                                 <div>
                                     <hr />
                                     <div style="color:#999;margin:1em 0">
-                                        Вы успешно авторизованы, но слишком долго не проявляли активность в панеле управления сайтом.
-                                        Пожалуйста, подтвердите что это вы, и введите ваш пароль.
+                                        <?=\Yii::t('app','You have successfully logged in, but not for too long been active in the control panel site.')?>
+                                        <?=\Yii::t('app','Please confirm that it is you, and enter your password.')?>
                                         <p>
 
                                             <?= Html::a('<i class="glyphicon glyphicon-off"></i> Выход', $logoutUrl, [
