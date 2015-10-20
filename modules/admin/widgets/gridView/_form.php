@@ -34,7 +34,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 <div class="col-lg-6">
 
                     <label><?=\Yii::t('app','Available fields')?></label>
-                    <p><?=\Yii::t('app','Double click for item, turn it on')?></p>
+                    <p><?=\Yii::t('app','Double-click for item, turn it on')?></p>
                     <hr />
                     <?= \yii\helpers\Html::listBox('possibleColumns', [], $columns, [
                         'size'      => "20",
@@ -45,7 +45,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 </div>
                 <div class="col-lg-6">
                     <label><?=\Yii::t('app','Included fields')?></label>
-                    <p>Двойной клик по пункту, выключит его. Так же можно менять порядок пуктов перетаскивая их.</p>
+                    <p><?=\Yii::t('app','Double-click for item, turn it off. You can also change the order of items by dragging them.')?></p>
                     <hr />
                     <ul id="sx-visible-selected">
 

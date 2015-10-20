@@ -218,7 +218,7 @@ JS
                             <?= $form->field($loginModel, 'password')->passwordInput()->label(\Yii::t('app','Password')) ?>
                                 <?= Html::input('hidden', 'do', 'login'); ?>
                                 <div class="form-group sx-submit-group">
-                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> " . \Yii::t('app','Login'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> " . \Yii::t('app','Log in'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                                 </div>
 
                                 <div>
