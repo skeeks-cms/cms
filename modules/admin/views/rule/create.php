@@ -7,8 +7,8 @@ use yii\helpers\Html;
  * @var skeeks\cms\models\AuthItem $model
  */
 
-$this->title = Yii::t('app', 'Create Rule');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Rules'), 'url' => ['index']];
+$this->title = \Yii::t('app', 'Create Rule');
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('app', 'Rules'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="auth-item-create">

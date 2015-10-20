@@ -379,6 +379,17 @@ return
     "Specify which groups of users will have access." => "Укажите пользователи каких групп получат доступ.",
     "Code privileges"       => "Код привилегии",
     "The list displays only those groups that have access to the system administration." => "В списке показаны только те группы, которые имеют доступ к системе администрирования.",
-    "Go to site {cms}" => "Перейти на сайт {cms}",
+    "Go to site {cms}"      => "Перейти на сайт {cms}",
     "Go to site of the developer" => "Перейти на сайт разработчика системы",
+
+    "Execute command"       => "Выполнить комманду",
+
+    "Chose file"            => "Выбрать файл",
+    "Pagination"            => "Постраничная навигация",
+    "from smaller to larger" => "от меньшего к большему",
+    "from highest to lowest" => "от большего к меньшему",
+    "Table fields"          => "Поля таблицы",
+    "Available fields"      => "Доступные поля",
+    "Double click for item, turn it on" => "Двойной клик по пункту, включит его",
+    "Included fields"       => "Включенные поля",
 ];
