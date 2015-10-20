@@ -100,8 +100,8 @@ return
     "To Index For Search Module" => "Индексировать для модуля поиска",
 
     "The Main Section"      => "Основной раздел",
-    "Main Image (preview)"  => "Главное фото (для анонса)",
-    "Main Image"            => "Главное фото",
+    "Main Image (preview)"  => "Главное изображение (для анонса)",
+    "Main Image"            => "Главное изображение",
 
     "Elements"              => "Элементы",
     "Element"               => "Элемент",
@@ -293,7 +293,7 @@ return
 
     "recover password"      => "восстановить пароль",
     "Recover password"      => "Восстановить пароль",
-    "Login"                 => "Войти",
+    "Log in"                => "Войти",
     "log in"                => "авторизоваться",
     "I remembered password" => "Я вспомнил пароль",
     "You have successfully logged in, but not for too long been active in the control panel site." => "Вы успешно авторизованы, но слишком долго не проявляли активность в панеле управления сайтом.",
@@ -379,6 +379,39 @@ return
     "Specify which groups of users will have access." => "Укажите пользователи каких групп получат доступ.",
     "Code privileges"       => "Код привилегии",
     "The list displays only those groups that have access to the system administration." => "В списке показаны только те группы, которые имеют доступ к системе администрирования.",
-    "Go to site {cms}" => "Перейти на сайт {cms}",
+    "Go to site {cms}"      => "Перейти на сайт {cms}",
     "Go to site of the developer" => "Перейти на сайт разработчика системы",
+
+    "Execute command"       => "Выполнить комманду",
+
+    "Chose file"            => "Выбрать файл",
+    "Pagination"            => "Постраничная навигация",
+    "from smaller to larger" => "от меньшего к большему",
+    "from highest to lowest" => "от большего к меньшему",
+    "Table fields"          => "Поля таблицы",
+    "Available fields"      => "Доступные поля",
+    "Double-click for item, turn it on" => "Двойной клик по пункту, включит его",
+    "Included fields"       => "Включенные поля",
+    "Double-click for item, turn it off. You can also change the order of items by dragging them." => "Двойной клик по пункту, выключит его. Так же можно менять порядок пуктов перетаскивая их.",
+
+    "Table settings"        => "Настройки таблицы",
+    "Inclusion {ajax} navigation" => "Включение {ajax} навигации",
+    "Sort by what parameter" => "По какому параметру сортировать",
+    "sorting direction"     => "направление сортировки",
+    "Display column"        => "Отображаемые колонки",
+    "Increase"              => "Увеличить",
+
+    "Incorrectly configured widget, you must pass an controller object to which is built widget" => "Некорректно сконфигурирован виджет, необходимо передать объект контроллера для которого сроится виджет",
+    "For this controller can not build action" => "У данного контроллера нельзя построить действия",
+    "Possible actions"      => "Возможные действия",
+    "On the page"           => "На странице",
+
+    "Button actions"        => "Кнопка действий",
+    "Selecting items"       => "Выбор элементов",
+    "Sequence number"       => "Порядковый номер",
+    "Minimize"              => "Свернуть",
+    "Restore"               => "Развернуть",
+    "Show at site"          => "Показать на сайте",
+    "Create subsection"     => "Создать подраздел",
+
 ];

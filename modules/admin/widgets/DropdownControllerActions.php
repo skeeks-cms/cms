@@ -69,7 +69,7 @@ class DropdownControllerActions
         }
 
 
-        return "<div class='{$this->containerClass}' title='Возможные действия'>
+        return "<div class='{$this->containerClass}' title='".\Yii::t('app','Possible actions')."'>
                     <div class=\"btn-group\" role=\"group\" style='{$style}'>
                         {$firstActionString}
                         <button type=\"button\" class='btn btn-xs btn-default' data-toggle=\"dropdown\">

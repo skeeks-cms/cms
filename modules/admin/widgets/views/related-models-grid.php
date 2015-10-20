@@ -34,10 +34,10 @@ $controller = \Yii::$app->createController($widget->controllerRoute)[0];
 JS
     ); ?>
 
-
+    <? $add = \Yii::t('app','Add');?>
     <?= \skeeks\cms\modules\admin\widgets\GridView::widget(\yii\helpers\ArrayHelper::merge($gridOptions, [
         'beforeTableLeft' => <<<HTML
-        <a class="btn btn-default btn-sm" onclick="{$onclick}"><i class="glyphicon glyphicon-plus"></i>Добавить</a>
+        <a class="btn btn-default btn-sm" onclick="{$onclick}"><i class="glyphicon glyphicon-plus"></i>{$add}</a>
 HTML
 
     ])); ?>

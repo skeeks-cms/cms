@@ -417,7 +417,7 @@ JS
     {
         $matches = [];
         if (!preg_match('/^([\w\.]+)(:(\w*))?(:(.*))?$/', $column, $matches)) {
-            throw new InvalidConfigException("Invalid column configuration for '{$column}'. The column must be specified in the format of 'attribute', 'attribute:format' or 'attribute:format: label'.");
+            throw new InvalidConfigException(\Yii::t('app',"Invalid column configuration for '{column}'. The column must be specified in the format of 'attribute', 'attribute:format' or 'attribute:format: label'.",['column' => $column]));
         }
         return $matches;
     }
@@ -431,18 +431,18 @@ JS
         {
             if ($column instanceof ActionColumn)
             {
-                $data[$code] = 'Кнопка действий';
+                $data[$code] = \Yii::t('app','Button actions');
             }
             else if ($column instanceof CheckboxColumn)
             {
-                $data[$code] = 'Выбор элементов';
+                $data[$code] = \Yii::t('app','Selecting items');
             }
             else if ($column instanceof SerialColumn)
             {
-                $data[$code] = 'Порядковый номер';
+                $data[$code] = \Yii::t('app','Sequence number');
             } else if ($column instanceof ImageColumn)
             {
-                $data[$code] = 'Главное изображение';
+                $data[$code] = \Yii::t('app','Main Image');
             } else if ($column instanceof DataColumn)
             {
                 if ($column->label === null)

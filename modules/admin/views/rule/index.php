@@ -9,7 +9,7 @@ use yii\widgets\Pjax;
  * @var yii\data\ActiveDataProvider $dataProvider
  * @var skeeks\cms\models\AuthItemSearch $searchModel
  */
-$this->title = Yii::t('app', 'Rules');
+$this->title = \Yii::t('app', 'Rules');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="role-index">
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a(Yii::t('app', 'Create Rule'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(\Yii::t('app', 'Create Rule'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php
@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
             [
                 'attribute' => 'name',
-                'label' => Yii::t('app', 'Name'),
+                'label' => \Yii::t('app', 'Name'),
             ],
             ['class' => 'yii\grid\ActionColumn',],
         ],

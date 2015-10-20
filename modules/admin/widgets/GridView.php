@@ -203,7 +203,7 @@ JS
 );
 
 
-        return "<div class='sx-per-page'><form method='get' action='" . $url . "'> <span class='per-page-label'>На странице:</span>"
+        return "<div class='sx-per-page'><form method='get' action='" . $url . "'> <span class='per-page-label'>".\Yii::t('app','On the page').":</span>"
                     . Html::dropDownList($pagination->pageSizeParam, [$pagination->pageSize], $items, [
                     'id' => $id
                 ]) . "</form></div>";
