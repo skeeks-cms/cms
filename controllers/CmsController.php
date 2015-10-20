@@ -29,7 +29,7 @@ class CmsController extends Controller
 {
     public function actionIndex()
     {
-        return $this->output(\Yii::$app->cms->moduleCms()->getDescriptor());
+        return $this->output("Система управления сайтом: " . Html::a("Yii2 cms — " . \Yii::$app->cms->descriptor, \Yii::$app->cms->descriptor->homepage));
     }
 
     public function actionVersion()
