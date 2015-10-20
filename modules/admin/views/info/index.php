@@ -24,8 +24,8 @@ if (file_exists(APP_ENV_GLOBAL_FILE))
 {
     $autoEnvFile = \Yii::t('app','No').' ';
 }
-$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'dev'])->enableAdmin()->toString() . "'>".\Yii::t('To record')." dev</a>  ";
-$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'prod'])->enableAdmin()->toString() . "'>".\Yii::t('To record')." prod</a>";
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'dev'])->enableAdmin()->toString() . "'>".\Yii::t('app', 'To record')." dev</a>  ";
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'prod'])->enableAdmin()->toString() . "'>".\Yii::t('app', 'To record')." prod</a>";
 
 ?>
 <? $form = ActiveForm::begin(); ?>

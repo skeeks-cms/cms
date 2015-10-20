@@ -16,7 +16,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         <?= $form->field($model, 'pageParamName')->textInput(); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(|Yii::t('app','Priority')); ?>
+    <?= $form->fieldSet(\Yii::t('app','Priority')); ?>
         <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
         <?= $form->fieldSelect($model, 'order', [
             SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
