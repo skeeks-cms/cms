@@ -271,10 +271,10 @@ class CmsContentElement extends RelatedElementModel
     {
         if ($this->cmsTree)
         {
-            return $this->cmsTree->site->url . $this->getUrl();
+            return $this->cmsTree->site->url . $this->url;
         }
 
-        return $this->getUrl();
+        return $this->url;
     }
 
 
