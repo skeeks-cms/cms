@@ -18,8 +18,10 @@ use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
+use yii\base\ViewEvent;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -147,6 +149,14 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         {
             $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
         }
+
+        \Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
+        {
+            $e->output = Html::tag('span', $e->output,
+            [
+                'style' => 'border: 1px solid blue;',
+            ]);
+        });
     }
 
     /**
