@@ -80,25 +80,25 @@ return
     'content' =>
     [
         'priority'  => 0,
-        'label'     => 'Контент',
+        'label'     => \Yii::t('app','Content'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
 
         'items' => array_merge([
 
             [
-                "label"     => "Разделы",
+                "label"     => \Yii::t('app',"Sections"),
                 "url"       => ["cms/admin-tree"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
             ],
 
             [
-                "label"     => "Файловый менеджер",
+                "label"     => \Yii::t('app',"File manager"),
                 "url"       => ["cms/admin-file-manager"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/folder.png'],
             ],
 
             [
-                "label"     => "Файлы в хранилище",
+                "label"     => \Yii::t('app',"File storage"),
                 "url"       => ["cms/admin-storage-files/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
@@ -108,64 +108,64 @@ return
     'settings' =>
     [
         'priority'  => 10,
-        'label'     => 'Настройки',
+        'label'     => \Yii::t('app','Settings'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
 
         'items' =>
         [
 
             [
-                "label"     => "Настройки продукта",
+                "label"     => \Yii::t('app',"Product settings"),
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
 
                 'items' =>
                 [
                     [
-                        "label"     => "Сайты",
+                        "label"     => \Yii::t('app','Sites'),
                         "url"       => ["cms/admin-cms-site"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
                     ],
 
                     [
-                        "label"     => "Языки",
+                        "label"     => \Yii::t('app',"Languages"),
                         "url"       => ["cms/admin-cms-lang"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/lang.png']
                     ],
 
                     [
-                        "label"     => "Метки разделов",
+                        "label"     => \Yii::t('app',"Section markers"),
                         "url"       => ["cms/admin-tree-menu"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
                     ],
 
                     [
-                        "label"     => "Сервера файлового хранилища",
+                        "label"     => \Yii::t('app',"Server file storage"),
                         "url"       => ["cms/admin-storage/index"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
                     ],
 
 
                     [
-                        "label"     => "Настройки разделов",
+                        "label"     => \Yii::t('app',"Settings sections"),
                         "url"       => ["cms/admin-cms-tree-type"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
                     ],
 
                     [
-                        "label"     => "Настройки контента",
+                        "label"     => \Yii::t('app',"Content settings"),
                         "url"       => ["cms/admin-cms-content-type"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/content.png'],
                     ],
 
                     [
-                        "label"     => "Настройки модулей",
+                        "label"     => \Yii::t('app',"Module settings"),
                         "url"       => ["cms/admin-settings"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
                         'items'     => componentsMenu()
                     ],
 
                     [
-                        "label"     => "Агенты",
+                        "label"     => \Yii::t('app',"Agents"),
                         "url"       => ["cms/admin-cms-agent"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clock.png'],
                     ],
@@ -174,7 +174,7 @@ return
 
 
             [
-                'label'     => 'Пользователи и доступ',
+                'label'     => \Yii::t('app','Users and Access'),
                 'priority'  => 0,
                 'enabled'   => true,
 
@@ -183,38 +183,38 @@ return
                 'items' =>
                 [
                     [
-                        "label"     => "Управление пользователями",
+                        "label"     => \Yii::t('app',"User management"),
                         "url"       => ["cms/admin-user"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png']
                     ],
 
                     [
-                        "label"     => "Свойства пользователей",
+                        "label"     => \Yii::t('app',"User properties"),
                         "url"       => ["cms/admin-cms-user-universal-property"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png']
                     ],
 
                     [
-                        "label"     => "База email адресов",
+                        "label"     => \Yii::t('app','The base of {email} addresses',['email' => 'email']),
                         "url"       => ["cms/admin-user-email"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/email-2.png']
                     ],
 
                     [
-                        "label"     => "База телефонов",
+                        "label"     => \Yii::t('app',"Base phones"),
                         "url"       => ["cms/admin-user-phone"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/phone.png']
                     ],
 
                     [
-                        "label"     => "Социальные профили",
+                        "label"     => \Yii::t('app',"Social profiles"),
                         "url"       => ["cms/admin-user-auth-client"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/facebook.png']
                     ],
 
 
                     [
-                        "label"     => "Роли",
+                        "label"     => \Yii::t('app','Roles'),
                         "url"       => ["admin/admin-role"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
                         'enabled'   => true,
@@ -222,7 +222,7 @@ return
                     ],
 
                     [
-                        "label"     => "Привилегии",
+                        "label"     => \Yii::t('app','Privileges'),
                         "url"       => ["admin/admin-permission"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/access.png'],
                         'enabled'   => true,
@@ -234,13 +234,13 @@ return
 
             [
 
-                "label"     => "Поиск",
+                "label"     => \Yii::t('app',"Searching"),
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/search.png'],
 
                 'items' =>
                 [
                     [
-                        "label" => "Настройки",
+                        "label" => \Yii::t('app',"Settings"),
                         "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\components\CmsSearchComponent'],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
                         "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
@@ -250,18 +250,18 @@ return
                     ],
 
                     [
-                        "label"     => "Статистика",
+                        "label"     => \Yii::t('app',"Statistic"),
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/statistics.png'],
 
                         'items' =>
                         [
                             [
-                                "label" => "Список переходов",
+                                "label" => \Yii::t('app',"Jump list"),
                                 "url"   => ["cms/admin-search-phrase"],
                             ],
 
                             [
-                                "label" => "Список фраз",
+                                "label" => \Yii::t('app',"Phrase list"),
                                 "url"   => ["cms/admin-search-phrase-group"],
                             ],
                         ],
@@ -272,7 +272,7 @@ return
 
 
             [
-                'label'     => 'Инструменты',
+                'label'     => \Yii::t('app','Instruments'),
                 'priority'  => 0,
                 'enabled'   => true,
 
@@ -281,31 +281,31 @@ return
                 'items' =>
                 [
                     [
-                        "label"     => "Проверка системы",
+                        "label"     => \Yii::t('app',"Checking system"),
                         "url"       => ["admin/checker"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/tools.png'],
                     ],
 
                     [
-                        "label"     => "Информация",
+                        "label"     => \Yii::t('app',"Information"),
                         "url"       => ["admin/info"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png'],
                     ],
 
                     [
-                        "label"     => "Отправка email",
+                        "label"     => \Yii::t('app',"Sending {email}",['email' => 'email']),
                         "url"       => ["admin/email"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/email.png'],
                     ],
 
                     [
-                        "label"     => "Чистка временных данных",
+                        "label"     => \Yii::t('app',"Clearing temporary data"),
                         "url"       => ["admin/clear"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clear.png'],
                     ],
 
                     [
-                        "label"     => "Работа с базой данных",
+                        "label"     => \Yii::t('app',"Job to database"),
                         "url"       => ["admin/db"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
                     ],
@@ -317,12 +317,12 @@ return
                     ],*/
 
                     [
-                        "label"     => "Ssh console",
+                        "label"     => \Yii::t('app',"{ssh} console",['ssh' => 'Ssh']),
                         "url"       => ["admin/ssh"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
                     ],
                     [
-                        "label"         => "Генератор кода gii",
+                        "label"         => \Yii::t('app','Code generator'). " gii",
                         "url"           => ["admin/gii"],
                         "img"           => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ssh.png'],
                         "accessCallback"=> function()
@@ -354,32 +354,32 @@ return
     'marketplace' =>
     [
         'priority'  => 20,
-        'label'     => 'Маркетплейс',
+        'label'     => \Yii::t('app','Marketplace'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png'],
 
         'items' =>
         [
 
             [
-                "label"     => "Каталог",
+                "label"     => \Yii::t('app',"Catalog"),
                 "url"       => ["cms/admin-marketplace/catalog"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
             ],
 
             [
-                "label"     => "Установленные",
+                "label"     => \Yii::t('app',"Installed"),
                 "url"       => ["cms/admin-marketplace/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installed.png']
             ],
 
             [
-                "label"     => "Установить/Удалить",
+                "label"     => \Yii::t('app',"Install{s}Remove",['s' => '/']),
                 "url"       => ["cms/admin-marketplace/install"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installer.png']
             ],
 
             [
-                "label"     => "Обновление платформы",
+                "label"     => \Yii::t('app',"Updated platforms"),
                 "url"       => ["cms/admin-marketplace/update"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update-2.png']
             ],
@@ -390,13 +390,13 @@ return
     'other' =>
     [
         'priority'  => 100,
-        'label'     => 'Дополнительно',
+        'label'     => \Yii::t('app','Additionally'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/other.png'],
 
         'items' =>
         [
             [
-                "label"     => "Чистка временных данных",
+                "label"     => \Yii::t('app',"Clearing temporary data"),
                 "url"       => ["admin/clear"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clear.png'],
             ],

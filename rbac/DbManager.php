@@ -146,7 +146,7 @@ class DbManager extends CmsManager
 
         /** @var Item $item */
         $item = $this->_items[$itemName];
-        Yii::trace($item instanceof Role ? "Checking role: $itemName" : "Checking permission : $itemName", __METHOD__);
+        Yii::trace($item instanceof Role ? \Yii::t('app','Checking role').": $itemName" : \Yii::t('app','Checking permission')." : $itemName", __METHOD__);
 
         if (!$this->executeRule($user, $item, $params)) {
             return false;

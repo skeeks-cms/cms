@@ -16,23 +16,41 @@ use yii\helpers\ArrayHelper;
 class PropertyTypeText extends PropertyType
 {
     public $code             = self::CODE_STRING;
-    public $name             = "Текст";
+    public $name             = "";
 
-    static public $fieldElements    =
+    /*static public $fieldElements    =
     [
         'textarea'  => 'Текстовое поле (textarea)',
         'textInput' => 'Текстовая строка (input)',
-    ];
+    ];*/
 
     public $fieldElement            = 'textInput';
     public $rows                    = 5;
+
+    static public function fieldElements()
+    {
+        return [
+            'textarea'  => \Yii::t('app','Text field').' (textarea)',
+            'textInput' => \Yii::t('app','Text string').' (input)',
+        ];
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','Text');
+        }
+    }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
-            'fieldElement'  => 'Элемент формы',
-            'rows'          => 'Количество строк текстового поля'
+            'fieldElement'  => \Yii::t('app','Element form'),
+            'rows'          => \Yii::t('app','The number of lines of the text field')
         ]);
     }
 
@@ -63,7 +81,7 @@ class PropertyTypeText extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        if (in_array($this->fieldElement, array_keys(self::$fieldElements)))
+        if (in_array($this->fieldElement, array_keys(self::fieldElements())))
         {
             $fieldElement = $this->fieldElement;
             $field->$fieldElement([

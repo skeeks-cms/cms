@@ -205,7 +205,7 @@ class RelatedPropertiesModel extends Model
         if ($this->hasAttribute($name)) {
             $this->_attributes[$name] = $value;
         } else {
-            throw new InvalidParamException(get_class($this) . ' has no attribute named "' . $name . '".');
+            throw new InvalidParamException(get_class($this) . ' '.\Yii::t('app','has no attribute named "{name}".',['name' => $name]));
         }
     }
 

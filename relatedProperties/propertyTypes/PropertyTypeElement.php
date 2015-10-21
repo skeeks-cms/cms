@@ -18,16 +18,26 @@ use yii\helpers\ArrayHelper;
 class PropertyTypeElement extends PropertyType
 {
     public $code = self::CODE_ELEMENT;
-    public $name = "Привязка к элементу";
+    public $name = "";
 
 
     public $content_id;
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','Binding to an element');
+        }
+    }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
-            'content_id'  => 'Контент',
+            'content_id'  => \Yii::t('app','Content'),
         ]);
     }
 
