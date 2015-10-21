@@ -74,7 +74,7 @@ JS
         </li>
 
         <li class="visible-md visible-lg visible-sm visible-xs">
-            <a href="<?= \yii\helpers\Url::base(); ?>" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','To main page of site')?>"><i class="glyphicon glyphicon-globe"></i></a>
+            <a href="<?= \yii\helpers\Url::home(); ?>" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','To main page of site')?>"><i class="glyphicon glyphicon-globe"></i></a>
         </li>
     </ul>
 <? endif; ?>
