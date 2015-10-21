@@ -1,6 +1,5 @@
 <?php
 use yii\helpers\Html;
-use Yii;
 /* @var $caption string */
 /* @var $values array */
 ?>

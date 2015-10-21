@@ -16,7 +16,6 @@ use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
-use skeeks\modules\cms\user\models\User;
 use Yii;
 
 /**
@@ -32,8 +31,6 @@ use Yii;
  * @property string $code
  *
  * @property CmsContent[] $cmsContents
- * @property User $updatedBy
- * @property User $createdBy
  */
 class CmsContentType extends Core
 {
@@ -100,19 +97,4 @@ class CmsContentType extends Core
         return $this->hasMany(CmsContent::className(), ['content_type' => 'code'])->orderBy("priority DESC")->andWhere(['active' => Cms::BOOL_Y]);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
-    }
 }

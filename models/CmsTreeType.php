@@ -7,14 +7,7 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\traits\ValidateRulesTrait;
-use skeeks\modules\cms\user\models\User;
 use Yii;
 
 /**

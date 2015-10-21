@@ -9,7 +9,6 @@
 /* @var $this yii\web\View */
 
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-use Yii;
 
 $autoModulesFile = (file_exists(AUTO_GENERATED_MODULES_FILE) ? "Да" : "Нет") . " <a class='btn btn-xs btn-default' title='" . AUTO_GENERATED_MODULES_FILE . "'>i</a>
 <a class='btn btn-xs btn-primary' title='" . AUTO_GENERATED_MODULES_FILE . "' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/update-modules-file')->enableAdmin()->toString() . "'>".\Yii::t('app','Update')."</a>

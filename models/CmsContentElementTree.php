@@ -9,19 +9,7 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
-use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\modules\cms\user\models\User;
 use Yii;
-use yii\db\BaseActiveRecord;
-use yii\widgets\ActiveForm;
-
 /**
  * This is the model class for table "{{%cms_content_element_tree}}".
  *
