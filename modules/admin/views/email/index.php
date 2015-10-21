@@ -11,8 +11,6 @@
 /* @var $model \skeeks\cms\modules\admin\models\forms\SshConsoleForm */
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 use \yii\helpers\Html;
-
-use \Yii;
 ?>
 
 <div class="sx-widget-ssh-console">
