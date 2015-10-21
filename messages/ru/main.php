@@ -414,4 +414,31 @@ return
     "Show at site"          => "Показать на сайте",
     "Create subsection"     => "Создать подраздел",
 
+    "Binding to an element" => "Привязка к элементу",
+    "File"                  => "Файл",
+    "Combobox"              => "Выпадающий список",
+    "Radio Buttons (selecting one value)" => "Радио кнопки (выбор одного значения)",
+    "Element form"          => "Элемент формы",
+    "Number"                => "Число",
+    "Text"                  => "Текст",
+    "Text field"            => "Текстовое поле",
+    "Text string"           => "Текстовая строка",
+    "The number of lines of the text field" => "Количество строк текстового поля",
+
+    "This INPUT to opened the palette" => "Это инпут в открывающейся политре",
+
+    "Choice of color"       => "Выбор цвета",
+    "Show extended palette of colors" => "Показывать расширенную политру цветов",
+    "Format conservation values" => "Формат сохранения значения",
+    "Use the native color selection" => "Использовать нативный выбор цвета",
+    "Management transparency" => "Управление прозрачностью",
+    "Show input field values" => "Показывать поле для ввода значения",
+    "Generally show the palette" => "Вообще показывать политру",
+
+    "Datetime"              => "Дата и время",
+    "Only date"             => "Только дата",
+
+    "Standard file selection" => "Стандартный выбор файла",
+
+    "Multiple choice"       => "Множественный выбор",
 ];

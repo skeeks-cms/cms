@@ -70,7 +70,7 @@ abstract class PropertyType extends Component
     {
         return array_merge(parent::attributeLabels(),
         [
-            'multiple'  => 'Множественный выбор',
+            'multiple'  => \Yii::t('app','Multiple choice'),
         ]);
     }
 

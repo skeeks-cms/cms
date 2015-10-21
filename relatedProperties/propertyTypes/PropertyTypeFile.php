@@ -14,5 +14,15 @@ use skeeks\cms\relatedProperties\PropertyType;
 class PropertyTypeFile extends PropertyType
 {
     public $code = self::CODE_FILE;
-    public $name = "Файл";
+    public $name = "";
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','File');
+        }
+    }
 }

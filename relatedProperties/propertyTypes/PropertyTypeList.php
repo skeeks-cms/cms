@@ -17,28 +17,48 @@ use yii\helpers\ArrayHelper;
 class PropertyTypeList extends PropertyType
 {
     public $code                 = self::CODE_LIST;
-    public $name                 = "Список";
+    public $name                 = "";
 
     const FIELD_ELEMENT_SELECT              = "select";
     const FIELD_ELEMENT_SELECT_MULTI        = "selectMulti";
     const FIELD_ELEMENT_RADIO_LIST          = "radioList";
     const FIELD_ELEMENT_CHECKBOX_LIST       = "checkbox";
 
-    static public $fieldElements    =
+    /*static public $fieldElements    =
     [
         self::FIELD_ELEMENT_SELECT          => 'Выпадающий список (select)',
         self::FIELD_ELEMENT_SELECT_MULTI    => 'Выпадающий список (select multiple)',
         self::FIELD_ELEMENT_RADIO_LIST      => 'Радио кнопки (выбор одного значения)',
         self::FIELD_ELEMENT_CHECKBOX_LIST   => 'Checkbox List',
-    ];
+    ];*/
+
+    static public function fieldElements()
+    {
+        return [
+            self::FIELD_ELEMENT_SELECT          => \Yii::t('app','Combobox').' (select)',
+            self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('app','Combobox').' (select multiple)',
+            self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('app','Radio Buttons (selecting one value)'),
+            self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('app','Checkbox List'),
+        ];
+    }
 
     public $fieldElement            = self::FIELD_ELEMENT_SELECT;
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','List');
+        }
+    }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
-            'fieldElement'  => 'Элемент формы',
+            'fieldElement'  => \Yii::t('app','Element form'),
         ]);
     }
 
@@ -47,7 +67,7 @@ class PropertyTypeList extends PropertyType
         return ArrayHelper::merge(parent::rules(),
         [
             ['fieldElement', 'string'],
-            ['fieldElement', 'in', 'range' => array_keys(static::$fieldElements)],
+            ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
         ]);
     }
 

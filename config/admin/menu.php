@@ -80,7 +80,7 @@ return
     'content' =>
     [
         'priority'  => 0,
-        'label'     => 'Контент',
+        'label'     => \Yii::t('app','Content'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
 
         'items' => array_merge([

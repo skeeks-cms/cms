@@ -19,7 +19,7 @@ use yii\helpers\ArrayHelper;
 class UserPropertyTypeColor extends PropertyType
 {
     public $code = self::CODE_STRING;
-    public $name = "Выбор цвета";
+    public $name = "";
 
 
     public $showDefaultPalette  = Cms::BOOL_Y;
@@ -30,16 +30,26 @@ class UserPropertyTypeColor extends PropertyType
     public $showInput           = Cms::BOOL_Y;
     public $showPalette         = Cms::BOOL_Y;
 
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','Choice of color');
+        }
+    }
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
-            'showDefaultPalette'    => 'Показывать расширенную политру цветов',
-            'saveValueAs'           => 'Формат сохранения значения',
-            'useNative'             => 'Использовать нативный выбор цвета',
-            'showAlpha'             => 'Управление прозрачностью',
-            'showInput'             => 'Показывать поле для ввода значения',
-            'showPalette'           => 'Вообще показывать политру',
+            'showDefaultPalette'    => \Yii::t('app','Show extended palette of colors'),
+            'saveValueAs'           => \Yii::t('app','Format conservation values'),
+            'useNative'             => \Yii::t('app','Use the native color selection'),
+            'showAlpha'             => \Yii::t('app','Management transparency'),
+            'showInput'             => \Yii::t('app','Show input field values'),
+            'showPalette'           => \Yii::t('app','Generally show the palette'),
         ]);
     }
 

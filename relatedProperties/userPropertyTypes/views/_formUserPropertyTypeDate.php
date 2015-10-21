@@ -8,6 +8,6 @@
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <? $form = ActiveForm::begin(); ?>
-    <?= $form->field($model, 'type')->radioList(\skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate::$types); ?>
+    <?= $form->field($model, 'type')->radioList(\skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate::types()); ?>
     <?= $form->buttonsStandart($model); ?>
 <? ActiveForm::end(); ?>
