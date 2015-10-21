@@ -96,7 +96,7 @@ $config =
             'showScriptName' => false,
             'suffix' => '',
             'rules' => [
-                ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //админка
+                'cms-admin' => ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //админка
 
                 'robots.txt'                            => 'cms/seo/robots',
                 'sitemap.xml'                           => 'cms/seo/sitemap',
@@ -112,7 +112,7 @@ $config =
                 'skeeks-cms/<action>'                   => 'cms/cms/<action>',
                 'search'                                => 'cms/search/result',
 
-                ["class" => 'skeeks\cms\components\ImagingUrlRule'], //админка
+                "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'], //админка
             ]
         ],
 

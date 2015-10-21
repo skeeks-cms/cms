@@ -28,6 +28,7 @@ use Yii;
 use yii\db\ActiveQuery;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "{{%cms_tree}}".
@@ -236,7 +237,7 @@ class Tree extends Core
     /**
      * @return string
      */
-    public function getUrl()
+    /*public function getUrl()
     {
         if ($this->redirect)
         {
@@ -258,6 +259,20 @@ class Tree extends Core
                 return \Yii::$app->request->getHostInfo();
             }
         }
+    }*/
+
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        if ($this->redirect)
+        {
+            return $this->redirect;
+        }
+
+        return ($this->site ? $this->site->url : "") . Url::to(['/cms/tree/view', 'model' => $this]);
     }
 
 

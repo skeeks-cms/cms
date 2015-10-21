@@ -113,16 +113,30 @@ class Module extends CmsModule
      */
     public function requestIsAdmin()
     {
-        $request = \Yii::$app->request;
-        $urlRuleAdmin = new UrlRule();
-        $pathInfo       = $request->getPathInfo();
-        $params         = $request->getQueryParams();
-        $firstPrefix    = substr($pathInfo, 0, strlen($urlRuleAdmin->adminPrefix));
-
-        if ($firstPrefix == $urlRuleAdmin->adminPrefix)
+        if (\Yii::$app->urlManager->rules)
         {
-            return true;
+            foreach (\Yii::$app->urlManager->rules as $rule)
+            {
+                if ($rule instanceof UrlRule)
+                {
+                    $urlRuleAdmin = $rule;
+
+
+                    $request = \Yii::$app->request;
+                    $pathInfo       = $request->getPathInfo();
+                    $params         = $request->getQueryParams();
+                    $firstPrefix    = substr($pathInfo, 0, strlen($urlRuleAdmin->adminPrefix));
+
+                    if ($firstPrefix == $urlRuleAdmin->adminPrefix)
+                    {
+                        return true;
+                    }
+
+                }
+            }
         }
+
+
 
         return false;
     }
