@@ -27,11 +27,7 @@ use skeeks\cms\models\Tree;
 
 
     <?= $form->field($model, 'name')->textarea(); ?>
-    <?= $form->fieldSelect($model, 'lang_code', \yii\helpers\ArrayHelper::map(
-        \skeeks\cms\models\CmsLang::find()->active()->all(),
-        'code',
-        'name'
-    )); ?>
+
 
     <?= $form->field($model, 'description')->textarea(); ?>
     <?= $form->field($model, 'server_name')->textInput(['maxlength' => 255]) ?>

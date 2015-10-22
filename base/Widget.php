@@ -64,16 +64,25 @@ abstract class Widget extends Component implements ViewContextInterface
      */
     public function run()
     {
-        try
+        if (YII_ENV == 'prod')
+        {
+            try
+            {
+                \Yii::beginProfile("Run: " . $this->_token);
+                    $content = $this->_run();
+                \Yii::endProfile("Run: " . $this->_token);
+            }
+            catch (\Exception $e)
+            {
+                $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
+            }
+        } else
         {
             \Yii::beginProfile("Run: " . $this->_token);
                 $content = $this->_run();
             \Yii::endProfile("Run: " . $this->_token);
         }
-        catch (\Exception $e)
-        {
-            $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
-        }
+
 
         \Yii::$app->cmsToolbar->initEnabled();
         if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
