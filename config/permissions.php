@@ -58,7 +58,7 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_MANGER,
-            'description'   => 'Менеджер (доступ а администрированию)',
+            'description'   => \Yii::t('app','Manager (access to the administration)'),
 
             'child'         =>
             [
@@ -86,7 +86,7 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_EDITOR,
-            'description'   => 'Редактор (доступ а администрированию)',
+            'description'   => \Yii::t('app','Editor (access to the administration)'),
 
             'child'         =>
             [
@@ -114,7 +114,7 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_USER,
-            'description'   => 'Зарегистрированный пользователь',
+            'description'   => \Yii::t('app','Registered user'),
 
             //Есть доступ к системе администрирования
             'permissions' =>
@@ -125,7 +125,7 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_APPROVED,
-            'description'   => 'Подтвержденный пользователь',
+            'description'   => \Yii::t('app','Confirmed user'),
 
             //Есть доступ к системе администрирования
             'permissions' =>
@@ -138,27 +138,27 @@ return [
     'permissions'   => [
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-            'description'   => 'Доступ к системе администрирования'
+            'description'   => \Yii::t('app','Access to system administration')
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
-            'description'   => 'Доступ к панеле управления сайтом'
+            'description'   => \Yii::t('app','Access to the site control panel')
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
-            'description'   => 'Возможность создания записей'
+            'description'   => \Yii::t('app','The ability to create records')
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
-            'description'   => 'Обновление данных записей',
+            'description'   => \Yii::t('app','Updating data records'),
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
-            'description'   => 'Обновление данных своих записей',
+            'description'   => \Yii::t('app','Updating data own records'),
             'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
             'child'         =>
             [
@@ -171,12 +171,12 @@ return [
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
-            'description'   => 'Обновление дополнительных данных записей',
+            'description'   => \Yii::t('app','Updating additional data records'),
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED_OWN,
-            'description'   => 'Обновление дополнительных данных своих записей',
+            'description'   => \Yii::t('app','Updating additional data own records'),
             'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
             'child'         =>
             [
@@ -189,12 +189,12 @@ return [
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
-            'description'   => 'Удаление записей',
+            'description'   => \Yii::t('app','Deleting records'),
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
-            'description'   => 'Удаление своих записей',
+            'description'   => \Yii::t('app','Deleting own records'),
             'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
             'child'         =>
             [
@@ -207,17 +207,17 @@ return [
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-            'description'   => 'Доступ к личным файлам'
+            'description'   => \Yii::t('app','Access to personal files')
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
-            'description'   => 'Доступ к общим публичным файлам'
+            'description'   => \Yii::t('app','Access to the public files')
         ],
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
-            'description'   => 'Доступ ко всем файлам'
+            'description'   => \Yii::t('app','Access to all files')
         ],
     ],
 
