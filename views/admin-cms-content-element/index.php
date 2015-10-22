@@ -95,8 +95,8 @@ $columns = \yii\helpers\ArrayHelper::merge($userColumns, $autoColumns);
         'class' => 'alert-info',
     ],
 ]); ?>
-    Изменить свойства и права доступа к информационному блоку вы можете в <?= \yii\helpers\Html::a('Настройках контента', [
+    Изменить свойства и права доступа к информационному блоку вы можете в <?= \yii\helpers\Html::a('Настройках контента', \skeeks\cms\helpers\UrlHelper::construct([
         '/cms/admin-cms-content/update', 'pk' => $content_id
-    ]); ?>.
+    ])->enableAdmin()->toString()); ?>.
 <? \yii\bootstrap\Alert::end(); ?>
 
