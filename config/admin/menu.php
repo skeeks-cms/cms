@@ -14,7 +14,7 @@ function contentMenu()
 {
     $result = [];
 
-    if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->orderBy("priority DESC")->all())
+    if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->orderBy("priority ASC")->all())
     {
         /**
          * @var $contentType \skeeks\cms\models\CmsContentType
@@ -41,6 +41,49 @@ function contentMenu()
             }
 
             $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
+        }
+    }
+
+    return $result;
+};
+
+/**
+ * Меню контента
+ * @return array
+ */
+function contentEditMenu()
+{
+    $result = [];
+
+    if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->orderBy("priority ASC")->all())
+    {
+        /**
+         * @var $contentType \skeeks\cms\models\CmsContentType
+         */
+        foreach ($contentTypes as $contentType)
+        {
+            $itemData = [
+                'code'      => "content-block-edit-" . $contentType->id,
+                'url'       => ["/cms/admin-cms-content-type/update", "pk" => $contentType->id],
+                'label'     => $contentType->name,
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+            ];
+
+            if ($contents = $contentType->cmsContents)
+            {
+                foreach ($contents as $content)
+                {
+                    $itemData['items'][] =
+                    [
+                        'label' => $content->name,
+                        'url'   => ["cms/admin-cms-content/update", "pk" => $content->id],
+
+                    ];
+                }
+            }
+
+
+            $result[] = $itemData;
         }
     }
 
@@ -155,6 +198,8 @@ return
                         "label"     => \Yii::t('app',"Content settings"),
                         "url"       => ["cms/admin-cms-content-type"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/content.png'],
+
+                        'items'     => contentEditMenu()
                     ],
 
                     [

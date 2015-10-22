@@ -94,7 +94,7 @@ class CmsContentType extends Core
      */
     public function getCmsContents()
     {
-        return $this->hasMany(CmsContent::className(), ['content_type' => 'code'])->orderBy("priority DESC")->andWhere(['active' => Cms::BOOL_Y]);
+        return $this->hasMany(CmsContent::className(), ['content_type' => 'code'])->orderBy("priority ASC")->andWhere(['active' => Cms::BOOL_Y]);
     }
 
 }
