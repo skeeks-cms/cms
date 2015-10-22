@@ -24,7 +24,7 @@ class CmsToolbarAsset extends AssetBundle
     [
         'toolbar/classes/window.js',
         'toolbar/classes/dialog.js',
-        'toolbar/classes/infoblock.js',
+        'toolbar/classes/edit-view-block.js',
         'toolbar/toolbar.js',
     ];
 
