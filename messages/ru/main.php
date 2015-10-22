@@ -473,4 +473,10 @@ return
     "Updated platforms"     => "Обновление платформы",
     "Additionally"          => "Дополнительно",
 
+    "Local storage"         => "Локальное хранилище",
+
+    "Superuser"             => "Суперпользователь",
+    "Unauthorized user"     => "Неавторизованный пользователь",
+    "Admin"                 => "Администратор",
+
 ];

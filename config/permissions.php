@@ -17,17 +17,17 @@ return [
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_ROOT,
-            'description'   => 'Суперпользователь',
+            'description'   => \Yii::t('app','Superuser'),
         ],
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_GUEST,
-            'description'   => 'Неавторизованный пользователь',
+            'description'   => \Yii::t('app','Unauthorized user'),
         ],
 
         [
             'name'          => \skeeks\cms\rbac\CmsManager::ROLE_ADMIN,
-            'description'   => 'Администратор',
+            'description'   => \Yii::t('app','Admin'),
 
             'child'         =>
             [

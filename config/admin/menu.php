@@ -334,7 +334,7 @@ return
                                  */
                                 $gii = \Yii::$app->getModule('gii');
 
-                                $ip = Yii::$app->getRequest()->getUserIP();
+                                $ip = \Yii::$app->getRequest()->getUserIP();
                                 foreach ($gii->allowedIPs as $filter) {
                                     if ($filter === '*' || $filter === $ip || (($pos = strpos($filter, '*')) !== false && !strncmp($ip, $filter, $pos))) {
                                         return true;
