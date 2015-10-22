@@ -26,7 +26,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <? endif; ?>
 <? endif; ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app','Main')); ?>
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
@@ -45,7 +45,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         </div>
     </div>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint("Этот параметр влияет на адрес страницы"); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('app',"This parameter affects the address of the page")); ?>
 
 <?= $form->fieldSetEnd()?>
 
@@ -53,7 +53,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
-<?= $form->fieldSet('Анонс'); ?>
+<?= $form->fieldSet(\Yii::t('app','Announcement')); ?>
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
     ); ?>
@@ -67,7 +67,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Подробно'); ?>
+<?= $form->fieldSet(\Yii::t('app','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -82,26 +82,26 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Разделы'); ?>
-    <?= $form->field($model, 'treeIds')->label('Разделы сайта')->widget(
+<?= $form->fieldSet(\Yii::t('app','Sections')); ?>
+    <?= $form->field($model, 'treeIds')->label(\Yii::t('app','Sections of the site'))->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
         [
             "attributeMulti" => "treeIds"
-        ])->hint('Укажите разделы сайт, где бы хотелось видеть эту публикацию');
+        ])->hint(\Yii::t('app','Specify sections of the site, which would like to see this publication'));
     ?>
 
 <?= $form->fieldSetEnd()?>
 
 
 
-<?= $form->fieldSet('SEO'); ?>
+<?= $form->fieldSet(\Yii::t('app','SEO')); ?>
     <?= $form->field($model, 'meta_title')->textarea(); ?>
     <?= $form->field($model, 'meta_description')->textarea(); ?>
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
 
-<?= $form->fieldSet('Изображения'); ?>
+<?= $form->fieldSet(\Yii::t('app','Images')); ?>
 
     <?= $form->field($model, 'images')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -110,7 +110,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd()?>
 
 
-<?= $form->fieldSet('Файлы'); ?>
+<?= $form->fieldSet(\Yii::t('app','Files')); ?>
 
     <?= $form->field($model, 'files')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -120,7 +120,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet('Дополнительно'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
         <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\CmsContent::find()->active()->all(),
             'id',

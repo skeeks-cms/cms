@@ -34,7 +34,7 @@ class NotSame
     {
         if (Validate::validate(new IsSame($this->_activeRecordForComparison), $activeRecord)->isValid())
         {
-            return $this->_bad("Сущьности одинковые");
+            return $this->_bad(\Yii::t('app',"Essence same"));
         }
 
         return $this->_ok();

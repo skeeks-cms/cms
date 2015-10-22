@@ -11,7 +11,7 @@ use common\models\User;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app','Main')); ?>
 
     <? if ($content_type = \Yii::$app->request->get('content_type')) : ?>
         <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
@@ -29,16 +29,16 @@ use common\models\User;
     <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Подписи'); ?>
+<?= $form->fieldSet(\Yii::t('app','Captions')); ?>
     <?= $form->field($model, 'name_one')->textInput(); ?>
     <?= $form->field($model, 'name_meny')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet('Свойства') ?>
+    <?= $form->fieldSet(\Yii::t('app','Properties')) ?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-            'label'             => "Свойства элементов",
-            'hint'              => "У каждого контента на сайте есть свой набор свойств, тут они и задаются",
+            'label'             => \Yii::t('app',"Element properties"),
+            'hint'              => \Yii::t('app',"Every content on the site has its own set of properties, its sets here"),
             'parentModel'       => $model,
             'relation'          => [
                 'content_id' => 'id'

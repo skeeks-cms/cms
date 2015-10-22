@@ -68,10 +68,10 @@ trait WidgetTrait
                 echo $widget->run();
                 return $widget;
             } else {
-                throw new InvalidCallException("Expecting end() of " . get_class($widget) . ", found " . get_called_class());
+                throw new InvalidCallException(\Yii::t('app','"Expecting end() of {widget}, found {class}',['widget' => get_class($widget) , 'class' => get_called_class()]));
             }
         } else {
-            throw new InvalidCallException("Unexpected " . get_called_class() . '::end() call. A matching begin() is not found.');
+            throw new InvalidCallException(\Yii::t('app',"Unexpected {class}::end() call. A matching begin() is not found.",['class' => get_called_class()]));
         }
     }
 

@@ -75,7 +75,7 @@ return [
 
         },
         'format' => 'raw',
-        'label' => 'Дополнительные разделы',
+        'label' => \Yii::t('app','Additional sections'),
     ],
 
     [
@@ -90,7 +90,7 @@ return [
 
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
                 'target' => '_blank',
-                'title' => 'Посмотреть на сайте (Откроется в новом окне)',
+                'title' => \Yii::t('app','Watch to site (opens new window)'),
                 'data-pjax' => '0',
                 'class' => 'btn btn-default btn-sm'
             ]);

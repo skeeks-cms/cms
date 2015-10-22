@@ -47,10 +47,10 @@ class HasBehavior
         {
             if ($component instanceof Object)
             {
-                return $this->_bad("Объект: " . $component->className() . " должен быть наследован от: " . Component::className());
+                return $this->_bad(\Yii::t('app',"Object: {class} must be inherited from: {parent}",['class' => $component->className(), 'parent' => ActiveRecord::className()]));
             } else
             {
-                return $this->_bad("Объект должен быть наследован от: " . Component::className());
+                return $this->_bad(\Yii::t('app',"The object must be inherited from").": " . Component::className());
             }
 
         }
@@ -70,7 +70,7 @@ class HasBehavior
             }
         }
 
-        return $this->_bad("У компонента: " . $component->className() . " необходимо наличие поведения: " . $this->_behavior);
+        return $this->_bad(\Yii::t('app',"At the component: {class} requires a behavior",['class' => $component->className()]).": " . $this->_behavior);
     }
 
 
