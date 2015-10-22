@@ -80,7 +80,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         'sort'              => [
             'defaultOrder' =>
             [
-                'priority' => SORT_DESC
+                'priority' => SORT_ASC
             ]
         ],
 

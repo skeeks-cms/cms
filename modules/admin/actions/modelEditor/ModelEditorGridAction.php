@@ -14,6 +14,7 @@ use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use yii\authclient\AuthAction;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\Application;
 use yii\web\ViewAction;
@@ -35,6 +36,11 @@ class ModelEditorGridAction extends AdminModelEditorAction
      * @var array
      */
     public $columns = [];
+
+    /**
+     * @var array
+     */
+    public $gridConfig = [];
 
     /**
      * @var callable
@@ -76,13 +82,30 @@ class ModelEditorGridAction extends AdminModelEditorAction
             $filter($dataProvider, \Yii::$app->request->queryParams);
         }
 
+
+        $gridConfig =
+        [
+            'dataProvider'      => $dataProvider,
+            'filterModel'       => $searchModel,
+            'adminController'   => $this->controller,
+            'columns'           => $this->columns,
+        ];
+
+        $gridConfig = ArrayHelper::merge($gridConfig, $this->gridConfig);
+
         $this->viewParams =
         [
             'searchModel'   => $searchModel,
             'dataProvider'  => $dataProvider,
             'controller'    => $this->controller,
             'columns'       => $this->columns,
+
+            'gridConfig' => $gridConfig
         ];
+
+
+
+
 
         return parent::run();
     }

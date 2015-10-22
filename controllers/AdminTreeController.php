@@ -75,7 +75,7 @@ class AdminTreeController extends AdminModelEditorController
     {
         $tree = new Tree();
 
-        $models = $tree->findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_DESC])->all();
+        $models = $tree->findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
 
         return
         [
@@ -189,7 +189,8 @@ class AdminTreeController extends AdminModelEditorController
 
             $post = \Yii::$app->request->post();
 
-            $ids = array_reverse(array_filter($post['ids']));
+            //$ids = array_reverse(array_filter($post['ids']));
+            $ids = array_filter($post['ids']);
 
             $priority = 100;
 

@@ -18,13 +18,13 @@
             var self = this;
             if (!ajaxQuery instanceof sx.classes._AjaxQuery)
             {
-                throw new Error('Передан неконнектный ajaxQuery объект');
+                throw new Error('Передан некорректный ajaxQuery объект');
             }
 
             opts = opts || {};
             opts.ajaxQuery = ajaxQuery;
 
-            this.applyParentMethod(sx.classes.Component, 'construct', [opts]); // TODO: make a workaround for magic parent calling
+            this.applyParentMethod(sx.classes.Component, 'construct', [opts]);
         },
 
         _init: function()

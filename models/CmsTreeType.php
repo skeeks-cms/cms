@@ -99,6 +99,6 @@ class CmsTreeType extends Core
      */
     public function getCmsTreeTypeProperties()
     {
-        return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])->orderBy(['priority' => SORT_DESC]);;
+        return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);;
     }
 }

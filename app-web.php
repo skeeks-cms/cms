@@ -13,4 +13,3 @@ $config = require(__DIR__ . '/bootstrap.php');
 //$config->appendDependency(Yii::getVersion()); //Так можно подмешать чего либо к сбросу кэша
 $application = new yii\web\Application($config->getResult());
 $application->run();
-

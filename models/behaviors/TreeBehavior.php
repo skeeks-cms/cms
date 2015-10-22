@@ -194,7 +194,7 @@ class TreeBehavior extends ActiveRecordBehavior
      */
 	public function findChildrens()
 	{
-		return $this->owner->find()->where([$this->pidAttrName => $this->owner->primaryKey])->orderBy(["priority" => SORT_DESC]);
+		return $this->owner->find()->where([$this->pidAttrName => $this->owner->primaryKey])->orderBy(["priority" => SORT_ASC]);
 	}
 
     /**
@@ -207,7 +207,7 @@ class TreeBehavior extends ActiveRecordBehavior
 
 		return $this->owner->find()
             ->andWhere(['like', $this->pidsAttrName, $pidString . '%', false])
-            ->orderBy(["priority" => SORT_DESC]);
+            ->orderBy(["priority" => SORT_ASC]);
 	}
 
 
@@ -476,13 +476,13 @@ class TreeBehavior extends ActiveRecordBehavior
      * @param string $field Название поля
      * @param bool $is_asc Упорядочивать ли по возрастанию
      */
-    public function recalculateChildrenPriorities($field = "name", $is_asc = false)
+    public function recalculateChildrenPriorities($field = "name", $is_asc = true)
     {
         //если второй аргумент - true, то сортируем по-возрастанию,
         //по-умолчанию - false: сортировка по-убыванию,
         //потому что как правило везде элементы сортируются по убыванию приоритета:
         //чем больше приоритет, тем выше элемент стоит в списке.
-        if($is_asc)
+        if ($is_asc)
         {
             $order = SORT_ASC;
         }

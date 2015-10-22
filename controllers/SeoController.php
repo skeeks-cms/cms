@@ -37,7 +37,7 @@ class SeoController extends Controller
     {
         ini_set("memory_limit","512M");
 
-        $trees = Tree::find()->where(['site_code' => \Yii::$app->cms->site->code])->orderBy(['level' => SORT_ASC, 'priority' => SORT_DESC])->all();
+        $trees = Tree::find()->where(['site_code' => \Yii::$app->cms->site->code])->orderBy(['level' => SORT_ASC, 'priority' => SORT_ASC])->all();
 
         if ($trees)
         {
@@ -62,7 +62,7 @@ class SeoController extends Controller
         $elements = CmsContentElement::find()
                     ->joinWith('cmsTree')
                     ->andWhere([Tree::tableName() . '.site_code' => \Yii::$app->cms->site->code])
-                    ->orderBy(['updated_at' => SORT_DESC, 'priority' => SORT_DESC])
+                    ->orderBy(['updated_at' => SORT_DESC, 'priority' => SORT_ASC])
                     ->all();
         //Добавление элементов в карту
         if ($elements)
