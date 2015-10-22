@@ -71,14 +71,6 @@
                     self.close();
                 }
             });
-
-            $('body').on('click', '.skeeks-cms-toolbar-edit-mode', function()
-            {
-                new sx.classes.toolbar.Dialog($(this).data('config-url'));
-                return false;
-            });
-
-
         },
 
 

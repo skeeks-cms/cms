@@ -18,13 +18,18 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
         </a>
     </div>
 
-    <div class="skeeks-cms-toolbar-block">
-        <a href="<?= UrlHelper::construct('')->enableAdmin()->toString(); ?>" title="Перейти в панель администрирования"><span class="label label-info">Администрирование</span></a>
-    </div>
+    <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS)) : ?>
+        <div class="skeeks-cms-toolbar-block">
+            <a href="<?= UrlHelper::construct('')->enableAdmin()->toString(); ?>" title="Перейти в панель администрирования"><span class="label label-info">Администрирование</span></a>
+        </div>
+    <? endif; ?>
 
-    <div class="skeeks-cms-toolbar-block">
-        <a onclick="new sx.classes.toolbar.Dialog('<?= $urlSettings; ?>'); return false;" href="<?= $urlSettings; ?>" title="Управление настройками проекта"><span class="label label-info">Настройки проекта</span></a>
-    </div>
+
+    <? if (\Yii::$app->user->can('cms/admin-settings')) : ?>
+        <div class="skeeks-cms-toolbar-block">
+            <a onclick="new sx.classes.toolbar.Dialog('<?= $urlSettings; ?>'); return false;" href="<?= $urlSettings; ?>" title="Управление настройками проекта"><span class="label label-info">Настройки проекта</span></a>
+        </div>
+    <? endif; ?>
 
     <div class="skeeks-cms-toolbar-block sx-profile">
         <a href="<?= $urlUserEdit; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlUserEdit; ?>'); return false;" title="Это вы, перейти к редактированию свох данных">
@@ -39,16 +44,16 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
     </div>
 
     <? if ($urlEditModel && $editModel) : ?>
-    <div class="skeeks-cms-toolbar-block">
-        <a href="<?= $urlEditModel; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlEditModel; ?>'); return false;" title="Редактировать">
-             <span class="label">Редактировать страницу</span>
-        </a>
-    </div>
+        <div class="skeeks-cms-toolbar-block">
+            <a href="<?= $urlEditModel; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlEditModel; ?>'); return false;" title="Редактировать текущую страницу">
+                 <span class="label">Редактировать</span>
+            </a>
+        </div>
     <? endif; ?>
 
     <div class="skeeks-cms-toolbar-block">
         <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditMode();" <?= \Yii::$app->cmsToolbar->isEditMode() ? "checked" : ""; ?>/>
-        <span>Режим редактирования</span>
+        <span>Редактирование виджетов</span>
     </div>
 
     <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.close(); return false;">›</span>
@@ -66,7 +71,6 @@ $this->registerJs(<<<JS
     (function(sx, $, _)
     {
         sx.Toolbar = new sx.classes.SkeeksToolbar({$clientOptionsJson});
-
     })(sx, sx.$, sx._);
 JS
 );

@@ -95,14 +95,15 @@ abstract class Widget extends Component implements ViewContextInterface
             $id = 'sx-infoblock-' . $this->getId();
 
             $this->getView()->registerJs(<<<JS
-new sx.classes.toolbar.Infoblock({'id' : '{$id}'});
+new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
 JS
 );
             return Html::tag('div', $pre . (string) $content,
             [
-                'class' => 'skeeks-cms-toolbar-edit-mode',
-                'id'    => $id,
-                'data' =>
+                'class'     => 'skeeks-cms-toolbar-edit-view-block',
+                'id'        => $id,
+                'title'     => "Двойной клик по блоку откроек окно управлния настройками",
+                'data'      =>
                 [
                     'id' => $this->getId(),
                     'config-url' => $this->getEditUrl()
