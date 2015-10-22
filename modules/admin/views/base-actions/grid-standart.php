@@ -13,9 +13,4 @@
 
 ?>
 
-<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider'      => $dataProvider,
-    'filterModel'       => $searchModel,
-    'adminController'   => $controller,
-    'columns'           => $columns,
-]); ?>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget($gridConfig); ?>

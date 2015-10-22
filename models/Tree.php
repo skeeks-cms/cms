@@ -470,7 +470,7 @@ class Tree extends Core
     public function getChildren()
     {
         $result = $this->hasMany($this->className(), ["pid" => "id"]);
-        $result->orderBy(["priority" => SORT_DESC]);
+        $result->orderBy(["priority" => SORT_ASC]);
 
         return $result;
     }
@@ -489,7 +489,7 @@ class Tree extends Core
                 ["{$tableName}.[[pid]]" => $this->pid],
                 ['<', "{$tableName}.[[priority]]", $this->priority],
             ])
-            ->orderBy(["{$tableName}.[[priority]]" => SORT_DESC])
+            ->orderBy(["{$tableName}.[[priority]]" => SORT_ASC])
             ->limit(1);
         $query->multiple = false;
         return $query;
@@ -538,7 +538,7 @@ class Tree extends Core
      */
 	public function findRoots()
 	{
-		return $this->owner->find()->where([$this->levelAttrName => 0])->orderBy(["priority" => SORT_DESC]);
+		return $this->owner->find()->where([$this->levelAttrName => 0])->orderBy(["priority" => SORT_ASC]);
 	}
 
     /**

@@ -32,7 +32,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public $site_codes                  = [];
 
     public $orderBy                     = "priority";
-    public $order                       = SORT_DESC;
+    public $order                       = SORT_ASC;
 
     public $enabledCurrentSite          = Cms::BOOL_Y;
 

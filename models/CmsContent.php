@@ -145,6 +145,6 @@ class CmsContent extends Core
      */
     public function getCmsContentProperties()
     {
-        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])->orderBy(['priority' => SORT_DESC]);
+        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 }

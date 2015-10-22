@@ -32,7 +32,7 @@ use common\models\User;
         'sort'              => [
             'defaultOrder' =>
             [
-                'priority' => SORT_DESC
+                'priority' => SORT_ASC
             ]
         ],
 

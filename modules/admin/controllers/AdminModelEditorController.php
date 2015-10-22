@@ -473,11 +473,11 @@ class AdminModelEditorController extends AdminController
 
             if ($keys = \Yii::$app->request->post('keys'))
             {
-                $counter = count($keys);
+                //$counter = count($keys);
 
-                foreach ($keys as $key)
+                foreach ($keys as $counter => $key)
                 {
-                    $priority = $counter * 1000;
+                    $priority = ($counter + 1) * 1000;
 
                     $modelClassName = $this->modelClassName;
                     $model = $modelClassName::findOne($key);
@@ -487,7 +487,7 @@ class AdminModelEditorController extends AdminController
                         $model->save(false);
                     }
 
-                    $counter = $counter - 1;
+                    //$counter = $counter - 1;
                 }
             }
 
