@@ -542,4 +542,10 @@ return
     "Users settings"        => "Настройки пользователей",
     "Clearing cache"        => "Чистка кэша",
     "Remove{s}Recovery"     => "Удаление{s}Восстановление",
+    "Default Section"       => "Раздел по умолчанию",
+    "Root Section"          => "Корневой раздел",
+    "Link to section"          => "Привязка к разделам",
+    "Is Allow Change Default Section"          => "Разрешено менять раздел заданный по умолчанию",
+    "If it is set to the root partition, the elements can be tied to him and his sub."          => "Если будет задан коревой раздел, то элементы можно будет привязывать к нему и его подразделам.",
+    "The name of the template to draw the elements of this type will be the same as the name of the code."     => "Название шаблон для отрисовки элементов данного типа, будет совпадать с названием этого кода.",
 ];

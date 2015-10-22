@@ -21,9 +21,12 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <? if ($model->isNewRecord) : ?>
     <? if ($content_id = \Yii::$app->request->get("content_id")) : ?>
+        <? $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id); ?>
         <? $model->content_id = $content_id; ?>
         <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
     <? endif; ?>
+<? else : ?>
+    <? $contentModel = $model->cmsContent; ?>
 <? endif; ?>
 
 <?= $form->fieldSet(\Yii::t('app','Main')); ?>
@@ -83,12 +86,42 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd() ?>
 
 <?= $form->fieldSet(\Yii::t('app','Sections')); ?>
-    <?= $form->field($model, 'treeIds')->label(\Yii::t('app','Sections of the site'))->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-        [
-            "attributeMulti" => "treeIds"
-        ])->hint(\Yii::t('app','Specify sections of the site, which would like to see this publication'));
-    ?>
+
+
+    <? if ($contentModel->root_tree_id) : ?>
+
+        <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
+            <?= $form->fieldSelect($model, 'tree_id', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name'), [
+                    'allowDeselect' => true
+                ]
+            );
+            ?>
+        <? endif; ?>
+
+        <?= $form->fieldSelectMulti($model, 'treeIds', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name')
+            );
+        ?>
+
+    <? else : ?>
+        <?
+            $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_COMBO;
+            if ($contentModel->is_allow_change_tree != \skeeks\cms\components\Cms::BOOL_Y)
+            {
+                $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI;
+            }
+        ?>
+        <?= $form->field($model, 'treeIds')->label(\Yii::t('app','Sections of the site'))->widget(
+            \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+            [
+                "attributeMulti" => "treeIds",
+                "mode" => $mode
+            ])->hint(\Yii::t('app','Specify sections of the site, which would like to see this publication'));
+        ?>
+    <? endif; ?>
+
+
 
 <?= $form->fieldSetEnd()?>
 

@@ -22,11 +22,28 @@ use common\models\User;
     <? endif; ?>
 
     <?= $form->field($model, 'name')->textInput(); ?>
-    <?= $form->field($model, 'code')->textInput(); ?>
+    <?= $form->field($model, 'code')->textInput()
+        ->hint(\Yii::t('app', 'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 
+
+
     <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('app', 'Link to section')
+    ]); ?>
+
+    <?= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+        'allowDeselect' => true
+    ]); ?>
+    <?= $form->fieldRadioListBoolean($model, 'is_allow_change_tree'); ?>
+
+
+    <?= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+        'allowDeselect' => true
+    ])->hint(\Yii::t('app', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('app','Captions')); ?>
