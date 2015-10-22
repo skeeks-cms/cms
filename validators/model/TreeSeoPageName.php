@@ -60,7 +60,7 @@ class TreeSeoPageName
 
         if ($find)
         {
-            return $this->_bad("Название " . $seoPageName  . " уже занято");
+            return $this->_bad(\Yii::t('app','{seoname} name is already used',['seoname' => $seoPageName]));
         }
 
         return $this->_ok();

@@ -26,10 +26,10 @@ class NotNewRecord
     {
         if (!$component instanceof ActiveRecord)
         {
-            return $this->_bad("Объект: " . $component->className() . " должен быть наследован от: " . ActiveRecord::className());
+            return $this->_bad(\Yii::t('app',"Object: {class} must be inherited from: {parent}",['class' => $component->className(), 'parent' => ActiveRecord::className()]));
         }
 
-        return !$component->isNewRecord ? $this->_ok() : $this->_bad("Объект должет быть уже сохранен");
+        return !$component->isNewRecord ? $this->_ok() : $this->_bad(\Yii::t('app',"The object must already be saved"));
     }
 
 

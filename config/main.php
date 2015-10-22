@@ -64,9 +64,9 @@ $config =
                 [
                     'class'                 => 'skeeks\cms\components\storage\ClusterLocal',
 
-                    "name"                  => "Локальное хранилище",
+                    "name"                  => \Yii::t('app',"Local storage"),
                     "publicBaseUrl"         => "/uploads/all",
-                    "rootBasePath"          =>  Yii::getAlias("@frontend/web/uploads/all"),
+                    "rootBasePath"          =>  \Yii::getAlias("@frontend/web/uploads/all"),
                 ]
             ],
         ],

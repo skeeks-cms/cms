@@ -15,6 +15,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\helpers\Tree;
 use skeeks\cms\models\User;
+use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
@@ -294,7 +295,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
         //\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS) version > 2.0.13
         if (\Yii::$app->user->can(CmsManager::PERMISSION_CONTROLL_PANEL))
         {
-            if (!\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
+            if (!\Yii::$app->cms->moduleAdmin()->requestIsAdmin() && (!\Yii::$app->controller instanceof AdminController) )
             {
                 return true;
             }

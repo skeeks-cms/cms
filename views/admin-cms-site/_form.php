@@ -12,14 +12,14 @@ use skeeks\cms\models\Tree;
 <?php $form = ActiveForm::begin(); ?>
 
 
-<?= $form->fieldSet("Основное"); ?>
+<?= $form->fieldSet(\Yii::t('app',"Main")); ?>
 
     <?= $form->field($model, 'code')->textInput(); ?>
 
 
     <? if ($model->def === \skeeks\cms\components\Cms::BOOL_Y): ?>
-        <?= $form->field($model, 'active')->hiddenInput()->hint('Сайт выбранный по умолчанию всегда активный'); ?>
-        <?= $form->field($model, 'def')->hiddenInput()->hint('Этот сайт выбран сайтом по умолчанию. Если вы хотите изменить это, вам нужно выбрать другой сайт, сайтом по умолчанию.'); ?>
+        <?= $form->field($model, 'active')->hiddenInput()->hint(\Yii::t('app','Site selected by default always active')); ?>
+        <?= $form->field($model, 'def')->hiddenInput()->hint(\Yii::t('app','This site is the site selected by default. If you want to change it, you need to choose a different site, the default site.')); ?>
     <? else : ?>
         <?= $form->fieldRadioListBoolean($model, 'active'); ?>
         <?= $form->fieldRadioListBoolean($model, 'def'); ?>
@@ -27,11 +27,7 @@ use skeeks\cms\models\Tree;
 
 
     <?= $form->field($model, 'name')->textarea(); ?>
-    <?= $form->fieldSelect($model, 'lang_code', \yii\helpers\ArrayHelper::map(
-        \skeeks\cms\models\CmsLang::find()->active()->all(),
-        'code',
-        'name'
-    )); ?>
+
 
     <?= $form->field($model, 'description')->textarea(); ?>
     <?= $form->field($model, 'server_name')->textInput(['maxlength' => 255]) ?>
@@ -40,7 +36,7 @@ use skeeks\cms\models\Tree;
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet("Домены"); ?>
+    <?= $form->fieldSet(\Yii::t('app',"Domains")); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => "",

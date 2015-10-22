@@ -50,7 +50,7 @@ trait HasComponentDbSettingsTrait
 
         } catch (\Exception $e)
         {
-            \Yii::error('Cms component error load defaul settings: ' . $e->getMessage());
+            \Yii::error(\Yii::t('app','{cms} component error load defaul settings',['cms' => 'Cms']).': ' . $e->getMessage());
         }
 
         return $this;

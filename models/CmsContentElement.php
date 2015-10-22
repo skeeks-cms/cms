@@ -165,11 +165,12 @@ class CmsContentElement extends RelatedElementModel
             'meta_description' => Yii::t('app', 'Meta Description'),
             'description_short_type' => Yii::t('app', 'Description Short Type'),
             'description_full_type' => Yii::t('app', 'Description Full Type'),
-            'image_id' => Yii::t('app', 'Main Image (preview)'),
+            'image_id' => Yii::t('app', 'Main Image (announcement)'),
             'image_full_id' => Yii::t('app', 'Main Image'),
 
             'images' => Yii::t('app', 'Images'),
             'files' => Yii::t('app', 'Files'),
+            'treeIds' => Yii::t('app', 'Sections'),
         ]);
     }
 
@@ -196,6 +197,13 @@ class CmsContentElement extends RelatedElementModel
             ['description_full_type', 'string'],
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
+            ['tree_id', 'default', 'value' => function()
+            {
+                if ($this->cmsContent->defaultTree)
+                {
+                    return $this->cmsContent->defaultTree->id;
+                }
+            }],
 
 
         ]);

@@ -50,6 +50,6 @@ class HasBehaviorsOr
             }
         }
 
-        return $this->_bad('Ни одного поведения нет');
+        return $this->_bad(\Yii::t('app','No behavior'));
     }
 }
