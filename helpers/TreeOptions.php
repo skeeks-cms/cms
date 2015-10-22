@@ -41,9 +41,13 @@ class TreeOptions extends \skeeks\cms\models\Tree
      * @param array $tree
      * @return array
      */
-    public function getMultiOptions()
+    public function getMultiOptions($includeSelf = true)
     {
         $this->_tmpResult = [];
+        if (!$this->isNewRecord && $includeSelf)
+        {
+            $this->_tmpResult[$id] = $this;
+        }
         return $this->_buildTreeArrayRecursive($this, $this->_filter);
     }
 

@@ -170,6 +170,7 @@ class CmsContentElement extends RelatedElementModel
 
             'images' => Yii::t('app', 'Images'),
             'files' => Yii::t('app', 'Files'),
+            'treeIds' => Yii::t('app', 'Sections'),
         ]);
     }
 
@@ -196,6 +197,13 @@ class CmsContentElement extends RelatedElementModel
             ['description_full_type', 'string'],
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
+            ['tree_id', 'default', 'value' => function()
+            {
+                if ($this->cmsContent->defaultTree)
+                {
+                    return $this->cmsContent->defaultTree->id;
+                }
+            }],
 
 
         ]);
