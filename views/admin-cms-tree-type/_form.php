@@ -12,7 +12,7 @@ use common\models\User;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app','Main')); ?>
 
 
     <?= $form->field($model, 'name')->textInput(); ?>
@@ -23,16 +23,16 @@ use common\models\User;
     <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Подписи'); ?>
+<?= $form->fieldSet(\Yii::t('app','Captions')); ?>
     <?= $form->field($model, 'name_one')->textInput(); ?>
     <?= $form->field($model, 'name_meny')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet('Свойства элементов') ?>
+    <?= $form->fieldSet(\Yii::t('app','Element properties')) ?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-            'label'             => "Свойства элементов",
-            'hint'              => "У каждого контента на сайте есть свой набор свойств, тут они и задаются",
+            'label'             => \Yii::t('app','Element properties'),
+            'hint'              => \Yii::t('app','Every content on the site has its own set of properties, its sets here'),
             'parentModel'       => $model,
             'relation'          => [
                 'tree_type_id' => 'id'

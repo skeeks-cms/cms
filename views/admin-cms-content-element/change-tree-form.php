@@ -20,6 +20,6 @@ $model = new \skeeks\cms\models\CmsContentElement();
         'class' => 'alert-warning',
     ],
 ])?>
-    <p>Внимание! Для отмеченных элементов будет задан новый основной раздел.</p>
-    <p>Это приведет к изменению страницы записи, и она перестанет быть доступной по старому адресу.</p>
+    <p><?=\Yii::t('app','Attention! For checked items will be given a new primary section.')?></p>
+    <p><?=\Yii::t('app','This will alter the page record, and it will cease to be available at the old address.')?></p>
 <? \yii\bootstrap\Alert::end(); ?>

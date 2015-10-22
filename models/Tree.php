@@ -198,7 +198,7 @@ class Tree extends Core
             'description_full' => Yii::t('app', 'Description Full'),
             'description_short_type' => Yii::t('app', 'Description Short Type'),
             'description_full_type' => Yii::t('app', 'Description Full Type'),
-            'image_id' => Yii::t('app', 'Main Image (preview)'),
+            'image_id' => Yii::t('app', 'Main Image (announcement)'),
             'image_full_id' => Yii::t('app', 'Main Image'),
             'images' => Yii::t('app', 'Images'),
             'files' => Yii::t('app', 'Files'),
