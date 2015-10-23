@@ -16,15 +16,15 @@
 
 
     <div class="sx-box sx-mb-10 sx-p-10">
-        <p>Этот компонент может иметь персональные настройки для каждого пользователя. И работает по разному в зависимости от того, для какого пользователя он запускается.</p>
-        <p>В том случае если пользователь не имеет персональных настроек, будут использоваться настройки по умолчанию.</p>
+        <p><?=\Yii::t('app','This component may have personal preferences for each user. And it works differently depending on which of the sites is displayed.')?></p>
+        <p><?=\Yii::t('app','In that case, if user not has personal settings will be used the default settings.')?></p>
         <? if ($settings = \skeeks\cms\models\CmsComponentSettings::baseQueryUsers($component)->count()) : ?>
-            <p><b>Количество настроенных пользователей:</b> <?= $settings; ?></p>
+            <p><b><?=\Yii::t('app','Number of customized users')?>:</b> <?= $settings; ?></p>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeUsers(); return false;">
-                <i class="glyphicon glyphicon-remove"></i> сбросить настройки для всех пользователей
+                <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('app','Reset settings for all users')?>
             </button>
         <? else: ?>
-            <small>Ни один пользователь, еще не имеет персональных настроек для этого компонента</small>
+            <small><?=\Yii::t('app','Neither user does not have personal settings for this component')?></small>
         <? endif; ?>
     </div>
 
@@ -45,7 +45,7 @@
                     \skeeks\cms\helpers\UrlHelper::constructCurrent()->setRoute('cms/admin-component-settings/user')->set('user_id', $model->id)->toString(),
                     [
                         'class' => 'btn btn-default btn-xs',
-                        'title' => 'Настроить'
+                        'title' => \Yii::t('app','Customize')
                     ]);
                 },
 

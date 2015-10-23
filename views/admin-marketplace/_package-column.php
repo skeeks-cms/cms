@@ -26,7 +26,7 @@
         </a>
     </h3>
     <p>
-        <a data-pjax="0" href="<?= $model->getPackagistUrl(); ?>" class="btn btn-default btn-xs" target="_blank" title="Посмотреть на Packagist.org (откроется в новом окне)">
+        <a data-pjax="0" href="<?= $model->getPackagistUrl(); ?>" class="btn btn-default btn-xs" target="_blank" title="<?=\Yii::t('app','Watch to {site} (opens in new window)',['site' => 'Packagist.org'])?>">
             <?= $model->packagistCode; ?>
             <i class="glyphicon glyphicon-search"></i>
         </a>
@@ -34,6 +34,6 @@
     </p>
 
     <p>
-        <a data-pjax="0" href="<?= $model->url; ?>" class="btn btn-default btn-primary" target="_blank" title="Посмотреть на Маркетплейс (откроется в новом окне)"><i class="glyphicon glyphicon-shopping-cart"></i> Маркетплейс</a>
+        <a data-pjax="0" href="<?= $model->url; ?>" class="btn btn-default btn-primary" target="_blank" title="<?=\Yii::t('app','Watch to {site} (opens in new window)',['site' => \Yii::t('app','Marketplace')])?>"><i class="glyphicon glyphicon-shopping-cart"></i> <?=\Yii::t('app','Marketplace')?></a>
     </p>
 </div>

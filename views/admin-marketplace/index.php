@@ -27,7 +27,7 @@ foreach ($models as $name => $model)
 if (CmsExtension::$coreExtensions)
 {
     $items[] = [
-        'label' => '<i class="glyphicon glyphicon-info-sign"></i> Ядро SkeekS CMS',
+        'label' => '<i class="glyphicon glyphicon-info-sign"></i> '.\Yii::t('app','Core {cms}',['cms' => 'SkeekS CMS']),
         'encode' => false,
         'content' => $this->render('_table-extensions', [
             'models' => CmsExtension::$coreExtensions,

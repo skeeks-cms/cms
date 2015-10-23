@@ -473,7 +473,7 @@ return
     "Marketplace"           => "Маркетплейс",
     "Catalog"               => "Каталог",
     "Installed"             => "Установленные",
-    "Install{s}Remove"      => "Установить{s}Удалить",
+    "Install{s}Delete"      => "Установить{s}Удалить",
     "Updated platforms"     => "Обновление платформы",
     "Additionally"          => "Дополнительно",
 
@@ -573,5 +573,32 @@ return
     "reset settings for all sites" => "сбросить настройки для всех сайтов",
     "Neither site does not have personal settings for this component" => "Ни один сайт, еще не имеет персональных настроек для этого компонента",
     "Customize"             => "Настроить",
+
+    "User settings"         => "Настройки пользователя",
+    "Reset settings for this user" => "сбросить настройки для этого пользователя",
+
+    "This component may have personal preferences for each user. And it works differently depending on which of the sites is displayed." => "Этот компонент может иметь персональные настройки для каждого пользователя. И работает по разному в зависимости от того, для какого пользователя он запускается.",
+    "In that case, if user not has personal settings will be used the default settings." => "В том случае если пользователь не имеет персональных настроек, будут использоваться настройки по умолчанию.",
+    "Number of customized users" => "Количество настроенных пользователей",
+    "Reset settings for all users" => "сбросить настройки для всех пользователей",
+    "Neither user does not have personal settings for this component" => "Ни один пользователь, еще не имеет персональных настроек для этого компонента",
+
+    "Watch to site (opens in new window)" => "Посмотреть на {site} (откроется в новом окне)",
+
+    "The extension is not found" => "Расширение не найдено",
+    "You can choose the suitable solution for your project and install it." => "Вы можете выбрать подходящее решение для вашего проекта и установить его.",
+    "Future versions will be integrated {market} here. For now, simply click the link below." => "В следующих версиях {market} будет интегрирован сюда. А пока, просто перейдите по ссылке ниже.",
+    "catalog of available solutions" => "каталог доступных решений",
+    "Installed version"     => "Установлена версия",
+    "Install"               => "Установить",
+    "Photos and screenshots" => "Фото и скриншоты",
+    "Installation"          => "Установка",
+    "To install the module, you must run the standard installation." => "Для установки модуля необходимо запустить стандартную установку.",
+    "Support"               => "Поддержка",
+    "The developer did not leave a contact for communication with them. But you can always turn to the {cms} developers" => "Разработчик не оставил контактов для связи с ним. Но вы всегда можете обратиться к разработчикам {cms}",
+    "Demo"                  => "Демо",
+    "Development process"   => "Процесс разработки",
+    "For developer"         => "Для разработчика",
+    "Core {cms}"            => "Ядро {cms}",
 
 ];
