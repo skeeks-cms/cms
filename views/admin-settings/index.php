@@ -25,6 +25,9 @@
         'value' => $component->className()
     ])
     ?>
+    <? if (\Yii::$app->admin->isEmptyLayout()) : ?>
+        <input type="hidden" name="<?= \skeeks\cms\helpers\UrlHelper::SYSTEM_CMS_NAME; ?>[<?= \skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT?>]" value="true" />
+    <? endif; ?>
 </form>
 <hr />
 <iframe data-src="<?= $component->getEditUrl(); ?>" width="100%;" height="200px;" id="sx-test">
