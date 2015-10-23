@@ -568,4 +568,5 @@ return
     "reset settings for all sites" => "сбросить настройки для всех сайтов",
     "Neither site does not have personal settings for this component" => "Ни один сайт, еще не имеет персональных настроек для этого компонента",
     "Customize"             => "Настроить",
+
 ];
