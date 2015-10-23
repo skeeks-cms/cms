@@ -51,7 +51,13 @@ class ViewModelActionTree extends ViewModelAction
         {
             if ($this->model->treeType)
             {
-                $this->view = $this->model->treeType->code;
+                if ($this->model->treeType->viewFile)
+                {
+                    $this->view = $this->model->treeType->viewFile;
+                } else
+                {
+                    $this->view = $this->model->treeType->code;
+                }
             }
         }
 

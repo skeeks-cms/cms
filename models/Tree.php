@@ -229,7 +229,13 @@ class Tree extends Core
         {
             if ($this->parent)
             {
-                $this->tree_type_id = $this->parent->tree_type_id;
+                if ($this->parent->treeType->defaultChildrenTreeType)
+                {
+                    $this->tree_type_id = $this->parent->treeType->defaultChildrenTreeType->id;
+                } else
+                {
+                    $this->tree_type_id = $this->parent->tree_type_id;
+                }
             }
         }
 

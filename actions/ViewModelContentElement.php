@@ -40,7 +40,13 @@ class ViewModelContentElement extends ViewModelAction
         {
             if ($this->model->cmsContent)
             {
-                $this->view = $this->model->cmsContent->code;
+                if ($this->model->cmsContent->viewFile)
+                {
+                    $this->view = $this->model->cmsContent->viewFile;
+                } else
+                {
+                    $this->view = $this->model->cmsContent->code;
+                }
             }
         }
 

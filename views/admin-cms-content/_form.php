@@ -24,6 +24,11 @@ use common\models\User;
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput()
         ->hint(\Yii::t('app', 'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
+
+    <?= $form->field($model, 'viewFile')->textInput()
+        ->hint(\Yii::t('app', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
+
+
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 

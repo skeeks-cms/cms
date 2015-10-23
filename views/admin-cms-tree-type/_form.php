@@ -16,11 +16,21 @@ use common\models\User;
 
 
     <?= $form->field($model, 'name')->textInput(); ?>
-    <?= $form->field($model, 'code')->textInput(); ?>
+    <?= $form->field($model, 'code')
+        ->hint(\Yii::t('app', 'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
+
+    <?= $form->field($model, 'viewFile')->textInput()
+            ->hint(\Yii::t('app', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
+
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
+
+    <?= $form->fieldSelect($model, 'default_children_tree_type', \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'), [
+            'allowDeselect' => true
+        ])->hint(\Yii::t('app', 'If this parameter is not specified, the child partition is created of the same type as the current one.')); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('app','Captions')); ?>

@@ -11,6 +11,7 @@ use skeeks\cms\models\CmsTreeType;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -52,6 +53,15 @@ class AdminCmsTreeTypeController extends AdminModelEditorController
                     "columns" => [
                         'name',
                         'code',
+
+                        [
+                            'class'         => DataColumn::className(),
+                            'label'         => \Yii::t('app', 'Number of sections'),
+                            'value'     => function(CmsTreeType $cmsTreeType)
+                            {
+                                return $cmsTreeType->getCmsTrees()->count();
+                            }
+                        ],
 
                         [
                             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
