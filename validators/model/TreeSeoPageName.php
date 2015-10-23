@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms\validators\model;
 
-use skeeks\cms\models\behaviors\TreeBehavior;
 use skeeks\cms\models\Tree;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
@@ -27,10 +26,9 @@ class TreeSeoPageName
      */
     protected $_model = null;
 
-    public function __construct($model)
+    public function __construct(Tree $model)
     {
         //Модель должна обладать поведением Tree
-        Validate::ensure(new HasBehavior(TreeBehavior::className()), $model);
         $this->_model = $model;
     }
 
@@ -52,8 +50,8 @@ class TreeSeoPageName
                 return $this->_ok();
             }
 
-            $find   = $parent->findChildrens()->where([
-                $this->_model->pageAttrName => $seoPageName,
+            $find   = $parent->getChildren()->where([
+                "code" => $seoPageName,
                 'pid' => $this->_model->pid
             ])->one();
         }

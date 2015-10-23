@@ -62,7 +62,7 @@ class TreeOptions extends \skeeks\cms\models\Tree
     private function _buildTreeArrayRecursive($model, $filter)
     {
         $is_filter_set = !empty($filter);
-        $childs = $model->findChildrens()->all();
+        $childs = $model->getChildren()->all();
 
         foreach ($childs as $child)
         {

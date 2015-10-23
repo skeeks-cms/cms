@@ -179,7 +179,7 @@ class Tree
 
             if ($isOpen && $model->children)
             {
-                $child = $this->renderNodes($model->findChildrens()->all());
+                $child = $this->renderNodes($model->children);
             }
 
 

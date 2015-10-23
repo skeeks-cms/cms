@@ -159,7 +159,7 @@ class UrlRuleTree
                 }, null, $dependency);*/
 
                 $treeNode = Tree::find()->where([
-                    (new Tree())->dirAttrName       => $normalizeDir,
+                    "dir"                           => $normalizeDir,
                     "site_code"                     => \Yii::$app->cms->site->code,
                 ])->one();
             }

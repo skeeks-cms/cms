@@ -163,7 +163,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 {
                     if ($this->enabledCurrentTreeChildAll)
                     {
-                        if ($childrens = $tree->findChildrensAll()->all())
+                        if ($childrens = $tree->children)
                         {
                             foreach ($childrens as $chidren)
                             {
@@ -172,7 +172,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         }
                     } else
                     {
-                        if ($childrens = $tree->findChildrens()->all())
+                        if ($childrens = $tree->children)
                         {
                             foreach ($childrens as $chidren)
                             {

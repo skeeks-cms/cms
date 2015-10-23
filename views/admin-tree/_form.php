@@ -12,8 +12,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <div class="row">
         <div class="col-md-12">
             <div class="pull-left">
-                <? if ($model->parentTrees) : ?>
-                    <? foreach ($model->parentTrees as $tree) : ?>
+                <? if ($model->parents) : ?>
+                    <? foreach ($model->parents as $tree) : ?>
                         <a href="<?= $tree->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
                             <?= $tree->name ?>
                             <? if ($tree->level == 0) : ?>

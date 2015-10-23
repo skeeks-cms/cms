@@ -73,9 +73,7 @@ class AdminTreeController extends AdminModelEditorController
 
     public function indexData()
     {
-        $tree = new Tree();
-
-        $models = $tree->findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
+        $models = Tree::findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
 
         return
         [

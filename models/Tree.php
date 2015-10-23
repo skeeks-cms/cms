@@ -11,6 +11,11 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\validators\db\IsNewRecord;
+use skeeks\cms\validators\db\NotNewRecord;
+use skeeks\cms\validators\db\NotSame;
+use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
+use skeeks\cms\validators\model\TreeSeoPageName;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
@@ -24,8 +29,12 @@ use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
+use skeeks\sx\validate\Validate;
+use skeeks\sx\validators\ChainAnd;
 use Yii;
+use yii\base\Event;
 use yii\db\ActiveQuery;
+use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -90,8 +99,6 @@ use yii\helpers\Url;
  */
 class Tree extends Core
 {
-    use TreeBehaviorTrait;
-    use HasUrlTrait;
     use HasRelatedPropertiesTrait;
 
     /**
@@ -103,6 +110,7 @@ class Tree extends Core
     }
 
     const PRIORITY_STEP = 100; //Шаг приоритета
+    const PIDS_DELIMETR = "/"; //Шаг приоритета
 
 
     public function behaviors()
@@ -123,17 +131,19 @@ class Tree extends Core
                 'relations'     => ['images', 'files']
             ],
 
-            TreeBehavior::className() =>
-            [
-                'class' => TreeBehavior::className()
-            ],
-
             Implode::className() =>
             [
                 'class' => Implode::className(),
                 "fields" =>  [
                     "tree_menu_ids"
                 ]
+            ],
+
+            "implode_tree" =>
+            [
+                'class' => Implode::className(),
+                "fields" =>  ["pids"],
+                "delimetr" => self::PIDS_DELIMETR,
             ],
 
             HasRelatedProperties::className() =>
@@ -149,11 +159,63 @@ class Tree extends Core
     {
         parent::init();
 
-        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'checksBeforeSave']);
-        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'checksBeforeSave']);
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'beforeSaveTree']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'beforeSaveTree']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'afterUpdateTree']);
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'beforeDeleteTree']);
+        $this->on(self::EVENT_AFTER_DELETE, [$this, 'afterDeleteTree']);
     }
 
-    public function checksBeforeSave($event)
+
+    /**
+     * Если есть дети для начала нужно удалить их всех
+     * @param Event $event
+     * @throws \Exception
+     */
+    public function beforeDeleteTree(Event $event)
+    {
+        if ($this->children)
+        {
+            foreach ($this->children as $childNode)
+            {
+                $childNode->delete();
+            }
+        }
+    }
+
+    /**
+     * После удаления нужно родителя пересчитать
+     * @param Event $event
+     */
+    public function afterDeleteTree(Event $event)
+    {
+        if ($this->parent)
+        {
+            $this->parent->processNormalize();
+        }
+    }
+
+    /**
+     * Изменился код
+     * @param AfterSaveEvent $event
+     */
+    public function afterUpdateTree(AfterSaveEvent $event)
+    {
+        if ($event->changedAttributes)
+        {
+            //Если изменилось название seo_page_name
+            if (isset($event->changedAttributes['code']))
+            {
+                $event->sender->processNormalize();
+            }
+        }
+    }
+
+    /**
+     * Проверки и дополнения перед сохранением раздела
+     * @param $event
+     */
+    public function beforeSaveTree($event)
     {
         if (!$this->site_code)
         {
@@ -170,7 +232,21 @@ class Tree extends Core
                 $this->tree_type_id = $this->parent->tree_type_id;
             }
         }
+
+
+        //Если не заполнено название, нужно сгенерить
+        if (!$this->name)
+        {
+            $this->generateName();
+        }
+
+        if (!$this->code)
+        {
+            $this->generateCode();
+        }
     }
+
+
 
     /**
      * @inheritdoc
@@ -237,31 +313,15 @@ class Tree extends Core
 
 
     /**
-     * @return string
+     *
+     * Корневые разделы дерева.
+     *
+     * @return ActiveQuery
      */
-    /*public function getUrl()
-    {
-        if ($this->redirect)
-        {
-            return $this->redirect;
-        }
-
-        if ($this->site)
-        {
-            if ($this->getDir())
-            {
-                return $this->site->url . DIRECTORY_SEPARATOR . $this->dir . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
-            } else {
-                return $this->site->url;
-            }
-        } else {
-            if ($this->dir) {
-                return \Yii::$app->request->getHostInfo() . DIRECTORY_SEPARATOR . $this->dir . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
-            } else {
-                return \Yii::$app->request->getHostInfo();
-            }
-        }
-    }*/
+	static public function findRoots()
+	{
+		return static::find()->where(['level' => 0])->orderBy(["priority" => SORT_ASC]);
+	}
 
 
     /**
@@ -278,6 +338,13 @@ class Tree extends Core
     }
 
 
+    /**
+     * @return string
+     */
+    public function getAbsoluteUrl()
+    {
+        return $this->url;
+    }
 
     /**
      * @return CmsSite
@@ -404,6 +471,8 @@ class Tree extends Core
 
 
 
+
+
         //Работа с деревом
 
     /**
@@ -440,14 +509,6 @@ class Tree extends Core
             ->andWhere(["{$tableName}.[[" . $this->primaryKey()[0] . "]]" => $id]);
         $query->multiple = false;
         return $query;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRoot()
-    {
-        return (bool) ($this->level == 0);
     }
 
     /**
@@ -522,102 +583,231 @@ class Tree extends Core
 
 
 
+        //Манипуляции с деревом
 
-
-
-
-
-
-
-
-    //TODO: is depricated 2.3.3
 
     /**
-     *
-     * Корневые разделы дерева.
-     *
-     * @return ActiveQuery
+     * Автоматическая генерация названия раздела
+     * @return $this
      */
-	public function findRoots()
-	{
-		return $this->owner->find()->where(['level' => 0])->orderBy(["priority" => SORT_ASC]);
-	}
-
-    /**
-     * Эта страница является ссылкой?
-     *
-     * @return bool
-     */
-    public function isLink()
+    public function generateName()
     {
-        return (bool) ($this->redirect);
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getParentTree()
-    {
-        return $this->hasOne(static::className(), ['id' => 'pid']);
+        $lastTree = $this->find()->orderBy(["id" => SORT_DESC])->one();
+        $this->setAttribute("name", "pk-" . $lastTree->primaryKey);
+
+        return $this;
     }
 
     /**
-     * @return array
+     * Автоматическая генерация code по названию
+     * @return $this
      */
-    public function getParentTrees()
+    public function generateCode()
     {
-        if ($parents = $this->findParents())
+        if ($this->isRoot())
         {
-            return $parents->all();
+            $this->setAttribute("code", null);
+        } else
+        {
+            $filter     = new FilterSeoPageName();
+            $newName    = $filter->filter($this->name);
+
+            if (Validate::validate(new TreeSeoPageName($this), $newName)->isInvalid())
+            {
+                $newName    = $filter->filter($newName . "-" . substr(md5(uniqid() . time()), 0, 4));
+
+                if (!Validate::validate(new TreeSeoPageName($this), $newName)->isValid())
+                {
+                    $this->generateName();
+                }
+            }
+
+            $this->setAttribute("code", $newName);
         }
 
-        return [];
+        return $this;
     }
 
     /**
-     * У текущего раздела есть ли родительский элемент
-     * @return bool
+     *
+     * Обновление всего дерева ниже, и самого элемента.
+     * Если найти всех рутов дерева и запустить этот метод, то дерево починиться в случае поломки
+     * правильно переустановятся все dir, pids и т.д.
+     *
+     * @return $this
      */
-    public function hasParent()
+    public function processNormalize()
     {
-        return (bool) $this->pid;
-    }
-
-    /**
-     * @return array|null|ActiveQuery
-     */
-    public function findParents()
-    {
+        //Если это новая несохраненная сущьность, ничего делать не надо
         if ($this->isNewRecord)
         {
-            return null;
+            return $this;
         }
 
-        if (!$this->pid || $this->isRoot())
+        if (!$this->pid)
         {
-            return null;
+            $this->setAttribute("dir", null);
+            $this->save(false);
         }
-
-        $find = $this->find()->orderBy(["level" => SORT_ASC]);
-        if ($pids = $this->pids)
+        else
         {
-            $find->andWhere([$this->primaryKey()[0] => $pids]);
+            $this->setAttributesForFutureParent($this->parent);
+            $this->save(false);
         }
 
-        return $find;
+
+        //Берем детей на один уровень ниже
+        if ($this->children)
+        {
+            $this->save(false);
+
+            foreach ($this->children as $childModel)
+            {
+                $childModel->processNormalize();
+            }
+        }
+
+        return $this;
     }
 
-    public function findParent()
+
+    /**
+     * Установка атрибутов если родителем этой ноды будет новый, читаем родителя, и обновляем необходимые данные у себя
+     *
+     * @param Tree $parent
+     * @return $this
+     */
+    public function setAttributesForFutureParent(Tree $parent)
     {
-        return $this->parent;
+        //Родитель должен быть уже сохранен
+        Validate::ensure(new ChainAnd([
+            new NotNewRecord(),
+            new NotSame($this)
+        ]), $parent);
+
+        $newPids     = $parent->pids;
+        $newPids[]   = $parent->primaryKey;
+
+        $this->setAttribute("level",     ($parent->level + 1));
+        $this->setAttribute('pid',       $parent->primaryKey);
+        $this->setAttribute("pids",      $newPids);
+
+
+        if (!$this->name)
+        {
+            $this->generateName();
+        }
+
+        if (!$this->code)
+        {
+            //Просто генерируем pageName
+            $this->generateCode();
+        }
+
+        if ($parent->dir)
+        {
+            $this->setAttribute("dir",       $parent->dir . Tree::PIDS_DELIMETR . $this->code);
+        } else
+        {
+            $this->setAttribute("dir",       $this->code);
+        }
+
+        return $this;
     }
 
+
+    /**
+     * Создание дочерней ноды
+     *
+     * @param Tree $target
+     * @return Tree
+     * @throws Exception
+     * @throws \skeeks\sx\validate\Exception
+     */
+    public function processCreateNode(Tree $target)
+    {
+        //Текущая сущьность должна быть уже сохранена
+        Validate::ensure(new NotNewRecord(), $this);
+        //Новая сущьность должна быть еще не сохранена
+        Validate::ensure(new IsNewRecord(), $target);
+
+        //Установка атрибутов будущему ребенку
+        $target->setAttributesForFutureParent($this);
+        if (!$target->save(false))
+        {
+            throw new Exception(\Yii::t('app',"Failed to create the child element:  ") . Json::encode($target->attributes));
+        }
+
+        $this->save(false);
+
+        return $target;
+    }
+
+
+    /**
+     * Процесс вставки ноды одна в другую. Можно вставлять как уже сохраненную модель с дочерними элементами, так и еще не сохраненную.
+     *
+     * @param Tree $target
+     * @return $this
+     * @throws Exception
+     * @throws \skeeks\sx\validate\Exception
+     */
+    public function processAddNode(Tree $target)
+    {
+        //Текущая сущьность должна быть уже сохранена, и не равна $target
+        Validate::ensure(new ChainAnd([
+            new NotNewRecord(),
+            new NotSame($target)
+        ]), $this);
+
+        //Если раздел который мы пытаемся добавить новый, то у него нет детей и он
+        if ($target->isNewRecord)
+        {
+            $this->processCreateNode($target);
+            return $this;
+        }
+        else
+        {
+            $target->setAttributesForFutureParent($this);
+            if (!$target->save(false))
+            {
+                throw new Exception(\Yii::t('app',"Unable to move: ") . Json::encode($target->attributes));
+            }
+
+            $this->processNormalize();
+        }
+
+        return $this;
+    }
+
+
+
+
+
+
+    //TODO: is depricated 2.4
     /**
      * @return bool
      */
-    public function hasChildrens()
+    public function isRoot()
     {
-        return (bool) $this->children;
+        return (bool) ($this->level == 0);
     }
+
+    //TODO: is depricated 2.3.3
+    /**
+     * Найти непосредственных детей ноды
+     * @return ActiveQuery
+     */
+	/*public function findChildrensAll()
+	{
+        $pidString = implode('/', $this->pids) . "/" . $this->primaryKey;
+
+		return $this->find()
+            ->andWhere(['like', 'pids', $pidString . '%', false])
+            ->orderBy(["priority" => SORT_ASC]);
+	}*/
+
 }
 
 

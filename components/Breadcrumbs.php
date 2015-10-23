@@ -66,7 +66,7 @@ class Breadcrumbs extends Component
      */
     public function setPartsByTree(Tree $tree)
     {
-        $parents    = $tree->parentTrees;
+        $parents    = $tree->parents;
         $parents[]  = $tree;
 
         foreach ($parents as $tree)
