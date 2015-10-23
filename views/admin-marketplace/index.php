@@ -23,6 +23,8 @@ foreach ($models as $name => $model)
         $notCoreModels[] = $model;
     }
 }
+$mess = \Yii::t('app','The modules included in the kernel {cms} can not be deleted or updated individually.',['cms' => 'SkeekS CMS']);
+$mess2 = \Yii::t('app','You also can read the version of the installed extensions, see it in the {market}',['market' => 'Marketplace']);
 
 if (CmsExtension::$coreExtensions)
 {
@@ -32,23 +34,26 @@ if (CmsExtension::$coreExtensions)
         'content' => $this->render('_table-extensions', [
             'models' => CmsExtension::$coreExtensions,
             'message' => <<<HTML
-                <p>Модули входящие в состав ядра SkeekS CMS не могут быть удалены, или же обновлены по отдельности.</p>
-                <p>Вы так же, можете ознакомиться с версией установленного расширения, посмотреть его в маркетплейс.</p>
+                <p>{$mess}</p>
+                <p>{$mess2}</p>
 HTML
 
         ]),
     ];
 }
+
+$mess3 = \Yii::t('app','Additional solutions, successfully installed in your project.');
+$mess4 = \Yii::t('app','These solutions can be removed and updated.');
 if ($notCoreModels)
 {
     $items[] = [
-        'label' => '<i class="glyphicon glyphicon-plus-sign"></i> Дополнительные решения',
+        'label' => '<i class="glyphicon glyphicon-plus-sign"></i> '.\Yii::t('app','Additional solutions'),
         'encode' => false,
         'content' => $this->render('_table-extensions', [
             'models' => $notCoreModels,
             'message' => <<<HTML
-                <p>Дополнительные решения успешно установленные в вашем проекте.</p>
-                <p>Эти решения можно удалять и обновлять.</p>
+                <p>{$mess3}</p>
+                <p>{$mess4}</p>
 HTML
 
         ]),
