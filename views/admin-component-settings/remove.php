@@ -16,14 +16,14 @@
 
 
     <div class="sx-box sx-mb-10 sx-p-10">
-        <p>Стереть все настройки из базы для данного компонента.</p>
+        <p><?= \Yii::t('app','Erase all the settings from the database for this component.')?></p>
         <? if ($settingsAllCount = \skeeks\cms\models\CmsComponentSettings::baseQuery($component)->count()) : ?>
-            <p><b>Всего найдено:</b> <?= $settingsAllCount; ?></p>
+            <p><b><?=\Yii::t('app','Total found')?>:</b> <?= $settingsAllCount; ?></p>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeAll(); return false;">
-                <i class="glyphicon glyphicon-remove"></i> сбросить все настройки
+                <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('app','reset all settings')?>
             </button>
         <? else: ?>
-            <small>В базе данных нет ни одной настройки для данного компонента.</small>
+            <small><?= \Yii::t('app','The database no settings for this component.')?></small>
         <? endif; ?>
     </div>
 

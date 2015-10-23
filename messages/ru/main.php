@@ -553,4 +553,25 @@ return
     "Is Allow Change Default Section"          => "Разрешено менять раздел заданный по умолчанию",
     "If it is set to the root partition, the elements can be tied to him and his sub."          => "Если будет задан коревой раздел, то элементы можно будет привязывать к нему и его подразделам.",
     "The name of the template to draw the elements of this type will be the same as the name of the code."     => "Название шаблон для отрисовки элементов данного типа, будет совпадать с названием этого кода.",
+
+    "To improve performance, configure each component of the site is cached." => "Для увеличения производительности, настройки каждого компонента сайта, кэшируются.",
+    "reset default settings" => "сбросить настройки по умолчанию",
+    "The settings for this component are stored in the database. This option will erase them from the database, but the component, restore the default values. As they have in the code the developer." => "Настройки для данного компонента сохранены в базу данных. Эта опция сотрет их из базы, но компонент, восстановит значения по умолчанию. Как их указал разработчик в коде.",
+    "These settings not yet saved in the database" => "Эти настройки еще не сохранялись в базу данных",
+
+    "Erase all the settings from the database for this component." => "Стереть все настройки из базы для данного компонента.",
+    "Total found"           => "Всего найдено",
+    "reset all settings"    => "сбросить все настройки",
+    "The database no settings for this component." => "В базе данных нет ни одной настройки для данного компонента.",
+
+    "Settings for the site" => "Настройки для сайта",
+    "reset settings for this site" => "сбросить настройки для этого сайта",
+
+    "This component may have personal preferences. And it works differently depending on which of the sites is displayed." => "Этот компонент может иметь персональные настройки. И работает по разному в зависимости от того на каком из сайтов показывается.",
+    "In that case, if the site not has personal settings will be used the default settings." => "В том случае если сайт не имеет персональных настроек, будут использоваться настройки по умолчанию.",
+    "Number of customized sites" => "Количество настроенных сайтов",
+    "reset settings for all sites" => "сбросить настройки для всех сайтов",
+    "Neither site does not have personal settings for this component" => "Ни один сайт, еще не имеет персональных настроек для этого компонента",
+    "Customize"             => "Настроить",
+
 ];

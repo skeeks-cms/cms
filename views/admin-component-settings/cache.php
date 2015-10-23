@@ -16,7 +16,7 @@
 
 
     <div class="sx-box sx-mb-10 sx-p-10">
-        <p>Для увеличения производительности, настройки каждого компонента сайта, кэшируются.</p>
+        <p><?=\Yii::t('app','To improve performance, configure each component of the site is cached.')?></p>
         <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Cache.clearAll(); return false;">
             <i class="glyphicon glyphicon-remove"></i> Сбросить кэш для всех
         </button>

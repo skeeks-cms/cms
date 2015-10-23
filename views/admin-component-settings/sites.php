@@ -16,16 +16,16 @@
 
 
     <div class="sx-box sx-mb-10 sx-p-10">
-        <p>Этот компонент может иметь персональные настройки. И работает по разному в зависимости от того на каком из сайтов показывается.</p>
-        <p>В том случае если сайт не имеет персональных настроек, будут использоваться настройки по умолчанию.</p>
+        <p><?= \Yii::t('app','This component may have personal preferences. And it works differently depending on which of the sites is displayed.')?></p>
+        <p><?= \Yii::t('app','In that case, if the site not has personal settings will be used the default settings.')?></p>
         <? if ($settings = \skeeks\cms\models\CmsComponentSettings::baseQuerySites($component)->count()) : ?>
-            <p><b>Количество настроенных сайтов:</b> <?= $settings; ?></p>
+            <p><b><?=\Yii::t('app','Number of customized sites')?>:</b> <?= $settings; ?></p>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeSites(); return false;">
-                <i class="glyphicon glyphicon-remove"></i> сбросить настройки для всех сайтов
+                <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('app','reset settings for all sites"')?>
             </button>
             <small>.</small>
         <? else: ?>
-            <small>Ни один сайт, еще не имеет персональных настроек для этого компонента</small>
+            <small><?= \Yii::t('app','Neither site does not have personal settings for this component')?></small>
         <? endif; ?>
     </div>
 
@@ -48,7 +48,7 @@
                     \skeeks\cms\helpers\UrlHelper::constructCurrent()->setRoute('cms/admin-component-settings/site')->set('site_id', $model->id)->toString(),
                     [
                         'class' => 'btn btn-default btn-xs',
-                        'title' => 'Настроить'
+                        'title' => \Yii::t('app','Customize')
                     ]);
                 },
 
