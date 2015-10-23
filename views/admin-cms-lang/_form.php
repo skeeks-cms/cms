@@ -13,7 +13,7 @@ use skeeks\cms\models\Tree;
 
 
 <?= $form->field($model, 'code')->textInput(); ?>
-<?= $form->fieldRadioListBoolean($model, 'active')->hint('На сайте должен быть включен хотя бы один язык'); ?>
+<?= $form->fieldRadioListBoolean($model, 'active')->hint(\Yii::t('app','On the site must be included at least one language')); ?>
 <?= $form->field($model, 'name')->textarea(); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>

@@ -20,7 +20,7 @@ class GridViewSettings extends Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => 'Настройки таблицы'
+            'name' => \Yii::t('app','Table settings')
         ]);
     }
 
@@ -63,14 +63,14 @@ class GridViewSettings extends Component
     {
         return array_merge(parent::attributeLabels(),
         [
-            'enabledPjaxPagination'     => 'Включение ajax навигации',
-            'pageParamName'             => 'Названия парамтера страниц, при постраничной навигации',
-            'pageSize'                  => 'Количество записей на одной странице',
+            'enabledPjaxPagination'     => \Yii::t('app','Inclusion {ajax} navigation',['ajax' => 'ajax']),
+            'pageParamName'             => \Yii::t('app','Parameter name pages, pagination'),
+            'pageSize'                  => \Yii::t('app','Number of records on one page'),
 
-            'orderBy'                   => 'По какому параметру сортировать',
-            'order'                     => 'Направление сортировки',
+            'orderBy'                   => \Yii::t('app','Sort by what parameter'),
+            'order'                     => \Yii::t('app','sorting direction'),
 
-            'visibleColumns'            => 'Отображаемые колонки',
+            'visibleColumns'            => \Yii::t('app','Display column'),
         ]);
     }
 

@@ -30,7 +30,7 @@ class DbController extends AdminController
 {
     public function init()
     {
-        $this->name = "Удаление временных файлов";
+        $this->name = \Yii::t('app',"Job to database");
 
         parent::init();
     }
@@ -43,7 +43,7 @@ class DbController extends AdminController
             "index" =>
             [
                 "class"        => AdminAction::className(),
-                "name"         => "Работа с базой данных",
+                "name"         => \Yii::t('app',"Job to database"),
                 "callback"     => [$this, 'actionIndex'],
             ],
         ];
@@ -59,7 +59,7 @@ class DbController extends AdminController
             if (\Yii::$app->request->getQueryParam('act') == 'refresh-tables')
             {
                 \Yii::$app->db->getSchema()->refresh();
-                \Yii::$app->getSession()->setFlash('success', 'Кэш таблиц успешно обновлен');
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','The cache table has been successfully updated'));
             }
         }
 
@@ -96,7 +96,7 @@ class DbController extends AdminController
 
 
                 $rr->success = true;
-                $rr->message = "Копия создана успешно";
+                $rr->message = \Yii::t('app',"A copy created successfully");
                 $rr->data = [
                     'result' => $result
                 ];

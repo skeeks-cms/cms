@@ -64,7 +64,30 @@
                                                                             <img src="<?= $sub4AdminMenuItem->getImgUrl(); ?>" />
                                                                         </span>
                                                                         <span class="txt"><?= $sub4AdminMenuItem->label; ?></span>
+                                                                        <? if ($sub4AdminMenuItem->items) : ?>
+                                                                            <span class="caret"></span>
+                                                                        <? endif; ?>
                                                                     </a>
+
+
+
+                                                                    <? if ($sub5AdminMenuItems = $sub4AdminMenuItem->items) : ?>
+                                                                        <ul class="nav nav-sidebar">
+                                                                        <? foreach ($sub5AdminMenuItems as $sub5AdminMenuItem) : ?>
+                                                                            <? if ($sub5AdminMenuItem->isAllowShow()) : ?>
+                                                                                <li <?= $sub5AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
+                                                                                    <a href="<?= $sub5AdminMenuItem->getUrl() ?>" title="<?= $sub5AdminMenuItem->label; ?>" class="sx-test">
+                                                                                        <span class="sx-icon">
+                                                                                            <img src="<?= $sub5AdminMenuItem->getImgUrl(); ?>" />
+                                                                                        </span>
+                                                                                        <span class="txt"><?= $sub5AdminMenuItem->label; ?></span>
+                                                                                    </a>
+                                                                                </li>
+                                                                            <? endif; ?>
+                                                                        <? endforeach; ?>
+                                                                        </ul>
+                                                                    <? endif; ?>
+
                                                                 </li>
                                                             <? endif; ?>
                                                         <? endforeach; ?>

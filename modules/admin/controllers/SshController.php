@@ -35,7 +35,7 @@ class SshController extends AdminController
 {
     public function init()
     {
-        $this->name = "Ssh консоль";
+        $this->name = \Yii::t('app',"{ssh} console",['ssh' => 'Ssh']);
 
         parent::init();
     }
@@ -47,7 +47,7 @@ class SshController extends AdminController
             "index" =>
             [
                 "class"        => AdminAction::className(),
-                "name"         => "Консоль",
+                "name"         => \Yii::t('app',"Console"),
                 "callback"     => [$this, 'actionIndex'],
             ],
 

@@ -71,16 +71,22 @@ class AdminTreeController extends AdminModelEditorController
         ]);
     }
 
+    static public $indexData = [];
+
     public function indexData()
     {
-        $tree = new Tree();
+        if (self::$indexData)
+        {
+            return self::$indexData;
+        }
+        $models = Tree::findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
 
-        $models = $tree->findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_DESC])->all();
-
-        return
+        self::$indexData =
         [
             'models' => $models
         ];
+
+        return self::$indexData;
     }
 
     public function actionNewChildren()
@@ -94,47 +100,41 @@ class AdminTreeController extends AdminModelEditorController
         {
             $post = \Yii::$app->request->post();
 
-            if($post["recalculate_children_priorities"])
+
+            $childTree = new Tree();
+            $parent = Tree::find()->where(['id' => $post["pid"]])->one();
+
+            $childTree->load($post);
+
+            if (!$childTree->priority)
             {
-                $sort = $post["sort"]=="asc"?true:false;
+                $childTree->priority = Tree::PRIORITY_STEP;
 
-                $parent->recalculateChildrenPriorities($post["column"], $sort);
-
-                //$node1 = $tree->find()->where(['priority'=>200])->one();
-                //$node2 = $tree->find()->where(['priority'=>300])->one();
-                //$node1->swapPriorities($node2);
-            }
-            else
-            {
-                $childTree = new Tree();
-                $parent = Tree::find()->where(['id' => $post["pid"]])->one();
-
-                $childTree->load($post);
-
-                if(!$childTree->priority)
+                //Элемент с большим приоритетом
+                if ($treeChildrens = $parent->getChildren()->orderBy(['priority' => SORT_DESC])->one())
                 {
-                    $childTree->priority = 0;
+                    $childTree->priority = $treeChildrens->priority + Tree::PRIORITY_STEP;
                 }
-
-                $response = ['success' => false];
-
-                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-                try
-                {
-                    if ($parent && $parent->processAddNode($childTree))
-                    {
-                        $response['success'] = true;
-                    }
-                } catch (\Exception $e)
-                {
-                    $response['success'] = false;
-                    $response['message'] = $e->getMessage();
-                }
-
             }
 
-            if(!$post["no_redirect"])
+            $response = ['success' => false];
+
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+            try
+            {
+                if ($parent && $parent->processAddNode($childTree))
+                {
+                    $response['success'] = true;
+                }
+            } catch (\Exception $e)
+            {
+                $response['success'] = false;
+                $response['message'] = $e->getMessage();
+            }
+
+
+            if (!$post["no_redirect"])
             {
                 $this->redirect(Url::to(["new-children", "id" => $parent->primaryKey]));
             }
@@ -150,7 +150,7 @@ class AdminTreeController extends AdminModelEditorController
             $dataProvider   = $search->search(\Yii::$app->request->queryParams);
             $searchModel    = $search->getLoadedModel();
 
-            $dataProvider->query->andWhere([$tree->pidAttrName => $parent->primaryKey]);
+            $dataProvider->query->andWhere(['pid' => $parent->primaryKey]);
 
             $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-tree");
 
@@ -189,7 +189,8 @@ class AdminTreeController extends AdminModelEditorController
 
             $post = \Yii::$app->request->post();
 
-            $ids = array_reverse(array_filter($post['ids']));
+            //$ids = array_reverse(array_filter($post['ids']));
+            $ids = array_filter($post['ids']);
 
             $priority = 100;
 

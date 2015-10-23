@@ -37,7 +37,7 @@ class CmsContentElementImage extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'storage_file_id', 'content_element_id', 'priority'], 'integer'],
             [['storage_file_id', 'content_element_id'], 'required'],
-            [['storage_file_id', 'content_element_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'content_element_id'], 'message' => 'The combination of Storage File ID and Content Element ID has already been taken.']
+            [['storage_file_id', 'content_element_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'content_element_id'], 'message' => \Yii::t('app','The combination of Storage File ID and Content Element ID has already been taken.')]
         ];
     }
 

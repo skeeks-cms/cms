@@ -43,16 +43,25 @@ class UrlRuleTree
     {
         if ($route == 'cms/tree/view')
         {
-            $id = (int) ArrayHelper::getValue($params, 'id');
-            if (!$id)
+            $id          = (int) ArrayHelper::getValue($params, 'id');
+            $treeModel   = ArrayHelper::getValue($params, 'model');
+
+            if (!$id && !$treeModel)
             {
                 return false;
             }
 
-            if (!$tree = ArrayHelper::getValue(self::$models, $id))
+            if ($treeModel && $treeModel instanceof Tree)
             {
-                $tree = Tree::findOne(['id' => $id]);
-                self::$models[$id] = $tree;
+                $tree = $treeModel;
+                self::$models[$treeModel->id] = $treeModel;
+            } else
+            {
+                if (!$tree = ArrayHelper::getValue(self::$models, $id))
+                {
+                    $tree = Tree::findOne(['id' => $id]);
+                    self::$models[$id] = $tree;
+                }
             }
 
             if (!$tree)
@@ -60,20 +69,24 @@ class UrlRuleTree
                 return false;
             }
 
-            $url = $tree->url;
+            if ($tree->dir)
+            {
+                $url = $tree->dir . ((bool) \Yii::$app->seo->useLastDelimetrTree ? DIRECTORY_SEPARATOR : "") . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
+            } else
+            {
+                $url = "";
+            }
 
-            unset($params['id']);
-            /*if ($url !== '') {
-                $url .= ($this->suffix === null ? $manager->suffix : $this->suffix);
-            }*/
+            ArrayHelper::remove($params, 'id');
+            ArrayHelper::remove($params, 'model');
 
             if (!empty($params) && ($query = http_build_query($params)) !== '') {
                 $url .= '?' . $query;
             }
 
             return $url;
-
         }
+
         return false;
     }
 
@@ -146,7 +159,7 @@ class UrlRuleTree
                 }, null, $dependency);*/
 
                 $treeNode = Tree::find()->where([
-                    (new Tree())->dirAttrName       => $normalizeDir,
+                    "dir"                           => $normalizeDir,
                     "site_code"                     => \Yii::$app->cms->site->code,
                 ])->one();
             }

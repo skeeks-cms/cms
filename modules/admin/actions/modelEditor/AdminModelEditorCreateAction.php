@@ -88,7 +88,7 @@ class AdminModelEditorCreateAction extends AdminModelEditorAction
         {
             if ($model->load(\Yii::$app->request->post()) && $model->save($this->modelValidate))
             {
-                \Yii::$app->getSession()->setFlash('success', 'Сохранено');
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -106,7 +106,7 @@ class AdminModelEditorCreateAction extends AdminModelEditorAction
 
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
             }
         }
 

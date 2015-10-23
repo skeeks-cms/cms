@@ -74,8 +74,8 @@ class CmsComponentSettings extends Core
     {
         return array_merge(parent::attributeLabels(), [
             'id'            => Yii::t('app', 'ID'),
-            'value'         => Yii::t('app', 'Значение'),
-            'component'     => Yii::t('app', 'Компонент'),
+            'value'         => Yii::t('app', 'Value'),
+            'component'     => Yii::t('app', 'Component'),
 
             'site_code' => Yii::t('app', 'Site Code'),
             'user_id' => Yii::t('app', 'User ID'),
@@ -326,5 +326,19 @@ class CmsComponentSettings extends Core
     static public function fetchByComponentUser($component, $user)
     {
         return static::fetchByComponentUserId($component, $user->id);
+    }
+
+
+    /**
+     * @param $settingAttribute
+     * @param $value
+     * @return $this
+     */
+    public function setSettingValue($settingAttribute, $settingValue)
+    {
+        $values = $this->value;
+        $values[$settingAttribute] = $settingValue;
+        $this->value = $values;
+        return $this;
     }
 }

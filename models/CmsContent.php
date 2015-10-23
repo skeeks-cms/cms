@@ -9,14 +9,8 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
+use skeeks\cms\components\Cms;
 use skeeks\cms\traits\ValidateRulesTrait;
-use skeeks\modules\cms\user\models\User;
 use Yii;
 
 /**
@@ -38,7 +32,13 @@ use Yii;
  * @property string $list_mode
  * @property string $name_meny
  * @property string $name_one
+ * @property integer $default_tree_id
+ * @property string $is_allow_change_tree
+ * @property integer $root_tree_id
+ * @property string $viewFile
  *
+ * @property CmsTree $rootTree
+ * @property CmsTree $defaultTree
  * @property CmsContentType $contentType
  * @property CmsContentElement[] $cmsContentElements
  * @property CmsContentProperty[] $cmsContentProperties
@@ -72,11 +72,16 @@ class CmsContent extends Core
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
             'content_type' => Yii::t('app', 'Content Type'),
-            'index_for_search' => Yii::t('app', 'Индексировать для модуля поиска'),
-            'tree_chooser' => Yii::t('app', 'Интерфейс привязки элемента к разделам'),
-            'list_mode' => Yii::t('app', 'Режим просмотра разделов и элементов'),
-            'name_meny' => Yii::t('app', 'Название элементов (множественное число)'),
-            'name_one' => Yii::t('app', 'Название одного элемента'),
+            'index_for_search' => Yii::t('app', 'To Index For Search Module'),
+            'tree_chooser' => Yii::t('app', 'The Interface Binding Element To Sections'),
+            'list_mode' => Yii::t('app', 'View Mode Sections And Elements'),
+            'name_meny' => Yii::t('app', 'The Name Of The Elements (Plural)'),
+            'name_one' => Yii::t('app', 'Name One Element'),
+
+            'default_tree_id' => Yii::t('app', 'Default Section'),
+            'is_allow_change_tree' => Yii::t('app', 'Is Allow Change Default Section'),
+            'root_tree_id' => Yii::t('app', 'Root Section'),
+            'viewFile' => Yii::t('app', 'Template'),
         ]);
     }
 
@@ -86,21 +91,38 @@ class CmsContent extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id'], 'integer'],
             [['name', 'content_type', 'code'], 'required'],
             [['description'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'viewFile'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
-            [['active', 'index_for_search', 'tree_chooser', 'list_mode'], 'string', 'max' => 1],
+            [['active', 'index_for_search', 'tree_chooser', 'list_mode', 'is_allow_change_tree'], 'string', 'max' => 1],
             [['content_type'], 'string', 'max' => 32],
             [['name_meny', 'name_one'], 'string', 'max' => 100],
             ['priority', 'default', 'value'         => 500],
-            ['active', 'default', 'value'           => "Y"],
-            ['name_meny', 'default', 'value'    => "Элементы"],
-            ['name_one', 'default', 'value'     => "Элемент"],
+            ['active', 'default', 'value'           => Cms::BOOL_Y],
+            ['is_allow_change_tree', 'default', 'value'           => Cms::BOOL_Y],
+            ['name_meny', 'default', 'value'    => Yii::t('app', 'Elements')],
+            ['name_one', 'default', 'value'     => Yii::t('app', 'Element')],
         ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRootTree()
+    {
+        return $this->hasOne(CmsTree::className(), ['id' => 'root_tree_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDefaultTree()
+    {
+        return $this->hasOne(CmsTree::className(), ['id' => 'default_tree_id']);
     }
 
     /**
@@ -125,6 +147,6 @@ class CmsContent extends Core
      */
     public function getCmsContentProperties()
     {
-        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])->orderBy(['priority' => SORT_DESC]);
+        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 }

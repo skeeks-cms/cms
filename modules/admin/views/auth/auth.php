@@ -214,17 +214,17 @@ JS
 
                             <div class="sx-form-messages"></div>
 
-                            <?= $form->field($loginModel, 'identifier')->label('Логин или email'); ?>
-                            <?= $form->field($loginModel, 'password')->passwordInput()->label('Пароль') ?>
+                            <?= $form->field($loginModel, 'identifier')->label(\Yii::t('app','Username or Email')); ?>
+                            <?= $form->field($loginModel, 'password')->passwordInput()->label(\Yii::t('app','Password')) ?>
                                 <?= Html::input('hidden', 'do', 'login'); ?>
                                 <div class="form-group sx-submit-group">
-                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> Войти", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> " . \Yii::t('app','Log in'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                                 </div>
 
                                 <div>
                                     <hr />
                                     <div style="color:#999;margin:1em 0">
-                                        <a href="#" class="sx-act-controll" onclick="sx.auth.goActForget(); return false;">восстановить пароль</a>
+                                        <a href="#" class="sx-act-controll" onclick="sx.auth.goActForget(); return false;"><?= \Yii::t('app','recover password')?></a>
                                     </div>
                                 </div>
                         <?php ActiveForm::end(); ?>
@@ -238,10 +238,10 @@ JS
 
                             <div class="sx-form-messages"></div>
 
-                            <?= $form->field($passwordResetModel, 'identifier')->label('Логин или email'); ?>
+                            <?= $form->field($passwordResetModel, 'identifier')->label(\Yii::t('app','Username or Email')); ?>
                                 <?= Html::input('hidden', 'do', 'password-reset'); ?>
                                 <div class="form-group sx-submit-group">
-                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> Восстановить пароль", [
+                                    <?= Html::submitButton("<i class='glyphicon glyphicon-off'></i> " . \Yii::t('app','Recover password'), [
                                         'class' => 'btn btn-primary',
                                         'name' => 'login-button',
                                         //'onclick' => 'sx.notify.info("Не нажимайте пока меня, я еще не работаю )"); return false;'
@@ -251,7 +251,7 @@ JS
                                 <div class="sx-hidden1">
                                     <hr />
                                     <div style="color:#999;margin:1em 0">
-                                        Я вспомнил пароль <a href="#" class="sx-act-controll" onclick="sx.auth.goActLogin(); return false;">авторизоваться</a>
+                                        <?= \Yii::t('app','I remembered password')?> <a href="#" class="sx-act-controll" onclick="sx.auth.goActLogin(); return false;"><?= \Yii::t('app','log in') ?></a>
                                     </div>
                                 </div>
 

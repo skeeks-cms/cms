@@ -9,19 +9,8 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\modules\cms\user\models\User;
 use Yii;
-use yii\db\BaseActiveRecord;
-use yii\widgets\ActiveForm;
-
 /**
  * This is the model class for table "{{%cms_content_property}}".
  *
@@ -69,7 +58,7 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'content_id' => Yii::t('app', 'Связь с контентом'),
+            'content_id' => Yii::t('app', 'Linked to content'),
         ]);
     }
 
@@ -81,7 +70,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         return array_merge(parent::rules(), [
             [['content_id'], 'integer'],
-            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
+            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('app','For the content of this code is already in use.')],
         ]);
     }
 }

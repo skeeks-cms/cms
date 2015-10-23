@@ -177,9 +177,9 @@ class Tree
                 }
             }
 
-            if ($isOpen && $model->hasChildrens())
+            if ($isOpen && $model->children)
             {
-                $child = $this->renderNodes($model->findChildrens()->all());
+                $child = $this->renderNodes($model->children);
             }
 
 
@@ -187,7 +187,7 @@ class Tree
 
             $openCloseLink = "";
             $currentLink = "";
-            if ($model->hasChildrens())
+            if ($model->children)
             {
                 $openedIds = $this->_getOpenIds();
 
@@ -208,7 +208,7 @@ class Tree
 
                     $currentLink = UrlHelper::construct("cms/admin-tree/index")->setData($params);
                     $openCloseLink = Html::a(
-                        Html::tag("span", "" ,["class" => "glyphicon glyphicon-minus", "title" => "Свернуть"]),
+                        Html::tag("span", "" ,["class" => "glyphicon glyphicon-minus", "title" => \Yii::t('app',"Minimize")]),
                         $currentLink,
                         ['class' => 'btn btn-xs btn-default']
                     );
@@ -219,7 +219,7 @@ class Tree
                     $params[$this->openedRequestName] = $urlOptionsOpen;
                     $currentLink = UrlHelper::construct("cms/admin-tree/index")->setData($params);
                     $openCloseLink = Html::a(
-                        Html::tag("span", "" ,["class" => "glyphicon glyphicon-plus", "title" => "Развернуть"]),
+                        Html::tag("span", "" ,["class" => "glyphicon glyphicon-plus", "title" => \Yii::t('app',"Restore")]),
                         $currentLink,
                         ['class' => 'btn btn-xs btn-default']
                     );
@@ -351,8 +351,10 @@ JS
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
                              $model->getAbsoluteUrl(),
-                             ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-xs show-at-site", "title" => "Показать на сайте"]
+                             ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-xs show-at-site", "title" => \Yii::t('app',"Show at site")]
                     );
+
+            $subsection = \Yii::t('app','Create subsection');
 
             return Html::tag("li",
                         Html::tag("div",
@@ -383,7 +385,7 @@ JS
 
                                     Html::tag("div",
                                         <<<HTML
-                                        <a href="#" class="btn-tree-node-controll btn btn-default btn-xs add-tree-child" title="Создать подраздел" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
+                                        <a href="#" class="btn-tree-node-controll btn btn-default btn-xs add-tree-child" title="{$subsection}" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
 HTML
                                     ,
                                         [

@@ -36,7 +36,7 @@ class AdminPermissionController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление привилегиями";
+        $this->name                   = \Yii::t('app',"Управление привилегиями");
         $this->modelShowAttribute      = "name";
         $this->modelPkAttribute         = "name";
         $this->modelClassName          = Permission::className();
@@ -72,7 +72,7 @@ class AdminPermissionController extends AdminModelEditorController
             "update-data" =>
             [
                 "class"         => AdminAction::className(),
-                "name"          => "Обновить привилегии",
+                "name"          => \Yii::t('app',"Update privileges"),
                 "icon"          => "glyphicon glyphicon-retweet",
                 "method"        => "post",
                 "request"       => "ajax",
@@ -130,7 +130,7 @@ class AdminPermissionController extends AdminModelEditorController
                                 if (!$adminAccess = $auth->getPermission($controller->permissionName))
                                 {
                                     $adminAccess = $auth->createPermission($controller->permissionName);
-                                    $adminAccess->description = 'Администрирование | ' . $controller->name;
+                                    $adminAccess->description = \Yii::t('app','Administration') . ' | ' . $controller->name;
                                     $auth->add($adminAccess);
 
                                     if ($root = $auth->getRole('root'))
@@ -145,7 +145,7 @@ class AdminPermissionController extends AdminModelEditorController
             }
 
             $rr->success = true;
-            $rr->message = "Обновление завершено";
+            $rr->message = \Yii::t("app","Update completed");
 
             return $rr;
         }
@@ -245,10 +245,10 @@ class AdminPermissionController extends AdminModelEditorController
         {
             if ($model->load(\Yii::$app->request->post()) && $model->save())
             {
-                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved successfully'));
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Failed to save'));
             }
         }
 
@@ -278,16 +278,16 @@ class AdminPermissionController extends AdminModelEditorController
                 {
                     if (\Yii::$app->getAuthManager()->remove($model->item))
                     {
-                        $rr->message = 'Запись успешно удалена';
+                        $rr->message = \Yii::t('app','Record deleted successfully');
                         $rr->success = true;
                     } else
                     {
-                        $rr->message = 'Не получилось удалить запись';
+                        $rr->message = \Yii::t('app','Record deleted unsuccessfully');
                         $rr->success = false;
                     }
                 } else
                 {
-                    $rr->message = 'Эту запись нельзя удалять!';
+                    $rr->message = \Yii::t('app','This entry can not be deleted!');
                     $rr->success = false;
                 }
 
@@ -384,7 +384,7 @@ class AdminPermissionController extends AdminModelEditorController
         if ($item) {
             return new AuthItem($item);
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(\Yii::t('app','The requested page does not exist.'));
         }
     }
 }

@@ -46,7 +46,7 @@ class AdminAccessControl extends \yii\filters\AccessControl
 
         } else
         {
-            throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
+            throw new ForbiddenHttpException(\Yii::t('yii', \Yii::t('app','You are not allowed to perform this action.')));
         }
     }
 }

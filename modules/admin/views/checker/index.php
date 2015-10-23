@@ -22,20 +22,20 @@ $this->registerCss(<<<CSS
 CSS
 );
 ?>
-<h2>Полное тестирование системы</h2>
+<h2><?= \Yii::t('app','Full system testing')?></h2>
 <p>
-    Полная проверка системы помогает найти причины проблем в работе сайта и избежать появление ошибок в дальнейшем. Справка по каждому тесту поможет устранить причину ошибки.
+    <?=\Yii::t('app','Full system scan helps to find the causes of the problems in the work site, and avoid errors in the future. Help for each test will help eliminate the cause of the error.')?>
 </p>
 <div class="sx-box sx-p-10 sx-bg-primary sx-checker">
     <p>
-        <a href="#" class="btn btn-primary sx-controll-start"><i class="glyphicon glyphicon-play"></i> Начать тестирование</a>
-        <a href="#" class="btn btn-default sx-controll-stop"><i class="glyphicon glyphicon-stop"></i> Остановить</a>
+        <a href="#" class="btn btn-primary sx-controll-start"><i class="glyphicon glyphicon-play"></i> <?= \Yii::t('app','Start testing') ?></a>
+        <a href="#" class="btn btn-default sx-controll-stop"><i class="glyphicon glyphicon-stop"></i> <?= \Yii::t('app','Stop') ?></a>
     </p>
 
     <p>
         <div class="sx-progress-tasks" id="sx-progress-tasks" style="display: none;">
-            <span style="vertical-align:middle;"><h3>Тестирование системы (Выполнено <span class="sx-executing-ptc"></span>%)</h3></span>
-            <span style="vertical-align:middle;">Тест: <span class="sx-executing-task-name"></span></span>
+            <span style="vertical-align:middle;"><h3><?= \Yii::t('app','"Testing the system (Proccess"') ?> <span class="sx-executing-ptc"></span>%)</h3></span>
+            <span style="vertical-align:middle;"><?= \Yii::t('app','Test') ?>: <span class="sx-executing-task-name"></span></span>
             <div>
                 <div class="progress progress-striped active">
                     <div class="progress-bar progress-bar-success"></div>

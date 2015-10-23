@@ -16,15 +16,15 @@
 ]); ?>
 
 
-    <h2>Настройки для сайта: <?= $site->name; ?> (<?= $site->code; ?>)</h2>
+    <h2><?=\Yii::t('app','Settings for the site')?>: <?= $site->name; ?> (<?= $site->code; ?>)</h2>
     <div class="sx-box sx-mb-10 sx-p-10">
         <? if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentSiteCode($component, $site->code)) : ?>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeBySite('<?= $site->code; ?>'); return false;">
-                <i class="glyphicon glyphicon-remove"></i> сбросить настройки для этого сайта
+                <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('app','reset settings for this site')?>
             </button>
-            <small>Настройки для данного компонента сохранены в базу данных. Эта опция сотрет их из базы, но компонент, восстановит значения по умолчанию. Как их указал разработчик в коде.</small>
+            <small><?=\Yii::t('app','The settings for this component are stored in the database. This option will erase them from the database, but the component, restore the default values. As they have in the code the developer.')?></small>
         <? else: ?>
-            <small>Эти настройки еще не сохранялись в базу данных</small>
+            <small><?=\Yii::t('app','These settings not yet saved in the database')?></small>
         <? endif; ?>
     </div>
     <?= $component->renderConfigForm(); ?>

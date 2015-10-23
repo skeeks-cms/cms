@@ -34,7 +34,6 @@ use yii\helpers\ArrayHelper;
  * @property string $def
  * @property integer $priority
  * @property string $code
- * @property string $lang_code
  * @property string $name
  * @property string $server_name
  * @property string $description
@@ -115,7 +114,7 @@ class CmsSite extends Core
 
         if (!$tree->save(false))
         {
-            throw new Exception('Не удалось создать раздел дерева');
+            throw new Exception('Failed to create a section of the tree');
         }
     }
 
@@ -136,7 +135,6 @@ class CmsSite extends Core
             'def' => Yii::t('app', 'Default'),
             'priority' => Yii::t('app', 'Priority'),
             'code' => Yii::t('app', 'Code'),
-            'lang_code' => Yii::t('app', 'Lang'),
             'name' => Yii::t('app', 'Name'),
             'server_name' => Yii::t('app', 'Server Name'),
             'description' => Yii::t('app', 'Description'),
@@ -151,10 +149,9 @@ class CmsSite extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
-            [['code', 'lang_code', 'name'], 'required'],
+            [['code', 'name'], 'required'],
             [['active', 'def'], 'string', 'max' => 1],
             [['code'], 'string', 'max' => 15],
-            [['lang_code'], 'string', 'max' => 5],
             [['name', 'server_name', 'description'], 'string', 'max' => 255],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
@@ -179,14 +176,6 @@ class CmsSite extends Core
         }
 
         return static::$sites[$code];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCmsLang()
-    {
-        return $this->hasOne(CmsLang::className(), ['code' => 'lang_code']);
     }
 
     /**

@@ -39,7 +39,7 @@ trait HasComponentDescriptorTrait
             "description"           => "",
             "keywords"              => "skeeks, cms",
 
-            "homepage"              => "http://www.skeeks.com/",
+            "homepage"              => "http://cms.skeeks.com/",
             "license"               => "BSD-3-Clause",
 
             "support"               =>

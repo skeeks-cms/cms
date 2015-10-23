@@ -11,7 +11,7 @@ use common\models\User;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app','Main')); ?>
 
     <? if ($content_type = \Yii::$app->request->get('content_type')) : ?>
         <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
@@ -22,23 +22,45 @@ use common\models\User;
     <? endif; ?>
 
     <?= $form->field($model, 'name')->textInput(); ?>
-    <?= $form->field($model, 'code')->textInput(); ?>
+    <?= $form->field($model, 'code')->textInput()
+        ->hint(\Yii::t('app', 'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
+
+    <?= $form->field($model, 'viewFile')->textInput()
+        ->hint(\Yii::t('app', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
+
+
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 
+
+
     <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('app', 'Link to section')
+    ]); ?>
+
+    <?= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+        'allowDeselect' => true
+    ]); ?>
+    <?= $form->fieldRadioListBoolean($model, 'is_allow_change_tree'); ?>
+
+
+    <?= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+        'allowDeselect' => true
+    ])->hint(\Yii::t('app', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Подписи'); ?>
+<?= $form->fieldSet(\Yii::t('app','Captions')); ?>
     <?= $form->field($model, 'name_one')->textInput(); ?>
     <?= $form->field($model, 'name_meny')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet('Свойства') ?>
+    <?= $form->fieldSet(\Yii::t('app','Properties')) ?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-            'label'             => "Свойства элементов",
-            'hint'              => "У каждого контента на сайте есть свой набор свойств, тут они и задаются",
+            'label'             => \Yii::t('app',"Element properties"),
+            'hint'              => \Yii::t('app',"Every content on the site has its own set of properties, its sets here"),
             'parentModel'       => $model,
             'relation'          => [
                 'content_id' => 'id'
@@ -47,7 +69,7 @@ use common\models\User;
             'sort'              => [
                 'defaultOrder' =>
                 [
-                    'priority' => SORT_DESC
+                    'priority' => SORT_ASC
                 ]
             ],
 

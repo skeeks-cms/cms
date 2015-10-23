@@ -194,34 +194,6 @@
 }
 
 
-
-
-.skeeks-cms-toolbar-edit-mode
-{
-      margin: 0;
-      padding: 0;
-      border: 0;
-      font-size: 100%;
-      font: inherit;
-      vertical-align: baseline;
-      outline: none;
-}
-
-
-.skeeks-cms-toolbar-edit-mode:before
-{
-      display: table;
-      content: " ";
-}
-
-
-
-.skeeks-cms-toolbar-edit-mode:hover
-{
-    /*border: 1px solid red;
-    //outline: none;*/
-}
-
 #skeeks-cms-toolbar .sx-profile a img
 {
     height: 30px;
@@ -233,4 +205,49 @@
 #skeeks-cms-toolbar .sx-profile a:hover img
 {
     border: 1px solid #20a8d8;
+}
+
+
+
+/*
+* Обрамление редактируемой области
+*/
+.skeeks-cms-toolbar-edit-view-block
+{
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-size: 100%;
+      font: inherit;
+      vertical-align: baseline;
+      outline: none;
+}
+/*
+* Пустой блок, отметка фоном
+*/
+.skeeks-cms-toolbar-edit-view-block-empty
+{
+    background: scroll transparent url(icons/empty-block.png) no-repeat !important
+}
+
+/**
+* Кнопки при редактировании
+*/
+.sx-edit-view-block-controlls
+{
+    position: absolute !important;
+    height: 23px !important;
+    display: none;
+    padding: 4px 4px 10px !important;
+    color: white !important;
+    background: black !important;
+    overflow: hidden !important;
+    z-index: 9999 !important;
+    font-size: 12px !important;
+}
+.sx-edit-view-block-controlls a
+{
+    font-size: 12px !important;
+    color: white !important;
+    z-index: 9999 !important;
 }

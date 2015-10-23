@@ -9,18 +9,8 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\modules\cms\user\models\User;
 use Yii;
-use yii\db\BaseActiveRecord;
-use yii\widgets\ActiveForm;
 
 /**
  * This is the model class for table "{{%cms_content_property}}".
@@ -68,7 +58,7 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'tree_type_id' => Yii::t('app', 'Связь с типом раздела'),
+            'tree_type_id' => Yii::t('app', "Linked To Section's Type"),
         ]);
     }
 
@@ -81,7 +71,7 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
         return array_merge(parent::rules(), [
             [['tree_type_id'], 'integer'],
             //[['code'], 'unique'],
-            [['code', 'tree_type_id'], 'unique', 'targetAttribute' => ['tree_type_id', 'code'], 'message' => 'Для данного типа раздела этот код уже занят.'],
+            [['code', 'tree_type_id'], 'unique', 'targetAttribute' => ['tree_type_id', 'code'], 'message' => \Yii::t('app',"For this section's type of the code is already in use.")],
         ]);
     }
 }

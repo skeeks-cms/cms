@@ -64,16 +64,25 @@ abstract class Widget extends Component implements ViewContextInterface
      */
     public function run()
     {
-        try
+        if (YII_ENV == 'prod')
+        {
+            try
+            {
+                \Yii::beginProfile("Run: " . $this->_token);
+                    $content = $this->_run();
+                \Yii::endProfile("Run: " . $this->_token);
+            }
+            catch (\Exception $e)
+            {
+                $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
+            }
+        } else
         {
             \Yii::beginProfile("Run: " . $this->_token);
                 $content = $this->_run();
             \Yii::endProfile("Run: " . $this->_token);
         }
-        catch (\Exception $e)
-        {
-            $content = "Ошибка в виджете " . $this->className() . " (" . $this->descriptor->name . "): " . $e->getMessage();
-        }
+
 
         \Yii::$app->cmsToolbar->initEnabled();
         if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
@@ -86,14 +95,15 @@ abstract class Widget extends Component implements ViewContextInterface
             $id = 'sx-infoblock-' . $this->getId();
 
             $this->getView()->registerJs(<<<JS
-new sx.classes.toolbar.Infoblock({'id' : '{$id}'});
+new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
 JS
 );
             return Html::tag('div', $pre . (string) $content,
             [
-                'class' => 'skeeks-cms-toolbar-edit-mode',
-                'id'    => $id,
-                'data' =>
+                'class'     => 'skeeks-cms-toolbar-edit-view-block',
+                'id'        => $id,
+                'title'     => "Двойной клик по блоку откроек окно управлния настройками",
+                'data'      =>
                 [
                     'id' => $this->getId(),
                     'config-url' => $this->getEditUrl()

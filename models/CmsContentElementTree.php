@@ -9,19 +9,7 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
-use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\modules\cms\user\models\User;
 use Yii;
-use yii\db\BaseActiveRecord;
-use yii\widgets\ActiveForm;
-
 /**
  * This is the model class for table "{{%cms_content_element_tree}}".
  *
@@ -70,7 +58,7 @@ class CmsContentElementTree extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'element_id', 'tree_id'], 'integer'],
             [['element_id', 'tree_id'], 'required'],
-            [['element_id', 'tree_id'], 'unique', 'targetAttribute' => ['element_id', 'tree_id'], 'message' => 'The combination of Element ID and Tree ID has already been taken.']
+            [['element_id', 'tree_id'], 'unique', 'targetAttribute' => ['element_id', 'tree_id'], 'message' => \Yii::t('app','The combination of Element ID and Tree ID has already been taken.')]
         ]);
     }
 

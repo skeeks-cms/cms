@@ -48,7 +48,7 @@ class BlockedUserForm extends Model
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password))
             {
-                $this->addError($attribute, 'Некорректный пароль.');
+                $this->addError($attribute, \Yii::t('app','Incorrect password.'));
             }
         }
     }

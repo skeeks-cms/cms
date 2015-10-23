@@ -9,12 +9,15 @@ namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsLang;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
 
 /**
+ * @property CmsLang $cmsLanguage
+ *
  * Class AdminSettings
  * @package skeeks\cms\modules\admin\components\settings
  */
@@ -27,7 +30,7 @@ class AdminSettings extends Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Настройки админ панели',
+            'name'          => \Yii::t('app','Setting the admin panel'),
         ]);
     }
 
@@ -81,24 +84,24 @@ class AdminSettings extends Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'asset'                             => 'Дополнительные css и js админки',
-            'enableCustomConfirm'               => 'Включить стилизованные окошки подтверждения (confirm)',
-            'enableCustomPromt'                 => 'Включить стилизованные окошки вопрос с одним полем (promt)',
-            'languageCode'                      => 'Язык интерфейса',
+            'asset'                             => \Yii::t('app','Additional css and js admin area'),
+            'enableCustomConfirm'               => \Yii::t('app','Include stylized window confirmation (confirm)'),
+            'enableCustomPromt'                 => \Yii::t('app','Include stylized window question with one field (promt)'),
+            'languageCode'                      => \Yii::t('app','Interface language'),
 
-            'pageParamName'                     => 'Язык интерфейса',
+            'pageParamName'                     => \Yii::t('app','Interface language'),
 
-            'enabledPjaxPagination'             => 'Включение ajax навигации',
-            'pageParamName'                     => 'Названия парамтера страниц, при постраничной навигации',
-            'pageSize'                          => 'Количество записей на одной странице',
+            'enabledPjaxPagination'             => \Yii::t('app','Turning ajax navigation'),
+            'pageParamName'                     => \Yii::t('app','Parameter name pages, pagination'),
+            'pageSize'                          => \Yii::t('app','Number of records on one page'),
 
-            'ckeditorPreset'                    => 'Инструменты',
-            'ckeditorSkin'                      => 'Тема оформления',
-            'ckeditorHeight'                    => 'Высота',
-            'ckeditorCodeSnippetGeshi'          => 'Использовать подсветку кода (Code Snippets Using GeSHi)',
-            'ckeditorCodeSnippetTheme'          => 'Тема highlight подсветки кода',
+            'ckeditorPreset'                    => \Yii::t('app','Instruments'),
+            'ckeditorSkin'                      => \Yii::t('app','Theme of formalization'),
+            'ckeditorHeight'                    => \Yii::t('app','Height'),
+            'ckeditorCodeSnippetGeshi'          => \Yii::t('app','Use code highlighting') . ' (Code Snippets Using GeSHi)',
+            'ckeditorCodeSnippetTheme'          => \Yii::t('app','Theme of {theme} code',['theme' => 'hightlight']),
 
-            'blockedTime'                       => 'Время через, через которое, блокировать пользователя',
+            'blockedTime'                       => \Yii::t('app','Time through which block user'),
         ]);
     }
 
@@ -217,6 +220,14 @@ JS
             'preset' => $this->ckeditorPreset,
             'clientOptions' => $clientOptions
         ];
+    }
+
+    /**
+     * @return array|null|\yii\db\ActiveRecord
+     */
+    public function getCmsLanguage()
+    {
+        return CmsLang::find()->where(['code' => $this->languageCode])->one();
     }
 
 }

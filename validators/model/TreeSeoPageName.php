@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms\validators\model;
 
-use skeeks\cms\models\behaviors\TreeBehavior;
 use skeeks\cms\models\Tree;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
@@ -27,10 +26,9 @@ class TreeSeoPageName
      */
     protected $_model = null;
 
-    public function __construct($model)
+    public function __construct(Tree $model)
     {
         //Модель должна обладать поведением Tree
-        Validate::ensure(new HasBehavior(TreeBehavior::className()), $model);
         $this->_model = $model;
     }
 
@@ -46,21 +44,21 @@ class TreeSeoPageName
             return $this->_ok();
         } else
         {
-            $parent = $this->_model->findParent();
+            $parent = $this->_model->parent;
             if (!$parent)
             {
                 return $this->_ok();
             }
 
-            $find   = $parent->findChildrens()->where([
-                $this->_model->pageAttrName => $seoPageName,
-                $this->_model->pidAttrName => $this->_model->getPid()
+            $find   = $parent->getChildren()->where([
+                "code" => $seoPageName,
+                'pid' => $this->_model->pid
             ])->one();
         }
 
         if ($find)
         {
-            return $this->_bad("Название " . $seoPageName  . " уже занято");
+            return $this->_bad(\Yii::t('app','{seoname} name is already used',['seoname' => $seoPageName]));
         }
 
         return $this->_ok();

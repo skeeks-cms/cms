@@ -45,8 +45,8 @@ class Module extends CmsModule
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            "name"          => \Yii::$app->cms->moduleCms()->getName() . " — система администрирования",
-            "description"   => "Модуль входит в состав модуля cms, содержит все необходимые элементы для админки",
+            "name"          => \Yii::$app->cms->moduleCms()->getName() . " — " . \Yii::t('app','system administration'),
+            "description"   => \Yii::t('app',"The module is part of the module cms, it contains all the necessary elements for admin"),
         ]);
     }
 
@@ -113,16 +113,30 @@ class Module extends CmsModule
      */
     public function requestIsAdmin()
     {
-        $request = \Yii::$app->request;
-        $urlRuleAdmin = new UrlRule();
-        $pathInfo       = $request->getPathInfo();
-        $params         = $request->getQueryParams();
-        $firstPrefix    = substr($pathInfo, 0, strlen($urlRuleAdmin->adminPrefix));
-
-        if ($firstPrefix == $urlRuleAdmin->adminPrefix)
+        if (\Yii::$app->urlManager->rules)
         {
-            return true;
+            foreach (\Yii::$app->urlManager->rules as $rule)
+            {
+                if ($rule instanceof UrlRule)
+                {
+                    $urlRuleAdmin = $rule;
+
+
+                    $request = \Yii::$app->request;
+                    $pathInfo       = $request->getPathInfo();
+                    $params         = $request->getQueryParams();
+                    $firstPrefix    = substr($pathInfo, 0, strlen($urlRuleAdmin->adminPrefix));
+
+                    if ($firstPrefix == $urlRuleAdmin->adminPrefix)
+                    {
+                        return true;
+                    }
+
+                }
+            }
         }
+
+
 
         return false;
     }

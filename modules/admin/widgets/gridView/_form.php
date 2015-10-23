@@ -10,17 +10,17 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->fieldSet('Постраничная навигация'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldInputInt($model, 'pageSize'); ?>
         <?= $form->field($model, 'pageParamName')->textInput(); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Сортировка'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Priority')); ?>
         <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
         <?= $form->fieldSelect($model, 'order', [
-            SORT_ASC    => "ASC (от меньшего к большему)",
-            SORT_DESC   => "DESC (от большего к меньшему)",
+            SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
+            SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
         ]); ?>
     <?= $form->fieldSetEnd(); ?>
 
@@ -28,13 +28,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <? $selectedColumns = \skeeks\cms\helpers\UrlHelper::constructCurrent()->getSystem('selectedColumns'); ?>
 
     <? if ($columns) : ?>
-        <?= $form->fieldSet('Поля таблицы'); ?>
+        <?= $form->fieldSet(\Yii::t('app','Table fields')); ?>
 
             <div class="row">
                 <div class="col-lg-6">
 
-                    <label>Доступные поля</label>
-                    <p>Двойной клик по пункту, включит его</p>
+                    <label><?=\Yii::t('app','Available fields')?></label>
+                    <p><?=\Yii::t('app','Double-click for item, turn it on')?></p>
                     <hr />
                     <?= \yii\helpers\Html::listBox('possibleColumns', [], $columns, [
                         'size'      => "20",
@@ -44,8 +44,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
                 </div>
                 <div class="col-lg-6">
-                    <label>Включенные поля</label>
-                    <p>Двойной клик по пункту, выключит его. Так же можно менять порядок пуктов перетаскивая их.</p>
+                    <label><?=\Yii::t('app','Included fields')?></label>
+                    <p><?=\Yii::t('app','Double-click for item, turn it off. You can also change the order of items by dragging them.')?></p>
                     <hr />
                     <ul id="sx-visible-selected">
 

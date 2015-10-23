@@ -19,7 +19,7 @@ class IndexController extends AdminController
 {
     public function init()
     {
-        $this->name = "Рабочий стол";
+        $this->name = \Yii::t('app',"Desktop");
 
         parent::init();
     }
@@ -31,7 +31,7 @@ class IndexController extends AdminController
             'index' =>
             [
                 'class'         => AdminAction::className(),
-                'name'          => 'Главная страница',
+                'name'          => \Yii::t('app','Main page'),
                 "visible"       => false,
             ]
         ];

@@ -15,7 +15,7 @@ use skeeks\cms\relatedProperties\PropertyType;
 class PropertyTypeNumber extends PropertyType
 {
     public $code                 = self::CODE_NUMBER;
-    public $name                 = "Число";
+    public $name                 = "";
 
     /**
      * @return \yii\widgets\ActiveField
@@ -27,5 +27,16 @@ class PropertyTypeNumber extends PropertyType
         $field->textInput();
 
         return $field;
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','Number');
+        }
+
     }
 }

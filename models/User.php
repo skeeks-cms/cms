@@ -128,12 +128,12 @@ class User
     {
         if (in_array($this->username, static::getProtectedUsernames()))
         {
-            throw new Exception('Этого пользователя нельзя удалить');
+            throw new Exception(\Yii::t('app','This user can not be removed'));
         }
 
         if ($this->id == \Yii::$app->user->identity->id)
         {
-            throw new Exception('Нельзя удалять самого себя');
+            throw new Exception(\Yii::t('app','You can not delete yourself'));
         }
     }
 
@@ -148,7 +148,14 @@ class User
             {
                 if ($role = \Yii::$app->authManager->getRole($roleName))
                 {
-                    \Yii::$app->authManager->assign($role, $this->id);
+                    try
+                    {
+                        \Yii::$app->authManager->assign($role, $this->id);
+                    } catch(\Exception $e)
+                    {
+
+                    }
+
                 }
             }
         }
@@ -164,10 +171,16 @@ class User
         {
             if ($this->cmsUserEmail)
             {
+
                 $this->cmsUserEmail->value  = $this->_email;
                 $this->cmsUserEmail->def    = Cms::BOOL_Y;
 
-                $this->cmsUserEmail->save();
+                if (!$this->cmsUserEmail->save())
+                {
+                    /*print_r($this->cmsUserEmail->getErrors());
+                    die;*/
+                }
+
             } else
             {
                 $cmsUserEmail = new CmsUserEmail([
@@ -175,7 +188,7 @@ class User
                     'def'   => Cms::BOOL_Y,
                 ]);
 
-                $cmsUserEmail->save();
+                $cmsUserEmail->save(false);
 
                 $cmsUserEmail->link('user', $this);
             }
@@ -316,25 +329,25 @@ class User
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'username' => Yii::t('app', 'Логин'),
+            'username' => Yii::t('app', 'Login'),
             'auth_key' => Yii::t('app', 'Auth Key'),
             'password_hash' => Yii::t('app', 'Password Hash'),
             'password_reset_token' => Yii::t('app', 'Password Reset Token'),
             'email' => Yii::t('app', 'Email'),
-            'phone' => Yii::t('app', 'Телефон'),
+            'phone' => Yii::t('app', 'Phone'),
             'active' => Yii::t('app', 'Active'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Имя'),
-            'city' => Yii::t('app', 'Город'),
-            'address' => Yii::t('app', 'Адрес'),
-            'info' => Yii::t('app', 'Информация'),
-            'gender' => Yii::t('app', 'Пол'),
-            'logged_at' => Yii::t('app', 'Время последней авторизации'),
-            'last_activity_at' => Yii::t('app', 'Время последней активности'),
-            'last_admin_activity_at' => Yii::t('app', 'Время последней активности в админке'),
-            'status_of_life' => Yii::t('app', 'Статус'),
-            'image_id' => Yii::t('app', 'Фото'),
+            'name' => Yii::t('app', 'Name???'),
+            'city' => Yii::t('app', 'City'),
+            'address' => Yii::t('app', 'Address'),
+            'info' => Yii::t('app', 'Information'),
+            'gender' => Yii::t('app', 'Gender'),
+            'logged_at' => Yii::t('app', 'Logged At'),
+            'last_activity_at' => Yii::t('app', 'Last Activity At'),
+            'last_admin_activity_at' => Yii::t('app', 'Last Activity In The Admin At'),
+            'status_of_life' => Yii::t('app', 'Status'),
+            'image_id' => Yii::t('app', 'Image'),
         ];
     }
 
@@ -475,7 +488,7 @@ class User
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        throw new NotSupportedException(\Yii::t('app','"findIdentityByAccessToken" is not implemented.'));
     }
 
     /**
@@ -707,19 +720,23 @@ class User
     }
 
     /**
-     * @return string
+     * @return $this
      */
     public function getCmsUserEmail()
     {
-        return $this->getCmsUserEmails()->andWhere(['def' => Cms::BOOL_Y])->one();
+        $query = $this->getCmsUserEmails()->andWhere(['def' => Cms::BOOL_Y]);
+        $query->multiple = false;
+        return $query;
     }
 
     /**
-     * @return string
+     * @return $this
      */
     public function getCmsUserPhone()
     {
-        return $this->getCmsUserPhones()->andWhere(['def' => Cms::BOOL_Y])->one();
+        $query = $this->getCmsUserPhones()->andWhere(['def' => Cms::BOOL_Y]);
+        $query->multiple = false;
+        return $query;
     }
 
 
@@ -755,9 +772,9 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCmsUserAuthclients()
+    public function getCmsUserAuthClients()
     {
-        return $this->hasMany(CmsUserAuthclient::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserAuthClient::className(), ['user_id' => 'id']);
     }
 
     /**

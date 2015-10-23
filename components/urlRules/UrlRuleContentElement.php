@@ -14,7 +14,7 @@ use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
-/**asd
+/**
  * Class UrlRuleContentElement
  * @package skeeks\cms\components\urlRules
  */

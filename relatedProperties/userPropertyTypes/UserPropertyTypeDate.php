@@ -18,15 +18,35 @@ use yii\helpers\ArrayHelper;
 class UserPropertyTypeDate extends PropertyType
 {
     public $code = self::CODE_NUMBER;
-    public $name = "Дата и время";
+    public $name = "";
 
-    static public $types = [
+   /* static public $types = [
         \kartik\datecontrol\DateControl::FORMAT_DATETIME => 'Дата и время',
         \kartik\datecontrol\DateControl::FORMAT_DATE => 'Только дата',
         //\kartik\datecontrol\DateControl::FORMAT_TIME => 'Только время',
-    ];
+    ];*/
 
     public $type = \kartik\datecontrol\DateControl::FORMAT_DATETIME;
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','Datetime');
+        }
+
+    }
+
+    public static function types()
+    {
+        return [
+            \kartik\datecontrol\DateControl::FORMAT_DATETIME => \Yii::t('app','Datetime'),
+            \kartik\datecontrol\DateControl::FORMAT_DATE => \Yii::t('app','Only date'),
+            //\kartik\datecontrol\DateControl::FORMAT_TIME => 'Только время',
+        ];
+    }
 
     public function attributeLabels()
     {
@@ -41,7 +61,7 @@ class UserPropertyTypeDate extends PropertyType
         return ArrayHelper::merge(parent::rules(),
         [
             ['type', 'string'],
-            ['type', 'in', 'range' => array_keys(self::$types)],
+            ['type', 'in', 'range' => array_keys(self::types())],
         ]);
     }
 

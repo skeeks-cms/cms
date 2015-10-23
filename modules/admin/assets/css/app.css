@@ -345,6 +345,7 @@ body.empty .sx-panel
             font-weight: bold;
             padding: 5px 0px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
+            font-size: 14px;
         }
 
             .sx-sidebar .sidebar-menu .sx-head .icon
@@ -422,7 +423,9 @@ body.empty .sx-panel
 
                 .sidebar ul.nav.nav-sidebar li a .txt
                 {
-                    font-size: 11px;
+                    /*font-size: 11px;*/
+                    /* SkeekS CMS 2.3.5 */
+                    font-size: 12px;
                 }
 
 

@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -36,6 +37,16 @@ class AdminCmsContentTypeController extends AdminModelEditorController
             [
                 'index' =>
                 [
+
+                    "gridConfig" =>
+                    [
+                        'settingsData' =>
+                        [
+                            'order' => SORT_ASC,
+                            'orderBy' => "priority",
+                        ]
+                    ],
+
                     "columns" => [
                         'name',
                         'code',

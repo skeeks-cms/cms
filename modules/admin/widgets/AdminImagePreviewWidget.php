@@ -34,7 +34,7 @@ class AdminImagePreviewWidget extends Widget
         }
 
 
-        return "<a href='" . $originalSrc . "' class='sx-fancybox sx-img-link-hover' title='Увеличить' data-pjax='0'>
+        return "<a href='" . $originalSrc . "' class='sx-fancybox sx-img-link-hover' title='".\Yii::t('app','Increase')."' data-pjax='0'>
                     <img src='" . $src . "' style='width: " . $this->maxWidth . ";' />
                 </a>";
     }

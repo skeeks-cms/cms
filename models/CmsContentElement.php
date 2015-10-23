@@ -156,8 +156,8 @@ class CmsContentElement extends RelatedElementModel
             'code' => Yii::t('app', 'Code'),
             'description_short' => Yii::t('app', 'Description Short'),
             'description_full' => Yii::t('app', 'Description Full'),
-            'content_id' => Yii::t('app', 'Контент'),
-            'tree_id' => Yii::t('app', 'Основной раздел'),
+            'content_id' => Yii::t('app', 'Content'),
+            'tree_id' => Yii::t('app', 'The Main Section'),
             'show_counter' => Yii::t('app', 'Show Counter'),
             'show_counter_start' => Yii::t('app', 'Show Counter Start'),
             'meta_title' => Yii::t('app', 'Meta Title'),
@@ -165,11 +165,12 @@ class CmsContentElement extends RelatedElementModel
             'meta_description' => Yii::t('app', 'Meta Description'),
             'description_short_type' => Yii::t('app', 'Description Short Type'),
             'description_full_type' => Yii::t('app', 'Description Full Type'),
-            'image_id' => Yii::t('app', 'Главное фото (для анонса)'),
-            'image_full_id' => Yii::t('app', 'Главное фото'),
+            'image_id' => Yii::t('app', 'Main Image (announcement)'),
+            'image_full_id' => Yii::t('app', 'Main Image'),
 
-            'images' => Yii::t('app', 'Изображения'),
-            'files' => Yii::t('app', 'Файлы'),
+            'images' => Yii::t('app', 'Images'),
+            'files' => Yii::t('app', 'Files'),
+            'treeIds' => Yii::t('app', 'Sections'),
         ]);
     }
 
@@ -184,8 +185,8 @@ class CmsContentElement extends RelatedElementModel
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
-            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => 'Для данного контента этот код уже занят.'],
-            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => 'Для данного раздела этот код уже занят.'],
+            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('app','For the content of this code is already in use.')],
+            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => \Yii::t('app','For this section of the code is already in use.')],
             [['treeIds'], 'safe'],
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
@@ -196,6 +197,13 @@ class CmsContentElement extends RelatedElementModel
             ['description_full_type', 'string'],
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
+            ['tree_id', 'default', 'value' => function()
+            {
+                if ($this->cmsContent->defaultTree)
+                {
+                    return $this->cmsContent->defaultTree->id;
+                }
+            }],
 
 
         ]);
@@ -271,10 +279,10 @@ class CmsContentElement extends RelatedElementModel
     {
         if ($this->cmsTree)
         {
-            return $this->cmsTree->site->url . $this->getUrl();
+            return $this->cmsTree->site->url . $this->url;
         }
 
-        return $this->getUrl();
+        return $this->url;
     }
 
 

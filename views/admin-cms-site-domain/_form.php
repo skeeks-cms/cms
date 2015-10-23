@@ -11,7 +11,7 @@ use skeeks\cms\models\Tree;
 
 <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->fieldSet("Основное"); ?>
+    <?= $form->fieldSet(\Yii::t('app',"Main")); ?>
 
             <? if ($code = \Yii::$app->request->get('site_code')) : ?>
                 <?= $form->field($model, 'site_code')->hiddenInput(['value' => $code])->label(false); ?>

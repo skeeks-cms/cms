@@ -37,7 +37,7 @@ class AdminRoleController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление ролями";
+        $this->name                   = \Yii::t('app',"Managing Roles");
         $this->modelShowAttribute     = "name";
         $this->modelPkAttribute       = "name";
         $this->modelClassName         = Role::className();
@@ -58,7 +58,7 @@ class AdminRoleController extends AdminModelEditorController
             'view' =>
             [
                 "class"     => AdminOneModelEditAction::className(),
-                "name"      => "Смотреть",
+                "name"      => \Yii::t('app',"Watch"),
                 "icon"      => "glyphicon glyphicon-eye-open",
                 "callback"  => [$this, "actionView"],
             ],
@@ -199,10 +199,10 @@ class AdminRoleController extends AdminModelEditorController
         {
             if ($model->load(\Yii::$app->request->post()) && $model->save())
             {
-                \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app'.'Saved successfully'));
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Failed to save'));
             }
         }
 
@@ -231,16 +231,16 @@ class AdminRoleController extends AdminModelEditorController
                 {
                     if (\Yii::$app->getAuthManager()->remove($model->item))
                     {
-                        $rr->message = 'Запись успешно удалена';
+                        $rr->message = \Yii::t('app','Record deleted successfully');
                         $rr->success = true;
                     } else
                     {
-                        $rr->message = 'Не получилось удалить запись';
+                        $rr->message = \Yii::t('app','Record deleted unsuccessfully');
                         $rr->success = false;
                     }
                 } else
                 {
-                    $rr->message = 'Эту запись нельзя удалять!';
+                    $rr->message = \Yii::t('app','This entry can not be deleted!');
                     $rr->success = false;
                 }
 
@@ -353,7 +353,7 @@ class AdminRoleController extends AdminModelEditorController
         if ($item) {
             return new AuthItem($item);
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(\Yii::t('app','The requested page does not exist.'));
         }
     }
 }

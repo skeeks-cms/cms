@@ -32,7 +32,7 @@ class SitesCmsWidget extends WidgetRenderable
 {
     //Сортировка
     public $orderBy                     = "priority";
-    public $order                       = SORT_DESC;
+    public $order                       = SORT_ASC;
 
     //Дополнительные настройки
     public $label                       = null;

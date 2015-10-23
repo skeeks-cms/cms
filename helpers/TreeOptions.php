@@ -6,6 +6,8 @@
  * @date 14.10.2015
  */
 namespace skeeks\cms\helpers;
+use skeeks\cms\models\Tree;
+
 /**
  * Class TreeOptions
  * @package skeeks\cms\helpers
@@ -41,9 +43,13 @@ class TreeOptions extends \skeeks\cms\models\Tree
      * @param array $tree
      * @return array
      */
-    public function getMultiOptions()
+    public function getMultiOptions($includeSelf = true)
     {
         $this->_tmpResult = [];
+        if (!$this->isNewRecord && $includeSelf)
+        {
+            $this->_tmpResult[$id] = $this;
+        }
         return $this->_buildTreeArrayRecursive($this, $this->_filter);
     }
 
@@ -55,14 +61,22 @@ class TreeOptions extends \skeeks\cms\models\Tree
      * @param array $filter
      * @return array
      */
-    private function _buildTreeArrayRecursive($model, $filter)
+    private function _buildTreeArrayRecursive(Tree $model, $filter)
     {
         $is_filter_set = !empty($filter);
-        $childs = $model->findChildrens()->all();
+
+        if ($model->isNewRecord)
+        {
+            $childs = static::findRoots()->all();
+        } else
+        {
+            $childs = $model->children;
+        }
+
 
         foreach ($childs as $child)
         {
-            $level  = $child->getLevel();
+            $level  = $child->level;
             $id     = $child->id;
             if (!$is_filter_set || in_array($id, $filter))
             {

@@ -166,7 +166,7 @@ class AdminModelEditorController extends AdminController
                 'index' =>
                 [
                     'class'         => ModelEditorGridAction::className(),
-                    'name'          => 'Список',
+                    'name'          => \Yii::t('app','List'),
                     "icon"          => "glyphicon glyphicon-th-list",
                     "priority"      => 0,
                 ],
@@ -174,7 +174,7 @@ class AdminModelEditorController extends AdminController
                 'create' =>
                 [
                     'class'         => AdminModelEditorCreateAction::className(),
-                    'name'          => 'Добавить',
+                    'name'          => \Yii::t('app','Add'),
                     "icon"          => "glyphicon glyphicon-plus",
                 ],
 
@@ -182,7 +182,7 @@ class AdminModelEditorController extends AdminController
                 "update" =>
                 [
                     'class'         => AdminOneModelUpdateAction::className(),
-                    "name"         => "Редактировать",
+                    "name"         => \Yii::t('app',"Edit"),
                     "icon"          => "glyphicon glyphicon-pencil",
                     "priority"      => 0,
                 ],
@@ -190,7 +190,7 @@ class AdminModelEditorController extends AdminController
                 "delete" =>
                 [
                     'class'         => AdminOneModelEditAction::className(),
-                    "name"          => "Удалить",
+                    "name"          => \Yii::t('app',"Delete"),
                     "icon"          => "glyphicon glyphicon-trash",
                     "confirm"       => \Yii::t('yii', 'Are you sure you want to delete this item?'),
                     "method"        => "post",
@@ -202,9 +202,9 @@ class AdminModelEditorController extends AdminController
                 "delete-multi" =>
                 [
                     'class'             => AdminMultiModelEditAction::className(),
-                    "name"              => "Удалить",
+                    "name"              => \Yii::t('app',"Delete"),
                     "icon"              => "glyphicon glyphicon-trash",
-                    "confirm"           => \Yii::t('yii', 'Вы действительно хотите безвозвратно удалить выбранные элементы?'),
+                    "confirm"           => \Yii::t('yii', 'Are you sure you want to permanently delete the selected items?'),
                     "eachCallback"      => [$this, 'eachMultiDelete'],
                     "priority"          => 99999,
                 ],
@@ -231,12 +231,12 @@ class AdminModelEditorController extends AdminController
     {
         if (!$this->modelClassName)
         {
-            throw new InvalidConfigException("Для AdminModelEditorController необходимо указать класс модели");
+            throw new InvalidConfigException(\Yii::t('app',"For {modelname} must specify the model class",['modelname' => 'AdminModelEditorController']));
         }
 
         if (!class_exists($this->modelClassName))
         {
-            throw new InvalidConfigException("{$this->modelClassName} класс не нейден, необходимо указать существующий класс модели");
+            throw new InvalidConfigException("{$this->modelClassName} " . \Yii::t('app','the class is not found, you must specify the existing class model'));
         }
     }
 
@@ -415,11 +415,11 @@ class AdminModelEditorController extends AdminController
             {
                 if ($this->model->delete())
                 {
-                    $rr->message = 'Запись успешно удалена';
+                    $rr->message = \Yii::t('app','Record deleted successfully');
                     $rr->success = true;
                 } else
                 {
-                    $rr->message = 'Не получилось удалить запись';
+                    $rr->message = \Yii::t('app','Record deleted unsuccessfully');
                     $rr->success = false;
                 }
             } catch (\Exception $e)
@@ -473,11 +473,11 @@ class AdminModelEditorController extends AdminController
 
             if ($keys = \Yii::$app->request->post('keys'))
             {
-                $counter = count($keys);
+                //$counter = count($keys);
 
-                foreach ($keys as $key)
+                foreach ($keys as $counter => $key)
                 {
-                    $priority = $counter * 1000;
+                    $priority = ($counter + 1) * 1000;
 
                     $modelClassName = $this->modelClassName;
                     $model = $modelClassName::findOne($key);
@@ -487,13 +487,13 @@ class AdminModelEditorController extends AdminController
                         $model->save(false);
                     }
 
-                    $counter = $counter - 1;
+                    //$counter = $counter - 1;
                 }
             }
 
             return [
                 'success' => true,
-                'message' => 'Изминения сохранены',
+                'message' => \Yii::t('app','Changes saved'),
             ];
         }
     }

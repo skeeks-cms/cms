@@ -67,7 +67,7 @@ JS
 
             <!--<a href="/">Перейти на сайт &rarr;</a>-->
         <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-            <a href="/" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="Открыть сайтовую часть"><i class="glyphicon glyphicon-globe"></i></a>
+            <a href="/" style="width: auto;" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','To main page of site')?>"><i class="glyphicon glyphicon-globe"></i></a>
         </li>
 
     </ul>
@@ -89,10 +89,10 @@ JS
     <div class="row">
         <div class="col-sm-5">
             <div class="sx-footer-copyright">
-                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт SkeekS CMS">
+                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site {cms}',['cms' => 'SkeekS CMS'])?>">
                     <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
                 </a>
-                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="Перейти на сайт разработчика системы">SkeekS.com</a>
+                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site of the developer')?>">SkeekS.com</a>
             </div>
         </div><!--/.col-->
         <div class="col-sm-7 text-right">

@@ -8,6 +8,6 @@
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <? $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSelect($model, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::$fieldElements); ?>
+    <?= $form->fieldSelect($model, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements()); ?>
     <?= $form->buttonsStandart($model); ?>
 <? ActiveForm::end(); ?>

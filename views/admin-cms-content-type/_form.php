@@ -13,16 +13,16 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet('Общая информация')?>
+<?= $form->fieldSet(\Yii::t('app','General information'))?>
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput(); ?>
     <?= $form->fieldInputInt($model, 'priority')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Контент')?>
+<?= $form->fieldSet(\Yii::t('app','Content'))?>
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => "Контент",
+        'label'             => \Yii::t('app',"Content"),
         'hint'              => "",
         'parentModel'       => $model,
         'relation'          => [
@@ -32,7 +32,7 @@ use common\models\User;
         'sort'              => [
             'defaultOrder' =>
             [
-                'priority' => SORT_DESC
+                'priority' => SORT_ASC
             ]
         ],
 

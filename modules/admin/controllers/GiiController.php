@@ -28,7 +28,7 @@ class GiiController extends AdminController
 {
     public function init()
     {
-        $this->name = "Генератор кода";
+        $this->name = \Yii::t('app',"Code generator");
 
         parent::init();
     }
@@ -40,7 +40,7 @@ class GiiController extends AdminController
             "index" =>
             [
                 "class"        => AdminAction::className(),
-                "name"         => "Генератор кода",
+                "name"         => \Yii::t('app',"Code generator"),
             ],
         ];
     }

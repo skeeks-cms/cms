@@ -12,8 +12,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <div class="row">
         <div class="col-md-12">
             <div class="pull-left">
-                <? if ($model->parentTrees) : ?>
-                    <? foreach ($model->parentTrees as $tree) : ?>
+                <? if ($model->parents) : ?>
+                    <? foreach ($model->parents as $tree) : ?>
                         <a href="<?= $tree->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
                             <?= $tree->name ?>
                             <? if ($tree->level == 0) : ?>
@@ -45,7 +45,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint("Этот параметр влияет на адрес страницы, будте внимательно при его редактировании."); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])
+        ->hint(\Yii::t('app', 'Этот параметр влияет на адрес страницы, будте внимательно при его редактировании.')); ?>
 
 
 

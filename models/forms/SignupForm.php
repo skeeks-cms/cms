@@ -35,9 +35,9 @@ class SignupForm extends Model
     public function attributeLabels()
     {
         return [
-            'username'      => 'Логин',
-            'email'         => 'Email',
-            'password'      => 'Пароль',
+            'username'      => \Yii::t('app','Login'),
+            'email'         => \Yii::t('app','Email'),
+            'password'      => \Yii::t('app','Password'),
         ];
     }
 
@@ -64,7 +64,7 @@ class SignupForm extends Model
         return [
             ['username', 'filter', 'filter' => 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => 'Этот логин уже занят другим пользователем.'],
+            ['username', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => \Yii::t('app','This login is already in use by another user.')],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'filter', 'filter' => 'trim'],
@@ -124,7 +124,7 @@ class SignupForm extends Model
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                         ->setTo($user->email)
-                        ->setSubject('Регистрация на сайте ' . \Yii::$app->cms->appName)
+                        ->setSubject(\Yii::t('app','Sign up at site') . \Yii::$app->cms->appName)
                         ->send();
                 }
 
@@ -145,12 +145,9 @@ class SignupForm extends Model
     public function sendEmail()
     {
         /* @var $user User */
-        $user = User::findOne([
-            'status' => User::STATUS_ACTIVE,
-            'email' => $this->email,
-        ]);
 
-        if ($user) {
+        if ($user = User::findByEmail($this->email))
+        {
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();
             }
@@ -159,7 +156,7 @@ class SignupForm extends Model
                 return \Yii::$app->mailer->compose('passwordResetToken', ['user' => $user])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
                     ->setTo($this->email)
-                    ->setSubject('Password reset for ' . \Yii::$app->cms->appName)
+                    ->setSubject(\Yii::t('app','Password reset for ') . \Yii::$app->cms->appName)
                     ->send();
             }
         }

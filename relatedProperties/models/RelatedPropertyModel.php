@@ -182,6 +182,19 @@ abstract class RelatedPropertyModel extends Core
      */
     public function renderActiveForm(ActiveForm $activeForm, $model)
     {
+        if (!$propertyType = $this->createPropertyType($activeForm, $model))
+        {
+            return false;
+        }
+
+        return $propertyType->renderForActiveForm();
+    }
+
+    /**
+     * @return PropertyType
+     */
+    public function createPropertyType(ActiveForm $activeForm = null, $model = null)
+    {
         $elementClass   = $this->component;
 
         if (!class_exists($elementClass))
@@ -200,9 +213,8 @@ abstract class RelatedPropertyModel extends Core
 
         $propertyType->attributes = $this->component_settings;
 
-        return $propertyType->renderForActiveForm();
+        return $propertyType;
     }
-
 
     /**
      * @return array

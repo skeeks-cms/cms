@@ -18,13 +18,23 @@ use yii\helpers\ArrayHelper;
 class UserPropertyTypeSelectFile extends PropertyType
 {
     public $code = self::CODE_STRING;
-    public $name = "Стандартный выбор файла";
+    public $name = "";
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','Standard file selection');
+        }
+    }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
-            'type'  => 'Тип',
+            'type'  => \Yii::t('app','Type'),
         ]);
     }
 

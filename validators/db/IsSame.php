@@ -41,7 +41,7 @@ class IsSame
             }
         }
 
-        return $this->_bad("Сущьности разные");
+        return $this->_bad(\Yii::t('app','Essence different'));
     }
 
 

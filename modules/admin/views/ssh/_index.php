@@ -20,13 +20,13 @@ use Yii;
             'placeholder' => 'php yii help'
         ]); ?>
         <div class="form-group sx-commands">
-            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii</button>
-            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii help cms/update</button>
-            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii cms/update</button>
-            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="Выполнить комманду" data-original-title="Выполнить комманду">php yii cms/update/all --interactive=0</button>
+            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="<?=\Yii::t('app','Execute command')?>" data-original-title="<?=\Yii::t('app','Execute command')?>">php yii</button>
+            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="<?=\Yii::t('app','Execute command')?>" data-original-title="<?=\Yii::t('app','Execute command')?>">php yii help cms/update</button>
+            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="<?=\Yii::t('app','Execute command')?>" data-original-title="<?=\Yii::t('app','Execute command')?>">php yii cms/update</button>
+            <button type="button" class="btn btn-default btn-xs" data-sx-widget="tooltip" title="<?=\Yii::t('app','Execute command')?>" data-original-title="<?=\Yii::t('app','Execute command')?>">php yii cms/update/all --interactive=0</button>
         </div>
         <?= Html::tag('div',
-            Html::submitButton("Выполнить команду", ['class' => 'btn btn-primary']),
+            Html::submitButton(\Yii::t('app','Execute command'), ['class' => 'btn btn-primary']),
             ['class' => 'form-group']
         ); ?>
 

@@ -66,12 +66,12 @@ class ControllerActions
     {
         if (!$this->controller)
         {
-            throw new InvalidConfigException("Некорректно сконфигурирован виджет, необходимо передать объект контроллера для которого сроится виджет");
+            throw new InvalidConfigException(\Yii::t('app',"Incorrectly configured widget, you must pass an controller object to which is built widget"));
         }
 
         if (!$this->controller instanceof AdminController)
         {
-            throw new InvalidConfigException("У данного контроллера нельзя построить действия");
+            throw new InvalidConfigException(\Yii::t('app',"For this controller can not build action"));
         }
     }
 

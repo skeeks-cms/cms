@@ -113,12 +113,12 @@ class CmsUserEmail extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'Пользователь'),
+            'user_id' => Yii::t('app', 'User'),
             'value' => "Email",
-            'approved' => "Подтвержден",
+            'approved' => \Yii::t('app',"Approved"),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'def' => Yii::t('app', 'Основной'),
+            'def' => Yii::t('app', 'Default'),
         ];
     }
 

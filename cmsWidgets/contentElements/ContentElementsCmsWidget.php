@@ -159,11 +159,11 @@ class ContentElementsCmsWidget extends WidgetRenderable
             if ($tree)
             {
                 $treeIds[] = $tree->id;
-                if ($tree->hasChildrens() && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
+                if ($tree->children && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
                 {
                     if ($this->enabledCurrentTreeChildAll)
                     {
-                        if ($childrens = $tree->findChildrensAll()->all())
+                        if ($childrens = $tree->children)
                         {
                             foreach ($childrens as $chidren)
                             {
@@ -172,7 +172,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         }
                     } else
                     {
-                        if ($childrens = $tree->findChildrens()->all())
+                        if ($childrens = $tree->children)
                         {
                             foreach ($childrens as $chidren)
                             {

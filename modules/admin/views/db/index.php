@@ -15,7 +15,7 @@ $schema = $db->getSchema();
 $schema->refresh();
 
 ?>
-<?= \yii\helpers\Html::a("<i class=\"glyphicon glyphicon-retweet\"></i> Обновить кэш структуры таблиц", \skeeks\cms\helpers\UrlHelper::construct('admin/db/index')->set('act', 'refresh-tables')->enableAdmin(), [
+<?= \yii\helpers\Html::a("<i class=\"glyphicon glyphicon-retweet\"></i> ". \Yii::t('app','Refresh cache table structure'), \skeeks\cms\helpers\UrlHelper::construct('admin/db/index')->set('act', 'refresh-tables')->enableAdmin(), [
     'class'         => 'btn btn-primary',
     'data-method'   => 'post'
 ])?>
@@ -25,7 +25,7 @@ $schema->refresh();
 <p></p>
 <? $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Структура таблиц'); ?>
+<?= $form->fieldSet(\Yii::t('app','Table structure')); ?>
     <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
         'dataProvider'  => $dataProvider,
         'columns' => [
@@ -37,7 +37,7 @@ $schema->refresh();
             [
                 'class'         => \yii\grid\DataColumn::className(),
                 'attribute'     => 'schemaName',
-                'label'         => 'Количество колонок',
+                'label'         => \Yii::t('app','Number of columns'),
                 'value' => function(yii\db\TableSchema $model)
                 {
                     return count($model->columns);
@@ -48,7 +48,7 @@ $schema->refresh();
             [
                 'class'         => \yii\grid\DataColumn::className(),
                 'attribute'     => 'schemaName',
-                'label'         => 'Количество внешних ключей',
+                'label'         => \Yii::t('app','Number of foreign keys'),
                 'value' => function(yii\db\TableSchema $model)
                 {
                     return count($model->foreignKeys);
@@ -58,19 +58,19 @@ $schema->refresh();
     ]); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Настройки'); ?>
+<?= $form->fieldSet(\Yii::t('app','Settings')); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
         'dataProvider'  => new \yii\data\ArrayDataProvider([
             'allModels' =>
             [
                 [
-                    'name' => 'Кэш структуры таблиц',
+                    'name' => \Yii::t('app','Cache table structure'),
                     'value' => $db->enableSchemaCache ? "Y" : "N"
                 ],
 
                 [
-                    'name' => 'Кэш запросов',
+                    'name' => \Yii::t('app','Cache query'),
                     'value' => $db->enableSchemaCache ? "Y" : "N"
                 ]
             ]
@@ -87,13 +87,13 @@ $schema->refresh();
 ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Бэкапы'); ?>
+<?= $form->fieldSet(\Yii::t('app','Backup')); ?>
 
     <? \skeeks\cms\modules\admin\widgets\Pjax::begin([
         'id' => 'sx-backups'
     ])?>
         <? $url = \skeeks\cms\helpers\UrlHelper::construct('admin/db/backup')->enableAdmin()->toString(); ?>
-        <?= \yii\helpers\Html::a("<i class=\"glyphicon glyphicon-save\"></i> Сделать бэкап", $url, [
+        <?= \yii\helpers\Html::a("<i class=\"glyphicon glyphicon-save\"></i> ". \Yii::t('app','Make a backup'), $url, [
             'class'         => 'btn btn-primary',
             'onclick'   => new \yii\web\JsExpression(<<<JS
     new sx.classes.Backup({'backend' : '{$url}'}); return false;
@@ -101,7 +101,7 @@ JS
 )
         ]); ?>
 
-        <p>Для создания бэкапов базы данных используется утилита mysqldump, и данный инструмент работает только в том случае если эта утилита установлена на вашем сервере.</p>
+        <p><?=\Yii::t('app',"To create backups of the database used by the utility {mysqldump}, and this tool will only work if the utility is installed on your server.",['mysqldump' => 'mysqldump'])?></p>
         <hr />
         <? if ($dbBackupDir->isExist()) : ?>
             <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
@@ -143,7 +143,7 @@ JS
                 ]);
             ?>
         <? else: ?>
-            <p>Дирриктория с файлами бэкапов базы данных не найдена.</p>
+            <p><?=\Yii::t('app','Directory with files of backups database is not found.')?></p>
         <? endif; ?>
 
     <? \skeeks\cms\modules\admin\widgets\Pjax::end() ?>
