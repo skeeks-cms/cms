@@ -46,7 +46,7 @@ class TreeSeoPageName
             return $this->_ok();
         } else
         {
-            $parent = $this->_model->findParent();
+            $parent = $this->_model->parent;
             if (!$parent)
             {
                 return $this->_ok();
@@ -54,7 +54,7 @@ class TreeSeoPageName
 
             $find   = $parent->findChildrens()->where([
                 $this->_model->pageAttrName => $seoPageName,
-                $this->_model->pidAttrName => $this->_model->getPid()
+                'pid' => $this->_model->pid
             ])->one();
         }
 

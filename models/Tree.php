@@ -102,6 +102,8 @@ class Tree extends Core
         return '{{%cms_tree}}';
     }
 
+    const PRIORITY_STEP = 100; //Шаг приоритета
+
 
     public function behaviors()
     {
@@ -538,7 +540,7 @@ class Tree extends Core
      */
 	public function findRoots()
 	{
-		return $this->owner->find()->where([$this->levelAttrName => 0])->orderBy(["priority" => SORT_ASC]);
+		return $this->owner->find()->where(['level' => 0])->orderBy(["priority" => SORT_ASC]);
 	}
 
     /**
@@ -571,6 +573,14 @@ class Tree extends Core
         return [];
     }
 
+    /**
+     * У текущего раздела есть ли родительский элемент
+     * @return bool
+     */
+    public function hasParent()
+    {
+        return (bool) $this->pid;
+    }
 
     /**
      * @return array|null|ActiveQuery
@@ -587,13 +597,26 @@ class Tree extends Core
             return null;
         }
 
-        $find = $this->find()->orderBy([$this->levelAttrName => SORT_ASC]);
+        $find = $this->find()->orderBy(["level" => SORT_ASC]);
         if ($pids = $this->pids)
         {
             $find->andWhere([$this->primaryKey()[0] => $pids]);
         }
 
         return $find;
+    }
+
+    public function findParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildrens()
+    {
+        return (bool) $this->children;
     }
 }
 

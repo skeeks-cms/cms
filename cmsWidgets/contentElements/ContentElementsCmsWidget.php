@@ -159,7 +159,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
             if ($tree)
             {
                 $treeIds[] = $tree->id;
-                if ($tree->hasChildrens() && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
+                if ($tree->children && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
                 {
                     if ($this->enabledCurrentTreeChildAll)
                     {

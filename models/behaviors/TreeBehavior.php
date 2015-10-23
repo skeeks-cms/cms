@@ -32,18 +32,15 @@ use yii\helpers\Json;
 use yii\validators\Validator;
 
 /**
+ * @property Tree $owner
+ *
  * Class TreeBehavior
  * @package skeeks\cms\models\behaviors
  */
 class TreeBehavior extends ActiveRecordBehavior
 {
-    public $pidAttrName         = "pid"; //Непосредственный родитель
-    public $pidsAttrName        = "pids";
-    public $levelAttrName       = "level";
     public $dirAttrName         = "dir";
     public $pageAttrName        = "code";
-    public $nameAttrName        = "name";
-    public $hasChildrenAttrName = "has_children";
 
     public $delimetr = "/";
 
@@ -93,7 +90,7 @@ class TreeBehavior extends ActiveRecordBehavior
     public function beforeSaveNode(ModelEvent $event)
     {
         //Если не заполнено название, нужно сгенерить
-        if (!$this->getName())
+        if (!$this->owner->name)
         {
             $this->generateName();
         }
@@ -121,11 +118,9 @@ class TreeBehavior extends ActiveRecordBehavior
     public function afterDeleteNode(Event $event)
     {
         //После удаления нужно родителя пересчитать
-        $parent = $this->findParent();
-
-        if ($parent)
+        if ($this->owner->parent)
         {
-            $parent->processNormalize();
+            $this->owner->parent->processNormalize();
         }
     }
 
@@ -138,13 +133,13 @@ class TreeBehavior extends ActiveRecordBehavior
      */
     public function generateSeoPageName()
     {
-        if ($this->isRoot())
+        if ($this->owner->isRoot())
         {
             $this->owner->setAttribute($this->pageAttrName, null);
         } else
         {
             $filter     = new FilterSeoPageName();
-            $newName    = $filter->filter($this->getName());
+            $newName    = $filter->filter($this->owner->name);
 
             if (Validate::validate(new TreeSeoPageName($this->owner), $newName)->isInvalid())
             {
@@ -170,7 +165,7 @@ class TreeBehavior extends ActiveRecordBehavior
     public function generateName()
     {
         $lastTree = $this->owner->find()->orderBy(["id" => SORT_DESC])->one();
-        $this->owner->setAttribute($this->nameAttrName, "pk-" . $lastTree->primaryKey);
+        $this->owner->setAttribute("name", "pk-" . $lastTree->primaryKey);
 
         return $this->owner;
     }
@@ -194,7 +189,7 @@ class TreeBehavior extends ActiveRecordBehavior
      */
 	public function findChildrens()
 	{
-		return $this->owner->find()->where([$this->pidAttrName => $this->owner->primaryKey])->orderBy(["priority" => SORT_ASC]);
+		return $this->owner->find()->where(['pid' => $this->owner->primaryKey])->orderBy(["priority" => SORT_ASC]);
 	}
 
     /**
@@ -203,27 +198,11 @@ class TreeBehavior extends ActiveRecordBehavior
      */
 	public function findChildrensAll()
 	{
-        $pidString = implode('/', $this->owner->getPids()) . "/" . $this->owner->primaryKey;
+        $pidString = implode('/', $this->owner->pids) . "/" . $this->owner->primaryKey;
 
 		return $this->owner->find()
-            ->andWhere(['like', $this->pidsAttrName, $pidString . '%', false])
+            ->andWhere(['like', 'pids', $pidString . '%', false])
             ->orderBy(["priority" => SORT_ASC]);
-	}
-
-
-
-    /**
-     * Родительский элемент
-     * @return array|bool|null|\yii\db\ActiveRecord
-     */
-	public function findParent()
-	{
-        if (!$this->hasParent())
-        {
-            return false;
-        }
-
-		return $this->owner->find()->where([$this->owner->primaryKey()[0] => $this->getPid()])->one();
 	}
 
 
@@ -245,15 +224,15 @@ class TreeBehavior extends ActiveRecordBehavior
             new NotSame($this->owner)
         ]), $parent);
 
-        $newPids     = $parent->getPids();
+        $newPids     = $parent->pids;
         $newPids[]   = $parent->primaryKey;
 
-        $this->owner->setAttribute($this->levelAttrName,     ($parent->getLevel() + 1));
-        $this->owner->setAttribute($this->pidAttrName,       $parent->primaryKey);
-        $this->owner->setAttribute($this->pidsAttrName,      $newPids);
+        $this->owner->setAttribute("level",     ($parent->level + 1));
+        $this->owner->setAttribute('pid',       $parent->primaryKey);
+        $this->owner->setAttribute("pids",      $newPids);
 
 
-        if (!$this->getName())
+        if (!$this->owner->name)
         {
             $this->generateName();
         }
@@ -299,7 +278,6 @@ class TreeBehavior extends ActiveRecordBehavior
             throw new Exception(\Yii::t('app',"Failed to create the child element:  ") . Json::encode($target->attributes));
         }
 
-        $this->owner->setAttribute($this->hasChildrenAttrName, 1);
         $this->owner->save(false);
 
         return $target;
@@ -354,20 +332,19 @@ class TreeBehavior extends ActiveRecordBehavior
     public function processNormalize()
     {
         //Если это новая несохраненная сущьность, ничего делать не надо
-        if (Validate::validate(new IsNewRecord(), $this->owner)->isValid())
+        if ($this->owner->isNewRecord)
         {
             return $this;
         }
 
-        if (!$this->hasParent())
+        if (!$this->owner->pid)
         {
             $this->owner->setAttribute($this->dirAttrName, null);
             $this->owner->save(false);
         }
         else
         {
-            $parent = $this->findParent();
-            $this->setAttributesForFutureParent($parent);
+            $this->setAttributesForFutureParent($this->owner->parent);
             $this->owner->save(false);
         }
 
@@ -376,7 +353,6 @@ class TreeBehavior extends ActiveRecordBehavior
         $childModels = $this->findChildrens()->all();
         if ($childModels)
         {
-            $this->owner->setAttribute($this->hasChildrenAttrName, 1);
             $this->owner->save(false);
 
             foreach ($childModels as $childModel)
@@ -385,7 +361,6 @@ class TreeBehavior extends ActiveRecordBehavior
             }
         } else
         {
-            $this->owner->setAttribute($this->hasChildrenAttrName, 0);
             $this->owner->save(false);
         }
 
@@ -396,40 +371,6 @@ class TreeBehavior extends ActiveRecordBehavior
 
 
 
-    /**
-     * У текущего раздела есть ли родительский элемент
-     * @return bool
-     */
-    public function hasParent()
-    {
-        return (bool) $this->getPid();
-    }
-
-    /**
-     * У текущего раздела есть ли родительский элемент
-     * @return bool
-     */
-    public function hasChildrens()
-    {
-        return (bool) $this->owner->{$this->hasChildrenAttrName};
-    }
-
-    /**
-     * Корневая нода?
-     * @return bool
-     */
-    public function isRoot()
-    {
-        return (bool) ($this->getLevel() == 0);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return (string) $this->owner->{$this->nameAttrName};
-    }
 
     /**
      * @return string
@@ -439,72 +380,6 @@ class TreeBehavior extends ActiveRecordBehavior
         return (string) $this->owner->{$this->pageAttrName};
     }
 
-    /**
-     * @return array
-     */
-    public function getPids()
-    {
-        return (array) $this->owner->{$this->pidsAttrName};
-    }
-
-    /**
-     * @return int
-     */
-    public function getLevel()
-    {
-        return (int) $this->owner->{$this->levelAttrName};
-    }
-
-    /**
-     * @return string
-     */
-    public function getDir()
-    {
-        return (string) $this->owner->{$this->dirAttrName};
-    }
-
-    /**
-     * @return int
-     */
-    public function getPid()
-    {
-        return (int) $this->owner->{$this->pidAttrName};
-    }
-
-    /**
-     * Пересчитывает приоритеты детей в соответствии со занчениями заданного поля
-     * @param string $field Название поля
-     * @param bool $is_asc Упорядочивать ли по возрастанию
-     */
-    public function recalculateChildrenPriorities($field = "name", $is_asc = true)
-    {
-        //если второй аргумент - true, то сортируем по-возрастанию,
-        //по-умолчанию - false: сортировка по-убыванию,
-        //потому что как правило везде элементы сортируются по убыванию приоритета:
-        //чем больше приоритет, тем выше элемент стоит в списке.
-        if ($is_asc)
-        {
-            $order = SORT_ASC;
-        }
-        else
-        {
-            $order = SORT_DESC;
-        }
-
-        $children = $this->findChildrens()->orderBy([$field => $order])->all();
-
-        //значения приориетов начинаются со 100 и кратны 100,
-        //на тот случай, если между какими-то элементами
-        //нужно будет вручную добавить другие
-        $i = 100;
-
-        foreach($children as $child)
-        {
-            $child->priority = $i;
-            $child->save(false);
-            $i += 100;
-        }
-    }
 
     /**
      * Производит обмен значений приоритетов между текущим элементом дерева и элементом, переданном в аргументе

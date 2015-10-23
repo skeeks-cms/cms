@@ -41,6 +41,15 @@ class AdminCmsLangController extends AdminModelEditorController
             [
                 'index' =>
                 [
+                    "gridConfig" =>
+                    [
+                        'settingsData' =>
+                        [
+                            'order' => SORT_ASC,
+                            'orderBy' => "priority",
+                        ]
+                    ],
+
                     "columns"      => [
                         'name',
                         'code',
@@ -48,6 +57,7 @@ class AdminCmsLangController extends AdminModelEditorController
                             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
                             'attribute'     => "active"
                         ],
+                        'priority',
                     ],
                 ],
 

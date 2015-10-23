@@ -66,7 +66,7 @@ class TreeOptions extends \skeeks\cms\models\Tree
 
         foreach ($childs as $child)
         {
-            $level  = $child->getLevel();
+            $level  = $child->level;
             $id     = $child->id;
             if (!$is_filter_set || in_array($id, $filter))
             {

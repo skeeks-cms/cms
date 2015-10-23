@@ -177,7 +177,7 @@ class Tree
                 }
             }
 
-            if ($isOpen && $model->hasChildrens())
+            if ($isOpen && $model->children)
             {
                 $child = $this->renderNodes($model->findChildrens()->all());
             }
@@ -187,7 +187,7 @@ class Tree
 
             $openCloseLink = "";
             $currentLink = "";
-            if ($model->hasChildrens())
+            if ($model->children)
             {
                 $openedIds = $this->_getOpenIds();
 

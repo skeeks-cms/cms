@@ -20,10 +20,7 @@ use yii\db\ActiveQuery;
  * @method ActiveRecord         processCreateNode(Tree $tree)
  * @method ActiveRecord         generateSeoPageName()
  *
- * @property string $pidAttrName
  * @property string $pidMainAttrName
- * @property string $pidsAttrName
- * @property string $levelAttrName
  * @property string $dirAttrName
  * @property string $pageAttrName
  * @property string $nameAttrName

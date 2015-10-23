@@ -38,8 +38,19 @@ class AdminCmsSiteController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
+
+
                 'index' =>
                 [
+                    "gridConfig" =>
+                    [
+                        'settingsData' =>
+                        [
+                            'order' => SORT_ASC,
+                            'orderBy' => "priority",
+                        ]
+                    ],
+
                     "columns"      => [
                         'name',
                         'code',
@@ -53,6 +64,9 @@ class AdminCmsSiteController extends AdminModelEditorController
                             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
                             'attribute'     => "def"
                         ],
+
+                        'priority',
+
                     ],
                 ],
 
