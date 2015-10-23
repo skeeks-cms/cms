@@ -124,6 +124,10 @@ return
     "Search Phrase"         => "Поисковая фраза",
     "Documents Found"       => "Найдено документов",
     "Pages Count"           => "Количество страниц",
+    "Template"           => "Шаблон",
+    "Type of child partitions by default"           => "Тип дочерних разделов по умолчанию",
+    "If this parameter is not specified, the child partition is created of the same type as the current one."           => "Если этот параметр не будет указан, то дочерний раздел будет создан того же типа что и текущий.",
+    "The path to the template. If not specified, the pattern will be the same code."           => "Путь к шаблону. Если не будет указан, то шаблон будет совпадать с кодом.",
 
     "Failed to create a section of the tree" => "Не удалось создать раздел дерева",
     "Failed to create the child element: " => "Не удалось создать дочерний элемент: ",
@@ -545,6 +549,7 @@ return
     "Default Section"       => "Раздел по умолчанию",
     "Root Section"          => "Корневой раздел",
     "Link to section"          => "Привязка к разделам",
+    "Number of sections"          => "Количество разделов",
     "Is Allow Change Default Section"          => "Разрешено менять раздел заданный по умолчанию",
     "If it is set to the root partition, the elements can be tied to him and his sub."          => "Если будет задан коревой раздел, то элементы можно будет привязывать к нему и его подразделам.",
     "The name of the template to draw the elements of this type will be the same as the name of the code."     => "Название шаблон для отрисовки элементов данного типа, будет совпадать с названием этого кода.",

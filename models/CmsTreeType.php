@@ -26,9 +26,12 @@ use Yii;
  * @property string $index_for_search
  * @property string $name_meny
  * @property string $name_one
+ * @property string $viewFile
+ * @property integer $default_children_tree_type
  *
  * @property CmsTree[] $cmsTrees
  * @property CmsTreeTypeProperty[] $cmsTreeTypeProperties
+ * @property CmsTreeType $defaultChildrenTreeType
  */
 class CmsTreeType extends Core
 {
@@ -58,9 +61,11 @@ class CmsTreeType extends Core
             'active' => Yii::t('app', 'Active'),
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
-            'index_for_search' => Yii::t('app', 'Index For Search'),
+            'index_for_search' => Yii::t('app', 'To Index For Search Module'),
             'name_meny' => Yii::t('app', 'Name Meny'),
             'name_one' => Yii::t('app', 'Name One'),
+            'viewFile' => Yii::t('app', 'Template'),
+            'default_children_tree_type' => Yii::t('app', 'Type of child partitions by default'),
         ]);
     }
 
@@ -70,10 +75,10 @@ class CmsTreeType extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_children_tree_type'], 'integer'],
             [['name', 'code'], 'required'],
             [['description'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'viewFile'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['active', 'index_for_search'], 'string', 'max' => 1],
             [['name_meny', 'name_one'], 'string', 'max' => 100],
@@ -100,5 +105,13 @@ class CmsTreeType extends Core
     public function getCmsTreeTypeProperties()
     {
         return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDefaultChildrenTreeType()
+    {
+        return $this->hasOne(CmsTreeType::className(), ['id' => 'default_children_tree_type']);
     }
 }

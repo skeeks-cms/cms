@@ -71,14 +71,22 @@ class AdminTreeController extends AdminModelEditorController
         ]);
     }
 
+    static public $indexData = [];
+
     public function indexData()
     {
+        if (self::$indexData)
+        {
+            return self::$indexData;
+        }
         $models = Tree::findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
 
-        return
+        self::$indexData =
         [
             'models' => $models
         ];
+
+        return self::$indexData;
     }
 
     public function actionNewChildren()

@@ -6,6 +6,8 @@
  * @date 14.10.2015
  */
 namespace skeeks\cms\helpers;
+use skeeks\cms\models\Tree;
+
 /**
  * Class TreeOptions
  * @package skeeks\cms\helpers
@@ -59,10 +61,18 @@ class TreeOptions extends \skeeks\cms\models\Tree
      * @param array $filter
      * @return array
      */
-    private function _buildTreeArrayRecursive($model, $filter)
+    private function _buildTreeArrayRecursive(Tree $model, $filter)
     {
         $is_filter_set = !empty($filter);
-        $childs = $model->getChildren()->all();
+
+        if ($model->isNewRecord)
+        {
+            $childs = static::findRoots()->all();
+        } else
+        {
+            $childs = $model->children;
+        }
+
 
         foreach ($childs as $child)
         {

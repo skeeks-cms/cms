@@ -35,6 +35,7 @@ use Yii;
  * @property integer $default_tree_id
  * @property string $is_allow_change_tree
  * @property integer $root_tree_id
+ * @property string $viewFile
  *
  * @property CmsTree $rootTree
  * @property CmsTree $defaultTree
@@ -80,6 +81,7 @@ class CmsContent extends Core
             'default_tree_id' => Yii::t('app', 'Default Section'),
             'is_allow_change_tree' => Yii::t('app', 'Is Allow Change Default Section'),
             'root_tree_id' => Yii::t('app', 'Root Section'),
+            'viewFile' => Yii::t('app', 'Template'),
         ]);
     }
 
@@ -92,7 +94,7 @@ class CmsContent extends Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id'], 'integer'],
             [['name', 'content_type', 'code'], 'required'],
             [['description'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'viewFile'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
