@@ -137,7 +137,7 @@ class CmsExtension extends Model
     {
         return array_merge(parent::attributeLabels(), [
             'name'      => \Yii::t('app','Name'),
-            'version'   => \Yii::t('app','Version'),
+            'version'   => \Yii::t('app','Installed version'),
             'alias'     => \Yii::t('app','Aliases'),
         ]);
     }

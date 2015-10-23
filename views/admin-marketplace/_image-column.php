@@ -16,7 +16,7 @@
 <? else : ?>
     <div>
         <p>
-            <a data-pjax="0" href="<?= $model->getPackagistUrl(); ?>" class="btn btn-default btn-xs" target="_blank" title="Посмотреть на Packagist.org (откроется в новом окне)">
+            <a data-pjax="0" href="<?= $model->getPackagistUrl(); ?>" class="btn btn-default btn-xs" target="_blank" title="<?=\Yii::t('app','Watch to {site} (opens in new window)',['site' => 'Packagist.org'])?>">
                 <?= $model->name; ?>
                 <i class="glyphicon glyphicon-search"></i>
             </a>

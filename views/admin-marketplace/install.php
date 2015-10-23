@@ -33,7 +33,7 @@ if (!\Yii::$app->user->can('admin/ssh'))
 
       <div class="form-group">
         <div class="input-group">
-          <div class="input-group-addon">Код решения</div>
+          <div class="input-group-addon"><?=\Yii::t('app','Solution code')?></div>
           <?= \yii\helpers\Html::textInput('packagistCode', $packagistCode, [
                 'class' => 'form-control',
                 'placeholder' => 'skeeks/cms'
@@ -41,7 +41,7 @@ if (!\Yii::$app->user->can('admin/ssh'))
         </div>
       </div>
 
-        <?= \yii\helpers\Html::button('Найти', [
+        <?= \yii\helpers\Html::button(\Yii::t('app','Find'), [
             'type'  => 'submit',
             'class' => 'btn btn-primary'
         ]); ?>
@@ -81,7 +81,7 @@ if (!\Yii::$app->user->can('admin/ssh'))
 ;
                         }
                     },
-                    'label' => 'Версия',
+                    'label' => \Yii::t('app','Version'),
                     'format' => 'raw'
                 ],
 
@@ -102,9 +102,10 @@ if (!\Yii::$app->user->can('admin/ssh'))
                                     $class = ' btn-danger';
                                 }
 
+                                $sd = \Yii::t('app','Start deleting');
                                 return <<<HTML
                                 <a data-pjax="0"  class="btn btn-default {$class}" target="" title="" onclick="sx.Installer.remove('{$code}'); return false;" {$attrDisabled}>
-                                    <i class="glyphicon glyphicon-remove"></i> Запустить удаление
+                                    <i class="glyphicon glyphicon-remove"></i> {$sd}
                                 </a>
 HTML;
 ;
@@ -117,15 +118,17 @@ HTML;
                             }
 
                             $code = $model->packagistCode;
+                            $si = \Yii::t('app','Start installing');
+                            $tit = \Yii::t('app','This will start the installation process, the latest stable version.');
                             return <<<HTML
-                                <a data-pjax="0"  class="btn btn-default btn-success" target="" title="Будет запущен процесс установки, последней стабильной версии." onclick="sx.Installer.install('{$code}:*'); return false;" {$attrDisabled}>
-                                    <i class="glyphicon glyphicon-download-alt"></i> Запустить установку
+                                <a data-pjax="0"  class="btn btn-default btn-success" target="" title="{$tit}" onclick="sx.Installer.install('{$code}:*'); return false;" {$attrDisabled}>
+                                    <i class="glyphicon glyphicon-download-alt"></i> {$si}
                                 </a>
 HTML;
 ;
                         }
                     },
-                    'label' => 'Действия',
+                    'label' => \Yii::t('app','Actions'),
                     'format' => 'raw'
                 ],
 
@@ -184,11 +187,11 @@ JS
       ]
     ]);
 ?>
-    <p>Установка/Удаление пакетов обычно длится 1-5 минут.</p>
-    <p>В процессе установки будут изменены все ваши модификации ядра.</p>
-    <p>Будет создана резервная копия базы данных</p>
-    <p>Сброшен кэш</p>
-    <p>Удалены временные файлы</p>
+    <p><?=\Yii::t('app','Install{s}Delete packages usually lasts 1-5 minutes.',['s' => '/'])?></p>
+    <p><?=\Yii::t('app','The installation process will change all your modifications to the core.')?></p>
+    <p><?=\Yii::t('app','Will be created a backup of the database')?></p>
+    <p><?=\Yii::t('app','Cleared cache')?></p>
+    <p><?=\Yii::t('app','Deleted temporary files')?></p>
 
 <? \yii\bootstrap\Alert::end(); ?>
 

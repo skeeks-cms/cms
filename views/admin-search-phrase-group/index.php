@@ -22,12 +22,12 @@
     [
         [
             'attribute' => 'phrase',
-            'label'     => 'Поисковая фраза',
+            'label'     => \Yii::t('app','Search Phrase'),
         ],
 
         [
             'attribute' => 'count',
-            'label'     => 'Количество запросов',
+            'label'     => \Yii::t('app','The number of requests'),
         ],
     ]
 ]); ?><!--
