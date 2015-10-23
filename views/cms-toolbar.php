@@ -56,6 +56,47 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
         <span>Редактирование виджетов</span>
     </div>
 
+
+    <? if (\Yii::$app->user->can('admin/clear')) : ?>
+
+        <?
+            $clearCacheOptions = \yii\helpers\Json::encode([
+                'backend' => UrlHelper::construct(['/admin/clear/index'])->enableAdmin()->toString()
+            ]);
+
+        $this->registerJs(<<<JS
+(function(sx, $, _)
+{
+    sx.classes.ClearCache = sx.classes.Component.extend({
+
+        execute: function(code)
+        {
+            this.ajaxQuery = sx.ajax.preparePostQuery(this.get('backend'), {
+                'code' : code
+            });
+
+            var Handler = new sx.classes.AjaxHandlerStandartRespose(this.ajaxQuery);
+
+            this.ajaxQuery.execute();
+        }
+    });
+
+    sx.ClearCache = new sx.classes.ClearCache({$clearCacheOptions});
+
+})(sx, sx.$, sx._);
+JS
+);
+        ?>
+
+        <div class="skeeks-cms-toolbar-block">
+
+            <a href="#" onclick="sx.ClearCache.execute(); return false;" title="Очистить кэш и временные данные">
+                 <span class="label label-info">Очистить кэш</span>
+            </a>
+            <span></span>
+        </div>
+    <? endif; ?>
+
     <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.close(); return false;">›</span>
 </div>
 
