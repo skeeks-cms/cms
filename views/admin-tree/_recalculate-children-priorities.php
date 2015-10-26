@@ -12,12 +12,12 @@ use yii\widgets\ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-Пересчитать приоритеты детей<br />
-По полю: <?= Html::dropDownList('column', null, ['name' => 'Название', 'created_at' => 'Дата добавления', 'updated_at' => 'Дата обновления']) ?>
+<?=\Yii::t('app','Recalculate the priorities of childs')?><br />
+По полю: <?= Html::dropDownList('column', null, ['name' => \Yii::t('app','Name'), 'created_at' => \Yii::t('app','Created At'), 'updated_at' => \Yii::t('app','Updated At')]) ?>
 <br />
-Порядок: <?= Html::dropDownList('sort', null, ['desc' => 'По убыванию', 'asc' => 'По возрастанию']) ?>
+Порядок: <?= Html::dropDownList('sort', null, ['desc' => \Yii::t('app','Descending'), 'asc' => \Yii::t('app','Ascending')]) ?>
 <br />
-<?= Html::submitButton('Пересчитать', ['class' => 'btn btn-xs btn-primary', 'name' => 'recalculate_children_priorities', 'value' => '1']) ?>
+<?= Html::submitButton(\Yii::t('app','Recalculate'), ['class' => 'btn btn-xs btn-primary', 'name' => 'recalculate_children_priorities', 'value' => '1']) ?>
 <br /><br />
 
 <?php ActiveForm::end(); ?>

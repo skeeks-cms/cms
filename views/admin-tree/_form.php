@@ -14,7 +14,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             <div class="pull-left">
                 <? if ($model->parents) : ?>
                     <? foreach ($model->parents as $tree) : ?>
-                        <a href="<?= $tree->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
+                        <a href="<?= $tree->url ?>" target="_blank" title="<?=\Yii::t('app','Watch to site (opens new window)')?>">
                             <?= $tree->name ?>
                             <? if ($tree->level == 0) : ?>
                                 [<?= $tree->site->name; ?>]
@@ -23,7 +23,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                         /
                     <? endforeach; ?>
                 <? endif; ?>
-                <a href="<?= $model->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
+                <a href="<?= $model->url ?>" target="_blank" title="<?=Yii::t('app','Watch to site (opens new window)')?>">
                     <?= $model->name; ?>
                 </a>
             </div>
@@ -38,7 +38,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app','Main')); ?>
 
 
 
@@ -46,14 +46,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])
-        ->hint(\Yii::t('app', 'Этот параметр влияет на адрес страницы, будте внимательно при его редактировании.')); ?>
+        ->hint(\Yii::t('app', \Yii::t('app','This affects the address of the page, be careful when editing.'))); ?>
 
 
 
 
     <?= Html::checkbox("isLink", (bool) $model->redirect, [
         'value'     => '1',
-        'label'     => 'Этот раздел является ссылкой',
+        'label'     => \Yii::t('app','This section is a link'),
         'class'     => 'smartCheck',
         'id'        => 'isLink',
     ]); ?>
@@ -66,21 +66,21 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                          "id",
                          "name"
                      ),
-            ])->label('Тип раздела')->hint('От выбранного типа раздела может зависеть, то, как она будет отображаться.');
+            ])->label('Тип раздела')->hint(\Yii::t('app','On selected type of partition can depend how it will be displayed.'));
         ?>
     </div>
 
     <div data-listen="isLink" data-show="1" class="sx-hide">
     <?= $form->field($model, 'redirect', [
 
-    ])->textInput(['maxlength' => 500])->label('Редиррект') ?>
+    ])->textInput(['maxlength' => 500])->label(\Yii::t('app','Redirect')) ?>
     </div>
 
 <?= $form->fieldSetEnd() ?>
 
 
 
-<?= $form->fieldSet('Анонс'); ?>
+<?= $form->fieldSet(\Yii::t('app','Announcement')); ?>
 
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -122,7 +122,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     </div>
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Подробно'); ?>
+<?= $form->fieldSet(\Yii::t('app','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -140,14 +140,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 </div>
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('SEO'); ?>
+<?= $form->fieldSet(\Yii::t('app','SEO')); ?>
     <?= $form->field($model, 'meta_title')->textarea(); ?>
     <?= $form->field($model, 'meta_description')->textarea(); ?>
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
 
-<?= $form->fieldSet('Изображения'); ?>
+<?= $form->fieldSet(\Yii::t('app','Images')); ?>
 
     <?= $form->field($model, 'images')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -156,7 +156,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd()?>
 
 
-<?= $form->fieldSet('Файлы'); ?>
+<?= $form->fieldSet(\Yii::t('app','Files')); ?>
 
     <?= $form->field($model, 'files')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -165,9 +165,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd()?>
 
 
-<?= $form->fieldSet('Дополнительно') ?>
+<?= $form->fieldSet(\Yii::t('app','Additionally')) ?>
 
-    <?= $form->field($model, 'tree_menu_ids')->label('Метки')->widget(
+    <?= $form->field($model, 'tree_menu_ids')->label(\Yii::t('app','Marks'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\TreeMenu::find()->all(),
@@ -185,7 +185,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                  ),
                 'multiple' => true
         ]*/
-        )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
+        )->hint(\Yii::t('app','You can link the current section to a few marks, and according to this, section will be displayed in different menus for example.'));
     ?>
 
 <?= $form->fieldSetEnd() ?>
@@ -204,7 +204,7 @@ $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_colu
 
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => $content->name,
-                'hint'              => "Показаны все элементы типа '{$content->name}' связанные с этим разделом. Учитывается только главная привязка.",
+                'hint'              => \Yii::t('app',"Showing all elements of type '{name}' associated with this section. Taken into account only the main binding.",['name' => $content->name]),
                 'parentModel'       => $model,
                 'relation'          => [
                     'tree_id'       => 'id',

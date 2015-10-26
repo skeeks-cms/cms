@@ -33,6 +33,9 @@ return
     "Description"           =>  "Описание",
     "Seo Page Name"         =>  "Название для url (SEO)",
 
+    "Descending"            => "По убыванию",
+    "Ascending"             => "По возрастанию",
+
     "Count Comment"         =>  "Количество комментариев",
     "Priority"              =>  "Сортировка",
 
@@ -164,7 +167,8 @@ return
     "User not found"        => "Пользователь не найден",
     "The request to change the password for" => "Запрос на смену пароля для ",
     "This login is already in use by another user." => "Этот логин уже занят другим пользователем.",
-    "Sign up at site "       => "Регистрация на сайте ",
+    "Sign up at site "      => "Регистрация на сайте ",
+    "Sign up"               => "Регистрация",
 
     "This action is designed to work with the controller: " => "Это действие рассчитано для работы с контроллером: ",
     "Saved"                 => "Сохранено",
@@ -299,7 +303,7 @@ return
     "recover password"      => "восстановить пароль",
     "Recover password"      => "Восстановить пароль",
     "Log in"                => "Войти",
-    "log in"                => "авторизоваться",
+    "log in"                => "Авторизоваться",
     "I remembered password" => "Я вспомнил пароль",
     "You have successfully logged in, but not for too long been active in the control panel site." => "Вы успешно авторизованы, но слишком долго не проявляли активность в панеле управления сайтом.",
     "Please confirm that it is you, and enter your password." => "Пожалуйста, подтвердите что это вы, и введите ваш пароль.",
@@ -623,5 +627,44 @@ return
     "The updating process will change all your modifications to the core." => "В процессе обновления будут изменены все ваши модификации ядра.",
     "Updated all included packages" => "Обновлены все подключеные пакеты",
     "The number of requests" => "Количество запросов",
+
+    "Servers to store the files." => "Сервера для хранения файлов.",
+    "Public file path"      => "Публичный путь к файлам",
+    "The folder on the server" => "Папка на сервере",
+    "Total available space" => "Всего доступно места",
+    "Files download from domain" => "Файлы раздаются с домена",
+
+    "This name is usually needed for SEO, so that the file was found in the search engines" => "Это название обычно нужно для сео, чтобы файл был найден в поисковых системах",
+    "Filename, when someone will be download it." => "Как будет называться файл, когда его кто то будет скачивать.",
+    "Additional Information" => "Дополнительная информация",
+    "Filename at upload time to the site" => "Так назывался файл в момент загрузки на сайт",
+    "types of data which can be transmitted via the Internet using standard MIME." => "типы данных, которые могут быть переданы посредством сети интернет с применением стандарта MIME.",
+    "Thumbnails"            => "Уменьшенные копии изображения",
+    "This is an image in different places of the site displayed in different sizes." => "Это изображение в разных местах сайта, показывается в разных размерах.",
+    "Image editor"          => "Редактор изображения",
+
+    "This affects the address of the page, be careful when editing." => "Этот параметр влияет на адрес страницы, будте внимательно при его редактировании.",
+    "This section is a link" => "Этот раздел является ссылкой",
+    "On selected type of partition can depend how it will be displayed." => "От выбранного типа раздела может зависеть, то, как она будет отображаться.",
+    "Redirect"              => "Редиррект",
+    "Marks"                 => "Метки",
+    "You can link the current section to a few marks, and according to this, section will be displayed in different menus for example." => "Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.",
+    "Showing all elements of type {name} associated with this section. Taken into account only the main binding." => "Показаны все элементы типа '{name}' связанные с этим разделом. Учитывается только главная привязка.",
+
+    "Recalculate the priorities of childs" => "Пересчитать приоритеты детей",
+    "Recalculate"           => "Пересчитать",
+    "nowhere used"          => "нигде не используется",
+
+    "Male"                  => "Муж",
+    "Female"                => "Жен",
+    "The unique username. Used for authorization and to form links to personal cabinet." => "Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.",
+    "Input format phone"    => "Формат ввода телефона",
+    "{email} not confirmed" => "{email} не подтвержден",
+
+    "Data of provider"      => "Данные провайдера",
+    "Send"                  => "Отправить",
+    "Request for password recovery" => "Запрос на восстановление пароля",
+    "Registration"          => "Регистрация",
+    "Forgot your password?" => "Забыли пароль?",
 
 ];

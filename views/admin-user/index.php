@@ -54,7 +54,7 @@
                 return implode(', ', $result);
             },
             'format'    => 'html',
-            'label'     => 'Роли',
+            'label'     => \Yii::t('app','Roles'),
         ],
 
         [
