@@ -82,11 +82,11 @@ JS
 
                     <div class="sx-act-reset-password">
                         <div class="alert alert-danger" role="alert">
-                            Настройте подключение к базе данных!
+                            <?=\Yii::t('app','Configure a database connection!')?>
                         </div>
 
                         <div class="alert alert-info" role="alert">
-                            Путь к файлу настроек: <?= \Yii::getAlias('@common/config/db.php'); ?>
+                            <?=\Yii::t('app','The path to the configuration file')?>: <?= \Yii::getAlias('@common/config/db.php'); ?>
                         </div>
 
                         <? if (YII_ENV != "prod") : ?>
@@ -107,7 +107,7 @@ JS
                                 <?= $form->field($connectToDbForm, 'dbname')->textInput(); ?>
                                 <?= $form->field($connectToDbForm, 'username')->textInput(); ?>
                                 <?= $form->field($connectToDbForm, 'password')->passwordInput(); ?>
-                                <a href="#" class="sx-btn-additional">Дополнительные настройки</a>
+                                <a href="#" class="sx-btn-additional"><?=\Yii::t('app','Additional settings')?></a>
                                 <div class="sx-additional sx-hide">
                                     <?= $form->field($connectToDbForm, 'charset')->textInput(); ?>
                                     <?= $form->fieldRadioListBoolean($connectToDbForm, 'enableSchemaCache'); ?>
@@ -115,7 +115,7 @@ JS
                                 </div>
                                 <div class="form-group sx-buttons-standart">
                                     <button type="submit" class="btn btn-success">
-                                        <i class="glyphicon glyphicon-save"></i> Сохранить и продолжить
+                                        <i class="glyphicon glyphicon-save"></i> <?=\Yii::t('app','Save and continue')?>
                                     </button>
                                 </div>
                             <? \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>

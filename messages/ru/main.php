@@ -168,7 +168,7 @@ return
     "The request to change the password for" => "Запрос на смену пароля для ",
     "This login is already in use by another user." => "Этот логин уже занят другим пользователем.",
     "Sign up at site "      => "Регистрация на сайте ",
-    "Sign up"               => "Регистрация",
+    "Sign up"               => "Зарегистрироваться",
 
     "This action is designed to work with the controller: " => "Это действие рассчитано для работы с контроллером: ",
     "Saved"                 => "Сохранено",
@@ -393,7 +393,7 @@ return
 
     "Execute command"       => "Выполнить комманду",
 
-    "Chose file"            => "Выбрать файл",
+    "Choose file"            => "Выбрать файл",
     "Pagination"            => "Постраничная навигация",
     "from smaller to larger" => "от меньшего к большему",
     "from highest to lowest" => "от большего к меньшему",
@@ -666,5 +666,25 @@ return
     "Request for password recovery" => "Запрос на восстановление пароля",
     "Registration"          => "Регистрация",
     "Forgot your password?" => "Забыли пароль?",
+    "Getting a new password" => "Получение нового пароля",
+    "Request recovery again" => "Запросить восстановление еще раз",
 
+    "The database is empty!" => "База данных пустая!",
+    "The path to the configuration file" => "Путь к файлу настроек",
+    "Start a new installation" => "Запустить новую установку",
+    "Install from a backup file" => "Установить из бэкап файла",
+    "Configure a database connection!" => "Настройте подключение к базе данных!",
+    "Additional settings"   => "Дополнительные настройки",
+    "Save and continue"     => "Сохранить и продолжить",
+
+    "Added"                 => "Добавил",
+    "Category"              => "Категория",
+    "Time of publication"   => "Время публикации",
+    "Read completely"       => "Читать полностью",
+
+    "Search"                => "Искать",
+    "Files attached to records" => "Файлы привязанные к записи",
+    "At this tab displays all the files and images that are tied to the current element." => "В этой вкладке показаны все файлы и изображения которые привязаны к текущему элементу.",
+    "Help"                  => "Справка",
+    "Help in the process of writing ..." => "Справка в процессе написания...",
 ];

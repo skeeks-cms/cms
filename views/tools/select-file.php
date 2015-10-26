@@ -72,12 +72,12 @@ JS
 ]); ?>
 
 <? if ($model) : ?>
-    <?= $form->fieldSet('Файлы привязанные к записи'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Files attached to records')); ?>
 
         <? \yii\bootstrap\Alert::begin(['options' => [
           'class' => 'alert-info',
         ]]); ?>
-            В этой вкладке показаны все файлы и изображения которые привязаны к текущему элементу.
+            <?=\Yii::t('app','At this tab displays all the files and images that are tied to the current element.')?>
         <? \yii\bootstrap\Alert::end(); ?>
 
 
@@ -208,7 +208,7 @@ CSS
     <?= $form->fieldSetEnd(); ?>
 <? endif; ?>
 
-<?= $form->fieldSet('Файловый менеджер'); ?>
+<?= $form->fieldSet(\Yii::t('app','File manager')); ?>
     <?
         echo \mihaildev\elfinder\ElFinder::widget([
             'language'         => 'ru',
@@ -224,7 +224,7 @@ CSS
     ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Файловое хранилище'); ?>
+<?= $form->fieldSet(\Yii::t('app','File storage')); ?>
 
 
         <?
@@ -270,7 +270,7 @@ JS
                     'class'     => \yii\grid\DataColumn::className(),
                     'value'     => function(\skeeks\cms\models\StorageFile $model)
                     {
-                        return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> Выбрать файл', $model->src, [
+                        return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose file'), $model->src, [
                             'class' => 'btn btn-primary',
                             'onclick' => 'sx.SelectFile.submit("' . $model->src . '"); return false;',
                             'data-pjax' => 0
@@ -293,7 +293,7 @@ JS
                         {
 
                             $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
-                            return "<a href='" . $model->src . "' data-pjax='0' class='sx-fancybox' title='Увеличить'>
+                            return "<a href='" . $model->src . "' data-pjax='0' class='sx-fancybox' title='".\Yii::t('app','Increase')."'>
                                     <img src='" . $smallImage . "' />
                                 </a>";
                         }
@@ -362,10 +362,10 @@ JS
 <hr />
 <?= \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#", [
     'class' => 'btn btn-default',
-    'onclick' => "sx.dialog({'title' : 'Справка', 'content' : '#sx-help'}); return false;"
+    'onclick' => "sx.dialog({'title' : '".\Yii::t('app','Help')."', 'content' : '#sx-help'}); return false;"
 ]);?>
 <div style="display: none;" id="sx-help">
-    Справка в процессе написания...
+    <?\Yii::t('app','Help in the process of writing ...')?>
 </div>
 
 <? ActiveForm::end(); ?>

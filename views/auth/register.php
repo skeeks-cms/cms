@@ -12,7 +12,7 @@ use yii\helpers\Html;
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 use \skeeks\cms\helpers\UrlHelper;
 
-$this->title = 'Регистрация';
+$this->title = \Yii::t('app','Registration');
 \Yii::$app->breadcrumbs->createBase()->append($this->title);
 ?>
 <div class="row">
@@ -31,11 +31,11 @@ $this->title = 'Регистрация';
                         <?= $form->field($model, 'password')->passwordInput() ?>
 
                         <div class="form-group">
-                            <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> Зарегистрироваться", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                            <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> ".\Yii::t('app','Sign up'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                         </div>
 
                     <?php ActiveForm::end(); ?>
-                    <?= Html::a('Авторизация', UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?>
+                    <?= Html::a(\Yii::t('app','Authorization'), UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?>
                 </div>
 
                 <div class="col-lg-3">

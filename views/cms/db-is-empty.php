@@ -83,11 +83,11 @@ JS
 
                     <div class="sx-act-reset-password">
                         <div class="alert alert-danger" role="alert">
-                            База данных пустая!
+                            <?=\Yii::t('app','The database is empty!')?>
                         </div>
 
                         <div class="alert alert-info" role="alert">
-                            Путь к файлу настроек: <?= \Yii::getAlias('@common/config/db.php'); ?><br />
+                            <?=\Yii::t('app','The path to the configuration file')?>: <?= \Yii::getAlias('@common/config/db.php'); ?><br />
                             Dsn: <?= \Yii::$app->db->dsn; ?>
                         </div>
 
@@ -95,11 +95,11 @@ JS
                         <div style="text-align: center;">
                             <button class="btn btn-success btn-lg" onclick="sx.DbRestore.execute(); return false;">
                                 <i class="glyphicon glyphicon-play"></i>
-                                Запустить новую установку
+                                <?=\Yii::t('app','Start a new installation')?>
                             </button>
                             <? if ($files = \skeeks\cms\helpers\FileHelper::findFiles(\Yii::$app->dbDump->backupDir)) : ?>
                                 <hr />
-                                <h2>Установить из бэкап файла</h2>
+                                <h2><?=\Yii::t('app','Install from a backup file')?></h2>
                                 <? foreach ($files as $file) : ?>
                                     <? $fileObj = new \skeeks\sx\File($file); ?>
                                     <br />
