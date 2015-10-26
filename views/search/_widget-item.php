@@ -32,19 +32,19 @@
 
             <ul class="list-inline posted-info">
                 <? if ($model->createdBy) : ?>
-                    <li>Добавил: <a href="<?= $model->createdBy->getPageUrl(); ?>" title="<?= $model->createdBy->name; ?>"><?= $model->createdBy->name; ?></a></li>
+                    <li><?=\Yii::t('app','Added')?>: <a href="<?= $model->createdBy->getPageUrl(); ?>" title="<?= $model->createdBy->name; ?>"><?= $model->createdBy->name; ?></a></li>
                 <? endif; ?>
                 <? if ($model->cmsTree) : ?>
-                    <li>Категория: <a href="<?= $model->cmsTree->url; ?>" title="<?= $model->cmsTree->name; ?>"><?= $model->cmsTree->name; ?></a></li>
+                    <li><?=\Yii::t('app','Category')?>: <a href="<?= $model->cmsTree->url; ?>" title="<?= $model->cmsTree->name; ?>"><?= $model->cmsTree->name; ?></a></li>
                 <? endif; ?>
-                <li>Время публикации: <?= \Yii::$app->formatter->asDate($model->published_at, 'full')?></li>
+                <li><?=\Yii::t('app','Time of publication')?>: <?= \Yii::$app->formatter->asDate($model->published_at, 'full')?></li>
                 <? if ($testValue = $model->relatedPropertiesModel->getAttribute('test')) : ?>
                     <li><?= $model->relatedPropertiesModel->getAttributeLabel('test'); ?>: <?= $testValue; ?></li>
                 <? endif; ?>
             </ul>
 
             <p><?= $model->description_short; ?></p>
-            <p><a href="<?= $model->url; ?>">Читать полностью</a></p>
+            <p><a href="<?= $model->url; ?>"><?=\Yii::t('app','Read completely')?></a></p>
 
         </div>
     </div>

@@ -6,7 +6,7 @@
  * @date 29.04.2015
  */
 ?>
-<h2>Сервера для хранения файлов.</h2>
+<h2><?=\Yii::t('app','Servers to store the files.')?></h2>
 <? foreach(\Yii::$app->storage->getClusters() as $count => $cluster) : ?>
 <div class="sx-box sx-p-10 sx-bg-primary">
     <div class="row">
@@ -15,16 +15,16 @@
             <hr />
         </div>
         <div class="col-md-4">
-            <p><b>Публичный путь к файлам: </b> <?= $cluster->publicBaseUrl; ?></p>
-            <p><b>Папка на сервере: </b> <?= $cluster->rootBasePath; ?></p>
+            <p><b><?=\Yii::t('app','Public file path')?>: </b> <?= $cluster->publicBaseUrl; ?></p>
+            <p><b><?=\Yii::t('app','The folder on the server')?>: </b> <?= $cluster->rootBasePath; ?></p>
 
-            <p><b>Всего доступно места</b>: <?= Yii::$app->formatter->asShortSize($cluster->getTotalSpace()); ?></p>
-            <p><b>Занято</b>: <?= Yii::$app->formatter->asShortSize($cluster->getUsedSpace()); ?></p>
-            <p><b>Еще свободно</b>: <?= Yii::$app->formatter->asShortSize($cluster->getFreeSpace()); ?></p>
+            <p><b><?=\Yii::t('app','Total available space')?></b>: <?= Yii::$app->formatter->asShortSize($cluster->getTotalSpace()); ?></p>
+            <p><b><?=\Yii::t('app','Used')?></b>: <?= Yii::$app->formatter->asShortSize($cluster->getUsedSpace()); ?></p>
+            <p><b><?=\Yii::t('app','Free')?></b>: <?= Yii::$app->formatter->asShortSize($cluster->getFreeSpace()); ?></p>
 
             <? if ($cluster instanceof \skeeks\cms\components\storage\ClusterLocal) : ?>
                 <? if ($cluster->publicBaseUrlIsAbsolute) : ?>
-                    <p><b>Файлы раздаются с домена: </b> <?= $cluster->publicBaseUrlIsAbsolute; ?></p>
+                    <p><b><?=\Yii::t('app','Files download from domain')?>: </b> <?= $cluster->publicBaseUrlIsAbsolute; ?></p>
                 <? endif; ?>
             <? endif; ?>
         </div>
@@ -33,7 +33,7 @@
                 <li>
                     <i class="icon-pie-chart"></i>
                     <div class="number"><?= round($cluster->getFreeSpacePct()); ?>%</div>
-                    <div class="title">Свободное место</div>
+                    <div class="title"><?=\Yii::t('app','Free place')?></div>
                     <div class="progress thin">
                         <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $cluster->getFreeSpacePct(); ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $cluster->getFreeSpacePct(); ?>%">
                             <span class="sr-only"><?= round($cluster->getFreeSpacePct()); ?>% Complete (success)</span>
@@ -47,7 +47,7 @@
 
                 $baseOptions =
                 [
-                  'title' => ['text' => 'В процентном соотношении'],
+                  'title' => ['text' => \Yii::t('app','At percent ratio')],
                   'chart' => [
                       'type' => 'pie',
 
@@ -72,8 +72,8 @@
                           'name'=> '%',
                           'data'=>
                               [
-                                    ['Свободно', round($cluster->getFreeSpacePct())],
-                                    ['Занято', round($cluster->getUsedSpacePct())],
+                                    [\Yii::t('app','Free'), round($cluster->getFreeSpacePct())],
+                                    [\Yii::t('app','Used'), round($cluster->getUsedSpacePct())],
                               ]
 
                       ],

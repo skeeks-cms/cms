@@ -24,7 +24,7 @@
             <? endif; ?>
             </div>
             <div class="sx-one-btn col-lg-2 col-md-2 col-sm-2">
-                <a class="btn btn-default sx-btn-create-file-manager"><i class="glyphicon glyphicon-download-alt"></i> <?=\Yii::t('app','Chose file')?></a>
+                <a class="btn btn-default sx-btn-create-file-manager"><i class="glyphicon glyphicon-download-alt"></i> <?=\Yii::t('app','Choose file')?></a>
             </div>
 
             <div class="sx-one-image col-lg-1 col-md-1 col-sm-1">

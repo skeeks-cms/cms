@@ -12,7 +12,7 @@ use skeeks\cms\models\Tree;
 <?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-<?= $form->field($model, 'description')->textarea()->label('Описание (нигде не используется)') ?>
+<?= $form->field($model, 'description')->textarea()->label(\Yii::t('app','Description') . '('. \Yii::t('app','nowhere used') .')') ?>
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
 <?php \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
