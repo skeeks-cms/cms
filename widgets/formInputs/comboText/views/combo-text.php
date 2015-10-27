@@ -14,9 +14,9 @@ $clientOptions  = \yii\helpers\Json::encode($options);
 <div id="<?= $widget->id; ?>">
     <div class="sx-select-controll">
         <? if ($widget->modelAttributeSaveType) : ?>
-            <?= \yii\helpers\Html::activeRadioList($widget->model, $widget->modelAttributeSaveType, \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::$editors)?>
+            <?= \yii\helpers\Html::activeRadioList($widget->model, $widget->modelAttributeSaveType, \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::editors())?>
         <? else : ?>
-            <?= \yii\helpers\Html::radioList($widget->id . '-radio', 'text', \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::$editors)?>
+            <?= \yii\helpers\Html::radioList($widget->id . '-radio', 'text', \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::editors())?>
         <? endif; ?>
     </div>
     <div class="sx-controll">

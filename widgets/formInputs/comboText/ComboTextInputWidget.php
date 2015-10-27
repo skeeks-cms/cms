@@ -32,11 +32,20 @@ class ComboTextInputWidget extends InputWidget
     /**
      * @var array Возможные редакторы.
      */
-    static public $editors = [
+    /*static public $editors = [
         self::CONTROLL_TEXT          => 'Текст',
         self::CONTROLL_EDITOR        => 'Визуальный редактор',
         self::CONTROLL_HTML          => 'HTML',
-    ];
+    ];*/
+    static public function editors()
+    {
+        return [
+            self::CONTROLL_TEXT          => \Yii::t('app','Text'),
+            self::CONTROLL_EDITOR        => \Yii::t('app','Visual Editor'),
+            self::CONTROLL_HTML          => 'HTML',
+        ];
+    }
+
 
     /**
      * @var array Опции текстового поля по умолчанию.
