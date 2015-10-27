@@ -687,4 +687,17 @@ return
     "At this tab displays all the files and images that are tied to the current element." => "В этой вкладке показаны все файлы и изображения которые привязаны к текущему элементу.",
     "Help"                  => "Справка",
     "Help in the process of writing ..." => "Справка в процессе написания...",
+
+    "User List"             => "Список пользователей",
+    "The current version {cms}" => "Текущая версия {cms}",
+    "Go to the administration panel" => "Перейти в панель администрирования",
+    "Managing project settings" => "Управление настройками проекта",
+    "It is you, go to edit your data" => "Это вы, перейти к редактированию свох данных",
+    "Edit the current page" => "Редактировать текущую страницу",
+    "Editing widgets"       => "Редактирование виджетов",
+    "Clear cache"           => "Очистить кэш",
+    "Open the Control Panel {cms}" => "Открыть панель управления {cms}",
+
+    "Visual Editor"         => "Визуальный редактор",
+    "Setting property"      => "Настройки свойства",
 ];
