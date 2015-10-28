@@ -265,7 +265,7 @@ return
     "Log files"             => "Файлы логов",
     "Cache cleared"         => "Кэш очищен",
 
-    "Job to database"       => "Работа с базой данных",
+    "Work to database"       => "Работа с базой данных",
     "The cache table has been successfully updated" => "Кэш таблиц успешно обновлен",
     "A copy created successfully" => "Копия создана успешно",
 
@@ -720,4 +720,16 @@ return
     "simulation of update"  => "симуляция обновления",
     "Utilities"             => "Утилиты",
     "watch the kernel modification" => "смотреть модицикации ядра",
+    "list of database backups" => "список бэкапов базы",
+    "reset cache of table structure" => "сброс кэша структуры таблиц",
+    "installing migration"  => "установка миграций",
+
+    "see help a certain command" => "посмотреть хелп определенной команды",
+    "example help of a sertain controller" => "пример хелпа определнного контроллера",
+    "example help of a sertain action" => "пример хелпа определнного действия",
+    "complete update of  project"     => "полное обновление проекта",
+    "watch the kernel modification" => "смотреть модификации ядра",
+    "installing package"    => "установка пакета",
+    "check the installation or update" => "проверка установки или обновления",
+
 ];

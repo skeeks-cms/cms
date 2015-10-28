@@ -77,12 +77,12 @@
 
     <div class="row">
         <div class="col-lg-3">
-            <h2>Работа с базой данных</h2>
+            <h2><?=\Yii::t('app','Work to database')?></h2>
             <p>
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('cms/db/dump-list'); return false;">
                     cms/db/dump-list
                     <small>
-                        (список бэкапов базы)
+                        (<?=\Yii::t('app','list of database backups')?>)
                     </small>
                 </a>
             </p>
@@ -91,7 +91,7 @@
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('cms/db/db-refresh'); return false;">
                     cms/db/db-refresh
                     <small>
-                        (сброс кэша структуры таблиц)
+                        (<?=\Yii::t('app','reset cache of table structure')?>)
                     </small>
                 </a>
             </p>
@@ -100,7 +100,7 @@
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('cms/db/apply-migrations'); return false;">
                     cms/db/apply-migrations
                     <small>
-                        (установка миграций)
+                        (<?=\Yii::t('app','installing migration')?>)
                     </small>
                 </a>
             </p>
