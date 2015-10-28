@@ -16,18 +16,18 @@
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii help'); return false;">
                     php yii help
                     <small>
-                        (посмотреть хелп)
+                        (<?=\Yii::t('app','see help')?>)
                     </small>
                 </a>
             </p>
         </div>
         <div class="col-lg-4">
-            <h2>Обновление и установка</h2>
+            <h2><?=\Yii::t('app','Update and Installation')?></h2>
             <p>
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii cms/update'); return false;">
                     php yii cms/update
                     <small>
-                        (обновление проекта)
+                        (<?=\Yii::t('app','updating project')?>)
                     </small>
                 </a>
             </p>
@@ -36,19 +36,19 @@
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii cms/update --dry-run'); return false;">
                     php yii cms/update --dry-run
                     <small>
-                        (симуляция обновления)
+                        (<?=\Yii::t('app','simulation of update')?>)
                     </small>
                 </a>
             </p>
 
         </div>
         <div class="col-lg-4">
-            <h2>Утилиты</h2>
+            <h2><?=\Yii::t('app','Utilities')?></h2>
             <p>
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('php yii cms/composer/status'); return false;">
                     php yii cms/composer/status
                     <small>
-                        (смотреть модицикации ядра)
+                        (<?=\Yii::t('app','watch the kernel modification')?>)
                     </small>
                 </a>
             </p>
@@ -58,7 +58,7 @@
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('cms/utils/clear-runtimes'); return false;">
                     cms/utils/clear-runtimes
                     <small>
-                        (чистка временных данных)
+                        (<?=\Yii::t('app','clearing temporary data')?>)
                     </small>
                 </a>
             </p>
@@ -67,7 +67,7 @@
                 <a href="#" class="btn btn-default" onclick="sx.SshConsole.execute('cms/utils/clear-assets'); return false;">
                     cms/utils/clear-assets
                     <small>
-                        (чистка временных css и js)
+                        (<?=\Yii::t('app','Cleaning temporary {css} and {js}',['css' => 'css', 'js' => 'js'])?>)
                     </small>
                 </a>
             </p>

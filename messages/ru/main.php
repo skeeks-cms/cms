@@ -20,6 +20,9 @@ return
     "Delete"                =>  "Удалить",
     "Apply"                 =>  "Применить",
     "Cancel"                =>  "Отменить",
+    "List"                  => "Список",
+    "Add"                   => "Добавить",
+    "Edit"                  => "Редактировать",
 
     "Created By"            =>  "Автор",
     "Updated By"            =>  "Последний обновил",
@@ -217,10 +220,6 @@ return
 
     "The name of the controller" => "Название контроллера",
 
-    "List"                  => "Список",
-    "Add"                   => "Добавить",
-    "Edit"                  => "Редактировать",
-    "Delete"                => "Удалить",
     "Are you sure you want to permanently delete the selected items?" => "Вы действительно хотите безвозвратно удалить выбранные элементы?",
     "For {modelname} must specify the model class" => "Для {modelname} необходимо указать класс модели",
     "the class is not found, you must specify the existing class model" => "класс не нейден, необходимо указать существующий класс модели",
@@ -257,6 +256,8 @@ return
 
     "Deleting temporary files" => "Удаление временных файлов",
     "Clearing temporary data" => "Чистка временных данных",
+    "clearing temporary data" => "чистка временных данных",
+    "Cleaning temporary {css} and {js}" => "чистка временных {css} и {js}",
     "temporary files"       => "временные файлы",
     "current site"          => "текущий сайт",
     "Cache files"           => "Файлы кэша",
@@ -317,7 +318,7 @@ return
 
     "Start testing"         => "Начать тестирование",
     "Stop"                  => "Остановить",
-    "Testing the system (Proccess" => "Тестирование системы (Выполнено",
+    "Testing the system (Progress" => "Тестирование системы (Выполнено",
     "Test"                  => "Тест",
 
     "Delete temporary files" => "Удалить временные файлы",
@@ -700,4 +701,23 @@ return
 
     "Visual Editor"         => "Визуальный редактор",
     "Setting property"      => "Настройки свойства",
+
+    "Circle — the main section (you can choose one section, it will affect the construction of bread crumbs)" => "Кружочек — главный раздел (можно выбрать один раздел, это будет влиять на построение хлебных крошек)",
+    "The square - an additional section (you can mark several additional sections)" => "Квадратик — дополнительный раздел (можно отметить несколько дополнительных разделов)",
+
+    "This file is intended only for forms model" => "Этот файл рассчитан только для форм с моделью",
+    "Current widget works only in form with model" => "Данный виджет работает только в формах с моделью",
+    "Images can be downloaded after you save the form data" => "Изображения можно загрузить после сохранения данных формы",
+    "The image can be downloaded after you save the form data" => "Изображение можно загрузить после сохранения данных формы",
+    "Show{s}Hide details"   => "Показать{s}Скрыть подробности",
+    "The process of installing a new package, please do not close this page. This can lead to sad consequences of working your site." => "Идет процесс установки нового пакета, пожалуйста не закрывайте эту страницу. Это может привести к печальным последствиям работы вашего сайта.",
+    "The installation process of extension (Progress" => "Процесс установки расширения (Выполнено",
+    "Stage"                 => "Этап",
+
+    "see help"              => "посмотреть хелп",
+    "Update and Installation" => "Обновление и установка",
+    "updating project"      => "обновление проекта",
+    "simulation of update"  => "симуляция обновления",
+    "Utilities"             => "Утилиты",
+    "watch the kernel modification" => "смотреть модицикации ядра",
 ];

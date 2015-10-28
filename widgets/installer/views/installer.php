@@ -11,7 +11,7 @@
 ?>
 <div class="sx-box sx-p-10 sx-mb-10" style="display: none;" id="<?= $widget->id; ?>">
     <div class="sx-toggle-ssh sx-p-10" style="display: none;">
-        <a href="#" class="btn btn-default btn-ssh-toggle">Показать/Скрыть подробности</a>
+        <a href="#" class="btn btn-default btn-ssh-toggle"><?=\Yii::t('app','Show{s}Hide details',['s' => '/'])?></a>
     </div>
 
     <?=
@@ -20,13 +20,12 @@
               'class' => 'alert-danger sx-notify-install',
               'style' => 'display: none;',
             ],
-          'body' => \yii\helpers\Html::tag("div", 'Идет процесс установки нового пакета, пожалуйста не закрывайте эту страницу.
-                                                    Это может привести к печальным последствиям работы вашего сайта.'),
+          'body' => \yii\helpers\Html::tag("div", \Yii::t('app','The process of installing a new package, please do not close this page. This can lead to sad consequences of working your site.')),
         ]);
     ?>
     <div class="sx-progress-tasks" id="sx-progress-tasks" style="display: none;">
-        <span style="vertical-align:middle;"><h3>Процесс установки расширения (Выполнено <span class="sx-executing-ptc">0</span>%)</h3></span>
-        <span style="vertical-align:middle;">Этап: <span class="sx-executing-task-name"></span></span>
+        <span style="vertical-align:middle;"><h3><?=\Yii::t('app','The installation process of extension (Progress')?> <span class="sx-executing-ptc">0</span>%)</h3></span>
+        <span style="vertical-align:middle;"><?=\Yii::t('app','Stage')?>: <span class="sx-executing-task-name"></span></span>
         <div>
             <div class="progress progress-striped active">
                 <div class="progress-bar progress-bar-success"></div>

@@ -49,12 +49,12 @@ class StorageImage extends InputWidget
         {
             if (!$this->hasModel())
             {
-                throw new Exception("Данный виджет работает только в формах с моделью");
+                throw new Exception(\Yii::t('app',"Current widget works only in form with model"));
             }
 
             if ($this->model->isNewRecord)
             {
-                throw new Exception("Изображение можно загрузить после сохранения данных формы");
+                throw new Exception(\Yii::t('app',"The image can be downloaded after you save the form data"));
             }
 
             echo $this->render('storage-image', [
