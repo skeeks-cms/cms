@@ -19,10 +19,10 @@ $idSmartFrame = $id . "-smart-frame";
     <p>
         <? if ($widget->mode == SelectTree::MOD_COMBO) : ?>
 
-        <small>Кружочек — главнй раздел (можно выбрать один раздел, это будет влиять на построение хлебных крошек)</small><br />
-        <small>Квадратик — доболнительный раздел (можно отметить несколько дополнительных разделов)</small>
+        <small><?=\Yii::t('app','Circle — the main section (you can choose one section, it will affect the construction of bread crumbs)')?></small><br />
+        <small><?=\Yii::t('app','The square - an additional section (you can mark several additional sections)')?></small>
         <? elseif($widget->mode == SelectTree::MOD_MULTI) : ?>
-            <small>Квадратик — доболнительный раздел (можно отметить несколько дополнительных разделов)</small>
+            <small><?=\Yii::t('app','The square - an additional section (you can mark several additional sections)')?></small>
         <? endif; ?>
     </p>
     <iframe data-src="<?= $src; ?>" width="100%;" height="200px;" id="sx-test"></iframe>

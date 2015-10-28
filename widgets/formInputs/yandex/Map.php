@@ -46,7 +46,7 @@ class Map extends InputWidget
     {
         if (!$this->hasModel())
         {
-            throw new Exception("Этот файл рассчитан только для форм с моделью");
+            throw new Exception(\Yii::t('app','This file is intended only for forms model'));
         }
     }
 
