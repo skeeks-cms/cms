@@ -40,7 +40,7 @@ class CmsController extends Controller
     public function actionInstall()
     {
         $message    = 'Проект успешно установлен<br />' .
-            Html::a('Перейти на главную страницу', '/') . " | " . Html::a('Перейти к управлению сайтом', UrlHelper::construct('/admin/index')->enableAdmin()->toString());
+            Html::a('Перейти на главную страницу', Url::home()) . " | " . Html::a('Перейти к управлению сайтом', UrlHelper::construct('/admin/index')->enableAdmin()->toString());
 
         \Yii::$app->cmsToolbar->enabled = false;
         $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
