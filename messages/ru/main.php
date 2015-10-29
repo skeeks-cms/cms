@@ -731,5 +731,5 @@ return
     "watch the kernel modification" => "смотреть модификации ядра",
     "installing package"    => "установка пакета",
     "check the installation or update" => "проверка установки или обновления",
-
+    "quick commands"        => "быстрые команды",
 ];
