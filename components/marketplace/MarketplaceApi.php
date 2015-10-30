@@ -23,7 +23,7 @@ class MarketplaceApi extends Component
     const RESPONSE_FORMAT_JSON = 'json';
 
     public $schema          = "http";
-    public $host            = "marketplace.cms.skeeks.com";
+    public $host            = "api.cms.skeeks.com";
     public $version         = "v1";
 
     public $responseFormat  = self::RESPONSE_FORMAT_JSON;
@@ -31,7 +31,7 @@ class MarketplaceApi extends Component
     /**
      * Базовый путь к апи, без версии
      *
-     * Пример http://cms.skeeks.com/v1/
+     * Пример http://api.cms.skeeks.com/v1/
      *
      * @return string
      */
@@ -72,6 +72,11 @@ class MarketplaceApi extends Component
         {
             list($route, $data) = $route;
             $url = $this->url . $route;
+
+            $data = array_merge($data, [
+                'sx-serverName' => \Yii::$app->request->serverName,
+                'sx-key'        => "",
+            ]);
             if ($data)
             {
                 $url .= '?' . http_build_query($data);
