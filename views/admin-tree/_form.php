@@ -51,7 +51,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-    <?= Html::checkbox("isLink", (bool) $model->redirect, [
+    <?= Html::checkbox("isLink", (bool) ($model->redirect || $model->redirect_tree_id), [
         'value'     => '1',
         'label'     => \Yii::t('app','This section is a link'),
         'class'     => 'smartCheck',
@@ -71,9 +71,31 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     </div>
 
     <div data-listen="isLink" data-show="1" class="sx-hide">
-    <?= $form->field($model, 'redirect', [
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \Yii::t('app', 'Redirect')
+        ]); ?>
+        <?= $form->field($model, 'redirect_code', [])->radioList([
+                301 => 'Постоянное перенаправление [301]',
+                302 => 'Временное перенаправление [302]'
+            ])
+            ->label(\Yii::t('app','Redirect Code')) ?>
+        <div class="row">
+            <div class="col-md-5">
+                <?= $form->field($model, 'redirect', [])->textInput(['maxlength' => 500])->label(\Yii::t('app','Redirect'))
+                    ->hint(\Yii::t('app', 'Specify an absolute or relative URL for redirection, in the free form.')) ?>
+            </div>
+            <div class="col-md-7">
+                <?= $form->field($model, 'redirect_tree_id')->widget(
+                    \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+                    [
+                        "attributeSingle" => "redirect_tree_id",
+                        "mode" => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_SINGLE
+                    ]
+                ) ?>
+            </div>
+        </div>
 
-    ])->textInput(['maxlength' => 500])->label(\Yii::t('app','Redirect')) ?>
+
     </div>
 
 <?= $form->fieldSetEnd() ?>
@@ -272,6 +294,7 @@ $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_colu
                 if (val == 0)
                 {
                     $('#tree-redirect').val('');
+                    $('#tree-redirect_tree_id').val('');
                 }
 
                 $('[data-listen="' + id + '"]').hide();

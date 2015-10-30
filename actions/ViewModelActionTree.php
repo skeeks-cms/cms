@@ -46,6 +46,11 @@ class ViewModelActionTree extends ViewModelAction
             $this->model   = \Yii::$app->cms->getCurrentTree();
         }
 
+        if ($this->model->redirect || $this->model->redirect_tree_id)
+        {
+            return \Yii::$app->response->redirect($this->model->url, $this->model->redirect_code);
+        }
+
         //Пробуем рендерить view для текущего типа страницы
         if ($this->model)
         {

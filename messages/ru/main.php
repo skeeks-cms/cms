@@ -647,7 +647,8 @@ return
     "This affects the address of the page, be careful when editing." => "Этот параметр влияет на адрес страницы, будте внимательно при его редактировании.",
     "This section is a link" => "Этот раздел является ссылкой",
     "On selected type of partition can depend how it will be displayed." => "От выбранного типа раздела может зависеть, то, как она будет отображаться.",
-    "Redirect"              => "Редиррект",
+    "Redirect"              => "Перенаправление",
+    "Redirect Section"      => "Перенаправление в раздел",
     "Marks"                 => "Метки",
     "You can link the current section to a few marks, and according to this, section will be displayed in different menus for example." => "Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.",
     "Showing all elements of type {name} associated with this section. Taken into account only the main binding." => "Показаны все элементы типа '{name}' связанные с этим разделом. Учитывается только главная привязка.",
@@ -732,4 +733,6 @@ return
     "installing package"    => "установка пакета",
     "check the installation or update" => "проверка установки или обновления",
     "quick commands"        => "быстрые команды",
+    "Redirect Code"        => "Код перенаправления",
+    "Specify an absolute or relative URL for redirection, in the free form."        => "Укажите абсолютный или относительный адрес, для перенаправления, в свободной форме.",
 ];
