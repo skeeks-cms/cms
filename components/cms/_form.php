@@ -29,12 +29,41 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
 
 
 <?= $form->fieldSet('Основное'); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Основное'
+    ])?>
     <?= $form->field($model, 'appName')->textInput()->hint(''); ?>
 
     <?= $form->field($model, 'noImageUrl')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\OneImage::className()
     )->hint('Это изображение показывается в тех случаях, когда не найдено основное.'); ?>
 
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Шаблоны/отображение'
+    ])?>
+
+    <?= $form->fieldSelect($model, 'template', $templates); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Языковые настройки'
+    ])?>
+
+    <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\models\CmsLang::find()->active()->all(),
+        'code',
+        'name'
+    )); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Email'
+    ])?>
+
+    <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.'); ?>
+    <?= $form->field($model, 'notifyAdminEmailsHidden')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Скрытая копия!'); ?>
+    <?= $form->field($model, 'notifyAdminEmails')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Эти email адреса будут отображаться в открытой копии.'); ?>
+
+    <?= $form->fieldSelect($model, 'emailTemplate', $emailTemplates); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
@@ -51,26 +80,7 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     <?= $form->fieldInputInt($model, 'hitAgentsInterval')->hint('Если агенты выполняются на хитах, то их выполнение будет осуществляться с заданным переидом (сек.)'); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Email'); ?>
-    <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.'); ?>
-    <?= $form->field($model, 'notifyAdminEmailsHidden')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Скрытая копия!'); ?>
-    <?= $form->field($model, 'notifyAdminEmails')->textInput()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Эти email адреса будут отображаться в открытой копии.'); ?>
 
-    <?= $form->fieldSelect($model, 'emailTemplate', $emailTemplates); ?>
-
-<?= $form->fieldSetEnd(); ?>
-
-<?= $form->fieldSet('Шаблоны/отображение'); ?>
-    <?= $form->fieldSelect($model, 'template', $templates); ?>
-<?= $form->fieldSetEnd(); ?>
-
-<?= $form->fieldSet('Языковые настройки'); ?>
-    <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
-        \skeeks\cms\models\CmsLang::find()->active()->all(),
-        'code',
-        'name'
-    )); ?>
-<?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Безопасность'); ?>
     <?= $form->fieldInputInt($model, 'passwordResetTokenExpire')->hint('Другими словами, ссылки на восстановление пароля перестанут работать через указанное время'); ?>
@@ -162,6 +172,10 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     ]); ?>
 
 
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Система обновлений'); ?>
+    <?= $form->field($model, 'licenseKey')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

@@ -75,7 +75,7 @@ class MarketplaceApi extends Component
 
             $data = array_merge($data, [
                 'sx-serverName' => \Yii::$app->request->serverName,
-                'sx-key'        => "",
+                'sx-key'        => \Yii::$app->cms->licenseKey,
             ]);
             if ($data)
             {
@@ -100,8 +100,15 @@ class MarketplaceApi extends Component
             'Accept: application/' . $this->responseFormat. '; q=1.0, */*; q=0.1'
         ]);
 
-        $url = $this->getRequestUrl($route);
-        $curl->httpRequest($method, $url);
+        try
+        {
+            $url = $this->getRequestUrl($route);
+            $curl->httpRequest($method, $url);
+        } catch (\Exception $e)
+        {
+
+        }
+
 
         return $curl;
     }

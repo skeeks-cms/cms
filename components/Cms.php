@@ -198,6 +198,8 @@ class Cms extends \skeeks\cms\base\Component
     public $giiEnabled                   = self::BOOL_N;
     public $giiAllowedIPs                = "*";
 
+    public $licenseKey                   = "";
+
     /**
      * @var array Возможные шаблоны сайта
      */
@@ -580,6 +582,7 @@ class Cms extends \skeeks\cms\base\Component
             [['debugAllowedIPs'], 'string'],
             [['giiEnabled'], 'string'],
             [['giiAllowedIPs'], 'string'],
+            [['licenseKey'], 'string'],
         ]);
     }
 
@@ -607,6 +610,7 @@ class Cms extends \skeeks\cms\base\Component
             'debugAllowedIPs'           => 'Включение режима отладки для ip адресов',
             'giiEnabled'                => 'Генератор кода включен',
             'giiAllowedIPs'             => 'Включение генератора кода для ip адресов',
+            'licenseKey'                => 'Лицензионный ключ',
         ]);
     }
 
