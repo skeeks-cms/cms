@@ -734,5 +734,7 @@ return
     "check the installation or update" => "проверка установки или обновления",
     "quick commands"        => "быстрые команды",
     "Redirect Code"        => "Код перенаправления",
+    "Hidden Name"        => "Скрытое название",
+    "Not displayed on the site"        => "Не отображается на сайте",
     "Specify an absolute or relative URL for redirection, in the free form."        => "Укажите абсолютный или относительный адрес, для перенаправления, в свободной форме.",
 ];

@@ -72,6 +72,7 @@ use yii\helpers\Url;
  * @property integer $image_id
  * @property integer $redirect_tree_id
  * @property integer $redirect_code
+ * @property string $name_hidden
  *
  * @property string $absoluteUrl
  * @property string $url
@@ -292,6 +293,7 @@ class Tree extends Core
             'files' => Yii::t('app', 'Files'),
             'redirect_tree_id' => Yii::t('app', 'Redirect Section'),
             'redirect_code' => Yii::t('app', 'Redirect Code'),
+            'name_hidden' => Yii::t('app', 'Hidden Name'),
         ]);
     }
 
@@ -307,6 +309,7 @@ class Tree extends Core
             [['redirect_code'], 'default', 'value' => 301],
             [['redirect_code'], 'in', 'range' => [301, 302]],
             [['redirect'], 'string'],
+            [['name_hidden'], 'string'],
             [['priority', 'tree_type_id', 'image_id', 'image_full_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
             [['tree_menu_ids'], 'safe'],
             [['code'], 'string', 'max' => 64],

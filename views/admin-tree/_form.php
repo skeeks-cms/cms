@@ -44,7 +44,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'name_hidden')->textInput(['maxlength' => 255])
+                ->hint(\Yii::t('app', 'Not displayed on the site')) ?>
+        </div>
+    </div>
+
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])
         ->hint(\Yii::t('app', \Yii::t('app','This affects the address of the page, be careful when editing.'))); ?>
 
