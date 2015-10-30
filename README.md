@@ -3,10 +3,9 @@ Skeeks CMS 2.0
 
 * [Сайт cms.skeeks.com](http://cms.skeeks.com)
 * [Докуметация](http://dev.cms.skeeks.com/docs)
-* [Руководство разработчика](http://git.skeeks.com/skeeks/cms/wikis/home)
+* [Руководство разработчика](http://dev.cms.skeeks.com/docs/dev)
 * [Процесс разработки (Changelog)](http://git.skeeks.com/skeeks/cms/blob/master/CHANGELOG.md)
 * [Релизы](http://git.skeeks.com/skeeks/cms/tags)
-
 
 
 > [![skeeks!](https://gravatar.com/userimage/74431132/13d04d83218593564422770b616e5622.jpg)](http://www.skeeks.com)  

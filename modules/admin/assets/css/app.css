@@ -90,6 +90,13 @@ body.sidebar-hidden footer.sx-admin-footer
     padding: 0 20px 0px 20px;
 }
 
+@media(max-width:767px) {
+    .empty .main {
+        overflow: hidden;
+        padding: 0px 0px 0 0px !important
+    }
+}
+
 @media (max-width: 991px)
 {
     .main
