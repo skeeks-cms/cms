@@ -110,7 +110,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     {
         parent::init();
 
-        \Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
+        /*\Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
         {
             if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
             {
@@ -138,7 +138,7 @@ JS
                     ]
                 ]);
             }
-        });
+        });*/
     }
 
     public function enableEditMode()
