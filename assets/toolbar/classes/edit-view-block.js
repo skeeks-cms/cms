@@ -66,7 +66,17 @@
                     }, 200);
                 }
             );
+
+
+            $(window).on('scroll', function()
+            {
+                if (self._isVisible === true)
+                {
+                    self.adjustHidden().show();
+                }
+            })
         },
+
 
         show: function()
         {
@@ -129,7 +139,7 @@
 
 
             this.jBorderTop = $('<div>')
-                                .css('position', 'absolute')
+                                .css('position', 'fixed')
                                 .css('height', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
@@ -138,7 +148,7 @@
                                 .appendTo(this.jHiddenBorders);
 
             this.jBorderRight = $('<div>')
-                                .css('position', 'absolute')
+                                .css('position', 'fixed')
                                 .css('width', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
@@ -148,7 +158,7 @@
 
 
             this.jBorderBottom = $('<div>')
-                                .css('position', 'absolute')
+                                .css('position', 'fixed')
                                 .css('height', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
@@ -157,7 +167,7 @@
                                 .appendTo(this.jHiddenBorders);
 
             this.jBorderLeft = $('<div>')
-                                .css('position', 'absolute')
+                                .css('position', 'fixed')
                                 .css('width', '1px')
                                 .css('fontSize', '1px')
                                 .css('overflow', 'hidden')
@@ -228,7 +238,7 @@
          */
         _adjustControlls : function()
         {
-            var top     = this.jWrapper.offset().top;
+            var top     = this.jWrapper.offset().top - $(window).scrollTop();
             var left    = this.jWrapper.offset().left;
 
             var fromTop = top - 24;
@@ -254,7 +264,7 @@
         {
             var height  = this.jWrapper.height();
             var width   = this.jWrapper.width();
-            var top     = this.jWrapper.offset().top;
+            var top     = this.jWrapper.offset().top - $(window).scrollTop();
             var left    = this.jWrapper.offset().left;
 
             this.jBorderTop

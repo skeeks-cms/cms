@@ -12,6 +12,7 @@ use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\helpers\Tree;
 use skeeks\cms\models\User;
@@ -74,18 +75,17 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     const NO_EDIT_MODE  = 'no-edit';
 
     public $mode                            = self::NO_EDIT_MODE;
+    public $isOpen                          = Cms::BOOL_N;
     public $enabled                         = 1;
     public $enableFancyboxWindow            = 0;
 
-    public $infoblockEditBorderColor             = "red";
-
-
+    public $infoblockEditBorderColor        = "red";
 
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['mode', 'infoblockEditBorderColor'], 'string'],
+            [['mode', 'infoblockEditBorderColor', 'isOpen'], 'string'],
             [['enabled', 'enableFancyboxWindow'], 'integer'],
         ]);
     }
@@ -93,10 +93,11 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'enabled'               => 'Активность панели управления',
-            'mode'                  => 'Режим редактирования',
-            'enableFancyboxWindow'  => 'Включить диалоговые онка панели (Fancybox)',
-            'infoblockEditBorderColor'   => 'Цвет рамки вокруг инфоблока',
+            'enabled'                       => 'Активность панели управления',
+            'mode'                          => 'Режим редактирования',
+            'isOpen'                        => 'Открыта',
+            'enableFancyboxWindow'          => 'Включить диалоговые онка панели (Fancybox)',
+            'infoblockEditBorderColor'      => 'Цвет рамки вокруг инфоблока',
         ]);
     }
 
@@ -104,15 +105,35 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
     public function enableEditMode()
     {
-        \Yii::$app->getSession()->set('skeeks-cms-toolbar-mode', self::EDIT_MODE);
-        $this->mode = self::EDIT_MODE;
+        $userSettings           = CmsComponentSettings::createByComponentUserId($this, \Yii::$app->user->id);
+        $userSettings->setSettingValue('mode', self::EDIT_MODE);
+
+        if (!$userSettings->save())
+        {
+            $rr->message = 'Не удалось сохранить настройки';
+            $rr->success = false;
+            return $rr;
+        }
+
+        $this->invalidateCache();
+
         return $this;
     }
 
     public function disableEditMode()
     {
-        \Yii::$app->getSession()->set('skeeks-cms-toolbar-mode', self::NO_EDIT_MODE);
-        $this->mode = self::NO_EDIT_MODE;
+        $userSettings           = CmsComponentSettings::createByComponentUserId($this, \Yii::$app->user->id);
+        $userSettings->setSettingValue('mode', self::NO_EDIT_MODE);
+
+        if (!$userSettings->save())
+        {
+            $rr->message = 'Не удалось сохранить настройки';
+            $rr->success = false;
+            return $rr;
+        }
+
+        $this->invalidateCache();
+
         return $this;
     }
 
@@ -138,16 +159,6 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public function isEditMode()
     {
         return (bool) ($this->mode == self::EDIT_MODE);
-    }
-
-    public function init()
-    {
-        parent::init();
-
-        if (\Yii::$app->getSession()->get('skeeks-cms-toolbar-mode'))
-        {
-            $this->mode = \Yii::$app->getSession()->get('skeeks-cms-toolbar-mode');
-        }
     }
 
     /**
@@ -253,7 +264,9 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             ],
             'container-id'                  => 'skeeks-cms-toolbar',
             'container-min-id'              => 'skeeks-cms-toolbar-min',
-            'backend-url-triggerEditMode'   => UrlHelper::construct('cms/toolbar/trigger-edit-mode')->toString()
+            'isOpen'                        => (bool) ($this->isOpen == Cms::BOOL_Y),
+            'backend-url-triggerEditMode'   => UrlHelper::construct('cms/toolbar/trigger-edit-mode')->toString(),
+            'backend-url-triggerIsOpen'     => UrlHelper::construct('cms/toolbar/trigger-is-open')->toString()
         ];
 
         //echo '<div id="skeeks-cms-toolbar" style="display:none"></div>';
