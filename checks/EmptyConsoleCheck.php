@@ -33,10 +33,7 @@ HTML;
 
     public function run()
     {
-		ob_start();
-            system('cd '  . ROOT_DIR . '; php yii cms/check/empty-console');
-        $result = ob_get_clean();
-        $result = trim($result);
+        $result = \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/check/empty-console');
 
         if ($result == CheckController::EMPTY_CONSOLE_TEXT)
         {

@@ -116,10 +116,7 @@ class CmsAgent extends ActiveRecord
         $this->is_running = Cms::BOOL_Y;
         $this->save();
 
-        ob_start();
-            system("cd " . ROOT_DIR . "; php yii " . $this->name);
-        $result = ob_get_clean();
-        $result = trim($result);
+        \Yii::$app->console->execute("cd " . ROOT_DIR . "; php yii " . $this->name);
 
         $this->is_running   = Cms::BOOL_N;
         $this->next_exec_at = \Yii::$app->formatter->asTimestamp(time()) + (int) $this->agent_interval;

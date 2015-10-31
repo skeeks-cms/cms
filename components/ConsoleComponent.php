@@ -27,7 +27,7 @@ class ConsoleComponent extends Component
         } else
         {
             list($output, $error, $code) = $this->executeProcOpen($cmd);
-            return $output;
+            return trim($output);
         }
     }
 
@@ -40,9 +40,8 @@ class ConsoleComponent extends Component
         if (function_exists('system'))
         {
             ob_start();
-                @system('cd '  . ROOT_DIR . '; php yii cms/check/empty-console');
+                @system($command);
             $result = ob_get_clean();
-            ob_end_flush();
 
             $result = trim($result);
 

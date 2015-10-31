@@ -232,10 +232,7 @@ function httpDigestParse($txt)
 #                Autocomplete                 #
 ###############################################
 
-ob_start();
-    system('cd '  . ROOT_DIR . '; php yii cms/utils/all-cmd');
-$result = ob_get_clean();
-$result = trim($result);
+$result = \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/utils/all-cmd');
 $possibleCmd = explode("\n", $result);
 
 $autocomplete = [

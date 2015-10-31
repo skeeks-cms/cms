@@ -10,6 +10,6 @@
 ?>
 <div class="sx-cms-cmds">
     <pre>
-        <? @system("cd " . ROOT_DIR . " && php yii help;"); ?>
+        <?= \Yii::$app->console->execute("cd " . ROOT_DIR . " && php yii help;"); ?>
     </pre>
 </div>
