@@ -74,12 +74,11 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     const NO_EDIT_MODE  = 'no-edit';
 
     public $mode                            = self::NO_EDIT_MODE;
+    public $isOpen                          = Cms::BOOL_N;
     public $enabled                         = 1;
     public $enableFancyboxWindow            = 0;
 
-    public $infoblockEditBorderColor             = "red";
-
-
+    public $infoblockEditBorderColor        = "red";
 
 
     public function rules()
@@ -93,10 +92,11 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'enabled'               => 'Активность панели управления',
-            'mode'                  => 'Режим редактирования',
-            'enableFancyboxWindow'  => 'Включить диалоговые онка панели (Fancybox)',
-            'infoblockEditBorderColor'   => 'Цвет рамки вокруг инфоблока',
+            'enabled'                       => 'Активность панели управления',
+            'mode'                          => 'Режим редактирования',
+            'isOpen'                        => 'Открыта',
+            'enableFancyboxWindow'          => 'Включить диалоговые онка панели (Fancybox)',
+            'infoblockEditBorderColor'      => 'Цвет рамки вокруг инфоблока',
         ]);
     }
 

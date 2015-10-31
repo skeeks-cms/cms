@@ -98,11 +98,11 @@ JS
         <? endif;  ?>
     </li>
 
-    <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
-        <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Toggle Full Screen')?>">
+    <!--<li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">
+        <a class="request-fullscreen toggle-active" href="#" onclick="new sx.classes.Fullscreen(); return false;" data-sx-widget="tooltip-b" data-original-title="<?/*=\Yii::t('app','Toggle Full Screen')*/?>">
             <i class="glyphicon glyphicon-fullscreen"></i>
         </a>
-    </li>
+    </li>-->
 
     <? if (\Yii::$app->user->can('admin/clear')) : ?>
     <li class="sx-left-border dropdown visible-md visible-lg visible-sm visible-xs">

@@ -235,7 +235,7 @@
 */
 .sx-edit-view-block-controlls
 {
-    position: absolute !important;
+    position: fixed !important;
     height: 23px !important;
     display: none;
     padding: 4px 4px 10px !important;
