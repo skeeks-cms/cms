@@ -8,6 +8,7 @@
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\base\console\Controller;
+use skeeks\cms\helpers\FileHelper;
 use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
@@ -43,7 +44,7 @@ class UpdateController extends Controller
      * @var bool
      * Откатить изменнные файлы перед началом установки
      */
-    public $revertModified = true;
+    public $revertModified = false;
 
     /**
      * @var string
@@ -74,10 +75,10 @@ class UpdateController extends Controller
     public function actionAll()
     {
         //Создание бэкапа базы данных.
-        $this->systemCmdRoot("php yii cms/backup/db-execute");
+        //$this->systemCmdRoot("php yii cms/backup/db-execute");
 
         //Список сохранненных баз данных
-        $this->systemCmdRoot("php yii cms/backup/db-list");
+        //$this->systemCmdRoot("php yii cms/backup/db-list");
 
         //Удаление блокирующего файла
         $this->systemCmdRoot("rm -f composer.lock");
@@ -87,14 +88,36 @@ class UpdateController extends Controller
         //Обновление asset plugins composer
         $this->systemCmdRoot("php yii cms/composer/update-asset-plugins " . ($this->noInteraction ? "--noInteraction":"" ));
 
-        if ($this->revertModified)
+        /*if ($this->revertModified)
         {
             //Откатить измененные файлы
             $this->systemCmdRoot("php yii cms/composer/revert-modified-files");
+        }*/
+
+
+        ob_start();
+            system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status');
+        $result = ob_get_clean();
+        $result = trim($result);
+
+        if ($result)
+        {
+            $dirs = explode("\n", $result);
+
+            if ($dirs)
+            {
+                foreach ($dirs as $dirPath)
+                {
+                    FileHelper::removeDirectory($dirPath);
+                    //system('cd ' . $dirPath . '; git checkout -f 2>&1; git clean -f -d 2>&1');
+                }
+            }
         }
 
+        $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar update  --no-interaction --profile ' . ($this->optimize ? " -o ": " "));
+
         //Обновление зависимостей
-        $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
+        //$this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
 
         //Генерация файла со списком модулей
         $this->systemCmdRoot("php yii cms/utils/generate-modules-config-file");
