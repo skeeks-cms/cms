@@ -10,7 +10,7 @@ use \skeeks\cms\helpers\UrlHelper;
 $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
 ?>
 
-<div id="skeeks-cms-toolbar" class="skeeks-cms-toolbar-top hidden-print">
+<div id="skeeks-cms-toolbar" class="skeeks-cms-toolbar-top hidden-print" <?= \Yii::$app->cmsToolbar->isOpen != \skeeks\cms\components\Cms::BOOL_Y ? "style='display: none;'": ""?>>
     <div class="skeeks-cms-toolbar-block title">
         <a href="<?= \Yii::$app->cms->moduleCms()->getDescriptor()->homepage; ?>" title="<?=\Yii::t('app','The current version {cms} ',['cms' => 'SkeekS SMS'],\Yii::$app->admin->languageCode)?> <?= \Yii::$app->cms->moduleCms()->descriptor->version; ?>" target="_blank">
             <img width="29" height="30" alt="" src="<?= \Yii::$app->cms->logo(); ?>">
@@ -100,7 +100,7 @@ JS
     <span class="skeeks-cms-toolbar-toggler" onclick="sx.Toolbar.close(); return false;">›</span>
 </div>
 
-<div id="skeeks-cms-toolbar-min">
+<div id="skeeks-cms-toolbar-min" <?= \Yii::$app->cmsToolbar->isOpen == \skeeks\cms\components\Cms::BOOL_Y ? "style='display: none;'": ""?>>
     <a href="#" onclick="sx.Toolbar.open(); return false;" title="<?=\Yii::t('app','Open the Control Panel {cms}',['cms' => 'SkeekS Cms'],\Yii::$app->admin->languageCode)?>" id="skeeks-cms-toolbar-logo">
         <img width="29" height="30" alt="" src="<?= \Yii::$app->cms->logo(); ?>">
     </a>

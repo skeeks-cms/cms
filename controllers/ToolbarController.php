@@ -12,6 +12,9 @@ namespace skeeks\cms\controllers;
 
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsComponentSettings;
 use Yii;
 use yii\web\Response;
 
@@ -42,6 +45,48 @@ class ToolbarController extends Controller
                 'message' => '',
                 'success' => true,
             ];
+        }
+    }
+
+    public function actionTriggerIsOpen()
+    {
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isAjax)
+        {
+            $rr = new RequestResponse();
+
+            if (\Yii::$app->request->post('isOpen') == "true")
+            {
+                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
+                $userSettings->setSettingValue('isOpen', Cms::BOOL_Y);
+
+                if (!$userSettings->save())
+                {
+                    $rr->message = 'Не удалось сохранить настройки';
+                    $rr->success = false;
+                    return $rr;
+                }
+
+                \Yii::$app->cmsToolbar->invalidateCache();
+                $rr->message = 'Сохранено';
+                $rr->success = true;
+            } else
+            {
+                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
+                $userSettings->setSettingValue('isOpen', Cms::BOOL_N);
+
+                if (!$userSettings->save())
+                {
+                    $rr->message = 'Не удалось сохранить настройки';
+                    $rr->success = false;
+                    return $rr;
+                }
+
+                \Yii::$app->cmsToolbar->invalidateCache();
+                $rr->message = 'Сохранено';
+                $rr->success = true;
+            }
+
+            return $rr;
         }
     }
 

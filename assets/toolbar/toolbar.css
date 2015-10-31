@@ -1,5 +1,5 @@
 #skeeks-cms-toolbar {
-    display: none;
+    /*display: none; SkeekS CMS > 2.4.0.2*/
     padding: 0;
     font: 11px Verdana, Arial, sans-serif;
     text-align: left;
@@ -160,7 +160,7 @@
 }
 
 #skeeks-cms-toolbar-min {
-    display: none;
+    /*display: none; SkeekS CMS > 2.4.0.2*/
     position: fixed;
     right: 0;
     top: 0;

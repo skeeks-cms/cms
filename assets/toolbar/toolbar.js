@@ -51,10 +51,15 @@
 
         _init: function()
         {
-            this.getCookieManager().setNamespace('skeeks-toolbar');
+            var self = this;
 
             this.Min    = new sx.classes.toolbar.Min('#' + this.get('container-min-id'));
             this.Full   = new sx.classes.toolbar.Full('#' + this.get('container-id'));
+
+            this.bind('update', function()
+            {
+                self.save();
+            });
         },
 
         _onDomReady: function()
@@ -63,24 +68,21 @@
 
             _.defer(function()
             {
-                if (self.getCookieManager().get('container') == 'opened')
+                if (self.get('isOpen', false))
                 {
-                    self.open();
-                } else
-                {
-                    self.close();
+                    self.Full.update();
                 }
             });
         },
-
-
 
         open: function()
         {
             this.Min.hide();
             this.Full.show();
 
-            this.getCookieManager().set('container', 'opened');
+            this.set('isOpen', true);
+
+            this.trigger('update', this);
         },
 
         close: function()
@@ -88,7 +90,23 @@
             this.Min.show();
             this.Full.hide();
 
-            this.getCookieManager().set('container', 'closed');
+            this.set('isOpen', false);
+
+            this.trigger('update', this);
+        },
+
+        save: function()
+        {
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-url-triggerIsOpen'), this.toArray());
+
+
+            //new sx.classes.AjaxHandlerNotify(ajax);
+            new sx.classes.AjaxHandlerStandartRespose(ajax);
+            /*new sx.classes.AjaxHandlerBlocker(ajax, {
+                'wrapper' : 'body'
+            })*/
+
+            ajax.execute();
         },
 
         triggerEditMode: function()
