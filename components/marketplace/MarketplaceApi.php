@@ -73,6 +73,11 @@ class MarketplaceApi extends Component
             list($route, $data) = $route;
             $url = $this->url . $route;
 
+            if (!$data || !is_array($data))
+            {
+                $data = [];
+            }
+
             $data = array_merge($data, [
                 'sx-serverName' => \Yii::$app->request->serverName,
                 'sx-key'        => \Yii::$app->cms->licenseKey,
@@ -100,14 +105,14 @@ class MarketplaceApi extends Component
             'Accept: application/' . $this->responseFormat. '; q=1.0, */*; q=0.1'
         ]);
 
+        $curl->setOption(CURLOPT_TIMEOUT, 2);
+
         try
         {
             $url = $this->getRequestUrl($route);
             $curl->httpRequest($method, $url);
         } catch (\Exception $e)
-        {
-
-        }
+        {}
 
 
         return $curl;
@@ -118,7 +123,7 @@ class MarketplaceApi extends Component
      * @param $route
      * @return array
      */
-    public function get($route)
+    public function fetch($route)
     {
         $curl = $this->request(Curl::METHOD_GET, $route);
         if ($curl->responseCode == 200 && $curl->response)
@@ -127,5 +132,22 @@ class MarketplaceApi extends Component
         }
 
         return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getInfo()
+    {
+        $key = 'test';
+
+        $result = \Yii::$app->cache->get($key);
+        if ($result === false)
+        {
+            $result = $this->fetch(['info']);
+            \Yii::$app->cache->set($key, $result, (60*60*24) );
+        }
+
+        return $result;
     }
 }
