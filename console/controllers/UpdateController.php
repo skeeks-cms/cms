@@ -112,8 +112,7 @@ class UpdateController extends Controller
             $this->systemCmdRoot("php yii cms/composer/revert-modified-files");
         }
 
-
-        ob_start();
+        /*ob_start();
             system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status');
         $result = ob_get_clean();
         $result = trim($result);
@@ -129,7 +128,7 @@ class UpdateController extends Controller
                     FileHelper::removeDirectory($dirPath);
                 }
             }
-        }
+        }*/
 
 
 

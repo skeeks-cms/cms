@@ -79,7 +79,7 @@
          */
         initSshConsole: function()
         {
-            $('#sx-ssh-console-wrapper').show();
+            //$('#sx-ssh-console-wrapper').show();
             $('.sx-toggle-ssh').show();
 
             this._ssh = true;
