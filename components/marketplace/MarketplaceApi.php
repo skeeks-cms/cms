@@ -23,7 +23,7 @@ class MarketplaceApi extends Component
     const RESPONSE_FORMAT_JSON = 'json';
 
     public $schema          = "http";
-    public $host            = "marketplace.cms.skeeks.com";
+    public $host            = "api.cms.skeeks.com";
     public $version         = "v1";
 
     public $responseFormat  = self::RESPONSE_FORMAT_JSON;
@@ -31,7 +31,7 @@ class MarketplaceApi extends Component
     /**
      * Базовый путь к апи, без версии
      *
-     * Пример http://cms.skeeks.com/v1/
+     * Пример http://api.cms.skeeks.com/v1/
      *
      * @return string
      */
@@ -72,6 +72,16 @@ class MarketplaceApi extends Component
         {
             list($route, $data) = $route;
             $url = $this->url . $route;
+
+            if (!$data || !is_array($data))
+            {
+                $data = [];
+            }
+
+            $data = array_merge($data, [
+                'sx-serverName' => \Yii::$app->request->serverName,
+                'sx-key'        => \Yii::$app->cms->licenseKey,
+            ]);
             if ($data)
             {
                 $url .= '?' . http_build_query($data);
@@ -95,8 +105,15 @@ class MarketplaceApi extends Component
             'Accept: application/' . $this->responseFormat. '; q=1.0, */*; q=0.1'
         ]);
 
-        $url = $this->getRequestUrl($route);
-        $curl->httpRequest($method, $url);
+        $curl->setOption(CURLOPT_TIMEOUT, 2);
+
+        try
+        {
+            $url = $this->getRequestUrl($route);
+            $curl->httpRequest($method, $url);
+        } catch (\Exception $e)
+        {}
+
 
         return $curl;
     }
@@ -106,7 +123,7 @@ class MarketplaceApi extends Component
      * @param $route
      * @return array
      */
-    public function get($route)
+    public function fetch($route)
     {
         $curl = $this->request(Curl::METHOD_GET, $route);
         if ($curl->responseCode == 200 && $curl->response)
@@ -115,5 +132,22 @@ class MarketplaceApi extends Component
         }
 
         return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getInfo()
+    {
+        $key = 'test';
+
+        $result = \Yii::$app->cache->get($key);
+        if ($result === false)
+        {
+            $result = $this->fetch(['info']);
+            \Yii::$app->cache->set($key, $result, (60*60*24) );
+        }
+
+        return $result;
     }
 }

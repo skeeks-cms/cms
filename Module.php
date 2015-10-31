@@ -45,6 +45,46 @@ class Module extends base\Module implements BootstrapInterface
         ]);
     }
 
+    static public $isRegisteredTranslations = false;
 
+    public function init()
+    {
+        parent::init();
+        self::registerTranslations();
+    }
+
+    static public function registerTranslations()
+    {
+        if (self::$isRegisteredTranslations === false)
+        {
+            \Yii::$app->i18n->translations['skeeks/cms/user'] = [
+                'class' => 'yii\i18n\PhpMessageSource',
+                'sourceLanguage' => 'en-US',
+                'basePath' => '@skeeks/cms/messages',
+                'fileMap' => [
+                    'skeeks/cms/user' => 'user.php',
+                ],
+                'on missingTranslation' => ['skeeks\cms\components\TranslationEventHandler', 'handleMissingTranslation']
+            ];
+
+            \Yii::$app->i18n->translations['skeeks/cms/v2'] = [
+                'class' => 'yii\i18n\PhpMessageSource',
+                'sourceLanguage' => 'en-US',
+                'basePath' => '@skeeks/cms/messages',
+                'fileMap' => [
+                    'skeeks/cms/v2' => 'v2.php',
+                ],
+                'on missingTranslation' => ['skeeks\cms\components\TranslationEventHandler', 'handleMissingTranslation']
+            ];
+
+            self::$isRegisteredTranslations = true;
+        }
+    }
+
+    public static function t($category, $message, $params = [], $language = null)
+    {
+        self::registerTranslations();
+        return \Yii::t('skeeks/cms/' . $category, $message, $params, $language);
+    }
 
 }

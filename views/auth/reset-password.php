@@ -11,7 +11,7 @@ use yii\helpers\Html;
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 use \skeeks\cms\helpers\UrlHelper;
 
-$this->title = 'Получение нового пароля';
+$this->title = \Yii::t('app','Getting a new password');
 \Yii::$app->breadcrumbs->createBase()->append($this->title);
 ?>
 <div class="row">
@@ -21,9 +21,9 @@ $this->title = 'Получение нового пароля';
                 <div class="col-lg-3"></div>
                 <div class="col-lg-6">
                     <h1><?= $message; ?></h1>
-                    <?= Html::a('Запросить восстановление еще раз', UrlHelper::constructCurrent()->setRoute('cms/auth/forget')->toString()) ?> |
-                    <?= Html::a('Авторизация', UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?> |
-                    <?= Html::a('Регистрация', UrlHelper::constructCurrent()->setRoute('cms/auth/register')->toString()) ?>
+                    <?= Html::a(\Yii::t('app','Request recovery again'), UrlHelper::constructCurrent()->setRoute('cms/auth/forget')->toString()) ?> |
+                    <?= Html::a(\Yii::t('app','Authorization'), UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?> |
+                    <?= Html::a(\Yii::t('app','Registration'), UrlHelper::constructCurrent()->setRoute('cms/auth/register')->toString()) ?>
                 </div>
                 <div class="col-lg-3"></div>
             </div>

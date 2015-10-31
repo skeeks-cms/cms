@@ -350,7 +350,7 @@ return
                     ],
 
                     [
-                        "label"     => \Yii::t('app',"Job to database"),
+                        "label"     => \Yii::t('app',"Work to database"),
                         "url"       => ["admin/db"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
                     ],
@@ -418,7 +418,7 @@ return
             ],
 
             [
-                "label"     => \Yii::t('app',"Install{s}Remove",['s' => '/']),
+                "label"     => \Yii::t('app',"Install{s}Delete",['s' => '/']),
                 "url"       => ["cms/admin-marketplace/install"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installer.png']
             ],

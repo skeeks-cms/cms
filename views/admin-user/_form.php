@@ -13,21 +13,21 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet('Общая информация')?>
+<?= $form->fieldSet(\Yii::t('app','General information'))?>
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'gender')->radioList([
-        'men'   => 'Муж',
-        'women' => 'Жен',
+        'men'   => \Yii::t('app','Male'),
+        'women' => \Yii::t('app','Female'),
     ]); ?>
 
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
     ); ?>
 
-    <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
+    <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint(\Yii::t('app','The unique username. Used for authorization and to form links to personal cabinet.')); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
 
     <?= $form->field($model, 'email')->textInput(); ?>
@@ -42,7 +42,7 @@ use common\models\User;
                   ],
                 ]); ?>
 
-                    Email не подтвержден
+                    <?=\Yii::t('app','{email} not confirmed',['email' => 'Email'])?>
                 <? \yii\bootstrap\Alert::end(); ?>
 
             <? else : ?>
@@ -53,7 +53,7 @@ use common\models\User;
 
     <?= $form->field($model, 'phone')->textInput([
         'placeholder' => '+7 903 722-28-73'
-    ])->hint('Формат ввода телефона: +7 903 722-28-73'); ?>
+    ])->hint(\Yii::t('app','Input format phone').': +7 903 722-28-73'); ?>
 
 <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
     'label'             => "Дополнительные email",
@@ -83,7 +83,7 @@ use common\models\User;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Дополнительно')?>
+<?= $form->fieldSet(\Yii::t('app','Additionally'))?>
     <?= $form->field($model, 'city')->textInput(); ?>
     <?= $form->field($model, 'address')->textInput(); ?>
     <?= $form->field($model, 'info')->textarea(); ?>
@@ -91,11 +91,11 @@ use common\models\User;
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Социальные профили')?>
+<?= $form->fieldSet(\Yii::t('app','Social profiles'))?>
 
 
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => "Социальные профили",
+        'label'             => \Yii::t('app',"Social profiles"),
         'hint'              => "",
         'parentModel'       => $model,
         'relation'          => [

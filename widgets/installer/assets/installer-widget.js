@@ -79,7 +79,7 @@
          */
         initSshConsole: function()
         {
-            $('#sx-ssh-console-wrapper').show();
+            //$('#sx-ssh-console-wrapper').show();
             $('.sx-toggle-ssh').show();
 
             this._ssh = true;
@@ -100,37 +100,37 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подготовка к обновлению',
-                'delay':3000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка системы, окружения',
-                'delay':2000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка совместимости',
-                'delay':3000
+                'delay':2000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Запуска ssh консоли',
-                'delay':1000,
+                'delay':500,
                 'callback':function()
                 {
                     self.initSshConsole();
                 }
             }));
 
-            tasks.push(new sx.classes.InstallerTaskConsole({
+            /*tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/composer/revert-modified-files',
                 'name':'Откат модификаций ядра',
                 'delay': 1500
-            }));
+            }));*/
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подключение к серверу обновлений',
-                'delay':2000
+                'delay':1000
             }));
 
 
@@ -140,11 +140,11 @@
                 'delay': 500
             }));
 
-            tasks.push(new sx.classes.InstallerTaskConsole({
+           /* tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/db/dump-list',
                 'name':'Создание резервной копии базы данных',
                 'delay': 1500
-            }));
+            }));*/
 
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/utils/generate-modules-config-file',
@@ -158,7 +158,7 @@
 
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/utils/clear-runtimes',
-                'name':'Чистка временных диррикторий',
+                'name':'Чистка временных файлов',
             }));
 
             tasks.push(new sx.classes.InstallerTaskConsole({
@@ -185,12 +185,12 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка обновленных решений',
-                'delay':3000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Завершение процесса обновления',
-                'delay':3000,
+                'delay':1000,
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
@@ -220,35 +220,39 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подготовка к удалению пакета',
-                'delay':3000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка системы, окружения',
-                'delay':2000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Запуска ssh консоли',
-                'delay':1000,
+                'delay':500,
                 'callback':function()
                 {
                     self.initSshConsole();
                 }
             }));
 
+            tasks.push(new sx.classes.InstallerTaskClean({
+                'name':'Подключение к серверу обновлений',
+                'delay':1000
+            }));
 
-            tasks.push(new sx.classes.InstallerTaskConsole({
+            /*tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/composer/revert-modified-files',
                 'name':'Откат модификаций ядра',
                 'delay': 1500
-            }));
+            }));*/
 
-            tasks.push(new sx.classes.InstallerTaskConsole({
+            /*tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/backup/db-execute',
                 'name':'Создание резервной копии базы данных',
                 'delay': 1500
-            }));
+            }));*/
 
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/update/remove ' + packageName,
@@ -295,11 +299,11 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Тестирование системы после удаления',
-                'delay':3000,
+                'delay':1000,
             }));
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Завершение процесса удаления',
-                'delay':3000,
+                'delay':2000,
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
@@ -329,17 +333,17 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подготовка к установке пакета',
-                'delay':3000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка системы, окружения',
-                'delay':2000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка совместимости пакета',
-                'delay':3000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
@@ -351,15 +355,15 @@
                 }
             }));
 
-            tasks.push(new sx.classes.InstallerTaskConsole({
+            /*tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/composer/revert-modified-files',
                 'name':'Откат модификаций ядра',
                 'delay': 1500
-            }));
+            }));*/
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Подключение к серверу обновлений',
-                'delay':2000
+                'delay':1000
             }));
 
 
@@ -369,11 +373,11 @@
                 'delay': 500
             }));
 
-            tasks.push(new sx.classes.InstallerTaskConsole({
+            /*tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/db/dump-list',
                 'name':'Создание резервной копии базы данных',
                 'delay': 1500
-            }));
+            }));*/
 
             tasks.push(new sx.classes.InstallerTaskConsole({
                 'cmd':'php yii cms/utils/generate-modules-config-file',
@@ -414,12 +418,12 @@
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Проверка установленного решения',
-                'delay':3000
+                'delay':1000
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({
                 'name':'Завершение процесса установки',
-                'delay':3000,
+                'delay':2000,
             }));
 
             tasks.push(new sx.classes.InstallerTaskClean({

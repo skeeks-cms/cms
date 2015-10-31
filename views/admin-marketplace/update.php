@@ -29,7 +29,7 @@ if (!\Yii::$app->user->can('admin/ssh'))
             'class' => 'form-inline'
         ]
     ]); ?>
-        <?= \yii\helpers\Html::button('<i class="glyphicon glyphicon-retweet"></i> Запустить обновление',
+        <?= \yii\helpers\Html::button('<i class="glyphicon glyphicon-retweet"></i> '.\Yii::t('app','Start update'),
         \yii\helpers\ArrayHelper::merge([
             'type'  => 'submit',
             'class' => 'btn btn-lg ' . ($attrDisabled ?: 'btn-primary'),
@@ -42,8 +42,8 @@ JS
 
     ); ?>
     <hr />
-    <p><b><a data-pjax="0" href="<?= \skeeks\cms\models\CmsExtension::getInstance('skeeks/cms')->adminUrl; ?>">SkeekS CMS Version</a>: </b> <?= \Yii::$app->cms->moduleCms->descriptor->version; ?></p>
-    <p><b>Yii Version: </b> <?= Yii::getVersion(); ?></p>
+    <p><b><a data-pjax="0" href="<?= \skeeks\cms\models\CmsExtension::getInstance('skeeks/cms')->adminUrl; ?>"><?=\Yii::t('app','{yii} Version',['yii' => 'SkeekS CMS'])?></a>: </b> <?= \Yii::$app->cms->moduleCms->descriptor->version; ?></p>
+    <p><b><?=\Yii::t('app','{yii} Version',['yii' => 'Yii'])?>: </b> <?= Yii::getVersion(); ?></p>
     <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 </div>
 
@@ -96,12 +96,12 @@ JS
       ]
     ]);
 ?>
-    <p>Обновление платформы обычно длится 1-5 минут.</p>
-    <p>В процессе обновления будут изменены все ваши модификации ядра.</p>
-    <p>Будет создана резервная копия базы данных</p>
-    <p>Сброшен кэш</p>
-    <p>Удалены временные файлы</p>
-    <p>Обновлены все подключеные пакеты</p>
+    <p><?=\Yii::t('app','Updating the platform usually lasts 1-5 minutes.')?></p>
+    <p><?=\Yii::t('app','The updating process will change all your modifications to the core.')?></p>
+    <p><?=\Yii::t('app','Will be created a backup of the database')?></p>
+    <p><?=\Yii::t('app','Cleared cache')?></p>
+    <p><?=\Yii::t('app','Deleted temporary files')?></p>
+    <p><?=\Yii::t('app','Updated all included packages')?></p>
 
 <? \yii\bootstrap\Alert::end(); ?>
 

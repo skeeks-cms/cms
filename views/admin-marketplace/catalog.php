@@ -24,7 +24,7 @@ $self = $this;
             ])?>
 
         <? else: ?>
-            Расширение не найдено
+            <?= \Yii::t('app','The extension is not found') ?>
         <? endif; ?>
 
     </div>
@@ -34,12 +34,12 @@ $self = $this;
           'class' => 'alert-info',
       ]
     ]); ?>
-        <p>Вы можете выбрать подходящее решение для вашего проекта и установить его.</p>
-        <p>В следующих версиях маркетплей будет интегрирован сюда. А пока, просто перейдите по ссылке ниже.</p>
+        <p><?= \Yii::t('app','You can choose the suitable solution for your project and install it.') ?></p>
+        <p><?= \Yii::t('app','Future versions will be integrated {market} here. For now, simply click the link below.',['market' => \Yii::t('app','Marketplace')])?></p>
     <? \yii\bootstrap\Alert::end(); ?>
 
     <div class="sx-marketplace">
-        <a href="http://marketplace.cms.skeeks.com/" target="_blank">Marketplace.CMS.SkeekS.com</a> — каталог доступных решений
+        <a href="http://marketplace.cms.skeeks.com/" target="_blank">Marketplace.CMS.SkeekS.com</a> — <?=\Yii::t('app','catalog of available solutions')?>
     </div>
 
 <?

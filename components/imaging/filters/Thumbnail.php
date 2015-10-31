@@ -31,7 +31,7 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
 
         if (!$this->w && !$this->h)
         {
-            throw new Exception("Не переданны обязательные параметры ширины и высоты");
+            throw new Exception("РќРµРѕР±С…РѕРґРёРјРѕ СѓРєР°Р·Р°С‚СЊ С€РёСЂРёРЅСѓ РёР»Рё РІС‹СЃРѕС‚Сѓ");
         }
 
     }

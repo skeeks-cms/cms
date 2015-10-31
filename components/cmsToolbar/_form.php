@@ -16,12 +16,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Основное'); ?>
 
-    <?= $form->field($model, 'enabled')->widget(
-        \skeeks\widget\chosen\Chosen::className(),
-        [
-            'items' => \Yii::$app->formatter->booleanFormat
-        ]
-    )->hint('Этот параметр отключает/включает панель для всех пользователей сайта, независимо от их прав и возможностей'); ?>
+    <?= $form->field($model, 'enabled')->checkbox()->hint('Этот параметр отключает/включает панель для всех пользователей сайта, независимо от их прав и возможностей'); ?>
+
+
+    <?= $form->fieldCheckboxBoolean($model, 'isOpen')->hint('По умолчанию панель будет открыта или закрыта'); ?>
 
 
     <?= $form->field($model, 'enableFancyboxWindow')->widget(

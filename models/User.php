@@ -21,6 +21,7 @@ use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
+use skeeks\cms\Module;
 use skeeks\cms\validators\PhoneValidator;
 use skeeks\sx\validate\Validate;
 use Yii;
@@ -338,7 +339,7 @@ class User
             'active' => Yii::t('app', 'Active'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name???'),
+            'name' => Module::t('user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
             'city' => Yii::t('app', 'City'),
             'address' => Yii::t('app', 'Address'),
             'info' => Yii::t('app', 'Information'),

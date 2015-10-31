@@ -347,6 +347,12 @@ JS
                 {
                     $additionalName = $model->site->name;
                 }
+            } else
+            {
+                if ($model->name_hidden)
+                {
+                    $additionalName = $model->name_hidden;
+                }
             }
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',

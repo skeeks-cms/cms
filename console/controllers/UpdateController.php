@@ -8,6 +8,7 @@
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\base\console\Controller;
+use skeeks\cms\helpers\FileHelper;
 use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
@@ -32,6 +33,18 @@ class UpdateController extends Controller
      */
     public $optimize = true;
 
+    /**
+     * @var bool
+     * Сделать бэкап базы данных, перед обновлением
+     */
+    public $dbDump = true;
+
+    /**
+     * @var bool
+     * Использовать опцию композер --profile
+     */
+    public $profile = true;
+
 
     /**
      * @var bool
@@ -41,7 +54,7 @@ class UpdateController extends Controller
 
     /**
      * @var bool
-     * Откатить изменнные файлы перед началом установки
+     * Откатить изменнные файлы перед началом установки (если установлен гит)
      */
     public $revertModified = true;
 
@@ -64,7 +77,13 @@ class UpdateController extends Controller
     public function options($actionID)
     {
         return ArrayHelper::merge(parent::options($actionID), [
-            'optimize', 'composerVersion', 'composerAssetPluginV', 'noInteraction', 'revertModified'
+            'optimize',
+            'composerVersion',
+            'composerAssetPluginV',
+            'noInteraction',
+            'revertModified',
+            'profile',
+            'dbDump'
         ]);
     }
 
@@ -73,13 +92,13 @@ class UpdateController extends Controller
      */
     public function actionAll()
     {
-        //Создание бэкапа базы данных.
-        $this->systemCmdRoot("php yii cms/backup/db-execute");
+        if ($this->dbDump)
+        {
+            //Создание бэкапа базы данных.
+            $this->systemCmdRoot("php yii cms/backup/db-execute");
+        }
 
-        //Список сохранненных баз данных
-        $this->systemCmdRoot("php yii cms/backup/db-list");
-
-        //Удаление блокирующего файла
+        //Удаление блокирующего файла TODO: rewrite this is
         $this->systemCmdRoot("rm -f composer.lock");
 
         //Проверка версии композера, его установка если нет
@@ -93,11 +112,47 @@ class UpdateController extends Controller
             $this->systemCmdRoot("php yii cms/composer/revert-modified-files");
         }
 
-        //Обновление зависимостей
-        $this->systemCmdRoot("php yii cms/composer/update " . ($this->optimize ? " -o ": " ") . ($this->noInteraction ? "--noInteraction":"" ));
+        /*ob_start();
+            system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status');
+        $result = ob_get_clean();
+        $result = trim($result);
+
+        if ($result)
+        {
+            $dirs = explode("\n", $result);
+
+            if ($dirs)
+            {
+                foreach ($dirs as $dirPath)
+                {
+                    FileHelper::removeDirectory($dirPath);
+                }
+            }
+        }*/
+
+
+
+        $options = [];
+
+        if ($this->optimize)
+        {
+            $options[] = "-o";
+        }
+
+        if ($this->noInteraction)
+        {
+            $options[] = "--no-interaction";
+        }
+
+        if ($this->profile)
+        {
+            $options[] = "--profile";
+        }
+
+        $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar update ' . implode(" ", $options) );
 
         //Генерация файла со списком модулей
-        $this->systemCmdRoot("php yii cms/utils/generate-modules-config-file");
+        \Yii::$app->cms->generateModulesConfigFile();
 
         //Установка всех миграций
         $this->systemCmdRoot("php yii cms/db/apply-migrations");
@@ -107,7 +162,7 @@ class UpdateController extends Controller
 
 
         //Сброс кэша стрктуры базы данных
-        $this->systemCmdRoot("php yii cms/db/db-refresh");
+        \Yii::$app->db->getSchema()->refresh();
 
         //Обновление привилегий
         $this->systemCmdRoot("php yii cms/rbac/init");

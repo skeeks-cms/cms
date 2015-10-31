@@ -82,6 +82,10 @@ class UtilsController extends Controller
         $dir->clear();
         $this->_checkIsEmptyDir($dir);
 
+        $dir = new Dir(\Yii::getAlias('@app/runtime'));
+        $dir->clear();
+        $this->_checkIsEmptyDir($dir);
+
         $dir = new Dir(\Yii::getAlias('@frontend/runtime'));
         $dir->clear();
         $this->_checkIsEmptyDir($dir);

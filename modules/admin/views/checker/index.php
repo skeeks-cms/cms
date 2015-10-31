@@ -34,7 +34,7 @@ CSS
 
     <p>
         <div class="sx-progress-tasks" id="sx-progress-tasks" style="display: none;">
-            <span style="vertical-align:middle;"><h3><?= \Yii::t('app','"Testing the system (Proccess"') ?> <span class="sx-executing-ptc"></span>%)</h3></span>
+            <span style="vertical-align:middle;"><h3><?= \Yii::t('app','"Testing the system (Progress"') ?> <span class="sx-executing-ptc"></span>%)</h3></span>
             <span style="vertical-align:middle;"><?= \Yii::t('app','Test') ?>: <span class="sx-executing-task-name"></span></span>
             <div>
                 <div class="progress progress-striped active">

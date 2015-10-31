@@ -90,6 +90,13 @@ body.sidebar-hidden footer.sx-admin-footer
     padding: 0 20px 0px 20px;
 }
 
+@media(max-width:767px) {
+    .empty .main {
+        overflow: hidden;
+        padding: 0px 0px 0 0px !important
+    }
+}
+
 @media (max-width: 991px)
 {
     .main
@@ -234,6 +241,7 @@ body.empty .sx-panel
     .sx-panel .sx-nav
     {
         border-bottom: 1px solid rgba(32, 168, 216, 0.23);
+        height: 40px;
     }
 
 
@@ -273,8 +281,10 @@ body.empty .sx-panel
     .sx-nav>li>a
     {
         border-radius: 0;
-        padding: 5px 10px;
-        font-size: 12px;
+        padding: 9px 10px;
+        font-size: 14px;
+        height: 40px;
+
     }
 
 

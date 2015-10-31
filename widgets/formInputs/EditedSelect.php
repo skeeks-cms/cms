@@ -76,10 +76,11 @@ class EditedSelect extends Chosen
                 ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                 ->enableAdmin()->toString();
 
-
+            $create_w = \Yii::t('app','Create');
+            $edit_w = \Yii::t('app','Edit');
             echo <<<HTML
-            <a href="{$createUrl}" class="btn btn-default sx-btn-create sx-btn-controll" ><span class="glyphicon glyphicon-plus"></span> Создать</a>
-            <a href="{$updateUrl}" class="btn btn-default sx-btn-update sx-btn-controll" ><span class="glyphicon glyphicon-pencil"></span> Редактировать</a>
+            <a href="{$createUrl}" class="btn btn-default sx-btn-create sx-btn-controll" ><span class="glyphicon glyphicon-plus"></span> {$create_w}</a>
+            <a href="{$updateUrl}" class="btn btn-default sx-btn-update sx-btn-controll" ><span class="glyphicon glyphicon-pencil"></span> {$edit_w}</a>
 HTML;
 
 

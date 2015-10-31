@@ -35,8 +35,18 @@ class ComponentSettingsWidget extends InputWidget
      * @var string ID селекта компонентов
      */
     public $componentSelectId   = "";
-    public $buttonText          = "Настройки свойства";
+    public $buttonText          = "";
     public $buttonClasses       = "sx-btn-edit btn btn-xs btn-default";
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->buttonText)
+        {
+            $this->buttonText = \Yii::t('app','Setting property');
+        }
+    }
 
     /**
 	 * @inheritdoc

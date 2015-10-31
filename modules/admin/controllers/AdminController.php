@@ -157,6 +157,29 @@ abstract class AdminController extends Controller
     {
         parent::init();
 
+        self::onceInit();
+
+        if (!$this->name)
+        {
+            $this->name = \Yii::t('app','The name of the controller'); //Inflector::humanize($this->id);
+        }
+
+        $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
+
+        \Yii::$app->trigger(self::EVENT_INIT, new AdminInitEvent([
+            'name'          => self::EVENT_INIT,
+            'controller'    => $this
+        ]));
+    }
+
+    static private $_onceInit = false;
+    static public function onceInit()
+    {
+        if (self::$_onceInit === true)
+        {
+            return false;
+        }
+
         //TODO: временное решение, проверка наличия соединенеия с базой, если этого не будет, то при проверки прав будут ошибки.
         try
         {
@@ -174,21 +197,10 @@ abstract class AdminController extends Controller
             }
         }
 
+        \Yii::$app->cmsMarkeplace->info;
 
-        if (!$this->name)
-        {
-            $this->name = \Yii::t('app','The name of the controller'); //Inflector::humanize($this->id);
-        }
-
-        $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
-
-
-        \Yii::$app->trigger(self::EVENT_INIT, new AdminInitEvent([
-            'name'          => self::EVENT_INIT,
-            'controller'    => $this
-        ]));
+        self::$_onceInit = true;
     }
-
     /**
      * @return array
      */

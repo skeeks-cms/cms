@@ -49,7 +49,6 @@ class AdminAsset extends AssetBundle
         '\skeeks\cms\modules\admin\assets\JqueryScrollbarAsset',
         '\skeeks\cms\modules\admin\assets\ThemeRealAdminAsset',
         '\skeeks\cms\assets\FancyboxAssets',
-        '\skeeks\cms\assets\JqueryFullscreenAsset'
     ];
 
     /**

@@ -70,6 +70,9 @@ use yii\helpers\Url;
  * @property string $description_full_type
  * @property integer $image_full_id
  * @property integer $image_id
+ * @property integer $redirect_tree_id
+ * @property integer $redirect_code
+ * @property string $name_hidden
  *
  * @property string $absoluteUrl
  * @property string $url
@@ -79,6 +82,7 @@ use yii\helpers\Url;
  *
  * @property CmsTreeFile[]  $cmsTreeFiles
  * @property CmsTreeImage[] $cmsTreeImages
+ * @property CmsTree        $redirectTree
  *
  * @property CmsStorageFile[] $files
  * @property CmsStorageFile[] $images
@@ -287,6 +291,9 @@ class Tree extends Core
             'image_full_id' => Yii::t('app', 'Main Image'),
             'images' => Yii::t('app', 'Images'),
             'files' => Yii::t('app', 'Files'),
+            'redirect_tree_id' => Yii::t('app', 'Redirect Section'),
+            'redirect_code' => Yii::t('app', 'Redirect Code'),
+            'name_hidden' => Yii::t('app', 'Hidden Name'),
         ]);
     }
 
@@ -299,8 +306,11 @@ class Tree extends Core
         return array_merge(parent::rules(), [
             [['description_short', 'description_full'], 'string'],
             ['active', 'default', 'value' => Cms::BOOL_Y],
+            [['redirect_code'], 'default', 'value' => 301],
+            [['redirect_code'], 'in', 'range' => [301, 302]],
             [['redirect'], 'string'],
-            [['priority', 'tree_type_id', 'image_id', 'image_full_id'], 'integer'],
+            [['name_hidden'], 'string'],
+            [['priority', 'tree_type_id', 'image_id', 'image_full_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
             [['tree_menu_ids'], 'safe'],
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
@@ -317,6 +327,14 @@ class Tree extends Core
         ]);
     }
 
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRedirectTree()
+    {
+        return $this->hasOne(CmsTree::className(), ['id' => 'redirect_tree_id']);
+    }
 
     /**
      *
@@ -338,6 +356,14 @@ class Tree extends Core
         if ($this->redirect)
         {
             return $this->redirect;
+        }
+
+        if ($this->redirect_tree_id)
+        {
+            if ($this->redirectTree->id != $this->id)
+            {
+                return $this->redirectTree->url;
+            }
         }
 
         return ($this->site ? $this->site->url : "") . Url::to(['/cms/tree/view', 'model' => $this]);

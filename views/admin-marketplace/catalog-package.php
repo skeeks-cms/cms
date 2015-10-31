@@ -23,19 +23,19 @@ $extension = $packageModel->createCmsExtension();
     <div class="col-lg-8">
         <h1><?= $packageModel->name; ?></h1>
         <h2><?= $packageModel->packagistCode; ?></h2>
-        <a data-pjax="0" href="<?= $packageModel->url; ?>" class="btn btn-default btn-primary" target="_blank" title="Посмотреть на Маркетплейс (откроется в новом окне)">
-            <i class="glyphicon glyphicon-shopping-cart"></i> Маркетплейс
+        <a data-pjax="0" href="<?= $packageModel->url; ?>" class="btn btn-default btn-primary" target="_blank" title="<?=\Yii::t('app','Watch to {site} (opens in new window)',['site' => \Yii::t('app','Marketplace')])?>">
+            <i class="glyphicon glyphicon-shopping-cart"></i> <?= \Yii::t('app','Marketplace') ?>
         </a>
 
         <? if ($packageModel->isInstalled()) : ?>
             <a data-pjax="0" href="<?= $packageModel->url; ?>" class="btn btn-default btn-success" target="_blank" title="">
-                <i class="glyphicon glyphicon-ok"></i> Установлена версия: <?= $extension->version; ?>
+                <i class="glyphicon glyphicon-ok"></i> <?=\Yii::t('app','Installed version')?>: <?= $extension->version; ?>
             </a>
 
             <? if ($extension) : ?>
                 <? if ($extension->canDelete()) : ?>
                     <a data-pjax="0" href="<?= $extension->controllUrl; ?>" class="btn btn-default btn-danger" title="">
-                        <i class="glyphicon glyphicon-remove"></i> Удалить
+                        <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('app','Delete')?>
                     </a>
                 <? endif; ?>
             <? endif; ?>
@@ -43,7 +43,7 @@ $extension = $packageModel->createCmsExtension();
 
         <? else : ?>
             <a data-pjax="0" href="<?= $packageModel->url; ?>" class="btn btn-default btn-danger" target="_blank" title="">
-                <i class="glyphicon glyphicon-download-alt"></i> Установить
+                <i class="glyphicon glyphicon-download-alt"></i> <?=\Yii::t('app','Install')?>
             </a>
 
         <? endif; ?>
@@ -55,7 +55,7 @@ $extension = $packageModel->createCmsExtension();
 <? if ($images = $packageModel->imagesSrc) : ?>
     <div class="row" style="margin-top: 15px;">
         <div class="col-lg-12">
-        <h2>Фото и скриншоты</h2>
+        <h2><?=\Yii::t('app','Photos and screenshots')?></h2>
         <? foreach($images as $image) : ?>
             <a href="<?= $image; ?>" class="sx-fancybox sx-img-link-hover sx-border-1px">
                 <img src="<?= $image; ?>" style="max-width: 300px;"/>
@@ -79,34 +79,34 @@ $extension = $packageModel->createCmsExtension();
       <div class="col-lg-12">
 
           <? $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
-          <?= $form->fieldSet('Описание'); ?>
+          <?= $form->fieldSet(\Yii::t('app','Description')); ?>
               <?= $packageModel->description_full; ?>
           <?= $form->fieldSetEnd(); ?>
 
-          <?= $form->fieldSet('Установка'); ?>
+          <?= $form->fieldSet(\Yii::t('app','Installation')); ?>
               <? if ($packageModel->installHelp): ?>
                   <?= $packageModel->installHelp; ?>
               <? else: ?>
-                  Для установки модуля необходимо запустить стандартную установку.
+                  <?=\Yii::t('app','To install the module, you must run the standard installation.')?>
               <? endif; ?>
           <?= $form->fieldSetEnd(); ?>
 
-          <?= $form->fieldSet('Поддержка'); ?>
+          <?= $form->fieldSet(\Yii::t('app','Support')); ?>
               <? if ($packageModel->support): ?>
                   <?= $packageModel->support; ?>
               <? else: ?>
-                  Разработчик не оставил контактов для связи с ним. Но вы всегда можете обратиться к разработчикам SkeekS CMS <a href="http://cms.skeeks.com/contacts" target="_blank">http://cms.skeeks.com/contacts</a>
+                  <?=\Yii::t('app','The developer did not leave a contact for communication with them. But you can always turn to the {cms} developers',['cms' => 'SkeekS CMS'])?>  <a href="http://cms.skeeks.com/contacts" target="_blank">http://cms.skeeks.com/contacts</a>
               <? endif; ?>
           <?= $form->fieldSetEnd(); ?>
 
           <? if ($packageModel->demoUrl) : ?>
-              <?= $form->fieldSet('Демо'); ?>
+              <?= $form->fieldSet(\Yii::t('app','Demo')); ?>
                   <a href="<?= $packageModel->demoUrl; ?>" target="_blank"><?= $packageModel->demoUrl; ?></a>
               <?= $form->fieldSetEnd(); ?>
           <? endif; ?>
 
           <? if ($images = $packageModel->imagesSrc) : ?>
-              <?= $form->fieldSet('Фото и скриншоты'); ?>
+              <?= $form->fieldSet(\Yii::t('app','Photos and screenshots')); ?>
                 <div class="row" style="margin-top: 15px;">
                     <div class="col-lg-12">
                     <? foreach($images as $image) : ?>
@@ -120,14 +120,14 @@ $extension = $packageModel->createCmsExtension();
         <? endif; ?>
 
           <? if ($extension->changeLog) : ?>
-              <?= $form->fieldSet('Процесс разработки'); ?>
+              <?= $form->fieldSet(\Yii::t('app','Development process')); ?>
                     <?= \kartik\markdown\Markdown::convert($extension->changeLog); ?>
 
               <?= $form->fieldSetEnd(); ?>
           <? endif; ?>
 
           <? if ($extension->readme) : ?>
-              <?= $form->fieldSet('Для разработчика'); ?>
+              <?= $form->fieldSet(\Yii::t('app','For developer')); ?>
               <?= \kartik\markdown\Markdown::convert($extension->readme); ?>
               <?= $form->fieldSetEnd(); ?>
           <? endif; ?>

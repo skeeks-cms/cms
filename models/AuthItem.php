@@ -73,7 +73,7 @@ class AuthItem extends \yii\base\Model
     public function attributeLabels()
     {
         return [
-            'name' => Yii::t('app', 'Name???'),
+            'name' =>  Yii::t('app', 'Name'),
             'type' => Yii::t('app', 'Type'),
             'description' => Yii::t('app', 'Description'),
             'ruleName' => Yii::t('app', 'Rule'),

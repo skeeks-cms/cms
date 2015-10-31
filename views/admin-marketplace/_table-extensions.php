@@ -67,7 +67,7 @@ $self = $this;
 
                     if ($model->canDelete())
                     {
-                        return \yii\helpers\Html::a('<i class="glyphicon glyphicon-remove"></i> Удалить', $model->controllUrl, [
+                        return \yii\helpers\Html::a('<i class="glyphicon glyphicon-remove"></i> ' . \Yii::t('app','Delete'), $model->controllUrl, [
                             'class' => 'btn btn-danger btn-xs',
                             'data-pjax' => '0'
                         ]);
@@ -78,7 +78,7 @@ $self = $this;
                 },
 
                 'format' => 'raw',
-                'label' => 'Возможные действия'
+                'label' => \Yii::t('app','Possible actions')
             ],
         ]
     ])?>

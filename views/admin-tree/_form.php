@@ -14,7 +14,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             <div class="pull-left">
                 <? if ($model->parents) : ?>
                     <? foreach ($model->parents as $tree) : ?>
-                        <a href="<?= $tree->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
+                        <a href="<?= $tree->url ?>" target="_blank" title="<?=\Yii::t('app','Watch to site (opens new window)')?>">
                             <?= $tree->name ?>
                             <? if ($tree->level == 0) : ?>
                                 [<?= $tree->site->name; ?>]
@@ -23,7 +23,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                         /
                     <? endforeach; ?>
                 <? endif; ?>
-                <a href="<?= $model->url ?>" target="_blank" title="Посмотреть на сайте (открыть в новой вкладке)">
+                <a href="<?= $model->url ?>" target="_blank" title="<?=Yii::t('app','Watch to site (opens new window)')?>">
                     <?= $model->name; ?>
                 </a>
             </div>
@@ -38,22 +38,31 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app','Main')); ?>
 
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'name_hidden')->textInput(['maxlength' => 255])
+                ->hint(\Yii::t('app', 'Not displayed on the site')) ?>
+        </div>
+    </div>
+
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])
-        ->hint(\Yii::t('app', 'Этот параметр влияет на адрес страницы, будте внимательно при его редактировании.')); ?>
+        ->hint(\Yii::t('app', \Yii::t('app','This affects the address of the page, be careful when editing.'))); ?>
 
 
 
 
-    <?= Html::checkbox("isLink", (bool) $model->redirect, [
+    <?= Html::checkbox("isLink", (bool) ($model->redirect || $model->redirect_tree_id), [
         'value'     => '1',
-        'label'     => 'Этот раздел является ссылкой',
+        'label'     => \Yii::t('app','This section is a link'),
         'class'     => 'smartCheck',
         'id'        => 'isLink',
     ]); ?>
@@ -66,21 +75,43 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                          "id",
                          "name"
                      ),
-            ])->label('Тип раздела')->hint('От выбранного типа раздела может зависеть, то, как она будет отображаться.');
+            ])->label('Тип раздела')->hint(\Yii::t('app','On selected type of partition can depend how it will be displayed.'));
         ?>
     </div>
 
     <div data-listen="isLink" data-show="1" class="sx-hide">
-    <?= $form->field($model, 'redirect', [
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \Yii::t('app', 'Redirect')
+        ]); ?>
+        <?= $form->field($model, 'redirect_code', [])->radioList([
+                301 => 'Постоянное перенаправление [301]',
+                302 => 'Временное перенаправление [302]'
+            ])
+            ->label(\Yii::t('app','Redirect Code')) ?>
+        <div class="row">
+            <div class="col-md-5">
+                <?= $form->field($model, 'redirect', [])->textInput(['maxlength' => 500])->label(\Yii::t('app','Redirect'))
+                    ->hint(\Yii::t('app', 'Specify an absolute or relative URL for redirection, in the free form.')) ?>
+            </div>
+            <div class="col-md-7">
+                <?= $form->field($model, 'redirect_tree_id')->widget(
+                    \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+                    [
+                        "attributeSingle" => "redirect_tree_id",
+                        "mode" => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_SINGLE
+                    ]
+                ) ?>
+            </div>
+        </div>
 
-    ])->textInput(['maxlength' => 500])->label('Редиррект') ?>
+
     </div>
 
 <?= $form->fieldSetEnd() ?>
 
 
 
-<?= $form->fieldSet('Анонс'); ?>
+<?= $form->fieldSet(\Yii::t('app','Announcement')); ?>
 
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -122,7 +153,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     </div>
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('Подробно'); ?>
+<?= $form->fieldSet(\Yii::t('app','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -140,14 +171,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 </div>
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet('SEO'); ?>
+<?= $form->fieldSet(\Yii::t('app','SEO')); ?>
     <?= $form->field($model, 'meta_title')->textarea(); ?>
     <?= $form->field($model, 'meta_description')->textarea(); ?>
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
 
-<?= $form->fieldSet('Изображения'); ?>
+<?= $form->fieldSet(\Yii::t('app','Images')); ?>
 
     <?= $form->field($model, 'images')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -156,7 +187,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd()?>
 
 
-<?= $form->fieldSet('Файлы'); ?>
+<?= $form->fieldSet(\Yii::t('app','Files')); ?>
 
     <?= $form->field($model, 'files')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -165,9 +196,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd()?>
 
 
-<?= $form->fieldSet('Дополнительно') ?>
+<?= $form->fieldSet(\Yii::t('app','Additionally')) ?>
 
-    <?= $form->field($model, 'tree_menu_ids')->label('Метки')->widget(
+    <?= $form->field($model, 'tree_menu_ids')->label(\Yii::t('app','Marks'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\TreeMenu::find()->all(),
@@ -185,7 +216,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                  ),
                 'multiple' => true
         ]*/
-        )->hint('Вы можете привязать текущий раздел к несокльким меткам, и в зависимости от этого раздел будет показываться в разных меню например.');
+        )->hint(\Yii::t('app','You can link the current section to a few marks, and according to this, section will be displayed in different menus for example.'));
     ?>
 
 <?= $form->fieldSetEnd() ?>
@@ -204,7 +235,7 @@ $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_colu
 
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => $content->name,
-                'hint'              => "Показаны все элементы типа '{$content->name}' связанные с этим разделом. Учитывается только главная привязка.",
+                'hint'              => \Yii::t('app',"Showing all elements of type '{name}' associated with this section. Taken into account only the main binding.",['name' => $content->name]),
                 'parentModel'       => $model,
                 'relation'          => [
                     'tree_id'       => 'id',
@@ -272,6 +303,7 @@ $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_colu
                 if (val == 0)
                 {
                     $('#tree-redirect').val('');
+                    $('#tree-redirect_tree_id').val('');
                 }
 
                 $('[data-listen="' + id + '"]').hide();
