@@ -63,14 +63,16 @@ AdminAsset::register($this);
     <div class="col-lg-12">
         <div class="panel panel-primary sx-panel sx-panel-content">
             <div class="panel-heading sx-no-icon">
-                <h2>
-                    <?= Breadcrumbs::widget([
-                        'homeLink' => ['label' => \Yii::t("yii", "Home"), 'url' =>
-                            UrlHelper::construct('admin/index')->enableAdmin()->toString()
-                        ],
-                        'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-                    ]) ?>
-                </h2>
+                <div class="pull-left">
+                    <h2>
+                        <?= Breadcrumbs::widget([
+                            'homeLink' => ['label' => \Yii::t("yii", "Home"), 'url' =>
+                                UrlHelper::construct('admin/index')->enableAdmin()->toString()
+                            ],
+                            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+                        ]) ?>
+                    </h2>
+                </div>
                 <div class="panel-actions">
 
                     <? if (\Yii::$app->user->can('admin/admin-role') && \Yii::$app->controller instanceof \skeeks\cms\modules\admin\controllers\AdminController) : ?>
