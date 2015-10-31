@@ -65,7 +65,7 @@ class SshController extends AdminController
     {
         $model = new SshConsoleForm();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
             $model->load(\Yii::$app->request->post());
             \Yii::$app->response->format = Response::FORMAT_JSON;
@@ -81,15 +81,13 @@ class SshController extends AdminController
             ob_start();
             system("cd " . ROOT_DIR . "; {$command};");
             $result = ob_get_clean();
-        }
+            $result = '1';
+        }*/
 
         return $this->render($this->action->id, [
-            'model'     => $model,
-            'result'    => $result
+            /*'model'     => $model,
+            'result'    => $result*/
         ]);
     }
-
-
-
 
 }

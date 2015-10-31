@@ -57,6 +57,7 @@ $deny = [
 // Use next two for long time executing commands.
 ignore_user_abort(true);
 set_time_limit(0);
+ini_set("memory_limit","1024M");
 
 //error_reporting(E_ALL | E_STRICT);
 // определяем режим вывода ошибок
@@ -145,7 +146,7 @@ if (false !== $userCommand) {
     }
     // Create final command and execute it.
     $command = "cd $currentDir && $command";
-    list($output, $error, $code) = executeCommand($command);
+    list($output, $error, $code) = \Yii::$app->console->executeProcOpen($command);
     header("Content-Type: text/plain; charset=utf-8");
     echo formatOutput($userCommand, htmlspecialchars($output));
     echo htmlspecialchars($error);
@@ -158,7 +159,7 @@ if (false !== $userCommand) {
     $currentDirName = end($currentDirName);
     // Show current user.
     $whoami = isset($commands['*']) ? str_replace('$1', 'whoami', $commands['*']) : 'whoami';
-    list($currentUser) = executeCommand($whoami);
+    list($currentUser) = \Yii::$app->console->executeProcOpen($whoami);
     $currentUser = trim($currentUser);
 }
 ###############################################
@@ -178,30 +179,7 @@ function searchCommand($userCommand, array $commands, &$found = false, $inValues
     }
     return false;
 }
-function executeCommand($command)
-{
-    $descriptors = array(
-        0 => array("pipe", "r"), // stdin - read channel
-        1 => array("pipe", "w"), // stdout - write channel
-        2 => array("pipe", "w"), // stdout - error channel
-        3 => array("pipe", "r"), // stdin - This is the pipe we can feed the password into
-    );
-    $process = proc_open($command, $descriptors, $pipes);
-    if (!is_resource($process)) {
-        die("Can't open resource with proc_open.");
-    }
-    // Nothing to push to input.
-    fclose($pipes[0]);
-    $output = stream_get_contents($pipes[1]);
-    fclose($pipes[1]);
-    $error = stream_get_contents($pipes[2]);
-    fclose($pipes[2]);
-    // TODO: Write passphrase in pipes[3].
-    fclose($pipes[3]);
-    // Close all pipes before proc_close!
-    $code = proc_close($process);
-    return array($output, $error, $code);
-}
+
 function formatOutput($command, $output)
 {
     if (preg_match("%^(git )?diff%is", $command) || preg_match("%^status.*?-.*?v%is", $command)) {
@@ -254,10 +232,7 @@ function httpDigestParse($txt)
 #                Autocomplete                 #
 ###############################################
 
-ob_start();
-    system('cd '  . ROOT_DIR . '; php yii cms/utils/all-cmd');
-$result = ob_get_clean();
-$result = trim($result);
+$result = \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/utils/all-cmd');
 $possibleCmd = explode("\n", $result);
 
 $autocomplete = [

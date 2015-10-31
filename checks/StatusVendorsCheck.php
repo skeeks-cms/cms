@@ -50,13 +50,15 @@ HTML;
         if (!$emptyCheck->isSuccess())
         {
             $this->addError('Найдены ошибки в процессе работы консольных комманд, проверка модификации ядра не может быть запущена.');
-            return;
+            //return;
         }
 
-        ob_start();
+        $result = \Yii::$app->console->execute('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status --verbose');
+
+        /*ob_start();
             system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status --verbose');
         $result = ob_get_clean();
-        $result = trim($result);
+        $result = trim($result);*/
 
         if ($result)
         {

@@ -394,14 +394,14 @@ class Cms extends \skeeks\cms\base\Component
         }
 
         //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
-        if ($this->enabledHitAgents == self::BOOL_Y && function_exists('system'))
+        if ($this->enabledHitAgents == self::BOOL_Y)
         {
             $key = 'Agents';
             Yii::beginProfile($key);
                 $data = \Yii::$app->cache->get($key);
                 if ($data === false)
                 {
-                    system("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
+                    $result = \Yii::$app->console->execute("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
                     \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
                 }
             Yii::endProfile($key);

@@ -79,7 +79,7 @@ class DbDumpComponent extends Component
 
         $cmd = "mysqldump -h{$dsn->host} -u {$dsn->username} -p'{$dsn->password}' {$dsn->dbname} > {$filePath}";
 
-        system($cmd);
+        \Yii::$app->console->execute($cmd);
     }
 
     /**
@@ -107,7 +107,7 @@ class DbDumpComponent extends Component
         $cmd = "mysql -h{$dsn->host} -u{$dsn->username} -p'{$dsn->password}' {$dsn->dbname} < {$filePath}";
 
         echo $cmd;
-        system($cmd);
+        \Yii::$app->console->execute($cmd);
 
         \Yii::$app->db->schema->refresh();
     }
@@ -119,7 +119,7 @@ class DbDumpComponent extends Component
         ignore_user_abort(true);
         set_time_limit(0);
 
-        system('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
+        \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
 
         \Yii::$app->db->schema->refresh();
     }

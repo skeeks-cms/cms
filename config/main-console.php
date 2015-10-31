@@ -75,6 +75,11 @@ $config =
         [
             'class' => '\skeeks\cms\components\CmsSearchComponent',
         ],
+
+        'console' =>
+        [
+            'class' => 'skeeks\cms\components\ConsoleComponent',
+        ],
     ],
 
 
