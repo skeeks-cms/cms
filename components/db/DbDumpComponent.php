@@ -119,6 +119,7 @@ class DbDumpComponent extends Component
         ignore_user_abort(true);
         set_time_limit(0);
 
+
         system('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
 
         \Yii::$app->db->schema->refresh();

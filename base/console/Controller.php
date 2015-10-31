@@ -74,7 +74,7 @@ class Controller extends YiiController
     public function systemCmd($cmd)
     {
         $this->stdoutN(' - system cmd: ' . $cmd);
-        system($cmd);
+        echo \Yii::$app->console->execute($cmd);
     }
 
     /**
@@ -83,6 +83,6 @@ class Controller extends YiiController
     public function systemCmdRoot($cmd)
     {
         $this->stdoutN(' - system cmd: ' . $cmd);
-        system("cd " . ROOT_DIR. "; " . $cmd);
+        echo \Yii::$app->console->execute("cd " . ROOT_DIR. "; " . $cmd);
     }
 }

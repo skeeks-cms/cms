@@ -57,6 +57,7 @@ $deny = [
 // Use next two for long time executing commands.
 ignore_user_abort(true);
 set_time_limit(0);
+ini_set("memory_limit","1024M");
 
 //error_reporting(E_ALL | E_STRICT);
 // определяем режим вывода ошибок
