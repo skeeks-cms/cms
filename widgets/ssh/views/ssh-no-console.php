@@ -8,6 +8,6 @@
 ?>
 
 <div class="sx-widget-ssh-console" id="<?= $widget->id; ?>">
-    На хостинге отключена функция system. Обратитесь к администраторам.
+    <?=\Yii::t('app','The function {system} at hosting is disabled. Contact your administrator.',['system' => 'system'])?>
 </div>
 

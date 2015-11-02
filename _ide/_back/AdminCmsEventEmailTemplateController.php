@@ -27,7 +27,7 @@ class AdminCmsEventEmailTemplateController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Управление email шаблонами";
+        $this->name                     = \Yii::t('app',"Managment {email} templates",['email' => 'email']);
         $this->modelShowAttribute       = "event_name";
         $this->modelClassName           = CmsEventEmailTemplate::className();
 

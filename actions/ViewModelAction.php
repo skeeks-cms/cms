@@ -94,7 +94,7 @@ abstract class ViewModelAction extends Action
         {
             if (!is_callable($this->callback))
             {
-                throw new InvalidConfigException('"' . get_class($this) . '::callback" should be a valid callback.');
+                throw new InvalidConfigException(\Yii::t('app','{cb} should be a valid callback.',['cb' => '"' . get_class($this) . '::callback"' ]));
             }
 
             $result = call_user_func($this->callback, $this);

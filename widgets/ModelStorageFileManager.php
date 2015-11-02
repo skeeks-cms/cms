@@ -22,10 +22,15 @@ class ModelStorageFileManager extends Widget
     /** @var array $targets */
     public $clientOptions = [];
 
-    public $simpleUploadBtnTitle = "Добавить файлы";
+    public $simpleUploadBtnTitle = "";
 
     public function init()
     {
+        if(!$this->simpleUploadBtnTitle)
+        {
+            $this->simpleUploadBtnTitle = \Yii::t('app',"Add files");
+        }
+
         parent::init();
 
 
@@ -49,6 +54,8 @@ JS
     {
 
         $simpleUploadBtnTitle = $this->simpleUploadBtnTitle;
+        $str_loadfile = \Yii::t('app','The upload file');
+        $str_loadfiles = \Yii::t('app','The upload files');
     return <<<HTML
     <div id="sx-file-manager">
 
@@ -62,7 +69,7 @@ JS
         </div>
 
         <div class="sx-progress-bar-file" style="display: none;">
-            <span style="vertical-align:middle;">Загрузка файла: <span class="sx-uploaded-file-name"></span></span>
+            <span style="vertical-align:middle;">{$str_loadfile}: <span class="sx-uploaded-file-name"></span></span>
             <div>
                 <div class="progress progress-striped active">
                     <div class="progress-bar progress-bar-success"></div>
@@ -71,7 +78,7 @@ JS
         </div>
 
         <div class="sx-progress-bar" style="display: none;">
-            <span style="vertical-align:middle;">Загрузка файлов (<span class="sx-uploadedFiles"></span> / <span class="sx-allFiles"></span>)</span>
+            <span style="vertical-align:middle;">{$str_loadfiles} (<span class="sx-uploadedFiles"></span> / <span class="sx-allFiles"></span>)</span>
             <div>
                 <div class="progress progress-striped active">
                     <div class="progress-bar progress-bar-success"></div>
