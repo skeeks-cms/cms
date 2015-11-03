@@ -756,4 +756,30 @@ return
     "Create application at page" => "Создайте приложение на странице",
     ", and get its settings." => ", и получите его настройки.",
     "Optional parameter, if not filled will be used {yii}" => "Необязательный параметр, если не заполнен будет использован {yii}",
+
+    "Authorization through social networks" => "Авторизация через соц. сети",
+    "Enable"                => "Включить",
+    "Enable authorization through {github}" => "Включить авторизацию через {github}",
+    "Handler"               => "Обработчик",
+    "This behavior is designed only to work with {class}" => "Данное поведение рассчитано только для работы с {class}",
+
+    "Checking the necessary modules" => "Проверка необходимых модулей",
+    "Checking the availability of the required extensions for maximality work product. If an error occurs, show a list of modules that are unavailable." => "Проверяется доступность требуемых расширений для полноценной работы продукта. В случае ошибки выводится список модулей, которые недоступны.",
+    "All necessary modules are installed" => "Все необходимые модули установлены",
+    "Not all modules are installed" => "Не все модули установлены",
+    "Some non-critical remark" => "Какое то некритичное замечание",
+
+    "Widget"                => "Виджет",
+    "Error widget {class}"  => "Ошибка в виджете {class}",
+    "Double-click on the block will open the settings manager" => "Двойной клик по блоку откроет окно управлния настройками",
+    "File-template"         => "Файл-шаблон",
+    "Template not found"    => "Шаблон не найден",
+
+    "Checking the basic configuration of the project" => "Проверка основной конфигурации проекта",
+    "Checking the configuration of the project. Global variables, mode of development, database query cache, the cache structure of the database tables." => "Осуществляется проверка конфигуркции проекта. Глобальные переменные, режим разработки, кэш запросов базы данных, кэш структуры таблиц базы данных.",
+    "There are mistakes"    => "Есть ошибки",
+    "Optimally"             => "Оптимально",
+    "Cache structure of the database tables is disabled" => "Кэш структуры таблиц БД отключен",
+    "Cache structure of the database tables is enabled" => "Кэш структуры таблиц БД включен",
+    "Sql query cache disabled" => " Кэш запросов sql отключен",
 ];

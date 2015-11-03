@@ -32,7 +32,7 @@ class Controller extends Behavior
     {
         if (!$owner instanceof \skeeks\cms\Controller)
         {
-            throw new Exception("Данное поведение рассчитано только для работы с " . \skeeks\cms\Controller::className());
+            throw new Exception(\Yii::t('app','This behavior is designed only to work with {class}',['class' => \skeeks\cms\Controller::className()]));
         }
 
         parent::attach($owner);

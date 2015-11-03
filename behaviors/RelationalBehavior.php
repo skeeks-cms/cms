@@ -29,10 +29,10 @@ class RelationalBehavior extends Behavior
     public function attach($owner)
     {
         if (!($owner instanceof ActiveRecord)) {
-            throw new ErrorException('Owner must be instance of yii\db\ActiveRecord');
+            throw new ErrorException(\Yii::t('app','Owner must be instance of {yii}',['yii' =>'yii\db\ActiveRecord']));
         }
         if (count($owner->getTableSchema()->primaryKey) > 1) {
-            throw new ErrorException('RelationalBehavior doesn\'t support composite primary keys');
+            throw new ErrorException(\Yii::t('app','RelationalBehavior doesn\'t support composite primary keys'));
         }
         parent::attach($owner);
     }
@@ -79,7 +79,7 @@ class RelationalBehavior extends Behavior
                 } elseif (is_array($activeQuery->via)) {
                     $viaQuery = $activeQuery->via[1];
                 } else {
-                    throw new ErrorException('Unknown via type');
+                    throw new ErrorException(\Yii::t('app','Unknown via type'));
                 }
                 $junctionTable = reset($viaQuery->from);
                 $primaryModelColumn = array_keys($viaQuery->link)[0];
@@ -90,7 +90,7 @@ class RelationalBehavior extends Behavior
                 $relationPks = array_filter($relationPks);
                 $savedRecords = count($relationPks);
                 if ($passedRecords != $savedRecords) {
-                    throw new ErrorException('All relation records must be saved');
+                    throw new ErrorException(\Yii::t('app','All relation records must be saved'));
                 }
                 foreach ($relationPks as $relationPk) {
                     $junctionRows[] = [$model->primaryKey, $relationPk];

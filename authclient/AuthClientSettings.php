@@ -39,7 +39,7 @@ class AuthClientSettings extends \skeeks\cms\base\Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Авторизация через соц. сети',
+            'name'          => \Yii::t('app','Authorization through social networks'),
         ]);
     }
 
@@ -78,12 +78,12 @@ class AuthClientSettings extends \skeeks\cms\base\Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'enabled'                       => 'Включить',
+            'enabled'                       => \Yii::t('app','Enable'),
 
-            'githubEnabled'                 => 'Включить авторизацию через GitHub',
+            'githubEnabled'                 => \Yii::t('app','Enable authorization through {github}',['github' => 'GitHub']),
             'githubClientId'                => 'clientId',
             'githubClientSecret'            => 'clientSecret',
-            'githubClass'                   => 'Обработчик',
+            'githubClass'                   => \Yii::t('app','Handler'),
 
             'vkEnabled'                 => 'Включить авторизацию через vk',
             'vkClientId'                => 'clientId',

@@ -56,7 +56,7 @@ class Collection extends \yii\authclient\Collection
     public function getClient($id)
     {
         if (!array_key_exists($id, $this->_clients)) {
-            throw new InvalidParamException("Unknown auth client '{$id}'.");
+            throw new InvalidParamException(\Yii::t('app',"Unknown auth client '{id}'.",['id' => $id]));
         }
         if (!is_object($this->_clients[$id])) {
             $this->_clients[$id] = $this->createClient($id, $this->_clients[$id]);

@@ -16,15 +16,14 @@ class ConfigCheck extends CheckComponent
 {
     public function init()
     {
-        $this->name             = "Проверка основной конфигурации проекта";
+        $this->name             = \Yii::t('app','Checking the basic configuration of the project');
+        $txt = \Yii::t('app','Checking the configuration of the project. Global variables, mode of development, database query cache, the cache structure of the database tables.');
         $this->description      = <<<HTML
-<p>
-Осуществляется проверка конфигуркции проекта. Глобальные переменные, режим разработки, кэш запросов базы данных, кэш структуры таблиц базы данных.
-</p>
+<p>{$txt}</p>
 HTML;
 ;
-        $this->errorText    = "Есть ошибки";
-        $this->successText  = "Оптимально";
+        $this->errorText    = \Yii::t('app','There are mistakes');
+        $this->successText  = \Yii::t('app',"Optimally");
 
         parent::init();
     }
@@ -34,15 +33,15 @@ HTML;
     {
 		if (!\Yii::$app->db->enableSchemaCache)
         {
-            $this->addError('Кэш структуры таблиц БД отключен');
+            $this->addError(\Yii::t('app','Cache structure of the database tables is disabled'));
         } else
         {
-            $this->addSuccess('Кэш структуры таблиц БД включен');
+            $this->addSuccess(\Yii::t('app','Cache structure of the database tables is enabled'));
         }
 
         if (!\Yii::$app->db->enableQueryCache)
         {
-            $this->addError('Кэш запросов sql отключен');
+            $this->addError(\Yii::t('app','Sql query cache disabled'));
         }else
         {
             $this->addSuccess('Кэш запросов sql включен');
