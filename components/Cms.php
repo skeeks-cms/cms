@@ -61,6 +61,7 @@ use yii\console\Application;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\validators\EmailValidator;
 use yii\web\UploadedFile;
 use yii\web\UserEvent;
 use yii\web\View;
@@ -107,8 +108,7 @@ class Cms extends \skeeks\cms\base\Component
      */
     public function getConfigFormFile()
     {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_form.php';
+        return __DIR__ . '/cms/_form.php';
     }
 
     const BOOL_Y = "Y";
@@ -332,10 +332,7 @@ class Cms extends \skeeks\cms\base\Component
      */
     public function beforeSendEmail(\yii\mail\MailEvent $event)
     {
-        if ($this->notifyAdminEmailsHiddenToArray())
-        {
-            $event->message->setCc($this->notifyAdminEmailsHiddenToArray());
-        }
+        
 
         if ($this->notifyAdminEmailsToArray())
         {
@@ -343,6 +340,10 @@ class Cms extends \skeeks\cms\base\Component
         }
 
 
+        if ($emails = $this->notifyAdminEmailsHiddenToArray())
+        {
+            $event->message->setBcc($this->notifyAdminEmailsHiddenToArray());
+        }
 
         /*if ($event->message instanceof Message)
         {
@@ -583,6 +584,42 @@ class Cms extends \skeeks\cms\base\Component
             [['giiEnabled'], 'string'],
             [['giiAllowedIPs'], 'string'],
             [['licenseKey'], 'string'],
+
+            [['notifyAdminEmails'], function($attribute)
+            {
+                if ($emails = $this->notifyAdminEmailsToArray())
+                {
+                    foreach ($emails as $email)
+                    {
+                        $validator = new EmailValidator();
+
+                        if (!$validator->validate($email, $error))
+                        {
+                            $this->addError($attribute, $email . ' — некорректный email адрес');
+                            return false;
+                        }
+                    }
+                }
+
+            }],
+
+            [['notifyAdminEmailsHidden'], function($attribute)
+            {
+                if ($emails = $this->notifyAdminEmailsHiddenToArray())
+                {
+                    foreach ($emails as $email)
+                    {
+                        $validator = new EmailValidator();
+
+                        if (!$validator->validate($email, $error))
+                        {
+                            $this->addError($attribute, $email . ' — некорректный email адрес');
+                            return false;
+                        }
+                    }
+                }
+
+            }],
         ]);
     }
 

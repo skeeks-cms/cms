@@ -117,6 +117,9 @@ abstract class ViewModelAction extends Action
     }
 
     /**
+     *
+     * TODO: Вынести в seo компонент
+     *
      * Установка метаданных страницы
      * @return $this
      */
