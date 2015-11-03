@@ -823,8 +823,39 @@ return
     "No user data is not transmitted!" => "Никакие пользовательские данные не передаются!",
     "Please note that the test does not check the delivery letter in the mailbox. Moreover, it is impossible to test the delivery of mail to other mail servers." => "Обратите внимание, что тест не проверяет доставку письма в почтовый ящик. Более того, нельзя протестировать доставку почты на другие почтовые сервера.",
     "If the time of sending the letter more than a second, it can significantly slow down the work site. Contact your hosting provider to set up a pending request to send mail (through the spooler), or turn on the transfer of mail (and the work of agents) through {cron}. To do this we must add the constant into {file}:" => "Если время отправки письма больше секунды, это может значительно затормозить работу сайта. Обратитесь к хостеру с просьбой настроить отложенную отправку почты (через спулер) или включите передачу почты (и работу агентов) через {cron}. Для этого в {file} надо добавить константу:",
-    "Error" => "Ошибка",
+    "Error"                 => "Ошибка",
 
     "Sending mail (through the object {obj})" => "Отправка почты (через объект {obj})",
-    "The system is transmitting a test letter to the postal address {email} through the library {obj}." => "Осуществляется передача тестового письма на почтовый адрес {email} через библиотеку {obj}."
+    "The system is transmitting a test letter to the postal address {email} through the library {obj}." => "Осуществляется передача тестового письма на почтовый адрес {email} через библиотеку {obj}.",
+
+    "Version MySQL server"  => "Версия MySQL сервера",
+    "Known versions of MySQL with errors that prevent normal operation of the site:" => "Известны версии MySQL с ошибками, препятствующими нормальной работе сайта:",
+    "incorrect method works {ex}, search does not work properly" => "некорректно работает метод {ex}, поиск работает неправильно",
+    "Step auto_increment default is 2, requires 1" => "шаг auto_increment по умолчанию равен 2, требуется 1",
+    "Update MySQL, if you have one of these versions." => "Обновите MySQL, если у вас установлена одна их этих версий.",
+    "MySQL installed version {cur}, {req} is required" => "Установлена MySQL версии {cur}, требуется {req}",
+    "Problem version of the database" => "Проблемная версия БД",
+    "The current version of the database" => "Текущая версия БД",
+
+    "Checking availability {mysqldump}" => "Проверка наличия {mysqldump}",
+    "To work correctly the update, requires a {mysqldump}" => "Для корректной работы обновлений требуется наличие {mysqldump}",
+    "The {obj} is not installed at the server" => "На сервере не установлен {obj}",
+
+    "Time at database and web server" => "Время на БД и веб сервере",
+    "Compares the system time database and web server. It may be of unsync when they are installed on different physical machines, but more often as a result of improper installation time zone." => "Сравнивается системное время базы данных и веб-сервера. Рассинхронизация может быть, когда они установлены на разные физические машины, но чаще всего в результате неправильной установки часового пояса.",
+    "Time is different for {diff} seconds" => "Время отличается на {diff} секунд",
+
+    "Availability of required modules {php}" => "Наличие необходимых модулей {php}",
+    "To solve the problem, refer to the host, and for the local installation to independently install the required extension on the basis of documentation at website {site}" => "Для решения проблемы необходимо обратиться к хостеру, а для локальной установки самостоятельно установить требуемые расширения на основе документации на сайте {site}",
+    "Not installed required extensions" => "Не установлены требуемые расширения",
+    "Functions to work with sockets" => "Функции для работы с сокетами",
+    "Support for regular expressions" => "Поддержка регулярных выражений",
+    "GD Library"            => "Библиотека GD",
+    "Jpeg support in GD"    => "Поддержка jpeg в GD",
+    "The encryption function {mcrypt}" => "Функции шифрования {mcrypt}",
+    "{p} support"           => "Поддержка {p}",
+    "{ssl} support is not configured in {php}" => "Поддержка {ssl} не настроена в {php}",
+    "Do not set extension {ext}. Will not work on the file download link (for those files which can not parse file extension in the url, for example {smpl}" => "Не установлено расширение {ext}. Не будет работать загрузка файлов по ссылке (для тех файлов где не удается спарсить расширение файла в url, например {smpl}",
+    "Extension {ext} is installed" => "Расширение {ext} установлено",
+
 ];

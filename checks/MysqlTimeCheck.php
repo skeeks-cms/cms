@@ -16,15 +16,16 @@ class MysqlTimeCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = "Время на БД и веб сервере";
+        $this->name             = \Yii::t('app',"Time at database and web server");
+        $txt = \Yii::t('app','Compares the system time database and web server. It may be of unsync when they are installed on different physical machines, but more often as a result of improper installation time zone.');
         $this->description      = <<<HTML
 <p>
-Сравнивается системное время базы данных и веб-сервера. Рассинхронизация может быть, когда они установлены на разные физические машины, но чаще всего в результате неправильной установки часового пояса.
+{$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Ошибка";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"Error");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -41,7 +42,7 @@ HTML;
             return true;
         } else
         {
-            $this->addError("Время отличается на {$diff} секунд");
+            $this->addError(\Yii::t('app',"Time is different for {diff} seconds",['diff' => $diff]));
         }
     }
 
