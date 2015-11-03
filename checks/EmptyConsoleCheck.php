@@ -17,15 +17,16 @@ class EmptyConsoleCheck extends CheckComponent
 {
     public function init()
     {
-        $this->name             = "Проверка php warning и notice в console";
+        $this->name             = \Yii::t('app',"Check {php} and {notice} in the {console}",['php' => "php warning", 'notice' => "notice", 'console' => "console"]);
+        $txt = \Yii::t('app','Checks console commands.').' '.\Yii::t('app',"Check {php} and {notice} in the {console}",['php' => "php warning", 'notice' => "notice", 'console' => "console"]);
         $this->description      = <<<HTML
 <p>
-Осуществляется проверка консольных команд. Проверка php warning и notice в console.
+{$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Есть ошибки";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"There are mistakes");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -40,7 +41,7 @@ HTML;
             //$this->addSuccess();
         } else
         {
-            $this->addError('Лишний текст в консоль.' . $result);
+            $this->addError(\Yii::t('app','Excess text into console.') . $result);
         }
     }
 

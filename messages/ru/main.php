@@ -781,5 +781,34 @@ return
     "Optimally"             => "Оптимально",
     "Cache structure of the database tables is disabled" => "Кэш структуры таблиц БД отключен",
     "Cache structure of the database tables is enabled" => "Кэш структуры таблиц БД включен",
-    "Sql query cache disabled" => " Кэш запросов sql отключен",
+    "Sql query cache is disabled" => " Кэш запросов sql отключен",
+    "Sql query cache is enabled" => "Кэш запросов sql включен",
+    "Enable debug mode"     => "Включен режим отладки",
+    "Debug mode is enabled" => "Режим отладки выключен",
+    "Setting corresponds to the working site {prod}" => "Окружение соовтествует рабочему сайту {prod}",
+    "Setting does not correspond to the working site now" => "Окружение не соовтествует рабочему сайту сейчас",
+    "preferably"            => "желательно",
+
+    "Check {php} and {notice} in the {console}" => "Проверка {php} и {notice} в {console}",
+    "Checks console commands." => "Осуществляется проверка консольных команд.",
+    "Successfully"          => "Успешно",
+    "Excess text into console" => "Лишний текст в консоль",
+
+    "Check availability file-storages" => "Проверка доступности файловых хранилищ",
+    "The site has a file storage. It contains all downloaded files. It also consists of a storage cluster (separate servers for file storage). If the site is not connected to the servers, then when you add files to the sections, publications, etc. errors will occur." => "На сайте есть файловое хранилище.
+    В него попадают все загруженные файлы.
+    Так же это хранилище состоит из кластеров (отдельных серверов для хранения файлов).
+    Если к сайту не подключены сервера, то при добавлении файлов, к разделам, публикациям и т.д. будет происходить с ошибками.",
+    "No available servers"  => "Нет доступных серверов",
+    "Connected servers"     => "Подключено серверов",
+    "Server {server} {d} available space" => "Сверер {server} {d} доступно места",
+
+    "Check availability {git}" => "Проверка наличия {git}",
+    "To work correctly the update, requires a git client" => "Для корректной работы обновлений требуется наличие git клиента",
+    "The git client is not installed at the server" => "На сервере не установлен git клиент",
+
+    "Checking availability installation scripts" => "Проверка наличия установочных скриптов",
+    "After installation it is recommended to remove the directory with installation script." => "После установки проекта рекоммендуется удалить диррикторию с установочными скриптами.",
+    "You must remove the installation script" => "Необходимо удалить скрипт установщик",
+
 ];
