@@ -16,18 +16,20 @@ class ServerVarsCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = "Значения переменных сервера";
+        $this->name             = \Yii::t('app',"The values of server variables");
+        $txt1 = \Yii::t('app','Check the values of variables defined by the web server.');
+        $txt2 = \Yii::t('app','value HTTP_HOST is taken based on the name of this virtual host (domain). Invalid domain leads to the fact that some browsers (ie, Internet Explorer 6) refuse to maintain his cookie, as a consequence - not stored authorization.');
         $this->description      = <<<HTML
 <p>
-Проверяются значения переменных, определяемых веб сервером.
+{$txt1}
 </p>
 <p>
-Значение HTTP_HOST берется на основе имени текущего виртуального хоста (домена). Невалидный домен приводит к тому, что некоторые браузеры (например, Internet Explorer 6) отказываются сохранять для него cookie, как следствие - не сохраняется авторизация.
+{$txt2}
 </p>
 HTML;
 ;
-        $this->errorText    = "Не корректные";
-        $this->successText  = "Корректные";
+        $this->errorText    = \Yii::t('app',"Incorrect");
+        $this->successText  = \Yii::t('app','Correct');
 
         parent::init();
     }
@@ -41,7 +43,7 @@ HTML;
 			if (!preg_match('#^[a-z0-9\-\.]{2,192}\.(xn--)?[a-z0-9]{2,63}$#i', $host))
             {
                 $val = htmlspecialchars($_SERVER['HTTP_HOST']);
-                $this->addError("Текущий домен не валидный ({$val}). Может содержать только цифры, латинские буквы и дефис. Должен содержать точку.");
+                $this->addError(\Yii::t('app','The current domain is not valid ({val}). It may only contain numbers, letters and hyphens. It must contain the point.',['val' => $val]));
             }
 		}
     }

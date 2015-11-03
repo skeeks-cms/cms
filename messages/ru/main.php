@@ -878,4 +878,24 @@ return
     "Loaded module {m}, there may be problems in the work administrative part" => "Загружен модуль {m}, возможны проблемы в работе административной части",
     "Loaded module {m}, {m1} will not work" => "Загружен модуль {m}, {m1} не будет работать",
 
+    "The values of server variables" => "Значения переменных сервера",
+    "Check the values of variables defined by the web server." => "Проверяются значения переменных, определяемых веб сервером.",
+    "value HTTP_HOST is taken based on the name of this virtual host (domain). Invalid domain leads to the fact that some browsers (ie, Internet Explorer 6) refuse to maintain his cookie, as a consequence - not stored authorization." => "Значение HTTP_HOST берется на основе имени текущего виртуального хоста (домена). Невалидный домен приводит к тому, что некоторые браузеры (например, Internet Explorer 6) отказываются сохранять для него cookie, как следствие - не сохраняется авторизация.",
+    "Incorrect"               => "Не корректные",
+    "Correct"                 => "Корректные",
+    "The current domain is not valid ({val}). It may only contain numbers, letters and hyphens. It must contain the point." => "Текущий домен не валидный ({val}). Может содержать только цифры, латинские буквы и дефис. Должен содержать точку.",
+
+    "Saved sessions"        => "Сохранение сессии",
+    "Checking the ability to store data on the server using the session mechanism. This basic ability necessary to preserve authorization between hits." => "Проверяется возможность хранить данные на сервере используя механизм сессий. Эта базовая возможность необходима для сохранения авторизации между хитами.",
+    "Sessions may not work if their support is not installed, in php.ini contains the incorrect folder to store the sessions or it is not available on the record." => "Сессии могут не работать, если их поддержка не установлена, в php.ini неправильно указана папка для хранения сессий или она не доступна на запись.",
+    "Could not to keep the session" => "Не получилось сохранить сессию",
+
+    "Checking kernel and libraries modification" => "Проверка модификации ядра и библиотек",
+    "Checks, changes kernel {cms} and third-party libraries (Folder {folder}). Folder location and the name given by the global constant VENDOR_DIR. For the current project:" => "Осуществаляется проверка, изменения ядра {cms} и сторонних библиотек (Папка {folder}). Расположение папки и ее название задаются глобальной константой VENDOR_DIR. Для текущего проекта:",
+    "We strongly not recommend to modify the core of the project, as it can bring to the update failed, or your modifications will be removed during the upgrade process. That in turn may result in errors of work the project." => "Мы настоятельно не рекоммендуем модифицировать ядро проекта, поскольку это может привезти к ошибкам обновления, или же ваши модификации будут удалены в процессе обновления. Что в свою очередь, может привести к ошибкам работы проекта.",
+    "To solve the problem, you can run the command in the console" => "Для решения проблемы, можно запустить команду в консоле",
+    "Found modified kernel" => "Найдены модификации ядра",
+    "The kernel has not been modified" => "Ядро не модифицировалось",
+    "Found an error in the process of console commands, check the kernel modification can not be started." => "Найдены ошибки в процессе работы консольных комманд, проверка модификации ядра не может быть запущена.",
+    "Breadcrumbs"           => "Хлебные крошки",
 ];
