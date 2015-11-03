@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
+use yii\caching\TagDependency;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
@@ -59,6 +60,9 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $enabledActiveTime           = CMS::BOOL_Y;
 
 
+    public $enabledRunCache             = Cms::BOOL_N;
+    public $runCacheDuration            = 0;
+
     public $activeQueryCallback;
     public $dataProviderCallback;
 
@@ -96,6 +100,9 @@ class ContentElementsCmsWidget extends WidgetRenderable
             'enabledCurrentTreeChildAll'=> \Yii::t('app','For the colection taken into account the current section and all its subsections'),
             'tree_ids'                  => \Yii::t('app','Show items linked to sections'),
             'enabledActiveTime'         => \Yii::t('app','Take into consideration activity time'),
+
+            'enabledRunCache'       => 'Включить кэширование',
+            'runCacheDuration'      => 'Время жизни кэша',
         ]);
     }
 
@@ -123,128 +130,153 @@ class ContentElementsCmsWidget extends WidgetRenderable
             [['enabledCurrentTreeChildAll'], 'string'],
             [['tree_ids'], 'safe'],
             [['enabledActiveTime'], 'string'],
+
+            [['enabledRunCache'], 'string'],
+            [['runCacheDuration'], 'integer'],
         ]);
     }
 
     protected function _run()
     {
-        $this->initDataProvider();
 
-        if ($this->createdBy)
+        $cacheKey = $this->getCacheKey() . 'run';
+
+        $dependency = new TagDependency([
+            'tags'      =>
+            [
+                $this->className() . (string) $this->namespace,
+                (new CmsContentElement())->getTableCacheTag(),
+            ],
+        ]);
+
+        $result = \Yii::$app->cache->get($cacheKey);
+        if ($result === false || $this->enabledRunCache == Cms::BOOL_N)
         {
-            $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.created_by' => $this->createdBy]);
-        }
-
-        if ($this->active)
-        {
-            $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.active' => $this->active]);
-        }
-
-        if ($this->content_ids)
-        {
-            $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.content_id' => $this->content_ids]);
-        }
-
-        if ($this->limit)
-        {
-            $this->dataProvider->query->limit($this->limit);
-        }
 
 
-        $treeIds = (array) $this->tree_ids;
 
-        if ($this->enabledCurrentTree == Cms::BOOL_Y)
-        {
-            $tree = \Yii::$app->cms->getCurrentTree();
-            if ($tree)
+            $this->initDataProvider();
+
+            if ($this->createdBy)
             {
-                $treeIds[] = $tree->id;
-                if ($tree->children && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
+                $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.created_by' => $this->createdBy]);
+            }
+
+            if ($this->active)
+            {
+                $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.active' => $this->active]);
+            }
+
+            if ($this->content_ids)
+            {
+                $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.content_id' => $this->content_ids]);
+            }
+
+            if ($this->limit)
+            {
+                $this->dataProvider->query->limit($this->limit);
+            }
+
+
+            $treeIds = (array) $this->tree_ids;
+
+            if ($this->enabledCurrentTree == Cms::BOOL_Y)
+            {
+                $tree = \Yii::$app->cms->getCurrentTree();
+                if ($tree)
                 {
-                    if ($this->enabledCurrentTreeChildAll)
+                    $treeIds[] = $tree->id;
+                    if ($tree->children && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
                     {
-                        if ($childrens = $tree->children)
+                        if ($this->enabledCurrentTreeChildAll)
                         {
-                            foreach ($childrens as $chidren)
+                            if ($childrens = $tree->children)
                             {
-                                $treeIds[] = $chidren->id;
+                                foreach ($childrens as $chidren)
+                                {
+                                    $treeIds[] = $chidren->id;
+                                }
                             }
-                        }
-                    } else
-                    {
-                        if ($childrens = $tree->children)
+                        } else
                         {
-                            foreach ($childrens as $chidren)
+                            if ($childrens = $tree->children)
                             {
-                                $treeIds[] = $chidren->id;
+                                foreach ($childrens as $chidren)
+                                {
+                                    $treeIds[] = $chidren->id;
+                                }
                             }
                         }
                     }
-                }
 
-            }
-        }
-
-        if ($treeIds)
-        {
-            foreach ($treeIds as $key => $treeId)
-            {
-                if (!$treeId)
-                {
-                    unset($treeIds[$key]);
                 }
             }
 
             if ($treeIds)
             {
-                /**
-                 * @var $query ActiveQuery
-                 */
-                $query = $this->dataProvider->query;
+                foreach ($treeIds as $key => $treeId)
+                {
+                    if (!$treeId)
+                    {
+                        unset($treeIds[$key]);
+                    }
+                }
 
-                $query->joinWith('cmsContentElementTrees');
-                $query->andWhere(
+                if ($treeIds)
+                {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $this->dataProvider->query;
+
+                    $query->joinWith('cmsContentElementTrees');
+                    $query->andWhere(
+                        [
+                            'or',
+                            [CmsContentElement::tableName() . '.tree_id' => $treeIds],
+                            [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
+                        ]
+                    );
+                }
+
+            }
+
+
+            if ($this->enabledActiveTime == Cms::BOOL_Y)
+            {
+                $this->dataProvider->query->andWhere(
+                    ["<=", CmsContentElement::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
+                );
+
+                $this->dataProvider->query->andWhere(
                     [
                         'or',
-                        [CmsContentElement::tableName() . '.tree_id' => $treeIds],
-                        [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
+                        [">=", CmsContentElement::tableName() . '.published_to', \Yii::$app->formatter->asTimestamp(time())],
+                        [CmsContentElement::tableName() . '.published_to' => null],
                     ]
                 );
             }
 
+            $this->dataProvider->query->groupBy([CmsContentElement::tableName() . '.id']);
+
+            if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
+            {
+                $callback = $this->activeQueryCallback;
+                $callback($this->dataProvider->query);
+            }
+
+            if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
+            {
+                $callback = $this->dataProviderCallback;
+                $callback($this->dataProvider);
+            }
+
+            $result = parent::_run();
+
+            \Yii::$app->cache->set($cacheKey, $result, (int) $this->runCacheDuration, $dependency);
         }
 
-
-        if ($this->enabledActiveTime == Cms::BOOL_Y)
-        {
-            $this->dataProvider->query->andWhere(
-                ["<=", CmsContentElement::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
-            );
-
-            $this->dataProvider->query->andWhere(
-                [
-                    'or',
-                    [">=", CmsContentElement::tableName() . '.published_to', \Yii::$app->formatter->asTimestamp(time())],
-                    [CmsContentElement::tableName() . '.published_to' => null],
-                ]
-            );
-        }
-
-        $this->dataProvider->query->groupBy([CmsContentElement::tableName() . '.id']);
-
-        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
-        {
-            $callback = $this->activeQueryCallback;
-            $callback($this->dataProvider->query);
-        }
-
-        if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
-        {
-            $callback = $this->dataProviderCallback;
-            $callback($this->dataProvider);
-        }
-
-        return parent::_run();
+        return $result;
     }
 
     /**
