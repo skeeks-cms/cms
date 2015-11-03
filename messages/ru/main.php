@@ -811,4 +811,20 @@ return
     "After installation it is recommended to remove the directory with installation script." => "После установки проекта рекоммендуется удалить диррикторию с установочными скриптами.",
     "You must remove the installation script" => "Необходимо удалить скрипт установщик",
 
+    "Sending e-mail messages larger than 64 KB (function {mail})" => "Отправка почтового сообщения больше 64Кб (функция {mail})",
+    "Unable to retrieve the contents of the file" => "Не удалось получить содержимое файла",
+    "Sent. Dispatch time: {s} sec." => "Отправлено. Время отправки: {s} сек.",
+    "The letter has not been sent." => "Письмо не отправлено.",
+
+    "Sending mail (function {mail})" => "Отправка почты (функция {mail})",
+    "The system is transmitting a test letter to the postal address {email} through a standard php function {mail}." => "Осуществляется передача тестового письма на почтовый адрес {email} через стандартную php функцию {mail}.",
+    "Created special mailbox, for maximality testing for real work." => "Чтобы максимально приблизить тест к реальной работе почты, заведен служебный ящик.",
+    "As a test message text is transferred the source code of the script checking site." => "В качестве тестового текста письма передается исходный код скрипта проверки сайта.",
+    "No user data is not transmitted!" => "Никакие пользовательские данные не передаются!",
+    "Please note that the test does not check the delivery letter in the mailbox. Moreover, it is impossible to test the delivery of mail to other mail servers." => "Обратите внимание, что тест не проверяет доставку письма в почтовый ящик. Более того, нельзя протестировать доставку почты на другие почтовые сервера.",
+    "If the time of sending the letter more than a second, it can significantly slow down the work site. Contact your hosting provider to set up a pending request to send mail (through the spooler), or turn on the transfer of mail (and the work of agents) through {cron}. To do this we must add the constant into {file}:" => "Если время отправки письма больше секунды, это может значительно затормозить работу сайта. Обратитесь к хостеру с просьбой настроить отложенную отправку почты (через спулер) или включите передачу почты (и работу агентов) через {cron}. Для этого в {file} надо добавить константу:",
+    "Error" => "Ошибка",
+
+    "Sending mail (through the object {obj})" => "Отправка почты (через объект {obj})",
+    "The system is transmitting a test letter to the postal address {email} through the library {obj}." => "Осуществляется передача тестового письма на почтовый адрес {email} через библиотеку {obj}."
 ];

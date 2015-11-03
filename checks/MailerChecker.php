@@ -16,11 +16,16 @@ class MailerChecker extends CheckComponent
 {
     public function init()
     {
-        $this->name             = "Отправка почты (через объект Mailer)";
+        $this->name             = \Yii::t('app','Sending mail (through the object {obj})',['obj' => 'Mailer']);
+        $txt1 = \Yii::t('app','The system is transmitting a test letter to the postal address {email} through the library {obj}.',['email' => 'hosting_test@skeeks.com', 'obj','Mailer']);
+        $txt2 = \Yii::t('app','Created special mailbox, for maximality testing for real work.');
+        $txt3 = \Yii::t('app','');
+        $txt4 = \Yii::t('app','');
+        $txt5 = \Yii::t('app','');
         $this->description      = <<<HTML
 <p>
-Осуществляется передача тестового письма на почтовый адрес hosting_test@skeeks.com через библиотеку Mailer.
-Чтобы максимально приблизить тест к реальной работе почты, заведен служебный ящик.
+{$txt1}
+{$txt2}
 </p>
 <p>
 В качестве тестового текста письма передается исходный код скрипта проверки сайта.
