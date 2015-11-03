@@ -42,20 +42,30 @@ class UrlRuleContentElement
     {
         if ($route == 'cms/content-element/view')
         {
-            $id = (int) ArrayHelper::getValue($params, 'id');
-            if (!$id)
+            $id                     = (int) ArrayHelper::getValue($params, 'id');
+            $contentElement         = ArrayHelper::getValue($params, 'model');
+
+            if (!$id && !$contentElement)
             {
                 return false;
             }
 
-            /**
-             * @var $contentElement CmsContentElement
-             */
-            if (!$contentElement = ArrayHelper::getValue(self::$models, $id))
+            if ($contentElement && $contentElement instanceof CmsContentElement)
             {
-                $contentElement     = CmsContentElement::findOne(['id' => $id]);
-                self::$models[$id]  = $contentElement;
+                self::$models[$contentElement->id] = $contentElement;
+            } else
+            {
+                /**
+                 * @var $contentElement CmsContentElement
+                 */
+                if (!$contentElement = ArrayHelper::getValue(self::$models, $id))
+                {
+                    $contentElement     = CmsContentElement::findOne(['id' => $id]);
+                    self::$models[$id]  = $contentElement;
+                }
             }
+
+
 
             if (!$contentElement)
             {
@@ -71,15 +81,9 @@ class UrlRuleContentElement
 
             $url .= $contentElement->id . '-' . $contentElement->code . ((bool) \Yii::$app->seo->useLastDelimetrContentElements ? DIRECTORY_SEPARATOR : "");
 
-            if (isset($params['code']))
-            {
-                unset($params['code']);
-            };
-
-            if (isset($params['id']))
-            {
-                unset($params['id']);
-            };
+            ArrayHelper::remove($params, 'id');
+            ArrayHelper::remove($params, 'code');
+            ArrayHelper::remove($params, 'model');
 
             if (!empty($params) && ($query = http_build_query($params)) !== '')
             {
