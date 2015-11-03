@@ -858,4 +858,24 @@ return
     "Do not set extension {ext}. Will not work on the file download link (for those files which can not parse file extension in the url, for example {smpl}" => "Не установлено расширение {ext}. Не будет работать загрузка файлов по ссылке (для тех файлов где не удается спарсить расширение файла в url, например {smpl}",
     "Extension {ext} is installed" => "Расширение {ext} установлено",
 
+    "Required parameters PHP" => "Обязательные параметры PHP",
+    "Checks critical parameters defined in the configuration file php.ini. If an error occurs, shows a list of parameters that are not configured correctly. For details on each parameter can be found at php.net." => "Проверяются критические значения параметров, определяемых в файле настроек php.ini. В случае ошибки выводится список параметров, которые настроены неправильно. Подробную информацию по каждому параметру можно найти на сайте php.net.",
+    "Incorrect settings"    => "Настройки неправильные",
+    "Settings are correct"      => "Настройки правильные",
+    "Installed version of PHP {cur}, {req] or higher is required" => "Установлена версия PHP {cur], требуется {req} и выше",
+    "Parameter {p} = {v}, required {r}" => "Параметр {p} = {v}, требуется {r}",
+    "{var} value should not be less than {max}. Current value" => "Значение {var} должно быть не ниже {max}. Текущее значение",
+    "Current delimiter: {delim}, {delim2} is required" => "Текущий разделитель: {delim}, требуется {delim2}",
+    "Parameter {p} has invalid value" => "Параметр {p} имеет неверное значение",
+    "Loaded module {m}, there may be problems work in the administrative part ({s})" => "Загружен модуль {m}, возможны проблемы в работе административной части ({s})",
+    "Not possible to change the value {v} through {f}" => "Нет возможности изменить значение {v} через {f}",
+
+    "Web-server modules"    => "Модули веб-сервера",
+    "Apache mod_security module like module php suhosin designed to protect the site from hackers, but in practice it often interferes with normal operation of the site. It is recommended to turn it off, instead, to use the module of proactive protection Skeeks CMS." => "Модуль Apache mod_security подобно модулю php suhosin призван защищать сайт от атак хакеров, но на практике он чаще препятствует нормальной работе сайта.
+Рекомендуется его отключить, вместо него использовать модуль проактивной защиты Skeeks CMS.",
+    "Identified conflicts"  => "Выявленные конфликты",
+    "No conflicts found"    => "Конфликтов не выявлено",
+    "Loaded module {m}, there may be problems in the work administrative part" => "Загружен модуль {m}, возможны проблемы в работе административной части",
+    "Loaded module {m}, {m1} will not work" => "Загружен модуль {m}, {m1} не будет работать",
+
 ];

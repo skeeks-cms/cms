@@ -16,16 +16,16 @@ class SecurityApacheCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = "Модули веб-сервера";
+        $this->name             = \Yii::t('app',"Web-server modules");
+        $txt = \Yii::t('app','Apache mod_security module like module php suhosin designed to protect the site from hackers, but in practice it often interferes with normal operation of the site. It is recommended to turn it off, instead, to use the module of proactive protection Skeeks CMS.');
         $this->description      = <<<HTML
 <p>
-Модуль Apache mod_security подобно модулю php suhosin призван защищать сайт от атак хакеров, но на практике он чаще препятствует нормальной работе сайта.
-Рекомендуется его отключить, вместо него использовать модуль проактивной защиты Skeeks CMS.
+{$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Выявленные конфликты";
-        $this->successText  = "Конфликтов не выявлено";
+        $this->errorText    = \Yii::t('app','Identified conflicts');
+        $this->successText  = \Yii::t('app',"No conflicts found");
 
         parent::init();
     }
@@ -38,11 +38,11 @@ HTML;
 			$arLoaded = apache_get_modules();
 			if (in_array('mod_security', $arLoaded))
             {
-                $this->addError("Загружен модуль mod_security, возможны проблемы в работе административной части");
+                $this->addError(\Yii::t('app',"Loaded module {m}, there may be problems in the work administrative part",['m' => 'mod_security']));
             }
 			if (in_array('mod_dav', $arLoaded) || in_array('mod_dav_fs', $arLoaded))
             {
-                $this->addError("Загружен модуль mod_dav/mod_dav_fs, WebDav не будет работать");
+                $this->addError(\Yii::t('app','Loaded module {m}, {m1} will not work',['m' => 'mod_dav/mod_dav_fs', 'm1' => 'WebDav']));
             }
 		}
     }
