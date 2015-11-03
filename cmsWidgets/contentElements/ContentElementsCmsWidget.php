@@ -74,28 +74,28 @@ class ContentElementsCmsWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
         [
-            'enabledPaging'             => 'Включить постраничную навигацию',
-            'enabledPjaxPagination'     => 'Включить ajax навигацию',
-            'pageParamName'             => 'Названия парамтера страниц, при постраничной навигации',
-            'pageSize'                  => 'Количество записей на одной странице',
-            'pageSizeLimitMin'          => 'Минимально допустимое значение при постраничной навигации',
-            'pageSizeLimitMax'          => 'Максимально допустимое значение при постраничной навигации',
+            'enabledPaging'             => \Yii::t('app','Enable paging'),
+            'enabledPjaxPagination'     => \Yii::t('app','Enable ajax navigation'),
+            'pageParamName'             => \Yii::t('app','Parameter name pages, pagination'),
+            'pageSize'                  => \Yii::t('app','Number of records on one page'),
+            'pageSizeLimitMin'          => \Yii::t('app','The minimum allowable value for pagination'),
+            'pageSizeLimitMax'          => \Yii::t('app','The maximum allowable value for pagination'),
 
-            'orderBy'                   => 'По какому параметру сортировать',
-            'order'                     => 'Направление сортировки',
+            'orderBy'                   => \Yii::t('app','Sort by what parameter'),
+            'order'                     => \Yii::t('app','Sorting direction'),
 
-            'label'                     => 'Заголовок',
-            'enabledSearchParams'       => 'Учитывать параметры из поисковый строки (для фильтрации)',
+            'label'                     => \Yii::t('app','Title'),
+            'enabledSearchParams'       => \Yii::t('app','Take into account the parameters from search string (for filtering)'),
 
-            'limit'                     => 'Максимальное количество записей в выборке (limit)',
-            'active'                    => 'Учитывать флаг активности',
-            'createdBy'                 => 'Выбор записей пользователей',
-            'content_ids'               => 'Элементы контента',
-            'enabledCurrentTree'        => 'При выборке учитывать текущий раздел (где показывается виджет)',
-            'enabledCurrentTreeChild'   => 'При выборке учитывать текущий раздел и его подразделы',
-            'enabledCurrentTreeChildAll'=> 'При выборке учитывать текущий раздел и все его подразделы',
-            'tree_ids'                  => 'Показывать элементы привязанные к разделам',
-            'enabledActiveTime'         => 'Учиьывать время активности',
+            'limit'                     => \Yii::t('app','The maximum number of entries in the sample ({limit})',['limit' => 'limit']),
+            'active'                    => \Yii::t('app','Take into consideration active flag'),
+            'createdBy'                 => \Yii::t('app','Selecting the user records'),
+            'content_ids'               => \Yii::t('app','Elements of content'),
+            'enabledCurrentTree'        => \Yii::t('app','For the colection taken into account the current section (which shows the widget)'),
+            'enabledCurrentTreeChild'   => \Yii::t('app','For the colection taken into account the current section and its subsections'),
+            'enabledCurrentTreeChildAll'=> \Yii::t('app','For the colection taken into account the current section and all its subsections'),
+            'tree_ids'                  => \Yii::t('app','Show items linked to sections'),
+            'enabledActiveTime'         => \Yii::t('app','Take into consideration activity time'),
         ]);
     }
 
