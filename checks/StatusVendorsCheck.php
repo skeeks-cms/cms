@@ -18,25 +18,26 @@ class StatusVendorsCheck extends CheckComponent
     {
         $vendorDir              = VENDOR_DIR;
 
-        $this->name             = "Проверка модификации ядра и библиотек";
+        $this->name             = \Yii::t('app',"Checking kernel and libraries modification");
+        $txt1 = \Yii::t('app','Checks, changes kernel {cms} and third-party libraries (Folder {folder}). Folder location and the name given by the global constant VENDOR_DIR. For the current project:',['cms' => 'cms', 'folder' => '/vendor']);
+        $txt2 = \Yii::t('app','We strongly not recommend to modify the core of the project, as it can bring to the update failed, or your modifications will be removed during the upgrade process. That in turn may result in errors of work the project.');
+        $txt3 = \Yii::t('app','To solve the problem, you can run the command in the console');
         $this->description      = <<<HTML
 <p>
-Осуществаляется проверка, изменения ядра cms и сторонних библиотек (Папка /vendor). Расположение папки и ее название задаются глобальной константой VENDOR_DIR.
-Для текущего проекта:
+{$txt1}
 </p>
 <p>
 <code>{$vendorDir}</code>
 </p>
 <p>
-Мы настоятельно не рекоммендуем модифицировать ядро проекта, поскольку это может привезти к ошибкам обновления, или же ваши модификации будут удалены в процессе обновления.
-Что в свою очередь, может привести к ошибкам работы проекта.
+{$txt2}
 </p>
-<p>Для решения проблемы, можно запустить команду в консоле:</p>
+<p>{$txt3}:</p>
 <p><code>php yii cms/composer/revert-modified-files</code></p>
 HTML;
 ;
-        $this->errorText    = "Найдены модификации ядра";
-        $this->successText  = "Ядро не модифицировалось";
+        $this->errorText    = \Yii::t('app',"Found modified kernel");
+        $this->successText  = \Yii::t('app',"The kernel has not been modified");
 
         parent::init();
     }
@@ -49,7 +50,7 @@ HTML;
 
         if (!$emptyCheck->isSuccess())
         {
-            $this->addError('Найдены ошибки в процессе работы консольных комманд, проверка модификации ядра не может быть запущена.');
+            $this->addError(\Yii::t('app','Found an error in the process of console commands, check the kernel modification can not be started.'));
             //return;
         }
 
@@ -62,7 +63,7 @@ HTML;
 
         if ($result)
         {
-            $this->addError('Найдены модификации ядра: ' . <<<HTML
+            $this->addError(\Yii::t('app','Found modified kernel').': ' . <<<HTML
 <pre><code>$result</code></pre>
 HTML
 );

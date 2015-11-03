@@ -26,12 +26,12 @@ abstract class CheckComponent extends \yii\base\Component
     const RESULT_ERROR          = 'error';
     const RESULT_WARNING        = 'warning';
 
-    public $name                = 'Проверка необходимых модулей';
-    public $description         = "Проверяется доступность требуемых расширений для полноценной работы продукта. В случае ошибки выводится список модулей, которые недоступны.";
+    public $name                = '';
+    public $description         = "";
 
-    public $successText         = "Все необходимые модули установлены";
-    public $errorText           = "Не все модули установлены";
-    public $warningText         = "Какое то некритичное замечание";
+    public $successText         = "";
+    public $errorText           = "";
+    public $warningText         = "";
 
     public $result                  = self::RESULT_SUCCESS;
 
@@ -46,6 +46,32 @@ abstract class CheckComponent extends \yii\base\Component
     public $lastValue               = null;
 
     abstract public function run();
+
+    public function init()
+    {
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('app','Checking the necessary modules');
+        }
+        if(!$this->description)
+        {
+            $this->description = \Yii::t('app','Checking the availability of the required extensions for maximality work product. If an error occurs, show a list of modules that are unavailable.');
+        }
+        if(!$this->successText)
+        {
+            $this->successText = \Yii::t('app','All necessary modules are installed');
+        }
+        if(!$this->errorText)
+        {
+            $this->errorText = \Yii::t('app','Not all modules are installed');
+        }
+        if(!$this->warningText)
+        {
+            $this->warningText = \Yii::t('app','Some non-critical remark');
+        }
+
+        parent::init();
+    }
 
     /**
      * @param string $message

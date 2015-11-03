@@ -33,7 +33,7 @@ class ActiveRecord extends Behavior
     {
         if (!$owner instanceof \yii\db\ActiveRecord)
         {
-            throw new Exception("Данное поведение рассчитано только для работы с " . \yii\db\ActiveRecord::className());
+            throw new Exception(\Yii::t('app',"This behavior is designed only to work with {class}",['class' => \yii\db\ActiveRecord::className()]));
         }
 
         parent::attach($owner);

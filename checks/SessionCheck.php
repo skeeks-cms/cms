@@ -16,18 +16,20 @@ class SessionCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = "Сохранение сессии";
+        $this->name             = \Yii::t('app',"Saved sessions");
+        $txt1 = \Yii::t('app','Checking the ability to store data on the server using the session mechanism. This basic ability necessary to preserve authorization between hits.');
+        $txt2 = \Yii::t('app','Sessions may not work if their support is not installed, in php.ini contains the incorrect folder to store the sessions or it is not available on the record.');
         $this->description      = <<<HTML
 <p>
-Проверяется возможность хранить данные на сервере используя механизм сессий. Эта базовая возможность необходима для сохранения авторизации между хитами.
+{$txt1}
 </p>
 <p>
-Сессии могут не работать, если их поддержка не установлена, в php.ini неправильно указана папка для хранения сессий или она не доступна на запись.
+{$txt2}
 </p>
 HTML;
 ;
-        $this->errorText    = "Ошибка";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"Error");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -48,7 +50,7 @@ HTML;
 
 			if ($_SESSION['CHECKER_CHECK_SESSION'] != 'SUCCESS')
             {
-                $this->addError('Не получилось сохранить сессию');
+                $this->addError(\Yii::t('app','Could not to keep the session'));
             }
 
 			unset($_SESSION['CHECKER_CHECK_SESSION']);

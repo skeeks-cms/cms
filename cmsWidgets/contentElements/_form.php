@@ -9,11 +9,11 @@
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <?php $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSet('Отображение'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Showing')); ?>
         <?= $form->field($model, 'viewFile')->textInput(); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Постраничная навигация'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledPaging', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldInputInt($model, 'pageSize'); ?>
@@ -23,12 +23,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Фильтрация'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Filtering')); ?>
         <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat(), [
             'allowDeselect' => true
         ]); ?>
 
-        <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint("Будет учитываться время начала и окончанию публикации");; ?>
+        <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint(\Yii::t('app',"Will be considered time of beginning and end of the publication")); ?>
 
         <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\User::find()->active()->all(),
@@ -58,16 +58,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Сортировка и количество'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Sorting and quantity')); ?>
         <?= $form->fieldInputInt($model, 'limit'); ?>
         <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
         <?= $form->fieldSelect($model, 'order', [
-            SORT_ASC    => "ASC (от меньшего к большему)",
-            SORT_DESC   => "DESC (от большего к меньшему)",
+            SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
+            SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
         ]); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Дополнительно'); ?>
+    <?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
         <?= $form->field($model, 'label')->textInput(); ?>
 
     <?= $form->fieldSetEnd(); ?>

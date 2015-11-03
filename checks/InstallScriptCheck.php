@@ -21,16 +21,17 @@ class InstallScriptCheck extends CheckComponent
         $this->installDir = ROOT_DIR . "/install";
 
 
-        $this->name             = "Проверка наличия установочных скриптов";
+        $this->name             = \Yii::t('app',"Checking availability installation scripts");
+        $txt = \Yii::t('app','After installation it is recommended to remove the directory with installation script.');
         $this->description      = <<<HTML
 <p>
-    После установки проекта рекоммендуется удалить диррикторию с установочными скриптами.
+    {$txt}
     <code>{$this->installDir}</code>
 </p>
 HTML;
 ;
-        $this->errorText    = "Есть ошибки";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"There are mistakes");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -40,7 +41,7 @@ HTML;
     {
 		if (is_dir($this->installDir))
         {
-            $this->addError('Необходимо удалить скрипт установщик');
+            $this->addError(\Yii::t('app','You must remove the installation script'));
         } else
         {}
     }

@@ -67,7 +67,12 @@ JS
 
     public function run()
     {
-
+        $str_upload = \Yii::t('app','Upload');
+        $str_togg_drop = \Yii::t('app','Toggle Dropdow');
+        $str_upl_from_comp = \Yii::t('app','Upload from your computer');
+        $str_remote_upl = \Yii::t('app','Upload by link {http}',['http' => 'http://']);
+        $str_up_f = \Yii::t('app','The upload file');
+        $str_up_fs = \Yii::t('app','The upload files');
     return <<<HTML
     <div id="sx-file-manager-{$this->id}">
 
@@ -75,21 +80,21 @@ JS
 
             <div class="btn-group">
               <button type="button" id="source-simpleUpload-{$this->id}" class="btn btn-default source-simpleUpload">
-                  <i class="glyphicon glyphicon-download-alt"></i> Загрузить
+                  <i class="glyphicon glyphicon-download-alt"></i> {$str_upload}
               </button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                 <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
+                <span class="sr-only">{$str_togg_drop}</span>
               </button>
               <ul class="dropdown-menu" role="menu">
-                <li><a href="#" id="source-simpleUpload-2-{$this->id}" ><i class="glyphicon glyphicon-download-alt"></i> Загрузить с компьютера</a></li>
-                <li><a href="#" id="source-remoteUpload-{$this->id}" class="source-remoteUpload-{$this->id}" ><i class="glyphicon glyphicon-globe "></i> Загрузить по ссылке http://</a></li>
+                <li><a href="#" id="source-simpleUpload-2-{$this->id}" ><i class="glyphicon glyphicon-download-alt"></i> {$str_upl_from_comp}</a></li>
+                <li><a href="#" id="source-remoteUpload-{$this->id}" class="source-remoteUpload-{$this->id}" ><i class="glyphicon glyphicon-globe "></i> {$str_remote_upl}</a></li>
               </ul>
             </div>
         </div>
 
         <div class="sx-progress-bar-file-{$this->id}" style="display: none;">
-            <span style="vertical-align:middle;">Загрузка файла: <span class="sx-uploaded-file-name"></span></span>
+            <span style="vertical-align:middle;">{$str_up_f}: <span class="sx-uploaded-file-name"></span></span>
             <div>
                 <div class="progress progress-striped active">
                     <div class="progress-bar progress-bar-success"></div>
@@ -98,7 +103,7 @@ JS
         </div>
 
         <div class="sx-progress-bar-{$this->id}" style="display: none;">
-            <span style="vertical-align:middle;">Загрузка файлов (<span class="sx-uploadedFiles"></span> / <span class="sx-allFiles"></span>)</span>
+            <span style="vertical-align:middle;">{$str_up_fs} (<span class="sx-uploadedFiles"></span> / <span class="sx-allFiles"></span>)</span>
             <div>
                 <div class="progress progress-striped active">
                     <div class="progress-bar progress-bar-success"></div>

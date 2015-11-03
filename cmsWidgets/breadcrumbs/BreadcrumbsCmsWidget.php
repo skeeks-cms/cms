@@ -24,7 +24,7 @@ class BreadcrumbsCmsWidget extends WidgetRenderable
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => 'Хлебные крошки'
+            'name' => \Yii::t('app','Breadcrumbs')
         ]);
     }
 }
