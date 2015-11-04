@@ -39,6 +39,14 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public $enabledRunCache             = Cms::BOOL_Y;
     public $runCacheDuration            = 0;
 
+    public $activeQueryCallback;
+
+    /**
+     * @see (new ActiveQuery)->with
+     * @var array
+     */
+    public $with = ['children'];
+
 
     /**
      * @var ActiveQuery
@@ -128,6 +136,20 @@ class TreeMenuCmsWidget extends WidgetRenderable
             if ($this->orderBy)
             {
                 $this->activeQuery->orderBy([$this->orderBy => (int) $this->order]);
+            }
+
+            /**
+             *
+             */
+            if ($this->with)
+            {
+                $this->activeQuery->with($this->with);
+            }
+
+            if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
+            {
+                $callback = $this->activeQueryCallback;
+                $callback($this->activeQuery);
             }
 
             $result = parent::_run();
