@@ -234,6 +234,10 @@ class RelatedPropertiesModel extends Model
         return ArrayHelper::getValue($this->_properties, $name);
     }
 
+    /**
+     * @param $name
+     * @return array|mixed|string
+     */
     public function getSmartAttribute($name)
     {
         /**
@@ -266,7 +270,14 @@ class RelatedPropertiesModel extends Model
                 if ($property->enums)
                 {
                     $enum = array_shift($property->enums);
-                    return $enum->value;
+
+                    foreach ($property->enums as $enum)
+                    {
+                        if ($enum->id == $value)
+                        {
+                            return $enum->value;;
+                        }
+                    }
                 }
 
                 return "";
@@ -275,5 +286,55 @@ class RelatedPropertiesModel extends Model
         {
             return $value;
         }
+    }
+
+
+    public function getEnumByAttribute($name)
+    {
+        /**
+         * @var $property RelatedPropertyModel
+         */
+        $value      = $this->getAttribute($name);
+        $property   = $this->getRelatedProperty($name);
+
+        if ($property->property_type == PropertyType::CODE_LIST)
+        {
+            if ($property->multiple == Cms::BOOL_Y)
+            {
+                if ($property->enums)
+                {
+                    $result = [];
+
+                    foreach ($property->enums as $enum)
+                    {
+                        if (in_array($enum->id, $value))
+                        {
+                            $result[$enum->code] = $enum;
+                        }
+
+                    }
+
+                    return $result;
+                }
+            } else
+            {
+                if ($property->enums)
+                {
+                    $enum = array_shift($property->enums);
+
+                    foreach ($property->enums as $enum)
+                    {
+                        if ($enum->id == $value)
+                        {
+                            return $enum;;
+                        }
+                    }
+                }
+
+                return "";
+            }
+        }
+
+        return null;
     }
 }
