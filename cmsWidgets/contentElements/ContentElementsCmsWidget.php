@@ -66,6 +66,12 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $activeQueryCallback;
     public $dataProviderCallback;
 
+    /**
+     * @see (new ActiveQuery)->with
+     * @var array
+     */
+    public $with = ['image', 'cmsTree'];
+
 
     static public function descriptorConfig()
     {
@@ -152,9 +158,6 @@ class ContentElementsCmsWidget extends WidgetRenderable
         $result = \Yii::$app->cache->get($cacheKey);
         if ($result === false || $this->enabledRunCache == Cms::BOOL_N)
         {
-
-
-
             $this->initDataProvider();
 
             if ($this->createdBy)
@@ -255,6 +258,14 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         [CmsContentElement::tableName() . '.published_to' => null],
                     ]
                 );
+            }
+
+            /**
+             *
+             */
+            if ($this->with)
+            {
+                $this->dataProvider->query->with($this->with);
             }
 
             $this->dataProvider->query->groupBy([CmsContentElement::tableName() . '.id']);
