@@ -16,18 +16,16 @@ class FileStoragesCheck extends CheckComponent
 {
     public function init()
     {
-        $this->name             = "Проверка доступности файловых хранилищ";
+        $this->name             = \Yii::t('app',"Check availability file-storages");
+        $txt = \Yii::t('app','The site has a file storage. It contains all downloaded files. It also consists of a storage cluster (separate servers for file storage). If the site is not connected to the servers, then when you add files to the sections, publications, etc. errors will occur.');
         $this->description      = <<<HTML
 <p>
-    На сайте есть файловое хранилище.
-    В него попадают все загруженные файлы.
-    Так же это хранилище состоит из кластеров (отдельных серверов для хранения файлов).
-    Если к сайту на подключены сервера, то при добавлении файлов, к разделам, публикациям и т.д. будет происходить с ошибками.
+    {$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Есть ошибки";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"There are mistakes");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -37,10 +35,10 @@ HTML;
     {
 		if (!\Yii::$app->storage->getClusters())
         {
-            $this->addError('Нет доступных серверов');
+            $this->addError(\Yii::t('app','No available servers'));
         } else
         {
-            $this->addSuccess('Подключено серверов: ' . count(\Yii::$app->storage->getClusters()));
+            $this->addSuccess(\Yii::t('app','Connected servers').': ' . count(\Yii::$app->storage->getClusters()));
         }
 
 
@@ -50,10 +48,10 @@ HTML;
             {
                 if ($cluster->getFreeSpacePct() > 10)
                 {
-                    $this->addSuccess("Сверер " . $cluster->name . ' — доступно места ' . \Yii::$app->formatter->asShortSize($cluster->getFreeSpace()) . ' (' . round($cluster->getFreeSpacePct()) . '%)');
+                    $this->addSuccess(\Yii::t('app',"Server {server} {d} available space",['server' => $cluster->name, 'd' => '—']).' ' . \Yii::$app->formatter->asShortSize($cluster->getFreeSpace()) . ' (' . round($cluster->getFreeSpacePct()) . '%)');
                 } else
                 {
-                    $this->addError("Сверер " . $cluster->name . ' — доступно места ' . \Yii::$app->formatter->asShortSize($cluster->getFreeSpace()) . ' (' . round($cluster->getFreeSpacePct()) . '%)');
+                    $this->addError(\Yii::t('app',"Server {server} {d} available space",['server' => $cluster->name, 'd' => '—']).' ' . \Yii::$app->formatter->asShortSize($cluster->getFreeSpace()) . ' (' . round($cluster->getFreeSpacePct()) . '%)');
                 }
             }
         }

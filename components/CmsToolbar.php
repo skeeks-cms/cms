@@ -20,8 +20,10 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\BootstrapInterface;
+use yii\base\ViewEvent;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -102,6 +104,42 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     }
 
 
+    public $viewFiles = [];
+
+    public function init()
+    {
+        parent::init();
+
+        /*\Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
+        {
+            if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
+            {
+                $id = "sx-view-render-md5" . md5($e->viewFile);
+                if (in_array($id, $this->viewFiles))
+                {
+                    return;
+                }
+
+                $this->viewFiles[$id] = $id;
+
+                $e->sender->registerJs(<<<JS
+new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
+JS
+);
+                $e->output = Html::tag('div', $e->output,
+                [
+                    'class'     => 'skeeks-cms-toolbar-edit-view-block',
+                    'id'        => $id,
+                    'title'     => "Двойной клик по блоку откроек окно управлния настройками",
+                    'data'      =>
+                    [
+                        'id'            => $id,
+                        'config-url'    => $e->viewFile
+                    ]
+                ]);
+            }
+        });*/
+    }
 
     public function enableEditMode()
     {

@@ -101,18 +101,25 @@ function componentsMenu()
 
     foreach (\Yii::$app->getComponents(true) as $id => $data)
     {
-        $loadedComponent = \Yii::$app->get($id);
-        if ($loadedComponent instanceof \skeeks\cms\base\Component)
+        try
         {
-            $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent([
-                'label'     => $loadedComponent->descriptor->name,
-                'url'   => ["cms/admin-settings", "component" => $loadedComponent->className()],
-                /*"activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
-                {
-                    return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
-                },*/
-            ]);
+            $loadedComponent = \Yii::$app->get($id);
+            if ($loadedComponent instanceof \skeeks\cms\base\Component)
+            {
+                $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent([
+                    'label'     => $loadedComponent->descriptor->name,
+                    'url'   => ["cms/admin-settings", "component" => $loadedComponent->className()],
+                    /*"activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                    {
+                        return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                    },*/
+                ]);
+            }
+        } catch (\Exception $e)
+        {
+
         }
+
     }
 
     return $result;

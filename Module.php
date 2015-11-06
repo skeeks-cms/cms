@@ -41,7 +41,7 @@ class Module extends base\Module implements BootstrapInterface
             "version"               => \Yii::$app->cms->extension->version,
 
             "name"                  => "SkeekS CMS",
-            "description"           => "Базовый модуль cms, без него не будет работать ничего и весь мир рухнет.",
+            "description"           => \Yii::t('app',"Basic module {cms}, without it nothing will work and the whole world will collapse."),
         ]);
     }
 

@@ -243,6 +243,11 @@ $config =
             'class' => 'skeeks\cms\authclient\AuthClientSettings',
         ],
 
+        'console' =>
+        [
+            'class' => 'skeeks\cms\components\ConsoleComponent',
+        ],
+
     ],
 
 

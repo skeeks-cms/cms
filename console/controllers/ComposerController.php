@@ -235,10 +235,7 @@ class ComposerController extends Controller
      */
     public function actionRevertModifiedFiles()
     {
-        ob_start();
-            system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status');
-        $result = ob_get_clean();
-        $result = trim($result);
+        $result = \Yii::$app->console->execute('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status');
 
         if ($result)
         {
@@ -249,7 +246,7 @@ class ComposerController extends Controller
                 foreach ($dirs as $dirPath)
                 {
                     //FileHelper::removeDirectory($dirPath);
-                    system('cd ' . $dirPath . '; git checkout -f 2>&1; git clean -f -d 2>&1');
+                    echo \Yii::$app->console->execute('cd ' . $dirPath . '; git checkout -f 2>&1; git clean -f -d 2>&1');
                 }
             }
         }

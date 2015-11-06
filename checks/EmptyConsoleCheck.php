@@ -17,15 +17,16 @@ class EmptyConsoleCheck extends CheckComponent
 {
     public function init()
     {
-        $this->name             = "Проверка php warning и notice в console";
+        $this->name             = \Yii::t('app',"Check {php} and {notice} in the {console}",['php' => "php warning", 'notice' => "notice", 'console' => "console"]);
+        $txt = \Yii::t('app','Checks console commands.').' '.\Yii::t('app',"Check {php} and {notice} in the {console}",['php' => "php warning", 'notice' => "notice", 'console' => "console"]);
         $this->description      = <<<HTML
 <p>
-Осуществляется проверка консольных команд. Проверка php warning и notice в console.
+{$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Есть ошибки";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"There are mistakes");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -33,17 +34,14 @@ HTML;
 
     public function run()
     {
-		ob_start();
-            system('cd '  . ROOT_DIR . '; php yii cms/check/empty-console');
-        $result = ob_get_clean();
-        $result = trim($result);
+        $result = \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/check/empty-console');
 
         if ($result == CheckController::EMPTY_CONSOLE_TEXT)
         {
             //$this->addSuccess();
         } else
         {
-            $this->addError('Лишний текст в консоль.' . $result);
+            $this->addError(\Yii::t('app','Excess text into console.') . $result);
         }
     }
 

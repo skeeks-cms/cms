@@ -26,7 +26,7 @@ class AdminCmsEventController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Управление событиями CMS";
+        $this->name                     = \Yii::t('app','Event management {cms}',['cms' => 'CMS']);
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = CmsEvent::className();
 

@@ -16,20 +16,24 @@ class MysqlBugVersionCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = "Версия MySQL сервера";
+        $this->name             = \Yii::t('app',"Version MySQL server");
+        $txt1 = \Yii::t('app','Known versions of MySQL with errors that prevent normal operation of the site:');
+        $txt2 = \Yii::t('app','incorrect method works {ex}, search does not work properly');
+        $txt3 = \Yii::t('app','Step auto_increment default is 2, requires 1');
+        $txt4 = \Yii::t('app','Update MySQL, if you have one of these versions.');
         $this->description      = <<<HTML
 <p>
-Известны версии MySQL с ошибками, препятствующими нормальной работе сайта:
+{$txt1}
 </p>
-<p><b>5.0.41</b> - некорректно работает метод EXISTS, поиск работает неправильно;</p>
-<p><b>5.1.34</b> - шаг auto_increment по умолчанию равен 2, требуется 1;</p>
+<p><b>5.0.41</b> - {$txt2};</p>
+<p><b>5.1.34</b> - {$txt3};</p>
 <p>
-Обновите MySQL, если у вас установлена одна их этих версий.
+{$txt4}
 </p>
 HTML;
 ;
-        $this->errorText    = "Ошибка";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"Error");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -48,7 +52,7 @@ HTML;
 
 		if (version_compare($version, $MySql_vercheck_min,'<'))
         {
-            $this->addError("Установлена MySQL версии {$version}, требуется {$MySql_vercheck_min}");
+            $this->addError(\Yii::t('app','MySQL installed version {cur}, {req} is required',['cur' => $version,'req' => $MySql_vercheck_min]));
         }
 
 		if ($version == '4.1.21' // sorting
@@ -57,12 +61,12 @@ HTML;
 //			|| $ver == '5.1.66' // forum page navigation
 			)
         {
-            $this->addError("Проблемная версия БД: " . trim($founded["r"]));
+            $this->addError(\Yii::t('app','Problem version of the database').": " . trim($founded["r"]));
         }
 
         if (!$this->errorMessages)
         {
-            $this->addSuccess("Текущая версия БД: " . trim($founded["r"]));
+            $this->addSuccess(\Yii::t('app','The current version of the database').": " . trim($founded["r"]));
         }
 
 		return true;

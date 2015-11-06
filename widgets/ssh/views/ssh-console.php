@@ -32,7 +32,7 @@ if ($widget->enabledTabHelp == \skeeks\cms\components\Cms::BOOL_Y)
 if ($widget->enabledTabCmds == \skeeks\cms\components\Cms::BOOL_Y)
 {
     $items[] = [
-        'label' => '<i class="glyphicon glyphicon-question-sign"></i> Доступные команды CMS',
+        'label' => '<i class="glyphicon glyphicon-question-sign"></i> '.\Yii::t('app','Available commands {cms}'),
         'encode' => false,
         'content' => $this->render('_sx-cms-cmds', ['widget' => $this]),
     ];

@@ -16,15 +16,16 @@ class PhpSettingsCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = "Обязательные параметры PHP";
+        $this->name             = \Yii::t('app',"Required parameters PHP");
+		$txt = \Yii::t('app','Checks critical parameters defined in the configuration file php.ini. If an error occurs, shows a list of parameters that are not configured correctly. For details on each parameter can be found at php.net.');
         $this->description      = <<<HTML
 <p>
-Проверяются критические значения параметров, определяемых в файле настроек php.ini. В случае ошибки выводится список параметров, которые настроены неправильно. Подробную информацию по каждому параметру можно найти на сайте php.net.
+{$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Настройки неправильные";
-        $this->successText  = "Настройки правильные";
+        $this->errorText    = \Yii::t('app',"Incorrect settings");
+        $this->successText  = \Yii::t('app',"Settings are correct");
 
         parent::init();
     }
@@ -36,7 +37,7 @@ HTML;
 		$PHP_vercheck_min = '5.4.0';
 		if (version_compare($v = phpversion(), $PHP_vercheck_min, '<'))
         {
-            $this->addError("Установлена версия PHP {$v}, требуется {$PHP_vercheck_min} и выше");
+            $this->addError(\Yii::t('app','Installed version of PHP {cur}, {req] or higher is required',['cur' => $v,'req' => $PHP_vercheck_min]));
         }
 
 		$arRequiredParams = array(
@@ -64,7 +65,7 @@ HTML;
                 $curS = $cur ? htmlspecialchars($cur) : 'off';
                 $valS = $val ? 'on' : 'off';
 
-                $this->addError("Параметр {$param} = {$curS}, требуется {$valS}");
+                $this->addError(\Yii::t('app','Parameter {p} = {v}, required {r}',['p' => $param, 'v' => $curS, 'r' => $valS]));
             }
 		}
 
@@ -72,14 +73,14 @@ HTML;
 		if (($cur = ini_get($param)) < 60)
         {
             $cur = htmlspecialchars($cur);
-            $this->addError("Параметр {$param} = {$cur}, требуется 60");
+            $this->addError(\Yii::t('app','Parameter {p} = {v}, required {r}',['p' => $param, 'v' => $cur, 'r' => '60']));
         }
 
 		if (version_compare(phpversion(), '5.3.9', '>='))
 		{
 			if (($m = ini_get('max_input_vars')) && $m < 10000)
             {
-                $this->addError("Значение max_input_vars должно быть не ниже 10000. Текущее значение: {$m}");
+                $this->addError(\Yii::t('app','{var} value should not be less than {max}. Current value',['var' => 'max_input_vars','max' => '10000']).": {$m}");
             }
 		}
 
@@ -88,20 +89,20 @@ HTML;
 		$delimiter = $locale_info['decimal_point'];
 		if ($delimiter != '.')
         {
-            $this->addError("Текущий разделитель: &quot;{$delimiter}&quot;, требуется &quot;.&quot;");
+            $this->addError(\Yii::t('app','Current delimiter: {delim}, {delim2} is required',['delim' => '&quot;'.$delimiter.'&quot;','delim2' => '&quot;.&quot;']));
         }
 
 		// check_precision
 		if (1234567891 != (string) doubleval(1234567891))
         {
-            $this->addError("Параметр precision имеет неверное значение");
+            $this->addError(\Yii::t('app','Parameter {p} has invalid value',['p' => 'precision']));
         }
 
 		// check_suhosin
 		if (in_array('suhosin',get_loaded_extensions()) && !ini_get('suhosin.simulation'))
         {
             $val = ini_get('suhosin.simulation') ? 1 : 0;
-            $this->addError("Загружен модуль suhosin, возможны проблемы в работе административной части (suhosin.simulation={$val})");
+            $this->addError(\Yii::t('app','Loaded module {m}, there may be problems work in the administrative part ({s})',['m' => 'suhosin', 's' => 'suhosin.simulation='.$val]));
         }
 
 		// check_backtrack_limit
@@ -111,7 +112,7 @@ HTML;
 		$new = ini_get($param);
 		if ($new != $cur + 1)
         {
-            $this->addError("Нет возможности изменить значение pcre.backtrack_limit через ini_set");
+            $this->addError(\Yii::t('app','Not possible to change the value {v} through {f}',['v' => 'pcre.backtrack_limit', 'f' => 'ini_set']));
         }
     }
 

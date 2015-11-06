@@ -16,28 +16,34 @@ class MailerChecker extends CheckComponent
 {
     public function init()
     {
-        $this->name             = "Отправка почты (через объект Mailer)";
+        $this->name             = \Yii::t('app','Sending mail (through the object {obj})',['obj' => 'Mailer']);
+        $txt1 = \Yii::t('app','The system is transmitting a test letter to the postal address {email} through the library {obj}.',['email' => 'hosting_test@skeeks.com', 'obj','Mailer']);
+        $txt2 = \Yii::t('app','Created special mailbox, for maximality testing for real work.');
+        $txt3 = \Yii::t('app','As a test message text is transferred the source code of the script checking site.');
+        $txt4 = \Yii::t('app','No user data is not transmitted!');
+        $txt5 = \Yii::t('app','Please note that the test does not check the delivery letter in the mailbox. Moreover, it is impossible to test the delivery of mail to other mail servers.');
+        $txt6 = \Yii::t('app','If the time of sending the letter more than a second, it can significantly slow down the work site. Contact your hosting provider to set up a pending request to send mail (through the spooler), or turn on the transfer of mail (and the work of agents) through {cron}. To do this we must add the constant into {file}:',['cron' => 'cron', 'file' => 'dbconn.php']);
         $this->description      = <<<HTML
 <p>
-Осуществляется передача тестового письма на почтовый адрес hosting_test@skeeks.com через библиотеку Mailer.
-Чтобы максимально приблизить тест к реальной работе почты, заведен служебный ящик.
+{$txt1}
+{$txt2}
 </p>
 <p>
-В качестве тестового текста письма передается исходный код скрипта проверки сайта.
+{$txt3}
 </p>
 <p>
-<b>Никакие пользовательские данные не передаются!</b>
+<b>{$txt4}</b>
 </p>
 <p>
-Обратите внимание, что тест не проверяет доставку письма в почтовый ящик. Более того, нельзя протестировать доставку почты на другие почтовые сервера.
+{$txt5}
 </p>
 <p>
-Если время отправки письма больше секунды, это может значительно затормозить работу сайта. Обратитесь к хостеру с просьбой настроить отложенную отправку почты (через спулер) или включите передачу почты (и работу агентов) через cron. Для этого в dbconn.php надо добавить константу:
+{$txt6}
 </p>
 HTML;
 ;
-        $this->errorText    = "Ошибка";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"Error");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -62,15 +68,15 @@ HTML;
 		{
 			if ($time > 1)
             {
-                $this->addError("Отправлено. Время отправки: " . $time . " сек.");
+                $this->addError(\Yii::t('app','Sent. Dispatch time: {s} sec.',['s' => $time]));
             } else
             {
-                $this->addSuccess("Отправлено. Время отправки: " . $time . " сек.");
+                $this->addSuccess(\Yii::t('app','Sent. Dispatch time: {s} sec.',['s' => $time]));
             }
 		}
 		else
         {
-            $this->addError("Письмо не отправлено.");
+            $this->addError(\Yii::t('app',"The letter has not been sent."));
         }
 
 		return true;

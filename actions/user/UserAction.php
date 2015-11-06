@@ -89,7 +89,7 @@ class UserAction extends Action
 
         if (!$this->controller instanceof UserController)
         {
-            throw new InvalidParamException('Данное действие предназначено для работы с: ' . UserController::className());
+            throw new InvalidParamException(\Yii::t('app','This action is designed to work with: {controller}',['controller' => UserController::className()]));
         }
 
         $this->defaultView = $this->id;
@@ -151,7 +151,7 @@ class UserAction extends Action
                 throw new NotFoundHttpException($e->getMessage());
             } else {
                 throw new NotFoundHttpException(
-                    Yii::t('yii', 'The requested view "{name}" was not found.', ['name' => $viewName])
+                    \Yii::t('yii', 'The requested view "{name}" was not found.', ['name' => $viewName])
                 );
             }
         }
@@ -169,13 +169,13 @@ class UserAction extends Action
      */
     protected function resolveViewName()
     {
-        $viewName = Yii::$app->request->get($this->viewParam, $this->defaultView);
+        $viewName = \Yii::$app->request->get($this->viewParam, $this->defaultView);
 
         if (!is_string($viewName) || !preg_match('~^\w(?:(?!\/\.{0,2}\/)[\w\/\-\.])*$~', $viewName)) {
             if (YII_DEBUG) {
-                throw new NotFoundHttpException("The requested view \"$viewName\" must start with a word character, must not contain /../ or /./, can contain only word characters, forward slashes, dots and dashes.");
+                throw new NotFoundHttpException(\Yii::t('app',"The requested view \"{viewName}\" must start with a word character, must not contain /../ or /./, can contain only word characters, forward slashes, dots and dashes.",['viewname' => $viewName]));
             } else {
-                throw new NotFoundHttpException(Yii::t('yii', 'The requested view "{name}" was not found.', ['name' => $viewName]));
+                throw new NotFoundHttpException(\Yii::t('yii', 'The requested view "{name}" was not found.', ['name' => $viewName]));
             }
         }
 

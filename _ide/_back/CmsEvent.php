@@ -49,11 +49,11 @@ class CmsEvent extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'event_name' => Yii::t('app', 'Событие'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'priority' => Yii::t('app', 'Priority'),
+            'id' => \Yii::t('app', 'ID'),
+            'event_name' => \Yii::t('app', 'Event'),
+            'name' => \Yii::t('app', 'Name'),
+            'description' => \Yii::t('app', 'Description'),
+            'priority' => \Yii::t('app', 'Priority'),
         ];
     }
 }

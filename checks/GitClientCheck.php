@@ -21,15 +21,16 @@ class GitClientCheck extends CheckComponent
         $this->installDir = ROOT_DIR . "/install";
 
 
-        $this->name             = "Проверка наличия git client";
+        $this->name             = \Yii::t('app',"Check availability {git}",['git' => "git client"]);
+        $txt = \Yii::t('app','To work correctly the update, requires a git client');
         $this->description      = <<<HTML
 <p>
-    Для корректной работы обновлений требуется наличие git клиента
+    {$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Есть ошибки";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"There are mistakes");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -39,7 +40,7 @@ HTML;
     {
 		if (!file_exists("/usr/bin/git"))
         {
-            $this->addError('На сервере не установлен git клиент');
+            $this->addError(\Yii::t('app','The git client is not installed at the server'));
         } else
         {}
     }

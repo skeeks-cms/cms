@@ -20,15 +20,16 @@ class MysqlDumpCheck extends CheckComponent
         $this->installDir = ROOT_DIR . "/install";
 
 
-        $this->name             = "Проверка наличия mysqldump";
+        $this->name             = \Yii::t('app',"Checking availability {mysqldump}",['mysqldump' => 'mysqldump']);
+        $txt = \Yii::t('app','To work correctly the update, requires a {mysqldump}',['mysqldump' => 'mysqldump']);
         $this->description      = <<<HTML
 <p>
-    Для корректной работы обновлений требуется наличие mysqldump
+    {$txt}
 </p>
 HTML;
 ;
-        $this->errorText    = "Есть ошибки";
-        $this->successText  = "Успешно";
+        $this->errorText    = \Yii::t('app',"There are mistakes");
+        $this->successText  = \Yii::t('app',"Successfully");
 
         parent::init();
     }
@@ -38,7 +39,7 @@ HTML;
     {
 		if (!file_exists("/usr/bin/mysqldump"))
         {
-            $this->addError('На сервере не установлен mysqldump');
+            $this->addError(\Yii::t('app','The {obj} is not installed at the server',['obj' => 'mysqldump']));
         } else
         {}
     }

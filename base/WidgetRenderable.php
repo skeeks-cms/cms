@@ -28,7 +28,7 @@ class WidgetRenderable extends Widget
     {
         return array_merge(parent::attributeLabels(),
         [
-            'viewFile'  => 'Файл-шаблон',
+            'viewFile'  => \Yii::t('app','File-template'),
         ]);
     }
 
@@ -49,7 +49,7 @@ class WidgetRenderable extends Widget
             ]);
         } else
         {
-            return "Шаблон не найден";
+            return \Yii::t('app',"Template not found");
         }
     }
 }

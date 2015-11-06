@@ -18,6 +18,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsSearchComponent;
 use skeeks\cms\components\CmsSettings;
 use skeeks\cms\components\CmsToolbar;
+use skeeks\cms\components\ConsoleComponent;
 use skeeks\cms\components\ControlToolbar;
 use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\db\DbDumpComponent;
@@ -50,6 +51,7 @@ use skeeks\cms\authclient\CollectionSettings;
  * @property CmsSearchComponent             $cmsSearch
  * @property MarketplaceApi                 $cmsMarkeplace
  * @property CmsSettings                    $cmsSettings
+ * @property ConsoleComponent               $console
  *
  * @property \yii\web\User|UserIde                 $user
  *

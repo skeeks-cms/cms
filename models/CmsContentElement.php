@@ -266,10 +266,11 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getUrl()
     {
-        return UrlHelper::construct('cms/content-element/view', [
+        return Url::to(['/cms/content-element/view', 'model' => $this]);
+        /*return UrlHelper::construct('cms/content-element/view', [
             'id'    => $this->id,
             'code'  => $this->code,
-        ])->toString();
+        ])->toString();*/
     }
 
     /**

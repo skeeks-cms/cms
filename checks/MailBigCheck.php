@@ -18,7 +18,7 @@ class MailBigCheck extends MailCheck
     public function init()
     {
         parent::init();
-        $this->name             = "Отправка почтового сообщения больше 64Кб (функция mail)";
+        $this->name             = \Yii::t('app',"Sending e-mail messages larger than 64 KB (function {mail})",['mail' => 'mail']);
 
     }
 
@@ -28,7 +28,7 @@ class MailBigCheck extends MailCheck
 		$str = file_get_contents(__FILE__);
         if (!$str)
         {
-            $this->addError("Не удалось получить содержимое файла: " . __FILE__);
+            $this->addError(\Yii::t('app','Unable to retrieve the contents of the file').": " . __FILE__);
         }
 
         $body = str_repeat($str, 10);
@@ -41,15 +41,15 @@ class MailBigCheck extends MailCheck
 		{
 			if ($time > 1)
             {
-                $this->addError("Отправлено. Время отправки: " . $time . " сек.");
+                $this->addError(\Yii::t('app','Sent. Dispatch time: {s} sec.',['s' => $time]));
             } else
             {
-                $this->addSuccess("Отправлено. Время отправки: " . $time . " сек.");
+                $this->addSuccess(\Yii::t('app','Sent. Dispatch time: {s} sec.',['s' => $time]));
             }
 		}
 		else
         {
-            $this->addError("Письмо не отправлено.");
+            $this->addError(\Yii::t('app',"The letter has not been sent."));
         }
 
 		return true;
