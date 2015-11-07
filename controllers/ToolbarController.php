@@ -33,18 +33,85 @@ class ToolbarController extends Controller
         return [];
     }
 
-    public function actionTriggerEditMode()
+    public function actionTriggerEditWidgets()
     {
+        $rr = new RequestResponse();
+
         if (\Yii::$app->request->isPost && \Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
 
-            \Yii::$app->cmsToolbar->triggerEditMode();
+            if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y)
+            {
+                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
+                $userSettings->setSettingValue('editWidgets', Cms::BOOL_N);
 
-            return [
-                'message' => '',
-                'success' => true,
-            ];
+                if (!$userSettings->save())
+                {
+                    $rr->message = 'Не удалось сохранить настройки';
+                    $rr->success = false;
+                    return $rr;
+                }
+
+                \Yii::$app->cmsToolbar->invalidateCache();
+
+            } else
+            {
+                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
+                $userSettings->setSettingValue('editWidgets', Cms::BOOL_Y);
+
+                if (!$userSettings->save())
+                {
+                    $rr->message = 'Не удалось сохранить настройки';
+                    $rr->success = false;
+                    return $rr;
+                }
+
+                \Yii::$app->cmsToolbar->invalidateCache();
+            }
+
+            return $rr;
+        }
+    }
+
+    public function actionTriggerEditViewFiles()
+    {
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isAjax)
+        {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+
+            if (\Yii::$app->cmsToolbar->editViewFiles == Cms::BOOL_Y)
+            {
+                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
+                $userSettings->setSettingValue('editViewFiles', Cms::BOOL_N);
+
+                if (!$userSettings->save())
+                {
+                    $rr->message = 'Не удалось сохранить настройки';
+                    $rr->success = false;
+                    return $rr;
+                }
+
+                \Yii::$app->cmsToolbar->invalidateCache();
+
+            } else
+            {
+                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
+                $userSettings->setSettingValue('editViewFiles', Cms::BOOL_Y);
+
+                if (!$userSettings->save())
+                {
+                    $rr->message = 'Не удалось сохранить настройки';
+                    $rr->success = false;
+                    return $rr;
+                }
+
+                \Yii::$app->cmsToolbar->invalidateCache();
+            }
+
+            return $rr;
         }
     }
 

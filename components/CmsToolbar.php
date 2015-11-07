@@ -72,11 +72,9 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
     public $infoblocks = [];
 
+    public $editWidgets                     = Cms::BOOL_N;
+    public $editViewFiles                   = Cms::BOOL_N;
 
-    const EDIT_MODE     = 'edit';
-    const NO_EDIT_MODE  = 'no-edit';
-
-    public $mode                            = self::NO_EDIT_MODE;
     public $isOpen                          = Cms::BOOL_N;
     public $enabled                         = 1;
     public $enableFancyboxWindow            = 0;
@@ -87,7 +85,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['mode', 'infoblockEditBorderColor', 'isOpen'], 'string'],
+            [['editWidgets', 'editViewFiles', 'infoblockEditBorderColor', 'isOpen'], 'string'],
             [['enabled', 'enableFancyboxWindow'], 'integer'],
         ]);
     }
@@ -96,7 +94,8 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'enabled'                       => 'Активность панели управления',
-            'mode'                          => 'Режим редактирования',
+            'editWidgets'                   => 'Редактирование виджетов',
+            'editViewFiles'                 => 'Редактирование шаблонов',
             'isOpen'                        => 'Открыта',
             'enableFancyboxWindow'          => 'Включить диалоговые онка панели (Fancybox)',
             'infoblockEditBorderColor'      => 'Цвет рамки вокруг инфоблока',
@@ -110,9 +109,9 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
     {
         parent::init();
 
-        /*\Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
+        \Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
         {
-            if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
+            if (\Yii::$app->cmsToolbar->editViewFiles == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
             {
                 $id = "sx-view-render-md5" . md5($e->viewFile);
                 if (in_array($id, $this->viewFiles))
@@ -134,70 +133,13 @@ JS
                     'data'      =>
                     [
                         'id'            => $id,
-                        'config-url'    => $e->viewFile
+                        'config-url'    => UrlHelper::construct(['/cms/admin-tools/view-file-edit', "file" => $e->viewFile])->enableAdmin()->toString()
                     ]
                 ]);
             }
-        });*/
+        });
     }
 
-    public function enableEditMode()
-    {
-        $userSettings           = CmsComponentSettings::createByComponentUserId($this, \Yii::$app->user->id);
-        $userSettings->setSettingValue('mode', self::EDIT_MODE);
-
-        if (!$userSettings->save())
-        {
-            $rr->message = 'Не удалось сохранить настройки';
-            $rr->success = false;
-            return $rr;
-        }
-
-        $this->invalidateCache();
-
-        return $this;
-    }
-
-    public function disableEditMode()
-    {
-        $userSettings           = CmsComponentSettings::createByComponentUserId($this, \Yii::$app->user->id);
-        $userSettings->setSettingValue('mode', self::NO_EDIT_MODE);
-
-        if (!$userSettings->save())
-        {
-            $rr->message = 'Не удалось сохранить настройки';
-            $rr->success = false;
-            return $rr;
-        }
-
-        $this->invalidateCache();
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function triggerEditMode()
-    {
-        if ($this->isEditMode())
-        {
-            $this->disableEditMode();
-        } else
-        {
-            $this->enableEditMode();
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEditMode()
-    {
-        return (bool) ($this->mode == self::EDIT_MODE);
-    }
 
     /**
      * @inheritdoc
@@ -303,7 +245,8 @@ JS
             'container-id'                  => 'skeeks-cms-toolbar',
             'container-min-id'              => 'skeeks-cms-toolbar-min',
             'isOpen'                        => (bool) ($this->isOpen == Cms::BOOL_Y),
-            'backend-url-triggerEditMode'   => UrlHelper::construct('cms/toolbar/trigger-edit-mode')->toString(),
+            'backend-url-triggerEditWidgets'   => UrlHelper::construct('cms/toolbar/trigger-edit-widgets')->toString(),
+            'backend-url-triggerEditViewFiles'   => UrlHelper::construct('cms/toolbar/trigger-edit-view-files')->toString(),
             'backend-url-triggerIsOpen'     => UrlHelper::construct('cms/toolbar/trigger-is-open')->toString()
         ];
 

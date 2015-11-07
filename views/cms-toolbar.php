@@ -52,8 +52,13 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
     <? endif; ?>
 
     <div class="skeeks-cms-toolbar-block">
-        <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditMode();" <?= \Yii::$app->cmsToolbar->isEditMode() ? "checked" : ""; ?>/>
+        <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditWidgets();" <?= \Yii::$app->cmsToolbar->editWidgets == \skeeks\cms\components\Cms::BOOL_Y ? "checked" : ""; ?>/>
         <span><?=\Yii::t('app','Editing widgets',[],\Yii::$app->admin->languageCode)?></span>
+    </div>
+
+    <div class="skeeks-cms-toolbar-block">
+        <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditViewFiles();" <?= \Yii::$app->cmsToolbar->editViewFiles == \skeeks\cms\components\Cms::BOOL_Y ? "checked" : ""; ?>/>
+        <span><?=\Yii::t('app','Editing view files',[],\Yii::$app->admin->languageCode)?></span>
     </div>
 
 

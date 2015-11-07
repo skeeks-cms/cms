@@ -109,9 +109,26 @@
             ajax.execute();
         },
 
-        triggerEditMode: function()
+        triggerEditWidgets: function()
         {
-            var ajax = sx.ajax.preparePostQuery(this.get('backend-url-triggerEditMode'));
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-url-triggerEditWidgets'));
+
+            new sx.classes.AjaxHandlerNotify(ajax);
+            new sx.classes.AjaxHandlerBlocker(ajax, {
+                'wrapper' : 'body'
+            })
+
+            ajax.bind('complete', function(e)
+            {
+                window.location.reload();
+            });
+
+            ajax.execute();
+        },
+
+        triggerEditViewFiles: function()
+        {
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-url-triggerEditViewFiles'));
 
             new sx.classes.AjaxHandlerNotify(ajax);
             new sx.classes.AjaxHandlerBlocker(ajax, {
