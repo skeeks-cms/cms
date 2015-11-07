@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\base;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\traits\WidgetTrait;
@@ -85,7 +86,7 @@ abstract class Widget extends Component implements ViewContextInterface
 
 
         \Yii::$app->cmsToolbar->initEnabled();
-        if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
+        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
         {
             $pre = "";
             /*$pre = Html::tag('pre', Json::encode($this->attributes), [

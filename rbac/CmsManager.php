@@ -42,6 +42,8 @@ class CmsManager extends \yii\rbac\DbManager
     const PERMISSION_ELFINDER_COMMON_PUBLIC_FILES           = 'cms.elfinder-common-public-files';
     const PERMISSION_ELFINDER_ADDITIONAL_FILES              = 'cms.elfinder-additional-files';
 
+    const PERMISSION_EDIT_VIEW_FILES                        = 'cms.edit-view-files';
+
 
     const ROLE_GUEST        = 'guest';
     const ROLE_ROOT         = 'root';

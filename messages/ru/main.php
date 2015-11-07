@@ -918,6 +918,10 @@ return
     "For the colection taken into account the current section and its subsections" => "При выборке учитывать текущий раздел и его подразделы",
     "For the colection taken into account the current section and all its subsections" => "При выборке учитывать текущий раздел и все его подразделы",
     "Show items linked to sections" => "Показывать элементы привязанные к разделам",
-    "Take into consideration activity time" => "Учиьывать время активности",
+    "Take into consideration activity time" => "Учитывать время активности",
+
+
+    "Editing view files" => "Редактирование шаблонов",
+    "The ability to edit view files" => "Возможно редактировать файлы представлений",
 
 ];
