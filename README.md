@@ -1,4 +1,4 @@
-Skeeks CMS 2.* (Yii2)
+Skeeks CMS 2.* (Yii2 cms)
 ================
 
 * [Сайт о SkeekS CMS](http://cms.skeeks.com)
