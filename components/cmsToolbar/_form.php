@@ -29,15 +29,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ]
     )->hint('Диалоговые окна в сайтовой части будут более красивые, однако это может портить верстку (но это происходит крайне редко)'); ?>
 
-    <?= $form->field($model, 'mode')->widget(
-        \skeeks\widget\chosen\Chosen::className(),
-        [
-            'items' => [
-                \skeeks\cms\components\CmsToolbar::EDIT_MODE => 'Включен',
-                \skeeks\cms\components\CmsToolbar::NO_EDIT_MODE => 'Выключен'
-            ]
-        ]
-    )->hint('Режим редактирования сайта по умолчаню, изначально.'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'editWidgets'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'editViewFiles'); ?>
 
     <?= $form->field($model, 'infoblockEditBorderColor')->widget(
         \skeeks\cms\widgets\ColorInput::className()

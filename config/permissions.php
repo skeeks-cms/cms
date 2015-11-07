@@ -152,6 +152,11 @@ return [
         ],
 
         [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_EDIT_VIEW_FILES,
+            'description'   => \Yii::t('app','The ability to edit view files')
+        ],
+
+        [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
             'description'   => \Yii::t('app','Updating data records'),
         ],

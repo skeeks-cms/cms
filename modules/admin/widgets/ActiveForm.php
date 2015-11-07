@@ -15,6 +15,7 @@ use skeeks\cms\modules\admin\assets\AdminFormAsset;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
+use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
 use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
@@ -32,11 +33,18 @@ use yii\helpers\Url;
 class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 {
     use AdminActiveFormTrait;
+    use ActiveFormAjaxSubmitTrait;
 
     /**
      * @var bool
      */
     public $usePjax = true;
+
+    /**
+     * @var bool
+     */
+    public $useAjaxSubmit = false;
+    public $afterValidateCallback = "";
 
     /**
      * @var bool
@@ -87,6 +95,11 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
         parent::run();
 
         AdminFormAsset::register($this->view);
+
+        if ($this->useAjaxSubmit)
+        {
+            $this->registerJs();
+        }
 
         if ($this->usePjax)
         {
