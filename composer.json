@@ -1,20 +1,21 @@
 {
     "name": "skeeks/cms",
-    "description": "SkeekS CMS — система управления интернет проектами, создание веб-проектов, система управления внутренним порталом компании",
+    "description": "SkeekS CMS (Yii2 cms) — система управления интернет проектами, создание веб-проектов, система управления внутренним порталом компании",
     "keywords": ["framework", "cms", "skeeks", "sx", "skeeks cms", "app", "yii2", "extension"],
     "homepage": "http://cms.skeeks.com",
     "type": "yii2-extension",
-    "license": "BSD-3-Clause",
+    "license": "GPL-2.0+",
     "support": {
         "issues": "http://cms.skeeks.com",
-        "wiki": "http://git.skeeks.com/skeeks/cms/wikis/home",
-        "source": "http://git.skeeks.com/skeeks/cms"
+        "wiki": "http://dev.cms.skeeks.com/docs/dev",
+        "source": "https://github.com/skeeks-cms/cms",
+        "authors": "http://skeeks.com"
     },
     "authors": [
         {
             "name": "SkeekS",
             "email": "support@skeeks.com",
-            "homepage": "http://www.skeeks.com"
+            "homepage": "http://skeeks.com"
         },
         {
             "name": "Semenov Alexander",
