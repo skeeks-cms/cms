@@ -921,6 +921,7 @@ return
     "Take into consideration activity time" => "Учитывать время активности",
 
 
-    "Editing view files" => "Редактирование блоков",
+    "Editing view files" => "Редактирование шаблонов",
+    "The ability to edit view files" => "Возможно редактировать файлы представлений",
 
 ];

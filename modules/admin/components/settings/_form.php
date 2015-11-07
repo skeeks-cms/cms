@@ -62,13 +62,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet(\Yii::t('app','Access')); ?>
 
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => 'Основное']); ?>
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
         'label'                 => \Yii::t('app','Access to the administrate area'),
     ]); ?>
 
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_EDIT_VIEW_FILES,
+        'label'                 => \Yii::t('app','The ability to edit view files'),
+    ]); ?>
 
-    <h3><b><?= \Yii::t('app',"Control recodrs")?></b></h3>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('app',"Control recodrs")]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
@@ -90,8 +96,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         'label'                 => \Yii::t('app','Ability to delete records'),
     ]); ?>
 
-
-    <h3><b><?= \Yii::t('app','Control only own records')?></b></h3>
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('app','Control only own records')]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,

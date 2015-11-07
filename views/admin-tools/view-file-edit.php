@@ -7,7 +7,39 @@
  */
 /* @var $this yii\web\View */
 /* @var $rootViewFile string */
-
+/* @var $model \skeeks\cms\models\forms\ViewFileEditModel */
+$this->registerCss(<<<CSS
+.CodeMirror
+{
+    height: auto;
+}
+CSS
+)
 ?>
 
-<?= $rootViewFile; ?>
+
+<? $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormStyled::begin([
+    'useAjaxSubmit' => true,
+    'usePjax' => false,
+    'enableAjaxValidation' => false
+]); ?>
+
+    <?= $form->field($model, 'source')->label($model->rootViewFile)->widget(
+        \skeeks\widget\codemirror\CodemirrorWidget::className(),
+        [
+            'preset'    => 'htmlmixed',
+            'assets'    =>
+            [
+                \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
+            ],
+            'clientOptions'   =>
+            [
+                'theme' => 'night'
+            ],
+            'options'=>['rows' => 40],
+        ]
+    ); ?>
+
+    <?= $form->buttonsStandart($model); ?>
+
+<? \skeeks\cms\modules\admin\widgets\form\ActiveFormStyled::end(); ?>

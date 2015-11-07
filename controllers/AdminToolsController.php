@@ -12,16 +12,20 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\App;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\forms\ViewFileEditModel;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
+use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\modules\admin\widgets\DropdownControllerActions;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\validators\db\IsSame;
 use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
@@ -45,6 +49,32 @@ use yii\web\Cookie;
  */
 class AdminToolsController extends AdminController
 {
+    /**
+     * Проверка доступа к админке
+     * @return array
+     */
+    public function behaviors()
+    {
+        return
+        [
+            //Проверка доступа к админ панели
+            'adminAccess' =>
+            [
+                'class' => AdminAccessControl::className(),
+                'rules' =>
+                [
+                    [
+                        'allow' => true,
+                        'roles' =>
+                        [
+                            CmsManager::PERMISSION_EDIT_VIEW_FILES
+                        ],
+                    ],
+                ]
+            ],
+        ];
+    }
+
     public function init()
     {
         $this->name                   = "Управление шаблоном";
@@ -55,10 +85,31 @@ class AdminToolsController extends AdminController
     {
         $rootViewFile = \Yii::$app->request->get('root-file');
 
+        $model = new ViewFileEditModel([
+            'rootViewFile' => $rootViewFile
+        ]);
 
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($model->load(\Yii::$app->request->post()))
+            {
+                if (!$model->saveFile())
+                {
+                    $rr->success = false;
+                    $rr->message = "Не удалось сохранить файл.";
+                }
+
+                $rr->message = "Сохранено";
+                $rr->success = true;
+            }
+
+            return $rr;
+        }
 
         return $this->render($this->action->id, [
-            'rootViewFile' => $rootViewFile
+            'model' => $model
         ]);
     }
 }

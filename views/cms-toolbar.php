@@ -51,16 +51,19 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
         </div>
     <? endif; ?>
 
-    <div class="skeeks-cms-toolbar-block">
-        <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditWidgets();" <?= \Yii::$app->cmsToolbar->editWidgets == \skeeks\cms\components\Cms::BOOL_Y ? "checked" : ""; ?>/>
-        <span><?=\Yii::t('app','Editing widgets',[],\Yii::$app->admin->languageCode)?></span>
-    </div>
+    <? if (\Yii::$app->user->can('cms/admin-settings')) : ?>
+        <div class="skeeks-cms-toolbar-block">
+            <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditWidgets();" <?= \Yii::$app->cmsToolbar->editWidgets == \skeeks\cms\components\Cms::BOOL_Y ? "checked" : ""; ?>/>
+            <span><?=\Yii::t('app','Editing widgets',[],\Yii::$app->admin->languageCode)?></span>
+        </div>
+    <? endif; ?>
 
-    <div class="skeeks-cms-toolbar-block">
-        <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditViewFiles();" <?= \Yii::$app->cmsToolbar->editViewFiles == \skeeks\cms\components\Cms::BOOL_Y ? "checked" : ""; ?>/>
-        <span><?=\Yii::t('app','Editing view files',[],\Yii::$app->admin->languageCode)?></span>
-    </div>
-
+    <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_EDIT_VIEW_FILES)) : ?>
+        <div class="skeeks-cms-toolbar-block">
+            <input type="checkbox" value="1" onclick="sx.Toolbar.triggerEditViewFiles();" <?= \Yii::$app->cmsToolbar->editViewFiles == \skeeks\cms\components\Cms::BOOL_Y ? "checked" : ""; ?>/>
+            <span><?=\Yii::t('app','Editing view files',[],\Yii::$app->admin->languageCode)?></span>
+        </div>
+    <? endif; ?>
 
     <? if (\Yii::$app->user->can('admin/clear')) : ?>
 

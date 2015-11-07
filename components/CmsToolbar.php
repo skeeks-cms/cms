@@ -116,7 +116,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
                 return false;
             }
 
-            if (\Yii::$app->cmsToolbar->editViewFiles == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
+            if (\Yii::$app->cmsToolbar->editViewFiles == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled && \Yii::$app->user->can(CmsManager::PERMISSION_EDIT_VIEW_FILES))
             {
                 $id = "sx-view-render-md5" . md5($e->viewFile);
                 if (in_array($id, $this->viewFiles))
