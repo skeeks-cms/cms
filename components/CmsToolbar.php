@@ -111,6 +111,11 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
         \Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
         {
+            if (\Yii::$app->controller instanceof AdminController)
+            {
+                return false;
+            }
+
             if (\Yii::$app->cmsToolbar->editViewFiles == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
             {
                 $id = "sx-view-render-md5" . md5($e->viewFile);
@@ -133,7 +138,9 @@ JS
                     'data'      =>
                     [
                         'id'            => $id,
-                        'config-url'    => UrlHelper::construct(['/cms/admin-tools/view-file-edit', "file" => $e->viewFile])->enableAdmin()->toString()
+                        'config-url'    => UrlHelper::construct(['/cms/admin-tools/view-file-edit', "root-file" => $e->viewFile])->enableAdmin()
+                            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                            ->toString()
                     ]
                 ]);
             }
