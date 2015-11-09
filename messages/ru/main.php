@@ -923,5 +923,6 @@ return
 
     "Editing view files" => "Редактирование шаблонов",
     "The ability to edit view files" => "Возможно редактировать файлы представлений",
+    "The ability to edit settings" => "Возможность управять настройками",
 
 ];

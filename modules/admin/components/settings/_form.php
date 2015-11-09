@@ -63,6 +63,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('app','Access')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => 'Основное']); ?>
+
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
         'label'                 => \Yii::t('app','Access to the administrate area'),
@@ -71,6 +72,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_EDIT_VIEW_FILES,
         'label'                 => \Yii::t('app','The ability to edit view files'),
+    ]); ?>
+
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => "cms/admin-settings",
+        'label'                 => \Yii::t('app','The ability to edit settings'),
     ]); ?>
 
 
