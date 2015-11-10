@@ -182,8 +182,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         if ($this->content)
         {
-            $this->name = $this->content->name;
-            return $this->getUniqueId() . "__" . $this->content->id;
+            return $this->content->adminPermissionName;
         }
 
         return parent::getPermissionName();

@@ -53,4 +53,22 @@ class ViewModelContentElement extends ViewModelAction
         return $this->_go();
     }
 
+    /**
+     * @return $this
+     */
+    public function initStandartMetaData()
+    {
+        parent::initStandartMetaData();
+
+        $model = $this->model;
+
+        if (!$title = $model->meta_title && $model->cmsContent->meta_title_template)
+        {
+            //TODO: Реализовать
+            $content = str_replace("{=model.name}", $model->name, $model->cmsContent->meta_title_template);
+            $this->controller->getView()->title = $content;
+        }
+
+        return $this;
+    }
 }
