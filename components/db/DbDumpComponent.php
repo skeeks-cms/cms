@@ -109,6 +109,9 @@ class DbDumpComponent extends Component
         echo $cmd;
         \Yii::$app->console->execute($cmd);
 
+        //Установка недостающих миграций
+        \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
+
         \Yii::$app->db->schema->refresh();
     }
     /**

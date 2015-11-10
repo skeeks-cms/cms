@@ -50,6 +50,7 @@ class DbController extends Controller
     public function actionDumpRestore($fileName)
     {
         \Yii::$app->dbDump->dumpRestore($fileName);
+
     }
 
     /**
@@ -57,27 +58,6 @@ class DbController extends Controller
      */
     public function actionDbRefresh()
     {
-        \Yii::$app->db->getSchema()->refresh();
-    }
-
-    /**
-     * TODO: is depricated
-     * @throws \yii\base\NotSupportedException
-     */
-    public function actioV1ApplyMigrations()
-    {
-        $cmd = "php yii migrate --migrationPath=@skeeks/cms/migrations --interactive=0" ;
-        $this->systemCmdRoot($cmd);
-
-        if ($dirs = $this->_findMigrationDirs())
-        {
-            foreach ($dirs as $path)
-            {
-                $cmd = "php yii migrate --migrationPath=" . $path . '  --interactive=0' ;
-                $this->systemCmdRoot($cmd);
-            }
-        }
-
         \Yii::$app->db->getSchema()->refresh();
     }
 
