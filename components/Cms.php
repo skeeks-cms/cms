@@ -52,7 +52,6 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
 use skeeks\sx\File;
-use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;

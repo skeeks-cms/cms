@@ -15,7 +15,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsStorageFile;
-use skeeks\sx\models\Ref;
 use Yii;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\searchs\StorageFile as StorageFileSearch;

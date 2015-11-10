@@ -18,7 +18,6 @@ use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
 use skeeks\sx\File;
-use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;

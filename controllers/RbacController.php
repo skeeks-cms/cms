@@ -12,7 +12,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\rbac\CmsManager;
-use skeeks\sx\models\Ref;
 use Yii;
 use yii\web\Response;
 
