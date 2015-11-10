@@ -62,7 +62,7 @@ class ViewModelContentElement extends ViewModelAction
 
         $model = $this->model;
 
-        if (!$title = $model->meta_title && $model->cmsContent->meta_title_template)
+        if (!$model->meta_title && $model->cmsContent->meta_title_template)
         {
             //TODO: Реализовать
             $content = str_replace("{=model.name}", $model->name, $model->cmsContent->meta_title_template);
