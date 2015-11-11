@@ -271,11 +271,6 @@ class Cms extends \skeeks\cms\base\Component
     {
         parent::init();
 
-        if (!$this->noImageUrl)
-        {
-            $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
-        }
-
         //Название проекта.
         if (!$this->appName)
         {
@@ -384,6 +379,11 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected function _initWeb()
     {
+        if (!$this->noImageUrl)
+        {
+            $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
+        }
+
         if ($this->debugEnabled === self::BOOL_Y)
         {
             /**
