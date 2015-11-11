@@ -3,6 +3,7 @@
 
 2.4.4.5.pre
 -----------------
+ * No image default update
  * New console tool [php yii cms/utils/clear-all-thumbnails] - чистка всех сгенерированных миниатюр
 
 2.4.4.4
