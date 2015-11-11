@@ -1,7 +1,7 @@
 Процесс разработки проекта.
 ==============
 
-2.4.4.5.pre
+2.4.4.5
 -----------------
  * No image default update
  * New console tool [php yii cms/utils/clear-all-thumbnails] - чистка всех сгенерированных миниатюр
