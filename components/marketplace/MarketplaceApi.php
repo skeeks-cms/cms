@@ -81,6 +81,8 @@ class MarketplaceApi extends Component
             $data = array_merge($data, [
                 'sx-serverName' => \Yii::$app->request->serverName,
                 'sx-key'        => \Yii::$app->cms->licenseKey,
+                'sx-version'    => \Yii::$app->cms->extension->version,
+                'sx-email'      => \Yii::$app->cms->adminEmail,
             ]);
             if ($data)
             {
