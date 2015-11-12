@@ -117,7 +117,7 @@ class DbDumpComponent extends Component
     /**
      * @return string
      */
-    public function dumpNewInstall($fileName)
+    public function dumpNewInstall()
     {
         ignore_user_abort(true);
         set_time_limit(0);
