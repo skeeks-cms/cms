@@ -10,6 +10,7 @@ namespace skeeks\cms\models;
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\Tree;
 use skeeks\cms\traits\ValidateRulesTrait;
@@ -34,12 +35,14 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property string $server_name
  * @property string $description
+ * @property integer $image_id
  *
  * @property string $url
  *
  * @property CmsLang $cmsLang
  * @property CmsSiteDomain[] $cmsSiteDomains
  * @property CmsTree[] $cmsTrees
+ * @property CmsStorageFile $image
  */
 class CmsSite extends Core
 {
@@ -62,6 +65,18 @@ class CmsSite extends Core
         $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'beforeInsertChecks']);
         $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'beforeUpdateChecks']);
 
+    }
+
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+
+            HasStorageFile::className() =>
+            [
+                'class'     => HasStorageFile::className(),
+                'fields'    => ['image_id']
+            ],
+        ]);
     }
 
     /**
@@ -135,6 +150,7 @@ class CmsSite extends Core
             'name' => Yii::t('app', 'Name'),
             'server_name' => Yii::t('app', 'Server Name'),
             'description' => Yii::t('app', 'Description'),
+            'image_id' => Yii::t('app', 'Image'),
         ]);
     }
 
@@ -156,6 +172,7 @@ class CmsSite extends Core
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             ['def', 'default', 'value' => Cms::BOOL_N],
+            [['image_id'], 'integer'],
         ]);
     }
 
@@ -204,6 +221,14 @@ class CmsSite extends Core
         }
 
         return \Yii::$app->request->hostInfo;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->hasOne(CmsStorageFile::className(), ['id' => 'image_id']);
     }
 
 }

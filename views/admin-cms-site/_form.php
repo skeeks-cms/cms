@@ -14,6 +14,10 @@ use skeeks\cms\models\Tree;
 
 <?= $form->fieldSet(\Yii::t('app',"Main")); ?>
 
+    <?= $form->field($model, 'image_id')->widget(
+        \skeeks\cms\widgets\formInputs\StorageImage::className()
+    ); ?>
+
     <?= $form->field($model, 'code')->textInput(); ?>
 
 

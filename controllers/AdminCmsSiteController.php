@@ -52,6 +52,9 @@ class AdminCmsSiteController extends AdminModelEditorController
                     ],
 
                     "columns"      => [
+                        [
+                            'class' => \skeeks\cms\grid\ImageColumn2::className(),
+                        ],
                         'name',
                         'code',
 
