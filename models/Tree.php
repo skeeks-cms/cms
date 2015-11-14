@@ -15,7 +15,6 @@ use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\cms\validators\db\NotNewRecord;
 use skeeks\cms\validators\db\NotSame;
 use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
-use skeeks\cms\validators\model\TreeSeoPageName;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
@@ -24,7 +23,6 @@ use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\behaviors\Implode;
-use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
@@ -641,23 +639,60 @@ class Tree extends Core
             $this->setAttribute("code", null);
         } else
         {
-            $filter     = new FilterSeoPageName();
-            $newName    = $filter->filter($this->name);
+            $filter         = new FilterSeoPageName();
+            $this->code     = $filter->filter($this->name);
 
-            if (Validate::validate(new TreeSeoPageName($this), $newName)->isInvalid())
+            $matches = [];
+            //Роутинг элементов нужно исключить
+            if (preg_match('/(?<id>\d+)\-(?<code>\S+)$/i', $this->code, $matches))
             {
-                $newName    = $filter->filter($newName . "-" . substr(md5(uniqid() . time()), 0, 4));
-
-                if (!Validate::validate(new TreeSeoPageName($this), $newName)->isValid())
-                {
-                    $this->generateName();
-                }
+                $this->code = "s" . $this->code;
             }
 
-            $this->setAttribute("code", $newName);
+            if (!$this->isValidCode())
+            {
+                $this->code    = $filter->filter($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
+
+                if (!$this->isValidCode())
+                {
+                    $this->generateCode();
+                }
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isValidCode()
+    {
+        $parent = $this->parent;
+        if (!$parent)
+        {
+            return true;
+        }
+
+        $find   = $parent->getChildren()
+            ->where([
+                "code" => $this->code,
+                'pid' => $this->pid
+            ]);
+
+        if (!$this->isNewRecord)
+        {
+            $find->andWhere([
+                "!=", 'id', $this->id
+            ]);
+        }
+
+        if ($find->one())
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**
