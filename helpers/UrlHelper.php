@@ -13,7 +13,6 @@ namespace skeeks\cms\helpers;
 use skeeks\cms\App;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\sx\traits\Entity;
-use skeeks\sx\traits\InstanceObject;
 use yii\base\Object;
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseUrl;

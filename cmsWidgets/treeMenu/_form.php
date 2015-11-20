@@ -17,6 +17,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         <?= $form->fieldRadioListBoolean($model, 'enabledCurrentSite', \Yii::$app->cms->booleanFormat())
             ->hint('Если будет выбрано "да", то в выборку разделов добавиться условие фильтрации, разделов сайта, где вызван компонент'); ?>
         <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat()); ?>
+
+        <?= $form->fieldSelectMulti($model, 'tree_type_ids', \yii\helpers\ArrayHelper::map(
+            \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
+        )); ?>
+
         <?= $form->fieldInputInt($model, 'level')->hint('Добавляет в выборку разделов, условие выбора вложенности. 0 — не будет использовать это условие вовсе.'); ?>
         <?= $form->fieldSelectMulti($model, 'site_codes', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\CmsSite::find()->active()->all(),

@@ -25,6 +25,14 @@ use yii\widgets\ActiveForm;
  */
 class AdminComponentSettingsController extends AdminController
 {
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return "cms/admin-settings";
+    }
+
     public function init()
     {
         $this->name                   = "Управление настройками компонентов";

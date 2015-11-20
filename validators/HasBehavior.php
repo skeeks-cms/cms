@@ -45,13 +45,7 @@ class HasBehavior
     {
         if (!$component instanceof Component)
         {
-            if ($component instanceof Object)
-            {
-                return $this->_bad(\Yii::t('app',"Object: {class} must be inherited from: {parent}",['class' => $component->className(), 'parent' => ActiveRecord::className()]));
-            } else
-            {
-                return $this->_bad(\Yii::t('app',"The object must be inherited from").": " . Component::className());
-            }
+            return $this->_bad(\Yii::t('app',"The object must be inherited from").": " . Component::className());
 
         }
 

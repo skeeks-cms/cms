@@ -51,6 +51,9 @@ class AdminCmsLangController extends AdminModelEditorController
                     ],
 
                     "columns"      => [
+                        [
+                            'class' => \skeeks\cms\grid\ImageColumn2::className(),
+                        ],
                         'name',
                         'code',
                         [

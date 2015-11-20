@@ -17,7 +17,6 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
-use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;

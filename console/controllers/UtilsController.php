@@ -11,6 +11,7 @@ use skeeks\cms\base\console\Controller;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsSearchPhrase;
+use skeeks\cms\models\StorageFile;
 use skeeks\sx\Dir;
 use Yii;
 use yii\base\Event;
@@ -191,7 +192,23 @@ class UtilsController extends Controller
                 $agent->execute();
             }
         }
-
     }
 
+
+    /**
+     * Читка всех сгенерированных миниатюр
+     */
+    public function actionClearAllThumbnails()
+    {
+        /**
+         * @var $files StorageFile[]
+         */
+        if ($files = StorageFile::find()->all())
+        {
+            foreach ($files as $file)
+            {
+                $file->deleteTmpDir();
+            }
+        }
+    }
 }

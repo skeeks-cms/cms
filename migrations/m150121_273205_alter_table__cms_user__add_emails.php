@@ -16,10 +16,11 @@ class m150121_273205_alter_table__cms_user__add_emails extends Migration
     public function up()
     {
         $this->execute("ALTER TABLE {{%cms_user}} CHANGE `email` `email` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL");
+        $this->execute("INSERT INTO `cms_user_email` (`id`, `user_id`, `value`, `approved`, `approved_key`, `created_at`, `updated_at`) VALUES (NULL, '1', 'admin@skeeks.com', NULL, NULL, NULL, NULL);");
 
 
         //Вставляем mails в базу
-        $users = \skeeks\cms\models\User::find()->all();
+        /*$users = \skeeks\cms\models\User::find()->all();
         if ($users)
         {
             foreach ($users as $user)
@@ -38,7 +39,7 @@ class m150121_273205_alter_table__cms_user__add_emails extends Migration
                     $user->save(false);
                 }
             }
-        }
+        }*/
 
         $this->addForeignKey(
             'cms_user_tree_cms_user_email', "{{%cms_user}}",

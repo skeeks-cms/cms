@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\rbac\CmsManager;
 
 /**
  * Class IndexController
@@ -22,6 +23,14 @@ class IndexController extends AdminController
         $this->name = \Yii::t('app',"Desktop");
 
         parent::init();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return CmsManager::PERMISSION_ADMIN_ACCESS;
     }
 
     public function actions()

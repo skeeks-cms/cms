@@ -15,7 +15,6 @@ use skeeks\cms\components\imaging\Filter;
 use skeeks\cms\Exception;
 use skeeks\sx\Dir;
 use skeeks\sx\File;
-use skeeks\sx\models\Ref;
 use Yii;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\searchs\StorageFile as StorageFileSearch;

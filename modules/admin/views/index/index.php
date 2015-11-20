@@ -51,9 +51,9 @@ $usedSpacePercent = 100 - $freeSpacePercent;
 
 <hr />
         <h2><?= \Yii::t('app','Read more')?></h2>
-        <p><?= \Yii::t('app','Total at server')?>: <?= Yii::$app->formatter->asSize($freeSpace); ?></p>
-        <p><?= \Yii::t('app','Used')?>: <?= Yii::$app->formatter->asSize($usedSpace); ?></p>
-        <p><?= \Yii::t('app','Free')?>: <?= Yii::$app->formatter->asSize($freeSpace); ?></p>
+        <p><?= \Yii::t('app','Total at server')?>: <?= Yii::$app->formatter->asShortSize($totalSpace); ?></p>
+        <p><?= \Yii::t('app','Used')?>: <?= Yii::$app->formatter->asShortSize($usedSpace); ?></p>
+        <p><?= \Yii::t('app','Free')?>: <?= Yii::$app->formatter->asShortSize($freeSpace); ?></p>
         <?
 
         $baseOptions =

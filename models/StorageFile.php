@@ -22,7 +22,6 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
 
-use skeeks\sx\models\Ref;
 use yii\base\Event;
 
 /**

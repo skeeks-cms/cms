@@ -8,10 +8,12 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\traits\ValidateRulesTrait;
 use Yii;
 use yii\base\Event;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_lang}}".
@@ -27,8 +29,10 @@ use yii\db\BaseActiveRecord;
  * @property string $code
  * @property string $name
  * @property string $description
+ * @property integer $image_id
  *
  * @property CmsSite[] $cmsSites
+ * @property CmsStorageFile $image
  */
 class CmsLang extends Core
 {
@@ -48,7 +52,18 @@ class CmsLang extends Core
 
         $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'afterBeforeChecks']);
         $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'afterBeforeChecks']);
+    }
 
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+
+            HasStorageFile::className() =>
+            [
+                'class'     => HasStorageFile::className(),
+                'fields'    => ['image_id']
+            ],
+        ]);
     }
 
     /**
@@ -86,6 +101,7 @@ class CmsLang extends Core
             'code' => Yii::t('app', 'Code'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
+            'image_id' => Yii::t('app', 'Image'),
         ]);
     }
 
@@ -106,6 +122,7 @@ class CmsLang extends Core
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             ['def', 'default', 'value' => Cms::BOOL_N],
+            [['image_id'], 'integer'],
         ]);
     }
 
@@ -115,5 +132,13 @@ class CmsLang extends Core
     public function getCmsSites()
     {
         return $this->hasMany(CmsSite::className(), ['lang_code' => 'code']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->hasOne(CmsStorageFile::className(), ['id' => 'image_id']);
     }
 }

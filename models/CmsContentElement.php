@@ -13,7 +13,6 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
-use skeeks\cms\models\behaviors\HasRef;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasStorageFile;

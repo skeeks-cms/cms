@@ -168,7 +168,7 @@ class AdminModelEditorController extends AdminController
                     'class'         => ModelEditorGridAction::className(),
                     'name'          => \Yii::t('app','List'),
                     "icon"          => "glyphicon glyphicon-th-list",
-                    "priority"      => 0,
+                    "priority"      => 10,
                 ],
 
                 'create' =>
@@ -184,7 +184,7 @@ class AdminModelEditorController extends AdminController
                     'class'         => AdminOneModelUpdateAction::className(),
                     "name"         => \Yii::t('app',"Edit"),
                     "icon"          => "glyphicon glyphicon-pencil",
-                    "priority"      => 0,
+                    "priority"      => 10,
                 ],
 
                 "delete" =>

@@ -5,7 +5,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
-/* @var $model \yii\db\ActiveRecord */
+/* @var $model \skeeks\cms\models\CmsContent */
 ?>
 
 
@@ -51,10 +51,6 @@ use common\models\User;
     ])->hint(\Yii::t('app', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Captions')); ?>
-    <?= $form->field($model, 'name_one')->textInput(); ?>
-    <?= $form->field($model, 'name_meny')->textInput(); ?>
-<?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
     <?= $form->fieldSet(\Yii::t('app','Properties')) ?>
@@ -112,6 +108,38 @@ use common\models\User;
             ],
         ]); ?>
     <?= $form->fieldSetEnd(); ?>
+
+    <?= $form->fieldSet(\Yii::t('app','Access')); ?>
+        <? \yii\bootstrap\Alert::begin([
+            'options' => [
+              'class' => 'alert-warning',
+          ],
+        ]); ?>
+        <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
+        <? \yii\bootstrap\Alert::end()?>
+
+        <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+            'permissionName'        => $model->adminPermissionName,
+            'label'                 => 'Доступ в административной части',
+        ]); ?>
+
+
+
+    <?= $form->fieldSetEnd(); ?>
+
+    <?= $form->fieldSet(\Yii::t('app','Seo')); ?>
+        <?= $form->field($model, 'meta_title_template')->textarea()->hint("Используйте конструкции вида {=model.name}"); ?>
+        <?= $form->field($model, 'meta_description_template')->textarea(); ?>
+        <?= $form->field($model, 'meta_keywords_template')->textarea(); ?>
+    <?= $form->fieldSetEnd(); ?>
+
 <? endif; ?>
+
+
+<?= $form->fieldSet(\Yii::t('app','Captions')); ?>
+    <?= $form->field($model, 'name_one')->textInput(); ?>
+    <?= $form->field($model, 'name_meny')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

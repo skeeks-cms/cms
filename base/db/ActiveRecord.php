@@ -12,7 +12,6 @@
 namespace skeeks\cms\base\db;
 
 use skeeks\cms\query\CmsActiveQuery;
-use skeeks\sx\models\Ref;
 use \yii\db\ActiveRecord as YiiActiveRecord;
 
 

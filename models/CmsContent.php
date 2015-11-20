@@ -37,6 +37,12 @@ use Yii;
  * @property integer $root_tree_id
  * @property string $viewFile
  *
+ * @property string $meta_title_template
+ * @property string $meta_description_template
+ * @property string $meta_keywords_template
+ *
+ * @property string $adminPermissionName
+ *
  * @property CmsTree $rootTree
  * @property CmsTree $defaultTree
  * @property CmsContentType $contentType
@@ -82,6 +88,10 @@ class CmsContent extends Core
             'is_allow_change_tree' => Yii::t('app', 'Is Allow Change Default Section'),
             'root_tree_id' => Yii::t('app', 'Root Section'),
             'viewFile' => Yii::t('app', 'Template'),
+
+            'meta_title_template' => Yii::t('app', 'Шаблон META TITLE'),
+            'meta_description_template' => Yii::t('app', 'Шаблон META KEYWORDS'),
+            'meta_keywords_template' => Yii::t('app', 'Шаблон META DESCRIPTION'),
         ]);
     }
 
@@ -94,6 +104,9 @@ class CmsContent extends Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id'], 'integer'],
             [['name', 'content_type', 'code'], 'required'],
             [['description'], 'string'],
+            [['meta_title_template'], 'string'],
+            [['meta_description_template'], 'string'],
+            [['meta_keywords_template'], 'string'],
             [['name', 'viewFile'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],
@@ -148,5 +161,13 @@ class CmsContent extends Core
     public function getCmsContentProperties()
     {
         return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAdminPermissionName()
+    {
+        return 'cms/admin-cms-content-element__' . $this->id;
     }
 }

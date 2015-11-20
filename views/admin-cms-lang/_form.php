@@ -11,7 +11,9 @@ use skeeks\cms\models\Tree;
 
 <?php $form = ActiveForm::begin(); ?>
 
-
+<?= $form->field($model, 'image_id')->widget(
+    \skeeks\cms\widgets\formInputs\StorageImage::className()
+); ?>
 <?= $form->field($model, 'code')->textInput(); ?>
 <?= $form->fieldRadioListBoolean($model, 'active')->hint(\Yii::t('app','On the site must be included at least one language')); ?>
 <?= $form->field($model, 'name')->textarea(); ?>

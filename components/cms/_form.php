@@ -154,7 +154,10 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
     <? \yii\bootstrap\Alert::end()?>
 
-    <h3><b>Файловый менеджер</b></h3>
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => "Файлы"
+    ])?>
+
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
         'label'                 => 'Доступ к личным файлам',

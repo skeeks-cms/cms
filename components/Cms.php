@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\components;
 
+use skeeks\cms\assets\CmsAsset;
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
@@ -52,7 +53,6 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
 use skeeks\sx\File;
-use skeeks\sx\models\IdentityMap;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
@@ -137,7 +137,7 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string Это изображение показывается в тех случаях, когда не найдено основное.
      */
-    public $noImageUrl          = 'http://vk.com/images/deactivated_100.gif';
+    public $noImageUrl;
 
     /**
      * @var array
@@ -379,6 +379,11 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected function _initWeb()
     {
+        if (!$this->noImageUrl)
+        {
+            $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
+        }
+
         if ($this->debugEnabled === self::BOOL_Y)
         {
             /**

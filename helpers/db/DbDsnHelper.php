@@ -9,8 +9,6 @@ namespace skeeks\cms\helpers\db;
 
 use skeeks\cms\App;
 use skeeks\cms\modules\admin\components\UrlRule;
-use skeeks\sx\traits\Entity;
-use skeeks\sx\traits\InstanceObject;
 use yii\base\Component;
 use yii\base\Object;
 use yii\db\Connection;
