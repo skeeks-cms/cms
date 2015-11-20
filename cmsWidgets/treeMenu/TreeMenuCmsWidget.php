@@ -39,6 +39,8 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public $enabledRunCache             = Cms::BOOL_Y;
     public $runCacheDuration            = 0;
 
+    public $tree_type_ids               = [];
+
     public $activeQueryCallback;
 
     /**
@@ -76,6 +78,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
             'enabledCurrentSite'    => 'Учитывать текущий сайт',
             'enabledRunCache'       => 'Включить кэширование',
             'runCacheDuration'      => 'Время жизни кэша',
+            'tree_type_ids'         => 'Типы страниц',
         ]);
     }
 
@@ -88,6 +91,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
             [['treePid', 'level', 'runCacheDuration'], 'integer'],
             [['order'], 'integer'],
             [['site_codes'], 'safe'],
+            [['tree_type_ids'], 'safe'],
         ]);
     }
 
@@ -136,6 +140,11 @@ class TreeMenuCmsWidget extends WidgetRenderable
             if ($this->orderBy)
             {
                 $this->activeQuery->orderBy([$this->orderBy => (int) $this->order]);
+            }
+
+            if ($this->tree_type_ids)
+            {
+                $this->activeQuery->andWhere(['tree_type_id' => $this->tree_type_ids]);
             }
 
             /**
