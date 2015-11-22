@@ -36,12 +36,16 @@ class AdminUniversalComponentSettingsController extends AdminController
         {
             $classComponentSettings = unserialize(StringHelper::base64DecodeUrl($classComponentSettings));
         }
+
         /**
          * @var $component \skeeks\cms\relatedProperties\PropertyType;
          */
         $component = new $classComponent();
-        $component->attributes = $classComponentSettings;
-
+        try
+        {
+            $component->attributes = $classComponentSettings;
+        } catch (\Exception $e)
+        {}
 
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
