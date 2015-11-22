@@ -215,29 +215,28 @@ JS
 
                 if ($editModel instanceof CmsContentElement)
                 {
-                    $adminControllerRoute = 'cms/admin-cms-content-element';
+                    $controller = \Yii::$app->createController('cms/admin-cms-content-element')[0];
+                    $adminControllerRoute = ['cms/admin-cms-content-element/update', $controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}, 'content_id' => $editModel->cmsContent->id];
+
+                    $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
+                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+
                 } else if ($editModel instanceof \skeeks\cms\models\Tree)
                 {
-                    $adminControllerRoute = 'cms/admin-tree';
+                    $controller = \Yii::$app->createController('cms/admin-tree')[0];
+                    $adminControllerRoute = ['cms/admin-tree/update', $controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}];
+
+                    $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
+                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+
                 } else if ($editModel instanceof User)
                 {
-                    $adminControllerRoute = 'cms/admin-user';
+                    $controller = \Yii::$app->createController('cms/admin-user')[0];
+                    $adminControllerRoute = ['cms/admin-user/update', $controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}];
+
+                    $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
+                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
                 }
-
-                if ($adminControllerRoute)
-                {
-
-                    /**
-                     * @var $controller AdminModelEditorController
-                     */
-                    $controller = \Yii::$app->createController($adminControllerRoute)[0];
-
-                    $urlEditModel = UrlHelper::construct($adminControllerRoute . '/update', [$controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}])->enableAdmin()
-                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                        //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
-                        ;
-                }
-
             }
         }
 
