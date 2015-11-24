@@ -121,7 +121,7 @@ class UrlRuleContentElement
         $pathInfoNormal = $this->_normalizeDir($pathInfo);
         if ($pathInfo != $pathInfoNormal)
         {
-            \Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
+            //\Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
         }
 
 

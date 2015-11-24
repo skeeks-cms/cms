@@ -111,7 +111,7 @@ class UrlRuleTree
 
         if ($pathInfo != $pathInfoNormal)
         {
-            \Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
+            //\Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
         }
 
         return $this->_go($pathInfoNormal);
