@@ -112,6 +112,11 @@ class UrlRuleContentElement
             return false;
         }
 
+        if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches))
+        {
+            return false;
+        }
+
         //Если урл преобразован, редирректим по новой
         $pathInfoNormal = $this->_normalizeDir($pathInfo);
         if ($pathInfo != $pathInfoNormal)
@@ -119,12 +124,6 @@ class UrlRuleContentElement
             \Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
         }
 
-        $pathInfo = "/" . $pathInfo;
-
-        if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', $pathInfo, $matches))
-        {
-            return false;
-        }
 
         return ['cms/content-element/view', [
             'id'    => $matches['id'],

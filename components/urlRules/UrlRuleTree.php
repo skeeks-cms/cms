@@ -108,6 +108,7 @@ class UrlRuleTree
 
         //Если урл преобразован, редирректим по новой
         $pathInfoNormal = $this->_normalizeDir($pathInfo);
+
         if ($pathInfo != $pathInfoNormal)
         {
             \Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
@@ -197,9 +198,9 @@ class UrlRuleTree
         $filter             = new NormalizeDir();
         $pathInfoNormal     = $filter->filter($pathInfo);
 
-        if (\Yii::$app->seo->useLastDelimetrTree)
+        if ((bool) \Yii::$app->seo->useLastDelimetrTree)
         {
-            return $pathInfoNormal . DIRECTORY_SEPARATOR;
+            return $pathInfoNormal . "/";
         } else
         {
             return $pathInfoNormal;
