@@ -12,6 +12,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\base\Exception;
@@ -278,6 +279,20 @@ class RelatedPropertiesModel extends Model
                             return $enum->value;;
                         }
                     }
+                }
+
+                return "";
+            }
+        } else if ($property->property_type == PropertyType::CODE_ELEMENT)
+        {
+            if ($property->multiple == Cms::BOOL_Y)
+            {
+                return ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
+            } else
+            {
+                if ($element = CmsContentElement::find()->where(['id' => $value])->one())
+                {
+                    return $element->name;
                 }
 
                 return "";

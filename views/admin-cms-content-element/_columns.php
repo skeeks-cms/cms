@@ -16,7 +16,7 @@ return [
     ['class' => \skeeks\cms\grid\PublishedAtColumn::className()],
     [
         'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
-        'attribute' => "published_to"
+        'attribute' => "published_to",
     ],
 
     ['class' => \skeeks\cms\grid\CreatedByColumn::className()],

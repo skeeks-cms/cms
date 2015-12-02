@@ -32,7 +32,7 @@ class UserColumnData extends DataColumn
         $this->filter = ArrayHelper::map(
             \Yii::$app->cms->findUser()->all(),
             'id',
-            'name'
+            'displayName'
         );
 
 
