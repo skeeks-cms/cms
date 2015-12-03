@@ -463,6 +463,54 @@ class AuthController extends Controller
     }
 
 
+
+
+    /**
+     * Восстановлеине пароля
+     * @return string|Response
+     */
+    public function actionRegisterByEmail()
+    {
+        if (!\Yii::$app->user->isGuest)
+        {
+            return $this->goHome();
+        }
+
+        $rr         = new RequestResponse();
+        $model      = new SignupForm();
+
+        $model->scenario = SignupForm::SCENARION_ONLYEMAIL;
+
+
+        //Запрос на валидацию ajax формы
+        if ($rr->isRequestOnValidateAjaxForm())
+        {
+            return $rr->ajaxValidateForm($model);
+        }
+        //Запрос ajax post
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup())
+            {
+                $rr->success = true;
+                $rr->message = 'Для дальнейших действий, проверьте вашу почту.';
+
+                return $rr;
+
+            } else
+            {
+                $rr->message = 'Не удалось зарегистрироваться';
+            }
+
+            return (array) $rr;
+
+        }
+
+        return $this->render('register', [
+            'model' => $model,
+        ]);
+    }
+
     public function actionResetPassword()
     {
         $rr = new RequestResponse();

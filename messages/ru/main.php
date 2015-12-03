@@ -170,7 +170,7 @@ return
     "User not found"        => "Пользователь не найден",
     "The request to change the password for" => "Запрос на смену пароля для ",
     "This login is already in use by another user." => "Этот логин уже занят другим пользователем.",
-    "Sign up at site "      => "Регистрация на сайте ",
+    "Sign up at site"      => "Регистрация на сайте ",
     "Sign up"               => "Зарегистрироваться",
 
     "This action is designed to work with the controller: " => "Это действие рассчитано для работы с контроллером: ",
