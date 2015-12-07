@@ -152,10 +152,7 @@ class User
                     {
                         \Yii::$app->authManager->assign($role, $this->id);
                     } catch(\Exception $e)
-                    {
-
-                    }
-
+                    {}
                 }
             }
         }
@@ -250,26 +247,6 @@ class User
         ]);
     }
 
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-
-        $scenario = $scenarios[self::SCENARIO_DEFAULT];
-
-        foreach ($scenario as $key => $code)
-        {
-            if (in_array($code, ['auth_key', 'password_hash']))
-            {
-                unset($scenario[$key]);
-            }
-        }
-
-        $scenarios['create'] = $scenario;
-        $scenarios['update'] = $scenario;
-
-        return $scenarios;
-    }
-
     /**
      * @inheritdoc
      */
@@ -280,7 +257,6 @@ class User
             ['gender', 'default', 'value' => 'men'],
             ['gender', 'in', 'range' => ['men', 'women']],
 
-            [['username', 'auth_key', 'password_hash'], 'required'],
             [['created_at', 'updated_at', 'image_id'], 'integer'],
 
             [['info', 'gender', 'status_of_life'], 'string'],
@@ -311,7 +287,7 @@ class User
 
             [['email'], 'email'],
 
-            [['username'], 'required'],
+            //[['username'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 12],
             [['username'], 'unique'],
             [['username'], \skeeks\cms\validators\LoginValidator::className()],
@@ -319,6 +295,22 @@ class User
             [['logged_at'], 'integer'],
             [['last_activity_at'], 'integer'],
             [['last_admin_activity_at'], 'integer'],
+
+            [['username'], 'default', 'value' => function(self $model)
+            {
+                $userLast = static::find()->orderBy("id DESC")->one();
+                return "id" . ($userLast->id + 1);
+            }],
+
+            [['auth_key'], 'default', 'value' => function(self $model)
+            {
+                return \Yii::$app->security->generateRandomString();
+            }],
+
+            [['password_hash'], 'default', 'value' => function(self $model)
+            {
+                return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
+            }],
         ];
     }
 

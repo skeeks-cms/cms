@@ -70,7 +70,7 @@ class PasswordResetRequestFormEmailOrLogin extends Model
      */
     public function sendEmail()
     {
-        /* @var $user User */
+        /* @var $user \common\models\User */
         $identityClassName = \Yii::$app->user->identityClass;
 
         $user = $identityClassName::findByUsernameOrEmail($this->identifier);
@@ -85,6 +85,11 @@ class PasswordResetRequestFormEmailOrLogin extends Model
 
             if ($user->save())
             {
+                if (!$user->email)
+                {
+                    return false;
+                }
+
                 if ($this->isAdmin)
                 {
                     $resetLink = \skeeks\cms\helpers\UrlHelper::construct('admin/auth/reset-password', ['token' => $user->password_reset_token])->enableAbsolute()->enableAdmin();
