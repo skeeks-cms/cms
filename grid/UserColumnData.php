@@ -12,6 +12,7 @@
  */
 namespace skeeks\cms\grid;
 
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\User;
 use skeeks\widget\chosen\Chosen;
 use yii\grid\DataColumn;
@@ -34,45 +35,8 @@ class UserColumnData extends DataColumn
             'id',
             'displayName'
         );
-
-
-        /*$model = $this->grid->filterModel;
-        $this->filter = Chosen::widget([
-            'attribute' => $this->attribute,
-            'model' => $model,
-            'name' => Html::getInputName($model, $this->attribute),
-            'items' => ArrayHelper::map(
-                \Yii::$app->cms->findUser()->all(),
-                'id',
-                'name'
-            )
-        ]);*/
-
-        /*$model = $this->grid->filterModel;
-        $this->filter = AutoComplete::widget([
-            'attribute' => $this->attribute,
-            'model' => $model,
-            'name' => Html::getInputName($model, $this->attribute),
-            'clientOptions' => [
-                'source' => \Yii::$app->cms->findUser()->select(['id as value', 'name as label'])->all(),
-            ],
-            /*'items' => ArrayHelper::map(
-                \Yii::$app->cms->findUser()->all(),
-                'id',
-                'name'
-            )
-        ]);*/
-
-        /*
-        $this->filter = Chosen::begin([
-            'model' => $this->m
-            'items' => ArrayHelper::map(
-                \Yii::$app->cms->findUser()->all(),
-                'id',
-                'name'
-            )
-        ])->run();*/
     }
+
     /**
      * @inheritdoc
      */
@@ -88,10 +52,31 @@ class UserColumnData extends DataColumn
                 $srcImage = \Yii::$app->cms->moduleAdmin()->noImage;
             }
 
-            return Html::img($srcImage, [
+            $this->grid->view->registerCss(<<<CSS
+.sx-user-preview
+{
+
+}
+.sx-user-preview .sx-user-preview-controll
+{
+    display: none;
+}
+
+.sx-user-preview:hover .sx-user-preview-controll
+{
+    display: inline;
+}
+CSS
+);
+            return "<div class='sx-user-preview'>" . Html::img($srcImage, [
                 'width' => 25,
                 'style' => 'margin-right: 5px;'
-            ]) . $user->getDisplayName();
+            ]) . $user->getDisplayName() . "
+                <div class='sx-user-preview-controll'>" . Html::a("<i class='glyphicon glyphicon-pencil' title='Редактировать'></i>", UrlHelper::construct(['/cms/admin-user/update', 'pk' => $user->id])->enableAdmin()->toString(),
+                [
+                    'class' => 'btn btn-xs btn-default',
+                    'data-pjax' => 0
+                ]) . '</div></div>';
         } else
         {
             return null;
