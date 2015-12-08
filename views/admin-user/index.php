@@ -29,6 +29,8 @@
 
         'username',
         'name',
+        'email',
+        'phone',
 
 
         ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
