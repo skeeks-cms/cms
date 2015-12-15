@@ -77,7 +77,8 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property CmsUserEmail[]     $cmsUserEmails
  * @property CmsUserPhone[]     $cmsUserPhones
  * @property UserAuthClient[]   $cmsUserAuthClients
-
+ *
+ * @property \yii\rbac\Role[]   $roles
  *
  * @property string $displayName
  *
@@ -112,6 +113,9 @@ class User
     {
         parent::init();
 
+        $this->on(self::EVENT_AFTER_INSERT,     [$this, "_cmsAfterSave"]);
+        $this->on(self::EVENT_AFTER_UPDATE,     [$this, "_cmsAfterSave"]);
+
         $this->on(self::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
         $this->on(self::EVENT_AFTER_INSERT,    [$this, "checkDataAfterInsert"]);
 
@@ -121,6 +125,34 @@ class User
         $this->on(self::EVENT_AFTER_INSERT,     [$this, "_cmsSavePhone"]);
     }
 
+    public function _cmsAfterSave($e)
+    {
+        if ($this->_roleNames !== null)
+        {
+            if ($this->roles)
+            {
+                foreach ($this->roles as $roleExist)
+                {
+                    if (!in_array($roleExist->name, (array) $this->_roleNames))
+                    {
+                        \Yii::$app->authManager->revoke($roleExist, $this->id);
+                    }
+                }
+            }
+
+            foreach ((array) $this->_roleNames as $roleName)
+            {
+                if ($role = \Yii::$app->authManager->getRole($roleName))
+                {
+                    try
+                    {
+                        \Yii::$app->authManager->assign($role, $this->id);
+                    } catch(\Exception $e)
+                    {}
+                }
+            }
+        }
+    }
     /**
      * @throws Exception
      */
@@ -142,6 +174,11 @@ class User
      */
     public function checkDataAfterInsert()
     {
+        if ($this->_roleNames)
+        {
+            return false;
+        }
+
         if (\Yii::$app->cms->registerRoles)
         {
             foreach (\Yii::$app->cms->registerRoles as $roleName)
@@ -311,6 +348,8 @@ class User
             {
                 return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
             }],
+
+            [['roleNames'], 'safe'],
         ];
     }
 
@@ -340,6 +379,7 @@ class User
             'last_admin_activity_at' => Yii::t('app', 'Last Activity In The Admin At'),
             'status_of_life' => Yii::t('app', 'Status'),
             'image_id' => Yii::t('app', 'Image'),
+            'roleNames' => Yii::t('app', 'Группы'),
         ];
     }
 
@@ -721,6 +761,8 @@ class User
         return $query;
     }
 
+
+
     /**
      * @return $this
      */
@@ -784,4 +826,44 @@ class User
     {
         return $this->hasMany(CmsUserPhone::className(), ['user_id' => 'id']);
     }
+
+    /**
+     * @return \yii\rbac\Role[]
+     */
+    public function getRoles()
+    {
+        return \Yii::$app->authManager->getRolesByUser($this->id);
+    }
+
+
+
+
+    protected $_roleNames = null;
+
+    /**
+     * @return array
+     */
+    public function getRoleNames()
+    {
+        if ($this->_roleNames !== null)
+        {
+            return $this->_roleNames;
+        }
+
+        $this->_roleNames = (array) ArrayHelper::map($this->roles, 'name', 'name');
+        return $this->_roleNames;
+    }
+
+    /**
+     * @param array $roleNames
+     * @return $this
+     */
+    public function setRoleNames($roleNames = [])
+    {
+        $this->_roleNames = $roleNames;
+
+        return $this;
+    }
+
+
 }

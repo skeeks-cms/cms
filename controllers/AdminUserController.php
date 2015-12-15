@@ -57,6 +57,7 @@ class AdminUserController extends AdminModelEditorController
             [
                 'modelScenario' => 'update'
             ],
+
             'change-password' =>
             [
                 "class"     => AdminOneModelEditAction::className(),
@@ -65,13 +66,13 @@ class AdminUserController extends AdminModelEditorController
                 "callback"  => [$this, "actionChangePassword"],
             ],
 
-            'permission' =>
+            /*'permission' =>
             [
                 "class"     => AdminOneModelEditAction::className(),
                 "name"      => "Привилегии",
                 "icon"      => "glyphicon glyphicon-exclamation-sign",
                 "callback"  => [$this, "actionPermission"],
-            ],
+            ],*/
 
 
             "activate-multi" =>

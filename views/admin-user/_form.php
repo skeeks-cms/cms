@@ -7,6 +7,7 @@ use common\models\User;
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsUser */
 /* @var $console \skeeks\cms\controllers\AdminUserController */
+
 ?>
 
 
@@ -83,6 +84,25 @@ use common\models\User;
 
 <?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet(\Yii::t('app','Группы'))?>
+
+
+    <? $this->registerCss(<<<CSS
+.sx-checkbox label
+{
+    width: 100%;
+}
+CSS
+)?>
+    <?= $form->field($model, 'roleNames')->checkboxList(
+        \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'), [
+            'class' => 'sx-checkbox'
+        ]
+    ); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+
 <?= $form->fieldSet(\Yii::t('app','Additionally'))?>
     <?= $form->field($model, 'city')->textInput(); ?>
     <?= $form->field($model, 'address')->textInput(); ?>
@@ -110,6 +130,8 @@ use common\models\User;
     ]); ?>
 
 <?= $form->fieldSetEnd(); ?>
+
+
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
