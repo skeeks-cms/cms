@@ -56,6 +56,9 @@ use yii\web\ErrorHandler;
  * @property string $meta_description
  * @property string $meta_keywords
  *
+ *
+ * @property string $permissionName
+ *
  * @property string $description_short_type
  * @property string $description_full_type
  *
@@ -93,6 +96,21 @@ class CmsContentElement extends RelatedElementModel
     public static function tableName()
     {
         return '{{%cms_content_element}}';
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_AFTER_DELETE, [$this, '_afterDeleteE']);
+    }
+
+    public function _afterDeleteE($e)
+    {
+        if ($permission = \Yii::$app->authManager->getPermission($this->permissionName))
+        {
+            \Yii::$app->authManager->remove($permission);
+        }
     }
 
     /**
@@ -343,4 +361,11 @@ class CmsContentElement extends RelatedElementModel
             ->via('cmsContentElementFiles');
     }
 
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return 'cms/cms-content-element__' . $this->id;
+    }
 }

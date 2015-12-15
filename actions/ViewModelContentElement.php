@@ -11,6 +11,7 @@
 namespace skeeks\cms\actions;
 
 
+use skeeks\cms\filters\CmsAccessControl;
 use skeeks\cms\models\CmsContentElement;
 use Yii;
 
@@ -25,6 +26,11 @@ class ViewModelContentElement extends ViewModelAction
      */
     public $model;
 
+    public function init()
+    {
+        parent::init();
+    }
+
     /**
      * @param $id
      * @return string
@@ -38,14 +44,47 @@ class ViewModelContentElement extends ViewModelAction
         //Пробуем рендерить view для текущего типа страницы
         if ($this->model)
         {
-            if ($this->model->cmsContent)
+            $cmsContent = $this->model->cmsContent;
+            if ($cmsContent)
             {
-                if ($this->model->cmsContent->viewFile)
+                if ($cmsContent->viewFile)
                 {
-                    $this->view = $this->model->cmsContent->viewFile;
+                    $this->view = $cmsContent->viewFile;
                 } else
                 {
-                    $this->view = $this->model->cmsContent->code;
+                    $this->view = $cmsContent->code;
+                }
+
+                if ($cmsContent->access_check_element == 'Y')
+                {
+                    /**
+                     * @var $filter CmsAccessControl
+                     */
+                    $filter = \Yii::createObject([
+                        'class' => CmsAccessControl::className(),
+                        'only'          => [$this->id],
+                        'rules'         =>
+                        [
+                            [
+                                'allow'         => true,
+                                'matchCallback' => function($rule, $action)
+                                {
+                                    //Если такая привилегия заведена, нужно ее проверять.
+                                    if ($permission = \Yii::$app->authManager->getPermission($this->model->permissionName))
+                                    {
+                                        if (!\Yii::$app->user->can($permission->name))
+                                        {
+                                            return false;
+                                        }
+                                    }
+
+                                    return true;
+                                }
+                            ],
+                        ],
+                    ]);
+
+                    $result = $filter->beforeAction($this);
                 }
             }
         }

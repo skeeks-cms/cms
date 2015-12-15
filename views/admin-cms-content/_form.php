@@ -13,6 +13,10 @@ use common\models\User;
 
 <?= $form->fieldSet(\Yii::t('app','Main')); ?>
 
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('app', 'Main')
+    ]); ?>
+
     <? if ($content_type = \Yii::$app->request->get('content_type')) : ?>
         <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
     <? else: ?>
@@ -49,6 +53,14 @@ use common\models\User;
     <?= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
         'allowDeselect' => true
     ])->hint(\Yii::t('app', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
+
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('app', 'Additionally')
+    ]); ?>
+
+    <?= $form->fieldRadioListBoolean($model, 'access_check_element'); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 

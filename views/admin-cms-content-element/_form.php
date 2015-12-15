@@ -162,6 +162,17 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <?= $form->fieldSetEnd() ?>
+
+    <? if ($model->cmsContent->access_check_element == "Y") : ?>
+        <?= $form->fieldSet(\Yii::t('app','Access')); ?>
+            <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+                'permissionName'                => $model->permissionName,
+                'permissionDescription'         => 'Доступ к этому элементу: ' . $model->name,
+                'label'                         => 'Доступ к этому элементу',
+            ]); ?>
+        <?= $form->fieldSetEnd() ?>
+    <? endif; ?>
+
 <? endif; ?>
 
 

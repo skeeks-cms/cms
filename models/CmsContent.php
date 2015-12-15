@@ -36,6 +36,7 @@ use Yii;
  * @property string $is_allow_change_tree
  * @property integer $root_tree_id
  * @property string $viewFile
+ * @property string $access_check_element
  *
  * @property string $meta_title_template
  * @property string $meta_description_template
@@ -92,6 +93,8 @@ class CmsContent extends Core
             'meta_title_template' => Yii::t('app', 'Шаблон META TITLE'),
             'meta_description_template' => Yii::t('app', 'Шаблон META KEYWORDS'),
             'meta_keywords_template' => Yii::t('app', 'Шаблон META DESCRIPTION'),
+
+            'access_check_element' => Yii::t('app', 'Включить управление доступом к элементам'),
         ]);
     }
 
@@ -110,6 +113,7 @@ class CmsContent extends Core
             [['name', 'viewFile'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],
+            [['access_check_element'], 'string'],
             [['code'], 'validateCode'],
             [['active', 'index_for_search', 'tree_chooser', 'list_mode', 'is_allow_change_tree'], 'string', 'max' => 1],
             [['content_type'], 'string', 'max' => 32],
@@ -117,6 +121,7 @@ class CmsContent extends Core
             ['priority', 'default', 'value'         => 500],
             ['active', 'default', 'value'           => Cms::BOOL_Y],
             ['is_allow_change_tree', 'default', 'value'           => Cms::BOOL_Y],
+            ['access_check_element', 'default', 'value'           => Cms::BOOL_N],
             ['name_meny', 'default', 'value'    => Yii::t('app', 'Elements')],
             ['name_one', 'default', 'value'     => Yii::t('app', 'Element')],
         ]);
