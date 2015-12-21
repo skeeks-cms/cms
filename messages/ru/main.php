@@ -10,7 +10,9 @@
  */
 return
 [
-
+    "Meta Title"            =>  "Заголовок (Meta title)",
+    "Meta Keywords"         =>  "Ключевые слова (Meta Keywords)",
+    "Meta Description"      =>  "Описание (Meta Description)",
 
     "Update"                =>  "Обновить",
     "Save"                  =>  "Сохранить",

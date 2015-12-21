@@ -7,8 +7,10 @@
  */
 namespace skeeks\cms\i18n\components;
 
+use skeeks\cms\models\Message;
 use skeeks\cms\models\SourceMessage;
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 use yii\i18n\DbMessageSource;
 use yii\i18n\MissingTranslationEvent;
 
@@ -54,7 +56,7 @@ class I18NDb extends I18N
 
     public static function handleMissingTranslation(MissingTranslationEvent $event)
     {
-        \Yii::info("@MISSING: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @");
+        \Yii::info("@DB: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @");
 
         $driver = \Yii::$app->getDb()->getDriverName();
         $caseInsensitivePrefix = $driver === 'mysql' ? 'binary' : '';
@@ -66,7 +68,10 @@ class I18NDb extends I18N
             ->with('messages')
             ->one();
 
-        if (!$sourceMessage) {
+        if (!$sourceMessage)
+        {
+            \Yii::info("@WRITE TO DB: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @");
+
             $sourceMessage = new SourceMessage();
             $sourceMessage->setAttributes([
                 'category' => $event->category,
@@ -74,12 +79,17 @@ class I18NDb extends I18N
             ], false);
             $sourceMessage->save(false);
         }
+
         $sourceMessage->initMessages();
         $sourceMessage->saveMessages();
 
-        if (!$event->category == 'app')
+        /**
+         * @var $message Message
+         */
+        $message = ArrayHelper::getValue($sourceMessage->messages, \Yii::$app->language);
+        if ($message)
         {
-            $event->translatedMessage = $sourceMessage->getMessages();
+            $event->translatedMessage = $message->translation;
         }
     }
 }
