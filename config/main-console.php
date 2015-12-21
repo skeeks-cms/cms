@@ -80,6 +80,10 @@ $config =
         [
             'class' => 'skeeks\cms\components\ConsoleComponent',
         ],
+
+        'i18n' => [
+            'class' => 'skeeks\cms\i18n\components\I18NDb',
+        ],
     ],
 
 

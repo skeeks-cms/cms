@@ -64,7 +64,7 @@ class Module extends base\Module implements BootstrapInterface
                 'fileMap' => [
                     'skeeks/cms/user' => 'user.php',
                 ],
-                'on missingTranslation' => ['skeeks\cms\components\TranslationEventHandler', 'handleMissingTranslation']
+                'on missingTranslation' => \Yii::$app->i18n->missingTranslationHandler
             ];
 
             \Yii::$app->i18n->translations['skeeks/cms/v2'] = [
@@ -74,7 +74,7 @@ class Module extends base\Module implements BootstrapInterface
                 'fileMap' => [
                     'skeeks/cms/v2' => 'v2.php',
                 ],
-                'on missingTranslation' => ['skeeks\cms\components\TranslationEventHandler', 'handleMissingTranslation']
+                'on missingTranslation' => \Yii::$app->i18n->missingTranslationHandler
             ];
 
             self::$isRegisteredTranslations = true;
