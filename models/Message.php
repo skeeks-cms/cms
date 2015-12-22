@@ -42,7 +42,7 @@ class Message extends ActiveRecord
         return [
             ['language', 'required'],
             ['language', 'string', 'max' => 16],
-            ['translation', 'string']
+            ['translation', 'string'],
         ];
     }
     /**
@@ -51,9 +51,9 @@ class Message extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('ID'),
-            'language' => \Yii::t('Language'),
-            'translation' => \Yii::t('Translation')
+            'id' => \Yii::t('app', 'ID'),
+            'language' => \Yii::t('app', 'Language'),
+            'translation' => \Yii::t('app', 'Translation')
         ];
     }
     public function getSourceMessage()

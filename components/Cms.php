@@ -19,6 +19,7 @@ use skeeks\cms\mail\Message;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsEvent;
 use skeeks\cms\models\CmsExtension;
+use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
@@ -72,6 +73,8 @@ use yii\web\View;
  * @property ComposerHelper                     $composer
  * @property ComposerHelper                     $appComposer
  * @property Extension                          $extension
+ *
+ * @property CmsLang[]                          $languages
  *
  * @property \skeeks\cms\modules\admin\Module            $moduleAdmin
  * @property \skeeks\cms\Module                          $moduleCms
@@ -264,6 +267,19 @@ class Cms extends \skeeks\cms\base\Component
     {
         return \Yii::$app->currentSite->site;
     }
+
+    protected $_languages = null;
+
+    public function getLanguages()
+    {
+        if ($this->_languages === null)
+        {
+            $this->_languages = CmsLang::find()->active()->indexBy('code')->all();
+        }
+
+        return (array) $this->_languages;
+    }
+
 
     private static $_huck = 'Z2VuZXJhdG9y';
 

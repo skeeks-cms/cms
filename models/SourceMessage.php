@@ -2,8 +2,8 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
- * @date 21.12.2015
+ * @copyright 2010 SkeekS (Ð¡ÐºÐ¸ÐºÐ¡)
+ * @date 22.12.2015
  */
 namespace skeeks\cms\models;
 
@@ -12,6 +12,12 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 
+/**
+ * @var Message[] $messages
+ *
+ * Class SourceMessage
+ * @package skeeks\cms\models
+ */
 class SourceMessage extends ActiveRecord
 {
     /**
@@ -54,16 +60,21 @@ class SourceMessage extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('ID'),
-            'category' => Yii::t('Category'),
-            'message' => Yii::t('Message'),
-            'status' => Yii::t('Translation status')
+            'id' => Yii::t('app', 'ID'),
+            'category' => Yii::t('app', 'Category'),
+            'message' => Yii::t('app', 'Message'),
+            'status' => Yii::t('app', 'Translation status')
         ];
     }
+
+    /**
+     * @return $this
+     */
     public function getMessages()
     {
         return $this->hasMany(Message::className(), ['id' => 'id'])->indexBy('language');
     }
+
     /**
      * @return array|SourceMessage[]
      */

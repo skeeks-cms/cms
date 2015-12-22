@@ -152,6 +152,8 @@ return
                 "url"       => ["cms/admin-storage-files/index"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
+
+
         ], contentMenu())
     ],
 
@@ -179,6 +181,12 @@ return
                     [
                         "label"     => \Yii::t('app',"Languages"),
                         "url"       => ["cms/admin-cms-lang"],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/lang.png']
+                    ],
+
+                    [
+                        "label"     => \Yii::t('app',"Database of translations"),
+                        "url"       => ["cms/admin-message/index"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/lang.png']
                     ],
 

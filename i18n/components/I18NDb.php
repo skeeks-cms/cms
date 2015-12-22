@@ -29,7 +29,7 @@ class I18NDb extends I18N
 
     public function getLanguages()
     {
-        return ['ru', 'en'];
+        return array_keys(\Yii::$app->cms->languages);
     }
     /**
      * @throws InvalidConfigException
@@ -82,6 +82,15 @@ class I18NDb extends I18N
 
         $sourceMessage->initMessages();
         $sourceMessage->saveMessages();
+
+        $messages = $sourceMessage->messages;
+
+        if (isset($messages[\Yii::$app->sourceLanguage]))
+        {
+            $message = $messages[\Yii::$app->sourceLanguage];
+            $message->translation = $sourceMessage->message;
+            $message->save(false);
+        }
 
         /**
          * @var $message Message

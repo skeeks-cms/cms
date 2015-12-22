@@ -14,6 +14,9 @@ return
     "Meta Keywords"         =>  "Ключевые слова (Meta Keywords)",
     "Meta Description"      =>  "Описание (Meta Description)",
 
+    "Database of translations"  =>  "База переводов",
+    "Message"                   =>  "Сообщение",
+
     "Update"                =>  "Обновить",
     "Save"                  =>  "Сохранить",
     "Create"                =>  "Создать",
