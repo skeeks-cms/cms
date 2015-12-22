@@ -27,6 +27,8 @@ use skeeks\cms\components\Langs;
 use skeeks\cms\components\marketplace\MarketplaceApi;
 use skeeks\cms\components\Seo;
 use skeeks\cms\components\storage\Storage;
+use skeeks\cms\i18n\components\I18N;
+use skeeks\cms\i18n\components\I18NDb;
 use skeeks\cms\mail\Mailer;
 use skeeks\cms\modules\admin\components\Menu;
 use skeeks\cms\modules\admin\components\settings\AdminSettings;
@@ -52,6 +54,7 @@ use skeeks\cms\authclient\CollectionSettings;
  * @property MarketplaceApi                 $cmsMarkeplace
  * @property CmsSettings                    $cmsSettings
  * @property ConsoleComponent               $console
+ * @property I18N|I18NDb                    $i18n
  *
  * @property \yii\web\User|UserIde                 $user
  *

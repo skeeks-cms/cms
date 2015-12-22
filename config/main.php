@@ -38,13 +38,8 @@ $config =
         ],
 
         'i18n' => [
-            'translations' => [
-                '*' => [
-                    'class' => 'yii\i18n\PhpMessageSource'
-                ],
-            ],
+            'class' => 'skeeks\cms\i18n\components\I18NDb',
         ],
-
 
         'mailer' => [
             'class'         => 'skeeks\cms\mail\Mailer',
@@ -87,7 +82,6 @@ $config =
 
         'authManager' => [
             'class' => '\skeeks\cms\rbac\DbManager',
-            //'defaultRoles' => ['user'],
         ],
 
         'urlManager' => [
