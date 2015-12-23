@@ -82,8 +82,16 @@ class Breadcrumbs extends Component
         return $this;
     }
 
-    public function createBase($baseData = ['name' => 'Главная', 'url' => '/'])
+    public function createBase($baseData = [])
     {
+        if (!$baseData)
+        {
+            $baseData = [
+                'name' => \Yii::t('app', 'Home'),
+                'url' => '/'
+            ];
+        }
+
         $this->parts = [];
 
         $this->append($baseData);
