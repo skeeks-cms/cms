@@ -75,7 +75,7 @@ use yii\web\ErrorHandler;
  * @property CmsContentProperty[]           $cmsContentProperties
  *
  * @property CmsStorageFile $image
- * @property CmsStorageFile $imageFull
+ * @property CmsStorageFile $fullImage
  *
  * @property CmsContentElementFile[] $cmsContentElementFiles
  * @property CmsContentElementImage[] $cmsContentElementImages
