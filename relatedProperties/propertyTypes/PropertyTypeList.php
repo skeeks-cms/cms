@@ -24,14 +24,6 @@ class PropertyTypeList extends PropertyType
     const FIELD_ELEMENT_RADIO_LIST          = "radioList";
     const FIELD_ELEMENT_CHECKBOX_LIST       = "checkbox";
 
-    /*static public $fieldElements    =
-    [
-        self::FIELD_ELEMENT_SELECT          => 'Выпадающий список (select)',
-        self::FIELD_ELEMENT_SELECT_MULTI    => 'Выпадающий список (select multiple)',
-        self::FIELD_ELEMENT_RADIO_LIST      => 'Радио кнопки (выбор одного значения)',
-        self::FIELD_ELEMENT_CHECKBOX_LIST   => 'Checkbox List',
-    ];*/
-
     static public function fieldElements()
     {
         return [

@@ -20,8 +20,23 @@ class PropertyTypeElement extends PropertyType
     public $code = self::CODE_ELEMENT;
     public $name = "";
 
+    const FIELD_ELEMENT_SELECT              = "select";
+    const FIELD_ELEMENT_SELECT_MULTI        = "selectMulti";
+    const FIELD_ELEMENT_RADIO_LIST          = "radioList";
+    const FIELD_ELEMENT_CHECKBOX_LIST       = "checkbox";
 
+    public $fieldElement            = self::FIELD_ELEMENT_SELECT;
     public $content_id;
+
+    static public function fieldElements()
+    {
+        return [
+            self::FIELD_ELEMENT_SELECT          => \Yii::t('app','Combobox').' (select)',
+            self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('app','Combobox').' (select multiple)',
+            self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('app','Radio Buttons (selecting one value)'),
+            self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('app','Checkbox List'),
+        ];
+    }
 
     public function init()
     {
@@ -46,6 +61,8 @@ class PropertyTypeElement extends PropertyType
         return ArrayHelper::merge(parent::rules(),
         [
             ['content_id', 'integer'],
+            ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
+            ['fieldElement', 'string'],
         ]);
     }
 
@@ -63,7 +80,7 @@ class PropertyTypeElement extends PropertyType
             $find->andWhere(['content_id' => $this->content_id]);
         }
 
-        if ($this->multiple == Cms::BOOL_N)
+        if ($this->fieldElement == self::FIELD_ELEMENT_SELECT)
         {
             $field = $this->activeForm->fieldSelect(
                 $this->model->relatedPropertiesModel,
@@ -71,7 +88,7 @@ class PropertyTypeElement extends PropertyType
                 ArrayHelper::map($find->all(), 'id', 'name'),
                 []
             );
-        } else if ($this->multiple == Cms::BOOL_Y)
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI)
         {
             $field = $this->activeForm->fieldSelectMulti(
                 $this->model->relatedPropertiesModel,
@@ -79,7 +96,23 @@ class PropertyTypeElement extends PropertyType
                 ArrayHelper::map($find->all(), 'id', 'name'),
                 []
             );
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_RADIO_LIST)
+        {
+            $field = parent::renderForActiveForm();
+            $field->radioList(ArrayHelper::map($find->all(), 'id', 'name'));
+
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_CHECKBOX_LIST)
+        {
+            $field = parent::renderForActiveForm();
+            $field->checkboxList(ArrayHelper::map($find->all(), 'id', 'name'));
         }
+
+
+        if (!$field)
+        {
+            return '';
+        }
+
 
         return $field;
     }
@@ -94,5 +127,21 @@ class PropertyTypeElement extends PropertyType
     {
         $class = new \ReflectionClass($this->className());
         return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formPropertyTypeElement.php';
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function initInstance()
+    {
+        parent::initInstance();
+
+        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        {
+            $this->multiple = Cms::BOOL_Y;
+        }
+
+        return $this;
     }
 }

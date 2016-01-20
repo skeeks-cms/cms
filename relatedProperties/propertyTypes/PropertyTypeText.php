@@ -30,8 +30,9 @@ class PropertyTypeText extends PropertyType
     static public function fieldElements()
     {
         return [
-            'textarea'  => \Yii::t('app','Text field').' (textarea)',
-            'textInput' => \Yii::t('app','Text string').' (input)',
+            'textarea'      => \Yii::t('app','Text field').' (textarea)',
+            'textInput'     => \Yii::t('app','Text string').' (input)',
+            'hiddenInput'   => \Yii::t('app','Скрытое поле').' (hiddenInput)',
         ];
     }
 
@@ -87,6 +88,11 @@ class PropertyTypeText extends PropertyType
             $field->$fieldElement([
                 'rows' => $this->rows
             ]);
+
+            if ($this->fieldElement == 'hiddenInput')
+            {
+                $field->label(false);
+            }
         } else
         {
             $field->textInput([]);

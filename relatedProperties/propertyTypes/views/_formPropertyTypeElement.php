@@ -8,7 +8,8 @@
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 <? $form = ActiveForm::begin(); ?>
-    <?= $form->fieldRadioListBoolean($model, 'multiple'); ?>
+    <?/*= $form->fieldRadioListBoolean($model, 'multiple'); */?>
+    <?= $form->fieldSelect($model, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::fieldElements()); ?>
     <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsContent::find()->active()->all(),
         'id',
