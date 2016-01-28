@@ -154,11 +154,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <? if (!$model->isNewRecord) : ?>
     <?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
-        <?= $form->fieldSelect($model, 'content_id', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\models\CmsContent::find()->active()->all(),
-            'id',
-            'name'
-        )); ?>
+        <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
         <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <?= $form->fieldSetEnd() ?>

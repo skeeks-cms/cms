@@ -12,6 +12,7 @@ namespace skeeks\cms\models;
 use skeeks\cms\components\Cms;
 use skeeks\cms\traits\ValidateRulesTrait;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_content}}".
@@ -125,6 +126,39 @@ class CmsContent extends Core
             ['name_meny', 'default', 'value'    => Yii::t('app', 'Elements')],
             ['name_one', 'default', 'value'     => Yii::t('app', 'Element')],
         ]);
+    }
+
+
+    static protected $_selectData = [];
+
+    /**
+     * Данные для мультиселекта с группами типов
+     *
+     * @param bool|false $refetch
+     * @return array
+     */
+    static public function getDataForSelect($refetch = false)
+    {
+        if ($refetch === false && static::$_selectData)
+        {
+            return static::$_selectData;
+        }
+
+        static::$_selectData = [];
+
+        if ($cmsContentTypes = CmsContentType::find()->orderBy("priority ASC")->all())
+        {
+            /**
+             * @var $cmsContentType CmsContentType
+             */
+            foreach ($cmsContentTypes as $cmsContentType)
+            {
+
+                static::$_selectData[$cmsContentType->name] = ArrayHelper::map($cmsContentType->cmsContents, 'id', 'name');
+            }
+        }
+
+        return static::$_selectData;
     }
 
     /**

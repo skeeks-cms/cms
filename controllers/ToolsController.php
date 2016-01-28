@@ -62,6 +62,7 @@ class ToolsController extends Controller
         {
             if ($model = $className::findOne($pk))
             {
+
             }
         }
 
@@ -69,6 +70,18 @@ class ToolsController extends Controller
         return $this->render($this->action->id, [
             'model' => $model
         ]);
+    }
+
+    /**
+     * Выбор элемента контента
+     * @return string
+     */
+    public function actionSelectCmsElement()
+    {
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
+        \Yii::$app->cmsToolbar->enabled = 0;
+
+        return $this->render($this->action->id);
     }
 
     /**
