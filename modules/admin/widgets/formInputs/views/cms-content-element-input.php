@@ -17,14 +17,23 @@
                 <? else: ?>
                     <?= \yii\helpers\Html::activeHiddenInput($widget->id, $widget->attribute); ?>
                 <? endif; ?>
-                <? if ($widget->cmsContentElement) : ?>
-                    <span class="sx-view-cms-content">
+
+                <span class="sx-view-cms-content">
+                    <? if ($widget->cmsContentElement) : ?>
                         <a href="<?= $widget->cmsContentElement->url; ?>" target="_blank" data-pjax="0"><?= $widget->cmsContentElement->name; ?></a>
-                    </span>
-                <? endif; ?>
+                    <? endif; ?>
+                </span>
+
                 <a class="btn btn-default btn-xs sx-btn-create-file-manager">
                     <i class="glyphicon glyphicon-pencil"></i>
                 </a>
+
+                <? if ($widget->allowDeselect) : ?>
+                    <a class="btn btn-default btn-danger btn-xs sx-btn-deselect" <?= !$widget->cmsContentElement ? "style='display: none;'": ""?>>
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </a>
+                <? endif; ?>
+
             </div>
         </div>
     </div>
@@ -50,7 +59,7 @@ $this->registerJs(<<<JS
 
             sx.EventManager.bind(this.get('callbackEvent'), function(e, data)
             {
-                self.setFile(data.file);
+                self.update(data);
             });
         },
 
@@ -60,54 +69,58 @@ $this->registerJs(<<<JS
 
             this.jQueryCreateBtn        = $(".sx-btn-create-file-manager", this.jQuryWrapper());
             this.jQueryInput            = $("input", this.jQuryWrapper());
-            this.jQueryImage            = $(".sx-one-image img", this.jQuryWrapper());
-            this.jQueryImageA           = $(".sx-one-image a", this.jQuryWrapper());
+            this.jQueryContentWrapper   = $(".sx-view-cms-content", this.jQuryWrapper());
+            this.jQueryDeselectBtn      = $(".sx-btn-deselect", this.jQuryWrapper());
 
             this.jQueryCreateBtn.on("click", function()
             {
-                self.createFileManager();
+                self.openModalWindow();
                 return this;
             });
 
-            this.jQueryInput.on("keyup", function()
+            this.jQueryDeselectBtn.on("click", function()
             {
-                self.update();
+                self.update({});
                 return this;
             });
-
-            this.jQueryInput.on("change", function()
-            {
-                self.update();
-                return this;
-            });
-
-            self.update();
         },
 
-        update: function()
+        update: function(model)
         {
-            this.jQueryImage.attr('src', this.jQueryInput.val());
-            this.jQueryImageA.attr('href', this.jQueryInput.val());
+            var self = this;
+
+            self.setVal();
+            this.jQueryContentWrapper.empty();
+            this.jQueryDeselectBtn.hide();
+
+            if (_.size(model) > 0)
+            {
+                this.jQueryContentWrapper.append(
+                    '<a href="' + model.url + '" target="_blank" data-pjax="0">' + model.name + '</a>'
+                );
+                self.setVal(model.id);
+                this.jQueryDeselectBtn.show();
+            }
+
             return this;
         },
 
         /**
-        *
-        * @param file
+        * @param id
         */
-        setFile: function(file)
+        setVal: function(id)
         {
-            $("input", this.jQuryWrapper()).val(file).change();
+            $("input", this.jQuryWrapper()).val(id).change();
         },
 
         /**
         *
         * @returns {sx.classes.SelectOneImage}
         */
-        createFileManager: function()
+        openModalWindow: function()
         {
-            this.WindowFileManager = new sx.classes.WindowOriginal(this.get('selectUrl'), 'sx-select-file-manager');
-            this.WindowFileManager.open();
+            this.Window = new sx.classes.WindowOriginal(this.get('selectUrl'), 'sx-select-file-manager');
+            this.Window.open();
 
             return this;
         },

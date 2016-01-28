@@ -29,21 +29,32 @@ class GridViewStandart extends GridViewHasSettings
      */
     public $adminController = null;
     public $isOpenNewWindow = false;
+    public $enabledCheckbox = true;
 
     public function init()
     {
-        $this->columns = ArrayHelper::merge([
-            ['class' => 'skeeks\cms\modules\admin\grid\CheckboxColumn'],
-            [
+        $defaultColumns = [];
+
+        if ($this->enabledCheckbox)
+        {
+            $defaultColumns[] = ['class' => 'skeeks\cms\modules\admin\grid\CheckboxColumn'];
+        }
+
+        if ($this->adminController)
+        {
+            $defaultColumns[] = [
                 'class'                 => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
                 'controller'            => $this->adminController,
                 'isOpenNewWindow'       => $this->isOpenNewWindow
-            ],
-            [
-                'class' => 'yii\grid\SerialColumn',
-                'visible' => false
-            ],
-        ], $this->columns);
+            ];
+        }
+
+        $defaultColumns[] = [
+            'class' => 'yii\grid\SerialColumn',
+            'visible' => false
+        ];
+
+        $this->columns = ArrayHelper::merge($defaultColumns, $this->columns);
 
         parent::init();
     }
@@ -68,7 +79,12 @@ class GridViewStandart extends GridViewHasSettings
             'class' => 'sx-select-full-all'
         ]);
 
-        $multiActions = $this->adminController->getMultiActions();
+        $multiActions = [];
+        if ($this->adminController)
+        {
+            $multiActions = $this->adminController->getMultiActions();
+        }
+
         if (!$multiActions)
         {
             return parent::renderAfterTable();

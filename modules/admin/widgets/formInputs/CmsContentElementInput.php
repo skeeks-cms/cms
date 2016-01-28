@@ -38,6 +38,11 @@ class CmsContentElementInput extends InputWidget
      */
     public $selectUrl = '';
 
+    /**
+     * @var boolean whether to show deselect button on single select
+     */
+    public $allowDeselect = true;
+
 
     public function init()
     {
