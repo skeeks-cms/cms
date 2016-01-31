@@ -54,9 +54,9 @@ class CmsContentElementInput extends InputWidget
             $additionalData['callbackEvent'] = $this->getCallbackEvent();
 
             $this->selectUrl = \skeeks\cms\helpers\UrlHelper::construct('cms/tools/select-cms-element', $additionalData)
-                                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                                        ->enableAdmin()
-                                        ->toString();
+                                    ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                                    ->enableAdmin()
+                                    ->toString();
         }
     }
 

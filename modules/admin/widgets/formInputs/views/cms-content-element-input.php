@@ -102,6 +102,8 @@ $this->registerJs(<<<JS
                 this.jQueryDeselectBtn.show();
             }
 
+            self.trigger('change', model);
+
             return this;
         },
 

@@ -28,8 +28,8 @@ $controller = \Yii::$app->createController($widget->controllerRoute)[0];
 
     <? $onclick = new \yii\web\JsExpression(<<<JS
         new sx.classes.RelationModelsGrid({
-        'createUrl': '{$createUrl}',
-        'pjaxId': '{$pjaxId}',
+            'createUrl': '{$createUrl}',
+            'pjaxId': '{$pjaxId}',
         }); return false;
 JS
     ); ?>
@@ -59,13 +59,7 @@ HTML
                     });
 
                     window.open();
-                },
-
-                _onDomReady: function()
-                {},
-
-                _onWindowReady: function()
-                {},
+                }
             });
         })(sx, sx.$, sx._);
 JS
