@@ -190,7 +190,7 @@ JS
 
 
     }
-    $userColumns = include_once __DIR__ . "/_columns.php";
+    $userColumns = include_once __DIR__ . "/_columns-select-cms-element.php";
 
     $columns = \yii\helpers\ArrayHelper::merge($userColumns, $autoColumns);
 

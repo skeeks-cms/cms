@@ -38,6 +38,8 @@ class CmsContentElementInput extends InputWidget
      */
     public $selectUrl = '';
 
+    public $baseRoute = 'cms/tools/select-cms-element';
+
     /**
      * @var boolean whether to show deselect button on single select
      */
@@ -53,7 +55,7 @@ class CmsContentElementInput extends InputWidget
             $additionalData = [];
             $additionalData['callbackEvent'] = $this->getCallbackEvent();
 
-            $this->selectUrl = \skeeks\cms\helpers\UrlHelper::construct('cms/tools/select-cms-element', $additionalData)
+            $this->selectUrl = \skeeks\cms\helpers\UrlHelper::construct($this->baseRoute, $additionalData)
                                     ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                                     ->enableAdmin()
                                     ->toString();
