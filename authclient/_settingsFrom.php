@@ -48,6 +48,22 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
         <?= $form->fieldSetEnd(); ?>
 
+
+        <?= $form->fieldSet('Facebook'); ?>
+
+            <p><?=\Yii::t('app','Create application at page')?>: <?= Html::a('https://developers.facebook.com/apps', 'https://developers.facebook.com/apps', [
+                    'target' => '_blank'
+                ]); ?><?=\Yii::t('app',', and get its settings.')?></p>
+            <hr />
+
+            <?= $form->field($model, 'facebookEnabled')->radioList(\Yii::$app->formatter->booleanFormat); ?>
+
+            <?= $form->field($model, 'facebookClientId')->textInput(['placeholder' => '5040380']); ?>
+            <?= $form->field($model, 'facebookClientSecret')->textInput(['placeholder' => 'sxAWws6ATNj5vDabPysA']); ?>
+            <?= $form->field($model, 'facebookClass')->textInput(['placeholder' => 'yii\authclient\clients\Facebook'])->hint(\Yii::t('app','Optional parameter, if not filled will be used {yii}',['yii' => 'yii\authclient\clients\VKontakte'])); ?>
+
+        <?= $form->fieldSetEnd(); ?>
+
     <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 

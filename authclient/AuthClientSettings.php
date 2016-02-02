@@ -32,6 +32,12 @@ class AuthClientSettings extends \skeeks\cms\base\Component
     public $vkClientSecret  = '';
     public $vkClass         = '';
 
+    //Настройки для facebook
+    public $facebookEnabled       = true;
+    public $facebookClientId      = '';
+    public $facebookClientSecret  = '';
+    public $facebookClass         = '';
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -69,6 +75,11 @@ class AuthClientSettings extends \skeeks\cms\base\Component
             [['vkClientId'], 'integer'],
             [['vkClientSecret'], 'string'],
             [['vkClass'], 'string'],
+
+            [['facebookEnabled'], 'boolean'],
+            [['facebookClientId'], 'integer'],
+            [['facebookClientSecret'], 'string'],
+            [['facebookClass'], 'string'],
         ]);
     }
 
@@ -89,6 +100,11 @@ class AuthClientSettings extends \skeeks\cms\base\Component
             'vkClientId'                => 'clientId',
             'vkClientSecret'            => 'clientSecret',
             'vkClass'                   => 'Обработчик',
+
+            'facebookEnabled'                 => 'Включить авторизацию через facebook',
+            'facebookClientId'                => 'clientId',
+            'facebookClientSecret'            => 'clientSecret',
+            'facebookClass'                   => 'Обработчик',
         ]);
     }
 
@@ -135,6 +151,26 @@ class AuthClientSettings extends \skeeks\cms\base\Component
 
         return $this;
     }
+    /**
+     *
+     * Инициализация гитхаб провайдера
+     *
+     * @param array $data
+     * @return $this
+     */
+    protected function _initFacebookData(&$data = [])
+    {
+        if ($this->vkEnabled && $this->vkClientId && $this->vkClientSecret)
+        {
+            $data['facebook'] = [
+                  'class'           => $this->facebookClass ? $this->facebookClass : 'yii\authclient\clients\Facebook',
+                  'clientId'        => $this->facebookClientId,
+                  'clientSecret'    => $this->facebookClientSecret,
+            ];
+        }
+
+        return $this;
+    }
 
     /**
      * @return array
@@ -145,6 +181,7 @@ class AuthClientSettings extends \skeeks\cms\base\Component
 
         $this->_initGitHubData($result);
         $this->_initVkData($result);
+        $this->_initFacebookData($result);
 
         return $result;
     }

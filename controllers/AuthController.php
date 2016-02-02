@@ -132,7 +132,9 @@ class AuthController extends Controller
                 if ($emailFromAuthClient = ArrayHelper::getValue($attributes, 'email'))
                 {
                     //Нашли email
-                    $userEmailModel = CmsUserEmail::find()->where(['value' => $emailFromAuthClient])->andWhere(['approved' => Cms::BOOL_Y])->one();
+                    $userEmailModel = CmsUserEmail::find()->where(['value' => $emailFromAuthClient])
+                        //->andWhere(['approved' => Cms::BOOL_Y])
+                        ->one();
                     if ($userEmailModel)
                     {
                         if ($userEmailModel->user)
