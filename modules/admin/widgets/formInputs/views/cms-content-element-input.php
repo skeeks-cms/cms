@@ -26,8 +26,8 @@
                     <? endif; ?>
                 </span>
 
-                <a class="btn btn-default btn-xs sx-btn-create">
-                    <i class="glyphicon glyphicon-pencil"></i>
+                <a class="btn btn-default btn-xs sx-btn-create" title="Выбрать">
+                    <i class="glyphicon glyphicon-th-list" title="Выбрать"></i>
                 </a>
 
                 <? if ($widget->allowDeselect) : ?>

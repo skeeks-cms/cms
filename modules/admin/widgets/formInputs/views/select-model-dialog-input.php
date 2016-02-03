@@ -27,7 +27,7 @@
 
             <div class="col-lg-6">
 
-                <a class="btn btn-default sx-btn-create">
+                <a class="btn btn-default sx-btn-create" title="Выбрать">
                     <i class="glyphicon glyphicon-th-list" title="Выбрать"></i>
                 </a>
 

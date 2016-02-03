@@ -65,10 +65,29 @@ class ActionColumn extends DataColumn
         $controller = clone $this->controller;
         $controller->model = $model;
 
+        $this->gridDoubleClickAction();
+
         return DropdownControllerActions::widget([
             "controller"            => $controller,
             "isOpenNewWindow"       => $this->isOpenNewWindow,
             "clientOptions"         => $this->clientOptions,
         ]);
+    }
+
+    static public $grids = [];
+
+    protected function gridDoubleClickAction()
+    {
+        if (!isset(self::$grids[$this->grid->id]))
+        {
+            $this->grid->view->registerJs(<<<JS
+            $('tr', $("#{$this->grid->id}")).on('dblclick', function()
+            {
+                $('.sx-row-action', $(this)).click();
+            });
+JS
+            );
+            self::$grids[$this->grid->id] = $this->grid->id;
+        }
     }
 }

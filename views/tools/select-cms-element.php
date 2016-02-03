@@ -20,6 +20,11 @@ $this->registerJs(<<<JS
         _onDomReady: function()
         {
             this.GetParams              = sx.helpers.Request.getParams();
+
+            $('table tr').on('dblclick', function()
+            {
+                $(".sx-row-action", $(this)).click();
+            });
         },
 
         submit: function(data)

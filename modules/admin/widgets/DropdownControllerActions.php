@@ -60,7 +60,7 @@ class DropdownControllerActions
 
             $tagOptions = [
                 "onclick"   => "new sx.classes.app.controllerAction({$actionDataJson}).go(); return false;",
-                "class"     => "btn btn-xs btn-default",
+                "class"     => "btn btn-xs btn-default sx-row-action",
                 "title"     => $firstAction->name
             ];
 

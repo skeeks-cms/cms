@@ -12,7 +12,7 @@ return [
         'value'     => function($model)
         {
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose'), $model->id, [
-                'class' => 'btn btn-primary',
+                'class' => 'btn btn-primary sx-row-action',
                 'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode(array_merge($model->toArray(), [
                     'url' => $model->url
                 ])) . '); return false;',

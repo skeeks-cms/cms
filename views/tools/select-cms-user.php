@@ -20,6 +20,11 @@ $this->registerJs(<<<JS
         _onDomReady: function()
         {
             this.GetParams              = sx.helpers.Request.getParams();
+
+            $('table tr').on('dblclick', function()
+            {
+                $(".sx-row-action", $(this)).click();
+            });
         },
 
         submit: function(data)
@@ -83,7 +88,7 @@ JS
             'value'     => function(\skeeks\cms\models\User $model)
             {
                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose'), '#', [
-                    'class' => 'btn btn-primary',
+                    'class' => 'btn btn-primary sx-row-action',
                     'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($model->toArray([], ['displayName'])) . '); return false;',
                     'data-pjax' => 0
                 ]);

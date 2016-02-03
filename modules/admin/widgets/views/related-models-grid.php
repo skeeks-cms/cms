@@ -35,12 +35,12 @@ JS
     ); ?>
 
     <? $add = \Yii::t('app','Add');?>
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget(\yii\helpers\ArrayHelper::merge($gridOptions, [
+    <?= \skeeks\cms\modules\admin\widgets\GridView::widget(\yii\helpers\ArrayHelper::merge([
         'beforeTableLeft' => <<<HTML
         <a class="btn btn-default btn-sm" onclick="{$onclick}"><i class="glyphicon glyphicon-plus"></i>{$add}</a>
 HTML
 
-    ])); ?>
+    ], $gridOptions)); ?>
 
     <?
 
