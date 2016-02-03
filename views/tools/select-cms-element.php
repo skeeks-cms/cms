@@ -31,14 +31,18 @@ $this->registerJs(<<<JS
                     if (window.opener.sx)
                     {
                         window.opener.sx.EventManager.trigger(this.GetParams['callbackEvent'], data);
-
-                        window.close();
+                        return this;
+                    }
+                } else if (window.parent)
+                {
+                    if (window.parent.sx)
+                    {
+                        window.parent.sx.EventManager.trigger(this.GetParams['callbackEvent'], data);
                         return this;
                     }
                 }
             }
 
-            sx.alert(file);
             return this;
         }
     });

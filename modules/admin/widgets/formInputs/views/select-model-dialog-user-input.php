@@ -26,8 +26,8 @@
                     <? endif; ?>
                 </span>
 
-                <a class="btn btn-default btn-xs sx-btn-create">
-                    <i class="glyphicon glyphicon-pencil"></i>
+                <a class="btn btn-default btn-xs sx-btn-create" title="Выбрать">
+                    <i class="glyphicon glyphicon-th-list"></i>
                 </a>
 
                 <? if ($widget->allowDeselect) : ?>
@@ -50,7 +50,7 @@ $this->registerCss(<<<CSS
 CSS
 );
 
-$this->registerJs(<<<JS
+\Yii::$app->view->registerJs(<<<JS
 (function(sx, $, _)
 {
     sx.classes.SelectCmsElement = sx.classes.Component.extend({
@@ -104,6 +104,8 @@ $this->registerJs(<<<JS
                 this.jQueryDeselectBtn.show();
             }
 
+            this.Window.close();
+
             self.trigger('change', model);
 
             return this;
@@ -123,7 +125,7 @@ $this->registerJs(<<<JS
         */
         openModalWindow: function()
         {
-            this.Window = new sx.classes.WindowOriginal(this.get('selectUrl'), 'sx-select-input-' + this.get('id'));
+            this.Window = new sx.classes.Window(this.get('selectUrl'), 'sx-select-input-' + this.get('id'));
             this.Window.open();
 
             return this;

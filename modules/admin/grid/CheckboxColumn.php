@@ -31,11 +31,6 @@ class CheckboxColumn extends \yii\grid\CheckboxColumn
         {
             sx.classes.CheckboxAdmin = sx.classes.Component.extend({
 
-                _init: function()
-                {
-                    console.log('aaaa');
-                },
-
                 _onDomReady: function()
                 {
 

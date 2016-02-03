@@ -19,6 +19,7 @@ use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\jui\AutoComplete;
+use yii\widgets\ActiveForm;
 
 /**
  * Class UserColumnData
@@ -35,6 +36,12 @@ class UserColumnData extends DataColumn
             'id',
             'displayName'
         );
+
+
+        /*$this->filter = \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
+            'model'             => $this->grid->filterModel,
+            'attribute'         => $this->attribute,
+        ]);*/
     }
 
     /**

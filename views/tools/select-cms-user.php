@@ -31,14 +31,18 @@ $this->registerJs(<<<JS
                     if (window.opener.sx)
                     {
                         window.opener.sx.EventManager.trigger(this.GetParams['callbackEvent'], data);
-
-                        window.close();
+                        return this;
+                    }
+                } else if (window.parent)
+                {
+                    if (window.parent.sx)
+                    {
+                        window.parent.sx.EventManager.trigger(this.GetParams['callbackEvent'], data);
                         return this;
                     }
                 }
             }
 
-            sx.alert(file);
             return this;
         }
     });
@@ -78,7 +82,7 @@ JS
             'class'     => \yii\grid\DataColumn::className(),
             'value'     => function(\skeeks\cms\models\User $model)
             {
-                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose file'), '#', [
+                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose'), '#', [
                     'class' => 'btn btn-primary',
                     'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($model->toArray([], ['displayName'])) . '); return false;',
                     'data-pjax' => 0

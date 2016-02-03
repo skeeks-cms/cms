@@ -105,6 +105,7 @@ $this->registerJs(<<<JS
                 this.jQueryDeselectBtn.show();
             }
 
+            this.Window.close();
             self.trigger('change', model);
 
             return this;
@@ -124,7 +125,7 @@ $this->registerJs(<<<JS
         */
         openModalWindow: function()
         {
-            this.Window = new sx.classes.WindowOriginal(this.get('selectUrl'), 'sx-select-input-' + this.get('id'));
+            this.Window = new sx.classes.Window(this.get('selectUrl'), 'sx-select-input-' + this.get('id'));
             this.Window.open();
 
             return this;
