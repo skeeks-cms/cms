@@ -6,38 +6,39 @@
  * @date 11.07.2015
  */
 /* @var $this yii\web\View */
-/* @var $widget \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput */
+/* @var $widget \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogInput */
 ?>
 <div class="row" id="<?= $widget->id; ?>">
     <div class="col-lg-12">
-        <div class="row">
-            <div class="sx-one-input col-lg-12">
+
+        <div class="row sx-one-input">
+
+            <div class="col-lg-3">
                 <? if ($widget->model) : ?>
-                    <?= \yii\helpers\Html::activeHiddenInput($widget->model, $widget->attribute); ?>
+                    <?= \yii\helpers\Html::activeTextInput($widget->model, $widget->attribute, [
+                        'class' => 'form-control'
+                    ]); ?>
                 <? else: ?>
-                    <?= \yii\helpers\Html::hiddenInput($widget->id, $widget->attribute); ?>
+                    <?= \yii\helpers\Html::textInput($widget->id, $widget->attribute, [
+                        'class' => 'form-control'
+                    ]); ?>
                 <? endif; ?>
+            </div>
 
-                <span class="sx-view-cms-content">
-                    <? if ($widget->modelData) : ?>
-                        <a href="<?= $widget->modelData->url; ?>" target="_blank" data-pjax="0">
-                            <?= $widget->modelData->name; ?>
-                        </a>
-                    <? endif; ?>
-                </span>
+            <div class="col-lg-6">
 
-                <a class="btn btn-default btn-xs sx-btn-create">
-                    <i class="glyphicon glyphicon-pencil"></i>
+                <a class="btn btn-default sx-btn-create">
+                    <i class="glyphicon glyphicon-th-list" title="Выбрать"></i>
                 </a>
 
                 <? if ($widget->allowDeselect) : ?>
-                    <a class="btn btn-default btn-danger btn-xs sx-btn-deselect" <?= !$widget->modelData ? "style='display: none;'": ""?>>
+                    <a class="btn btn-default btn-danger sx-btn-deselect" <?= !$widget->getModelData() ? "style='display: none;'": ""?> title="Убрать выбранное">
                         <i class="glyphicon glyphicon-remove"></i>
                     </a>
                 <? endif; ?>
-
             </div>
         </div>
+
     </div>
 </div>
 <?
@@ -53,7 +54,7 @@ CSS
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
-    sx.classes.SelectCmsElement = sx.classes.Component.extend({
+    sx.classes.SelectModelDialog = sx.classes.Component.extend({
 
         _init: function()
         {
@@ -92,14 +93,14 @@ $this->registerJs(<<<JS
             var self = this;
 
             self.setVal();
-            this.jQueryContentWrapper.empty();
+            //this.jQueryContentWrapper.empty();
             this.jQueryDeselectBtn.hide();
 
             if (_.size(model) > 0)
             {
-                this.jQueryContentWrapper.append(
+                /*this.jQueryContentWrapper.append(
                     '<a href="' + model.url + '" target="_blank" data-pjax="0">' + model.name + '</a>'
-                );
+                );*/
                 self.setVal(model.id);
                 this.jQueryDeselectBtn.show();
             }
@@ -138,7 +139,7 @@ $this->registerJs(<<<JS
         }
     });
 
-    new sx.classes.SelectCmsElement({$jsonOptions});
+    new sx.classes.SelectModelDialog({$jsonOptions});
 })(sx, sx.$, sx._);
 JS
 )

@@ -73,7 +73,17 @@ class AdminOneModelUpdateAction extends AdminOneModelEditAction
 
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                $errors = [];
+
+                if ($model->getErrors())
+                {
+                    foreach ($model->getErrors() as $error)
+                    {
+                        $errors[] = implode(', ', $error);
+                    }
+                }
+
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save') . $errors);
             }
         }
 

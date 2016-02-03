@@ -353,6 +353,12 @@ class User
         ];
     }
 
+    public function extraFields()
+    {
+        return [
+            'displayName',
+        ];
+    }
     /**
      * @inheritdoc
      */

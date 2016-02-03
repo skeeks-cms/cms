@@ -8,6 +8,7 @@ use \skeeks\cms\validators\HasBehavior;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
+//TODO: Заменить элемент выбора пользователя
 ?>
 
 
@@ -24,6 +25,12 @@ use \skeeks\cms\validators\HasBehavior;
             ),
         ]);
     ?>
+    <?/*= $form->field($model, 'created_by')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogInput::className(),
+        [
+            'baseRoute' => 'cms/tools/select-cms-element'
+        ]);
+    */?>
 
 <? endif;?>
 

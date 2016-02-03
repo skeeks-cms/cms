@@ -20,8 +20,8 @@
 
                 <span class="sx-view-cms-content">
                     <? if ($widget->modelData) : ?>
-                        <a href="<?= $widget->modelData->url; ?>" target="_blank" data-pjax="0">
-                            <?= $widget->modelData->name; ?>
+                        <a href="#" target="_blank" data-pjax="0">
+                            <?= $widget->modelData->displayName; ?>
                         </a>
                     <? endif; ?>
                 </span>
@@ -98,7 +98,7 @@ $this->registerJs(<<<JS
             if (_.size(model) > 0)
             {
                 this.jQueryContentWrapper.append(
-                    '<a href="' + model.url + '" target="_blank" data-pjax="0">' + model.name + '</a>'
+                    '<a href="' + model.url + '" target="_blank" data-pjax="0">' + model.displayName + '</a>'
                 );
                 self.setVal(model.id);
                 this.jQueryDeselectBtn.show();
