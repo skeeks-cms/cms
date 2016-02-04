@@ -19,6 +19,9 @@ class AdminImagePreviewWidget extends Widget
      */
     public $image = null;
 
+    /**
+     * @var string
+     */
     public $maxWidth        = "50px";
 
     public function run()
