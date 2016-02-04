@@ -16,7 +16,7 @@ use \skeeks\cms\validators\HasBehavior;
 
 
 <? if (Validate::validate( new HasBehavior(\yii\behaviors\BlameableBehavior::className()), $model)->isValid()) : ?>
-    <?= $form->field($model, 'created_by')->widget(
+    <?/*= $form->field($model, 'created_by')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                 \Yii::$app->cms->findUser()->all(),
@@ -24,13 +24,11 @@ use \skeeks\cms\validators\HasBehavior;
                 'displayName'
             ),
         ]);
-    ?>
-    <?/*= $form->field($model, 'created_by')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogInput::className(),
-        [
-            'baseRoute' => 'cms/tools/select-cms-element'
-        ]);
     */?>
+    <?= $form->field($model, 'created_by')->widget(
+        \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()
+    );
+    ?>
 
 <? endif;?>
 
