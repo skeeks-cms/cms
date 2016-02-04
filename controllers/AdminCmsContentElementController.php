@@ -69,12 +69,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     },
                 ],
 
-                'settings' =>
+                /*'settings' =>
                 [
                     'class'         => AdminModelEditorAction::className(),
                     'name'          => 'Настройки',
                     "icon"          => "glyphicon glyphicon-cog",
-                ],
+                ],*/
 
                 "activate-multi" =>
                 [
