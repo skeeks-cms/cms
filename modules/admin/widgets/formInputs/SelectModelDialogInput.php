@@ -48,6 +48,11 @@ class SelectModelDialogInput extends InputWidget
      */
     public $allowDeselect = true;
 
+    /**
+     * @var bool
+     */
+    public $closeWindow = true;
+
 
     public $viewFile  = 'select-model-dialog-input';
 
@@ -116,6 +121,7 @@ class SelectModelDialogInput extends InputWidget
             'id'                        => $this->id,
             'callbackEvent'             => $this->getCallbackEvent(),
             'selectUrl'                 => $this->selectUrl,
+            'closeWindow'               => (int) $this->closeWindow,
         ]);
 
     }

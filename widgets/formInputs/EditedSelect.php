@@ -36,6 +36,8 @@ class EditedSelect extends Chosen
 
     public $controllerRoute = '';
 
+    public $additionalData = [];
+
     public function init()
     {
         $this->_pjaxId = 'pjax-'  . $this->getId();
@@ -66,14 +68,14 @@ class EditedSelect extends Chosen
         echo "<div class='col-md-6'>";
 
 
-        $createUrl = (string) \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->createAction)
+        $createUrl = (string) \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->createAction, $this->additionalData)
                 ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                 ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                 ->enableAdmin()->toString();
 
-        $updateUrl =  (string) \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->updateAction)
+        $updateUrl =  (string) \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->updateAction, $this->additionalData)
                 ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                 ->enableAdmin()->toString();
 
             $create_w = \Yii::t('app','Create');

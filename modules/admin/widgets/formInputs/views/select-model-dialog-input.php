@@ -105,7 +105,11 @@ $this->registerJs(<<<JS
                 this.jQueryDeselectBtn.show();
             }
 
-            this.Window.close();
+            if (this.get('closeWindow'))
+            {
+                this.Window.close();
+            }
+
             self.trigger('change', model);
 
             return this;
