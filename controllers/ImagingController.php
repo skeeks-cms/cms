@@ -50,7 +50,7 @@ class ImagingController extends Controller
 
         if (!$extension)
         {
-            throw new \yii\base\Exception("Extension not found");
+            throw new \yii\base\Exception("Extension not found: " . $newFileSrc);
         }
 
 
@@ -61,10 +61,10 @@ class ImagingController extends Controller
 
 
         $newFile                        = File::object($newFileSrc);
-        $strposFilter                         = strpos($newFileSrc, DIRECTORY_SEPARATOR . Imaging::THUMBNAIL_PREFIX);
+        $strposFilter                   = strpos($newFileSrc, DIRECTORY_SEPARATOR . Imaging::THUMBNAIL_PREFIX);
         if (!$strposFilter)
         {
-            throw new \ErrorException("Это не thumbnail фильтр");
+            throw new \ErrorException("This is not a filter thumbnail: ". $newFileSrc);
         }
 
         $originalFileSrc                = substr($newFileSrc, 0, $strposFilter) . "." . $newFile->getExtension();
@@ -79,7 +79,7 @@ class ImagingController extends Controller
 
         if (!$originalFile->isExist())
         {
-            throw new \ErrorException("Оригинальный файл не найден");
+            throw new \ErrorException("The original file is not found: " . $newFileSrc);
         }
 
         //Проверено наличие оригинального файла, есть пути к оригиналу, и результирующему файлу.
@@ -95,13 +95,13 @@ class ImagingController extends Controller
             $pramsCheckArray = explode(DIRECTORY_SEPARATOR, $filterSting);
             if (count($pramsCheckArray) < 3)
             {
-                throw new \yii\base\Exception("Не найдена контрольная строка");
+                throw new \yii\base\Exception("the control line not found: " . $newFileSrc);
             }
 
             $string = $imaging->getParamsCheckString($params);
             if ($pramsCheckArray[1] != $string)
             {
-                throw new \yii\base\Exception("Параметры невалидны");
+                throw new \yii\base\Exception("Parameters invalid: " . $newFileSrc);
             }
         }
 
@@ -110,7 +110,7 @@ class ImagingController extends Controller
 
         if (!class_exists($filterClass))
         {
-            throw new \ErrorException("Класс фильтра не создан");
+            throw new \ErrorException("Filter class is not created: " . $newFileSrc);
         }
 
         /**
@@ -119,7 +119,7 @@ class ImagingController extends Controller
         $filter = new $filterClass((array) $params);
         if (!is_subclass_of($filter, Filter::className()))
         {
-            throw new \ErrorException("Не дочерний класс фильтра");
+            throw new \ErrorException("No child filter class: " . $newFileSrc);
         }
 
         try
