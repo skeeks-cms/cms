@@ -70,7 +70,7 @@ class AdminSettings extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['asset', 'languageCode', 'pageParamName', 'enabledPjaxPagination'], 'string'],
+            [['languageCode', 'pageParamName', 'enabledPjaxPagination'], 'string'],
             [['pageSize'], 'integer'],
             [['ckeditorCodeSnippetGeshi'], 'string'],
             [['ckeditorCodeSnippetTheme'], 'string'],
@@ -84,7 +84,7 @@ class AdminSettings extends Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'asset'                             => \Yii::t('app','Additional css and js admin area'),
+            //'asset'                             => \Yii::t('app','Additional css and js admin area'),
             'enableCustomConfirm'               => \Yii::t('app','Include stylized window confirmation (confirm)'),
             'enableCustomPromt'                 => \Yii::t('app','Include stylized window question with one field (promt)'),
             'languageCode'                      => \Yii::t('app','Interface language'),
