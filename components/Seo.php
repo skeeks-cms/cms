@@ -82,6 +82,12 @@ class Seo extends Component
     public $robotsContent           = "User-agent: *";
 
 
+    /**
+     * @var string
+     */
+    public $countersContent         = ""; //Содержимое счетчиков
+
+
     public $useLastDelimetrContentElements              = false;
 
 
@@ -107,6 +113,7 @@ class Seo extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['enableKeywordsGenerator', 'minKeywordLenth', 'maxKeywordsLength'], 'integer'],
             ['robotsContent', 'string'],
+            ['countersContent', 'string'],
             ['useLastDelimetrContentElements', 'boolean'],
             ['useLastDelimetrTree', 'boolean'],
         ]);
@@ -119,6 +126,7 @@ class Seo extends Component
             'minKeywordLenth'                        => 'Минимальная длина ключевого слова',
             'maxKeywordsLength'                      => 'Длинна ключевых слов',
             'robotsContent'                          => 'Robots.txt файл',
+            'countersContent'                        => 'Коды счетчиков',
             'useLastDelimetrContentElements'         => 'Использовать слэш на конце адресов страниц элементов контента',
             'useLastDelimetrTree'                    => 'Использовать слэш на конце адресов страниц разделов',
         ]);

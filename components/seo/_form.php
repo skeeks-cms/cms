@@ -34,6 +34,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->field($model, 'robotsContent')->textarea(['rows' => 7])->hint('Это значение будет добавлено в автоматически сгенерированный файл robots.txt, в том случае если его не будет физически создано на сервере.'); ?>
 <?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet('Коды счетчиков'); ?>
+    <?= $form->field($model, 'countersContent')->textarea(['rows' => 20]); ?>
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->fieldSet('Адресация страниц'); ?>
     <?= $form->field($model, 'useLastDelimetrTree')->radioList(\Yii::$app->formatter->booleanFormat)->hint(''); ?>
     <?= $form->field($model, 'useLastDelimetrContentElements')->radioList(\Yii::$app->formatter->booleanFormat)->hint(''); ?>
