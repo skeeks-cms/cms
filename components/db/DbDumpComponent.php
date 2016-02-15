@@ -10,6 +10,7 @@ use skeeks\cms\helpers\db\DbDsnHelper;
 use skeeks\sx\Dir;
 use yii\base\Component;
 use yii\db\Connection;
+use yii\helpers\FileHelper;
 
 /**
  * @property Dir    $backupDir
@@ -80,6 +81,35 @@ class DbDumpComponent extends Component
         $cmd = "mysqldump -h{$dsn->host} -u {$dsn->username} -p'{$dsn->password}' {$dsn->dbname} > {$filePath}";
 
         \Yii::$app->console->execute($cmd);
+    }
+
+    /**
+     * @return string
+     */
+    public function firstDumpRestore()
+    {
+        if (!$this->backupDir->isExist())
+        {
+            throw new \InvalidArgumentException("Бэкап файлов не найдено" . $this->backupDir->getPath());
+        }
+
+        if (!$files = FileHelper::findFiles($this->backupDir->getPath()))
+        {
+            throw new \InvalidArgumentException("Бэкап файлов не найдено");
+        }
+
+        $filePath = $files[0];
+
+        $dsn = new DbDsnHelper($this->connection);
+        $cmd = "mysql -h{$dsn->host} -u{$dsn->username} -p'{$dsn->password}' {$dsn->dbname} < {$filePath}";
+
+        echo $cmd;
+        \Yii::$app->console->execute($cmd);
+
+        //Установка недостающих миграций
+        \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
+
+        \Yii::$app->db->schema->refresh();
     }
 
     /**

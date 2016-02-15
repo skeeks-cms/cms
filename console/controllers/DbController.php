@@ -47,10 +47,17 @@ class DbController extends Controller
     /**
      * Установить базу данных из бэкап файла
      */
+    public function actionFirstDumpRestore()
+    {
+        \Yii::$app->dbDump->firstDumpRestore();
+    }
+
+    /**
+     * Установить базу данных из бэкап файла
+     */
     public function actionDumpRestore($fileName)
     {
         \Yii::$app->dbDump->dumpRestore($fileName);
-
     }
 
     /**
