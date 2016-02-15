@@ -62,13 +62,13 @@ class UpdateController extends Controller
      * @var string
      * Версия композера, последняя стабильная
      */
-    public $composerVersion = "1.0.0-alpha10";
+    public $composerVersion = "1.0.0-alpha11";
 
     /**
      * @var string
      * Версия композер assets, последняя стабильная
      */
-    public $composerAssetPluginV = "1.0.3";
+    public $composerAssetPluginV = "1.1.1";
 
 
     /**
@@ -102,9 +102,9 @@ class UpdateController extends Controller
         $this->systemCmdRoot("rm -f composer.lock");
 
         //Проверка версии композера, его установка если нет
-        $this->systemCmdRoot("php yii cms/composer/self-update " . ($this->noInteraction ? "--noInteraction":"" ));
+        $this->systemCmdRoot("php yii cms/composer/self-update " . $this->composerVersion . " " . ($this->noInteraction ? "--noInteraction":"" ));
         //Обновление asset plugins composer
-        $this->systemCmdRoot("php yii cms/composer/update-asset-plugins " . ($this->noInteraction ? "--noInteraction":"" ));
+        $this->systemCmdRoot("php yii cms/composer/update-asset-plugins " . $this->composerAssetPluginV . " " . ($this->noInteraction ? "--noInteraction":"" ));
 
         if ($this->revertModified)
         {
@@ -152,7 +152,7 @@ class UpdateController extends Controller
         $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar update ' . implode(" ", $options) );
 
         //Генерация файла со списком модулей
-        \Yii::$app->cms->generateModulesConfigFile();
+        $this->systemCmdRoot("php yii cms/update/generate-config-files");
 
         //Установка всех миграций
         $this->systemCmdRoot("php yii cms/db/apply-migrations");
@@ -160,9 +160,11 @@ class UpdateController extends Controller
         //Чистка временных диррикторий
         $this->systemCmdRoot("php yii cms/utils/clear-runtimes");
 
+        //Чистка asset файлов
+        $this->systemCmdRoot("php yii cms/utils/clear-assets");
 
         //Сброс кэша стрктуры базы данных
-        \Yii::$app->db->getSchema()->refresh();
+        $this->systemCmdRoot("php yii cms/db/db-refresh");
 
         //Обновление привилегий
         $this->systemCmdRoot("php yii cms/rbac/init");
@@ -171,6 +173,10 @@ class UpdateController extends Controller
         $this->systemCmdRoot("php yii cms/utils/trigger-after-update");
     }
 
+    public function actionGenerateConfigFiles()
+    {
+        \Yii::$app->cms->generateModulesConfigFile();
+    }
 
     /**
      * Установка пакета
