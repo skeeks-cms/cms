@@ -131,7 +131,6 @@ class UpdateController extends Controller
         }*/
 
 
-
         $options = [];
 
         if ($this->optimize)
