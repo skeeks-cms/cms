@@ -166,7 +166,7 @@ abstract class AdminController extends Controller
         }
 
         //TODO: Добавить возможность настройки
-        \Yii::$app->view->theme = new Theme([
+        /*\Yii::$app->view->theme = new Theme([
             'pathMap' =>
             [
                 '@app/views' =>
@@ -174,7 +174,7 @@ abstract class AdminController extends Controller
                     '@skeeks/cms/modules/admin/views',
                 ]
             ]
-        ]);
+        ]);*/
 
         $this->layout = \Yii::$app->cms->moduleAdmin->layout;
 
