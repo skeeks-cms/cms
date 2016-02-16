@@ -930,5 +930,6 @@ return
     "The ability to edit settings" => "Возможность управять настройками",
 
     "Choose" => "Выбрать",
+    "Dashboards" => "Рабочие столы",
 
 ];

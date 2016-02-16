@@ -19,6 +19,7 @@ use Yii;
  * @property string $columns_settings
  *
  * @property CmsUser $cmsUser
+ * @property CmsDashboardWidget[] $cmsDashboardWidgets
  */
 class CmsDashboard extends \skeeks\cms\models\Core
 {
@@ -71,5 +72,13 @@ class CmsDashboard extends \skeeks\cms\models\Core
     public function getCmsUser()
     {
         return $this->hasOne(CmsUser::className(), ['id' => 'cms_user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsDashboardWidgets()
+    {
+        return $this->hasMany(CmsDashboardWidget::className(), ['cms_dashboard_id' => 'id']);
     }
 }

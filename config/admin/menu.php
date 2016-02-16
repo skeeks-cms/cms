@@ -127,18 +127,40 @@ function componentsMenu()
 
 return
 [
-    'content' =>
+    'dashboard' =>
     [
         'priority'  => 0,
+        'label'     => \Yii::t('app','Dashboards'),
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png'],
+
+        'items' => array_merge([
+
+            [
+                "label"     => \Yii::t('app', "Рабочий стол 1"),
+                "url"       => ["admin/index"],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png']
+            ],
+
+            [
+                "label"     => \Yii::t('app', "Создать стол"),
+                "url"       => ["cms/admin-dashboard/create"],
+            ],
+
+        ])
+    ],
+
+    'content' =>
+    [
+        'priority'  => 5,
         'label'     => \Yii::t('app','Content'),
-        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/sections.png'],
 
         'items' => array_merge([
 
             [
                 "label"     => \Yii::t('app',"Sections"),
                 "url"       => ["cms/admin-tree"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/sections.png']
             ],
 
             [
@@ -161,14 +183,14 @@ return
     [
         'priority'  => 10,
         'label'     => \Yii::t('app','Settings'),
-        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
 
         'items' =>
         [
 
             [
                 "label"     => \Yii::t('app',"Product settings"),
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
 
                 'items' =>
                 [
@@ -220,7 +242,7 @@ return
                     [
                         "label"     => \Yii::t('app',"Module settings"),
                         "url"       => ["cms/admin-settings"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
                         'items'     => componentsMenu()
                     ],
 
@@ -251,7 +273,7 @@ return
                     [
                         "label"     => \Yii::t('app',"User properties"),
                         "url"       => ["cms/admin-cms-user-universal-property"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png']
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png']
                     ],
 
                     [
@@ -302,7 +324,7 @@ return
                     [
                         "label" => \Yii::t('app',"Settings"),
                         "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\components\CmsSearchComponent'],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
                         "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
                         {
                             return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());

@@ -16,7 +16,52 @@
 
         _onDomReady: function()
         {
+            this.initHeadMenu();
+            this.initMenu();
+        },
 
+        initHeadMenu: function()
+        {
+            var self = this;
+
+            $('.sidebar-menu .sx-head').on('click', function()
+            {
+                var Block = $(this).parent();
+                if (Block.hasClass('sx-opened'))
+                {
+                    self._closeSxHead(Block);
+                } else
+                {
+                    self._openSxHead(Block);
+                }
+            });
+        },
+
+        _openSxHead: function(jQuery)
+        {
+            //Закрыть все остальные
+            var self = this;
+            $('.sidebar-menu.sx-opened').each(function()
+            {
+                self._closeSxHead($(this));
+            });
+
+            jQuery.children('ul').slideDown("fast", function()
+            {
+                jQuery.addClass('sx-opened');
+            });
+        },
+
+        _closeSxHead: function(jQuery)
+        {
+            jQuery.children('ul').slideUp("fast", function()
+            {
+                jQuery.removeClass('sx-opened');
+            });
+        },
+
+        initMenu: function()
+        {
             $(".nav-sidebar>li>a").on("click", function(types) {
                 if ($.ajaxLoad) {
                   types.preventDefault();
@@ -62,16 +107,9 @@
                 }
               });
 
-                //$("li.active", $("ul.nav-sidebar")).parent().parent().children('a').click();
-                var jQueryLi = $("li.active", $("ul.nav-sidebar")).parent().parent('li');
-                jQueryLi.addClass('opened');
-                jQueryLi.find("ul").slideDown();
-
-
-
-              //dropSidebarShadow();
-              //$(".sidebar").mmenu();
-
+            var jQueryLi = $("li.active", $("ul.nav-sidebar")).parent().parent('li');
+            jQueryLi.addClass('opened');
+            jQueryLi.children("ul").slideDown();
         }
 
     });

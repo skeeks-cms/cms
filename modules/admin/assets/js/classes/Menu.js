@@ -17,7 +17,6 @@
         _init: function()
         {
             this.getCookieManager().setNamespace('admin-menu');
-
         },
 
         _onDomReady: function()

@@ -1,5 +1,5 @@
 /**
-* Перекрытие некоторых стилей
+* Overlap some basic styles
 */
 html
 {
@@ -20,7 +20,7 @@ body
     padding-top: 4px;
 }
 
-iframe{
+iframe {
     border: 0px;
 }
 
@@ -63,6 +63,8 @@ body.sidebar-hidden .main
 {
     margin-right: 0px;
 }
+
+
 footer.sx-admin-footer
 {
     width: 100%;
@@ -225,12 +227,13 @@ body.empty .sx-panel
 
         .sx-panel .breadcrumb>.active
         {
-            color: #ffffff;
+            color: #E8E6E6;
         }
 
         .sx-panel .breadcrumb li
         {
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
+            font-size: 15px;
         }
         .sx-panel .breadcrumb li a
         {
@@ -289,7 +292,7 @@ body.empty .sx-panel
 
 
 
-    /**
+/**
 * Доработка слайдбара
 */
 .sidebar .sidebar-footer {
@@ -355,7 +358,7 @@ body.empty .sx-panel
             font-weight: bold;
             padding: 5px 0px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
-            font-size: 14px;
+            font-size: 16px;
         }
 
             .sx-sidebar .sidebar-menu .sx-head .icon
@@ -375,8 +378,21 @@ body.empty .sx-panel
 
                 .sx-sidebar .sidebar-menu .sx-head .sx-icon img
                 {
-                    max-width: 20px;
-                    max-height: 16px;
+                    max-width: 30px;
+                    max-height: 30px;
+                    min-height: 30px;
+                    min-width: 30px;
+                }
+
+
+                .sx-sidebar .sidebar-menu>ul.nav.nav-sidebar
+                {
+                    display: none;
+                }
+
+                .sx-sidebar .sidebar-menu.sx-opened>ul.nav.nav-sidebar
+                {
+                    display: block;
                 }
 
         .sidebar ul.nav.nav-sidebar li a i
