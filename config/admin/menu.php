@@ -129,7 +129,7 @@ return
 [
     'dashboard' =>
     [
-        'priority'  => 0,
+        'priority'  => 100,
         'label'     => \Yii::t('app','Dashboards'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png'],
 
@@ -151,7 +151,7 @@ return
 
     'content' =>
     [
-        'priority'  => 5,
+        'priority'  => 200,
         'label'     => \Yii::t('app','Content'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/sections.png'],
 
@@ -181,7 +181,7 @@ return
 
     'settings' =>
     [
-        'priority'  => 10,
+        'priority'  => 300,
         'label'     => \Yii::t('app','Settings'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
 
@@ -435,7 +435,7 @@ return
 
     'marketplace' =>
     [
-        'priority'  => 20,
+        'priority'  => 400,
         'label'     => \Yii::t('app','Marketplace'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png'],
 
@@ -471,7 +471,7 @@ return
 
     'other' =>
     [
-        'priority'  => 100,
+        'priority'  => 500,
         'label'     => \Yii::t('app','Additionally'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/other.png'],
 
