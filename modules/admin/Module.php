@@ -37,7 +37,7 @@ class Module extends CmsModule
      * Используем свой layout
      * @var string
      */
-    public $layout ='@skeeks/cms/modules/admin/views/layouts/main.php';
+    public $layout = '@skeeks/cms/modules/admin/views/layouts/main';
 
     /**
      * @return array

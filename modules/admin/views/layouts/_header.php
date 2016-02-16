@@ -66,7 +66,7 @@ $this->registerJs(<<<JS
 JS
 );
 ?>
-
+<div class="navbar sx-navbar" role="navigation">
 <? if (!\Yii::$app->user->isGuest): ?>
     <ul class="nav navbar-nav navbar-actions navbar-left">
         <li class="visible-md visible-lg visible-sm visible-xs">
@@ -144,3 +144,4 @@ JS
 
     <? endif; ?>
 </ul>
+</div>

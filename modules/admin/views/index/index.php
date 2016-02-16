@@ -10,12 +10,11 @@ $freeSpace  = (float) disk_free_space("/");
 $totalSpace = (float) disk_total_space("/");
 $usedSpace = $totalSpace - $freeSpace;
 
-
-
 $freeSpacePercent = ($freeSpace * 100) / $totalSpace;
 $usedSpacePercent = 100 - $freeSpacePercent;
 
 ?>
+
 <div class="site-index">
 
     <?=
@@ -50,6 +49,7 @@ $usedSpacePercent = 100 - $freeSpacePercent;
     </ul>
 
 <hr />
+    <div class="col-md-12">
         <h2><?= \Yii::t('app','Read more')?></h2>
         <p><?= \Yii::t('app','Total at server')?>: <?= Yii::$app->formatter->asShortSize($totalSpace); ?></p>
         <p><?= \Yii::t('app','Used')?>: <?= Yii::$app->formatter->asShortSize($usedSpace); ?></p>
@@ -94,5 +94,6 @@ $usedSpacePercent = 100 - $freeSpacePercent;
 
         ?>
 
+    </div>
     </div>
 </div>

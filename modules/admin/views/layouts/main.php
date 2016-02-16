@@ -17,146 +17,95 @@ AdminAsset::register($this);
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
-<head>
-    <meta charset="<?= Yii::$app->charset ?>"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?= Html::csrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
-    <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
-    <?php $this->head() ?>
-</head>
-<body class="<?= \Yii::$app->user->isGuest ? "sidebar-hidden" : ""?> <?= \Yii::$app->admin->isEmptyLayout() ? "empty" : ""?>">
-
-
+    <head>
+        <meta charset="<?= Yii::$app->charset ?>"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <?= Html::csrfMetaTags() ?>
+        <title><?= Html::encode($this->title) ?></title>
+        <link rel="icon" href="http://skeeks.com/favicon.ico"  type="image/x-icon" />
+        <?php $this->head() ?>
+    </head>
+    <body class="<?= \Yii::$app->user->isGuest ? "sidebar-hidden" : ""?> <?= \Yii::$app->admin->isEmptyLayout() ? "empty" : ""?>">
 <?php $this->beginBody() ?>
-<div class="navbar sx-navbar" role="navigation">
     <?= $this->render('_header'); ?>
-</div>
-
-<? if (!\Yii::$app->user->isGuest): ?>
-
-<!-- start: Main Menu -->
-<div class="sidebar sx-sidebar">
-
-    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="<?=\Yii::t('app','Close menu')?>">
-        <i class="glyphicon glyphicon-menu-left"></i>
-    </a>
-
-    <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-closed" data-sx-widget="tooltip-r" data-original-title="<?=\Yii::t('app','Open menu')?>">
-        <i class="glyphicon glyphicon-menu-right"></i>
-    </a>
-
-    <div class="inner-wrapper scrollbar-macosx">
-        <div class="sidebar-collapse sx-sidebar-collapse">
-
-            <?= $this->render('_admin-menu'); ?>
-
-        </div>
-    </div>
-</div>
-<!-- end: Main Menu -->
-<? endif; ?>
-
-
-
-<div class="main">
-    <div class="col-lg-12">
-        <div class="panel panel-primary sx-panel sx-panel-content">
-            <div class="panel-heading sx-no-icon">
-                <div class="pull-left">
-                    <h2>
-                        <?= Breadcrumbs::widget([
-                            'homeLink' => ['label' => \Yii::t("yii", "Home"), 'url' =>
-                                UrlHelper::construct('admin/index')->enableAdmin()->toString()
-                            ],
-                            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-                        ]) ?>
-                    </h2>
-                </div>
-                <div class="panel-actions">
-
-                    <? if (\Yii::$app->user->can('admin/admin-role') && \Yii::$app->controller instanceof \skeeks\cms\modules\admin\controllers\AdminController) : ?>
-
-                        <a href="#sx-permissions-for-controller" class="sx-fancybox">
-                            <i class="glyphicon glyphicon-exclamation-sign" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Setting up access to this section')?>" style="color: white;"></i>
-                        </a>
-
-                        <div style="display: none;">
-                            <div id="sx-permissions-for-controller" style="min-height: 300px;">
-
-                                <?
-                                $adminPermission = \Yii::$app->authManager->getPermission(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS);
-                                $items = [];
-                                foreach (\Yii::$app->authManager->getRoles() as $role)
-                                {
-                                    if (\Yii::$app->authManager->hasChild($role, $adminPermission))
-                                    {
-                                        $items[] = $role;
-                                    }
-                                }
-                                ?>
-                                <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
-                                    'permissionName'        => \Yii::$app->controller->permissionName,
-                                    'permissionDescription' => \Yii::t('app','Administration')." | " . \Yii::$app->controller->name,
-                                    'label'                 => \Yii::t('app','Setting up access to the section').": " . \Yii::$app->controller->name,
-                                    'items'                 => \yii\helpers\ArrayHelper::map($items, 'name', 'description'),
-                                ]); ?>
-                                <?=\Yii::t('app','Specify which groups of users will have access.')?>
-                                <hr />
-                                <? \yii\bootstrap\Alert::begin([
-                                    'options' => [
-                                      'class' => 'alert-info',
+    <? if (!\Yii::$app->user->isGuest): ?>
+        <?= $this->render('_admin-menu'); ?>
+    <? endif; ?>
+        <div class="main">
+            <div class="col-lg-12">
+                <div class="panel panel-primary sx-panel sx-panel-content">
+                    <div class="panel-heading sx-no-icon">
+                        <div class="pull-left">
+                            <h2>
+                                <?= Breadcrumbs::widget([
+                                    'homeLink' => ['label' => \Yii::t("yii", "Home"), 'url' =>
+                                        UrlHelper::construct('admin/index')->enableAdmin()->toString()
                                     ],
-                                ])?>
-                                    <p><?=\Yii::t('app','Code privileges')?>: <b><?= \Yii::$app->controller->permissionName; ?></b></p>
-                                    <p><?=\Yii::t('app','The list displays only those groups that have access to the system administration.')?></p>
-                                <? \yii\bootstrap\Alert::end()?>
-                            </div>
+                                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+                                ]) ?>
+                            </h2>
                         </div>
+                        <div class="panel-actions">
 
-                    <? endif; ?>
+                            <? if (\Yii::$app->user->can('admin/admin-role') && \Yii::$app->controller instanceof \skeeks\cms\modules\admin\controllers\AdminController) : ?>
 
-                </div>
-            </div><!-- End .panel-heading -->
-            <div class="panel-body">
-                    <div class="panel-content-before">
-                        <? if (!UrlHelper::constructCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL)) : ?>
-                            <?= \yii\helpers\ArrayHelper::getValue($this->params, 'actions'); ?>
-                        <? endif; ?>
-                        <?/*= Alert::widget() */?>
+                                <a href="#sx-permissions-for-controller" class="sx-fancybox">
+                                    <i class="glyphicon glyphicon-exclamation-sign" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Setting up access to this section')?>" style="color: white;"></i>
+                                </a>
+
+                                <div style="display: none;">
+                                    <div id="sx-permissions-for-controller" style="min-height: 300px;">
+
+                                        <?
+                                        $adminPermission = \Yii::$app->authManager->getPermission(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS);
+                                        $items = [];
+                                        foreach (\Yii::$app->authManager->getRoles() as $role)
+                                        {
+                                            if (\Yii::$app->authManager->hasChild($role, $adminPermission))
+                                            {
+                                                $items[] = $role;
+                                            }
+                                        }
+                                        ?>
+                                        <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+                                            'permissionName'        => \Yii::$app->controller->permissionName,
+                                            'permissionDescription' => \Yii::t('app','Administration')." | " . \Yii::$app->controller->name,
+                                            'label'                 => \Yii::t('app','Setting up access to the section').": " . \Yii::$app->controller->name,
+                                            'items'                 => \yii\helpers\ArrayHelper::map($items, 'name', 'description'),
+                                        ]); ?>
+                                        <?=\Yii::t('app','Specify which groups of users will have access.')?>
+                                        <hr />
+                                        <? \yii\bootstrap\Alert::begin([
+                                            'options' => [
+                                              'class' => 'alert-info',
+                                            ],
+                                        ])?>
+                                            <p><?=\Yii::t('app','Code privileges')?>: <b><?= \Yii::$app->controller->permissionName; ?></b></p>
+                                            <p><?=\Yii::t('app','The list displays only those groups that have access to the system administration.')?></p>
+                                        <? \yii\bootstrap\Alert::end()?>
+                                    </div>
+                                </div>
+
+                            <? endif; ?>
+
+                        </div>
                     </div>
-                    <div class="panel-content sx-unblock-onWindowReady">
-                        <!--<div class="sx-show-onWindowReady">-->
+                    <div class="panel-body">
+                        <div class="panel-content-before">
+                            <? if (!UrlHelper::constructCurrent()->getSystem(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL)) : ?>
+                                <?= \yii\helpers\ArrayHelper::getValue($this->params, 'actions'); ?>
+                            <? endif; ?>
+                        </div>
+                        <div class="panel-content sx-unblock-onWindowReady">
                             <?= \skeeks\cms\modules\admin\widgets\Alert::widget(); ?>
                             <?= $content ?>
-                        <!--</div>-->
-                    </div><!-- End .panel-body -->
-            </div><!-- End .panel-body -->
-        </div><!-- End .widget -->
-
-    </div><!-- End .col-lg-12  -->
-
-
-</div>
-
-<footer class="sx-admin-footer">
-    <div class="row">
-        <div class="col-sm-5">
-            <div class="sx-footer-copyright">
-                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site {cms}',['cms' => 'SkeekS CMS'])?>">
-                    <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
-                </a>
-                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site of the developer')?>">SkeekS.com</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div><!--/.col-->
-        <div class="col-sm-7 text-right">
-
-        </div><!--/.col-->
-    </div><!--/.row-->
-</footer>
-
-    <?php $this->endBody() ?>
-
-</body>
+        </div>
+        <?php echo $this->render('_footer'); ?>
+        <?php $this->endBody() ?>
+    </body>
 </html>
 <?php $this->endPage() ?>
