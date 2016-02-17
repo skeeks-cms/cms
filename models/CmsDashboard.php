@@ -44,6 +44,7 @@ class CmsDashboard extends \skeeks\cms\models\Core
 
             [['priority'], 'default', 'value' => 100],
             [['columns'], 'default', 'value' => 1],
+            [['columns'], 'integer', 'max' => 6, 'min' => 1],
         ];
     }
 
@@ -61,7 +62,7 @@ class CmsDashboard extends \skeeks\cms\models\Core
             'name' => Yii::t('app', 'Name'),
             'cms_user_id' => Yii::t('app', 'Cms User ID'),
             'priority' => Yii::t('app', 'Priority'),
-            'columns' => Yii::t('app', 'Columns'),
+            'columns' => Yii::t('app', 'Количество колонок'),
             'columns_settings' => Yii::t('app', 'Columns Settings'),
         ];
     }
@@ -81,4 +82,5 @@ class CmsDashboard extends \skeeks\cms\models\Core
     {
         return $this->hasMany(CmsDashboardWidget::className(), ['cms_dashboard_id' => 'id']);
     }
+
 }

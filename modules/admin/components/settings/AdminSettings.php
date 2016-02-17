@@ -7,6 +7,8 @@
  */
 namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
+use skeeks\cms\base\Widget;
+use skeeks\cms\cmsWidgets\admin\base\AdminBaseWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsLang;
@@ -17,6 +19,8 @@ use yii\web\View;
 
 /**
  * @property CmsLang $cmsLanguage
+ * @property [] $dasboardWidgets
+ * @property [] $dasboardWidgetsLabels
  *
  * Class AdminSettings
  * @package skeeks\cms\modules\admin\components\settings
@@ -35,6 +39,8 @@ class AdminSettings extends Component
     }
 
     public $asset;
+
+    public $userDashboardWidgets = [];
 
     //Всплывающие окошки
     public $enableCustomConfirm     = Cms::BOOL_Y;
@@ -58,6 +64,47 @@ class AdminSettings extends Component
 
 
     public $blockedTime                 = 900; //15 минут
+
+
+    /**
+     * @return array
+     */
+    public function getDasboardWidgets()
+    {
+        $baseWidgets = [
+            AdminBaseWidget::className()
+        ];
+
+        $widgets = ArrayHelper::merge($baseWidgets, $this->userDashboardWidgets);
+
+        $result = [];
+        foreach ($widgets as $key => $classWidget)
+        {
+            if (class_exists($classWidget) && is_subclass_of($classWidget, Widget::className()))
+            {
+                $result[$classWidget] = $classWidget;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDasboardWidgetsLabels()
+    {
+        $result = [];
+        if ($this->dasboardWidgets)
+        {
+            foreach ($this->dasboardWidgets as $widgetClassName)
+            {
+                $result[$widgetClassName] = (new $widgetClassName)->descriptor->name;
+            }
+        }
+
+        return $result;
+    }
 
 
     public function init()

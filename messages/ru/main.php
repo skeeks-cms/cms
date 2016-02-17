@@ -931,5 +931,6 @@ return
 
     "Choose" => "Выбрать",
     "Dashboards" => "Рабочие столы",
+    "Dashboard" => "Рабочий стол",
 
 ];

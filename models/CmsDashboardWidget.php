@@ -20,6 +20,10 @@ use yii\helpers\ArrayHelper;
  * @property integer $priority
  * @property string $component
  * @property string $component_settings
+ * @property string $cms_dashboard_column
+ *
+ *
+ * @property string $name
  *
  * @property CmsDashboard $cmsDashboard
  *
@@ -54,9 +58,12 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_dashboard_id', 'priority'], 'integer'],
             [['cms_dashboard_id', 'component'], 'required'],
-            [['component_settings'], 'string'],
+            [['component_settings'], 'safe'],
             [['component'], 'string', 'max' => 255],
 
+            [['componentSettingsString'], 'string'],
+            [['cms_dashboard_column'], 'integer', 'max' => 6, 'min' => 1],
+            [['cms_dashboard_column'], 'default', 'value' => 1],
             [['priority'], 'default', 'value' => 100],
         ];
     }
@@ -76,7 +83,27 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
             'priority' => Yii::t('app', 'Priority'),
             'component' => Yii::t('app', 'Component'),
             'component_settings' => Yii::t('app', 'Component Settings'),
+            'cms_dashboard_column' => Yii::t('app', 'cms_dashboard_column'),
         ];
+    }
+
+
+    protected $_componentSettingsString = "";
+    /**
+     * @return string
+     */
+    public function getComponentSettingsString()
+    {
+        return \skeeks\cms\helpers\StringHelper::base64EncodeUrl(serialize((array) $this->component_settings));
+    }
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setComponentSettingsString($value)
+    {
+        $this->component_settings = unserialize(\skeeks\cms\helpers\StringHelper::base64DecodeUrl($value));
+        return $this;
     }
 
     /**
@@ -107,5 +134,21 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        if ($this->widget)
+        {
+            if ($this->widget->getAttributes(['name']))
+            {
+                return (string) $this->widget->name;
+            }
+        }
+
+        return '';
     }
 }

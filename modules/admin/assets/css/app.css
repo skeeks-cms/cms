@@ -30,16 +30,42 @@ iframe {
     max-height: 20px;
 }
 
+
+
 .main {
     /*padding: 70px 30px 40px 280px;*/
-    padding: 60px 0px 40px 270px;
+    padding: 50px 0px 40px 270px;
     background: none;
+}
+
+.main:after
+{
+    clear: both;
+    display: table;
+    content: " ";
+}
+.main:before
+{
+    content: " ";
+    display: table;
+}
+
+    .main .sx-main-body
+    {
+        margin-top: 10px;
+    }
+
+@media (max-width: 767px)
+{
+    .main
+    {
+        padding: 50px 0px 0 24px!important;
+    }
 }
 
 body.sidebar-hidden .main
 {
-    /*padding: 70px 30px 40px 30px;*/
-    padding: 60px 0px 40px 26px;
+    padding: 50px 0px 0px 26px;
 }
 
 .navbar-brand:hover i
@@ -153,12 +179,12 @@ body.sidebar-hidden footer.sx-admin-footer
         padding: 0;
     }
 
-        body.empty .main>.col-lg-12
+        body.empty .main>.sx-main-body
         {
             margin: 0;
             padding: 0;
         }
-            body.empty .main>.col-lg-12>.sx-panel
+            body.empty .main>.sx-main-body>.sx-panel
             {
                 margin: 0;
             }
@@ -207,13 +233,19 @@ form.sx-form-admin
 body.empty .sx-panel
 {
     box-shadow: none;
-    margin-bottom: 60px;
+    margin-bottom: 15px;
 }
 
 .sx-panel
 {
-    box-shadow: 1px 7px 16px rgba(0, 0, 0, 0.42);
-    margin-bottom: 60px;
+    /*box-shadow: 1px 7px 16px rgba(0, 0, 0, 0.42);*/
+    box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.42);
+    margin-bottom: 15px;
+}
+.sx-panel:hover
+{
+    box-shadow: 1px 1px 8px 1px rgba(32, 168, 216, 0.69);
+    /*box-shadow: 1px 5px 9px rgba(32, 168, 216, 0.69);*/
 }
 
     .sx-panel .breadcrumb
@@ -262,14 +294,15 @@ body.empty .sx-panel
 
 
 
-    .sx-panel.panel-default > .panel-heading > h2
+    .sx-panel.panel-default > .panel-heading h2
     {
         color: black;
     }
 
-    .sx-panel.panel-primary > .panel-heading > h2
+    .sx-panel.panel-primary > .panel-heading h2
     {
         color: white;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
     }
 
     .sx-panel .panel-body
@@ -299,16 +332,19 @@ body.empty .sx-panel
     height: 43px;
 }
 
-
 .sx-sidebar
 {
-    background: rgba(208, 208, 208, 0.32);
     padding-left: 10px;
     z-index: 1;
     width: 270px;
 }
 
-.sx-sidebar:hover
+.sx-bg-glass
+{
+    background: rgba(208, 208, 208, 0.32);
+}
+
+.sx-bg-glass-hover:hover
 {
     background: rgba(208, 208, 208, 0.5);
 }
@@ -451,7 +487,9 @@ body.empty .sx-panel
                 {
                     /*font-size: 11px;*/
                     /* SkeekS CMS 2.3.5 */
-                    font-size: 12px;
+                    /*font-size: 12px;*/
+                    /* SkeekS CMS 2.4.8 */
+                    font-size: 13px;
                 }
 
 

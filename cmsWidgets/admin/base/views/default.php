@@ -1,30 +1,24 @@
 <?php
+/**
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 17.02.2016
+ */
 /* @var $this yii\web\View */
 
-$this->title = \Yii::t('app','The site managment system');
-use yii\bootstrap\Alert;
+?>
 
-
-
+<?
 $freeSpace  = (float) disk_free_space("/");
 $totalSpace = (float) disk_total_space("/");
 $usedSpace = $totalSpace - $freeSpace;
 
 $freeSpacePercent = ($freeSpace * 100) / $totalSpace;
 $usedSpacePercent = 100 - $freeSpacePercent;
-
 ?>
 
 <div class="site-index">
-
-    <?=
-        Alert::widget([
-            'options' => [
-              'class' => 'alert-info',
-          ],
-          'body' => \yii\helpers\Html::tag("div", \Yii::t('app','Welcome! You are in the site management system.')),
-        ]);
-    ?>
 
     <div class="body-content">
 
@@ -39,23 +33,19 @@ $usedSpacePercent = 100 - $freeSpacePercent;
                     </div>
                 </div>
             </li>
-
         <li>
             <i class="icon-users"></i>
             <div class="number"><a href="<?= \skeeks\cms\helpers\UrlHelper::construct('/cms/admin-user')->enableAdmin()->toString(); ?>"><?= \skeeks\cms\models\User::find()->count(); ?></a></div>
             <div class="title"><?=\Yii::t('app','Number of users')?></div>
-
         </li>
     </ul>
-
-<hr />
+    <hr />
     <div class="col-md-12">
         <h2><?= \Yii::t('app','Read more')?></h2>
         <p><?= \Yii::t('app','Total at server')?>: <?= Yii::$app->formatter->asShortSize($totalSpace); ?></p>
         <p><?= \Yii::t('app','Used')?>: <?= Yii::$app->formatter->asShortSize($usedSpace); ?></p>
         <p><?= \Yii::t('app','Free')?>: <?= Yii::$app->formatter->asShortSize($freeSpace); ?></p>
         <?
-
         $baseOptions =
         [
           'title' => ['text' => \Yii::t('app','At percent ratio')],
@@ -97,3 +87,5 @@ $usedSpacePercent = 100 - $freeSpacePercent;
     </div>
     </div>
 </div>
+
+

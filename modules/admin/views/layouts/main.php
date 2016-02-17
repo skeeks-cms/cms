@@ -32,7 +32,7 @@ AdminAsset::register($this);
         <?= $this->render('_admin-menu'); ?>
     <? endif; ?>
         <div class="main">
-            <div class="col-lg-12">
+            <div class="col-lg-12 sx-main-body">
                 <div class="panel panel-primary sx-panel sx-panel-content">
                     <div class="panel-heading sx-no-icon">
                         <div class="pull-left">

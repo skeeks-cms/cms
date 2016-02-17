@@ -56,6 +56,8 @@ class Module extends CmsModule
     {
         parent::init();
 
+        \Yii::setAlias('@admin/views', $this->viewPath);
+
         if ($this->requestIsAdmin())
         {
             if (!$this->noImage)

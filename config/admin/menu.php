@@ -34,7 +34,7 @@ function contentMenu()
                     $itemData['items'][] =
                     [
                         'label' => $content->name,
-                        'url'   => ["cms/admin-cms-content-element/index", "content_id" => $content->id, "content_type" => $contentType->code],
+                        'url'   => ["cms/admin-cms-content-element", "content_id" => $content->id],
 
                     ];
                 }
@@ -42,6 +42,46 @@ function contentMenu()
 
             $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
         }
+    }
+
+    return $result;
+};
+
+
+/**
+ * Меню контента
+ * @return array
+ */
+function dashboardsMenu()
+{
+    $result = [];
+
+    if ($dashboards = \skeeks\cms\models\CmsDashboard::find()->orderBy("priority ASC")->all())
+    {
+        /**
+         * @var $dashboard \skeeks\cms\models\CmsDashboard
+         */
+        foreach ($dashboards as $dashboard)
+        {
+            $itemData = [
+                'label'     => $dashboard->name,
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png'],
+                'url'       => ["admin/index/dashboard", "pk" => $dashboard->id],
+                "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                {
+                    return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                },
+            ];
+
+            $result[] = $itemData;
+        }
+    } else
+    {
+        $result[] = [
+            "label"     => \Yii::t('app', "Рабочий стол 1"),
+            "url"       => ["admin/index"],
+            "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png']
+        ];
     }
 
     return $result;
@@ -133,20 +173,7 @@ return
         'label'     => \Yii::t('app','Dashboards'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png'],
 
-        'items' => array_merge([
-
-            [
-                "label"     => \Yii::t('app', "Рабочий стол 1"),
-                "url"       => ["admin/index"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png']
-            ],
-
-            [
-                "label"     => \Yii::t('app', "Создать стол"),
-                "url"       => ["cms/admin-dashboard/create"],
-            ],
-
-        ])
+        'items' => dashboardsMenu()
     ],
 
     'content' =>
@@ -171,7 +198,7 @@ return
 
             [
                 "label"     => \Yii::t('app',"File storage"),
-                "url"       => ["cms/admin-storage-files/index"],
+                "url"       => ["cms/admin-storage-files"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
 

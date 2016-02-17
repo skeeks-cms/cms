@@ -33,6 +33,7 @@ class m160216_093837__create_table__cms_dashboard_widget extends Migration
             'updated_at'            => $this->integer(),
 
             'cms_dashboard_id'      => $this->integer()->notNull(),
+            'cms_dashboard_column'  => $this->integer()->notNull()->defaultValue(1),
 
             'priority'              => $this->integer()->notNull()->defaultValue(100),
 
@@ -49,6 +50,7 @@ class m160216_093837__create_table__cms_dashboard_widget extends Migration
         $this->createIndex('priority', '{{%cms_dashboard_widget}}', 'priority');
         $this->createIndex('component', '{{%cms_dashboard_widget}}', 'component');
         $this->createIndex('cms_dashboard_id', '{{%cms_dashboard_widget}}', 'cms_dashboard_id');
+        $this->createIndex('cms_dashboard_column', '{{%cms_dashboard_widget}}', 'cms_dashboard_column');
 
         $this->execute("ALTER TABLE {{%cms_dashboard_widget}} COMMENT = 'Виджет рабочего стола';");
 

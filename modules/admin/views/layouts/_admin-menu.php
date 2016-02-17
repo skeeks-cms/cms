@@ -6,7 +6,7 @@
  * @date 27.09.2015
  */
 ?>
-<div class="sidebar sx-sidebar">
+<div class="sidebar sx-sidebar sx-bg-glass sx-bg-glass-hover">
     <a href="#" onclick="sx.App.Menu.toggleTrigger(); return false;" class="btn btn-default btn-xs sx-main-menu-toggle sx-main-menu-toggle-opened" data-sx-widget="tooltip-l" data-original-title="<?=\Yii::t('app','Close menu')?>">
         <i class="glyphicon glyphicon-menu-left"></i>
     </a>
