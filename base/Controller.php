@@ -60,10 +60,14 @@ class Controller extends YiiWebController
             return parent::render($view, $params);
         }
 
+
         try
         {
             $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
             return parent::render($viewApp, $params);
+
+            /*$this->viewPath = $this->beforeRender . $this->module->id . '/' . $this->id;
+            return parent::render($view, $params);*/
 
         }  catch (InvalidParamException $e)
         {
