@@ -7,6 +7,8 @@
  */
 namespace skeeks\cms\modules\admin\widgets;
 use yii\base\Widget;
+use yii\bootstrap\Html;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /**
@@ -15,7 +17,8 @@ use yii\helpers\Url;
  */
 class AdminPanelWidget extends Widget
 {
-    public $cssClass;
+    public $options = [];
+
     public $name;
     public $content;
     public $buttons;
@@ -26,8 +29,20 @@ class AdminPanelWidget extends Widget
      */
     public function init()
     {
+        $classses = "panel panel-primary sx-panel sx-panel-content";
+        if ($class = ArrayHelper::getValue($this->options, 'class'))
+        {
+            $classses .= " " . $class;
+        }
+
+        $options = ArrayHelper::merge($this->options, [
+            'id'    => $this->id,
+            'class' => $classses,
+        ]);
+
+        echo Html::beginTag('div', $options);
+
         echo <<<HTML
-<div class="panel panel-primary sx-panel sx-panel-content {$this->cssClass}" id="{$this->id}">
     <div class="panel-heading sx-no-icon">
         <div class="pull-left">
             <h2>
@@ -57,8 +72,9 @@ HTML;
         echo <<<HTML
         </div>
     </div>
-</div>
 HTML;
+
+        echo Html::endTag('div');
 
     }
 }

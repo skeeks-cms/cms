@@ -13,12 +13,17 @@ $this->registerCss(<<<CSS
     border-left: 1px solid rgba(255, 255, 255, 0.46);
 }
 
+.sx-dashboard table tr td
+{
+    vertical-align: top;
+}
+
 CSS
 );
 
 $sortableString = [];
 ?>
-<div class="col-md-12">
+<div class="col-md-12 sx-dashboard">
 
     <? echo $this->render('_head', [
         'dashboard' => $dashboard
@@ -40,20 +45,28 @@ $sortableString = [];
             <? else : ?>
 
 
-                <table>
+                <table id="sx-dashboard-table">
                     <tr>
                         <? for($i = 1; $i <= $dashboard->columns; $i++) : ?>
                             <?
                             $sortableString[] = "#sx-column-" . $i;
                             ?>
-                            <td style="width: <? echo round(100/$dashboard->columns); ?>%;" id="sx-column-<?= $i; ?>" class="sx-columns">
+                            <td style="width: <? echo round(100/$dashboard->columns); ?>%;" id="sx-column-<?= $i; ?>" class="sx-columns" data-column="<?= $i; ?>">
                                 <? $widgets = $dashboard->getCmsDashboardWidgets()->andWhere(['cms_dashboard_column' => $i])->all(); ?>
                                 <? if ($widgets) : ?>
 
                                     <? foreach($widgets as $cmsDashboardWidget) : ?>
                                         <? \skeeks\cms\modules\admin\widgets\AdminPanelWidget::begin([
                                             'name'      => $cmsDashboardWidget->name,
-                                            'cssClass'  => 'sx-dashboard-widget',
+
+                                            'options' =>
+                                            [
+                                                'class' => 'sx-dashboard-widget',
+                                                'data'      =>
+                                                [
+                                                    'id' => $cmsDashboardWidget->id
+                                                ],
+                                            ],
                                         ]); ?>
                                             <?= $cmsDashboardWidget->widget->run(); ?>
                                         <? \skeeks\cms\modules\admin\widgets\AdminPanelWidget::end(); ?>
@@ -80,56 +93,101 @@ $sortableString = [];
 \yii\jui\Sortable::widget();
 
 $sortableString = implode(', ', $sortableString);
+
+$jsonData = \yii\helpers\Json::encode([
+    'model'             => $dashboard,
+    'sortableSelector'  => $sortableString,
+]);
+
 $this->registerJs(<<<JS
-$("{$sortableString}").sortable(
+
+(function(sx, $, _)
 {
-    connectWith: ".sx-columns",
-    cursor: "move",
-    forceHelperSize: true,
-    forcePlaceholderSize: true,
-    //delay: 150,
-    opacity: 0.5,
-    placeholder: "ui-state-highlight",
-    out: function( event, ui )
-    {
-        var Jul = $(ui.item).closest("ul");
-        var newSort = [];
-        Jul.children("li").each(function(i, element)
+    sx.classes.Dashboard = sx.classes.Component.extend({
+
+        _init: function()
         {
-            newSort.push($(this).data("id"));
-        });
+            var self = this;
 
-        var blocker = sx.block(Jul);
-
-        var ajax = sx.ajax.preparePostQuery(
-            "resort",
+            this.bind('change', function(e, data)
             {
-                "ids" : newSort,
-                "changeId" : $(ui.item).data("id")
-            }
-        );
+                self.save();
+            });
+        },
 
-        new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
-        new sx.classes.AjaxHandlerNotify(ajax, {
-            'error': "Изменения не сохранились",
-            'success': "Изменения сохранены",
-        }); //отключение глобального загрузчика
-
-        ajax.onError(function(e, data)
+        _onDomReady: function()
         {
-            sx.notify.info("Подождите сейчас страница будет перезагружена");
-            _.delay(function()
+            this._initSortable();
+        },
+
+        getData: function()
+        {
+
+        },
+
+        save: function()
+        {
+
+            var blocker = sx.block(Jul);
+
+            var ajax = sx.ajax.preparePostQuery(
+                "resort",
+                {
+                    "ids" : newSort,
+                    "changeId" : $(ui.item).data("id")
+                }
+            );
+
+            new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+            new sx.classes.AjaxHandlerNotify(ajax, {
+                'error': "Изменения не сохранились",
+                'success': "Изменения сохранены",
+            }); //отключение глобального загрузчика
+
+            ajax.onError(function(e, data)
             {
-                window.location.reload();
-            }, 2000);
-        })
-        .onSuccess(function(e, data)
+                sx.notify.info("Подождите сейчас страница будет перезагружена");
+                _.delay(function()
+                {
+                    window.location.reload();
+                }, 2000);
+            })
+            .onSuccess(function(e, data)
+            {
+                blocker.unblock();
+            })
+            .execute();
+        },
+
+        _initSortable: function()
         {
-            blocker.unblock();
-        })
-        .execute();
-    }
-}).disableSelection();;
+            var self = this;
+
+            $(self.get('sortableSelector')).sortable(
+            {
+                connectWith: ".sx-columns",
+                cursor: "move",
+                forceHelperSize: true,
+                forcePlaceholderSize: true,
+                //delay: 150,
+                opacity: 0.5,
+                placeholder: "ui-state-highlight",
+                stop: function( event, ui )
+                {
+                    self.trigger('change', {
+                        'event' : event,
+                        'ui' : ui,
+                    });
+                }
+
+            }).disableSelection();
+        }
+    });
+
+    sx.Dashboard = new sx.classes.Dashboard({$jsonData});
+})(sx, sx.$, sx._);
+
+
 JS
 );
 
