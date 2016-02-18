@@ -4,6 +4,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\models\behaviors\Serialize;
+use skeeks\cms\modules\admin\base\AdminDashboardWidget;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -27,7 +28,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsDashboard $cmsDashboard
  *
- * @property Widget $widget
+ * @property AdminDashboardWidget $widget
  */
 class CmsDashboardWidget extends \skeeks\cms\models\Core
 {
@@ -61,7 +62,6 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
             [['component_settings'], 'safe'],
             [['component'], 'string', 'max' => 255],
 
-            [['componentSettingsString'], 'string'],
             [['cms_dashboard_column'], 'integer', 'max' => 6, 'min' => 1],
             [['cms_dashboard_column'], 'default', 'value' => 1],
             [['priority'], 'default', 'value' => 100],
@@ -88,23 +88,6 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
     }
 
 
-    protected $_componentSettingsString = "";
-    /**
-     * @return string
-     */
-    public function getComponentSettingsString()
-    {
-        return \skeeks\cms\helpers\StringHelper::base64EncodeUrl(serialize((array) $this->component_settings));
-    }
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function setComponentSettingsString($value)
-    {
-        $this->component_settings = unserialize(\skeeks\cms\helpers\StringHelper::base64DecodeUrl($value));
-        return $this;
-    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -117,20 +100,23 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
 
 
     /**
-     * @return null|Widget
+     * @return AdminDashboardWidget
      * @throws \yii\base\InvalidConfigException
      */
     public function getWidget()
     {
         if ($this->component)
         {
-            /**
-             * @var $component Component
-             */
-            $component = \Yii::createObject($this->component);
-            $component->load($this->component_settings, "");
+            if (class_exists($this->component))
+            {
+                /**
+                 * @var $component AdminDashboardWidget
+                 */
+                $component = \Yii::createObject($this->component);
+                $component->load($this->component_settings, "");
 
-            return $component;
+                return $component;
+            }
         }
 
         return null;

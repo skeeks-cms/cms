@@ -8,11 +8,13 @@
 namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
 use skeeks\cms\base\Widget;
-use skeeks\cms\cmsWidgets\admin\base\AdminBaseWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\modules\admin\assets\AdminAsset;
+use skeeks\cms\modules\admin\base\AdminDashboardWidget;
+use skeeks\cms\modules\admin\dashboards\base\BaseDashboardWidget;
+use skeeks\cms\modules\admin\dashboards\CmsInformDashboard;
 use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
@@ -72,7 +74,8 @@ class AdminSettings extends Component
     public function getDasboardWidgets()
     {
         $baseWidgets = [
-            AdminBaseWidget::className()
+            BaseDashboardWidget::className(),
+            CmsInformDashboard::className()
         ];
 
         $widgets = ArrayHelper::merge($baseWidgets, $this->userDashboardWidgets);
@@ -80,7 +83,7 @@ class AdminSettings extends Component
         $result = [];
         foreach ($widgets as $key => $classWidget)
         {
-            if (class_exists($classWidget) && is_subclass_of($classWidget, Widget::className()))
+            if (class_exists($classWidget) && is_subclass_of($classWidget, AdminDashboardWidget::className()))
             {
                 $result[$classWidget] = $classWidget;
             }

@@ -18,6 +18,7 @@ use skeeks\cms\rbac\CmsManager;
 use yii\base\Exception;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -275,34 +276,7 @@ class IndexController extends AdminController
     }
 
 
-    public function actionWidgetRemove()
-    {
-        $rr = new RequestResponse();
-        $rr->success = false;
 
-        /**
-         * @var $dashboardWidget CmsDashboardWidget
-         */
-        $dashboardWidget = null;
-
-        if ($pk = \Yii::$app->request->post('id'))
-        {
-            $dashboardWidget = CmsDashboardWidget::findOne($pk);
-        }
-
-        if (!$dashboardWidget)
-        {
-            $rr->message = "Виджет не найден";
-            $rr->success = false;
-        }
-
-        if ($dashboardWidget->delete())
-        {
-            $rr->success = true;
-        }
-
-        return $rr;
-    }
 
 
     public function actionWidgetPrioritySave()
@@ -378,6 +352,93 @@ class IndexController extends AdminController
         }
 
         $rr->success = true;
+
+        return $rr;
+    }
+
+
+
+    public function actionEditDashboardWidget()
+    {
+        $rr = new RequestResponse();
+        $rr->success = false;
+
+        /**
+         * @var $dashboardWidget CmsDashboardWidget
+         */
+        $dashboardWidget = null;
+
+        if ($pk = \Yii::$app->request->get('pk'))
+        {
+            $dashboardWidget = CmsDashboardWidget::findOne($pk);
+        }
+
+        //print_r($dashboardWidget->toArray());die;
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            return $rr->ajaxValidateForm($dashboardWidget->widget);
+        }
+
+        if (\Yii::$app->request->isPjax && \Yii::$app->request->post())
+        {
+            if (!$dashboardWidget)
+            {
+                $rr->message = "Виджет не найден";
+                $rr->success = false;
+            }
+
+            if ($dashboardWidget->widget->load(\Yii::$app->request->post()))
+            {
+                $data = \Yii::$app->request->post($dashboardWidget->widget->formName());
+                $dashboardWidget->component_settings = $data;
+                if ($dashboardWidget->save())
+                {
+                    \Yii::$app->session->setFlash('success', 'Saved');
+                } else
+                {
+                    \Yii::$app->session->setFlash('success', 'Errors');
+                }
+            }
+
+        }
+
+        if (!$dashboardWidget)
+        {
+            throw new NotFoundHttpException('Widget not found');
+        }
+
+        return $this->render($this->action->id, [
+            'model' => $dashboardWidget
+        ]);
+    }
+
+
+    public function actionWidgetRemove()
+    {
+        $rr = new RequestResponse();
+        $rr->success = false;
+
+        /**
+         * @var $dashboardWidget CmsDashboardWidget
+         */
+        $dashboardWidget = null;
+
+        if ($pk = \Yii::$app->request->post('id'))
+        {
+            $dashboardWidget = CmsDashboardWidget::findOne($pk);
+        }
+
+        if (!$dashboardWidget)
+        {
+            $rr->message = "Виджет не найден";
+            $rr->success = false;
+        }
+
+        if ($dashboardWidget->delete())
+        {
+            $rr->success = true;
+        }
 
         return $rr;
     }

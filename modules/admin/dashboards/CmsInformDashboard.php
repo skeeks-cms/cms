@@ -6,30 +6,37 @@
  * @date 25.05.2015
  */
 
-namespace skeeks\cms\cmsWidgets\admin\base;
+namespace skeeks\cms\modules\admin\dashboards;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\base\AdminDashboardWidget;
+use skeeks\cms\modules\admin\base\AdminDashboardWidgetRenderable;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
- * Class AdminBaseWidget
- * @package skeeks\cms\cmsWidgets\admin\base
+ * Class BaseDashboardWidget
+ * @package skeeks\cms\modules\admin\dashboards\base
  */
-class AdminBaseWidget extends WidgetRenderable
+class CmsInformDashboard extends AdminDashboardWidgetRenderable
 {
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('app','Базовый виджет')
+            'name' => \Yii::t('app', 'Короткая информация о ресурсах')
         ]);
     }
 
-    public $name = 'Базовый виджет';
+    public $viewFile = 'cms-inform';
+    public $name = 'Короткая информация о ресурсах';
 
+    /**
+     * @return array
+     */
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -42,5 +49,13 @@ class AdminBaseWidget extends WidgetRenderable
         return ArrayHelper::merge(parent::attributeLabels(), [
             'name'                           => \Yii::t('app', 'Name'),
         ]);
+    }
+
+    /**
+     * @param ActiveForm $form
+     */
+    public function renderConfigForm(ActiveForm $form = null)
+    {
+        echo $form->field($this, 'name');
     }
 }
