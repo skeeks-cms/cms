@@ -7,7 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\widgets;
 use yii\base\Widget;
-use yii\bootstrap\Html;
+use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
@@ -17,11 +17,64 @@ use yii\helpers\Url;
  */
 class AdminPanelWidget extends Widget
 {
+    /**
+     * Widget options
+     *
+     *  'class' => 'sx-dashboard-widget',
+        'data'      =>
+        [
+            'id' => 1
+        ],
+     * @var array
+     */
     public $options = [];
 
+
+
+    /**
+     * Widget color scheme
+     *
+     * panel-primary
+     * panel-success
+     * panel-danger
+     *
+     * @var string
+     */
+    public $color = 'panel-primary';
+
+    /**
+     * Panel heading options
+     *
+     * @var array
+     */
+    public $headingOptions = [
+        'class' => 'panel-heading'
+    ];
+
+
+    /**
+     * Panel body options
+     *
+     * @var array
+     */
+    public $bodyOptions = [
+        'class' => 'panel-body'
+    ];
+
+
+    /**
+     * @var Название панели
+     */
     public $name;
+    /**
+     * @var Содержимое
+     */
     public $content;
-    public $buttons;
+
+    /**
+     * @var Кнопки действий
+     */
+    public $actions;
 
     /**
      * Initializes the widget.
@@ -29,35 +82,33 @@ class AdminPanelWidget extends Widget
      */
     public function init()
     {
-        $classses = "panel panel-primary sx-panel sx-panel-content";
-        if ($class = ArrayHelper::getValue($this->options, 'class'))
-        {
-            $classses .= " " . $class;
-        }
+        Html::addCssClass($this->options, ['panel', 'sx-panel', $this->color]);
 
         $options = ArrayHelper::merge($this->options, [
             'id'    => $this->id,
-            'class' => $classses,
         ]);
 
         echo Html::beginTag('div', $options);
 
-        echo <<<HTML
-    <div class="panel-heading sx-no-icon">
-        <div class="pull-left">
-            <h2>
-                {$this->name}
-            </h2>
-        </div>
-        <div class="panel-actions">
-            {$this->buttons}
-        </div>
-    </div><!-- End .panel-heading -->
-    <div class="panel-body">
-        <div class="panel-content">
-            {$this->content}
+            echo Html::beginTag('div', $this->headingOptions);
 
+echo<<<HTML
+
+                <div class="pull-left">
+                    <h2>
+                        {$this->name}
+                    </h2>
+                </div>
+                <div class="panel-actions panel-hidden-actions">
+                    {$this->actions}
+                </div>
 HTML;
+
+            echo Html::endTag('div');
+
+            echo Html::beginTag('div', $this->bodyOptions);
+
+                echo '<div class="panel-content">' . $this->content;
 
     }
 
@@ -71,9 +122,9 @@ HTML;
 
         echo <<<HTML
         </div>
-    </div>
 HTML;
 
+            echo Html::endTag('div');
         echo Html::endTag('div');
 
     }

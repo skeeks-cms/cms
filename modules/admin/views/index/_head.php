@@ -95,24 +95,27 @@ JS
         ])?>
             <?= $form->field($modelWidget, 'cms_dashboard_id')->hiddenInput()->label(false); ?>
 
-            <div class="row">
+            <?= $form->fieldSelect($modelWidget, 'component', \Yii::$app->admin->dasboardWidgetsLabels); ?>
+
+            <!--<div class="row">
                 <div class="col-md-6">
-                    <?= $form->field($modelWidget, 'component')->listBox(\Yii::$app->admin->dasboardWidgetsLabels, ['size' => 1]); ?>
-                </div>
-                <div class="col-md-6">
+                    --><?/*= $form->fieldSelect($modelWidget, 'component', \Yii::$app->admin->dasboardWidgetsLabels); */?>
+                    <?/*= $form->field($modelWidget, 'component')->listBox(\Yii::$app->admin->dasboardWidgetsLabels, ['size' => 1]); */?>
+                <!--</div>-->
+                <!--<div class="col-md-6">
                     <label></label>
-                    <?= $form->field($modelWidget, 'componentSettingsString')->label(false)->widget(
+                    <?/*= $form->field($modelWidget, 'componentSettingsString')->label(false)->widget(
                         \skeeks\cms\widgets\formInputs\componentSettings\ComponentSettingsWidget::className(),
                         [
-                            'componentSelectId' => \yii\helpers\Html::getInputId($model, "component"),
+                            'componentSelectId' => \yii\helpers\Html::getInputId($modelWidget, "component"),
                             'buttonText'        => \skeeks\cms\shop\Module::t('app', 'Settings handler'),
                             'buttonClasses'     => "sx-btn-edit btn btn-default"
                         ]
-                    ); ?>
-                </div>
-            </div>
+                    ); */?>
+                </div>-->
+            <!--</div>-->
 
-            <?= $form->buttonsStandart($model, ['save']); ?>
+            <?= $form->buttonsStandart($modelWidget, ['save']); ?>
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end()?>
     </div>
 </div>

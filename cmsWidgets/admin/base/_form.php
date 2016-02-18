@@ -6,9 +6,5 @@
  * @date 27.05.2015
  */
 /* @var $this yii\web\View */
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
-<?php $form = ActiveForm::begin(); ?>
-    <?= $form->field($model, 'name')->textInput(); ?>
-<?= $form->buttonsStandart($model) ?>
-<?php ActiveForm::end(); ?>
+<?= $form->field($model, 'name')->textInput(); ?>

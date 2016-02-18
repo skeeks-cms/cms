@@ -273,4 +273,112 @@ class IndexController extends AdminController
 
         return $rr;
     }
+
+
+    public function actionWidgetRemove()
+    {
+        $rr = new RequestResponse();
+        $rr->success = false;
+
+        /**
+         * @var $dashboardWidget CmsDashboardWidget
+         */
+        $dashboardWidget = null;
+
+        if ($pk = \Yii::$app->request->post('id'))
+        {
+            $dashboardWidget = CmsDashboardWidget::findOne($pk);
+        }
+
+        if (!$dashboardWidget)
+        {
+            $rr->message = "Виджет не найден";
+            $rr->success = false;
+        }
+
+        if ($dashboardWidget->delete())
+        {
+            $rr->success = true;
+        }
+
+        return $rr;
+    }
+
+
+    public function actionWidgetPrioritySave()
+    {
+        $rr = new RequestResponse();
+        $rr->success = false;
+
+        /**
+         * @var $dashboard CmsDashboard
+         */
+        $dashboard = null;
+
+        if ($pk = \Yii::$app->request->get('pk'))
+        {
+            $dashboard = CmsDashboard::findOne($pk);
+        }
+
+        if (!$dashboard)
+        {
+            $rr->message = "Рабочий стол не найден";
+            $rr->success = false;
+        }
+
+        $widgets = $dashboard->cmsDashboardWidgets;
+        $widgets = ArrayHelper::map($dashboard->cmsDashboardWidgets, 'id', function($model)
+        {
+            return $model;
+        });
+
+        if ($rr->isRequestAjaxPost())
+        {
+            if ($data = \Yii::$app->request->post())
+            {
+                foreach ($data as $columnId => $widgetIds)
+                {
+                    //Обновляем приоритеты виджетов в этой колонке
+                    if ($widgetIds)
+                    {
+                        $priority = 100;
+                        foreach ($widgetIds as $widgetId)
+                        {
+                            if (isset($widgets[$widgetId]))
+                            {
+                                /**
+                                 * @var $widget CmsDashboardWidget
+                                 */
+                                $widget = $widgets[$widgetId];
+                                $widget->cms_dashboard_column = $columnId;
+                                $widget->priority = $priority;
+                                $widget->save();
+
+                                $priority = $priority + 100;
+
+                                unset($widgets[$widgetId]);
+                            }
+                        }
+                    }
+                }
+
+                //еще остались виджеты, суем их в конец
+                if ($widgets)
+                {
+                    foreach ($widgets as $widget)
+                    {
+                        $widget->cms_dashboard_column   = $columnId;
+                        $widget->priority               = $priority;
+                        $widget->save();
+
+                        $priority = $priority + 100;
+                    }
+                }
+            }
+        }
+
+        $rr->success = true;
+
+        return $rr;
+    }
 }

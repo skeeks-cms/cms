@@ -1,0 +1,98 @@
+/**
+* Доработка панелей
+*/
+.sx-panel
+{
+    box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.42);
+    margin-bottom: 15px;
+}
+.sx-panel:hover
+{
+    box-shadow: 1px 1px 8px 1px rgba(32, 168, 216, 0.69);
+}
+
+
+    .sx-panel .breadcrumb
+    {
+        height: auto;
+        padding: 8px 15px;
+        line-height: normal;
+    }
+
+        .sx-panel .breadcrumb>.active
+        {
+            color: #E8E6E6;
+        }
+
+        .sx-panel .breadcrumb li
+        {
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
+            font-size: 15px;
+        }
+        .sx-panel .breadcrumb li a
+        {
+            color: #ffffff;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
+        }
+
+    .sx-panel .sx-nav
+    {
+        border-bottom: 1px solid rgba(32, 168, 216, 0.23);
+        height: 40px;
+    }
+
+
+    .sx-panel.panel-default
+    {
+        box-shadow: 0px 0px 3px 0px rgba(32, 168, 216, 0.5);
+    }
+
+    .sx-panel.panel-default .panel-heading
+    {
+        background: #f8f9fa;
+        border-bottom: 1px solid rgba(32, 168, 216, 0.23);
+    }
+
+    .sx-panel.panel-default > .panel-heading h2
+    {
+        color: black;
+    }
+
+    .sx-panel.panel-primary > .panel-heading h2
+    {
+        color: white;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
+    }
+
+    .sx-panel .panel-body
+    {
+        padding: 0px;
+    }
+        .sx-panel .panel-body .panel-content
+        {
+            padding: 15px;
+        }
+
+    .sx-nav>li>a
+    {
+        border-radius: 0;
+        padding: 9px 10px;
+        font-size: 14px;
+        height: 40px;
+    }
+
+    .sx-panel .panel-heading .panel-hidden-actions
+    {
+        display: none;
+    }
+
+    .sx-panel .panel-heading:hover .panel-hidden-actions
+    {
+        display: block;
+    }
+
+body.empty .sx-panel
+{
+    box-shadow: none;
+    margin-bottom: 15px;
+}
