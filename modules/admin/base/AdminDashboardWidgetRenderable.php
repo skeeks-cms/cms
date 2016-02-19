@@ -29,9 +29,16 @@ class AdminDashboardWidgetRenderable extends AdminDashboardWidget
     {
         if ($this->viewFile)
         {
-            return $this->render($this->viewFile, [
-                'widget' => $this
-            ]);
+            try
+            {
+                return $this->render($this->viewFile, [
+                    'widget' => $this
+                ]);
+            } catch (\Exception $e)
+            {
+                return $e->getMessage();
+            }
+
         } else
         {
             return \Yii::t('app',"Template not found");

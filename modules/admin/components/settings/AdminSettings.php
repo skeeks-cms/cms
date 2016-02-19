@@ -44,7 +44,7 @@ class AdminSettings extends Component
 
     public $asset;
 
-    public $userDashboardWidgets = [];
+    public $dashboards = [];
 
     //Всплывающие окошки
     public $enableCustomConfirm     = Cms::BOOL_Y;
@@ -85,7 +85,7 @@ class AdminSettings extends Component
             ]
         ];
 
-        $widgetsAll = ArrayHelper::merge($baseWidgets, $this->userDashboardWidgets);
+        $widgetsAll = ArrayHelper::merge($baseWidgets, $this->dashboards);
 
         $result = [];
         foreach ($widgetsAll as $label => $widgets)
