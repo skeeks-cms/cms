@@ -16,7 +16,11 @@ Skeeks CMS 2.* (Yii2 cms)
 
 
 ##screenshot
-[![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)]
+[![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)](http://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)
+
+[![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)
+
+
 
 
 ##Install
