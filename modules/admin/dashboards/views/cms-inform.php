@@ -16,6 +16,13 @@ $usedSpace = $totalSpace - $freeSpace;
 
 $freeSpacePercent = ($freeSpace * 100) / $totalSpace;
 $usedSpacePercent = 100 - $freeSpacePercent;
+$this->registerCss(<<<CSS
+ul.statistics
+{
+    margin-bottom: 10px;
+}
+CSS
+)
 ?>
 
 <div class="site-index">

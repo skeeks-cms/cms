@@ -13,8 +13,10 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use skeeks\cms\modules\admin\base\AdminDashboardWidget;
-use skeeks\cms\modules\admin\dashboards\base\BaseDashboardWidget;
+use skeeks\cms\modules\admin\dashboards\AboutCmsDashboard;
 use skeeks\cms\modules\admin\dashboards\CmsInformDashboard;
+use skeeks\cms\modules\admin\dashboards\ContentElementListDashboard;
+use skeeks\cms\modules\admin\dashboards\DiscSpaceDashboard;
 use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
@@ -74,19 +76,34 @@ class AdminSettings extends Component
     public function getDasboardWidgets()
     {
         $baseWidgets = [
-            BaseDashboardWidget::className(),
-            CmsInformDashboard::className()
+            \Yii::t('app', 'Basic widgets') =>
+            [
+                AboutCmsDashboard::className(),
+                CmsInformDashboard::className(),
+                DiscSpaceDashboard::className(),
+                ContentElementListDashboard::className(),
+            ]
         ];
 
-        $widgets = ArrayHelper::merge($baseWidgets, $this->userDashboardWidgets);
+        $widgetsAll = ArrayHelper::merge($baseWidgets, $this->userDashboardWidgets);
 
         $result = [];
-        foreach ($widgets as $key => $classWidget)
+        foreach ($widgetsAll as $label => $widgets)
         {
-            if (class_exists($classWidget) && is_subclass_of($classWidget, AdminDashboardWidget::className()))
+            if (is_array($widgets))
             {
-                $result[$classWidget] = $classWidget;
+                $resultWidgets = [];
+                foreach ($widgets as $key => $classWidget)
+                {
+                    if (class_exists($classWidget) && is_subclass_of($classWidget, AdminDashboardWidget::className()))
+                    {
+                        $resultWidgets[$classWidget] = $classWidget;
+                    }
+                }
+
+                $result[$label] = $resultWidgets;
             }
+
         }
 
         return $result;
@@ -100,9 +117,15 @@ class AdminSettings extends Component
         $result = [];
         if ($this->dasboardWidgets)
         {
-            foreach ($this->dasboardWidgets as $widgetClassName)
+            foreach ($this->dasboardWidgets as $label => $widgets)
             {
-                $result[$widgetClassName] = (new $widgetClassName)->descriptor->name;
+                $resultWidgets = [];
+                foreach ($widgets as $key => $widgetClassName)
+                {
+                    $resultWidgets[$widgetClassName] = (new $widgetClassName)->descriptor->name;
+                }
+
+                $result[$label] = $resultWidgets;
             }
         }
 

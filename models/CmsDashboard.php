@@ -62,7 +62,7 @@ class CmsDashboard extends \skeeks\cms\models\Core
             'name' => Yii::t('app', 'Name'),
             'cms_user_id' => Yii::t('app', 'Cms User ID'),
             'priority' => Yii::t('app', 'Priority'),
-            'columns' => Yii::t('app', 'Количество колонок'),
+            'columns' => Yii::t('app', 'Number of columns'),
             'columns_settings' => Yii::t('app', 'Columns Settings'),
         ];
     }

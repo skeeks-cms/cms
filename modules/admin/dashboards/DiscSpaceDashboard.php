@@ -6,7 +6,7 @@
  * @date 25.05.2015
  */
 
-namespace skeeks\cms\modules\admin\dashboards\base;
+namespace skeeks\cms\modules\admin\dashboards;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
@@ -19,20 +19,30 @@ use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
- * Class BaseDashboardWidget
- * @package skeeks\cms\modules\admin\dashboards\base
+ * Class DiscSpaceDashboard
+ * @package skeeks\cms\modules\admin\dashboards
  */
-class BaseDashboardWidget extends AdminDashboardWidgetRenderable
+class DiscSpaceDashboard extends AdminDashboardWidgetRenderable
 {
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('app','Базовый виджет')
+            'name' => \Yii::t('app', 'Disk space')
         ]);
     }
 
-    public $name = 'Базовый виджет';
+    public $viewFile    = 'disc-space';
+    public $name;
 
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->name)
+        {
+            $this->name = \Yii::t('app', 'Disk space');
+        }
+    }
     /**
      * @return array
      */

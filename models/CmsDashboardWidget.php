@@ -64,7 +64,7 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
 
             [['cms_dashboard_column'], 'integer', 'max' => 6, 'min' => 1],
             [['cms_dashboard_column'], 'default', 'value' => 1],
-            [['priority'], 'default', 'value' => 100],
+            [['priority'], 'default', 'value' => 50],
         ];
     }
 

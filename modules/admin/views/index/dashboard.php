@@ -28,6 +28,9 @@ $this->registerCss(<<<CSS
     cursor: move;
 }
 
+#sx-dashboard-table {
+    width: 100%;
+}
 CSS
 );
 

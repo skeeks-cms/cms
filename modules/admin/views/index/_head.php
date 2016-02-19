@@ -24,13 +24,13 @@ CSS
 ?>
 <div class="row sx-dashboard-head sx-bg-glass sx-bg-glass-hover">
     <div class="col-md-6 pull-left">
-        <a href="#sx-dashboard-create" class="btn btn-default btn-primary sx-fancybox" data-sx-widget="tooltip-b" data-original-title="Добавить еще один стол">Добавить рабочий стол</a>
+        <a href="#sx-dashboard-create" class="btn btn-default btn-primary sx-fancybox"><i class="glyphicon glyphicon-plus"></i> <?= \Yii::t('app', 'Add dashboard'); ?></a>
     </div>
     <div class="col-md-6">
         <div class="pull-right">
-            <a href="#sx-dashboard-widget-create" class="btn btn-default btn-primary sx-fancybox" data-sx-widget="tooltip-b" data-original-title="Добавить виджет на текущий стол"><i class="icon-calculator"></i> Добавить виджет</a>
-            <a href="#sx-dashboard-edit" class="btn btn-default btn-primary sx-fancybox" data-sx-widget="tooltip-b" data-original-title="Настройки текущего стола"><i class="glyphicon glyphicon-cog"></i> Настройки</a>
-            <a href="#" onclick="sx.DashboardsControll.remove(); return false;" class="btn btn-default btn-danger" data-sx-widget="tooltip-b" data-original-title="Удалить текущий стол"><i class="glyphicon glyphicon-remove"></i> Удалить</a>
+            <a href="#sx-dashboard-widget-create" class="btn btn-default btn-primary sx-fancybox"><i class="icon-calculator"></i> <?= \Yii::t('app', 'Add widget'); ?></a>
+            <a href="#sx-dashboard-edit" class="btn btn-default btn-primary sx-fancybox"><i class="glyphicon glyphicon-cog"></i>  <?= \Yii::t('app', 'Settings'); ?></a>
+            <a href="#" onclick="sx.DashboardsControll.remove(); return false;" class="btn btn-default btn-danger"><i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('app', 'Delete'); ?></a>
         </div>
     </div>
 </div>
@@ -78,7 +78,7 @@ JS
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end()?>
     </div>
 
-    <div id="sx-dashboard-widget-create" style="min-width: 500px; max-width: 800px;">
+    <div id="sx-dashboard-widget-create" style="min-width: 500px; min-height: 500px; max-width: 800px;">
         <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
             'usePjax'           => false,
             'useAjaxSubmit'     => true,
@@ -123,6 +123,7 @@ JS
 <?
 $jsonData = \yii\helpers\Json::encode([
     'model' => $dashboard,
+    'confirmMsg' => \Yii::t('app', 'Are you sure you want to delete this desktop?'),
     'removeBackend' => \skeeks\cms\helpers\UrlHelper::construct(['/admin/index/dashboard-remove', 'pk' => $dashboard->id])->enableAdmin()->toString(),
 ]);
 
@@ -138,7 +139,7 @@ $this->registerJs(<<<JS
         {
             var self = this;
 
-            sx.confirm('Вы действительно хотите удалить этот стол?', {
+            sx.confirm(this.get('confirmMsg'), {
                 'yes': function()
                 {
                     var AjaxQuery = sx.ajax.preparePostQuery(self.get('removeBackend'));

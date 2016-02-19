@@ -108,7 +108,8 @@ HTML;
 
             echo Html::beginTag('div', $this->bodyOptions);
 
-                echo '<div class="panel-content">' . $this->content;
+                //echo '<div class="panel-content">' . $this->content;
+                echo $this->content;
 
     }
 
@@ -119,13 +120,7 @@ HTML;
      */
     public function run()
     {
-
-        echo <<<HTML
-        </div>
-HTML;
-
             echo Html::endTag('div');
         echo Html::endTag('div');
-
     }
 }

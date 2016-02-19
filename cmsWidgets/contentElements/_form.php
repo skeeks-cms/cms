@@ -30,17 +30,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
         <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint(\Yii::t('app',"Will be considered time of beginning and end of the publication")); ?>
 
-        <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\models\User::find()->active()->all(),
-            'id',
-            'name'
-        )); ?>
+        <?= $form->fieldSelectMulti($model, 'createdBy')->widget(
+            \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()
+        ); ?>
 
-        <?= $form->fieldSelectMulti($model, 'content_ids', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\models\CmsContent::find()->active()->all(),
-            'id',
-            'name'
-        )); ?>
+        <?= $form->fieldSelectMulti($model, 'content_ids', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
 
         <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTree', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTreeChild', \Yii::$app->cms->booleanFormat()); ?>

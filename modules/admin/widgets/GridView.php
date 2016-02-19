@@ -77,7 +77,7 @@ class GridView extends \yii\grid\GridView
                           {items}\n
                       </div>
                       {afterTable}
-                      <div class='row'>
+                      <div class='row sx-table-additional'>
                           <div class='col-md-12'>
                       \n<div class='pull-left'>{pager}</div>
                       \n<div class='pull-left'>{perPage}</div>

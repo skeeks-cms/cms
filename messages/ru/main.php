@@ -929,8 +929,17 @@ return
     "The ability to edit view files" => "Возможно редактировать файлы представлений",
     "The ability to edit settings" => "Возможность управять настройками",
 
-    "Choose" => "Выбрать",
-    "Dashboards" => "Рабочие столы",
-    "Dashboard" => "Рабочий стол",
+    "Choose"        => "Выбрать",
+    "Dashboards"    => "Рабочие столы",
+    "Dashboard"     => "Рабочий стол",
+
+    "Add dashboard"                         => "Добавить рабочий стол",
+    "Number of columns"                     => "Количество колонок",
+    "Basic widgets"                         => "Базовые виджеты",
+    "Add widget"                            => "Добавить виджет",
+    "Disk space"                            => "Место на диске",
+    "Short info"                            => "Краткая информация",
+    "Information about SkeekS CMS"          => "Информация о SkeekS CMS",
+    "The list of content items"             => "Список элементов контента",
 
 ];

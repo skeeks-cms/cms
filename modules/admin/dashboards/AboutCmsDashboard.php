@@ -19,19 +19,19 @@ use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
- * Class BaseDashboardWidget
- * @package skeeks\cms\modules\admin\dashboards\base
+ * Class AboutCmsDashboard
+ * @package skeeks\cms\modules\admin\dashboards
  */
-class CmsInformDashboard extends AdminDashboardWidgetRenderable
+class AboutCmsDashboard extends AdminDashboardWidgetRenderable
 {
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('app', 'Short info')
+            'name' => \Yii::t('app', 'Information about SkeekS CMS')
         ]);
     }
 
-    public $viewFile = 'cms-inform';
+    public $viewFile = 'about-cms';
     public $name;
 
     public function init()
@@ -40,7 +40,7 @@ class CmsInformDashboard extends AdminDashboardWidgetRenderable
 
         if (!$this->name)
         {
-            $this->name = \Yii::t('app', 'Short info');
+            $this->name = \Yii::t('app', 'Information about SkeekS CMS');
         }
     }
 
