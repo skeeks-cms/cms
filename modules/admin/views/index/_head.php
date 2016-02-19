@@ -14,10 +14,7 @@ $this->registerCss(<<<CSS
     border-left: 1px solid rgba(255, 255, 255, 0.46);
 }
 
-.sx-dashboard-body
-{
-    margin-top: 10px;
-}
+
 
 CSS
 );

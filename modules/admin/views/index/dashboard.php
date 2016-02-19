@@ -23,14 +23,15 @@ $this->registerCss(<<<CSS
     padding-left: 0;
 }
 
-.sx-panel .panel-heading
-{
-    cursor: move;
-}
-
 #sx-dashboard-table {
     width: 100%;
 }
+
+.sx-dashboard-body
+{
+    margin-top: 10px;
+}
+
 CSS
 );
 
@@ -38,9 +39,12 @@ $sortableString = [];
 ?>
 <div class="col-md-12 sx-dashboard" id="sx-dashboard">
 
-    <? echo $this->render('_head', [
-        'dashboard' => $dashboard
-    ]); ?>
+    <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_DASHBOARDS_EDIT)) : ?>
+        <? echo $this->render('_head', [
+            'dashboard' => $dashboard
+        ]); ?>
+    <? endif; ?>
+
 
     <div class="row sx-dashboard-body">
         <div class="col-lg-12 col-md-12">
@@ -70,6 +74,7 @@ $sortableString = [];
 
                                     <? foreach($widgets as $cmsDashboardWidget) : ?>
 
+                                        <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_DASHBOARDS_EDIT)) : ?>
                                         <?
                                             $cmsWidgetData = $cmsDashboardWidget->toArray(['id']);
 
@@ -85,10 +90,7 @@ $sortableString = [];
                                             ]);
 
                                             $cmsWidgetData = \yii\helpers\Json::encode($cmsWidgetData);
-                                        ?>
-                                        <? \skeeks\cms\modules\admin\widgets\AdminPanelWidget::begin([
-                                            'name'      => $cmsDashboardWidget->name,
-                                            'actions'   => <<<HTML
+                                        $actions = <<<HTML
 <a href="#sx-permissions-for-controller" onclick='sx.Dashboard.editConfigWidget({$cmsWidgetData}); return false;'>
     <i class="glyphicon glyphicon-cog" data-sx-widget="tooltip-b" data-original-title="Настроить" style="color: white;"></i>
 </a>
@@ -96,8 +98,14 @@ $sortableString = [];
 <a href="#sx-permissions-for-controller" onclick='sx.Dashboard.removeWidget({$cmsWidgetData}); return false;'>
     <i class="glyphicon glyphicon-remove" data-sx-widget="tooltip-b" data-original-title="Удалить" style="color: white;"></i>
 </a>
-HTML
-,
+HTML;
+                                        ?>
+                                        <? endif; ?>
+
+
+                                        <? \skeeks\cms\modules\admin\widgets\AdminPanelWidget::begin([
+                                            'name'      => $cmsDashboardWidget->name,
+                                            'actions'   => $actions,
 
                                             'options' =>
                                             [
@@ -128,222 +136,231 @@ HTML
     </div>
 </div>
 
+<? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_DASHBOARDS_EDIT)) : ?>
 
-<?
+    <?
 
-\yii\jui\Sortable::widget();
-
-$sortableString = implode(', ', $sortableString);
-
-$jsonData = \yii\helpers\Json::encode([
-    'model'                     => $dashboard,
-    'sortableSelector'          => $sortableString,
-    'backendPrioritySave'       => \skeeks\cms\helpers\UrlHelper::construct(['/admin/index/widget-priority-save', 'pk' => $dashboard->id])->enableAdmin()->toString(),
-    'backendWidgetRemove'       => \skeeks\cms\helpers\UrlHelper::construct(['/admin/index/widget-remove'])->enableAdmin()->toString(),
-]);
-
-$this->registerJs(<<<JS
-
-(function(sx, $, _)
+    $this->registerCss(<<<CSS
+.sx-panel .panel-heading
 {
-    sx.classes.Dashboard = sx.classes.Component.extend({
+    cursor: move;
+}
+CSS
+);
+    \yii\jui\Sortable::widget();
 
-        _init: function()
-        {
-            var self = this;
+    $sortableString = implode(', ', $sortableString);
 
-            this.bind('change', function(e, data)
+    $jsonData = \yii\helpers\Json::encode([
+        'model'                     => $dashboard,
+        'sortableSelector'          => $sortableString,
+        'backendPrioritySave'       => \skeeks\cms\helpers\UrlHelper::construct(['/admin/index/widget-priority-save', 'pk' => $dashboard->id])->enableAdmin()->toString(),
+        'backendWidgetRemove'       => \skeeks\cms\helpers\UrlHelper::construct(['/admin/index/widget-remove'])->enableAdmin()->toString(),
+    ]);
+
+    $this->registerJs(<<<JS
+
+    (function(sx, $, _)
+    {
+        sx.classes.Dashboard = sx.classes.Component.extend({
+
+            _init: function()
             {
-                self.save();
-            });
-        },
+                var self = this;
 
-        _onDomReady: function()
-        {
-            this._initSortable();
-
-
-        },
-
-        /**
-        *
-        * @returns {*|HTMLElement}
-        */
-        getJWrapper: function()
-        {
-            return $('#sx-dashboard');
-        },
-
-        /**
-        *
-        * @returns {{}|*}
-        */
-        getData: function()
-        {
-            data = {};
-
-            $('table tr td.sx-columns', this.getJWrapper()).each(function()
-            {
-                var ids = [];
-                $(".sx-dashboard-widget", $(this)).each(function()
+                this.bind('change', function(e, data)
                 {
-                    ids.push($(this).data('id'));
+                    self.save();
                 });
+            },
 
-                data[ $(this).data('column') ] = ids;
-            });
-
-            return data;
-        },
-
-        save: function()
-        {
-            var self = this;
-            var data = self.getData();
-
-            var ajax = sx.ajax.preparePostQuery(this.get('backendPrioritySave'), data);
-
-            new sx.classes.AjaxHandlerNoLoader(ajax);
-
-            new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                'enableBlocker' : true,
-                'blockerSelector' : this.getJWrapper()
-            });
-
-            ajax.onError(function(e, data)
+            _onDomReady: function()
             {
-                sx.notify.info("Подождите сейчас страница будет перезагружена");
-                _.delay(function()
+                this._initSortable();
+
+
+            },
+
+            /**
+            *
+            * @returns {*|HTMLElement}
+            */
+            getJWrapper: function()
+            {
+                return $('#sx-dashboard');
+            },
+
+            /**
+            *
+            * @returns {{}|*}
+            */
+            getData: function()
+            {
+                data = {};
+
+                $('table tr td.sx-columns', this.getJWrapper()).each(function()
                 {
-                    //window.location.reload();
-                }, 2000);
-            })
-            .onSuccess(function(e, data)
-            {
-                //blocker.unblock();
-            })
-            .execute();
-        },
-
-
-        editConfigWidget: function(data)
-        {
-            new sx.classes.DashboardWidget(this, data).editConfig();
-        },
-
-        removeWidget: function(data)
-        {
-            new sx.classes.DashboardWidget(this, data).remove();
-        },
-
-        _initSortable: function()
-        {
-            var self = this;
-
-            $(self.get('sortableSelector')).sortable(
-            {
-                connectWith: ".sx-columns",
-                cursor: "move",
-                handle: ".panel-heading",
-                forceHelperSize: true,
-                forcePlaceholderSize: true,
-                //delay: 150,
-                opacity: 0.5,
-                placeholder: "ui-state-highlight",
-                stop: function( event, ui )
-                {
-                    self.trigger('change', {
-                        'event' : event,
-                        'ui' : ui,
+                    var ids = [];
+                    $(".sx-dashboard-widget", $(this)).each(function()
+                    {
+                        ids.push($(this).data('id'));
                     });
-                }
 
-            }).disableSelection();
-        }
-    });
-
-    sx.Dashboard = new sx.classes.Dashboard({$jsonData});
-
-
-    sx.classes.DashboardWidget = sx.classes.Component.extend({
-
-        construct: function (Dashboard, opts)
-        {
-            var self = this;
-            opts = opts || {};
-            this.Dashboard = Dashboard;
-            //this.parent.construct(opts);
-            this.applyParentMethod(sx.classes.Component, 'construct', [opts]); // TODO: make a workaround for magic parent calling
-        },
-
-        _init: function()
-        {
-            var self = this;
-        },
-
-        /**
-        *
-        * @returns {*|HTMLElement}
-        */
-        getJWrapper: function()
-        {
-            return $('.sx-dashboard-widget[data-id=' + this.get('id') + ']');
-        },
-
-        remove: function()
-        {
-            var self = this;
-            var jWrapper = this.getJWrapper();
-
-            var ajax = sx.ajax.preparePostQuery(this.Dashboard.get('backendWidgetRemove'), {
-                'id' : this.get('id')
-            });
-
-            new sx.classes.AjaxHandlerNoLoader(ajax);
-
-            var Handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                'enableBlocker' : true,
-                'blockerSelector' : jWrapper
-            });
-
-            Handler.bind('success', function()
-            {
-                jWrapper.fadeOut('fast', function()
-                {
-                    $(this).remove();
+                    data[ $(this).data('column') ] = ids;
                 });
-            });
 
-            ajax.onError(function(e, data)
+                return data;
+            },
+
+            save: function()
             {
-                sx.notify.info("Подождите сейчас страница будет перезагружена");
-                _.delay(function()
+                var self = this;
+                var data = self.getData();
+
+                var ajax = sx.ajax.preparePostQuery(this.get('backendPrioritySave'), data);
+
+                new sx.classes.AjaxHandlerNoLoader(ajax);
+
+                new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                    'enableBlocker' : true,
+                    'blockerSelector' : this.getJWrapper()
+                });
+
+                ajax.onError(function(e, data)
                 {
-                    //window.location.reload();
-                }, 2000);
-            })
-            .onSuccess(function(e, data)
-            {})
-            .execute();
-        },
+                    sx.notify.info("Подождите сейчас страница будет перезагружена");
+                    _.delay(function()
+                    {
+                        //window.location.reload();
+                    }, 2000);
+                })
+                .onSuccess(function(e, data)
+                {
+                    //blocker.unblock();
+                })
+                .execute();
+            },
 
-        editConfig: function()
-        {
-            this.Window = new sx.classes.Window(this.get('editConfigUrl'), 'sx-edit-widget-' + this.get('id'));
-            this.Window.open();
 
-            this.Window.bind('close', function()
+            editConfigWidget: function(data)
             {
-                window.location.reload();
-            });
-        }
-    });
+                new sx.classes.DashboardWidget(this, data).editConfig();
+            },
+
+            removeWidget: function(data)
+            {
+                new sx.classes.DashboardWidget(this, data).remove();
+            },
+
+            _initSortable: function()
+            {
+                var self = this;
+
+                $(self.get('sortableSelector')).sortable(
+                {
+                    connectWith: ".sx-columns",
+                    cursor: "move",
+                    handle: ".panel-heading",
+                    forceHelperSize: true,
+                    forcePlaceholderSize: true,
+                    //delay: 150,
+                    opacity: 0.5,
+                    placeholder: "ui-state-highlight",
+                    stop: function( event, ui )
+                    {
+                        self.trigger('change', {
+                            'event' : event,
+                            'ui' : ui,
+                        });
+                    }
+
+                }).disableSelection();
+            }
+        });
+
+        sx.Dashboard = new sx.classes.Dashboard({$jsonData});
 
 
-})(sx, sx.$, sx._);
+        sx.classes.DashboardWidget = sx.classes.Component.extend({
+
+            construct: function (Dashboard, opts)
+            {
+                var self = this;
+                opts = opts || {};
+                this.Dashboard = Dashboard;
+                //this.parent.construct(opts);
+                this.applyParentMethod(sx.classes.Component, 'construct', [opts]); // TODO: make a workaround for magic parent calling
+            },
+
+            _init: function()
+            {
+                var self = this;
+            },
+
+            /**
+            *
+            * @returns {*|HTMLElement}
+            */
+            getJWrapper: function()
+            {
+                return $('.sx-dashboard-widget[data-id=' + this.get('id') + ']');
+            },
+
+            remove: function()
+            {
+                var self = this;
+                var jWrapper = this.getJWrapper();
+
+                var ajax = sx.ajax.preparePostQuery(this.Dashboard.get('backendWidgetRemove'), {
+                    'id' : this.get('id')
+                });
+
+                new sx.classes.AjaxHandlerNoLoader(ajax);
+
+                var Handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                    'enableBlocker' : true,
+                    'blockerSelector' : jWrapper
+                });
+
+                Handler.bind('success', function()
+                {
+                    jWrapper.fadeOut('fast', function()
+                    {
+                        $(this).remove();
+                    });
+                });
+
+                ajax.onError(function(e, data)
+                {
+                    sx.notify.info("Подождите сейчас страница будет перезагружена");
+                    _.delay(function()
+                    {
+                        //window.location.reload();
+                    }, 2000);
+                })
+                .onSuccess(function(e, data)
+                {})
+                .execute();
+            },
+
+            editConfig: function()
+            {
+                this.Window = new sx.classes.Window(this.get('editConfigUrl'), 'sx-edit-widget-' + this.get('id'));
+                this.Window.open();
+
+                this.Window.bind('close', function()
+                {
+                    window.location.reload();
+                });
+            }
+        });
+
+
+    })(sx, sx.$, sx._);
 
 
 JS
-);
+    );
 
-?>
+    ?>
+<? endif; ?>

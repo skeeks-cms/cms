@@ -79,6 +79,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         'label'                 => \Yii::t('app','The ability to edit settings'),
     ]); ?>
 
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_DASHBOARDS_EDIT,
+        'label'                 => \Yii::t('app','Access to edit dashboards'),
+    ]); ?>
+
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('app',"Control recodrs")]); ?>
 

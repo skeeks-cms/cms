@@ -210,6 +210,7 @@ return [
             ]
         ],
 
+
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
             'description'   => \Yii::t('app','Access to personal files')
@@ -223,6 +224,11 @@ return [
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
             'description'   => \Yii::t('app','Access to all files')
+        ],
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_DASHBOARDS_EDIT,
+            'description'   => \Yii::t('app','Access to edit dashboards')
         ],
     ],
 
