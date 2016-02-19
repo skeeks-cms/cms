@@ -15,7 +15,7 @@ Skeeks CMS 2.* (Yii2 cms)
 [![Video on youtube](http://img.youtube.com/vi/u9JRc27WVYY/0.jpg)](http://www.youtube.com/watch?v=u9JRc27WVYY)
 
 
-##Images
+##screenshot
 [![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)]
 
 
@@ -50,7 +50,7 @@ Update file: common/config/db.php
 php yii cms/db/first-dump-restore
 ```
 
-##Backend (username and password by default)
+###Backend (username and password by default)
 
 http://your-site.ru/~sx
 
