@@ -15,10 +15,14 @@ Skeeks CMS 2.* (Yii2 cms)
 [![Video on youtube](http://img.youtube.com/vi/u9JRc27WVYY/0.jpg)](http://www.youtube.com/watch?v=u9JRc27WVYY)
 
 
-##screenshot
+##Screenshot
 [![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)](http://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)
 
 [![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)
+
+
+[![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/93/1b/7d/931b7d207ca2d0ea41ddf45193fea218.png)](http://cms.skeeks.com/uploads/all/93/1b/7d/931b7d207ca2d0ea41ddf45193fea218.png)
+
 
 
 
