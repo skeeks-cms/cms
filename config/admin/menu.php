@@ -69,7 +69,7 @@ function dashboardsMenu()
                 'url'       => ["admin/index/dashboard", "pk" => $dashboard->id],
                 "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
                 {
-                    return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                    return (bool) (\Yii::$app->controller->action->uniqueId == 'admin/index/dashboard' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->url, 'pk') == \Yii::$app->request->get('pk'));
                 },
             ];
 
