@@ -107,9 +107,11 @@
                 }
               });
 
-            var jQueryLi = $("li.active", $("ul.nav-sidebar")).parent().parent('li');
+            var jQueryActiveLi = $("li.active", $("ul.nav-sidebar"));
+            var jQueryLi = jQueryActiveLi.parent().parent('li');
             jQueryLi.addClass('opened');
             jQueryLi.children("ul").slideDown();
+            jQueryActiveLi.children("ul").slideDown();
         }
 
     });

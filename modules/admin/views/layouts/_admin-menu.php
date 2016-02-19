@@ -36,7 +36,7 @@
                     <? foreach ($subAdminMenuItems as $subAdminMenuItem) : ?>
                         <? if ($subAdminMenuItem->isAllowShow()) : ?>
                             <li <?= $subAdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                <a href="<?= $subAdminMenuItem->getUrl() ? $subAdminMenuItem->getUrl() : "#" ?>" title="<?= $subAdminMenuItem->label; ?>" class="sx-test">
+                                <a href="<?= $subAdminMenuItem->getUrl() ? $subAdminMenuItem->getUrl() : "#" ?>" title="<?= $subAdminMenuItem->label; ?>">
                                     <span class="sx-icon">
                                         <img src="<?= $subAdminMenuItem->getImgUrl(); ?>" />
                                     </span>
@@ -52,7 +52,7 @@
                                         <? foreach ($sub3AdminMenuItems as $sub3AdminMenuItem) : ?>
                                             <? if ($sub3AdminMenuItem->isAllowShow()) : ?>
                                                 <li <?= $sub3AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                    <a href="<?= $sub3AdminMenuItem->getUrl() ? $sub3AdminMenuItem->getUrl() : "#" ?>" title="<?= $sub3AdminMenuItem->label; ?>" class="sx-test">
+                                                    <a href="<?= $sub3AdminMenuItem->getUrl() ? $sub3AdminMenuItem->getUrl() : "#" ?>" title="<?= $sub3AdminMenuItem->label; ?>">
                                                         <span class="sx-icon">
                                                             <img src="<?= $sub3AdminMenuItem->getImgUrl(); ?>" />
                                                         </span>
@@ -68,7 +68,7 @@
                                                         <? foreach ($sub4AdminMenuItems as $sub4AdminMenuItem) : ?>
                                                             <? if ($sub4AdminMenuItem->isAllowShow()) : ?>
                                                                 <li <?= $sub4AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                                    <a href="<?= $sub4AdminMenuItem->getUrl() ?>" title="<?= $sub4AdminMenuItem->label; ?>" class="sx-test">
+                                                                    <a href="<?= $sub4AdminMenuItem->getUrl() ?>" title="<?= $sub4AdminMenuItem->label; ?>">
                                                                         <span class="sx-icon">
                                                                             <img src="<?= $sub4AdminMenuItem->getImgUrl(); ?>" />
                                                                         </span>
@@ -85,7 +85,7 @@
                                                                         <? foreach ($sub5AdminMenuItems as $sub5AdminMenuItem) : ?>
                                                                             <? if ($sub5AdminMenuItem->isAllowShow()) : ?>
                                                                                 <li <?= $sub5AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                                                    <a href="<?= $sub5AdminMenuItem->getUrl() ?>" title="<?= $sub5AdminMenuItem->label; ?>" class="sx-test">
+                                                                                    <a href="<?= $sub5AdminMenuItem->getUrl() ?>" title="<?= $sub5AdminMenuItem->label; ?>">
                                                                                         <span class="sx-icon">
                                                                                             <img src="<?= $sub5AdminMenuItem->getImgUrl(); ?>" />
                                                                                         </span>

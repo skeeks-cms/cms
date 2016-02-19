@@ -32,11 +32,14 @@ class AdminMenuItemCmsConent extends AdminMenuItem
         {
             if ($content_id = ArrayHelper::getValue($this->url, 'content_id'))
             {
-                if ($content_id == \Yii::$app->request->get("content_id"))
+                if ($content_id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == $this->url[0])
                 {
                     return true;
                 }
             }
+        } else
+        {
+            return parent::isActive();
         }
 
         return false;
