@@ -17,13 +17,10 @@ Skeeks CMS 2.* (Yii2 cms)
 
 ##Screenshot
 [![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)](http://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)
-
+___
 [![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)](http://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)
-
-
+___
 [![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/93/1b/7d/931b7d207ca2d0ea41ddf45193fea218.png)](http://cms.skeeks.com/uploads/all/93/1b/7d/931b7d207ca2d0ea41ddf45193fea218.png)
-
-
 
 
 
@@ -58,7 +55,7 @@ Update file: common/config/db.php
 php yii cms/db/first-dump-restore
 ```
 
-###Backend (username and password by default)
+*  Backend (username and password by default)
 
 http://your-site.ru/~sx
 
