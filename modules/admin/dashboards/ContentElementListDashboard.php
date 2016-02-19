@@ -259,7 +259,6 @@ class ContentElementListDashboard extends AdminDashboardWidgetRenderable
     {
         echo $form->fieldSet(\Yii::t('app','Main'));
             echo $form->field($this, 'name');
-            echo $form->field($this, 'limit');
         echo $form->fieldSetEnd();
 
         echo $form->fieldSet(\Yii::t('app','Pagination'));
@@ -286,6 +285,15 @@ class ContentElementListDashboard extends AdminDashboardWidgetRenderable
                     'attributeMulti' => 'tree_ids'
                 ]
             );
+        echo $form->fieldSetEnd();
+
+        echo $form->fieldSet(\Yii::t('app','Sorting and quantity'));
+            echo $form->field($this, 'limit');
+            echo $form->fieldSelect($this, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels());
+            echo $form->fieldSelect($this, 'order', [
+            SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
+            SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
+        ]);
         echo $form->fieldSetEnd();
     }
 }
