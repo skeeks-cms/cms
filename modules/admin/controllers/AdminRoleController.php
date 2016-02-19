@@ -199,10 +199,10 @@ class AdminRoleController extends AdminModelEditorController
         {
             if ($model->load(\Yii::$app->request->post()) && $model->save())
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('app'.'Saved successfully'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Saved successfully'));
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Failed to save'));
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app', 'Failed to save'));
             }
         }
 
