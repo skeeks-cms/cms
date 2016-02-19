@@ -17,7 +17,6 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
 use skeeks\cms\models\User;
-use skeeks\sx\File;
 use Yii;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;

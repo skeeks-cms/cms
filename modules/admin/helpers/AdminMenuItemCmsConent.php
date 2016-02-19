@@ -23,6 +23,11 @@ class AdminMenuItemCmsConent extends AdminMenuItem
      */
     public function isActive()
     {
+        /*if (!parent::isActive())
+        {
+            return false;
+        }*/
+
         if (is_array($this->url))
         {
             if ($content_id = ArrayHelper::getValue($this->url, 'content_id'))

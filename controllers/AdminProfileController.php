@@ -19,6 +19,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
+use skeeks\cms\rbac\CmsManager;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -31,6 +32,14 @@ use yii\web\Response;
  */
 class AdminProfileController extends AdminModelEditorController
 {
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return CmsManager::PERMISSION_ADMIN_ACCESS;
+    }
+
     public function init()
     {
         $this->name                     = "Личный кабинет";

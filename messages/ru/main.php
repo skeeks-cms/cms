@@ -193,6 +193,7 @@ return
     "If a user, for a specified time, not active in the admin panel, it will be prompted for a password." => "Если пользователь, в течение указанного времени, не проявит активность в админ панели, у него будет запрошен пароль.",
     "Access"                => "Доступ",
     "Access to the administrate area" => "Доступ к административной части",
+    "Access to edit dashboards"     => "Возможность управлять рабочими стоами",
     "The ability to create records" => "Возможность создания записей",
     "The ability to update records" => "Возможность обновления записей",
     "The ability to update service information at records" => "Возможность обновления служебной информации записей",
@@ -929,6 +930,17 @@ return
     "The ability to edit view files" => "Возможно редактировать файлы представлений",
     "The ability to edit settings" => "Возможность управять настройками",
 
-    "Choose" => "Выбрать",
+    "Choose"        => "Выбрать",
+    "Dashboards"    => "Рабочие столы",
+    "Dashboard"     => "Рабочий стол",
+
+    "Add dashboard"                         => "Добавить рабочий стол",
+    "Number of columns"                     => "Количество колонок",
+    "Basic widgets"                         => "Базовые виджеты",
+    "Add widget"                            => "Добавить виджет",
+    "Disk space"                            => "Место на диске",
+    "Short info"                            => "Краткая информация",
+    "Information about SkeekS CMS"          => "Информация о SkeekS CMS",
+    "The list of content items"             => "Список элементов контента",
 
 ];

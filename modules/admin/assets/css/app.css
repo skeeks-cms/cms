@@ -1,5 +1,5 @@
 /**
-* Перекрытие некоторых стилей
+* Overlap some basic styles
 */
 html
 {
@@ -20,7 +20,7 @@ body
     padding-top: 4px;
 }
 
-iframe{
+iframe {
     border: 0px;
 }
 
@@ -30,17 +30,46 @@ iframe{
     max-height: 20px;
 }
 
+
+
 .main {
-    /*padding: 70px 30px 40px 280px;*/
-    padding: 60px 0px 40px 270px;
+    padding: 50px 0px 40px 270px;
     background: none;
 }
 
+.main:after
+{
+    clear: both;
+    display: table;
+    content: " ";
+}
+.main:before
+{
+    content: " ";
+    display: table;
+}
+
+    .main .sx-main-body
+    {
+        margin-top: 10px;
+    }
+
+@media (max-width: 767px)
+{
+    .main
+    {
+        padding: 50px 0px 0 24px!important;
+    }
+}
+
+
 body.sidebar-hidden .main
 {
-    /*padding: 70px 30px 40px 30px;*/
-    padding: 60px 0px 40px 26px;
+    padding: 50px 0px 0px 26px;
 }
+
+
+
 
 .navbar-brand:hover i
 {
@@ -63,6 +92,8 @@ body.sidebar-hidden .main
 {
     margin-right: 0px;
 }
+
+
 footer.sx-admin-footer
 {
     width: 100%;
@@ -151,12 +182,12 @@ body.sidebar-hidden footer.sx-admin-footer
         padding: 0;
     }
 
-        body.empty .main>.col-lg-12
+        body.empty .main>.sx-main-body
         {
             margin: 0;
             padding: 0;
         }
-            body.empty .main>.col-lg-12>.sx-panel
+            body.empty .main>.sx-main-body>.sx-panel
             {
                 margin: 0;
             }
@@ -198,342 +229,6 @@ form.sx-form-admin
     }
 
 
-
-/**
-* Доработка панелей
-*/
-body.empty .sx-panel
-{
-    box-shadow: none;
-    margin-bottom: 60px;
-}
-
-.sx-panel
-{
-    box-shadow: 1px 7px 16px rgba(0, 0, 0, 0.42);
-    margin-bottom: 60px;
-}
-
-    .sx-panel .breadcrumb
-    {
-        height: auto;
-        padding: 8px 15px;
-        line-height: normal;
-    }
-
-
-
-        .sx-panel .breadcrumb>.active
-        {
-            color: #ffffff;
-        }
-
-        .sx-panel .breadcrumb li
-        {
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
-        }
-        .sx-panel .breadcrumb li a
-        {
-            color: #ffffff;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
-        }
-
-    .sx-panel .sx-nav
-    {
-        border-bottom: 1px solid rgba(32, 168, 216, 0.23);
-        height: 40px;
-    }
-
-
-    .sx-panel.panel-default
-    {
-        box-shadow: 0px 0px 3px 0px rgba(32, 168, 216, 0.5);
-    }
-
-    .sx-panel.panel-default .panel-heading
-    {
-        background: #f8f9fa;
-        border-bottom: 1px solid rgba(32, 168, 216, 0.23);
-    }
-
-
-
-
-    .sx-panel.panel-default > .panel-heading > h2
-    {
-        color: black;
-    }
-
-    .sx-panel.panel-primary > .panel-heading > h2
-    {
-        color: white;
-    }
-
-    .sx-panel .panel-body
-    {
-        padding: 0px;
-    }
-        .sx-panel .panel-body .panel-content
-        {
-            padding: 15px;
-        }
-
-    .sx-nav>li>a
-    {
-        border-radius: 0;
-        padding: 9px 10px;
-        font-size: 14px;
-        height: 40px;
-
-    }
-
-
-
-    /**
-* Доработка слайдбара
-*/
-.sidebar .sidebar-footer {
-    height: 43px;
-}
-
-
-.sx-sidebar
-{
-    background: rgba(208, 208, 208, 0.32);
-    padding-left: 10px;
-    z-index: 1;
-    width: 270px;
-}
-
-.sx-sidebar:hover
-{
-    background: rgba(208, 208, 208, 0.5);
-}
-
-    .sx-sidebar .sidebar-collapse
-    {
-        margin-bottom: 70px;
-    }
-
-    .sx-sidebar a
-    {
-        color: black;
-    }
-
-    .sx-sidebar .inner-wrapper
-    {
-        overflow-y: auto;
-        width: 260px;
-        height: 100%;
-    }
-
-
-
-
-    .sx-sidebar .sidebar-menu
-    {
-        width: 240px;
-        border: 1px solid #20a8d8;
-        margin-bottom: 0px;
-        margin-top: 10px;
-        overflow: hidden;
-        background: white;
-        box-shadow: 1px 5px 9px rgba(0, 0, 0, 0.42);
-    }
-
-        .sx-sidebar .sidebar-menu:hover
-        {
-            box-shadow: 1px 5px 9px rgba(32, 168, 216, 0.69)
-        }
-
-        .sx-sidebar .sidebar-menu .sx-head
-        {
-            cursor: pointer;
-            background: #5dc3e7;
-            color: white;
-            /*text-transform: uppercase;*/
-            font-weight: bold;
-            padding: 5px 0px;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.41);
-            font-size: 14px;
-        }
-
-            .sx-sidebar .sidebar-menu .sx-head .icon
-            {
-                float:  left;
-                padding-left: 10px;
-                /* font-size: 17px; */
-                cursor: pointer;
-                padding-top: 3px;
-                padding-right: 5px;
-            }
-            .sx-sidebar .sidebar-menu .sx-head .sx-icon
-            {
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-                .sx-sidebar .sidebar-menu .sx-head .sx-icon img
-                {
-                    max-width: 20px;
-                    max-height: 16px;
-                }
-
-        .sidebar ul.nav.nav-sidebar li a i
-        {
-            color: black;
-        }
-
-
-        .sidebar .nav>li>a
-        {
-            padding: 5px 0px;
-        }
-
-        .sidebar ul.nav.nav-sidebar li a i
-        {
-            margin: 0px;
-        }
-
-        .sidebar ul.nav.nav-sidebar li a
-        {
-            text-transform: none;
-        }
-
-        .sidebar ul.nav.nav-sidebar li.active, .sidebar ul.nav.nav-sidebar li:hover, .sidebar ul.nav.nav-sidebar li.opened
-        {
-            background: rgba(93, 195, 231, 0.3);
-            color: black;
-            border-left: 3px solid #20a8d8;
-        }
-
-        .sidebar ul.nav.nav-sidebar li ul li a
-        {
-            line-height: 20px;
-        }
-
-        .sidebar ul.nav.nav-sidebar li ul
-        {
-            background: rgba(93, 195, 231, 0.0);
-        }
-
-
-            .sidebar ul.nav.nav-sidebar li a .sx-icon
-            {
-                width: 33px;
-                position: relative;
-                float: left;
-            }
-
-                .sidebar ul.nav.nav-sidebar li a .sx-icon img
-                {
-                    width: 16px;
-                    margin-left: 7px;
-                }
-
-                .sidebar ul.nav.nav-sidebar li a .txt
-                {
-                    /*font-size: 11px;*/
-                    /* SkeekS CMS 2.3.5 */
-                    font-size: 12px;
-                }
-
-
-
-
-
-
-
-
-
-
-
-/*************** SCROLLBAR MAC OS X ***************/
-
-.scrollbar-macosx > .scroll-element,
-.scrollbar-macosx > .scroll-element div
-{
-    background: none;
-    border: none;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    z-index: 10;
-}
-
-.scrollbar-macosx > .scroll-element div {
-    display: block;
-    height: 100%;
-    left: 0;
-    top: 0;
-    width: 100%;
-}
-
-.scrollbar-macosx > .scroll-element .scroll-element_track { display: none; }
-.scrollbar-macosx > .scroll-element .scroll-bar {
-    background-color: #6C6E71;
-    display: block;
-
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    filter: alpha(opacity=0);
-    opacity: 0;
-
-    -webkit-border-radius: 7px;
-    -moz-border-radius: 7px;
-    border-radius: 7px;
-
-    -webkit-transition: opacity 0.2s linear;
-    -moz-transition: opacity 0.2s linear;
-    -o-transition: opacity 0.2s linear;
-    -ms-transition: opacity 0.2s linear;
-    transition: opacity 0.2s linear;
-}
-.scrollbar-macosx:hover > .scroll-element .scroll-bar,
-.scrollbar-macosx > .scroll-element.scroll-draggable .scroll-bar {
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
-    filter: alpha(opacity=70);
-    opacity: 0.7;
-}
-
-
-.scrollbar-macosx > .scroll-element.scroll-x {
-    bottom: 0px;
-    height: 0px;
-    left: 0;
-    min-width: 100%;
-    overflow: visible;
-    width: 100%;
-}
-
-.scrollbar-macosx > .scroll-element.scroll-y {
-    height: 100%;
-    min-height: 100%;
-    right: 0px;
-    top: 0;
-    width: 0px;
-}
-
-/* scrollbar height/width & offset from container borders */
-.scrollbar-macosx > .scroll-element.scroll-x .scroll-bar { height: 7px; min-width: 10px; top: -9px; }
-.scrollbar-macosx > .scroll-element.scroll-y .scroll-bar { left: -9px; min-height: 10px; width: 7px; }
-
-.scrollbar-macosx > .scroll-element.scroll-x .scroll-element_outer { left: 2px; }
-.scrollbar-macosx > .scroll-element.scroll-x .scroll-element_size { left: -4px; }
-
-.scrollbar-macosx > .scroll-element.scroll-y .scroll-element_outer { top: 2px; }
-.scrollbar-macosx > .scroll-element.scroll-y .scroll-element_size { top: -4px; }
-
-/* update scrollbar offset if both scrolls are visible */
-.scrollbar-macosx > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_size { left: -11px; }
-.scrollbar-macosx > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_size { top: -11px; }
-
-
-
-
-
-
-
-
 div#jGrowl
 {
     top: 130px;
@@ -559,10 +254,6 @@ div#jGrowl
 }
 
 
-
-
-
-
 .sx-main-menu-toggle-opened
 {
     position: fixed;
@@ -579,39 +270,6 @@ div#jGrowl
     top: 50%;
     left: 12px;
 }
-
-
-
-
-
-
-
-    body.sidebar-hidden .sx-main-menu-toggle-closed
-    {
-        display: block;
-    }
-
-    body.sidebar-hidden .sx-main-menu-toggle-opened
-    {
-        display: none;
-    }
-
-    body.empty.sidebar-hidden .sx-sidebar
-    {
-        display: none;
-    }
-
-    body.sidebar-hidden .sx-sidebar
-    {
-        display: block;
-        width: 25px;
-    }
-
-    body.sidebar-hidden .sx-sidebar .inner-wrapper
-    {
-        display: none;
-    }
-
 
 
 .sx-hide {
@@ -633,16 +291,6 @@ div#jGrowl
     border-right: 1px solid #ddd;
 }
 
-
-
-
-
-.sidebar ul.nav.nav-sidebar li a.active,
-.sidebar ul.nav.nav-sidebar li a:hover,
-.sidebar ul.nav.nav-sidebar li a:focus {
-    background: transparent;
-    color: black
-}
 
 .panel .panel-heading h2, .panel .panel-heading h3
 {

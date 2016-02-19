@@ -85,21 +85,7 @@ JS
     <img src="<?= $urlBg; ?>" id="sx-auth-bg"/></div>
 </div>
 
-<footer class="sx-admin-footer">
-    <div class="row">
-        <div class="col-sm-5">
-            <div class="sx-footer-copyright">
-                <a href="http://cms.skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site {cms}',['cms' => 'SkeekS CMS'])?>">
-                    <?= \Yii::$app->cms->moduleCms()->getDescriptor()->getCopyright(); ?>
-                </a>
-                | <a href="http://skeeks.com" target="_blank" data-sx-widget="tooltip" title="<?=\Yii::t('app','Go to site of the developer')?>">SkeekS.com</a>
-            </div>
-        </div><!--/.col-->
-        <div class="col-sm-7 text-right">
-
-        </div><!--/.col-->
-    </div><!--/.row-->
-</footer>
+    <?php echo $this->render('_footer'); ?>
     <?php $this->endBody() ?>
 </body>
 </html>

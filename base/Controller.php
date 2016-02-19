@@ -10,9 +10,6 @@
  */
 
 namespace skeeks\cms\base;
-use skeeks\cms\App;
-use skeeks\cms\helpers\FileHelper;
-use skeeks\sx\File;
 use yii\base\Exception;
 use yii\base\InvalidParamException;
 use yii\web\Application;
@@ -60,10 +57,14 @@ class Controller extends YiiWebController
             return parent::render($view, $params);
         }
 
+
         try
         {
             $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
             return parent::render($viewApp, $params);
+
+            /*$this->viewPath = $this->beforeRender . $this->module->id . '/' . $this->id;
+            return parent::render($view, $params);*/
 
         }  catch (InvalidParamException $e)
         {

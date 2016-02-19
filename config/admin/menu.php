@@ -34,7 +34,7 @@ function contentMenu()
                     $itemData['items'][] =
                     [
                         'label' => $content->name,
-                        'url'   => ["cms/admin-cms-content-element/index", "content_id" => $content->id, "content_type" => $contentType->code],
+                        'url'   => ["cms/admin-cms-content-element", "content_id" => $content->id],
 
                     ];
                 }
@@ -42,6 +42,46 @@ function contentMenu()
 
             $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
         }
+    }
+
+    return $result;
+};
+
+
+/**
+ * Меню контента
+ * @return array
+ */
+function dashboardsMenu()
+{
+    $result = [];
+
+    if ($dashboards = \skeeks\cms\models\CmsDashboard::find()->orderBy("priority ASC")->all())
+    {
+        /**
+         * @var $dashboard \skeeks\cms\models\CmsDashboard
+         */
+        foreach ($dashboards as $dashboard)
+        {
+            $itemData = [
+                'label'     => $dashboard->name,
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png'],
+                'url'       => ["admin/index/dashboard", "pk" => $dashboard->id],
+                "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                {
+                    return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                },
+            ];
+
+            $result[] = $itemData;
+        }
+    } else
+    {
+        $result[] = [
+            "label"     => \Yii::t('app', "Рабочий стол 1"),
+            "url"       => ["admin/index"],
+            "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png']
+        ];
     }
 
     return $result;
@@ -127,18 +167,27 @@ function componentsMenu()
 
 return
 [
+    'dashboard' =>
+    [
+        'priority'  => 100,
+        'label'     => \Yii::t('app','Dashboards'),
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png'],
+
+        'items' => dashboardsMenu()
+    ],
+
     'content' =>
     [
-        'priority'  => 0,
+        'priority'  => 200,
         'label'     => \Yii::t('app','Content'),
-        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif'],
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/sections.png'],
 
         'items' => array_merge([
 
             [
                 "label"     => \Yii::t('app',"Sections"),
                 "url"       => ["cms/admin-tree"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.gif']
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/sections.png']
             ],
 
             [
@@ -149,7 +198,7 @@ return
 
             [
                 "label"     => \Yii::t('app',"File storage"),
-                "url"       => ["cms/admin-storage-files/index"],
+                "url"       => ["cms/admin-storage-files"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/storage_file.png'],
             ],
 
@@ -159,16 +208,16 @@ return
 
     'settings' =>
     [
-        'priority'  => 10,
+        'priority'  => 300,
         'label'     => \Yii::t('app','Settings'),
-        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
 
         'items' =>
         [
 
             [
                 "label"     => \Yii::t('app',"Product settings"),
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
 
                 'items' =>
                 [
@@ -220,7 +269,7 @@ return
                     [
                         "label"     => \Yii::t('app',"Module settings"),
                         "url"       => ["cms/admin-settings"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
                         'items'     => componentsMenu()
                     ],
 
@@ -251,7 +300,7 @@ return
                     [
                         "label"     => \Yii::t('app',"User properties"),
                         "url"       => ["cms/admin-cms-user-universal-property"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png']
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png']
                     ],
 
                     [
@@ -302,7 +351,7 @@ return
                     [
                         "label" => \Yii::t('app',"Settings"),
                         "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\components\CmsSearchComponent'],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
                         "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
                         {
                             return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
@@ -413,7 +462,7 @@ return
 
     'marketplace' =>
     [
-        'priority'  => 20,
+        'priority'  => 400,
         'label'     => \Yii::t('app','Marketplace'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png'],
 
@@ -449,7 +498,7 @@ return
 
     'other' =>
     [
-        'priority'  => 100,
+        'priority'  => 500,
         'label'     => \Yii::t('app','Additionally'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/other.png'],
 

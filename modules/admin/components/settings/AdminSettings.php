@@ -7,16 +7,24 @@
  */
 namespace skeeks\cms\modules\admin\components\settings;
 use skeeks\cms\base\Component;
+use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\modules\admin\assets\AdminAsset;
+use skeeks\cms\modules\admin\base\AdminDashboardWidget;
+use skeeks\cms\modules\admin\dashboards\AboutCmsDashboard;
+use skeeks\cms\modules\admin\dashboards\CmsInformDashboard;
+use skeeks\cms\modules\admin\dashboards\ContentElementListDashboard;
+use skeeks\cms\modules\admin\dashboards\DiscSpaceDashboard;
 use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
 
 /**
  * @property CmsLang $cmsLanguage
+ * @property [] $dasboardWidgets
+ * @property [] $dasboardWidgetsLabels
  *
  * Class AdminSettings
  * @package skeeks\cms\modules\admin\components\settings
@@ -35,6 +43,8 @@ class AdminSettings extends Component
     }
 
     public $asset;
+
+    public $userDashboardWidgets = [];
 
     //Всплывающие окошки
     public $enableCustomConfirm     = Cms::BOOL_Y;
@@ -58,6 +68,69 @@ class AdminSettings extends Component
 
 
     public $blockedTime                 = 900; //15 минут
+
+
+    /**
+     * @return array
+     */
+    public function getDasboardWidgets()
+    {
+        $baseWidgets = [
+            \Yii::t('app', 'Basic widgets') =>
+            [
+                AboutCmsDashboard::className(),
+                CmsInformDashboard::className(),
+                DiscSpaceDashboard::className(),
+                ContentElementListDashboard::className(),
+            ]
+        ];
+
+        $widgetsAll = ArrayHelper::merge($baseWidgets, $this->userDashboardWidgets);
+
+        $result = [];
+        foreach ($widgetsAll as $label => $widgets)
+        {
+            if (is_array($widgets))
+            {
+                $resultWidgets = [];
+                foreach ($widgets as $key => $classWidget)
+                {
+                    if (class_exists($classWidget) && is_subclass_of($classWidget, AdminDashboardWidget::className()))
+                    {
+                        $resultWidgets[$classWidget] = $classWidget;
+                    }
+                }
+
+                $result[$label] = $resultWidgets;
+            }
+
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDasboardWidgetsLabels()
+    {
+        $result = [];
+        if ($this->dasboardWidgets)
+        {
+            foreach ($this->dasboardWidgets as $label => $widgets)
+            {
+                $resultWidgets = [];
+                foreach ($widgets as $key => $widgetClassName)
+                {
+                    $resultWidgets[$widgetClassName] = (new $widgetClassName)->descriptor->name;
+                }
+
+                $result[$label] = $resultWidgets;
+            }
+        }
+
+        return $result;
+    }
 
 
     public function init()

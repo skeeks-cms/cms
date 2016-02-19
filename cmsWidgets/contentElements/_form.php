@@ -36,11 +36,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'name'
         )); ?>
 
-        <?= $form->fieldSelectMulti($model, 'content_ids', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\models\CmsContent::find()->active()->all(),
-            'id',
-            'name'
-        )); ?>
+        <?= $form->fieldSelectMulti($model, 'content_ids', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
 
         <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTree', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTreeChild', \Yii::$app->cms->booleanFormat()); ?>

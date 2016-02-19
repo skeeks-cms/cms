@@ -8,9 +8,6 @@
 {
     sx.classes.ComponentSettingsWidget = sx.classes.Component.extend({
 
-        _init: function()
-        {},
-
         getjWrapper: function()
         {
             return $("#" + this.get('id'));
@@ -92,8 +89,5 @@
             this.windowObject = new sx.classes.Window(url);
             this.windowObject.open();
         },
-
-        _onWindowReady: function()
-        {},
     });
 })(sx, sx.$, sx._);

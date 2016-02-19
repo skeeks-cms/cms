@@ -27,6 +27,7 @@ use yii\base\Event;
 use yii\base\Exception;
 use yii\base\InlineAction;
 use yii\base\Model;
+use yii\base\Theme;
 use yii\behaviors\BlameableBehavior;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
@@ -164,7 +165,18 @@ abstract class AdminController extends Controller
             $this->name = \Yii::t('app','The name of the controller'); //Inflector::humanize($this->id);
         }
 
-        $this->layout = \Yii::$app->cms->moduleAdmin()->layout;
+        //TODO: Добавить возможность настройки
+        /*\Yii::$app->view->theme = new Theme([
+            'pathMap' =>
+            [
+                '@app/views' =>
+                [
+                    '@skeeks/cms/modules/admin/views',
+                ]
+            ]
+        ]);*/
+
+        $this->layout = \Yii::$app->cms->moduleAdmin->layout;
 
         \Yii::$app->trigger(self::EVENT_INIT, new AdminInitEvent([
             'name'          => self::EVENT_INIT,

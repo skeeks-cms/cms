@@ -172,13 +172,13 @@ $config =
                 'default' =>
                 [
                     'name'          => 'Базовый шаблон (по умолчанию)',
-                    'pathMap'       =>
+                    /*'pathMap'       =>
                     [
                         '@app/views' =>
                         [
                             '@app/templates/default',
                         ],
-                    ]
+                    ]*/
                 ]
             ],
         ],
