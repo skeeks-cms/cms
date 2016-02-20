@@ -29,7 +29,7 @@ class AdminMenuItem extends Component
     /**
      * @var array|string|null путь до картинки
      */
-    public $img = ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ico_block.gif'];
+    public $img = ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/posteditem.png'];
 
     /**
      * @var array|string|null ссылка на раздел
