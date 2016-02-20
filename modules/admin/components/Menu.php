@@ -90,7 +90,6 @@ class Menu
             }
         }
 
-
         ArrayHelper::multisort($this->groups, 'priority');
 
         $this->isLoaded = true;
@@ -111,6 +110,7 @@ class Menu
         if ($data = $this->getData())
         {
             $result = AdminMenuItem::createItems($data);
+            ArrayHelper::multisort($result, 'priority');
         }
 
         return $result;

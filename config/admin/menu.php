@@ -176,7 +176,7 @@ return
 [
     'dashboard' =>
     [
-        'priority'  => 100,
+        'priority'  => 90,
         'label'     => \Yii::t('app','Dashboards'),
         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/dashboard.png'],
 

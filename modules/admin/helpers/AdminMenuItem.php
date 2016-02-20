@@ -49,7 +49,7 @@ class AdminMenuItem extends Component
     /**
      * @var int
      */
-    public $priority = 0;
+    public $priority = 100;
 
     /**
      * @var null
