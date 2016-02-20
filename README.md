@@ -10,6 +10,8 @@ Skeeks CMS 2.* (Yii2 cms)
 * [Докуметация (wiki)](http://dev.cms.skeeks.com/docs)
 * [Установка (install)](http://dev.cms.skeeks.com/docs/dev/ustanovka-nastroyka-konfigurirov/ustanovka-s-ispolzovaniem-composer)
 * [Компания разработчик (author)](http://skeeks.com)
+* [ChangeLog](https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md)
+* [Plans](https://github.com/skeeks-cms/cms/blob/master/PLANS.md)
 
 ##Last video
 [![Video on youtube](http://img.youtube.com/vi/u9JRc27WVYY/0.jpg)](http://www.youtube.com/watch?v=u9JRc27WVYY)
