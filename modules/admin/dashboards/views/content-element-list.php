@@ -12,6 +12,14 @@ $this->registerCss(<<<CSS
 {
     padding: 0 15px;
 }
+
+.sx-content-element-list .sx-content-element-list-controlls
+{
+    padding-top: 0px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
 CSS
 )
 ?>
@@ -52,6 +60,32 @@ CSS
         ]); ?>
 
     </div>
+
+
+    <? if (count($widget->content_ids) == 1) : ?>
+    <?
+        $contentId = array_shift($widget->content_ids);
+        /**
+         * @var $content \skeeks\cms\models\CmsContent
+         */
+        $content = \skeeks\cms\models\CmsContent::findOne($contentId)
+    ?>
+    <div class="col-md-12">
+        <div class="sx-content-element-list-controlls">
+            <a href="<?= \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-cms-content-element', 'content_id' => $contentId])?>" data-pjax="0" class="btn btn-primary">
+                <i class="glyphicon glyphicon-th-list"></i> <?/*= $content->name_meny */?> Все записи
+            </a>
+
+            <a href="<?= \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-cms-content-element/create', 'content_id' => $contentId])?>" data-pjax="0" class="btn btn-primary">
+                <i class="glyphicon glyphicon-plus"></i> <?/*= $content->name_meny */?> Добавить
+            </a>
+        </div>
+    </div>
+    <? endif; ?>
+
+
 </div>
+
+
 
 
