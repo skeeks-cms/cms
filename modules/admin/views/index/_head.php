@@ -50,6 +50,7 @@ JS
         ])?>
             <?= $form->field($dashboard, 'name'); ?>
             <?= $form->field($dashboard, 'columns'); ?>
+            <?= $form->field($dashboard, 'priority'); ?>
             <?= $form->buttonsStandart($dashboard, ['save']); ?>
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end()?>
     </div>
@@ -71,6 +72,7 @@ JS
         ])?>
             <?= $form->field($model, 'name'); ?>
             <?= $form->field($model, 'columns'); ?>
+            <?= $form->field($model, 'priority'); ?>
             <?= $form->buttonsStandart($model, ['save']); ?>
         <? \skeeks\cms\modules\admin\widgets\ActiveForm::end()?>
     </div>
