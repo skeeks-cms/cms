@@ -53,7 +53,7 @@ JS
 
                     $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
                     return "<a href='" . $model->src . "' class='sx-fancybox' data-pjax='0' title='" . \Yii::t('app','Increase') ."'>
-                            <img src='" . $smallImage . "' />
+                            <img src='" . $smallImage . "' style='max-width: 50px;'/>
                         </a>";
                 }
 
