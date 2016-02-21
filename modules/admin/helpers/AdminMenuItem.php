@@ -78,6 +78,18 @@ class AdminMenuItem extends Component
      */
     public function isActive()
     {
+        if ($this->items)
+        {
+            foreach ($this->items as $item)
+            {
+                if ($item->isActive())
+                {
+                    return true;
+                }
+            }
+        }
+
+
         if ($this->activeCallback && is_callable($this->activeCallback))
         {
             $callback = $this->activeCallback;
@@ -92,16 +104,7 @@ class AdminMenuItem extends Component
             }
         }
 
-        if ($this->items)
-        {
-            foreach ($this->items as $item)
-            {
-                if ($item->isActive())
-                {
-                    return true;
-                }
-            }
-        }
+
 
         return false;
     }
