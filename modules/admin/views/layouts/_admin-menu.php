@@ -31,92 +31,10 @@
                     <?= $adminMenuItem->label; ?>
                 </div>
 
-                <? if ($subAdminMenuItems = $adminMenuItem->items) : ?>
-                    <ul class="nav nav-sidebar">
-                    <? foreach ($subAdminMenuItems as $subAdminMenuItem) : ?>
-                        <? if ($subAdminMenuItem->isAllowShow()) : ?>
-                            <li <?= $subAdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                <a href="<?= $subAdminMenuItem->getUrl() ? $subAdminMenuItem->getUrl() : "#" ?>" title="<?= $subAdminMenuItem->label; ?>">
-                                    <span class="sx-icon">
-                                        <img src="<?= $subAdminMenuItem->getImgUrl(); ?>" />
-                                    </span>
-                                    <span class="txt"><?= $subAdminMenuItem->label; ?></span>
-                                    <? if ($subAdminMenuItem->items) : ?>
-                                        <span class="caret"></span>
-                                    <? endif; ?>
-                                </a>
+                <?= $this->render('_admin-menu-sub', [
+                    'subAdminMenuItems' => $adminMenuItem->items
+                ]); ?>
 
-
-                                    <? if ($sub3AdminMenuItems = $subAdminMenuItem->items) : ?>
-                                        <ul class="nav nav-sidebar">
-                                        <? foreach ($sub3AdminMenuItems as $sub3AdminMenuItem) : ?>
-                                            <? if ($sub3AdminMenuItem->isAllowShow()) : ?>
-                                                <li <?= $sub3AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                    <a href="<?= $sub3AdminMenuItem->getUrl() ? $sub3AdminMenuItem->getUrl() : "#" ?>" title="<?= $sub3AdminMenuItem->label; ?>">
-                                                        <span class="sx-icon">
-                                                            <img src="<?= $sub3AdminMenuItem->getImgUrl(); ?>" />
-                                                        </span>
-                                                        <span class="txt"><?= $sub3AdminMenuItem->label; ?></span>
-                                                        <? if ($sub3AdminMenuItem->items) : ?>
-                                                            <span class="caret"></span>
-                                                        <? endif; ?>
-                                                    </a>
-
-
-                                                    <? if ($sub4AdminMenuItems = $sub3AdminMenuItem->items) : ?>
-                                                        <ul class="nav nav-sidebar">
-                                                        <? foreach ($sub4AdminMenuItems as $sub4AdminMenuItem) : ?>
-                                                            <? if ($sub4AdminMenuItem->isAllowShow()) : ?>
-                                                                <li <?= $sub4AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                                    <a href="<?= $sub4AdminMenuItem->getUrl() ?>" title="<?= $sub4AdminMenuItem->label; ?>">
-                                                                        <span class="sx-icon">
-                                                                            <img src="<?= $sub4AdminMenuItem->getImgUrl(); ?>" />
-                                                                        </span>
-                                                                        <span class="txt"><?= $sub4AdminMenuItem->label; ?></span>
-                                                                        <? if ($sub4AdminMenuItem->items) : ?>
-                                                                            <span class="caret"></span>
-                                                                        <? endif; ?>
-                                                                    </a>
-
-
-
-                                                                    <? if ($sub5AdminMenuItems = $sub4AdminMenuItem->items) : ?>
-                                                                        <ul class="nav nav-sidebar">
-                                                                        <? foreach ($sub5AdminMenuItems as $sub5AdminMenuItem) : ?>
-                                                                            <? if ($sub5AdminMenuItem->isAllowShow()) : ?>
-                                                                                <li <?= $sub5AdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
-                                                                                    <a href="<?= $sub5AdminMenuItem->getUrl() ?>" title="<?= $sub5AdminMenuItem->label; ?>">
-                                                                                        <span class="sx-icon">
-                                                                                            <img src="<?= $sub5AdminMenuItem->getImgUrl(); ?>" />
-                                                                                        </span>
-                                                                                        <span class="txt"><?= $sub5AdminMenuItem->label; ?></span>
-                                                                                    </a>
-                                                                                </li>
-                                                                            <? endif; ?>
-                                                                        <? endforeach; ?>
-                                                                        </ul>
-                                                                    <? endif; ?>
-
-                                                                </li>
-                                                            <? endif; ?>
-                                                        <? endforeach; ?>
-                                                        </ul>
-                                                    <? endif; ?>
-
-
-                                                </li>
-                                            <? endif; ?>
-                                        <? endforeach; ?>
-                                        </ul>
-                                    <? endif; ?>
-
-                            </li>
-
-
-                        <? endif; ?>
-                    <? endforeach; ?>
-                    </ul>
-                <? endif; ?>
             </div>
         <? endif; ?>
     <? endforeach; ?>
