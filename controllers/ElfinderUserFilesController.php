@@ -35,5 +35,7 @@ class ElfinderUserFilesController extends ElfinderController
         }
 
         parent::init();
+
+        \Yii::$app->cmsToolbar->enabled = false;
     }
 }
