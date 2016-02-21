@@ -43,7 +43,7 @@ class ViewModelActionTree extends ViewModelAction
             ])->one();
 
             \Yii::$app->cms->setCurrentTree($treeNode);
-            $this->model   = \Yii::$app->cms->getCurrentTree();
+            $this->model   = \Yii::$app->cms->currentTree;
         }
 
         if ($this->model->redirect || $this->model->redirect_tree_id)
@@ -54,7 +54,12 @@ class ViewModelActionTree extends ViewModelAction
         //Пробуем рендерить view для текущего типа страницы
         if ($this->model)
         {
-            if ($this->model->treeType)
+            //Если у раздела указан персональный шаблон, рендерим его, иначе шаблон типа страницы
+            if ($this->model->view_file)
+            {
+                $this->view = $this->model->view_file;
+
+            } else if ($this->model->treeType)
             {
                 if ($this->model->treeType->viewFile)
                 {

@@ -77,6 +77,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                      ),
             ])->label('Тип раздела')->hint(\Yii::t('app','On selected type of partition can depend how it will be displayed.'));
         ?>
+
+        <?= $form->field($model, 'view_file')->textInput()
+            ->hint('@app/views/template-name || template-name'); ?>
+
     </div>
 
     <div data-listen="isLink" data-show="1" class="sx-hide">

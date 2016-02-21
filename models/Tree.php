@@ -72,6 +72,9 @@ use yii\helpers\Url;
  * @property integer $redirect_code
  * @property string $name_hidden
  *
+ *
+ * @property string $view_file //version > 2.4.8
+ *
  * @property string $absoluteUrl
  * @property string $url
  *
@@ -292,6 +295,7 @@ class Tree extends Core
             'redirect_tree_id' => Yii::t('app', 'Redirect Section'),
             'redirect_code' => Yii::t('app', 'Redirect Code'),
             'name_hidden' => Yii::t('app', 'Hidden Name'),
+            'view_file' => Yii::t('app', 'Template'),
         ]);
     }
 
@@ -322,6 +326,7 @@ class Tree extends Core
             ['description_full_type', 'string'],
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
+            ['view_file', 'string', 'max' => 128],
         ]);
     }
 
