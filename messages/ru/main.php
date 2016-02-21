@@ -942,5 +942,6 @@ return
     "Short info"                            => "Краткая информация",
     "Information about SkeekS CMS"          => "Информация о SkeekS CMS",
     "The list of content items"             => "Список элементов контента",
+    "Change sorting"                        => "Поменять сортировку",
 
 ];

@@ -210,7 +210,7 @@ class Tree
                     $openCloseLink = Html::a(
                         Html::tag("span", "" ,["class" => "glyphicon glyphicon-minus", "title" => \Yii::t('app',"Minimize")]),
                         $currentLink,
-                        ['class' => 'btn btn-xs btn-default']
+                        ['class' => 'btn btn-sm btn-default']
                     );
                 } else
                 {
@@ -221,7 +221,7 @@ class Tree
                     $openCloseLink = Html::a(
                         Html::tag("span", "" ,["class" => "glyphicon glyphicon-plus", "title" => \Yii::t('app',"Restore")]),
                         $currentLink,
-                        ['class' => 'btn btn-xs btn-default']
+                        ['class' => 'btn btn-sm btn-default']
                     );
                 }
 
@@ -357,8 +357,17 @@ JS
 
             $link = Html::a('<span class="glyphicon glyphicon-eye-open"></span>',
                              $model->getAbsoluteUrl(),
-                             ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-xs show-at-site", "title" => \Yii::t('app',"Show at site")]
+                             ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-sm show-at-site", "title" => \Yii::t('app',"Show at site")]
                     );
+
+            if ($model->level > 0)
+            {
+                $linkMove = Html::a('<span class="glyphicon glyphicon-move"></span>',
+                             "#",
+                             ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-sm sx-tree-move", "title" => \Yii::t('app',"Change sorting")]
+                    );
+            }
+
 
             $subsection = \Yii::t('app','Create subsection');
 
@@ -374,14 +383,10 @@ JS
 
                             ) .
 
-                            ($model->treeType ? Html::tag("div", $model->treeType->name, [
-                                "class"     => "pull-left sx-tree-type",
-                            ]) : '') .
-
                             Html::tag("div",
                                     DropdownControllerActions::widget([
                                         "controller"    => $controller,
-                                        "renderFirstAction"    => false,
+                                        "renderFirstAction"    => true,
                                         "containerClass"     => "dropdown pull-left",
                                         'clientOptions' =>
                                         [
@@ -391,7 +396,7 @@ JS
 
                                     Html::tag("div",
                                         <<<HTML
-                                        <a href="#" class="btn-tree-node-controll btn btn-default btn-xs add-tree-child" title="{$subsection}" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
+                                        <a href="#" class="btn-tree-node-controll btn btn-default btn-sm add-tree-child" title="{$subsection}" data-id={$model->id}><span class="glyphicon glyphicon-plus"></span></a>
 HTML
                                     ,
                                         [
@@ -404,19 +409,29 @@ HTML
                                         [
                                             "class" => "pull-left sx-controll-act"
                                         ]
+                                    ) .
 
+                                    Html::tag("div", $linkMove,
+                                        [
+                                            "class" => "pull-left sx-controll-act"
+                                        ]
                                     )
                                 ,
                                 [
                                     "class" => "sx-controll-node row"
                                 ]
-                            )
+                            ) .
+
+                            ($model->treeType ? Html::tag("div", $model->treeType->name, [
+                                "class"     => "pull-right sx-tree-type",
+                            ]) : '')
 
                         , ["class" => "row"])
                         . $child ,
                         [
                             "class" => "sx-tree-node " . ($isActive ? " active" : "") . ($isOpen ? " open" : ""),
-                            "data-id" => $model->id
+                            "data-id" => $model->id,
+                            "title" => "Двойной клик — переход к редактированию раздела."
                         ]
             );
         };
@@ -455,9 +470,21 @@ HTML
 
                 _onDomReady: function()
                 {
+                    $('.sx-tree-node').on('dblclick', function(event)
+                    {
+                        event.stopPropagation();
+                        $(this).find(".sx-row-action:first").click();
+                    });
 
                     $(".sx-tree ul").find("ul").sortable(
                     {
+                        cursor: "move",
+                        handle: ".sx-tree-move",
+                        forceHelperSize: true,
+                        forcePlaceholderSize: true,
+                        opacity: 0.5,
+                        placeholder: "ui-state-highlight",
+
                         out: function( event, ui )
                         {
                             var Jul = $(ui.item).closest("ul");
@@ -623,113 +650,6 @@ JS
 
         $this->getView()->registerCss(<<<CSS
 
-.sx-tree
-{
-    margin-left: 15px;
-}
-.sx-tree ul
-{
-    padding-left: 0px;
-}
-
-
-    .sx-tree ul li.sx-tree-node
-    {
-        list-style-type: none;
-        padding-left: 15px;
-        margin: 2px 0px;
-    }
-
-        .sx-tree ul li .sx-tree-type
-        {
-            display: none;
-            padding-top: 2px;
-            padding-left: 20px;
-            font-size: 11px;
-        }
-
-            .sx-tree ul li:hover>.row .sx-tree-type
-            {
-                display: block;
-            }
-
-        .sx-tree ul li.sx-tree-node .sx-controll-act
-        {
-            margin-left: 5px;
-        }
-
-    .sx-tree ul li.sx-tree-node.open
-    {}
-
-    .sx-tree ul li.sx-tree-node.active
-    {}
-
-        .sx-tree ul li.sx-tree-node .row
-        {
-            margin: 0 !important;
-        }
-
-
-
-    .sx-tree ul li.sx-tree-node .sx-node-open-close
-    {
-        float: left;
-        width: 23px;
-        margin-left: -23px;
-    }
-
-        .sx-tree ul li.sx-tree-node .sx-node-open-close > a
-        {
-            font-size: 6px;
-            color: #000000;
-            background: white;
-            padding: 2px 4px;
-            margin-top: 2px;
-        }
-
-.btn-tree-node-controll
-{
-    font-size: 8px;
-}
-
-    .sx-tree ul li.sx-tree-node .sx-controll-node
-    {
-        width: 80px;
-        float: left;
-        margin-left: 10px;
-        padding-top: 2px;
-    }
-
-        .sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button
-        {
-            font-size: 6px;
-            color: #000000;
-            background: white;
-            padding: 2px 4px;
-        }
-
-
-
-    .sx-tree ul li.sx-tree-node .sx-label-node
-    {
-        float: left;
-        padding-left: 23px;
-    }
-
-        .sx-tree ul li.sx-tree-node .sx-label-node > a
-        {
-            font-size: 12px;
-            font-weight: bold;
-            color: #000000;
-        }
-
-/**
-* Запись неактивна
-**/
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > a
-        {
-            color: silver;
-        }
 
 CSS
 );
