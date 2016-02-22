@@ -12,11 +12,18 @@ return [
 
     'name',
     ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-    ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
-    ['class' => \skeeks\cms\grid\PublishedAtColumn::className()],
+    [
+        'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
+        'visible' => false
+    ],
+    [
+        'class' => \skeeks\cms\grid\PublishedAtColumn::className(),
+        'visible' => false
+    ],
     [
         'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
         'attribute' => "published_to",
+        'visible' => false
     ],
 
     ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
@@ -76,6 +83,7 @@ return [
         },
         'format' => 'raw',
         'label' => \Yii::t('app','Additional sections'),
+        'visible' => false
     ],
 
     [
