@@ -40,6 +40,7 @@ $controller = \Yii::$app->createController('cms/admin-storage-files')[0];
         margin-bottom: 15px;
         box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.42);
         padding: 10px;
+        background: white;
     }
 
     .sx-fromWidget-storageImages .sx-group-images img

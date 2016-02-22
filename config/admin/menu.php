@@ -27,7 +27,9 @@ function contentMenu()
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
             ];
 
-            if ($contents = $contentType->cmsContents)
+            $contents = $contentType->getCmsContents()->andWhere(['visible' => 'Y'])->all();
+
+            if ($contents)
             {
                 foreach ($contents as $content)
                 {

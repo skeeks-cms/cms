@@ -56,6 +56,8 @@ use yii\web\ErrorHandler;
  * @property string $meta_description
  * @property string $meta_keywords
  *
+ * @property integer $parent_content_element_id version > 2.4.8
+ *
  *
  * @property string $permissionName
  *
@@ -83,6 +85,10 @@ use yii\web\ErrorHandler;
  * @property CmsStorageFile[] $files
  * @property CmsStorageFile[] $images
  *
+ * version > 2.4.8
+ * @property CmsContentElement $parentContentElement
+ * @property CmsContentElement[] $childrenContentElements
+ *
  */
 class CmsContentElement extends RelatedElementModel
 {
@@ -102,7 +108,20 @@ class CmsContentElement extends RelatedElementModel
     {
         parent::init();
 
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, '_beforeDeleteE']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, '_afterDeleteE']);
+    }
+
+    public function _beforeDeleteE($e)
+    {
+        //TODO: Upgrade this
+        if ($this->childrenContentElements)
+        {
+            foreach ($this->childrenContentElements as $childrenElement)
+            {
+                $childrenElement->delete();
+            }
+        }
     }
 
     public function _afterDeleteE($e)
@@ -188,6 +207,7 @@ class CmsContentElement extends RelatedElementModel
             'images' => Yii::t('app', 'Images'),
             'files' => Yii::t('app', 'Files'),
             'treeIds' => Yii::t('app', 'Sections'),
+            'parent_content_element_id' => Yii::t('app', 'Parent element'),
         ]);
     }
 
@@ -222,9 +242,51 @@ class CmsContentElement extends RelatedElementModel
                 }
             }],
 
+            ['parent_content_element_id', 'integer'],
+            ['parent_content_element_id', 'validateParentContentElement'],
+            ['parent_content_element_id', 'required', 'when' => function(CmsContentElement $model) {
+
+                if ($model->cmsContent && $model->cmsContent->parentContent)
+                {
+                    return (bool) ($model->cmsContent->parent_content_is_required == "Y");
+                }
+
+                return false;
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#cmscontent-parent_content_is_required').val() == 'Y';
+            }"]
 
         ]);
     }
+
+    /**
+     * Валидация родительского элемента
+     *
+     * @param $attribute
+     * @return bool
+     */
+    public function validateParentContentElement($attribute)
+    {
+        if (!$this->cmsContent)
+        {
+            return false;
+        }
+
+        if (!$this->cmsContent->parentContent)
+        {
+            return false;
+        }
+
+        if ($this->$attribute)
+        {
+            $contentElement = CmsContentElement::findOne($this->$attribute);
+            if ($contentElement->cmsContent->id != $this->cmsContent->parentContent->id)
+            {
+                $this->addError($attribute, \Yii::t('app', 'The parent must be a content element: «{contentName}».',['contentName' => $this->cmsContent->parentContent->name]));
+            }
+        }
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -368,4 +430,24 @@ class CmsContentElement extends RelatedElementModel
     {
         return 'cms/cms-content-element__' . $this->id;
     }
+
+
+    /**
+     * version > 2.4.8
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParentContentElement()
+    {
+        return $this->hasOne(CmsContentElement::className(), ['id' => 'parent_content_element_id']);
+    }
+
+    /**
+     * version > 2.4.8
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildrenContentElements()
+    {
+        return $this->hasMany(CmsContentElement::className(), ['parent_content_element_id' => 'id']);
+    }
+
 }

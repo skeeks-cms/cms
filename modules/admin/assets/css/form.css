@@ -1,4 +1,45 @@
+/** Оформление форм админки */
+
+form.sx-form-admin
+{
+    border: 1px solid rgba(32, 168, 216, 0.23);
+    padding: 10px;
+}
+
+    form.sx-form-admin .hint-block
+    {
+        font-size: 11px;
+    }
+
+        form.sx-form-admin .tab-content
+        {
+            background: #ffffff;
+        }
+
+    form.sx-form-admin .sx-buttons-standart
+    {
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-bottom: 0px;
+        margin-top: 15px;
+    }
+
 .sx-input-int
 {
     max-width: 20%;
 }
+
+    form.sx-form-admin .nav-tabs>li>a
+    {
+        font-size: 14px;
+    }
+
+    form.sx-form-admin .form-group
+    {
+        padding: 5px;
+        margin-bottom: 5px;
+    }
+    form.sx-form-admin .form-group:hover
+    {
+        background: rgba(93, 195, 231, 0.15);
+    }
