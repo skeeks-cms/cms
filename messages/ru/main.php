@@ -944,4 +944,17 @@ return
     "The list of content items"             => "Список элементов контента",
     "Change sorting"                        => "Поменять сортировку",
 
+    "Parent content"                        => "Родительский контент",
+    "Children content"                      => "Дочерний контент",
+    "Relationship to other content"         => "Связь с другим контентом",
+    "Parent element"                        => "Родительский элемент",
+    "Parent element is required to be filled"       => "Родительский элемент обязателен к заполнению",
+    "At the time of removal of the parent element"  => "В момент удаления родительского элемента",
+    "Show in menu"                          => "Показать в меню",
+
+    "Remove all items of that content"                          => "Удалить все элементы этого контента",
+    "Deny delete parent is not removed, these elements"                          => "Запретить удалять родителя, пока не удалены эти элементы",
+    "Remove the connection to a remote parent"                          => "Удалить связь с удаленным родителем",
+    "The parent must be a content element: «{contentName}»."                          => "Родительский элемент должен быть элементом контента: «{contentName}».",
+
 ];

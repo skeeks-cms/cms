@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 
@@ -25,4 +26,21 @@ class AdminCmsContentController extends AdminModelEditorController
         parent::init();
     }
 
+    /**
+     * @return string
+     */
+    public function getIndexUrl()
+    {
+        $contentTypePk = null;
+
+        if ($this->model)
+        {
+            if ($contentType = $this->model->contentType)
+            {
+                $contentTypePk = $contentType->id;
+            }
+        }
+
+        return UrlHelper::construct(["cms/admin-cms-content-type/update", 'pk' => $contentTypePk])->enableAdmin()->toString();
+    }
 }

@@ -34,32 +34,62 @@ use common\models\User;
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
-    <?= $form->fieldInputInt($model, 'priority'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'visible'); ?>
 
-
-
-    <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('app', 'Link to section')
     ]); ?>
 
-    <?= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
-        'allowDeselect' => true
-    ]); ?>
-    <?= $form->fieldRadioListBoolean($model, 'is_allow_change_tree'); ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+                'allowDeselect' => true
+            ]); ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->fieldRadioListBoolean($model, 'is_allow_change_tree'); ?>
+        </div>
+    </div>
 
 
     <?= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
         'allowDeselect' => true
     ])->hint(\Yii::t('app', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
 
-
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('app', 'Additionally')
+        'content' => \Yii::t('app', 'Relationship to other content')
     ]); ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'access_check_element'); ?>
+    <div class="row">
+        <div class="col-md-3">
+            <?= $form->fieldSelect($model, 'parent_content_id', \skeeks\cms\models\CmsContent::getDataForSelect(true, function(\yii\db\ActiveQuery $activeQuery) use ($model)
+                {
+                    $activeQuery->andWhere(['!=', 'id', $model->id]);
+                }),
+                [
+                'allowDeselect' => true
+                ]
+            ); ?>
+        </div>
+        <div class="col-md-3">
+            <?= $form->fieldRadioListBoolean($model, 'parent_content_is_required'); ?>
+        </div>
+        <div class="col-md-3">
+            <?= $form->fieldSelect($model, 'parent_content_on_delete', \skeeks\cms\models\CmsContent::getOnDeleteOptions()); ?>
+        </div>
+    </div>
+
+
+
+    <? if ($model->childrenContents) : ?>
+        <p><b><?= \Yii::t('app', 'Children content')?></b></p>
+        <? foreach ($model->childrenContents as $contentChildren) : ?>
+            <p><?= Html::a($contentChildren->name, \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-cms-content/update', 'pk' => $contentChildren->id])->enableAdmin()->toString())?></p>
+        <? endforeach;  ?>
+
+    <? endif ; ?>
+
 
 <?= $form->fieldSetEnd(); ?>
 
@@ -151,6 +181,21 @@ use common\models\User;
 <?= $form->fieldSet(\Yii::t('app','Captions')); ?>
     <?= $form->field($model, 'name_one')->textInput(); ?>
     <?= $form->field($model, 'name_meny')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('app', 'Access')
+    ]); ?>
+    <?= $form->fieldRadioListBoolean($model, 'access_check_element'); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('app', 'Additionally')
+    ]); ?>
+    <?= $form->fieldInputInt($model, 'priority'); ?>
+    <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

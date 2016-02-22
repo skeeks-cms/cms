@@ -14,6 +14,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
      {
          $model->tree_id = $tree_id;
      }
+
+     if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id"))
+     {
+         $model->parent_content_element_id = $parent_content_element_id;
+     }
  }
 ?>
 
@@ -27,6 +32,10 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <? endif; ?>
 <? else : ?>
     <? $contentModel = $model->cmsContent; ?>
+<? endif; ?>
+
+<? if ($contentModel && $contentModel->parentContent) : ?>
+    <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
 <? endif; ?>
 
 <?= $form->fieldSet(\Yii::t('app','Main')); ?>
@@ -50,6 +59,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('app',"This parameter affects the address of the page")); ?>
 
+    <? if ($contentModel->parent_content_id) : ?>
+        <?= $form->field($model, 'parent_content_element_id')->widget(
+            \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className()
+        )->label($contentModel->parentContent->name_one) ?>
+    <? endif; ?>
 <?= $form->fieldSetEnd()?>
 
 
@@ -169,7 +183,47 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         <?= $form->fieldSetEnd() ?>
     <? endif; ?>
 
+    <? if ($model->cmsContent->childrenContents) : ?>
+
+        <?
+        $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_columns.php');
+        /**
+         * @var $content \skeeks\cms\models\CmsContent
+         */
+        ?>
+        <? foreach($model->cmsContent->childrenContents as $childContent) : ?>
+            <?= $form->fieldSet($childContent->name); ?>
+
+
+
+                <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                    'label'             => $childContent->name,
+                    'parentModel'       => $model,
+                    'relation'          => [
+                        'content_id'                    => $childContent->id,
+                        'parent_content_element_id'     => $model->id
+                    ],
+
+                    'sort'              => [
+                        'defaultOrder' =>
+                        [
+                            'priority' => 'published_at'
+                        ]
+                    ],
+
+                    'controllerRoute'   => 'cms/admin-cms-content-element',
+                    'gridViewOptions'   => [
+                        'columns' => (array) include $columnsFile
+                    ],
+                ]); ?>
+
+
+            <?= $form->fieldSetEnd() ?>
+        <? endforeach; ?>
+    <? endif; ?>
+
 <? endif; ?>
+
 
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

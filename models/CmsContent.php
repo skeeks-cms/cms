@@ -43,6 +43,11 @@ use yii\helpers\ArrayHelper;
  * @property string $meta_description_template
  * @property string $meta_keywords_template
  *
+ * @property integer $parent_content_id             @version > 2.4.8
+ * @property string $visible                        @version > 2.4.8
+ * @property string $parent_content_on_delete       @version > 2.4.8
+ * @property string $parent_content_is_required     @version > 2.4.8
+ *
  * @property string $adminPermissionName
  *
  * @property CmsTree $rootTree
@@ -50,11 +55,30 @@ use yii\helpers\ArrayHelper;
  * @property CmsContentType $contentType
  * @property CmsContentElement[] $cmsContentElements
  * @property CmsContentProperty[] $cmsContentProperties
+ *
+ * @version > 2.4.8
+ * @property CmsContent $parentContent
+ * @property CmsContent[] $childrenContents
  */
 class CmsContent extends Core
 {
     use ValidateRulesTrait;
 
+    const CASCADE   = 'CASCADE';
+    const RESTRICT  = 'RESTRICT';
+    const SET_NULL  = 'SET_NULL';
+
+    /**
+     * @return array
+     */
+    static public function getOnDeleteOptions()
+    {
+        return [
+            self::CASCADE => "CASCADE (" . \Yii::t('app', 'Remove all items of that content') .  ")",
+            self::RESTRICT => "RESTRICT (" . \Yii::t('app', 'Deny delete parent is not removed, these elements') .  ")",
+            self::SET_NULL => "SET NULL (" . \Yii::t('app', 'Remove the connection to a remote parent') .  ")",
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -95,7 +119,12 @@ class CmsContent extends Core
             'meta_description_template' => Yii::t('app', 'Шаблон META KEYWORDS'),
             'meta_keywords_template' => Yii::t('app', 'Шаблон META DESCRIPTION'),
 
-            'access_check_element' => Yii::t('app', 'Включить управление доступом к элементам'),
+            'access_check_element'  => Yii::t('app', 'Включить управление доступом к элементам'),
+            'parent_content_id'     => Yii::t('app', 'Parent content'),
+
+            'visible'                       => Yii::t('app', 'Show in menu'),
+            'parent_content_on_delete'      => Yii::t('app', 'At the time of removal of the parent element'),
+            'parent_content_is_required'    => Yii::t('app', 'Parent element is required to be filled'),
         ]);
     }
 
@@ -125,8 +154,16 @@ class CmsContent extends Core
             ['access_check_element', 'default', 'value'           => Cms::BOOL_N],
             ['name_meny', 'default', 'value'    => Yii::t('app', 'Elements')],
             ['name_one', 'default', 'value'     => Yii::t('app', 'Element')],
+
+
+            ['visible', 'default', 'value'                              => Cms::BOOL_Y],
+            ['parent_content_is_required', 'default', 'value'           => Cms::BOOL_Y],
+            ['parent_content_on_delete', 'default', 'value'             => self::CASCADE],
+
+            ['parent_content_id', 'integer'],
         ]);
     }
+
 
 
     static protected $_selectData = [];
@@ -137,7 +174,7 @@ class CmsContent extends Core
      * @param bool|false $refetch
      * @return array
      */
-    static public function getDataForSelect($refetch = false)
+    static public function getDataForSelect($refetch = false, $contentQueryCallback = null)
     {
         if ($refetch === false && static::$_selectData)
         {
@@ -153,8 +190,13 @@ class CmsContent extends Core
              */
             foreach ($cmsContentTypes as $cmsContentType)
             {
+                $query = $cmsContentType->getCmsContents();
+                if ($contentQueryCallback && is_callable($contentQueryCallback))
+                {
+                    $contentQueryCallback($query);
+                }
 
-                static::$_selectData[$cmsContentType->name] = ArrayHelper::map($cmsContentType->cmsContents, 'id', 'name');
+                static::$_selectData[$cmsContentType->name] = ArrayHelper::map($query->all(), 'id', 'name');
             }
         }
 
@@ -208,5 +250,25 @@ class CmsContent extends Core
     public function getAdminPermissionName()
     {
         return 'cms/admin-cms-content-element__' . $this->id;
+    }
+
+
+
+     /**
+      * version > 2.4.8
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParentContent()
+    {
+        return $this->hasOne(CmsContent::className(), ['id' => 'parent_content_id']);
+    }
+
+    /**
+     * version > 2.4.8
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildrenContents()
+    {
+        return $this->hasMany(CmsContent::className(), ['parent_content_id' => 'id']);
     }
 }
