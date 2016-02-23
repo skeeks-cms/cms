@@ -13,7 +13,7 @@
     <ul class="nav nav-sidebar">
     <? foreach ($subAdminMenuItems as $subAdminMenuItem) : ?>
         <? if ($subAdminMenuItem->isAllowShow()) : ?>
-            <li <?= $subAdminMenuItem->isActive() ? 'class="active opened"' : '' ?>>
+            <li <?= $subAdminMenuItem->isActive() ? 'class="active opened sx-start-opened"' : '' ?>>
                 <a href="<?= $subAdminMenuItem->getUrl() ? $subAdminMenuItem->getUrl() : "#" ?>" title="<?= $subAdminMenuItem->label; ?>">
                     <span class="sx-icon">
                         <img src="<?= $subAdminMenuItem->getImgUrl(); ?>" />

@@ -142,6 +142,11 @@
             background: rgba(93, 195, 231, 0.0);
         }
 
+        .sidebar ul.nav.nav-sidebar li.sx-start-opened>ul
+        {
+            /** Быстрое открытие меню **/
+            display: block;
+        }
 
             .sidebar ul.nav.nav-sidebar li a .sx-icon
             {

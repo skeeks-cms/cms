@@ -242,24 +242,5 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
-
-
+<?= $form->buttonsStandart($model); ?>
 <?php ActiveForm::end(); ?>
-
-
-
-<?/* if ($model->relatedProperties) : */?><!--
-    <?/* foreach($model->relatedProperties as $relatedProperty) : */?>
-        <?/*= $relatedProperty->name; */?>
-    <?/* endforeach; */?>
-<?/* endif; */?>
-
-<?/* if ($model->relatedElementProperties) : */?>
-    <?/* foreach($model->relatedElementProperties as $relatedElementProperty) : */?>
-        <?/*= $relatedElementProperty->value; */?>
-    <?/* endforeach; */?>
---><?/* endif; */?>
-<? if (!$model->isNewRecord && $model->relatedProperties) : ?>
-
-<? endif; ?>
