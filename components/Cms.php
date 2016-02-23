@@ -483,7 +483,7 @@ class Cms extends \skeeks\cms\base\Component
                     'related-properties' =>
                         [
                             'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                            'name'          => 'Дополнительные свойства',
+                            'name'          => \Yii::t('app', 'Additional properties'),
                             "icon"          => "glyphicon glyphicon-plus-sign",
                         ],
                 ]);

@@ -65,6 +65,13 @@ class AdminModelEditorCreateAction extends AdminModelEditorAction
 
     public function run()
     {
+
+        if ($this->callback)
+        {
+            return $this->runCallback();
+        }
+
+
         $modelClassName = $this->controller->modelClassName;
         $model          = new $modelClassName();
         $scenarios      = $model->scenarios();
