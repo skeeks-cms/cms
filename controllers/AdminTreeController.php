@@ -12,11 +12,14 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\App;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
@@ -51,7 +54,7 @@ class AdminTreeController extends AdminModelEditorController
 
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(), [
+        $actions = ArrayHelper::merge(parent::actions(), [
             'index' =>
             [
                 'class'         => AdminAction::className(),
@@ -62,9 +65,92 @@ class AdminTreeController extends AdminModelEditorController
             'create' =>
             [
                 'visible'    => false
-            ]
+            ],
+
+            "update" =>
+            [
+                'class'         => AdminOneModelEditAction::className(),
+                "callback"      => [$this, 'update'],
+            ],
+
+        ]);
+
+        unset($actions['create']);
+
+        if (isset($actions['related-properties']))
+        {
+            unset($actions['related-properties']);
+        }
+
+        return $actions;
+    }
+
+
+
+
+    public function update(AdminAction $adminAction)
+    {
+        /**
+         * @var $model CmsTree
+         */
+        $model = $this->model;
+        $relatedModel = $model->relatedPropertiesModel;
+
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+            return \yii\widgets\ActiveForm::validateMultiple([
+                $model, $relatedModel
+            ]);
+        }
+
+        if ($rr->isRequestPjaxPost())
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+
+            if ($model->save() && $relatedModel->save())
+            {
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+
+                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                {
+
+                } else
+                {
+                    return $this->redirect(
+                        $this->indexUrl
+                    );
+                }
+
+                $model->refresh();
+
+            } else
+            {
+                $errors = [];
+
+                if ($model->getErrors())
+                {
+                    foreach ($model->getErrors() as $error)
+                    {
+                        $errors[] = implode(', ', $error);
+                    }
+                }
+
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save') . $errors);
+            }
+        }
+
+        return $this->render('_form', [
+            'model'           => $model,
+            'relatedModel'    => $relatedModel
         ]);
     }
+
+
 
     static public $indexData = [];
 
