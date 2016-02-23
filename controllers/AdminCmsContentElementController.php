@@ -52,7 +52,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
+        $actions = ArrayHelper::merge(parent::actions(),
             [
 
                 'index' =>
@@ -122,11 +122,15 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     "viewDialog"        => "change-trees-form",
                     "eachCallback"      => [$this, 'eachMultiChangeTrees'],
                 ],
-
-
-
             ]
         );
+
+        if (isset($actions['related-properties']))
+        {
+            unset($actions['related-properties']);
+        }
+
+        return $actions;
     }
 
 
