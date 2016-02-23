@@ -364,7 +364,7 @@ JS
             {
                 $linkMove = Html::a('<span class="glyphicon glyphicon-move"></span>',
                              "#",
-                             ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-sm sx-tree-move", "title" => \Yii::t('app',"Change sorting")]
+                             ["class" => "btn-tree-node-controll btn btn-default btn-sm sx-tree-move", "title" => \Yii::t('app',"Change sorting")]
                     );
             }
 

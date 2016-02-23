@@ -65,7 +65,10 @@ use common\models\User;
         <div class="col-md-3">
             <?= $form->fieldSelect($model, 'parent_content_id', \skeeks\cms\models\CmsContent::getDataForSelect(true, function(\yii\db\ActiveQuery $activeQuery) use ($model)
                 {
-                    $activeQuery->andWhere(['!=', 'id', $model->id]);
+                    if (!$model->isNewRecord)
+                    {
+                        $activeQuery->andWhere(['!=', 'id', $model->id]);
+                    }
                 }),
                 [
                 'allowDeselect' => true
