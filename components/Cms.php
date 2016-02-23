@@ -483,13 +483,13 @@ class Cms extends \skeeks\cms\base\Component
                     'related-properties' =>
                         [
                             'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                            'name'          => 'Дополнительные свойства',
+                            'name'          => \Yii::t('app', 'Additional properties'),
                             "icon"          => "glyphicon glyphicon-plus-sign",
                         ],
                 ]);
             }
 
-            if ($e->controller instanceof AdminModelEditorController)
+            /*if ($e->controller instanceof AdminModelEditorController)
             {
                 $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                     'system' =>
@@ -500,7 +500,7 @@ class Cms extends \skeeks\cms\base\Component
                             "priority"      => 9999,
                         ],
                 ]);
-            }
+            }*/
         });
     }
 

@@ -7,6 +7,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
+/* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 
  if ($model->isNewRecord)
  {
@@ -60,9 +61,24 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('app',"This parameter affects the address of the page")); ?>
 
     <? if ($contentModel->parent_content_id) : ?>
+
         <?= $form->field($model, 'parent_content_element_id')->widget(
             \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className()
         )->label($contentModel->parentContent->name_one) ?>
+    <? endif; ?>
+
+    <? if ($model->relatedProperties) : ?>
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \Yii::t('app', 'Additional properties')
+        ]); ?>
+        <? if ($properties = $model->relatedProperties) : ?>
+            <? foreach ($properties as $property) : ?>
+                <?= $property->renderActiveForm($form, $model)?>
+            <? endforeach; ?>
+        <? endif; ?>
+
+    <? else : ?>
+        <?/*= \Yii::t('app','Additional properties are not set')*/?>
     <? endif; ?>
 <?= $form->fieldSetEnd()?>
 

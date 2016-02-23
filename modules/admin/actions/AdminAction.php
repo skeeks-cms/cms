@@ -81,6 +81,16 @@ class AdminAction extends ViewAction
     {
         if ($this->callback)
         {
+            return $this->runCallback();
+        }
+
+        return parent::run();
+    }
+
+    public function runCallback()
+    {
+        if ($this->callback)
+        {
             if (!is_callable($this->callback))
             {
                 throw new InvalidConfigException('"' . get_class($this) . '::callback" '.\Yii::t('app','should be a valid callback.'));
@@ -88,8 +98,6 @@ class AdminAction extends ViewAction
 
             return call_user_func($this->callback, $this);
         }
-
-        return parent::run();
     }
 
     /**

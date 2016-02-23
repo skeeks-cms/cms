@@ -7,14 +7,17 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiDialogModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
@@ -49,7 +52,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
+        $actions = ArrayHelper::merge(parent::actions(),
             [
 
                 'index' =>
@@ -67,6 +70,18 @@ class AdminCmsContentElementController extends AdminModelEditorController
                         $query->with('cmsContentElementTrees');
                         $query->with('cmsContentElementTrees.tree');
                     },
+                ],
+
+                "create" =>
+                [
+                    'class'         => AdminModelEditorCreateAction::className(),
+                    "callback"      => [$this, 'create'],
+                ],
+
+                "update" =>
+                [
+                    'class'         => AdminOneModelEditAction::className(),
+                    "callback"      => [$this, 'update'],
                 ],
 
                 /*'settings' =>
@@ -109,8 +124,138 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 ],
             ]
         );
+
+        if (isset($actions['related-properties']))
+        {
+            unset($actions['related-properties']);
+        }
+
+        return $actions;
     }
 
+
+    public function create(AdminAction $adminAction)
+    {
+        $modelClassName = $this->modelClassName;
+        $model          = new $modelClassName();
+
+        if ($content_id = \Yii::$app->request->get("content_id"))
+        {
+            $contentModel       = \skeeks\cms\models\CmsContent::findOne($content_id);
+            $model->content_id  = $content_id;
+        }
+
+        $relatedModel = $model->relatedPropertiesModel;
+
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+
+            return \yii\widgets\ActiveForm::validateMultiple([
+                $model, $relatedModel
+            ]);
+        }
+
+
+        if ($rr->isRequestPjaxPost())
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+
+            if ($model->save() && $relatedModel->save())
+            {
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+
+                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                {
+                    return $this->redirect(
+                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
+                            ->toString()
+                    );
+                } else
+                {
+                    return $this->redirect(
+                        $this->indexUrl
+                    );
+                }
+
+            } else
+            {
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+            }
+        }
+
+        return $this->render('_form', [
+            'model'           => $model,
+            'relatedModel'    => $relatedModel
+        ]);
+    }
+
+    public function update(AdminAction $adminAction)
+    {
+        /**
+         * @var $model CmsContentElement
+         */
+        $model = $this->model;
+        $relatedModel = $model->relatedPropertiesModel;
+
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+            return \yii\widgets\ActiveForm::validateMultiple([
+                $model, $relatedModel
+            ]);
+        }
+
+        if ($rr->isRequestPjaxPost())
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+
+            if ($model->save() && $relatedModel->save())
+            {
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+
+                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                {
+
+                } else
+                {
+                    return $this->redirect(
+                        $this->indexUrl
+                    );
+                }
+
+                $model->refresh();
+
+            } else
+            {
+                $errors = [];
+
+                if ($model->getErrors())
+                {
+                    foreach ($model->getErrors() as $error)
+                    {
+                        $errors[] = implode(', ', $error);
+                    }
+                }
+
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save') . $errors);
+            }
+        }
+
+        return $this->render('_form', [
+            'model'           => $model,
+            'relatedModel'    => $relatedModel
+        ]);
+    }
 
     /**
      * @param CmsContentElement $model
