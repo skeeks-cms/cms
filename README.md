@@ -24,6 +24,9 @@ ___
 ___
 [![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/93/1b/7d/931b7d207ca2d0ea41ddf45193fea218.png)](http://cms.skeeks.com/uploads/all/93/1b/7d/931b7d207ca2d0ea41ddf45193fea218.png)
 
+___
+[![SkeekS CMS admin panel](http://cms.skeeks.com/uploads/all/35/b4/b6/35b4b6e7c1edf46b320002d61ffad411.png)](http://cms.skeeks.com/uploads/all/35/b4/b6/35b4b6e7c1edf46b320002d61ffad411.png)
+
 
 
 ##Install
