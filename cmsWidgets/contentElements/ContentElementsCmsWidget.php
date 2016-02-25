@@ -185,21 +185,22 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
             if ($this->enabledCurrentTree == Cms::BOOL_Y)
             {
-                $tree = \Yii::$app->cms->getCurrentTree();
+                $tree = \Yii::$app->cms->currentTree;
                 if ($tree)
                 {
                     $treeIds[] = $tree->id;
                     if ($tree->children && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
                     {
-                        if ($this->enabledCurrentTreeChildAll)
+                        if ($this->enabledCurrentTreeChildAll == Cms::BOOL_Y)
                         {
-                            if ($childrens = $tree->children)
+                            $treeIds = array_merge($treeIds, $this->getAllIdsForChildren($tree));
+                            /*if ($childrens = $tree->children)
                             {
                                 foreach ($childrens as $chidren)
                                 {
                                     $treeIds[] = $chidren->id;
                                 }
-                            }
+                            }*/
                         } else
                         {
                             if ($childrens = $tree->children)
@@ -290,6 +291,35 @@ class ContentElementsCmsWidget extends WidgetRenderable
         return $result;
     }
 
+    /**
+     * @param Tree $tree
+     * @return array
+     */
+    public function getAllIdsForChildren(Tree $tree)
+    {
+        $treeIds = [];
+        /**
+         * @var $query ActiveQuery
+         */
+        $childrens = $tree->getChildren()->with('children')->all();
+
+        if ($childrens)
+        {
+            foreach ($childrens as $chidren)
+            {
+                if ($chidren->children)
+                {
+                    $treeIds[$chidren->id] = $chidren->id;
+                    $treeIds = array_merge($treeIds, $this->getAllIdsForChildren($chidren));
+                } else
+                {
+                    $treeIds[$chidren->id] = $chidren->id;
+                }
+            }
+        }
+
+        return $treeIds;
+    }
     /**
      * @var ActiveDataProvider
      */
