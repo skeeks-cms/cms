@@ -40,6 +40,11 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
                 [
                     "modelScenario" => RelatedPropertyModel::SCENARIO_UPDATE_CONFIG,
                 ],
+
+                "create" =>
+                [
+                    "modelScenario" => RelatedPropertyModel::SCENARIO_UPDATE_CONFIG,
+                ],
             ]
         );
     }
