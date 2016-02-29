@@ -432,14 +432,28 @@ class Tree extends Core
 
 
     /**
+     * @version > 2.4.9.1
+     * Все возможные свойства связанные с моделью
      *
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    /*public function getRelatedProperties()
+    {
+        return $this->treeType->cmsTreeTypeProperties;
+    }*/
+
+    /**
+     *
+     * @version > 2.4.9.1
      * Все возможные свойства связанные с моделью
      *
      * @return array|\yii\db\ActiveRecord[]
      */
     public function getRelatedProperties()
     {
-        return $this->treeType->cmsTreeTypeProperties;
+        return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])
+                    ->via('treeType')->orderBy(['priority' => SORT_ASC]);
+        //return $this->cmsContent->cmsContentProperties;
     }
 
 
