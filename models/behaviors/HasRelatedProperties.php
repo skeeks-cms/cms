@@ -11,6 +11,7 @@
 namespace skeeks\cms\models\behaviors;
 use skeeks\cms\base\behaviors\ActiveRecord;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\web\ErrorHandler;
@@ -32,9 +33,6 @@ class HasRelatedProperties extends ActiveRecord
     public $relatedPropertyClassName;
 
     /**
-     *
-     * TODO: подумать, может быть если свойства еще не заданы, надо возвращать значения по умолчанию.
-     *
      * Значения связанных свойств.
      * Вернуться только заданные значения свойств.
      *
@@ -55,8 +53,11 @@ class HasRelatedProperties extends ActiveRecord
      */
     public function getRelatedProperties()
     {
-        $className = $this->relatedPropertyClassName;
-        return $className::find()->all();
+        $className  = $this->relatedPropertyClassName;
+        $find       = $className::find();
+        $find->multiple = true;
+
+        return $find;
     }
 
     /**
@@ -92,7 +93,7 @@ class HasRelatedProperties extends ActiveRecord
      */
     public function createRelatedPropertiesModel()
     {
-        return new RelatedPropertiesModel([
+        return new RelatedPropertiesModel([], [
             'relatedElementModel' => $this->owner
         ]);
     }
@@ -123,25 +124,7 @@ class HasRelatedProperties extends ActiveRecord
      */
     public function getRelatedPropertyValue($property)
     {
-        if ($property->multiple == "Y")
-        {
-            if ($values = $this->findRelatedElementProperties($property->id)->all())
-            {
-                return ArrayHelper::map($values, "id", "value");
-            } else
-            {
-                return [];
-            }
-        } else
-        {
-            if ($value = $this->findRelatedElementProperties($property->id)->one())
-            {
-                return $value->value;
-            } else
-            {
-                return null;
-            }
-        }
+        return $this->owner->relatedPropertiesModel->getAttribute($property->code);
     }
 
     /**

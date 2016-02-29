@@ -81,22 +81,6 @@ class ModelPropertiesController extends Controller
                     $response['success'] = true;
                     $response['message'] = 'Успешно отправлена';
 
-                    //Все проверки прошли, формируем модель отправленного сообщения и сохраняем ее
-                    /*$modelFormSendMessage = new FormSendMessage();
-
-                    $modelFormSendMessage->data_values     = $model->attributeValues();
-                    $modelFormSendMessage->data_labels     = $model->attributeLabels();
-
-                    if ($modelFormSendMessage->save())
-                    {
-                        $modelFormSendMessage->notify();
-
-                        $response['success'] = true;
-                        $response['message'] = 'Успешно отправлена';
-                    } else
-                    {
-                        $response['message'] = 'Не удалось сохранить сообщение в базу';
-                    }*/
                 } else
                 {
                     $response['message'] = 'Форма заполнена неправильно';

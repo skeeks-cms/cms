@@ -54,7 +54,7 @@ if (is_array($model) || is_object($model))
      */
     if ($model->relatedPropertiesModel)
     {
-        foreach ($model->relatedPropertiesModel->attributeValues() as $name => $value) {
+        foreach ($model->relatedPropertiesModel->toArray($model->relatedPropertiesModel->attributes()) as $name => $value) {
 
             $property = $model->relatedPropertiesModel->getRelatedProperty($name);
             $filter = '';

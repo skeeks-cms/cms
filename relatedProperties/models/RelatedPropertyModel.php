@@ -15,6 +15,7 @@ use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
 use Yii;
+use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -216,10 +217,28 @@ abstract class RelatedPropertyModel extends Core
         return $propertyType;
     }
 
+
+    /**
+     * @varsion > 2.4.9.1
+     * @param DynamicModel $dynamicModel
+     * @return $this
+     */
+    public function addRulesToDynamicModel(DynamicModel $dynamicModel)
+    {
+        if ($this->is_required == Cms::BOOL_Y)
+        {
+            $dynamicModel->addRule($this->code, 'required');
+        } else
+        {
+            $dynamicModel->addRule($this->code, 'safe');
+        }
+
+        return $this;
+    }
     /**
      * @return array
      */
-    public function rulesForActiveForm()
+    /*public function rulesForActiveForm()
     {
         $result = [];
 
@@ -242,5 +261,5 @@ abstract class RelatedPropertyModel extends Core
         }
 
         return $result;
-    }
+    }*/
 }
