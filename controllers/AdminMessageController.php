@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\App;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\i18n\components\I18NDb;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\forms\ViewFileEditModel;
 use skeeks\cms\models\Search;
@@ -63,7 +64,7 @@ class AdminMessageController extends AdminModelEditorController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
+        $actions = ArrayHelper::merge(parent::actions(),
             [
                 'index' =>
                 [
@@ -77,6 +78,26 @@ class AdminMessageController extends AdminModelEditorController
 
             ]
         );
+
+        if (!\Yii::$app->i18n instanceof I18NDb)
+        {
+            $actions['index'] =
+            [
+                'class'     => AdminAction::className(),
+                'name'      => "Управление переводами",
+                'callback'  => [$this, 'index']
+            ];
+
+            unset($actions['create']);
+            unset($actions['update']);
+        }
+
+        return $actions;
+    }
+
+    public function index(AdminAction $adminAction)
+    {
+        return $this->render('index-configurate');
     }
 
     public function update()
