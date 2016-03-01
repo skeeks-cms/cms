@@ -315,17 +315,4 @@ class RelatedPropertiesModel extends DynamicModel
 
         return null;
     }
-
-
-
-
-
-    /**
-     * TODO: is depricated > 2.4.9.1
-     * @return array
-     */
-    public function attributeValues()
-    {
-        return $this->toArray($this->attributes());
-    }
 }

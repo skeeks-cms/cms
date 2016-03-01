@@ -230,6 +230,11 @@ return [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_DASHBOARDS_EDIT,
             'description'   => \Yii::t('app','Access to edit dashboards')
         ],
+
+        [
+            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT,
+            'description'   => \Yii::t('app','The ability to manage user groups')
+        ],
     ],
 
 

@@ -957,4 +957,7 @@ return
     "Remove the connection to a remote parent"                          => "Удалить связь с удаленным родителем",
     "The parent must be a content element: «{contentName}»."                          => "Родительский элемент должен быть элементом контента: «{contentName}».",
 
+    "Groups"                          => "Группы",
+    "The ability to manage user groups"                          => "Вомзожность управлять группами пользователя",
+
 ];

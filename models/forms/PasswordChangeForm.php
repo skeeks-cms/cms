@@ -38,7 +38,7 @@ class PasswordChangeForm extends Model
     {
         return [
             // password is validated by validatePassword()
-            [['new_password_confirm', 'new_password'], 'required'],
+            //[['new_password_confirm', 'new_password'], 'required'],
             [['new_password_confirm', 'new_password'], 'string', 'min' => 6],
             [['new_password_confirm'], 'validateNewPassword'],
         ];

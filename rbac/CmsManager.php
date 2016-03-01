@@ -24,7 +24,8 @@ class CmsManager extends \yii\rbac\DbManager
 
     const PERMISSION_ALLOW_EDIT         = 'cms.allow-edit';
 
-    const PERMISSION_ADMIN_DASHBOARDS_EDIT         = 'cms.admin-dashboards-edit';
+    const PERMISSION_ADMIN_DASHBOARDS_EDIT          = 'cms.admin-dashboards-edit';
+    const PERMISSION_USER_FULL_EDIT                 = 'cms.user-full-edit';
 
     /**
      * Редактирование служебных данных (наприме id и url и т.д.)

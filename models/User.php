@@ -40,6 +40,12 @@ use skeeks\cms\models\behaviors\HasSubscribes;
 /**
  * This is the model class for table "{{%cms_user}}".
  *
+ *
+ * @property string $status_of_life @varsion > 2.4.9.1 is depricate
+ * @property string $city           @varsion > 2.4.9.1 is depricated
+ * @property string $address        @varsion > 2.4.9.1 is depricated
+ * @property string $info           @varsion > 2.4.9.1 is depricatedd
+ *
  * @property integer $id
  * @property string $username
  * @property string $auth_key
@@ -49,11 +55,9 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property integer $updated_at
  * @property string $name
  * @property integer $image_id
- * @property string $city
- * @property string $address
- * @property string $info
  * @property string $files
- * @property string $status_of_life
+ *
+ *
  * @property string $gender
  * @property string $active
  * @property integer $updated_by

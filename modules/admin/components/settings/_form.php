@@ -84,12 +84,17 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         'label'                 => \Yii::t('app','Access to edit dashboards'),
     ]); ?>
 
+    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT,
+        'label'                 => \Yii::t('app','The ability to manage user groups'),
+    ]); ?>
+
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('app',"Control recodrs")]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
-        'label'                 => \Yii::t('app','The ability to create records'),
+        'label'                 => \Yii::t('app','The ability to manage user groups'),
     ]); ?>
 
     <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([

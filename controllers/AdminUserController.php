@@ -11,7 +11,11 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
@@ -48,23 +52,27 @@ class AdminUserController extends AdminModelEditorController
 
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(), [
+        $actions = ArrayHelper::merge(parent::actions(), [
+
             'create' =>
             [
-                'modelScenario' => 'create'
-            ],
-            'update' =>
-            [
-                'modelScenario' => 'update'
+                'class'         => AdminModelEditorCreateAction::className(),
+                "callback"      => [$this, 'create'],
             ],
 
-            'change-password' =>
+            'update' =>
+            [
+                'class'         => AdminOneModelEditAction::className(),
+                "callback"      => [$this, 'update'],
+            ],
+
+            /*'change-password' =>
             [
                 "class"     => AdminOneModelEditAction::className(),
                 "name"      => "Изменение пароля",
                 "icon"      => "glyphicon glyphicon-cog",
                 "callback"  => [$this, "actionChangePassword"],
-            ],
+            ],*/
 
             /*'permission' =>
             [
@@ -90,6 +98,161 @@ class AdminUserController extends AdminModelEditorController
                 //"icon"              => "glyphicon glyphicon-trash",
                 "eachCallback" => [$this, 'eachMultiInActivate'],
             ]
+        ]);
+
+        if (isset($actions['related-properties']))
+        {
+            unset($actions['related-properties']);
+        }
+
+        return $actions;
+    }
+
+
+    public function create(AdminAction $adminAction)
+    {
+        $modelClassName = $this->modelClassName;
+        $model          = new $modelClassName();
+
+        $relatedModel = $model->relatedPropertiesModel;
+
+        $passwordChange = new PasswordChangeForm([
+            'user' => $model
+        ]);
+
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+            $passwordChange->load(\Yii::$app->request->post());
+
+            return \yii\widgets\ActiveForm::validateMultiple([
+                $model, $relatedModel, $passwordChange
+            ]);
+        }
+
+
+        if ($rr->isRequestPjaxPost())
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+
+            if ($model->save() && $relatedModel->save())
+            {
+                if ($passwordChange->new_password)
+                {
+                    if (!$passwordChange->changePassword())
+                    {
+                        \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
+                    }
+                }
+
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+
+                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                {
+                    return $this->redirect(
+                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
+                            ->toString()
+                    );
+                } else
+                {
+                    return $this->redirect(
+                        $this->indexUrl
+                    );
+                }
+
+            } else
+            {
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+            }
+        }
+
+        return $this->render('_form', [
+            'model'           => $model,
+            'relatedModel'    => $relatedModel,
+            'passwordChange'  => $passwordChange,
+        ]);
+    }
+
+
+    public function update(AdminAction $adminAction)
+    {
+        /**
+         * @var $model CmsUser
+         */
+        $model          = $this->model;
+        $relatedModel   = $model->relatedPropertiesModel;
+        $passwordChange = new PasswordChangeForm([
+            'user' => $model
+        ]);
+
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+            $passwordChange->load(\Yii::$app->request->post());
+
+            return \yii\widgets\ActiveForm::validateMultiple([
+                $model, $relatedModel, $passwordChange
+            ]);
+        }
+
+        if ($rr->isRequestPjaxPost())
+        {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+            $passwordChange->load(\Yii::$app->request->post());
+
+            if ($model->save() && $relatedModel->save())
+            {
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+
+                if ($passwordChange->new_password)
+                {
+                    if (!$passwordChange->changePassword())
+                    {
+                        \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
+                    }
+                }
+
+                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                {
+
+                } else
+                {
+                    return $this->redirect(
+                        $this->indexUrl
+                    );
+                }
+
+                $model->refresh();
+
+            } else
+            {
+                $errors = [];
+
+                if ($model->getErrors())
+                {
+                    foreach ($model->getErrors() as $error)
+                    {
+                        $errors[] = implode(', ', $error);
+                    }
+                }
+
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save') . ". " . implode($errors));
+            }
+        }
+
+        return $this->render('_form', [
+            'model'           => $model,
+            'relatedModel'    => $relatedModel,
+            'passwordChange'  => $passwordChange,
         ]);
     }
 
