@@ -47,8 +47,8 @@ use yii\base\Event;
  * @property string $description_full
  * @property integer $image_height
  * @property integer $image_width
- * @property string $linked_to_model
- * @property string $linked_to_value
+ * @property string $linked_to_model @version > 2.4.*  is depricated
+ * @property string $linked_to_value @version > 2.4.*  is depricated
  * @property string $rootSrc
  *
  * @property User $updatedBy

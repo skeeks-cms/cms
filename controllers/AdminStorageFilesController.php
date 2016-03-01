@@ -37,7 +37,6 @@ class AdminStorageFilesController extends AdminModelEditorController
     public function init()
     {
         $this->name                   = "Управление файлами хранилища";
-        $this->modelShowAttribute      = "src";
         $this->modelClassName          = StorageFile::className();
 
         parent::init();
