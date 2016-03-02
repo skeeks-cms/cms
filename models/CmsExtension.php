@@ -11,7 +11,6 @@ use skeeks\cms\components\marketplace\models\PackageModel;
 use skeeks\cms\helpers\ComposerHelper;
 use skeeks\cms\helpers\FileHelper;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\yii2\curl\Curl;
 use yii\base\Component;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;

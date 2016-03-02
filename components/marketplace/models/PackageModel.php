@@ -8,7 +8,6 @@
 namespace skeeks\cms\components\marketplace\models;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsExtension;
-use skeeks\yii2\curl\Curl;
 use yii\base\Component;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
