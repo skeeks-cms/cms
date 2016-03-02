@@ -54,7 +54,7 @@ class HasRelatedProperties extends ActiveRecord
     public function getRelatedProperties()
     {
         $className  = $this->relatedPropertyClassName;
-        $find       = $className::find();
+        $find       = $className::find()->orderBy(['priority' => SORT_ASC]);;
         $find->multiple = true;
 
         return $find;
