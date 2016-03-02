@@ -10,6 +10,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class UserPropertyTypeDate
@@ -79,15 +80,12 @@ class UserPropertyTypeDate extends PropertyType
         return $field;
     }
 
-
     /**
-     * Файл с формой настроек, по умолчанию лежит в той же папке где и компонент.
-     *
      * @return string
      */
-    public function getConfigFormFile()
+    public function renderConfigForm(ActiveForm $activeForm)
     {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formUserPropertyTypeDate.php';
+        echo $activeForm->field($this, 'type')->radioList(\skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate::types());
     }
+
 }

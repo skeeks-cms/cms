@@ -8,6 +8,7 @@
 namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\PropertyType;
+use yii\widgets\ActiveForm;
 
 /**
  * Class PropertyTypeTree
@@ -43,10 +44,9 @@ class PropertyTypeTree extends PropertyType
      *
      * @return string
      */
-    public function getConfigFormFile()
+    public function renderConfigForm(ActiveForm $activeForm)
     {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formPropertyTypeTree.php';
+        echo $activeForm->fieldRadioListBoolean($this, 'multiple');
     }
 
 }

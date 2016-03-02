@@ -9,6 +9,7 @@ namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class PropertyTypeList
@@ -64,14 +65,11 @@ class PropertyTypeList extends PropertyType
     }
 
     /**
-     * Файл с формой настроек, по умолчанию лежит в той же папке где и компонент.
-     *
      * @return string
      */
-    public function getConfigFormFile()
+    public function renderConfigForm(ActiveForm $activeForm)
     {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formPropertyTypeList.php';
+        echo $activeForm->fieldSelect($this, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements());
     }
 
     /**

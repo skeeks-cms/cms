@@ -11,6 +11,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\ColorInput;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class UserPropertyTypeColor
@@ -94,13 +95,15 @@ class UserPropertyTypeColor extends PropertyType
 
 
     /**
-     * Файл с формой настроек, по умолчанию лежит в той же папке где и компонент.
-     *
      * @return string
      */
-    public function getConfigFormFile()
+    public function renderConfigForm(ActiveForm $activeForm)
     {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formUserPropertyColor.php';
+        echo $activeForm->fieldRadioListBoolean($this, 'showDefaultPalette');
+        echo $activeForm->fieldRadioListBoolean($this, 'useNative');
+        echo $activeForm->fieldRadioListBoolean($this, 'showInput')->hint(\Yii::t('app','This INPUT to opened the palette'));
+        echo $activeForm->fieldRadioListBoolean($this, 'showAlpha');
+        echo $activeForm->fieldRadioListBoolean($this, 'showPalette');
+        echo $activeForm->field($this, 'saveValueAs')->radioList(\skeeks\cms\widgets\ColorInput::$possibleSaveAs);
     }
 }

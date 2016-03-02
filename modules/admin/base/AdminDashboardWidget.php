@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\base;
 
+use skeeks\cms\base\ConfigFormInterface;
 use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use skeeks\cms\traits\WidgetTrait;
@@ -18,7 +19,7 @@ use yii\widgets\ActiveForm;
  * Class AdminDashboardWidget
  * @package skeeks\cms\modules\admin\base
  */
-class AdminDashboardWidget extends Model implements ViewContextInterface
+class AdminDashboardWidget extends Model implements ViewContextInterface, ConfigFormInterface
 {
     /**
      * @see \yii\base\Widget
@@ -29,7 +30,8 @@ class AdminDashboardWidget extends Model implements ViewContextInterface
     use HasComponentDescriptorTrait;
 
     /**
-     * TODO: Вынести в интерфейс!
+     *
+     * Стоит форму для себя
      *
      * @param ActiveForm|null $form
      */

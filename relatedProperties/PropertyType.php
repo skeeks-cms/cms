@@ -10,19 +10,29 @@
 
 namespace skeeks\cms\relatedProperties;
 use skeeks\cms\base\Component;
-use skeeks\cms\base\widgets\ActiveForm;
+use skeeks\cms\base\ConfigFormInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
  */
-abstract class PropertyType extends Component
+abstract class PropertyType extends Model implements ConfigFormInterface
 {
+    use HasComponentDescriptorTrait;
+
+    /**
+     * @param ActiveForm $form
+     */
+    public function renderConfigForm(ActiveForm $form)
+    {}
+
     const CODE_STRING   = 'S';
     const CODE_NUMBER   = 'N';
     const CODE_LIST     = 'L';
