@@ -33,7 +33,7 @@ class AdminDashboardWidget extends Model implements ViewContextInterface
      *
      * @param ActiveForm|null $form
      */
-    public function renderConfigForm(ActiveForm $form = null)
+    public function renderConfigForm(ActiveForm $form)
     {}
 
     /**

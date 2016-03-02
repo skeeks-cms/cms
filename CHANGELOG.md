@@ -3,6 +3,7 @@ CHANGELOG
 
 2.4.11.pre
 -----------------
+ * Удален виджет формы yandex карт, вместо этого разработан целый пакет skeeks/cms-ya-map (https://github.com/skeeks-cms/cms-ya-map)
  * yi2-faker и yii2-codeception убраны из зависимостей
 
 2.4.10
