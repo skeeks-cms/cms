@@ -145,7 +145,7 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var array
      */
-    public $userPropertyTypes       = [];
+    public $relatedProperies       = [];
 
 
     //После регистрации пользователю будут присвоены эти роли
@@ -993,12 +993,23 @@ $fileContent .= '];';
      */
     public function userPropertyTypes()
     {
+        $fromConfig = [];
+
+        if ((array) $this->relatedProperies)
+        {
+            foreach ((array) $this->relatedProperies as $userPropertyClass)
+            {
+                //TODO: добавить проверки
+                $fromConfig[$userPropertyClass] = (new $userPropertyClass)->name;
+            }
+        }
+
         return (array) ArrayHelper::merge([
             UserPropertyTypeDate::className() => (new UserPropertyTypeDate())->name,
             UserPropertyTypeComboText::className() => (new UserPropertyTypeComboText())->name,
             UserPropertyTypeColor::className() => (new UserPropertyTypeColor())->name,
             UserPropertyTypeSelectFile::className() => (new UserPropertyTypeSelectFile())->name
-        ], (array) $this->userPropertyTypes);
+        ], (array) $fromConfig);
     }
 
     /**
