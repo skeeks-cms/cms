@@ -360,6 +360,7 @@ JS
                              ["target" => "_blank", "class" => "btn-tree-node-controll btn btn-default btn-sm show-at-site", "title" => \Yii::t('app',"Show at site")]
                     );
 
+            $linkMove = "";
             if ($model->level > 0)
             {
                 $linkMove = Html::a('<span class="glyphicon glyphicon-move"></span>',

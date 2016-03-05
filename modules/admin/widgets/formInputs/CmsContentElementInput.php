@@ -32,8 +32,9 @@ class CmsContentElementInput extends SelectModelDialogInput
      */
     public function getModelData()
     {
-        if ($id = $this->model->{$this->attribute})
+        if ($this->model && $this->model->{$this->attribute})
         {
+            $id = $this->model->{$this->attribute};
             return CmsContentElement::findOne($id);
         }
     }

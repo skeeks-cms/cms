@@ -71,7 +71,7 @@ class Serialize extends Behavior
             {
                 if (is_string($this->owner->{$fielName}))
                 {
-                    $this->owner->{$fielName} = unserialize($this->owner->{$fielName});
+                    $this->owner->{$fielName} = @unserialize($this->owner->{$fielName});
                 }
             }
             else

@@ -111,7 +111,7 @@ JS
         if ($this->viewDialog)
         {
             $content = $this->controller->view->render($this->viewDialog, [
-                'action' => $action,
+                'action' => $this->id,
             ]);
         }
 

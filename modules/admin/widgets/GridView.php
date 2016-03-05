@@ -157,6 +157,7 @@ class GridView extends \yii\grid\GridView
         $max = $pagination->pageSizeLimit[1];
 
         $items = [];
+        $i = 0;
         for ($i >= $min; $i <= $max; $i++)
         {
             $items[] = $i;
