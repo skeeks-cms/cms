@@ -18,7 +18,6 @@ use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use skeeks\cms\modules\admin\widgets\tree\Asset;
-use skeeks\sx\validate\Validate;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;

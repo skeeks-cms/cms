@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms\modules\admin\widgets\form;
 
-use skeeks\sx\validate\Validate;
 use yii\base\Model;
 use yii\helpers\Html;
 

@@ -10,7 +10,6 @@ namespace skeeks\cms\modules\admin\traits;
 
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;

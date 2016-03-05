@@ -21,7 +21,6 @@ use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\Module;
 use skeeks\cms\validators\PhoneValidator;
-use skeeks\sx\validate\Validate;
 use Yii;
 use yii\base\ErrorException;
 use yii\base\Exception;

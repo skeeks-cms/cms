@@ -12,7 +12,6 @@ namespace skeeks\cms\widgets\formInputs;
 use skeeks\cms\Exception;
 use skeeks\cms\models\Publication;
 use skeeks\cms\modules\admin\widgets\Pjax;
-use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
 use yii\helpers\Html;
 use yii\helpers\Json;

@@ -14,7 +14,6 @@ namespace skeeks\cms\components;
 use skeeks\cms\components\imaging\Filter;
 use skeeks\cms\components\imaging\validators\AllowExtension;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\sx\validate\Validate;
 use yii\base\Component;
 use Yii;
 use yii\base\Exception;

@@ -24,8 +24,6 @@ use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
-use skeeks\sx\validate\Validate;
-use skeeks\sx\validators\ChainAnd;
 use Yii;
 use yii\base\Event;
 use yii\base\Exception;

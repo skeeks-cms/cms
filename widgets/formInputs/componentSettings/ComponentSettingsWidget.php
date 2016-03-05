@@ -11,7 +11,6 @@ use skeeks\cms\Exception;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\Module;
-use skeeks\sx\validate\Validate;
 use skeeks\widget\codemirror\CodemirrorWidget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;

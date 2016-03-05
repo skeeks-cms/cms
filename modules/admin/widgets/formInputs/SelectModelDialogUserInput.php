@@ -12,7 +12,6 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\Publication;
 use skeeks\cms\modules\admin\Module;
-use skeeks\sx\validate\Validate;
 use yii\db\ActiveRecord;
 use yii\helpers\Html;
 use yii\helpers\Json;

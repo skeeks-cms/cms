@@ -126,7 +126,8 @@ class AdminOneModelEditAction extends AdminModelEditorAction
 
     public function checkUpdateAccess()
     {
-        if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->controller->model)->isValid())
+        $model = $this->controller->model;
+        if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $model)->isValid())
         {
             //Если такая привилегия заведена, нужно ее проверять.
             if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))

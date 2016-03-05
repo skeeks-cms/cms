@@ -15,7 +15,6 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
 use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
-use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
