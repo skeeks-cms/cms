@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.0.pre
 -----------------
+ * Удалена папка docs (документация на сайте dev.cms.skeeks.com)
  * Удален класс skeeks\cms\panels\ViewsPanel
  * Удален класс skeeks\cms\base\behaviors\ActiveRecord
  * Удален класс skeeks\cms\base\behaviors\Controller
