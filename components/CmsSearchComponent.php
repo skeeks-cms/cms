@@ -12,6 +12,7 @@ use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
 use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
@@ -28,6 +29,7 @@ use yii\web\Application;
 use yii\web\View;
 
 use \Yii;
+use yii\widgets\ActiveForm;
 
 /**
  * @property string searchQuery
@@ -97,6 +99,41 @@ class CmsSearchComponent extends \skeeks\cms\base\Component
             'searchElementContentIds'               => 'Искать элементы контента следующих типов',
             'phraseLiveTime'                        => 'Время хранения поисковых запросов',
         ]);
+    }
+
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'searchQueryParamName'              => 'Название параметра для адресной строки',
+            'phraseLiveTime'                    => 'Если указано 0 то поисковые запросы не будут удалятся никогда',
+            'enabledElementProperties'          => 'Включая эту опцию, поиск начнет учитывать дополнительные поля элементов',
+            'enabledElementPropertiesSearchable'=> 'Каждое дополнительное свойство имеет свои настройки. Эта опция включит поиск не по всем дополнительным свойствам, а только с включеной опцией "Значения свойства участвуют в поиске"',
+        ]);
+    }
+
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo $form->fieldSet(\Yii::t('app', 'Main'));
+
+            echo $form->field($this, 'searchQueryParamName');
+            echo $form->fieldInputInt($this, 'phraseLiveTime');
+
+        echo $form->fieldSetEnd();
+
+
+        echo $form->fieldSet('Поиск элементов');
+
+            echo $form->fieldSelectMulti($this, 'searchElementContentIds', CmsContent::getDataForSelect() );
+            echo $form->fieldSelectMulti($this, 'searchElementFields', (new \skeeks\cms\models\CmsContentElement())->attributeLabels() );
+            echo $form->fieldRadioListBoolean($this, 'enabledElementProperties');
+            echo $form->fieldRadioListBoolean($this, 'enabledElementPropertiesSearchable');
+
+        echo $form->fieldSetEnd();
+
+        echo $form->fieldSet('Поиск разделов');
+            echo 'В разработке';
+        echo $form->fieldSetEnd();
     }
 
     /**

@@ -71,10 +71,10 @@ class AdminComponentSettingsController extends AdminController
                 throw new UserException("Указан некорректный компонент");
             }
 
-            if (!$component->existsConfigFormFile())
+            /*if (!$component->existsConfigFormFile())
             {
                 throw new UserException("У компонента не задана форма для управления настройками");
-            }
+            }*/
 
             $this->_component = $component;
 

@@ -6,74 +6,70 @@
  * @date 27.05.2015
  */
 /* @var $this yii\web\View */
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
-<?php $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSet(\Yii::t('app','Showing')); ?>
-        <?= $form->field($model, 'viewFile')->textInput(); ?>
-    <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSet(\Yii::t('app','Showing')); ?>
+    <?= $form->field($model, 'viewFile')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
-        <?= $form->fieldRadioListBoolean($model, 'enabledPaging', \Yii::$app->cms->booleanFormat()); ?>
-        <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
-        <?= $form->fieldInputInt($model, 'pageSize'); ?>
-        <?= $form->fieldInputInt($model, 'pageSizeLimitMin'); ?>
-        <?= $form->fieldInputInt($model, 'pageSizeLimitMax'); ?>
-        <?= $form->field($model, 'pageParamName')->textInput(); ?>
+<?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledPaging', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldInputInt($model, 'pageSize'); ?>
+    <?= $form->fieldInputInt($model, 'pageSizeLimitMin'); ?>
+    <?= $form->fieldInputInt($model, 'pageSizeLimitMax'); ?>
+    <?= $form->field($model, 'pageParamName')->textInput(); ?>
 
-    <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\Yii::t('app','Filtering')); ?>
-        <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat(), [
-            'allowDeselect' => true
-        ]); ?>
+<?= $form->fieldSet(\Yii::t('app','Filtering')); ?>
+    <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat(), [
+        'allowDeselect' => true
+    ]); ?>
 
-        <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint(\Yii::t('app',"Will be considered time of beginning and end of the publication")); ?>
+    <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint(\Yii::t('app',"Will be considered time of beginning and end of the publication")); ?>
 
-        <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\models\User::find()->active()->all(),
-            'id',
-            'name'
-        )); ?>
+    <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\models\User::find()->active()->all(),
+        'id',
+        'name'
+    )); ?>
 
-        <?= $form->fieldSelectMulti($model, 'content_ids', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
+    <?= $form->fieldSelectMulti($model, 'content_ids', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
 
-        <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTree', \Yii::$app->cms->booleanFormat()); ?>
-        <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTreeChild', \Yii::$app->cms->booleanFormat()); ?>
-        <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTreeChildAll', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTree', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTreeChild', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledCurrentTreeChildAll', \Yii::$app->cms->booleanFormat()); ?>
 
-        <?= $form->field($model, 'tree_ids')->widget(
-            \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-            [
-                'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI,
-                'attributeMulti' => 'tree_ids'
-            ]
-        ); ?>
+    <?= $form->field($model, 'tree_ids')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+        [
+            'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI,
+            'attributeMulti' => 'tree_ids'
+        ]
+    ); ?>
 
-        <?= $form->fieldRadioListBoolean($model, 'enabledSearchParams', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledSearchParams', \Yii::$app->cms->booleanFormat()); ?>
 
-    <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\Yii::t('app','Sorting and quantity')); ?>
-        <?= $form->fieldInputInt($model, 'limit'); ?>
-        <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
-        <?= $form->fieldSelect($model, 'order', [
-            SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
-            SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
-        ]); ?>
-    <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSet(\Yii::t('app','Sorting and quantity')); ?>
+    <?= $form->fieldInputInt($model, 'limit'); ?>
+    <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
+    <?= $form->fieldSelect($model, 'order', [
+        SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
+        SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
+    ]); ?>
+<?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
-        <?= $form->field($model, 'label')->textInput(); ?>
+<?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
+    <?= $form->field($model, 'label')->textInput(); ?>
 
-    <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Настройки кэширования'); ?>
-        <?= $form->fieldRadioListBoolean($model, 'enabledRunCache', \Yii::$app->cms->booleanFormat()); ?>
-        <?= $form->fieldInputInt($model, 'runCacheDuration'); ?>
-    <?= $form->fieldSetEnd(); ?>
+    <?= $form->fieldRadioListBoolean($model, 'enabledRunCache', \Yii::$app->cms->booleanFormat()); ?>
+    <?= $form->fieldInputInt($model, 'runCacheDuration'); ?>
+<?= $form->fieldSetEnd(); ?>
 
 
 
-<?= $form->buttonsStandart($model) ?>
-<?php ActiveForm::end(); ?>

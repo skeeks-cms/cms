@@ -27,7 +27,12 @@
             <small><?=\Yii::t('app','These settings not yet saved in the database')?></small>
         <? endif; ?>
     </div>
-    <?= $component->renderConfigForm(); ?>
+
+
+    <? $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
+        <?= $component->renderConfigForm($form); ?>
+        <?= $form->buttonsStandart($component); ?>
+    <? \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
 
 
 <?= $this->render('_footer'); ?>

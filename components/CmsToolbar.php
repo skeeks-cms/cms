@@ -30,6 +30,7 @@ use yii\web\Application;
 use yii\web\View;
 
 use \Yii;
+use yii\widgets\ActiveForm;
 
 /**
  * Class CmsToolbar
@@ -47,18 +48,6 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             'name'          => 'Панель быстрого управления',
         ]);
     }
-
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cmsToolbar/_form.php';
-    }
-
 
     /**
      * @var array the list of IPs that are allowed to access this module.
@@ -101,6 +90,49 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
             'infoblockEditBorderColor'      => 'Цвет рамки вокруг инфоблока',
         ]);
     }
+
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'enabled'                   => 'Этот параметр отключает/включает панель для всех пользователей сайта, независимо от их прав и возможностей',
+            'isOpen'                    => 'По умолчанию панель будет открыта или закрыта',
+            'enableFancyboxWindow'      => 'Диалоговые окна в сайтовой части будут более красивые, однако это может портить верстку (но это происходит крайне редко)',
+            'infoblockEditBorderColor'  => 'Цвет рамки вокруг инфоблоков в режиме редактирования',
+        ]);
+    }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo $form->fieldSet(\Yii::t('app', 'Main'));
+
+            echo $form->field($this, 'enabled')->checkbox();
+            echo $form->fieldCheckboxBoolean($this, 'isOpen');
+            echo $form->field($this, 'enableFancyboxWindow')->widget(
+                \skeeks\widget\chosen\Chosen::className(),
+                [
+                    'items' => \Yii::$app->formatter->booleanFormat
+                ]
+            );
+
+            echo $form->fieldRadioListBoolean($this, 'editWidgets');
+            echo $form->fieldRadioListBoolean($this, 'editViewFiles');
+
+            echo $form->field($this, 'infoblockEditBorderColor')->widget(
+                \skeeks\cms\widgets\ColorInput::className()
+            );
+
+        echo $form->fieldSetEnd();
+
+        echo $form->fieldSet(\Yii::t('app', 'Access'));
+
+            echo \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+                'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+                'label'                 => 'Доступ к панеле разрешен',
+            ]);
+
+        echo $form->fieldSetEnd();
+    }
+
 
 
     public $viewFiles = [];

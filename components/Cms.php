@@ -66,6 +66,7 @@ use yii\validators\EmailValidator;
 use yii\web\UploadedFile;
 use yii\web\UserEvent;
 use yii\web\View;
+use yii\widgets\ActiveForm;
 
 /**
  * @property CmsSite                            $site
@@ -104,14 +105,13 @@ class Cms extends \skeeks\cms\base\Component
         ]);
     }
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
+
+    public function renderConfigForm(ActiveForm $form)
     {
-        return __DIR__ . '/cms/_form.php';
+        echo \Yii::$app->view->renderFile(__DIR__ . '/cms/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
     }
 
     const BOOL_Y = "Y";

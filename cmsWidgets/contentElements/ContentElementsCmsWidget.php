@@ -22,6 +22,7 @@ use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
  * Class СontentElementsCmsWidget
@@ -140,6 +141,14 @@ class ContentElementsCmsWidget extends WidgetRenderable
             [['enabledRunCache'], 'string'],
             [['runCacheDuration'], 'integer'],
         ]);
+    }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
     }
 
     protected function _run()

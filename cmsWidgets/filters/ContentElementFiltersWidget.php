@@ -25,6 +25,7 @@ use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
  * @property CmsContent         $cmsContent;
@@ -112,6 +113,15 @@ class ContentElementFiltersWidget extends WidgetRenderable
             [['realatedProperties'], 'safe'],
         ]);
     }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
+    }
+
     /**
      * @return CmsContent
      */

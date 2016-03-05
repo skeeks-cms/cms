@@ -22,6 +22,7 @@ use yii\base\Event;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\web\View;
+use yii\widgets\ActiveForm;
 
 /**
  * Class Seo
@@ -38,17 +39,6 @@ class Seo extends Component
         return array_merge(parent::descriptorConfig(), [
             'name'          => 'Seo (продвижение)',
         ]);
-    }
-
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'seo/_form.php';
     }
 
     /**
@@ -132,6 +122,14 @@ class Seo extends Component
     }
 
 
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/seo/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
+    }
 
 
 

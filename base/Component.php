@@ -10,16 +10,18 @@ use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
+use yii\widgets\ActiveForm;
+
 /**
  * Class Component
  * @package skeeks\cms\base
  */
-abstract class Component extends Model
+abstract class Component extends Model implements ConfigFormInterface
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;
     //Может строить форму для своих данных.
-    use HasComponentConfigFormTrait;
+    //use HasComponentConfigFormTrait;
     //Можно сохранять настройки в базу
     use HasComponentDbSettingsTrait;
 
@@ -34,4 +36,6 @@ abstract class Component extends Model
         \Yii::endProfile("Init: " . $this->className());
     }
 
+    public function renderConfigForm(ActiveForm $form)
+    {}
 }

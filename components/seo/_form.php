@@ -6,14 +6,10 @@
  * @date 27.03.2015
  */
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\WidgetConfig */
 ?>
-<?php $form = ActiveForm::begin(); ?>
-
-
 <?= $form->fieldSet('Ключевые слова'); ?>
 
     <?= $form->field($model, 'enableKeywordsGenerator')->widget(
@@ -42,6 +38,3 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->field($model, 'useLastDelimetrTree')->radioList(\Yii::$app->formatter->booleanFormat)->hint(''); ?>
     <?= $form->field($model, 'useLastDelimetrContentElements')->radioList(\Yii::$app->formatter->booleanFormat)->hint(''); ?>
 <?= $form->fieldSetEnd(); ?>
-
-<?= $form->buttonsCreateOrUpdate($model); ?>
-<?php ActiveForm::end(); ?>

@@ -9,6 +9,7 @@ namespace skeeks\cms\authclient;
 
 use skeeks\cms\components\Cms;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * @property array $clients
@@ -49,15 +50,12 @@ class AuthClientSettings extends \skeeks\cms\base\Component
         ]);
     }
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
+    public function renderConfigForm(ActiveForm $form)
     {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . '/_settingsFrom.php';
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_settingsFrom.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
     }
 
 

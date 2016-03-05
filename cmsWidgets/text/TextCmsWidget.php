@@ -13,6 +13,7 @@ use skeeks\cms\helpers\UrlHelper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
  * Class TextCmsWidget
@@ -43,6 +44,13 @@ class TextCmsWidget extends Widget
         [
             ['text', 'string']
         ]);
+    }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo $form->field($this, 'text')->widget(
+            \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className()
+        );
     }
 
     protected function _run()
