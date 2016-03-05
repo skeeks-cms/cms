@@ -10,6 +10,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\modules\admin\widgets\GridViewHasSettings;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class GridViewSettings
@@ -86,6 +87,15 @@ class GridViewSettings extends Component
             [['visibleColumns'], 'safe'],
         ]);
     }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
+    }
+
 
     /**
      * @return $this

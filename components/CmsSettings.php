@@ -8,6 +8,7 @@
 namespace skeeks\cms\components;
 
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class CmsSettings
@@ -31,15 +32,16 @@ class CmsSettings extends \skeeks\cms\base\Component
         ]);
     }
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
+    public function renderConfigForm(ActiveForm $form)
     {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'cms/_settings.php';
+        echo $form->fieldSet('Безопасность');
+
+        echo $form->fieldSelect($this, 'sessionType', [
+                \skeeks\cms\components\CmsSettings::SESSION_FILE    => 'В файлах',
+                \skeeks\cms\components\CmsSettings::SESSION_DB      => 'В базе данных',
+            ])->hint('Хранилище сессий');
+
+        echo $form->fieldSetEnd();;
     }
 
 

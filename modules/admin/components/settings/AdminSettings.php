@@ -20,6 +20,7 @@ use skeeks\cms\modules\admin\dashboards\DiscSpaceDashboard;
 use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
+use yii\widgets\ActiveForm;
 
 /**
  * @property CmsLang $cmsLanguage
@@ -176,6 +177,16 @@ class AdminSettings extends Component
 
             'blockedTime'                       => \Yii::t('app','Time through which block user'),
         ]);
+    }
+
+
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
     }
 
     /**

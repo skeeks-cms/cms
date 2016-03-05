@@ -6,10 +6,7 @@
  * @date 27.05.2015
  */
 /* @var $this yii\web\View */
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
-<?php $form = ActiveForm::begin(); ?>
-
     <?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldInputInt($model, 'pageSize'); ?>
@@ -217,7 +214,5 @@ JS
 );
 ?>
 
-<?= $form->buttonsStandart($model) ?>
-<?php ActiveForm::end(); ?>
 
 

@@ -25,8 +25,6 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     $emailTemplates[$code] = \yii\helpers\ArrayHelper::getValue($data, 'name');
 }
 ?>
-<?php $form = ActiveForm::begin(); ?>
-
 
 <?= $form->fieldSet('Основное'); ?>
 
@@ -181,7 +179,5 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     <?= $form->field($model, 'licenseKey')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
-<?php ActiveForm::end(); ?>
 
 

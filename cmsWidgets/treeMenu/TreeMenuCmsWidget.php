@@ -18,6 +18,7 @@ use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
  * Class TreeMenuCmsWidget
@@ -93,6 +94,14 @@ class TreeMenuCmsWidget extends WidgetRenderable
             [['site_codes'], 'safe'],
             [['tree_type_ids'], 'safe'],
         ]);
+    }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
     }
 
     protected function _run()
