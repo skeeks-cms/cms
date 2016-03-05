@@ -9,7 +9,6 @@ namespace skeeks\cms\components;
 use skeeks\cms\base\Component;
 
 use skeeks\cms\base\components\Descriptor;
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\Site;

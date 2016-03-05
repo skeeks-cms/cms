@@ -20,8 +20,6 @@ abstract class Component extends Model implements ConfigFormInterface
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;
-    //Может строить форму для своих данных.
-    //use HasComponentConfigFormTrait;
     //Можно сохранять настройки в базу
     use HasComponentDbSettingsTrait;
 

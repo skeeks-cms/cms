@@ -11,7 +11,6 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\User;
-use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
 use yii\caching\TagDependency;
@@ -63,7 +62,7 @@ trait HasComponentDbSettingsTrait
             $this->className(),
             $this->namespace,
             \Yii::$app->currentSite->site->code,
-            \Yii::$app->user->getId()
+            \Yii::$app->user->id
         ]);
     }
 
@@ -106,7 +105,7 @@ trait HasComponentDbSettingsTrait
             if (!\Yii::$app->user->isGuest)
             {
                 $settingsValues = ArrayHelper::merge($settingsValues,
-                    $this->fetchDefaultSettingsByUserId(\Yii::$app->user->identity->getId())
+                    $this->fetchDefaultSettingsByUserId(\Yii::$app->user->identity->id)
                 );
             }
 

@@ -265,7 +265,7 @@ $config =
 
         'cms' =>
         [
-            'class'                         => '\skeeks\cms\Module',
+            'class' => '\skeeks\cms\Module',
         ],
 
         'markdown' => [

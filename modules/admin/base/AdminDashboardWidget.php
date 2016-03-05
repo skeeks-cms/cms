@@ -8,7 +8,6 @@
 namespace skeeks\cms\modules\admin\base;
 
 use skeeks\cms\base\ConfigFormInterface;
-use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use skeeks\cms\traits\WidgetTrait;
 use yii\base\Model;

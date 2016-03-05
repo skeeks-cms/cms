@@ -12,7 +12,6 @@
 namespace skeeks\cms\models;
 
 use Imagine\Image\ManipulatorInterface;
-use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\exceptions\NotConnectedToDbException;

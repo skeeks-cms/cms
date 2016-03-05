@@ -9,7 +9,6 @@ namespace skeeks\cms\components;
 
 use skeeks\cms\assets\CmsAsset;
 use skeeks\cms\base\components\Descriptor;
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\Module;
 use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\events\LoginEvent;

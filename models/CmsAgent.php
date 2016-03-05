@@ -7,10 +7,11 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\components\Cms;
+use skeeks\cms\query\CmsActiveQuery;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%cms_agent}}".
@@ -34,6 +35,14 @@ class CmsAgent extends ActiveRecord
     public static function tableName()
     {
         return '{{%cms_agent}}';
+    }
+
+    /**
+     * @return CmsActiveQuery
+     */
+    public static function find()
+    {
+        return new CmsActiveQuery(get_called_class());
     }
 
     /**

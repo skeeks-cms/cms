@@ -10,20 +10,23 @@
  */
 
 namespace skeeks\cms\components\storage;
-use skeeks\cms\models\ComponentModel;
 use Yii;
 use yii\base\Component;
 
 
 use \skeeks\sx\File;
 use \skeeks\sx\Dir;
+use yii\base\Model;
 
 /**
  * Class Cluster
  * @package skeeks\cms\components\storage
  */
-abstract class Cluster extends ComponentModel
+abstract class Cluster extends Model
 {
+    public $id;
+    public $name;
+
     public $publicBaseUrl; //   http://c1.s.skeeks.com/uploads/
     public $rootBasePath;  //   /var/www/sites/test.ru/frontend/web/uploads/
 
@@ -34,15 +37,6 @@ abstract class Cluster extends ComponentModel
      * is not over burdened with a single directory having too many files.
      */
     public $directoryLevel = 3;
-
-    /**
-     * @return array
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
 
 
     /**

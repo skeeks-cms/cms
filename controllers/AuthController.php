@@ -99,13 +99,13 @@ class AuthController extends Controller
      */
     public function onAuthSuccess($client)
     {
-        \Yii::info('start auth client: ' . $client->getId(), 'authClient');
+        \Yii::info('start auth client: ' . $client->id, 'authClient');
 
         $attributes = $client->getUserAttributes();
 
         /* @var $userAuthClient UserAuthClient */
         $userAuthClient = UserAuthClient::find()->where([
-            'provider'              => $client->getId(),
+            'provider'              => $client->id,
             'provider_identifier'   => ArrayHelper::getValue($attributes, 'id'),
         ])->one();
 
@@ -215,7 +215,7 @@ class AuthController extends Controller
 
                 $auth = new UserAuthClient([
                     'user_id'               => $user->id,
-                    'provider'              => $client->getId(),
+                    'provider'              => $client->id,
                     'provider_identifier'   => (string)$attributes['id'],
                     'provider_data'         => $attributes,
                 ]);
@@ -275,7 +275,7 @@ class AuthController extends Controller
 
                 $userAuthClient = new UserAuthClient([
                     'user_id'               => \Yii::$app->user->identity->id,
-                    'provider'              => $client->getId(),
+                    'provider'              => $client->id,
                     'provider_identifier'   => (string) $attributes['id'],
                     'provider_data'         => $attributes,
                 ]);

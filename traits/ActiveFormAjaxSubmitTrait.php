@@ -7,10 +7,8 @@
  */
 namespace skeeks\cms\traits;
 
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
 use yii\base\Model;

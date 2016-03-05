@@ -81,7 +81,7 @@ class Imaging extends Component
         }
 
 
-        $replacePart    =   DIRECTORY_SEPARATOR . static::THUMBNAIL_PREFIX . $filter->getId()
+        $replacePart    =   DIRECTORY_SEPARATOR . static::THUMBNAIL_PREFIX . $filter->id
                             . ($params ? DIRECTORY_SEPARATOR . $this->getParamsCheckString($params) : "")
                             . DIRECTORY_SEPARATOR . $nameForSave;
 

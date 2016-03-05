@@ -9,14 +9,12 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\widgets;
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\assets\AdminFormAsset;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
 use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
-use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use skeeks\widget\chosen\Chosen;
 use yii\base\Model;

@@ -10,8 +10,6 @@
  */
 namespace skeeks\cms\modules\admin\widgets\form;
 
-use skeeks\cms\base\db\ActiveRecord;
-use skeeks\cms\validators\db\IsNewRecord;
 use skeeks\sx\validate\Validate;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;

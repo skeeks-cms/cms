@@ -7,8 +7,7 @@
  */
 
 namespace skeeks\cms\models\behaviors;
-use skeeks\cms\base\behaviors\ActiveRecord;
-use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
+use yii\base\Behavior;
 use yii\caching\Cache;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
@@ -21,7 +20,7 @@ use yii\web\ErrorHandler;
  * Class HasTableCache
  * @package skeeks\cms\models\behaviors
  */
-class HasTableCache extends ActiveRecord
+class HasTableCache extends Behavior
 {
     /**
      * @var Cache

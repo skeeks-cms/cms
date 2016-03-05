@@ -9,7 +9,6 @@
  */
 
 namespace skeeks\cms\models;
-use skeeks\cms\base\db\ActiveRecord;
 
 use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
