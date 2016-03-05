@@ -11,11 +11,11 @@
 
 namespace skeeks\cms\components\storage;
 
-use skeeks\cms\components\CollectionComponents;
 use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 use yii\helpers\BaseUrl;
@@ -36,16 +36,14 @@ use \skeeks\sx\Dir;
 
 /**
  *
- * @method Cluster[]   getComponents()
- * @method Cluster     getComponent($id)
- *
+ * @property Cluster[]   $clusters
  *
  * Class Storage
  * @package common\components\Storage
  */
-class Storage extends CollectionComponents
+class Storage extends Component
 {
-    public $componentClassName  = 'skeeks\cms\components\storage\ClusterLocal';
+    public $components          = [];
 
     /**
      *
@@ -188,7 +186,7 @@ class Storage extends CollectionComponents
                 $data = array_merge($data,
                 [
                     "src"           => $cluster->getPublicSrc($newFileSrc),
-                    "cluster_id"    => $cluster->getId(),
+                    "cluster_id"    => $cluster->id,
                     "cluster_file"  => $newFileSrc,
                 ]);
             }
@@ -200,14 +198,28 @@ class Storage extends CollectionComponents
         return $file;
     }
 
-
+    protected $_clusters = null;
 
     /**
      * @return Cluster[]
      */
     public function getClusters()
     {
-        return $this->getComponents();
+        if ($this->_clusters === null)
+        {
+            foreach ($this->components as $id => $data)
+            {
+                if (!is_int($id))
+                {
+                    $data['id'] = $id;
+                }
+
+                $cluster = \Yii::createObject($data);
+                $this->_clusters[$cluster->id] = $cluster;
+            }
+        }
+
+        return $this->_clusters;
     }
 
     /**
@@ -218,13 +230,13 @@ class Storage extends CollectionComponents
     {
         if ($id == null)
         {
-            foreach ($this->getComponents() as $clusterId => $cluster)
+            foreach ($this->clusters as $clusterId => $cluster)
             {
                 return $cluster;
             }
         } else
         {
-            return $this->getComponent($id);
+            return ArrayHelper::getValue($this->clusters, $id);
         }
     }
 }

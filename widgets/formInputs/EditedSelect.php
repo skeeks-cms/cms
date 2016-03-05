@@ -40,7 +40,7 @@ class EditedSelect extends Chosen
 
     public function init()
     {
-        $this->_pjaxId = 'pjax-'  . $this->getId();
+        $this->_pjaxId = 'pjax-'  . $this->id;
 
         Pjax::begin([
             'id' => $this->_pjaxId

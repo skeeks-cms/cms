@@ -17,7 +17,6 @@ use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\modules\admin\grid\ActionColumn;
 use skeeks\cms\modules\admin\traits\GridViewSortableTrait;
 use skeeks\cms\modules\admin\widgets\gridView\GridViewSettings;
-use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\InvalidConfigException;

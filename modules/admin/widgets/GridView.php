@@ -12,7 +12,6 @@ use skeeks\cms\grid\GridViewPjaxTrait;
 use skeeks\cms\modules\admin\assets\AdminGridAsset;
 use skeeks\cms\modules\admin\traits\GridViewSortableTrait;
 use skeeks\cms\modules\admin\widgets\gridView\GridViewSettings;
-use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\helpers\ArrayHelper;

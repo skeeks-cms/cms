@@ -93,7 +93,7 @@ abstract class Widget extends Component implements ViewContextInterface
                 'style' => 'display: none;'
             ]);*/
 
-            $id = 'sx-infoblock-' . $this->getId();
+            $id = 'sx-infoblock-' . $this->id;
 
             $this->getView()->registerJs(<<<JS
 new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
@@ -106,7 +106,7 @@ JS
                 'title'     => \Yii::t('app',"Double-click on the block will open the settings manager"),
                 'data'      =>
                 [
-                    'id' => $this->getId(),
+                    'id' => $this->id,
                     'config-url' => $this->getEditUrl()
                 ]
             ]);

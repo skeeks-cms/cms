@@ -7,7 +7,6 @@
  */
 namespace skeeks\cms\relatedProperties\models;
 
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;

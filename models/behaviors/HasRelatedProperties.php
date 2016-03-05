@@ -9,9 +9,9 @@
  */
 
 namespace skeeks\cms\models\behaviors;
-use skeeks\cms\base\behaviors\ActiveRecord;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use yii\base\Behavior;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\web\ErrorHandler;
@@ -20,7 +20,7 @@ use yii\web\ErrorHandler;
  * Class HasRelatedProperties
  * @package skeeks\cms\models\behaviors
  */
-class HasRelatedProperties extends ActiveRecord
+class HasRelatedProperties extends Behavior
 {
     /**
      * @var string связующая модель ( например CmsContentElementProperty::className() )

@@ -9,8 +9,7 @@
  */
 
 namespace skeeks\cms\models\behaviors;
-use skeeks\cms\base\behaviors\ActiveRecord;
-use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
+use yii\base\Behavior;
 use yii\db\ActiveQuery;
 use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
@@ -21,7 +20,7 @@ use yii\web\ErrorHandler;
  * Class HasTrees
  * @package skeeks\cms\models\behaviors
  */
-class HasTrees extends ActiveRecord
+class HasTrees extends Behavior
 {
     public $_tree_ids = null;
 

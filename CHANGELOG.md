@@ -1,8 +1,17 @@
 CHANGELOG
 ==============
 
-2.5.0.1
+2.6.0.pre
 -----------------
+ * Удален класс skeeks\cms\panels\ViewsPanel
+ * Удален класс skeeks\cms\base\behaviors\ActiveRecord
+ * Удален класс skeeks\cms\base\behaviors\Controller
+ * Удален класс skeeks\cms\components\CollectionComponents
+ * Удален класс skeeks\cms\traits\HasComponentConfigFormTrait
+ * Удален класс skeeks\cms\models\ModelDescriptor
+ * Удален класс skeeks\cms\models\ComponentModel
+ * Удален класс skeeks\cms\models\ActionViewModel
+ * Удален класс skeeks\cms\base\db\ActiveRecord
  * Чиста кода от Notice предупреждений
 
 2.5.0

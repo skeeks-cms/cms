@@ -13,7 +13,6 @@
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\admin\components\AccessControl;
 use skeeks\cms\App;
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\components\Cms;
 use skeeks\cms\Exception;
@@ -45,6 +44,7 @@ use yii\base\InvalidParamException;
 use yii\base\Model;
 use yii\behaviors\BlameableBehavior;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveRecord;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;

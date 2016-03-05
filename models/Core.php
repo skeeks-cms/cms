@@ -10,13 +10,14 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\User;
+use skeeks\cms\query\CmsActiveQuery;
 use Yii;
 
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * @method string getTableCacheTag()
@@ -70,6 +71,14 @@ abstract class Core extends ActiveRecord
                 'cache' => \Yii::$app->cache
             ]
         ]);
+    }
+
+    /**
+     * @return CmsActiveQuery
+     */
+    public static function find()
+    {
+        return new CmsActiveQuery(get_called_class());
     }
 
     /**

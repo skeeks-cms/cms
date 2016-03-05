@@ -7,7 +7,6 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\User;
 use Yii;
 
@@ -16,6 +15,7 @@ use yii\base\Model;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveRecord;
 
 /**
  * @property ActiveRecord $loadedModel

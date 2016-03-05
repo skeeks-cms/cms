@@ -67,7 +67,7 @@ class Alert extends \yii\bootstrap\Widget
                     $this->options['class'] = $this->alertTypes[$type] . $appendCss;
 
                     /* assign unique id to each alert box */
-                    $this->options['id'] = $this->getId() . '-' . $type;
+                    $this->options['id'] = $this->id . '-' . $type;
 
                     echo \yii\bootstrap\Alert::widget([
                         'body' => $message,
