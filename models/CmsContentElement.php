@@ -259,20 +259,20 @@ class CmsContentElement extends RelatedElementModel
         ]);
     }
 
-    public function fields()
+    /*public function fields()
     {
         return array_merge(parent::fields(), [
             'url'           => 'url',
             'absoluteUrl'   => 'absoluteUrl',
         ]);
-    }
+    }*/
 
-    public function extraFields()
+    /*public function extraFields()
     {
         return array_merge(parent::extraFields(), [
             'relatedPropertiesModel' => 'relatedPropertiesModel',
         ]);
-    }
+    }*/
 
     /**
      * Валидация родительского элемента

@@ -3,7 +3,6 @@ CHANGELOG
 
 2.4.10.1
 -----------------
- * fileds and extrafields in content elements
  * Изменено управление типами свойств
  * Добавлен ConfigFormInterface
  * Удален виджет формы yandex карт, вместо этого разработан целый пакет skeeks/cms-ya-map (https://github.com/skeeks-cms/cms-ya-map)
