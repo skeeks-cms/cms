@@ -11,9 +11,6 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\validators\db\IsNewRecord;
-use skeeks\cms\validators\db\NotNewRecord;
-use skeeks\cms\validators\db\NotSame;
 use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
@@ -31,6 +28,7 @@ use skeeks\sx\validate\Validate;
 use skeeks\sx\validators\ChainAnd;
 use Yii;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
@@ -766,10 +764,15 @@ class Tree extends Core
     public function setAttributesForFutureParent(Tree $parent)
     {
         //Родитель должен быть уже сохранен
-        Validate::ensure(new ChainAnd([
-            new NotNewRecord(),
-            new NotSame($this)
-        ]), $parent);
+        if ($parent->isNewRecord)
+        {
+            throw new Exception('Родитель дольжен быть сохранен');
+        }
+
+        if ($this->id == $parent->id)
+        {
+            throw new Exception('Родитель не может быть вложен в родителя');
+        }
 
         $newPids     = $parent->pids;
         $newPids[]   = $parent->primaryKey;
@@ -813,9 +816,15 @@ class Tree extends Core
     public function processCreateNode(Tree $target)
     {
         //Текущая сущьность должна быть уже сохранена
-        Validate::ensure(new NotNewRecord(), $this);
+        if ($this->isNewRecord)
+        {
+            throw new Exception('Текущая сущьность должна быть уже сохранена');
+        }
         //Новая сущьность должна быть еще не сохранена
-        Validate::ensure(new IsNewRecord(), $target);
+        if (!$target->isNewRecord)
+        {
+            throw new Exception('Новая сущьность должна быть еще не сохранена');
+        }
 
         //Установка атрибутов будущему ребенку
         $target->setAttributesForFutureParent($this);
@@ -841,10 +850,16 @@ class Tree extends Core
     public function processAddNode(Tree $target)
     {
         //Текущая сущьность должна быть уже сохранена, и не равна $target
-        Validate::ensure(new ChainAnd([
-            new NotNewRecord(),
-            new NotSame($target)
-        ]), $this);
+        if ($this->isNewRecord)
+        {
+            throw new Exception('Для начала нужно сохранить');
+        }
+
+        if ($this->id == $target->id)
+        {
+            throw new Exception('Должны быть разными');
+        }
+
 
         //Если раздел который мы пытаемся добавить новый, то у него нет детей и он
         if ($target->isNewRecord)

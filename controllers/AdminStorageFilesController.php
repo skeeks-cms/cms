@@ -19,7 +19,6 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
-use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use Yii;
 use skeeks\cms\models\User;

@@ -15,7 +15,6 @@ use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
-use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use Yii;
 use yii\behaviors\TimestampBehavior;

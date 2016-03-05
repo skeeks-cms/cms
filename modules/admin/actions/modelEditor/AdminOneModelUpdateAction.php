@@ -11,7 +11,6 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\rbac\CmsManager;
-use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\base\InvalidParamException;
 use yii\behaviors\BlameableBehavior;

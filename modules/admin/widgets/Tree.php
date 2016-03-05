@@ -18,7 +18,6 @@ use skeeks\cms\modules\admin\controllers\helpers\Action;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use skeeks\cms\modules\admin\widgets\tree\Asset;
-use skeeks\cms\validators\db\IsSame;
 use skeeks\sx\validate\Validate;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
@@ -170,7 +169,7 @@ class Tree
             $child = "";
             foreach ($this->_openedTmp as $activeNode)
             {
-                if (Validate::validate(new IsSame($activeNode), $model)->isValid())
+                if ($activeNode->id == $model->id)
                 {
                     $isOpen = true;
                     break;

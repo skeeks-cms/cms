@@ -6,7 +6,6 @@
  * @date 26.03.2015
  */
 namespace skeeks\cms\base;
-use skeeks\cms\traits\HasComponentConfigFormTrait;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;

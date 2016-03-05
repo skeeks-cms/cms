@@ -3,6 +3,10 @@ CHANGELOG
 
 2.6.0.pre
 -----------------
+ * Удален класс skeeks\cms\validators\db\IsNewRecord
+ * Удален класс skeeks\cms\validators\db\NotNewRecord
+ * Удален класс skeeks\cms\validators\db\NotSame
+ * Удален класс skeeks\cms\validators\db\IsSame
  * Удалена папка docs (документация на сайте dev.cms.skeeks.com)
  * Удален класс skeeks\cms\panels\ViewsPanel
  * Удален класс skeeks\cms\base\behaviors\ActiveRecord

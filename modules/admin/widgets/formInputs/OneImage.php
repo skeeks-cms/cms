@@ -10,7 +10,6 @@ namespace skeeks\cms\modules\admin\widgets\formInputs;
 use skeeks\cms\Exception;
 use skeeks\cms\models\Publication;
 use skeeks\cms\modules\admin\Module;
-use skeeks\cms\validators\HasBehavior;
 use skeeks\sx\validate\Validate;
 use yii\db\ActiveRecord;
 use yii\helpers\Html;
