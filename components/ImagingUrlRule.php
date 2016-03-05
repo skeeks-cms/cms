@@ -12,7 +12,6 @@
 namespace skeeks\cms\components;
 use skeeks\cms\App;
 use skeeks\cms\components\imaging\validators\AllowExtension;
-use skeeks\cms\filters\NormalizeDir;
 use skeeks\cms\models\Tree;
 use skeeks\sx\File;
 use skeeks\sx\validate\Validate;

@@ -191,7 +191,7 @@ abstract class AdminController extends Controller
         }
 
         //TODO: временное решение, проверка наличия соединенеия с базой, если этого не будет, то при проверки прав будут ошибки.
-        try
+        /*try
         {
             \Yii::$app->db->open();
             if (!\Yii::$app->db->schema->getTableNames())
@@ -205,7 +205,7 @@ abstract class AdminController extends Controller
             {
                 throw new NotConnectedToDbException;
             }
-        }
+        }*/
 
         \Yii::$app->cmsMarkeplace->info;
 

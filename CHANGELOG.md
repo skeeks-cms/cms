@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.0.pre
 -----------------
+ * Удален класс skeeks\cms\filters\NormalizeDir
  * Удален класс skeeks\cms\validators\db\IsNewRecord
  * Удален класс skeeks\cms\validators\db\NotNewRecord
  * Удален класс skeeks\cms\validators\db\NotSame

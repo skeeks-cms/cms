@@ -8,7 +8,6 @@
 namespace skeeks\cms\components\urlRules;
 use skeeks\cms\App;
 use skeeks\cms\exceptions\NotConnectedToDbException;
-use skeeks\cms\filters\NormalizeDir;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
@@ -195,8 +194,7 @@ class UrlRuleTree
      */
     protected function _normalizeDir($pathInfo)
     {
-        $filter             = new NormalizeDir();
-        $pathInfoNormal     = $filter->filter($pathInfo);
+        $pathInfoNormal     = $this->_filterNormalizeDir($pathInfo);
 
         if ((bool) \Yii::$app->seo->useLastDelimetrTree)
         {
@@ -205,5 +203,24 @@ class UrlRuleTree
         {
             return $pathInfoNormal;
         }
+    }
+
+    /**
+     * @param string $dir
+     * @return string
+     */
+    protected function _filterNormalizeDir($dir)
+    {
+        $result = [];
+
+        $data = explode(DIRECTORY_SEPARATOR, $dir);
+        foreach ($data as $value)
+        {
+            if ($value)
+            {
+                $result[] = $value;
+            }
+        }
+        return implode(DIRECTORY_SEPARATOR, $result);
     }
 }

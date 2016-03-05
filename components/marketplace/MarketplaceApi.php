@@ -147,7 +147,7 @@ class MarketplaceApi extends Component
         if ($result === false)
         {
             $result = $this->fetch(['info']);
-            \Yii::$app->cache->set($key, $result, (60*60*24) );
+            \Yii::$app->cache->set($key, $result, (60*60*6) );
         }
 
         return $result;
