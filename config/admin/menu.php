@@ -37,12 +37,14 @@ function contentMenu()
                     [
                         'label' => $content->name,
                         'url'   => ["cms/admin-cms-content-element", "content_id" => $content->id],
-
                     ];
                 }
             }
 
-            $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
+            if (isset($itemData['items']))
+            {
+                $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
+            }
         }
     }
 
