@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\actions\modelEditor;
 
+use skeeks\cms\helpers\ComponentHelper;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\Search;
@@ -14,8 +15,6 @@ use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
-use skeeks\cms\validators\HasBehavior;
-use skeeks\sx\validate\Validate;
 use yii\authclient\AuthAction;
 use yii\helpers\Inflector;
 use yii\web\Application;
@@ -55,6 +54,6 @@ class AdminOneModelRelatedPropertiesAction extends AdminOneModelEditAction
             return false;
         }
 
-        return Validate::validate(new HasBehavior(HasRelatedProperties::className()), $this->controller->model)->isValid();
+        return ComponentHelper::hasBehavior($this->controller->model, HasRelatedProperties::className());
     }
 }

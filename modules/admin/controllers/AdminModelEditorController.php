@@ -16,6 +16,7 @@ use skeeks\cms\App;
 use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\components\Cms;
 use skeeks\cms\Exception;
+use skeeks\cms\helpers\ComponentHelper;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
@@ -35,8 +36,6 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use skeeks\cms\rbac\CmsManager;
-use skeeks\cms\validators\HasBehavior;
-use skeeks\sx\validate\Validate;
 use yii\base\ActionEvent;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -132,7 +131,7 @@ class AdminModelEditorController extends AdminController
                         'allow'         => true,
                         'matchCallback' => function($rule, $action)
                         {
-                            if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->model)->isValid())
+                            if (ComponentHelper::hasBehavior($this->model, BlameableBehavior::className()))
                             {
                                 //Если такая привилегия заведена, нужно ее проверять.
                                 if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_DELETE))

@@ -3,8 +3,6 @@
 
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
-use \skeeks\sx\validate\Validate;
-use \skeeks\cms\validators\HasBehavior;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
@@ -15,7 +13,7 @@ use \skeeks\cms\validators\HasBehavior;
 <?php $form = ActiveForm::begin(); ?>
 
 
-<? if (Validate::validate( new HasBehavior(\yii\behaviors\BlameableBehavior::className()), $model)->isValid()) : ?>
+<? if (\skeeks\cms\helpers\ComponentHelper::hasBehavior($model, \yii\behaviors\BlameableBehavior::className())) : ?>
     <?/*= $form->field($model, 'created_by')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
@@ -33,7 +31,7 @@ use \skeeks\cms\validators\HasBehavior;
 <? endif;?>
 
 
-<? if (Validate::validate( new HasBehavior(\yii\behaviors\TimestampBehavior::className()), $model)->isValid()) : ?>
+<? if (\skeeks\cms\helpers\ComponentHelper::hasBehavior($model, \yii\behaviors\TimestampBehavior::className())) : ?>
     <?= $form->field($model, 'created_at')->widget(
         \kartik\datecontrol\DateControl::classname(), [
         'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
@@ -47,7 +45,7 @@ use \skeeks\cms\validators\HasBehavior;
     ]); ?>
 <? endif;?>
 
-<? if (Validate::validate( new HasBehavior(\skeeks\cms\models\behaviors\TimestampPublishedBehavior::className()), $model)->isValid()) : ?>
+<? if (\skeeks\cms\helpers\ComponentHelper::hasBehavior($model, \skeeks\cms\models\behaviors\TimestampPublishedBehavior::className())) : ?>
     <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
         //'displayFormat' => 'php:d-M-Y H:i:s',
         'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,

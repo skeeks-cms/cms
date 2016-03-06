@@ -3,6 +3,9 @@ CHANGELOG
 
 2.6.0.pre
 -----------------
+ * Удален класс skeeks\cms\components\imaging\validators\AllowExtension
+ * Удален класс skeeks\cms\validators\HasBehaviorsOr
+ * Удален класс skeeks\cms\validators\HasBehavior
  * Доработано поведение HasTrees (теперь не удаляются все связи при каждом сохранении)
  * Удален класс skeeks\cms\filters\NormalizeDir
  * Удален класс skeeks\cms\validators\db\IsNewRecord

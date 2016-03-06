@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\actions\modelEditor;
 
+use skeeks\cms\helpers\ComponentHelper;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
@@ -17,9 +18,6 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\rbac\CmsManager;
-use skeeks\cms\validators\HasBehavior;
-use skeeks\cms\validators\HasBehaviorsOr;
-use skeeks\sx\validate\Validate;
 use yii\authclient\AuthAction;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -82,11 +80,13 @@ class AdminOneModelSystemAction extends AdminOneModelUpdateAction
             return false;
         }
 
-        if (!Validate::validate(new HasBehaviorsOr([
+        $behaviors = [
             TimestampBehavior::className(),
             TimestampPublishedBehavior::className(),
             BlameableBehavior::className()
-        ]), $this->controller->model)->isValid())
+        ];
+
+        if (!ComponentHelper::hasBehaviorsOr($this->controller->model, $behaviors))
         {
             return false;
         }
@@ -97,7 +97,7 @@ class AdminOneModelSystemAction extends AdminOneModelUpdateAction
 
     public function checkAdvancedAccess()
     {
-        if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $this->controller->model)->isValid())
+        if ( ComponentHelper::hasBehavior($this->controller->model, BlameableBehavior::className()) )
         {
             //Если такая привилегия заведена, нужно ее проверять.
             if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED))

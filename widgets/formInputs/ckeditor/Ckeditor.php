@@ -43,10 +43,6 @@ class Ckeditor extends CKEditorWidget
         $additionalData = [];
         if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord))
         {
-            /*if (Validate::isValid(new HasBehavior(HasFiles::className()), $this->relatedModel))
-            {
-                $additionalData = $this->relatedModel->getRef()->toArray();
-            }*/
             $additionalData = [
                 'className' => $this->relatedModel->className(),
                 'pk'        => $this->relatedModel->primaryKey,

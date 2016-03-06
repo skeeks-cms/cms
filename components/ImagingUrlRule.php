@@ -11,10 +11,9 @@
 
 namespace skeeks\cms\components;
 use skeeks\cms\App;
-use skeeks\cms\components\imaging\validators\AllowExtension;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\Tree;
 use skeeks\sx\File;
-use skeeks\sx\validate\Validate;
 use \yii\base\InvalidConfigException;
 use yii\helpers\Url;
 
@@ -70,7 +69,7 @@ class ImagingUrlRule
             return false;
         }
 
-        if (Validate::validate(new AllowExtension(), $extension)->isInvalid())
+        if (!in_array(StringHelper::strtolower($extension), (array) \Yii::$app->imaging->extensions))
         {
             return false;
         }

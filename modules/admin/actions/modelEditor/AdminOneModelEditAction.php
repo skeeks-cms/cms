@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\modules\admin\actions\modelEditor;
 
+use skeeks\cms\helpers\ComponentHelper;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -15,8 +16,6 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\rbac\CmsManager;
-use skeeks\cms\validators\HasBehavior;
-use skeeks\sx\validate\Validate;
 use yii\authclient\AuthAction;
 use yii\behaviors\BlameableBehavior;
 use yii\helpers\Inflector;
@@ -127,7 +126,7 @@ class AdminOneModelEditAction extends AdminModelEditorAction
     public function checkUpdateAccess()
     {
         $model = $this->controller->model;
-        if (Validate::validate(new HasBehavior(BlameableBehavior::className()), $model)->isValid())
+        if (ComponentHelper::hasBehavior($model, BlameableBehavior::className()))
         {
             //Если такая привилегия заведена, нужно ее проверять.
             if ($permission = \Yii::$app->authManager->getPermission(CmsManager::PERMISSION_ALLOW_MODEL_UPDATE))
