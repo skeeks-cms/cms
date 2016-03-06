@@ -160,7 +160,7 @@ class UpdateController extends Controller
         $this->systemCmdRoot("php yii cms/utils/clear-runtimes");
 
         //Чистка asset файлов
-        $this->systemCmdRoot("php yii cms/utils/clear-assets");
+        //$this->systemCmdRoot("php yii cms/utils/clear-assets");
 
         //Сброс кэша стрктуры базы данных
         $this->systemCmdRoot("php yii cms/db/db-refresh");

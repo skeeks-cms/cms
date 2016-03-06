@@ -18,6 +18,7 @@ use yii\base\Event;
 use yii\console\controllers\HelpController;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
+use yii\helpers\FileHelper;
 
 /**
  * Полезные утилиты SkeekS CMS
@@ -75,31 +76,32 @@ class UtilsController extends Controller
      */
     public function actionClearRuntimes()
     {
-        $dir = new Dir(\Yii::getAlias('@console/runtime'));
-        $dir->clear();
-        $this->_checkIsEmptyDir($dir);
+        $paths = ArrayHelper::getValue(\Yii::$app->cms->tmpFolderScheme, 'runtime');
 
-        $dir = new Dir(\Yii::getAlias('@common/runtime'));
-        $dir->clear();
-        $this->_checkIsEmptyDir($dir);
-
-        $dir = new Dir(\Yii::getAlias('@app/runtime'));
-        $dir->clear();
-        $this->_checkIsEmptyDir($dir);
-
-        $dir = new Dir(\Yii::getAlias('@frontend/runtime'));
-        $dir->clear();
-        $this->_checkIsEmptyDir($dir);
+        if ($paths)
+        {
+            foreach ($paths as $path)
+            {
+                FileHelper::removeDirectory(\Yii::getAlias($path));
+                FileHelper::createDirectory(\Yii::getAlias($path));
+            }
+        }
     }
 
     /**
-     * Читска временный файлов ('@frontend/web/assets')
+     *
      */
-    public function actionClearAssets($dirPath = '@frontend/web/assets')
+    public function actionClearAssets()
     {
-        $dir = new Dir(\Yii::getAlias($dirPath));
-        $dir->clear();
-        $this->_checkIsEmptyDir($dir);
+        $paths = ArrayHelper::getValue(\Yii::$app->cms->tmpFolderScheme, 'assets');
+        if ($paths)
+        {
+            foreach ($paths as $path)
+            {
+                FileHelper::removeDirectory(\Yii::getAlias($path));
+                FileHelper::createDirectory(\Yii::getAlias($path));
+            }
+        }
     }
 
 
@@ -115,29 +117,6 @@ class UtilsController extends Controller
             ]);
 
             \Yii::info("Удалено поисковых запросов: " . $deleted);
-        }
-    }
-
-    /**
-     * Проверка папка пустая или нет
-     * @param $dirPath
-     */
-    protected function _checkIsEmptyDir($dirPath)
-    {
-        if ($dirPath instanceof Dir)
-        {
-            $dir = $dirPath;
-        } else
-        {
-            $dir = new Dir($dirPath);
-        }
-
-        if ($dir->findFiles() || $dir->findDirs())
-        {
-            $this->stdoutN('Папка assets (' . $dir->getPath() . ') не очищена. В ней остались файлы');
-        } else
-        {
-            $this->stdoutN('Папка assets (' . $dir->getPath() . ') очищена.');
         }
     }
 

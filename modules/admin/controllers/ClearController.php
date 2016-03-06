@@ -46,45 +46,35 @@ class ClearController extends AdminController
 
     public function actionIndex()
     {
-        $clearDirs =
-        [
-            [
-                'label'     => 'common ' . \Yii::t('app','temporary files'),
-                'dir'       => new Dir(\Yii::getAlias('@common/runtime'), false)
-            ],
+        $paths = ArrayHelper::getValue(\Yii::$app->cms->tmpFolderScheme, 'runtime');
 
-            [
-                'label'     => 'console ' . \Yii::t('app','temporary files'),
-                'dir'       => new Dir(\Yii::getAlias('@console/runtime'), false)
-            ],
+        $clearDirs = [];
 
+        if ($paths)
+        {
+            foreach ($paths as $path)
+            {
+                $clearDirs[] = [
+                    'label'         => 'Корневая временная дирриктория',
+                    'dir'           => new Dir(\Yii::getAlias($path), false)
+                ];
 
-            [
-                'label'     => 'runtime (' . \Yii::t('app','current site') . ')',
-                'dir'       => new Dir(\Yii::getAlias('@runtime'), false)
-            ],
+                $clearDirs[] = [
+                    'label'         => 'Логи',
+                    'dir'           => new Dir(\Yii::getAlias($path . "/logs"), false)
+                ];
 
-            [
-                'label'     => \Yii::t('app','Cache files').' (' . \Yii::t('app','current site') . ')',
-                'dir'       => new Dir(\Yii::getAlias('@runtime/cache'), false)
-            ],
+                $clearDirs[] = [
+                    'label'         => 'Кэш',
+                    'dir'           => new Dir(\Yii::getAlias($path . "/cache"), false)
+                ];
 
-            [
-                'label'     => \Yii::t('app','Files debug information') . ' (' . \Yii::t('app','current site') . ')',
-                'dir'       => new Dir(\Yii::getAlias('@runtime/debug'), false)
-            ],
-
-            [
-                'label'     => \Yii::t('app','Log files') . ' (' . \Yii::t('app','current site') . ')',
-                'dir'       => new Dir(\Yii::getAlias('@runtime/logs'), false)
-            ],
-
-            /*[
-                'label'     => 'Временные js и css файлы (текущий сайт)',
-                'dir'       => new Dir(\Yii::getAlias('@app/web/assets'), false)
-            ]*/
-
-        ];
+                $clearDirs[] = [
+                    'label'         => 'Дебаг',
+                    'dir'           => new Dir(\Yii::getAlias($path . "/debug"), false)
+                ];
+            }
+        }
 
         $rr = new RequestResponse();
         if ($rr->isRequestAjaxPost())

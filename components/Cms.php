@@ -202,6 +202,27 @@ class Cms extends \skeeks\cms\base\Component
 
     public $licenseKey                   = "";
 
+
+    /**
+     * Схема временных папок
+     * Чистятся в момент нажатия на кнопку чистки временных файлов
+     *
+     * @var array
+     */
+    public $tmpFolderScheme =
+    [
+        'runtime' =>
+        [
+            '@common/runtime', '@frontend/runtime', '@console/runtime'
+        ],
+
+        'assets' =>
+        [
+            '@frontend/web/assets'
+        ]
+    ];
+
+
     /**
      * @var array Возможные шаблоны сайта
      */

@@ -175,9 +175,5 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Система обновлений'); ?>
-    <?= $form->field($model, 'licenseKey')->textInput(); ?>
-<?= $form->fieldSetEnd(); ?>
-
 
 
