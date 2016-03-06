@@ -418,14 +418,16 @@ class Cms extends \skeeks\cms\base\Component
         if ($this->enabledHitAgents == self::BOOL_Y)
         {
             $key = 'Agents';
-            Yii::beginProfile($key);
+            Yii::beginProfile("Enabled agents on the hits");
                 $data = \Yii::$app->cache->get($key);
                 if ($data === false)
                 {
-                    $result = \Yii::$app->console->execute("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
-                    \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
+                    Yii::beginProfile("Execute");
+                        $result = \Yii::$app->console->execute("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
+                        \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
+                    Yii::endProfile("Execute");
                 }
-            Yii::endProfile($key);
+            Yii::endProfile("Enabled agents on the hits");
         }
 
 

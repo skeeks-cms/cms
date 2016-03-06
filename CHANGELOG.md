@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.0.pre
 -----------------
+ * Доработано поведение HasTrees (теперь не удаляются все связи при каждом сохранении)
  * Удален класс skeeks\cms\filters\NormalizeDir
  * Удален класс skeeks\cms\validators\db\IsNewRecord
  * Удален класс skeeks\cms\validators\db\NotNewRecord

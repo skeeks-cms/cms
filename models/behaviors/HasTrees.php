@@ -13,10 +13,13 @@ use yii\base\Behavior;
 use yii\db\ActiveQuery;
 use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\ErrorHandler;
 
 /**
+ * @property ActiveRecord $owner
+ *
  * Class HasTrees
  * @package skeeks\cms\models\behaviors
  */
@@ -50,23 +53,66 @@ class HasTrees extends Behavior
             return $this;
         }
 
+        //Старые атрибуты
+        $oldIds = (array) ArrayHelper::map($this->owner->elementTrees, "tree_id", "tree_id");
+        $newIds = (array) $this->owner->treeIds; //Новые
 
-        $savedValues = [];
-        //Смотрим какие разделы привязаны
-        //TODO: доработать, не удалять каждый раз
-        if ($elementTrees = $this->getElementTrees()->all())
+
+        //Если старых не было, просто записать новые
+        $writeIds = [];
+        $deleteIds = [];
+
+        if (!$oldIds)
         {
+            $writeIds = $newIds;
+        } else
+        {
+            foreach ($oldIds as $oldId)
+            {
+                //Старый элемент есть в новом массиве, его не трогаем он остается
+                if (in_array($oldId, $newIds))
+                {
+
+                } else
+                {
+                    $deleteIds[] = $oldId; //Иначе его надо удалить.
+                }
+            }
+
+            foreach ($newIds as $newId)
+            {
+                //Если новый элемент уже был, то ничего не делаем
+                if (in_array($newId, $oldIds))
+                {
+
+                } else
+                {
+                    $writeIds[] = $newId; //Иначе запишем
+                }
+            }
+        }
+
+
+
+        //Есть элементы на удаление
+        if ($deleteIds)
+        {
+            $elementTrees  = $this->owner->getElementTrees()->andWhere([
+                'tree_id' => $deleteIds
+            ])->limit(count($deleteIds))->all();
+
             foreach ($elementTrees as $elementTree)
             {
                 $elementTree->delete();
             }
         }
 
-        if ($ids = (array) $this->owner->treeIds)
+        //Есть элементы на запись
+        if ($writeIds)
         {
             $className = $this->elementTreesClassName;
 
-            foreach ($ids as $treeId)
+            foreach ($writeIds as $treeId)
             {
                 if ($treeId)
                 {
@@ -77,7 +123,6 @@ class HasTrees extends Behavior
 
                     $elementTree->save(false);
                 }
-
             }
         }
     }
