@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.0.pre
 -----------------
+ * Удалена зависимость от kartik-v/yii2-widget-touchspin (теперь используем нативные возможности)
  * Удален класс skeeks\cms\components\imaging\validators\AllowExtension
  * Удален класс skeeks\cms\validators\HasBehaviorsOr
  * Удален класс skeeks\cms\validators\HasBehavior
