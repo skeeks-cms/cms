@@ -97,7 +97,7 @@ class ComposerController extends Controller
     /**
      * Обновление композера
      */
-    public function actionSelfUpdate($version = "1.0.0-alpha11")
+    public function actionSelfUpdate($version = "1.0.0-beta1")
     {
         $this->_composerCmd('self-update ' . $version);
     }
@@ -145,7 +145,7 @@ class ComposerController extends Controller
      * Установка необходимых composer asset plugin-ов
      * @param string $version
      */
-    public function actionUpdateAssetPlugins($version = "1.1.1")
+    public function actionUpdateAssetPlugins($version = "1.1.2")
     {
         $this->_composerCmd('global require "fxp/composer-asset-plugin:' . $version . '"');
     }

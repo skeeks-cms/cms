@@ -3,6 +3,8 @@ CHANGELOG
 
 2.6.0.pre
 -----------------
+ * Адаптация под composer 1.0.0-beta1
+ * Изменен путь по умолчанию в AUTO_GENERATED_MODULES_FILE
  * Удалена зависимость от kartik-v/yii2-widget-touchspin (теперь используем нативные возможности)
  * Удален класс skeeks\cms\components\imaging\validators\AllowExtension
  * Удален класс skeeks\cms\validators\HasBehaviorsOr

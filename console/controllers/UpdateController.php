@@ -62,13 +62,13 @@ class UpdateController extends Controller
      * @var string
      * Версия композера, последняя стабильная
      */
-    public $composerVersion = "1.0.0-alpha11";
+    public $composerVersion = "1.0.0-beta1";
 
     /**
      * @var string
      * Версия композер assets, последняя стабильная
      */
-    public $composerAssetPluginV = "1.1.1";
+    public $composerAssetPluginV = "1.1.2";
 
 
     /**

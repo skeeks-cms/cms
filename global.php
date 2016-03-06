@@ -51,7 +51,7 @@ defined('BACKUP_DIR') or define('BACKUP_DIR', ROOT_DIR . '/backup');
 defined('CONFIG_CACHE') or define("CONFIG_CACHE", true);
 
 //Временный файл, в котором храняться пути к подключенным модулям
-defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", COMMON_CONFIG_DIR . '/auto-generated-config.php' );
+defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", COMMON_RUNTIME_DIR . '/sx-auto-generated-config.php' );
 
 //Включить в конфиги, мерж конфигов всех модулей
 defined('ENABLE_MODULES_CONF') or define('ENABLE_MODULES_CONF', true);
