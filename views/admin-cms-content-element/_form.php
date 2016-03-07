@@ -59,6 +59,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     </div>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('app',"This parameter affects the address of the page")); ?>
+    <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <? if ($contentModel->parent_content_id) : ?>
 
@@ -164,16 +165,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd() ?>
 
 
-<?= $form->fieldSet(\Yii::t('app','Images')); ?>
+<?= $form->fieldSet(\Yii::t('app','Images/Files')); ?>
 
     <?= $form->field($model, 'images')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
     ); ?>
-
-<?= $form->fieldSetEnd()?>
-
-
-<?= $form->fieldSet(\Yii::t('app','Files')); ?>
 
     <?= $form->field($model, 'files')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -183,11 +179,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
-        <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
-        <?= $form->fieldInputInt($model, 'priority'); ?>
+    <?/*= $form->fieldSet(\Yii::t('app','Additionally')); */?><!--
+        <?/*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */?>
+        <?/*= $form->fieldInputInt($model, 'priority'); */?>
 
-    <?= $form->fieldSetEnd() ?>
+    --><?/*= $form->fieldSetEnd() */?>
 
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('app','Access')); ?>

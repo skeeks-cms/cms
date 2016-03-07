@@ -958,6 +958,7 @@ return
     "The parent must be a content element: «{contentName}»."                          => "Родительский элемент должен быть элементом контента: «{contentName}».",
 
     "Groups"                          => "Группы",
+    "Images/Files"                          => "Изображения/Файлы",
     "The ability to manage user groups"                          => "Вомзожность управлять группами пользователя",
 
 ];
