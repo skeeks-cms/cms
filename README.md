@@ -91,8 +91,13 @@ php yii cms/init
 Update file: common/config/db.php
 
 * Install migrations
-```php
+```bash
+#Установка из готового дампа
 php yii cms/db/first-dump-restore
+#Установка недостающих миграций
+php yii cms/db/apply-migrations
+#Авто настройка прав доступа
+php yii cms/rbac/init
 ```
 
 *  Backend (username and password by default)
