@@ -960,5 +960,6 @@ return
     "Groups"                          => "Группы",
     "Images/Files"                          => "Изображения/Файлы",
     "The ability to manage user groups"                          => "Вомзожность управлять группами пользователя",
+    "Management will be available after saving"                          => "Управление будет доступно после сохранения",
 
 ];

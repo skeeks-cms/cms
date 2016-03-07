@@ -194,20 +194,29 @@ use skeeks\cms\modules\admin\widgets\Pjax;
             ]); ?>
         <?= $form->fieldSetEnd() ?>
     <? endif; ?>
+<? endif; ?>
 
-    <? if ($model->cmsContent->childrenContents) : ?>
+<? if ($model->cmsContent->childrenContents) : ?>
 
-        <?
-        $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_columns.php');
-        /**
-         * @var $content \skeeks\cms\models\CmsContent
-         */
-        ?>
-        <? foreach($model->cmsContent->childrenContents as $childContent) : ?>
-            <?= $form->fieldSet($childContent->name); ?>
+    <?
+    $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_columns.php');
+    /**
+     * @var $content \skeeks\cms\models\CmsContent
+     */
+    ?>
+    <? foreach($model->cmsContent->childrenContents as $childContent) : ?>
+        <?= $form->fieldSet($childContent->name); ?>
 
+            <? if ($model->isNewRecord) : ?>
 
-
+                <?= \yii\bootstrap\Alert::widget([
+                    'options' =>
+                    [
+                        'class' => 'alert-warning'
+                    ],
+                    'body' => \Yii::t('app', 'Management will be available after saving')
+                ]); ?>
+            <? else:  ?>
                 <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                     'label'             => $childContent->name,
                     'parentModel'       => $model,
@@ -229,11 +238,13 @@ use skeeks\cms\modules\admin\widgets\Pjax;
                     ],
                 ]); ?>
 
+            <? endif;  ?>
 
-            <?= $form->fieldSetEnd() ?>
-        <? endforeach; ?>
-    <? endif; ?>
 
+
+
+        <?= $form->fieldSetEnd() ?>
+    <? endforeach; ?>
 <? endif; ?>
 
 
