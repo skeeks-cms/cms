@@ -10,7 +10,13 @@
  * ln requirements.php ../requirements.php
  */
 // you may need to adjust this path to the correct Yii framework path
-$frameworkPath = dirname(__FILE__) . '../../../vendor/yiisoft/yii2';
+
+define("APP_DIR",               __DIR__);
+define("APP_CONFIG_DIR",        realpath(__DIR__ . '/../config'));
+define("APP_RUNTIME_DIR",       realpath(__DIR__ . '/../runtime'));
+define("ROOT_DIR",              dirname(dirname(__DIR__)));
+
+$frameworkPath = ROOT_DIR . '/vendor/yiisoft/yii2';
 if (!is_dir($frameworkPath)) {
     echo '<h1>Error</h1>';
     echo '<p><strong>The path to yii framework seems to be incorrect.</strong></p>';
@@ -38,6 +44,34 @@ if (extension_loaded('gd')) {
         $gdMemo = 'GD extension should be installed with FreeType support in order to be used for image CAPTCHA.';
     }
 }
+
+function wriatableCheck()
+{
+    $dirs = [
+        'console/runtime',
+        'common/runtime',
+        'frontend/runtime',
+        'frontend/web/assets',
+    ];
+
+    foreach ($dirs as $dirPath)
+    {
+        $dirPath = ROOT_DIR . "/" . $dirPath;
+        if (!is_dir($dirPath))
+        {
+            return 0;
+            break;
+        }
+
+        if (!is_writable($dirPath))
+        {
+            return 0;
+            break;
+        }
+    }
+
+    return 1;
+}
 /**
  * Adjust requirements according to your application specifics.
  */
@@ -49,13 +83,13 @@ $requirements = array(
         'condition' => extension_loaded('pdo'),
         'by' => 'All DB-related classes',
     ),
-    array(
+    /*array(
         'name' => 'PDO SQLite extension',
         'mandatory' => false,
         'condition' => extension_loaded('pdo_sqlite'),
         'by' => 'All DB-related classes',
         'memo' => 'Required for SQLite database.',
-    ),
+    ),*/
     array(
         'name' => 'PDO MySQL extension',
         'mandatory' => false,
@@ -63,13 +97,13 @@ $requirements = array(
         'by' => 'All DB-related classes',
         'memo' => 'Required for MySQL database.',
     ),
-    array(
+    /*array(
         'name' => 'PDO PostgreSQL extension',
         'mandatory' => false,
         'condition' => extension_loaded('pdo_pgsql'),
         'by' => 'All DB-related classes',
         'memo' => 'Required for PostgreSQL database.',
-    ),
+    ),*/
     // Cache :
     array(
         'name' => 'Memcache extension',
@@ -107,15 +141,6 @@ $requirements = array(
         'by' => 'Security reasons',
         'memo' => '"expose_php" should be disabled at php.ini',
     ),
-
-    'short_open_tag' => array(
-        'name' => 'short_open_tag',
-        'mandatory' => false,
-        'condition' => $requirementsChecker->checkPhpIniOn("short_open_tag"),
-        'by' => 'short_open_tag',
-        'memo' => '"short_open_tag" should be enabled at php.ini',
-    ),
-
     'phpAllowUrlInclude' => array(
         'name' => 'PHP allow url include',
         'mandatory' => false,
@@ -129,6 +154,21 @@ $requirements = array(
         'condition' => strlen(ini_get('SMTP')) > 0,
         'by' => 'Email sending',
         'memo' => 'PHP mail SMTP server required',
+    ),
+
+    'short_open_tag' => array(
+        'name' => 'short_open_tag',
+        'mandatory' => false,
+        'condition' => $requirementsChecker->checkPhpIniOn("short_open_tag"),
+        'by' => 'SkeekS CMS',
+        'memo' => '"short_open_tag" should be enabled at php.ini',
+    ),
+    'writableDirs' => array(
+        'name' => 'Writable Directories',
+        'mandatory' => false,
+        'condition' => wriatableCheck(),
+        'by' => 'SkeekS CMS',
+        'memo' => 'Verifying the existence and rights of access to directories',
     ),
 );
 $requirementsChecker->checkYii()->check($requirements)->render();

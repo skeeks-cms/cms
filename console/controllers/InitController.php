@@ -21,6 +21,7 @@ class InitController extends Controller
     {
         $conf = [
             'setWritable' => [
+                'console/runtime',
                 'common/runtime',
                 'frontend/runtime',
                 'frontend/web/assets',
