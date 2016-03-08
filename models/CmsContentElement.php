@@ -294,7 +294,7 @@ class CmsContentElement extends RelatedElementModel
 
         if ($this->$attribute)
         {
-            $contentElement = CmsContentElement::findOne($this->$attribute);
+            $contentElement = static::findOne($this->$attribute);
             if ($contentElement->cmsContent->id != $this->cmsContent->parentContent->id)
             {
                 $this->addError($attribute, \Yii::t('app', 'The parent must be a content element: «{contentName}».',['contentName' => $this->cmsContent->parentContent->name]));
@@ -455,7 +455,7 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getParentContentElement()
     {
-        return $this->hasOne(CmsContentElement::className(), ['id' => 'parent_content_element_id']);
+        return $this->hasOne(static::className(), ['id' => 'parent_content_element_id']);
     }
 
     /**
@@ -464,7 +464,7 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getChildrenContentElements()
     {
-        return $this->hasMany(CmsContentElement::className(), ['parent_content_element_id' => 'id']);
+        return $this->hasMany(static::className(), ['parent_content_element_id' => 'id']);
     }
 
 }

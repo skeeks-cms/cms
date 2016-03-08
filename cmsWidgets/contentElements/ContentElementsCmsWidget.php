@@ -30,6 +30,8 @@ use yii\widgets\ActiveForm;
  */
 class ContentElementsCmsWidget extends WidgetRenderable
 {
+    public $contentElementClass         = '\skeeks\cms\models\CmsContentElement';
+
     //Навигация
     public $enabledPaging               = CMS::BOOL_Y;
     public $enabledPjaxPagination       = CMS::BOOL_Y;
@@ -74,6 +76,14 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $with = ['image', 'cmsTree'];
 
 
+    /*public function init()
+    {
+        print_r($this->attributes);
+        $className = $this->contentElementClass;
+
+        echo $className;
+        //die;
+    }*/
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
@@ -153,6 +163,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
     protected function _run()
     {
+        $className = $this->contentElementClass;
 
         $cacheKey = $this->getCacheKey() . 'run';
 
@@ -171,17 +182,17 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
             if ($this->createdBy)
             {
-                $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.created_by' => $this->createdBy]);
+                $this->dataProvider->query->andWhere([$className::tableName() . '.created_by' => $this->createdBy]);
             }
 
             if ($this->active)
             {
-                $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.active' => $this->active]);
+                $this->dataProvider->query->andWhere([$className::tableName() . '.active' => $this->active]);
             }
 
             if ($this->content_ids)
             {
-                $this->dataProvider->query->andWhere([CmsContentElement::tableName() . '.content_id' => $this->content_ids]);
+                $this->dataProvider->query->andWhere([$className::tableName() . '.content_id' => $this->content_ids]);
             }
 
             if ($this->limit)
@@ -246,7 +257,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                     $query->andWhere(
                         [
                             'or',
-                            [CmsContentElement::tableName() . '.tree_id' => $treeIds],
+                            [$className::tableName() . '.tree_id' => $treeIds],
                             [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
                         ]
                     );
@@ -258,13 +269,13 @@ class ContentElementsCmsWidget extends WidgetRenderable
             if ($this->enabledActiveTime == Cms::BOOL_Y)
             {
                 $this->dataProvider->query->andWhere(
-                    ["<=", CmsContentElement::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
+                    ["<=", $className::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
                 );
 
                 $this->dataProvider->query->andWhere(
                     [
                         'or',
-                        [">=", CmsContentElement::tableName() . '.published_to', \Yii::$app->formatter->asTimestamp(time())],
+                        [">=", $className::tableName() . '.published_to', \Yii::$app->formatter->asTimestamp(time())],
                         [CmsContentElement::tableName() . '.published_to' => null],
                     ]
                 );
@@ -278,7 +289,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 $this->dataProvider->query->with($this->with);
             }
 
-            $this->dataProvider->query->groupBy([CmsContentElement::tableName() . '.id']);
+            $this->dataProvider->query->groupBy([$className::tableName() . '.id']);
 
             if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
             {
@@ -341,7 +352,9 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
     public function initDataProvider()
     {
-        $this->search         = new Search(CmsContentElement::className());
+        $className = $this->contentElementClass;
+
+        $this->search         = new Search($className::className());
         $this->dataProvider   = $this->search->getDataProvider();
 
         if ($this->enabledPaging == Cms::BOOL_Y)

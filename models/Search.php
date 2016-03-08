@@ -63,8 +63,10 @@ class Search extends Component
     {
         if ($this->_dataProvider === null)
         {
+            $className = $this->modelClassName;
+
             $this->_dataProvider = new ActiveDataProvider([
-                'query' => $this->loadedModel->find(),
+                'query' => $className::find(),
             ]);
         }
 
