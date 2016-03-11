@@ -1,15 +1,13 @@
 Skeeks CMS 2.* (Yii2 cms)
 ================
 
-[![skeeks!](http://cms.skeeks.com/uploads/all/02/bb/d1/02bbd1ed904fc44bdee66e33b661cf2c/sx-filter__skeeks-cms-components-imaging-filters-Thumbnail/15f3c42a5e338e459b5bfe72f1874494/sx-file.png?w=409&h=258)](http://cms.skeeks.com)  
+[![skeeks!](http://cms.skeeks.com/uploads/all/02/bb/d1/02bbd1ed904fc44bdee66e33b661cf2c/sx-filter__skeeks-cms-components-imaging-filters-Thumbnail/15f3c42a5e338e459b5bfe72f1874494/sx-file.png?w=409&h=258)](http://en.cms.skeeks.com)  
 
 
 
 ##Links
-* [Сайт о SkeekS CMS (about)](http://cms.skeeks.com)
-* [Докуметация (wiki)](http://dev.cms.skeeks.com/docs)
-* [Установка (install)](http://dev.cms.skeeks.com/docs/dev/ustanovka-nastroyka-konfigurirov/ustanovka-s-ispolzovaniem-composer)
-* [Компания разработчик (author)](http://skeeks.com)
+* [Web site](http://en.cms.skeeks.com)
+* [Author](http://skeeks.com)
 * [ChangeLog](https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md)
 * [Plans](https://github.com/skeeks-cms/cms/blob/master/PLANS.md)
 
@@ -30,23 +28,6 @@ Almost every page of the site - content item or section. Each of these models ha
 This versatility allows you to easily create any site, without writing and design of additional models and migration. What idelalno for quickly writing conventional nevysokonagruzhennyh projects (this does not mean that you can not write highly loaded projects).
 
 Just have http://marketplace.cms.skeeks.com/ marketpleys the CMS for this, which is constantly updated with useful solutions.
-
-## Info (rus)
-SkeekS CMS — Современная универсальная система управления сайтом на базе yii2 php фреймворка.
-
-Предоставляет возможности по управлению структурой сайта и элементами контента (новости, публикации, продукты, и т.д.). 
-
-Возможности по управлению и динамическому созданию дополнительных свойств разделов и элементов контента через систему администрирования.
-
-Возможности по управлению пользователями, привилегиями, ролями и их назначением.
-
-Поддерживается единая точка входа запроса (один index.php), для backend и frontend частей проекта. За счет чего, удобнее конфигурировать nginx and apache.
-
-Практически любая страница сайта — элемент контента или раздел. Каждая из этих моделей обладает неким повдением наличия дополнительных свойств. Поэтому у любого товара, публкации, новости и т.д. есть набор общих свойств, которые описаны в моделе, и набор динамически созданных свойств, через систему администрирования.
-
-Данная универсальность, позволяет легко создавать любые сайты, без написания и проектирования дополнительных моделей и миграций. Что иделально подходит для быстрого написания обычных, невысоконагруженных проектов (это не значит, что нельзя писать высоконагруженные проекты).
-
-Так же, есть http://marketplace.cms.skeeks.com/ маркетплейс для данной CMS, который постоянно пополняется полезными решениями.
 
 ##Last video
 [![Video on youtube](http://img.youtube.com/vi/u9JRc27WVYY/0.jpg)](http://www.youtube.com/watch?v=u9JRc27WVYY)
