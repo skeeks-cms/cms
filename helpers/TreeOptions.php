@@ -6,7 +6,9 @@
  * @date 14.10.2015
  */
 namespace skeeks\cms\helpers;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
+use yii\caching\TagDependency;
 
 /**
  * Class TreeOptions
@@ -30,11 +32,31 @@ class TreeOptions extends \skeeks\cms\models\Tree
      */
     static public function getAllMultiOptions()
     {
-        return \yii\helpers\ArrayHelper::map(
-             (new static())->getMultiOptions(),
-             "id",
-             "name"
-        );
+        $cacheKey = md5(implode([
+            ROOT_DIR, static::className()
+        ]));
+
+        $dependency = new TagDependency([
+            'tags'      =>
+            [
+                (new CmsTree())->getTableCacheTag(),
+            ],
+        ]);
+
+        $options = \Yii::$app->cache->get($cacheKey);
+
+        if (!$options)
+        {
+            $options = \yii\helpers\ArrayHelper::map(
+                 (new static())->getMultiOptions(),
+                 "id",
+                 "name"
+            );
+
+            \Yii::$app->cache->set($cacheKey, $options, 0, $dependency);
+        }
+
+        return $options;
     }
 
 

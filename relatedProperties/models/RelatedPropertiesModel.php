@@ -103,12 +103,19 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function save()
     {
-        foreach ($this->relatedElementModel->relatedProperties as $property)
+        try
         {
-            $this->relatedElementModel->saveRelatedPropertyValue($property, $this->getAttribute($property->code));
+            foreach ($this->relatedElementModel->relatedProperties as $property)
+            {
+                $this->relatedElementModel->saveRelatedPropertyValue($property, $this->getAttribute($property->code));
+            }
+
+        } catch (\Exception $e)
+        {
+            return false;
         }
 
-        return $this;
+        return true;
     }
 
 

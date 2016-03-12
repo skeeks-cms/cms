@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+2.6.1.pre
+-----------------
+ * Caching data tree to build the select element
+ * Revision the model related properties
+
 2.6.0
 -----------------
  * Доработка виджета ContentElementsCmsWidget — теперь более универсальный

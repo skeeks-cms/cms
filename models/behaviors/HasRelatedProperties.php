@@ -12,6 +12,7 @@ namespace skeeks\cms\models\behaviors;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Behavior;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\web\ErrorHandler;
@@ -128,13 +129,18 @@ class HasRelatedProperties extends Behavior
     }
 
     /**
-     * @param $property
+     * @param RelatedPropertyModel $property
      * @param $value
      * @return $this
      * @throws \Exception
      */
     public function saveRelatedPropertyValue($property, $value)
     {
+        if ($this->owner->isNewRecord)
+        {
+            throw new Exception("This owner model is new record: " . $property->code);
+        }
+
         if ($property->multiple == "Y")
         {
             $propertyValues = $this->findRelatedElementProperties($property->id)->all();
@@ -161,7 +167,10 @@ class HasRelatedProperties extends Behavior
                         'value_num'     => (float) $value,
                     ]);
 
-                    $productPropertyValue->save(false);
+                    if (!$productPropertyValue->save())
+                    {
+                        throw new Exception("{$property->code} not save");
+                    }
                 }
             }
 
@@ -185,7 +194,10 @@ class HasRelatedProperties extends Behavior
                 ]);
             }
 
-            $productPropertyValue->save();
+            if (!$productPropertyValue->save())
+            {
+                throw new Exception("{$property->code} not save");
+            }
         }
 
         return $this;
