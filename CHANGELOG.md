@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.1.pre
 -----------------
+ * Revision of validation of additional properties + added examples: http://en.cms.skeeks.com/docs/additional-properties-models
  * Caching data tree to build the select element
  * Revision the model related properties
 

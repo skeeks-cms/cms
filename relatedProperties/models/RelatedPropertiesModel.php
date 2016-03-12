@@ -99,10 +99,36 @@ class RelatedPropertiesModel extends DynamicModel
 
 
     /**
-     * @return $this
+     * Saves the current record.
+     *
+     * This method will call [[insert()]] when [[isNewRecord]] is true, or [[update()]]
+     * when [[isNewRecord]] is false.
+     *
+     * For example, to save a customer record:
+     *
+     * ```php
+     * $customer = new Customer; // or $customer = Customer::findOne($id);
+     * $customer->name = $name;
+     * $customer->email = $email;
+     * $customer->save();
+     * ```
+     *
+     * @param boolean $runValidation whether to perform validation (calling [[validate()]])
+     * before saving the record. Defaults to `true`. If the validation fails, the record
+     * will not be saved to the database and this method will return `false`.
+     * @param array $attributeNames list of attribute names that need to be saved. Defaults to null,
+     * meaning all attributes that are loaded from DB will be saved.
+     * @return boolean whether the saving succeeded (i.e. no validation errors occurred).
      */
-    public function save()
+    public function save($runValidation = true, $attributeNames = null)
     {
+        if ($runValidation && !$this->validate($attributeNames)) {
+            \Yii::info('Model not updated due to validation error.', __METHOD__);
+            return false;
+        }
+
+        $hasErrors = false;
+
         try
         {
             foreach ($this->relatedElementModel->relatedProperties as $property)
@@ -111,6 +137,12 @@ class RelatedPropertiesModel extends DynamicModel
             }
 
         } catch (\Exception $e)
+        {
+            $hasErrors = true;
+            $this->addError($property->code, $e->getMessage());
+        }
+
+        if ($hasErrors)
         {
             return false;
         }

@@ -138,7 +138,7 @@ class HasRelatedProperties extends Behavior
     {
         if ($this->owner->isNewRecord)
         {
-            throw new Exception("This owner model is new record: " . $property->code);
+            throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
         }
 
         if ($property->multiple == "Y")
