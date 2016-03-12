@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.1.pre
 -----------------
+ * Fixed critical bug with memory consumption when displaying files in the widget select file
  * Optimized widget content items
  * Added option to obtain all the descendants of the section element http://en.cms.skeeks.com/docs/sections-tree
  * Fixed critical bug with memory consumption when displaying files in the repository. There was at moments showing a large number of elements.
