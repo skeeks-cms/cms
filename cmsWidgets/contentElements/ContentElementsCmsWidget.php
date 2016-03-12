@@ -208,19 +208,12 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 $tree = \Yii::$app->cms->currentTree;
                 if ($tree)
                 {
-                    $treeIds[] = $tree->id;
-                    if ($tree->children && $this->enabledCurrentTreeChild == Cms::BOOL_Y)
+                    if ($this->enabledCurrentTreeChild == Cms::BOOL_Y)
                     {
                         if ($this->enabledCurrentTreeChildAll == Cms::BOOL_Y)
                         {
-                            $treeIds = array_merge($treeIds, $this->getAllIdsForChildren($tree));
-                            /*if ($childrens = $tree->children)
-                            {
-                                foreach ($childrens as $chidren)
-                                {
-                                    $treeIds[] = $chidren->id;
-                                }
-                            }*/
+                            $treeIds = $tree->getDescendants()->select(['id'])->indexBy('id')->asArray()->all();
+                            $treeIds = array_keys($treeIds);
                         } else
                         {
                             if ($childrens = $tree->children)
@@ -232,6 +225,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
                             }
                         }
                     }
+
+                    $treeIds[] = $tree->id;
 
                 }
             }

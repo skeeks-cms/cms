@@ -30,6 +30,7 @@ use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
@@ -97,6 +98,7 @@ use yii\helpers\Url;
  * @property Tree                       $root
  * @property Tree                       $prev
  * @property Tree                       $next
+ * @property Tree                       $descendants //@version > 2.6.0
  */
 class Tree extends Core
 {
@@ -581,6 +583,31 @@ class Tree extends Core
         $result->orderBy(["priority" => SORT_ASC]);
 
         return $result;
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDescendants()
+    {
+        $pidsAll = implode("/", $this->pids) . "/" . $this->id . "/%";
+
+        $expression = new Expression("`pids` LIKE '{$pidsAll}'");
+
+        $query = static::find()
+            ->andWhere([
+                'or',
+                $expression,
+                ['pid' => $this->id],
+            ])
+            ->orderBy([
+                "level"     => SORT_ASC,
+                "priority"  => SORT_ASC
+            ]);
+
+        //$query->primaryModel = $this;
+        $query->multiple = true;
+
+        return $query;
     }
 
 

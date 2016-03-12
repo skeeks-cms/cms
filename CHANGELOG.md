@@ -3,6 +3,8 @@ CHANGELOG
 
 2.6.1.pre
 -----------------
+ * Optimized widget content items
+ * Added option to obtain all the descendants of the section element
  * Fixed critical bug with memory consumption when displaying files in the repository. There was at moments showing a large number of elements.
  * Revision of validation of additional properties + added examples: http://en.cms.skeeks.com/docs/additional-properties-models
  * Caching data tree to build the select element
