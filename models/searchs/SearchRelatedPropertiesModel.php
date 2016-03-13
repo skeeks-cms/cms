@@ -138,6 +138,11 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
         foreach ($this->toArray() as $propertyCode => $value)
         {
+            //TODO: add to validator related properties
+            if ($propertyCode == 'properties')
+            {
+                continue;
+            }
 
             if ($property = $this->getProperty($propertyCode))
             {
@@ -158,6 +163,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
                     if ($toValue = $this->{$this->getAttributeNameRangeTo($propertyCode)})
                     {
+
                         $applyFilters = true;
 
                         $query->andWhere(['<=', 'value_num', (float) $toValue]);
@@ -185,8 +191,6 @@ class SearchRelatedPropertiesModel extends DynamicModel
                     ])->indexBy('element_id')->all();
                 }
 
-
-
                 $elementIds = array_keys($elementIds);
 
                 if (!$elementIds)
@@ -202,7 +206,6 @@ class SearchRelatedPropertiesModel extends DynamicModel
                     $elementIdsGlobal = $elementIds;
                 }
             }
-
         }
 
 
