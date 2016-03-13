@@ -59,6 +59,7 @@ $config =
                 'local' =>
                 [
                     'class'                 => 'skeeks\cms\components\storage\ClusterLocal',
+                    'priority'              => 100,
 
                     "name"                  => \Yii::t('app',"Local storage"),
                     "publicBaseUrl"         => "/uploads/all",

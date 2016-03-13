@@ -207,6 +207,8 @@ class Storage extends Component
     {
         if ($this->_clusters === null)
         {
+            ArrayHelper::multisort($this->components, 'priority');
+
             foreach ($this->components as $id => $data)
             {
                 if (!is_int($id))

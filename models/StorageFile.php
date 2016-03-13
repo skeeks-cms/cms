@@ -124,15 +124,6 @@ class StorageFile extends Core
         ]);
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentity($src)
-    {
-        return static::findOne(['src' => $src]);
-    }
-
     /**
      * @return bool|int
      * @throws \Exception
@@ -232,6 +223,7 @@ class StorageFile extends Core
         return $this;
     }
 
+
     /**
      * @return string
      */
@@ -247,4 +239,21 @@ class StorageFile extends Core
     {
         return $this->cluster()->getRootSrc($this->cluster_file);
     }
+
+    /*public function getSrc()
+    {
+        //echo $this->cluster_file;die;
+        return $this->cluster()->getPublicSrc($this->cluster_file);
+    }*/
+
+    /**
+     * @inheritdoc
+     */
+    /*public static function findIdentity($src)
+    {
+        return static::findOne(['src' => $src]);
+    }*/
 }
+
+
+

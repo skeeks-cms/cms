@@ -26,6 +26,7 @@ abstract class Cluster extends Model
 {
     public $id;
     public $name;
+    public $priority = 100;
 
     public $publicBaseUrl; //   http://c1.s.skeeks.com/uploads/
     public $rootBasePath;  //   /var/www/sites/test.ru/frontend/web/uploads/

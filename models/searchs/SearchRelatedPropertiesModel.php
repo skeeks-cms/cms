@@ -133,7 +133,6 @@ class SearchRelatedPropertiesModel extends DynamicModel
          * @var $activeQuery ActiveQuery
          */
         $activeQuery = $activeDataProvider->query;
-        //$activeQuery->leftJoin('cms_content_element_property', '`cms_content_element_property`.`element_id` = `cms_content_element`.`id`');
         $elementIdsGlobal = [];
         $applyFilters = false;
 
@@ -145,9 +144,10 @@ class SearchRelatedPropertiesModel extends DynamicModel
                 if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
                 {
                     $elementIds = [];
-                    $query = (new \yii\db\Query())->from(CmsContentElementProperty::tableName())->select(['element_id'])->where([
+
+                    $query = CmsContentElementProperty::find()->select(['element_id'])->where([
                         "property_id"   => $property->id
-                    ]);
+                    ])->indexBy('element_id');
 
                     if ($fromValue = $this->{$this->getAttributeNameRangeFrom($propertyCode)})
                     {
@@ -179,15 +179,15 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
                     $applyFilters = true;
 
-                    $elementIds = (new \yii\db\Query())->from(CmsContentElementProperty::tableName())->select(['element_id'])->where([
+                    $elementIds = CmsContentElementProperty::find()->select(['element_id'])->where([
                         "value"         => $value,
                         "property_id"   => $property->id
-                    ])->all();
+                    ])->indexBy('element_id')->all();
                 }
 
 
 
-                $elementIds = \yii\helpers\ArrayHelper::map($elementIds, "element_id", "element_id");
+                $elementIds = array_keys($elementIds);
 
                 if (!$elementIds)
                 {
