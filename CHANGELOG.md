@@ -1,7 +1,10 @@
 CHANGELOG
 ==============
 
-2.6.1.pre
+2.6.2.pre
+-----------------
+
+2.6.1
 -----------------
  * Deleted is deprecated fields from cms_storage_file
  * Deleted class skeeks\cms\widgets\ModelStorageFileManager
