@@ -84,7 +84,7 @@ class AdminStorageFilesController extends AdminModelEditorController
 
         header('Content-type: ' . $file->mime_type);
         header('Content-Disposition: attachment; filename="' . $file->cluster_file . '"');
-        echo file_get_contents($file->cluster()->getAbsoluteUrl($file->cluster_file));
+        echo file_get_contents($file->cluster->getAbsoluteUrl($file->cluster_file));
         die;
 
     }

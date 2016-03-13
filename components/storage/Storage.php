@@ -162,7 +162,7 @@ class Storage extends Component
         }
 
 
-        $data["type"]       = $tmpfile->getType();
+        //$data["type"]       = $tmpfile->getType();
         $data["mime_type"]  = $tmpfile->getMimeType();
         $data["size"]       = $tmpfile->size()->getBytes();
         $data["extension"]  = $tmpfile->getExtension();
@@ -185,7 +185,6 @@ class Storage extends Component
             {
                 $data = array_merge($data,
                 [
-                    "src"           => $cluster->getPublicSrc($newFileSrc),
                     "cluster_id"    => $cluster->id,
                     "cluster_file"  => $newFileSrc,
                 ]);
@@ -223,6 +222,7 @@ class Storage extends Component
 
         return $this->_clusters;
     }
+
 
     /**
      * @param null $id

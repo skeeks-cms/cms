@@ -3,6 +3,8 @@ CHANGELOG
 
 2.6.1.pre
 -----------------
+ * Deleted is deprecated fields from cms_storage_file
+ * Deleted class skeeks\cms\widgets\ModelStorageFileManager
  * Adding the priority clusters file storage
  * Fixed critical bug with memory consumption when displaying files in the widget select file
  * Optimized widget content items

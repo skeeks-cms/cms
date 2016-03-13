@@ -67,33 +67,6 @@ class StorageFilesController extends Controller
         ]);
     }
 
-    /*public function actionDetachFile()
-    {
-        $response =
-        [
-            'success' => false
-        ];
-
-        $request = Yii::$app->getRequest();
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        if ($request->get("linked_to_model") && $request->get("linked_to_value") && $request->get("field") && $request->get("src"))
-        {
-            $ref = ModelRef::createFromData(Yii::$app->getRequest()->getQueryParams());
-
-            /**
-             * @var Game $model
-            if (!$model = $ref->findModel())
-            {
-                throw new Exception("Не найдена сущьность к которой обавляется файл");
-            }
-
-            $model->detachFile($request->get("field"), $request->get("src"));
-        }
-
-
-        return $response;
-    }*/
     public function actionUpload()
     {
         $response =
