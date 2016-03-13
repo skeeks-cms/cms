@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.6.2.pre
+2.6.1.1.pre
 -----------------
  * Fixed a bug with the display of the content in the administrative part, an additional property with code properties
 
