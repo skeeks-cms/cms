@@ -10,7 +10,7 @@
 ?>
 <div style="width: 120px; float:left; ">
 
-    <a data-pjax="0" href="<?= $model->adminUrl->toString(); ?>" class="sx-img-link-hover sx-border-1px">
+    <a data-pjax="0" href="<?= $model->url; ?>" class="sx-img-link-hover sx-border-1px" target="_blank">
 
         <?= \yii\helpers\Html::img($model->imageSrc, [
             'width' => '100'
@@ -21,7 +21,7 @@
 </div>
 <div>
     <h3 style="margin-top: 0px;">
-        <a data-pjax="0" href="<?= $model->adminUrl->toString(); ?>">
+        <a data-pjax="0" href="<?= $model->url; ?>" target="_blank">
             <?= $model->name; ?>
         </a>
     </h3>
