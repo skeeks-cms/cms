@@ -84,6 +84,9 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  *
  * @property string $displayName
  *
+ * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
+ * @property CmsContentElement[] $favoriteCmsContentElements
+ *
  */
 class User
     extends Core
@@ -873,5 +876,25 @@ class User
         return $this;
     }
 
+
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElement2cmsUsers()
+    {
+        return $this->hasMany(CmsContentElement2cmsUser::className(), ['cms_user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFavoriteCmsContentElements()
+    {
+        return $this->hasMany(CmsContentElement::className(), ['id' => 'cms_content_element_id'])
+                    ->via('cmsContentElement2cmsUsers');
+    }
 
 }

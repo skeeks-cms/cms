@@ -85,9 +85,12 @@ use yii\web\ErrorHandler;
  * @property CmsStorageFile[] $files
  * @property CmsStorageFile[] $images
  *
- * version > 2.4.8
+ * @version > 2.4.8
  * @property CmsContentElement $parentContentElement
  * @property CmsContentElement[] $childrenContentElements
+ *
+ * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
+ * @property CmsUser[] $usersToFavorites
  *
  */
 class CmsContentElement extends RelatedElementModel
@@ -467,4 +470,24 @@ class CmsContentElement extends RelatedElementModel
         return $this->hasMany(static::className(), ['parent_content_element_id' => 'id']);
     }
 
+
+
+    /**
+     * version > 2.6.1
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElement2cmsUsers()
+    {
+        return $this->hasMany(CmsContentElement2cmsUser::className(), ['cms_content_element_id' => 'id']);
+    }
+
+    /**
+     * version > 2.6.1
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsersToFavorites()
+    {
+        return $this->hasMany(CmsUser::className(), ['id' => 'cms_user_id'])
+            ->via('cmsContentElement2cmsUsers');
+    }
 }
