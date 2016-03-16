@@ -27,14 +27,30 @@ class TreeOptions extends \skeeks\cms\models\Tree
     private $_filter = [];
 
     /**
-     * Строит всего дерева
-     * @return array
+     *
+     * @param CmsTree $parentTree
+     * @return array|mixed
      */
-    static public function getAllMultiOptions()
+    static public function getAllMultiOptions($parentTree = null)
     {
-        $cacheKey = md5(implode([
+        $key = [
             ROOT_DIR, static::className()
-        ]));
+        ];
+
+        if ($parentTree)
+        {
+            if ($parentTree instanceof CmsTree)
+            {
+                $parentTreeId = $parentTree->id;
+            } else
+            {
+                $parentTreeId = $parentTree;
+            }
+
+            $key[] = $parentTreeId;
+        }
+
+        $cacheKey = md5(implode($key));
 
         $dependency = new TagDependency([
             'tags'      =>
@@ -47,18 +63,28 @@ class TreeOptions extends \skeeks\cms\models\Tree
 
         if (!$options)
         {
-            $options = \yii\helpers\ArrayHelper::map(
-                 (new static())->getMultiOptions(),
-                 "id",
-                 "name"
-            );
+            if ($parentTree)
+            {
+                $options = \yii\helpers\ArrayHelper::map(
+                     self::findOne($parentTreeId)->getMultiOptions(),
+                     "id",
+                     "name"
+                );
+            } else
+            {
+                $options = \yii\helpers\ArrayHelper::map(
+                     (new static())->getMultiOptions(),
+                     "id",
+                     "name"
+                );
+            }
+
 
             \Yii::$app->cache->set($cacheKey, $options, 0, $dependency);
         }
 
         return $options;
     }
-
 
     /**
      * Строит массив для селекта

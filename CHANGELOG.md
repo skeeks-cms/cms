@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.2.pre
 -----------------
+ * Added caching tree for multiselect
  * Added elements to favorites users
  * Removed dependency skeeks/yii2-kartik-markdown
  * Fixed a bug with the display of the content in the administrative part, an additional property with code properties
