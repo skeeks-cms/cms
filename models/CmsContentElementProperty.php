@@ -28,6 +28,8 @@ use Yii;
  *
  * @property CmsContentProperty $property
  * @property CmsContentElement  $element
+ *
+ * @property CmsContentElement[]  $valueCmsContentElements
  */
 class CmsContentElementProperty extends RelatedElementPropertyModel
 {
@@ -53,5 +55,13 @@ class CmsContentElementProperty extends RelatedElementPropertyModel
     public function getElement()
     {
         return $this->hasOne(CmsContentElement::className(), ['id' => 'element_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getValueCmsContentElements()
+    {
+        return $this->hasMany(CmsContentElement::className(), ['id' => 'value_enum']);
     }
 }

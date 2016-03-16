@@ -21,109 +21,8 @@ use yii\helpers\ArrayHelper;
  * Class SearchRelatedPropertiesModel
  * @package skeeks\cms\models\searchs
  */
-class SearchRelatedPropertiesModel extends DynamicModel
+class SearchChildrenRelatedPropertiesModel extends SearchRelatedPropertiesModel
 {
-    /**
-     * @var CmsContent
-     */
-    public $cmsContent = null;
-    /**
-     * @var CmsContentProperty[]
-     */
-    public $properties = [];
-
-
-    public function initCmsContent(CmsContent $cmsContent)
-    {
-        $this->cmsContent = $cmsContent;
-
-        /**
-         * @var $prop CmsContentProperty
-         */
-        if ($props = $this->cmsContent->cmsContentProperties)
-        {
-            foreach ($props as $prop)
-            {
-                if ($prop->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
-                {
-                    $this->defineAttribute($this->getAttributeNameRangeFrom($prop->code), '');
-                    $this->defineAttribute($this->getAttributeNameRangeTo($prop->code), '');
-
-                    $this->addRule([$this->getAttributeNameRangeFrom($prop->code), $this->getAttributeNameRangeTo($prop->code)], "safe");
-
-                }
-
-                $this->defineAttribute($prop->code, "");
-                $this->addRule([$prop->code], "safe");
-
-                $this->properties[$prop->code] = $prop;
-
-            }
-        }
-    }
-
-    /**
-     * @param $code
-     * @return CmsContentProperty
-     */
-    public function getProperty($code)
-    {
-        return ArrayHelper::getValue($this->properties, $code);
-    }
-
-    /**
-     * @return array
-     */
-    public function attributeLabels()
-    {
-        $result = [];
-
-        foreach ($this->attributes() as $code)
-        {
-            $result[$code] = $this->getProperty($code)->name;
-        }
-
-        return $result;
-    }
-
-
-
-    public $prefixRange = "Sxrange";
-
-    /**
-     * @param $propertyCode
-     * @return string
-     */
-    public function getAttributeNameRangeFrom($propertyCode)
-    {
-        return $propertyCode . $this->prefixRange . "From";
-    }
-
-    /**
-     * @param $propertyCode
-     * @return string
-     */
-    public function getAttributeNameRangeTo($propertyCode)
-    {
-        return $propertyCode . $this->prefixRange . "To";
-    }
-
-
-    /**
-     * @param $propertyCode
-     * @return bool
-     */
-    public function isAttributeRange($propertyCode)
-    {
-        if (strpos($propertyCode, $this->prefixRange))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-
     /**
      * @param ActiveDataProvider $activeDataProvider
      */
@@ -193,7 +92,11 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
                 $elementIds = array_keys($elementIds);
 
-                \Yii::beginProfile('array_intersect');
+                if ($elementIds)
+                {
+                    $realElements = CmsContentElement::find()->where(['id' => $elementIds])->select(['id', 'parent_content_element_id'])->indexBy('parent_content_element_id')->groupBy(['parent_content_element_id'])->asArray()->all();
+                    $elementIds = array_keys($realElements);
+                }
 
                 if (!$elementIds)
                 {
@@ -207,9 +110,6 @@ class SearchRelatedPropertiesModel extends DynamicModel
                 {
                     $elementIdsGlobal = $elementIds;
                 }
-
-                \Yii::endProfile('array_intersect');
-
             }
         }
 

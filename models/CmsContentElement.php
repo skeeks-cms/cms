@@ -326,7 +326,7 @@ class CmsContentElement extends RelatedElementModel
      *
      * Все возможные свойства связанные с моделью
      *
-     * @return array|\yii\db\ActiveRecord[]
+     * @return \yii\db\ActiveQuery
      */
     public function getRelatedProperties()
     {
