@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.2.pre
 -----------------
+ * Updated admin info
  * Fixed searchRelatedProperties
  * Added caching tree for multiselect
  * Added elements to favorites users

@@ -50,31 +50,6 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
     ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Installed {cms} modules',['cms' => 'CMS'])); ?>
-    <?
-    echo \skeeks\cms\modules\admin\widgets\GridView::widget([
-        'dataProvider' => new \yii\data\ArrayDataProvider([
-            'allModels' => \Yii::$app->cms->getModules(),
-        ]),
-        'layout'    => "{items}",
-        'columns' => [
-
-            //['class' => 'yii\grid\SerialColumn'],
-
-            [
-                'attribute' => 'name',
-                'label'     => \Yii::t('app','Module name')
-            ],
-
-            [
-                'attribute' => 'version',
-                'label'     => \Yii::t('app','Module version')
-            ],
-        ]
-    ]);
-?>
-<?= $form->fieldSetEnd(); ?>
-
 
 <?= $form->fieldSet(\Yii::t('app','All extensions and modules {yii}',['yii' => 'Yii'])); ?>
     <?if (!empty($extensions)) {
