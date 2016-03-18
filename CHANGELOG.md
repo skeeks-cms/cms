@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-2.6.2.pre
+2.7.pre
 -----------------
+ * Major changes to work with the creation of the database dump and its recovery.
  * AssetManager LinkAssets options by default false
  * Updated admin info
  * Fixed searchRelatedProperties

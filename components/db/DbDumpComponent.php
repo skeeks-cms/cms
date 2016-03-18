@@ -6,7 +6,7 @@
  * @date 27.03.2015
  */
 namespace skeeks\cms\components\db;
-use skeeks\cms\helpers\db\DbDsnHelper;
+use Ifsnop\Mysqldump\Mysqldump;
 use skeeks\sx\Dir;
 use yii\base\Component;
 use yii\db\Connection;
@@ -60,100 +60,76 @@ class DbDumpComponent extends Component
 
     /**
      *
+     * Создание бэкап файла базы данных
+     *
+     * @return string
+     * @throws \Exception
+     * @throws \yii\base\Exception
      */
-    public function dumpRun()
+    public function toDump()
     {
-        if (!$this->backupDir->isExist())
+        if (!is_dir($this->backupDirPath))
         {
-            $this->backupDir->make();
+            FileHelper::createDirectory($this->backupDirPath);
         }
 
-        if (!$this->backupDir->isExist())
+        if (!is_dir($this->backupDirPath))
         {
-            throw new \InvalidArgumentException("Не получилось создать папку с файлами бекапов: " . $this->backupDir->getPath());
+            throw new \InvalidArgumentException("Folder to store the backup file is not found and could not be created: " . $this->backupDirPath);
         }
 
-        $dsn = new DbDsnHelper($this->connection);
+        $filePath   = $this->backupDirPath . "/db__" . date('Y-m-d_H:i:s') . ".sql";
 
-        $file       = $this->backupDir->newFile($dsn->dbname . "__" . date('Y-m-d_H:i:s') . ".sql");
-        $filePath   = $file->getPath();
+        $dump = new Mysqldump($this->connection->dsn, $this->connection->username, $this->connection->password);
+        $dump->start($filePath);
 
-        $cmd = "mysqldump -h{$dsn->host} -u {$dsn->username} -p'{$dsn->password}' {$dsn->dbname} > {$filePath}";
-
-        \Yii::$app->console->execute($cmd);
+        return $filePath;
     }
+
 
     /**
      * @return string
      */
-    public function firstDumpRestore()
-    {
-        if (!$this->backupDir->isExist())
-        {
-            throw new \InvalidArgumentException("Бэкап файлов не найдено" . $this->backupDir->getPath());
-        }
-
-        if (!$files = FileHelper::findFiles($this->backupDir->getPath()))
-        {
-            throw new \InvalidArgumentException("Бэкап файлов не найдено");
-        }
-
-        $filePath = $files[0];
-
-        $dsn = new DbDsnHelper($this->connection);
-        $cmd = "mysql -h{$dsn->host} -u{$dsn->username} -p'{$dsn->password}' {$dsn->dbname} < {$filePath}";
-
-        echo $cmd;
-        \Yii::$app->console->execute($cmd);
-
-        //Установка недостающих миграций
-        \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
-
-        \Yii::$app->db->schema->refresh();
-    }
-
-    /**
-     * @return string
-     */
-    public function dumpRestore($fileName)
+    public function restoreFromDump($fileDumpSql = null)
     {
         ignore_user_abort(true);
         set_time_limit(0);
 
-        if (!$this->backupDir->isExist())
+        $filePath = null;
+
+        //Если файл дампа для востановления не указан идет поиск первого файла в папке с бэкапами базы
+        if (!$fileDumpSql)
         {
-            throw new \InvalidArgumentException("Бэкап файлов не найдено" . $this->backupDir->getPath());
+            if (!is_dir($this->backupDirPath))
+            {
+                throw new \InvalidArgumentException("Do not locate the folder with the backup database: " . $this->backupDirPath);
+            }
+
+            if (!$files = FileHelper::findFiles($this->backupDirPath))
+            {
+                throw new \InvalidArgumentException("Backup files found in a dir: " . $this->backupDirPath);
+            }
+
+            $filePath = $files[0];
+
+        } else
+        {
+            $filePath = \Yii::getAlias($fileDumpSql);
         }
 
-        $file = $this->backupDir->newFile($fileName);
-        if (!$file->isExist())
+        if (!file_exists($filePath) || !is_readable($filePath))
         {
-            throw new \InvalidArgumentException("Бэкап файл не найден" . $file->getPath());
+            throw new \InvalidArgumentException("Dump file is not found");
         }
 
-        $filePath = $file->getPath();
+        $sql = file_get_contents($filePath);
 
-        $dsn = new DbDsnHelper($this->connection);
-        $cmd = "mysql -h{$dsn->host} -u{$dsn->username} -p'{$dsn->password}' {$dsn->dbname} < {$filePath}";
+        if (!$sql)
+        {
+            throw new \InvalidArgumentException("Sql query is invalid");
+        }
 
-        echo $cmd;
-        \Yii::$app->console->execute($cmd);
+        \Yii::$app->db->createCommand($sql)->execute();
 
-        //Установка недостающих миграций
-        \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
-
-        \Yii::$app->db->schema->refresh();
-    }
-    /**
-     * @return string
-     */
-    public function dumpNewInstall()
-    {
-        ignore_user_abort(true);
-        set_time_limit(0);
-
-        \Yii::$app->console->execute('cd '  . ROOT_DIR . '; php yii cms/db/apply-migrations');
-
-        \Yii::$app->db->schema->refresh();
     }
 }

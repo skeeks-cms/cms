@@ -19,51 +19,48 @@ use yii\helpers\Console;
 use yii\helpers\FileHelper;
 
 /**
- * Работа с базоый данных mysql
+ * Working with the mysql database
  *
  * @package skeeks\cms\controllers
  */
 class DbController extends Controller
 {
     /**
-     * Просмотр созданных бекапов баз данных
+     * Restore from the dump
+     * @param null $fileName The path to the dump file
      */
-    public function actionDumpList()
+    public function actionRestoreFromDump($fileName = null)
     {
-        if (!\Yii::$app->dbDump->backupDir->isExist() || !$files = \Yii::$app->dbDump->backupDir->findFiles())
+        try
         {
-            $this->stdoutN('Бэкапов не найдено');
-            return;
-        }
-
-        $this->stdoutN('Найдено бэкапов баз данных: ' . count($files));
-
-        foreach ($files as $file)
+            $this->stdout("The installation process is running the database\n");
+            \Yii::$app->dbDump->restoreFromDump($fileName);
+            $this->stdout("Dump successfully installed\n", Console::FG_GREEN);
+        } catch(\Exception $e)
         {
-            $this->stdoutN($file->getBaseName() . " (" . $file->size()->toString() . ")");
+            $this->stdout("In the process of restoring the dump occurred error: {$e->getMessage()}\n", Console::FG_RED);
         }
     }
 
     /**
-     * Установить базу данных из бэкап файла
+     * Creating a dump
      */
-    public function actionFirstDumpRestore()
+    public function actionToDump()
     {
-        \Yii::$app->dbDump->firstDumpRestore();
+        try
+        {
+            $result = \Yii::$app->dbDump->toDump();
+            $this->stdout("Dump the database was created successfully: {$result}\n", Console::FG_GREEN);
+        } catch(\Exception $e)
+        {
+            $this->stdout("During the dump error occurred: {$e->getMessage()}\n", Console::FG_RED);
+        }
     }
 
     /**
-     * Установить базу данных из бэкап файла
+     * Cache invalidation database structure
      */
-    public function actionDumpRestore($fileName)
-    {
-        \Yii::$app->dbDump->dumpRestore($fileName);
-    }
-
-    /**
-     * Инвалидация кэша стуктуры базы данных
-     */
-    public function actionDbRefresh()
+    public function actionRefresh()
     {
         \Yii::$app->db->getSchema()->refresh();
     }
@@ -110,21 +107,6 @@ class DbController extends Controller
         \Yii::$app->db->getSchema()->refresh();
     }
 
-    /**
-     * Найти все дирриктории проекта, и всех расширений, где есть файлы миграций
-     */
-    public function actionFindMigrationDirs()
-    {
-        print_r($this->_findMigrationDirs());
-    }
-
-    /**
-     * Найти все дирриктории проекта, и всех расширений, где могут быть файлы
-     */
-    public function actionFindMigrationPossibleDirs()
-    {
-        print_r($this->_findMigrationPossibleDirs());
-    }
 
     /**
      * @return array

@@ -45,7 +45,8 @@
         "mihaildev/yii2-elfinder": "*",
         "bower-asset/fancybox": "*",
         "kartik-v/yii2-widget-colorinput": "*",
-        "giggsey/libphonenumber-for-php": "~7.0"
+        "giggsey/libphonenumber-for-php": "~7.0",
+        "ifsnop/mysqldump-php":"*"
     },
     "minimum-stability" : "dev",
     "prefer-stable" : true,
