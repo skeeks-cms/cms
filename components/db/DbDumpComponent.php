@@ -66,7 +66,7 @@ class DbDumpComponent extends Component
      * @throws \Exception
      * @throws \yii\base\Exception
      */
-    public function toDump()
+    public function dump()
     {
         if (!is_dir($this->backupDirPath))
         {
@@ -90,7 +90,7 @@ class DbDumpComponent extends Component
     /**
      * @return string
      */
-    public function restoreFromDump($fileDumpSql = null)
+    public function restore($fileDumpSql = null)
     {
         ignore_user_abort(true);
         set_time_limit(0);

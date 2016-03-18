@@ -177,25 +177,5 @@ class UpdateController extends Controller
         \Yii::$app->cms->generateModulesConfigFile();
     }
 
-    /**
-     * Установка пакета
-     *
-     * @param $package skeeks/cms-module:*
-     */
-    public function actionInstall($package)
-    {
-        $this->systemCmdRoot("php yii cms/composer/require {$package}");
-        $this->systemCmdRoot("php yii cms/update");
-    }
 
-    /**
-     * Удаление пакета
-     *
-     * @param $package skeeks/cms-module
-     */
-    public function actionRemove($package)
-    {
-        $this->systemCmdRoot("php yii cms/composer/remove {$package}");
-        $this->systemCmdRoot("php yii cms/update");
-    }
 }
