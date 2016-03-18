@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.2.pre
 -----------------
+ * AssetManager LinkAssets options by default false
  * Updated admin info
  * Fixed searchRelatedProperties
  * Added caching tree for multiselect

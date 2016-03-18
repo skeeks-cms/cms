@@ -115,7 +115,6 @@ $config =
         'assetManager' =>
         [
             'appendTimestamp'   => true,
-            'linkAssets'        => true,
 
             'bundles' =>
             [
