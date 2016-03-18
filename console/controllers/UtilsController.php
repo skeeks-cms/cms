@@ -27,14 +27,7 @@ use yii\helpers\FileHelper;
  */
 class UtilsController extends Controller
 {
-    /**
-     * Проверка какие библиотечные файлы были заменены вручную (папка vendor)
-     * Не желательно менять библиотечные файлы, поскольку при следующем обновлении все изменения могут быть стерты.
-     */
-    public function actionVendorStatus()
-    {
-        $this->systemCmdRoot("php composer.phar status -v");
-    }
+
 
     /**
      * Получение списка всех возможных консольных команд

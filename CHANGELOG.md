@@ -3,7 +3,12 @@ CHANGELOG
 
 2.7.pre
 -----------------
- * Major changes to work with the creation of the database dump and its recovery.
+ * Added new dependency ifsnop/mysqldump-php
+ * Removed skeeks\cms\console\controllers\ComposerController
+ * Removed skeeks\cms\checks\MysqlDumpCheck
+ * Removed skeeks\cms\checks\InstallScriptCheck
+ * Removed skeeks\cms\checks\GitClientCheck
+ * Major changes to work with the creation of the database dump and its recovery
  * AssetManager LinkAssets options by default false
  * Updated admin info
  * Fixed searchRelatedProperties

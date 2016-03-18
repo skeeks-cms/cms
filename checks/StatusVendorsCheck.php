@@ -33,7 +33,6 @@ class StatusVendorsCheck extends CheckComponent
 {$txt2}
 </p>
 <p>{$txt3}:</p>
-<p><code>php yii cms/composer/revert-modified-files</code></p>
 HTML;
 ;
         $this->errorText    = \Yii::t('app',"Found modified kernel");
@@ -45,21 +44,7 @@ HTML;
 
     public function run()
     {
-		$emptyCheck = new EmptyConsoleCheck();
-        $emptyCheck->run();
-
-        if (!$emptyCheck->isSuccess())
-        {
-            $this->addError(\Yii::t('app','Found an error in the process of console commands, check the kernel modification can not be started.'));
-            //return;
-        }
-
         $result = \Yii::$app->console->execute('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status --verbose');
-
-        /*ob_start();
-            system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status --verbose');
-        $result = ob_get_clean();
-        $result = trim($result);*/
 
         if ($result)
         {

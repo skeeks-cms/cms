@@ -92,64 +92,6 @@ class UpdateController extends Controller
      */
     public function actionAll()
     {
-        if ($this->dbDump)
-        {
-            //Создание бэкапа базы данных.
-            $this->systemCmdRoot("php yii cms/backup/db-execute");
-        }
-
-        //Удаление блокирующего файла TODO: rewrite this is
-        $this->systemCmdRoot("rm -f composer.lock");
-
-        //Проверка версии композера, его установка если нет
-        $this->systemCmdRoot("php yii cms/composer/self-update " . $this->composerVersion . " " . ($this->noInteraction ? "--noInteraction":"" ));
-        //Обновление asset plugins composer
-        $this->systemCmdRoot("php yii cms/composer/update-asset-plugins " . $this->composerAssetPluginV . " " . ($this->noInteraction ? "--noInteraction":"" ));
-
-        if ($this->revertModified)
-        {
-            //Откатить измененные файлы
-            $this->systemCmdRoot("php yii cms/composer/revert-modified-files");
-        }
-
-        /*ob_start();
-            system('cd '  . ROOT_DIR . '; COMPOSER_HOME=.composer php composer.phar status');
-        $result = ob_get_clean();
-        $result = trim($result);
-
-        if ($result)
-        {
-            $dirs = explode("\n", $result);
-
-            if ($dirs)
-            {
-                foreach ($dirs as $dirPath)
-                {
-                    FileHelper::removeDirectory($dirPath);
-                }
-            }
-        }*/
-
-
-        $options = [];
-
-        if ($this->optimize)
-        {
-            $options[] = "-o";
-        }
-
-        if ($this->noInteraction)
-        {
-            $options[] = "--no-interaction";
-        }
-
-        if ($this->profile)
-        {
-            $options[] = "--profile";
-        }
-
-        $this->systemCmdRoot('COMPOSER_HOME=.composer php composer.phar update ' . implode(" ", $options) );
-
         //Генерация файла со списком модулей
         $this->systemCmdRoot("php yii cms/update/generate-config-files");
 
@@ -163,7 +105,7 @@ class UpdateController extends Controller
         //$this->systemCmdRoot("php yii cms/utils/clear-assets");
 
         //Сброс кэша стрктуры базы данных
-        $this->systemCmdRoot("php yii cms/db/db-refresh");
+        $this->systemCmdRoot("php yii cms/db/refresh");
 
         //Обновление привилегий
         $this->systemCmdRoot("php yii cms/rbac/init");
