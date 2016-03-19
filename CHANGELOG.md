@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.7.0.beta
+-----------------
+ * fix bugs
+
 2.7.0.alpha
 -----------------
  * Removed dependency yiisoft/yii2-gii
