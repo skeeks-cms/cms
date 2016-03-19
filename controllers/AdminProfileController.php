@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\App;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;

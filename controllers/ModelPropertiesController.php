@@ -13,7 +13,6 @@ use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use Yii;
 use skeeks\cms\models\searchs\User as UserSearch;
-use \skeeks\cms\App;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;

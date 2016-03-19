@@ -16,7 +16,6 @@ use skeeks\cms\authclient\AuthClientSettings;
 use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsSearchComponent;
-use skeeks\cms\components\CmsSettings;
 use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ConsoleComponent;
 use skeeks\cms\components\ControlToolbar;
@@ -52,7 +51,6 @@ use skeeks\cms\authclient\CollectionSettings;
  * @property DbDumpComponent                $dbDump
  * @property CmsSearchComponent             $cmsSearch
  * @property MarketplaceApi                 $cmsMarkeplace
- * @property CmsSettings                    $cmsSettings
  * @property ConsoleComponent               $console
  * @property I18N|I18NDb                    $i18n
  *

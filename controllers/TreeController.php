@@ -17,7 +17,6 @@ use skeeks\cms\models\Tree;
 use skeeks\cms\models\User;
 use Yii;
 use skeeks\cms\models\searchs\User as UserSearch;
-use \skeeks\cms\App;
 
 /**
  * Class UserController

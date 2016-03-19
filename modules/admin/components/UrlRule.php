@@ -9,7 +9,6 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\components;
-use skeeks\cms\App;
 use \yii\base\InvalidConfigException;
 /**
  * Class Storage

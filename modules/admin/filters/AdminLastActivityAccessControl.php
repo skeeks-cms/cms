@@ -2,12 +2,10 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (�����)
- * @date 31.05.2015
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 19.03.2016
  */
 namespace skeeks\cms\modules\admin\filters;
-
-use skeeks\cms\App;
 
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;

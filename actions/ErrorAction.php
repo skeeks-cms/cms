@@ -11,8 +11,6 @@
 namespace skeeks\cms\actions;
 
 
-use skeeks\cms\App;
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
@@ -45,11 +43,6 @@ class ErrorAction extends \yii\web\ErrorAction
             $code = $exception->statusCode;
         } else {
             $code = $exception->getCode();
-        }
-
-        if ($exception instanceof NotConnectedToDbException)
-        {
-            return \Yii::$app->response->redirect(Url::toRoute('cms/install'));
         }
 
         if ($exception instanceof Exception)
@@ -86,27 +79,18 @@ class ErrorAction extends \yii\web\ErrorAction
         {
             if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
             {
-                try
-                {
-                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
-                    {
-                        $this->controller->layout = \Yii::$app->cms->moduleAdmin()->layout;
-                        return $this->controller->output(nl2br(Html::encode($message)));
-                    } else
-                    {
-                        $this->controller->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
-                        return $this->controller->render('@skeeks/cms/modules/admin/views/error/unauthorized-403', [
-                            'message' => nl2br(Html::encode($message))
-                        ]);
-                    }
-                } catch(\yii\db\Exception $e)
-                {
-                    if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-                    {
-                        throw new NotConnectedToDbException;
-                    }
-                }
 
+                if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
+                {
+                    $this->controller->layout = \Yii::$app->cms->moduleAdmin()->layout;
+                    return $this->controller->output(nl2br(Html::encode($message)));
+                } else
+                {
+                    $this->controller->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
+                    return $this->controller->render('@skeeks/cms/modules/admin/views/error/unauthorized-403', [
+                        'message' => nl2br(Html::encode($message))
+                    ]);
+                }
 
             } else
             {

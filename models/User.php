@@ -14,7 +14,6 @@ namespace skeeks\cms\models;
 use Imagine\Image\ManipulatorInterface;
 
 use skeeks\cms\components\Cms;
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;

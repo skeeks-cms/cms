@@ -11,9 +11,9 @@
 namespace skeeks\cms\actions;
 
 
-use skeeks\cms\base\Action;
 use skeeks\cms\helpers\UrlHelper;
 use Yii;
+use yii\base\Action;
 
 /**
  * Class ErrorAction

@@ -8,7 +8,6 @@
 namespace skeeks\cms\base;
 
 use skeeks\cms\components\Cms;
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\traits\WidgetTrait;
 use yii\base\ViewContextInterface;

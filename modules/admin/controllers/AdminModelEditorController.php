@@ -12,7 +12,6 @@
 
 namespace skeeks\cms\modules\admin\controllers;
 use skeeks\admin\components\AccessControl;
-use skeeks\cms\App;
 use skeeks\cms\base\widgets\ActiveForm;
 use skeeks\cms\components\Cms;
 use skeeks\cms\Exception;

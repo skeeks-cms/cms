@@ -6,7 +6,6 @@
  * @date 24.05.2015
  */
 namespace skeeks\cms\components\urlRules;
-use skeeks\cms\App;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;

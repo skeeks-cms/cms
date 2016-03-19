@@ -15,7 +15,6 @@ use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
 use Yii;
 use skeeks\cms\models\searchs\User as UserSearch;
-use \skeeks\cms\App;
 use yii\helpers\ArrayHelper;
 use yii\rest\UpdateAction;
 use yii\web\NotFoundHttpException;

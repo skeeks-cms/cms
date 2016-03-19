@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms\base\console;
 
-use skeeks\cms\App;
 use Yii;
 use yii\console\Controller as YiiController;
 use yii\helpers\Console;

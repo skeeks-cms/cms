@@ -11,7 +11,6 @@
 
 namespace skeeks\cms\models\forms;
 
-use skeeks\cms\App;
 use skeeks\cms\models\User;
 use Yii;
 use yii\base\Model;

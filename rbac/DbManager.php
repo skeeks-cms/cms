@@ -11,7 +11,6 @@
 
 namespace skeeks\cms\rbac;
 
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use Yii;
 use yii\db\Connection;
 use yii\db\Exception;
@@ -108,19 +107,10 @@ class DbManager extends CmsManager
      */
     public function checkAccess($userId, $permissionName, $params = [])
     {
-        try
-        {
-            $this->loadItems();
-            $this->loadChildren();
-            $this->loadRules();
-            $assignments = $this->getAssignments($userId);
-        } catch (Exception $e)
-        {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                throw new NotConnectedToDbException;
-            }
-        }
+        $this->loadItems();
+        $this->loadChildren();
+        $this->loadRules();
+        $assignments = $this->getAssignments($userId);
 
         return $this->checkAccessRecursive($userId, $permissionName, $params, $assignments);
     }
@@ -604,25 +594,18 @@ class DbManager extends CmsManager
      */
     private function loadItems()
     {
-        try
-        {
-            $part = self::PART_ITEMS;
-            if ($this->_items === null && ($this->_items = $this->getFromCache($part)) === false) {
-                $query = (new Query)->from($this->itemTable);
 
-                $this->_items = [];
-                foreach ($query->all($this->db) as $row) {
-                    $this->_items[$row['name']] = $this->populateItem($row);
-                }
-                $this->saveToCache($part, $this->_items);
+        $part = self::PART_ITEMS;
+        if ($this->_items === null && ($this->_items = $this->getFromCache($part)) === false) {
+            $query = (new Query)->from($this->itemTable);
+
+            $this->_items = [];
+            foreach ($query->all($this->db) as $row) {
+                $this->_items[$row['name']] = $this->populateItem($row);
             }
-        } catch (Exception $e)
-        {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                throw new NotConnectedToDbException;
-            }
+            $this->saveToCache($part, $this->_items);
         }
+
     }
 
     /**
@@ -631,28 +614,20 @@ class DbManager extends CmsManager
      */
     private function loadChildren()
     {
-        try
-        {
-            $part = self::PART_CHILDREN;
-            if ($this->_children === null && ($this->_children = $this->getFromCache($part)) === false) {
-                $query = (new Query)->from($this->itemChildTable);
 
-                $this->_children = [];
-                foreach ($query->all($this->db) as $row) {
-                    if (isset($this->_items[$row['parent']], $this->_items[$row['child']])) {
-                        $this->_children[$row['parent']][] = $row['child'];
-                    }
+        $part = self::PART_CHILDREN;
+        if ($this->_children === null && ($this->_children = $this->getFromCache($part)) === false) {
+            $query = (new Query)->from($this->itemChildTable);
+
+            $this->_children = [];
+            foreach ($query->all($this->db) as $row) {
+                if (isset($this->_items[$row['parent']], $this->_items[$row['child']])) {
+                    $this->_children[$row['parent']][] = $row['child'];
                 }
-                $this->saveToCache($part, $this->_children);
             }
-
-        } catch (Exception $e)
-        {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                throw new NotConnectedToDbException;
-            }
+            $this->saveToCache($part, $this->_children);
         }
+
     }
 
     /**
@@ -661,29 +636,21 @@ class DbManager extends CmsManager
      */
     private function loadRules()
     {
-        try
-        {
-            $part = self::PART_RULES;
-            if ($this->_rules === null && ($this->_rules = $this->getFromCache($part)) === false) {
-                $query = (new Query)->from($this->ruleTable);
 
-                $this->_rules = [];
-                foreach ($query->all($this->db) as $row) {
-                    $rule = @unserialize($row['data']);
-                    if ($rule instanceof Rule) {
-                        $this->_rules[$row['name']] = $rule;
-                    }
+        $part = self::PART_RULES;
+        if ($this->_rules === null && ($this->_rules = $this->getFromCache($part)) === false) {
+            $query = (new Query)->from($this->ruleTable);
+
+            $this->_rules = [];
+            foreach ($query->all($this->db) as $row) {
+                $rule = @unserialize($row['data']);
+                if ($rule instanceof Rule) {
+                    $this->_rules[$row['name']] = $rule;
                 }
-                $this->saveToCache($part, $this->_rules);
             }
-
-        } catch (Exception $e)
-        {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                throw new NotConnectedToDbException;
-            }
+            $this->saveToCache($part, $this->_rules);
         }
+
     }
 
     /**

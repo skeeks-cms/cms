@@ -11,9 +11,7 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\App;
 use skeeks\cms\base\Controller;
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use yii\db\Exception;
@@ -84,12 +82,9 @@ class CmsController extends Controller
             \Yii::$app->db->open();
         } catch (Exception $e)
         {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                return $this->render('not-connected-to-db', [
-                    'connectToDbForm' => $connectToDbForm
-                ]);
-            }
+            return $this->render('not-connected-to-db', [
+                'connectToDbForm' => $connectToDbForm
+            ]);
         }
 
         //Если в базе нет таблиц

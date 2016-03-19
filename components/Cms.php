@@ -12,7 +12,6 @@ use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\Module;
 use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\events\LoginEvent;
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\ComposerHelper;
 use skeeks\cms\mail\Message;
 use skeeks\cms\models\CmsAgent;
@@ -420,15 +419,18 @@ class Cms extends \skeeks\cms\base\Component
             $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
         }
 
-        if ($this->debugEnabled === self::BOOL_Y)
-        {
+        /*if ($this->debugEnabled === self::BOOL_Y)
+        {*/
             /**
              * @var $debugModule \yii\debug\Module
              */
-            $debugModule = \Yii::$app->getModule('debug');
-            $debugModule->allowedIPs = explode(',', $this->debugAllowedIPs);
-            $debugModule->bootstrap(\Yii::$app);
-        }
+            /*if (\Yii::$app->has('debug'))
+            {
+                $debugModule = \Yii::$app->getModule('debug');
+                $debugModule->allowedIPs = explode(',', $this->debugAllowedIPs);
+                $debugModule->bootstrap(\Yii::$app);
+            }
+        }*/
 
         if ($this->enabledHttpAuth == self::BOOL_Y)
         {
@@ -510,19 +512,6 @@ class Cms extends \skeeks\cms\base\Component
                         ],
                 ]);
             }
-
-            /*if ($e->controller instanceof AdminModelEditorController)
-            {
-                $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
-                    'system' =>
-                        [
-                            'class'         => AdminOneModelSystemAction::className(),
-                            'name'          => 'Системные данные',
-                            "icon"          => "glyphicon glyphicon-cog",
-                            "priority"      => 9999,
-                        ],
-                ]);
-            }*/
         });
     }
 

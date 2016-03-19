@@ -26,10 +26,10 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
 }
 ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\Yii::t('app', 'Main')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Основное'
+        'content' => \Yii::t('app', 'Main')
     ])?>
     <?= $form->field($model, 'appName')->textInput()->hint(''); ?>
 
@@ -107,39 +107,39 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Отладка'); ?>
-    <? \yii\bootstrap\Alert::begin([
+<?/*= $form->fieldSet('Отладка'); */?><!--
+    <?/* \yii\bootstrap\Alert::begin([
         'options' => [
           'class' => 'alert-warning',
       ],
-    ]); ?>
+    ]); */?>
     <b>Внимание!</b> Помните, в режиме отладки ваш сайт работает медленнее. Не включайте отладку на рабочих сайтах.
-    <? \yii\bootstrap\Alert::end()?>
-    <?= $form->fieldRadioListBoolean($model, 'debugEnabled'); ?>
-    <?= $form->field($model, 'debugAllowedIPs')->textarea([
+    <?/* \yii\bootstrap\Alert::end()*/?>
+    <?/*= $form->fieldRadioListBoolean($model, 'debugEnabled'); */?>
+    <?/*= $form->field($model, 'debugAllowedIPs')->textarea([
         'placeholder' => '80.243.13.242,127.*'
-    ])->hint('Укажите ip адреса для которых будет показана отладочная панель дебага через запятую.'); ?>
-    <p><b>Ваш ip:</b> <?= \Yii::$app->getRequest()->getUserIP(); ?></p>
+    ])->hint('Укажите ip адреса для которых будет показана отладочная панель дебага через запятую.'); */?>
+    <p><b>Ваш ip:</b> <?/*= \Yii::$app->getRequest()->getUserIP(); */?></p>
 
 
-<?= $form->fieldSetEnd(); ?>
+--><?/*= $form->fieldSetEnd(); */?>
 
-<?= $form->fieldSet('Разработка'); ?>
-    <? \yii\bootstrap\Alert::begin([
+<?/*= $form->fieldSet('Разработка'); */?><!--
+    <?/* \yii\bootstrap\Alert::begin([
         'options' => [
           'class' => 'alert-warning',
       ],
-    ]); ?>
+    ]); */?>
     Обратите внимание на эти настройки
-    <? \yii\bootstrap\Alert::end()?>
-    <?= $form->fieldRadioListBoolean($model, 'giiEnabled'); ?>
-    <?= $form->field($model, 'giiAllowedIPs')->textarea([
+    <?/* \yii\bootstrap\Alert::end()*/?>
+    <?/*= $form->fieldRadioListBoolean($model, 'giiEnabled'); */?>
+    <?/*= $form->field($model, 'giiAllowedIPs')->textarea([
         'placeholder' => '80.243.13.242,127.*'
-    ])->hint('Укажите ip адреса для которых будет включен генератор кода через запятую.'); ?>
-    <p><b>Ваш ip:</b> <?= \Yii::$app->getRequest()->getUserIP(); ?></p>
+    ])->hint('Укажите ip адреса для которых будет включен генератор кода через запятую.'); */?>
+    <p><b>Ваш ip:</b> <?/*= \Yii::$app->getRequest()->getUserIP(); */?></p>
 
 
-<?= $form->fieldSetEnd(); ?>
+--><?/*= $form->fieldSetEnd(); */?>
 
 
 <?= $form->fieldSet('Доступ'); ?>

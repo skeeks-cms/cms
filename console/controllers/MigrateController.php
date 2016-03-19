@@ -42,12 +42,10 @@ class MigrateController extends \yii\console\controllers\MigrateController
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
-            if ($action->id == 'up') {
 
-                $this->migrationPath = \Yii::getAlias($this->_runtimeMigrationPath);
-                $this->_copyMigrations();
+            $this->migrationPath = \Yii::getAlias($this->_runtimeMigrationPath);
+            $this->_copyMigrations();
 
-            }
             return true;
         } else {
             return false;

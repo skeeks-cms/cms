@@ -6,8 +6,6 @@
  * @date 24.05.2015
  */
 namespace skeeks\cms\components\urlRules;
-use skeeks\cms\App;
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
@@ -124,55 +122,44 @@ class UrlRuleTree
         }
 
 
-        try
+        $dependency = new TagDependency([
+            'tags'      =>
+            [
+                (new Tree())->getTableCacheTag(),
+            ],
+        ]);
+
+
+        if (!$normalizeDir) //главная страница
         {
-            $dependency = new TagDependency([
-                'tags'      =>
-                [
-                    (new Tree())->getTableCacheTag(),
-                ],
-            ]);
-
-
-            if (!$normalizeDir) //главная страница
-            {
-                $treeNode = Tree::getDb()->cache(function ($db) {
-                    return Tree::find()->where([
-                        "site_code"         => \Yii::$app->cms->site->code,
-                        "level"             => 0,
-                    ])->one();
-                }, null, $dependency);
-
-                /*$treeNode = Tree::find()->where([
+            $treeNode = Tree::getDb()->cache(function ($db) {
+                return Tree::find()->where([
                     "site_code"         => \Yii::$app->cms->site->code,
                     "level"             => 0,
-                ])->one();*/
+                ])->one();
+            }, null, $dependency);
+
+            /*$treeNode = Tree::find()->where([
+                "site_code"         => \Yii::$app->cms->site->code,
+                "level"             => 0,
+            ])->one();*/
 
 
-            } else //второстепенная страница
-            {
-                /*$treeNode = Tree::getDb()->cache(function ($db) {
-                    return Tree::find()->where([
-                        (new Tree())->dirAttrName       => $normalizeDir,
-                        "site_code"                     => \Yii::$app->cms->site->code,
-                    ])->one();
-                }, null, $dependency);*/
-
-                $treeNode = Tree::find()->where([
-                    "dir"                           => $normalizeDir,
+        } else //второстепенная страница
+        {
+            /*$treeNode = Tree::getDb()->cache(function ($db) {
+                return Tree::find()->where([
+                    (new Tree())->dirAttrName       => $normalizeDir,
                     "site_code"                     => \Yii::$app->cms->site->code,
                 ])->one();
-            }
-        } catch (Exception $e)
-        {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                throw new NotConnectedToDbException;
-            }
-        } catch (\yii\base\InvalidConfigException $e)
-        {
-            throw new NotConnectedToDbException;
+            }, null, $dependency);*/
+
+            $treeNode = Tree::find()->where([
+                "dir"                           => $normalizeDir,
+                "site_code"                     => \Yii::$app->cms->site->code,
+            ])->one();
         }
+
 
         if ($treeNode)
         {

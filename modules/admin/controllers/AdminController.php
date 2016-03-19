@@ -8,7 +8,6 @@
 namespace skeeks\cms\modules\admin\controllers;
 
 use skeeks\cms\base\Controller;
-use skeeks\cms\exceptions\NotConnectedToDbException;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
@@ -189,23 +188,6 @@ abstract class AdminController extends Controller
         {
             return false;
         }
-
-        //TODO: временное решение, проверка наличия соединенеия с базой, если этого не будет, то при проверки прав будут ошибки.
-        /*try
-        {
-            \Yii::$app->db->open();
-            if (!\Yii::$app->db->schema->getTableNames())
-            {
-                throw new NotConnectedToDbException;
-            }
-
-        } catch(\yii\db\Exception $e)
-        {
-            if (in_array($e->getCode(), NotConnectedToDbException::$invalidConnectionCodes))
-            {
-                throw new NotConnectedToDbException;
-            }
-        }*/
 
         \Yii::$app->cmsMarkeplace->info;
 

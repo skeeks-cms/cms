@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
-use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
 
 /* @var $this \yii\web\View */

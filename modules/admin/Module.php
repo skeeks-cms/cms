@@ -11,7 +11,6 @@
 namespace skeeks\cms\modules\admin;
 
 use skeeks\cms\base\Module as CmsModule;
-use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Site;
 use skeeks\cms\modules\admin\assets\AdminAsset;

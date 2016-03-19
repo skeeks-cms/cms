@@ -3,7 +3,15 @@ CHANGELOG
 
 2.7.pre
 -----------------
+ * Big refactoring
+ * deleted references to class skeeks\cms\App
  * Added new dependency ifsnop/mysqldump-php
+ * Removed skeeks\cms\components\GiiModule
+ * Removed skeeks\cms\exceptions\NotConnectedToDbException
+ * Removed skeeks\cms\base\Action
+ * Removed skeeks\cms\base\Session
+ * Removed skeeks\cms\base\DbSession
+ * Removed skeeks\cms\components\CmsSettings
  * Removed skeeks\cms\console\controllers\ComposerController
  * Removed skeeks\cms\checks\MysqlDumpCheck
  * Removed skeeks\cms\checks\InstallScriptCheck

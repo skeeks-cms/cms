@@ -7,10 +7,6 @@
  */
 namespace skeeks\cms\actions;
 
-
-use skeeks\cms\App;
-use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\Tree;
 use Yii;
 use yii\base\Action;
 use yii\base\ActionEvent;

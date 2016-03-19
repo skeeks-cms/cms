@@ -7,8 +7,6 @@
  */
 namespace skeeks\cms\filters;
 
-use skeeks\cms\App;
-
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use yii\web\User;

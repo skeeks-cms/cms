@@ -46,7 +46,6 @@ $config =
             'class'         => 'skeeks\cms\mail\Mailer',
         ],
 
-
         'cmsToolbar' =>
         [
             'class' => 'skeeks\cms\components\CmsToolbar',
@@ -65,20 +64,6 @@ $config =
                     "publicBaseUrl"         => "/uploads/all",
                     "rootBasePath"          =>  \Yii::getAlias("@frontend/web/uploads/all"),
                 ]
-            ],
-        ],
-
-        'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class'     => 'yii\log\FileTarget',
-                    'logVars'   => [],
-                    'levels' => [
-                        'error',
-                        'warning'
-                    ],
-                ],
             ],
         ],
 
@@ -160,7 +145,6 @@ $config =
         'cmsSettings' =>
         [
             'class'                         => '\skeeks\cms\components\CmsSettings',
-
         ],
 
         'cms' =>
@@ -184,15 +168,6 @@ $config =
             ],
         ],
 
-        'dbSession' =>
-        [
-            'class'         => '\skeeks\cms\base\DbSession',
-        ],
-
-        'session' =>
-        [
-            'class' => '\skeeks\cms\base\Session',
-        ],
 
         'imaging' =>
         [
@@ -251,16 +226,6 @@ $config =
         'admin' =>
         [
             'class' => '\skeeks\cms\modules\admin\Module'
-        ],
-
-        'gii' =>
-        [
-            'class' => 'skeeks\cms\components\GiiModule',
-        ],
-
-        'debug' =>
-        [
-            'class' => 'yii\debug\Module',
         ],
 
         'cms' =>

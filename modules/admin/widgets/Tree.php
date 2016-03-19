@@ -10,7 +10,6 @@
 
 namespace skeeks\cms\modules\admin\widgets;
 
-use skeeks\cms\App;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;

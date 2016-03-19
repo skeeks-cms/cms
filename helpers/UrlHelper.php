@@ -10,7 +10,6 @@
  */
 namespace skeeks\cms\helpers;
 
-use skeeks\cms\App;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\sx\traits\Entity;
 use yii\base\Object;

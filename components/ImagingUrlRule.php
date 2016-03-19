@@ -10,7 +10,6 @@
  */
 
 namespace skeeks\cms\components;
-use skeeks\cms\App;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\Tree;
 use skeeks\sx\File;

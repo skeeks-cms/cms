@@ -43,7 +43,10 @@ $config =
             ],
         ],
 
-        'currentSite' => ['class' => 'skeeks\cms\components\CurrentSite'],
+        'currentSite' =>
+        [
+            'class' => 'skeeks\cms\components\CurrentSite'
+        ],
 
         'cms' =>
         [
@@ -82,7 +85,7 @@ $config =
         ],
 
         'i18n' => [
-            'class' => 'skeeks\cms\i18n\components\I18NDb',
+            'class' => 'skeeks\cms\i18n\components\I18N',
         ],
     ],
 

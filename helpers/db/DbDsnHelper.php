@@ -7,7 +7,6 @@
  */
 namespace skeeks\cms\helpers\db;
 
-use skeeks\cms\App;
 use skeeks\cms\modules\admin\components\UrlRule;
 use yii\base\Component;
 use yii\base\Object;

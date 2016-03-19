@@ -9,7 +9,6 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\modules\admin\components;
-use skeeks\cms\App;
 use skeeks\cms\modules\admin\helpers\AdminMenuItem;
 use skeeks\cms\modules\admin\helpers\MenuItem;
 use yii\base\Component;
