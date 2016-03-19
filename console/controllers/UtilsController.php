@@ -27,8 +27,6 @@ use yii\helpers\FileHelper;
  */
 class UtilsController extends Controller
 {
-
-
     /**
      * Получение списка всех возможных консольных команд
      * Используется в console ssh для автокомплита
@@ -59,43 +57,6 @@ class UtilsController extends Controller
     }
 
 
-    /**
-     * Читска временный файлов (runtimes)
-     *
-     * '@console/runtime'
-     * '@common/runtime'
-     * '@frontend/runtime'
-     *
-     */
-    public function actionClearRuntimes()
-    {
-        $paths = ArrayHelper::getValue(\Yii::$app->cms->tmpFolderScheme, 'runtime');
-
-        if ($paths)
-        {
-            foreach ($paths as $path)
-            {
-                FileHelper::removeDirectory(\Yii::getAlias($path));
-                FileHelper::createDirectory(\Yii::getAlias($path));
-            }
-        }
-    }
-
-    /**
-     *
-     */
-    public function actionClearAssets()
-    {
-        $paths = ArrayHelper::getValue(\Yii::$app->cms->tmpFolderScheme, 'assets');
-        if ($paths)
-        {
-            foreach ($paths as $path)
-            {
-                FileHelper::removeDirectory(\Yii::getAlias($path));
-                FileHelper::createDirectory(\Yii::getAlias($path));
-            }
-        }
-    }
 
 
     /**
@@ -111,14 +72,6 @@ class UtilsController extends Controller
 
             \Yii::info("Удалено поисковых запросов: " . $deleted);
         }
-    }
-
-    /**
-     * Генерация файла со списком модулей
-     */
-    public function actionGenerateModulesConfigFile()
-    {
-        \Yii::$app->cms->generateModulesConfigFile();
     }
 
     /**
