@@ -150,4 +150,5 @@ class InitController extends Controller
             @symlink($root . "/" . $target, $root . "/" . $link);
         }
     }
+
 }
