@@ -47,47 +47,7 @@ ___
 
 ##Install
 
-* Install files
-```php
-//Скачивание свежей версии composer
-php -r "readfile('https://getcomposer.org/installer');" | php
-//Установка базового проекта SkeekS CMS
-COMPOSER_HOME=.composer php composer.phar create-project --no-install --prefer-dist skeeks/app-basic app-basic
-//Спускаемся в папку
-cd app-basic
-//Качаем композер в проект
-php -r "readfile('https://getcomposer.org/installer');" | php
-//Используем самую последнюю стабильную версию
-COMPOSER_HOME=.composer php composer.phar self-update 1.0.0-beta1
-//Установка дополнительных плагинов
-COMPOSER_HOME=.composer php composer.phar global require "fxp/composer-asset-plugin:1.1.2" --profile
-//Ну и собственно установка проекта
-//В процессе вероятнее всего у вас будет запрошен доступ к github, поскольку большинство пакетов лежат именно на его серверах
-COMPOSER_HOME=.composer php composer.phar install
-//После установки, запуск команды, для инициализации проекта
-php yii cms/init
-```
-
-* Db connect
-Update file: common/config/db.php
-
-* Install migrations
-```bash
-#Установка из готового дампа
-php yii cms/db/first-dump-restore
-#Установка недостающих миграций
-php yii cms/db/apply-migrations
-#Авто настройка прав доступа
-php yii cms/rbac/init
-```
-
-*  Backend (username and password by default)
-
-http://your-site.ru/~sx
-
-root
-
-skeeks
+http://en.cms.skeeks.com/docs/install/installation-on-linux
 
 ___
 
