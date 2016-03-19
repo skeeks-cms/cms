@@ -743,7 +743,7 @@ return
     "Hidden Name"           => "Скрытое название",
     "Not displayed on the site"        => "Не отображается на сайте",
     "Specify an absolute or relative URL for redirection, in the free form." => "Укажите абсолютный или относительный адрес, для перенаправления, в свободной форме.",
-    "Available commands {cms}" => "Доступные команды {cms}",
+    "Available commands" => "Доступные команды",
     "The function {system} at hosting is disabled. Contact your administrator." => "На хостинге отключена функция {system}. Обратитесь к администраторам.",
     "Add files"             => "Добавить файлы",
     "The upload file"       => "Загрузка файла",

@@ -551,10 +551,10 @@ class Cms extends \skeeks\cms\base\Component
     protected function _installAgents()
     {
         //Вставка агентов
-        if (!CmsAgent::find()->where(['name' => 'cms/db/db-refresh'])->one())
+        if (!CmsAgent::find()->where(['name' => 'cms/db/refresh'])->one())
         {
             ( new CmsAgent([
-                'name'              => 'cms/db/db-refresh',
+                'name'              => 'cms/db/refresh',
                 'description'       => 'Инвалидация кэша структуры таблиц',
                 'agent_interval'    => 3600*3, //раз в три часа
                 'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*3,
@@ -562,10 +562,10 @@ class Cms extends \skeeks\cms\base\Component
             ]) )->save();
         }
 
-        if (!CmsAgent::find()->where(['name' => 'cms/utils/clear-runtimes'])->one())
+        if (!CmsAgent::find()->where(['name' => 'cms/cache/flush-runtimes'])->one())
         {
             ( new CmsAgent([
-                'name'              => 'cms/utils/clear-runtimes',
+                'name'              => 'cms/cache/flush-runtimes',
                 'description'       => 'Чистка временных диррикторий',
                 'agent_interval'    => 3600*24,
                 'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,
@@ -573,10 +573,10 @@ class Cms extends \skeeks\cms\base\Component
             ]) )->save();
         }
 
-        if (!CmsAgent::find()->where(['name' => 'cms/backup/db-execute'])->one())
+        if (!CmsAgent::find()->where(['name' => 'cms/db/dump'])->one())
         {
             ( new CmsAgent([
-                'name'              => 'cms/backup/db-execute',
+                'name'              => 'cms/db/dump',
                 'description'       => 'Бэкап базы данных',
                 'agent_interval'    => 3600*24, //раз в три часа
                 'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,

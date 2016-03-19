@@ -91,7 +91,7 @@ class DbController extends AdminController
             try
             {
                 ob_start();
-                    \Yii::$app->dbDump->dumpRun();
+                    \Yii::$app->dbDump->dump();
                 $result = ob_get_clean();
 
 

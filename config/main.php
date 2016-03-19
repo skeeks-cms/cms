@@ -142,11 +142,6 @@ $config =
             'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
         ],
 
-        'cmsSettings' =>
-        [
-            'class'                         => '\skeeks\cms\components\CmsSettings',
-        ],
-
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
