@@ -30,6 +30,12 @@ use yii\rbac\Rule;
 class RbacController extends Controller
 {
     /**
+     * @var string the default command action.
+     */
+    public $defaultAction = 'init';
+
+
+    /**
      * Загрузка конфига и применение правил
      */
     public function actionInit()
@@ -54,27 +60,27 @@ class RbacController extends Controller
 
         foreach (\Yii::$app->authManager->getPermissions() as $permission)
         {
-            $this->stdout(' assign root permisssion: ' . $permission->name);
+            $this->stdout("\t\tassign root permisssion: " . $permission->name);
             try
             {
                 \Yii::$app->authManager->addChild($roleRoot, $permission);
-                $this->stdoutN(' - success');
+                $this->stdout(' - success' . "\n");
             } catch(\Exception $e)
             {
-                $this->stdoutN(' - already exist');
+                $this->stdout(' - already exist' . "\n");
             }
         };
 
         foreach (\Yii::$app->authManager->getRoles() as $role)
         {
-            $this->stdout(' assign root role: ' . $role->name);
+            $this->stdout("\t\tassign root role: " . $role->name);
             try
             {
                 \Yii::$app->authManager->addChild($roleRoot, $role);
-                $this->stdoutN(' - success');
+                $this->stdout(' - success' . "\n");
             } catch(\Exception $e)
             {
-                $this->stdoutN(' - already exist');
+                $this->stdout(' - already exist' . "\n");
             }
         };
 
@@ -86,21 +92,21 @@ class RbacController extends Controller
      */
     public function initRbacModules()
     {
-        $this->stdoutN("Init rules, permissions adn data from all modules and extensions\n", Console::BOLD);
+        $this->stdout("Init rules, permissions adn data from all modules and extensions\n\n", Console::BOLD);
 
-        $this->stdoutN(" 1) Loading config");
+        $this->stdout("1) Loading config\n", Console::FG_YELLOW);
 
         if (!$config = $this->loadConfig())
         {
-            $this->stdoutN("Start script: not found data for rbac migrations");
+            $this->stdout("Start script: not found data for rbac migrations", Console::FG_RED);
             die;
         }
 
-        $this->stdoutN("2) Start migrations");
+        $this->stdout("2) Start migrations\n", Console::FG_YELLOW);
         $this->applyConfig($config);
 
 
-        $this->stdoutN("3) Assigning roles, privileges, rules");
+        $this->stdout("3) Assigning roles, privileges, rules\n", Console::FG_YELLOW);
         $this->applyAssigningConfig($config);
 
     }
@@ -181,16 +187,16 @@ class RbacController extends Controller
             {
                 foreach ($childRoles as $name)
                 {
-                    $this->stdout(' assign child role: ' . $name);
+                    $this->stdout("\t\tassign child role: " . $name);
                     if ($roleChild = \Yii::$app->authManager->getRole($name))
                     {
                         try
                         {
                             \Yii::$app->authManager->addChild($role, $roleChild);
-                            $this->stdoutN(' - success');
+                            $this->stdout(' - success' . "\n");
                         } catch(\Exception $e)
                         {
-                            $this->stdoutN(' - already exist');
+                            $this->stdout(' - already exist'. "\n");
                         }
 
                     }
@@ -204,16 +210,16 @@ class RbacController extends Controller
             {
                 foreach ($childPermissions as $name)
                 {
-                    $this->stdout(' assign child permission: ' . $name);
+                    $this->stdout("\t\tassign child permission: " . $name);
                     if ($permissionChild = \Yii::$app->authManager->getPermission($name))
                     {
                         try
                         {
                             \Yii::$app->authManager->addChild($role, $permissionChild);
-                            $this->stdoutN(' - success');
+                            $this->stdout(' - success' . "\n");
                         } catch(\Exception $e)
                         {
-                            $this->stdoutN(' - already exist');
+                            $this->stdout(' - already exist'. "\n");
                         }
 
                     }
@@ -259,16 +265,16 @@ class RbacController extends Controller
                 foreach ($childRoles as $name)
                 {
 
-                    $this->stdout(' assign child role: ' . $name);
+                    $this->stdout("\t\tassign child role: " . $name);
                     if ($roleChild = \Yii::$app->authManager->getRole($name))
                     {
                         try
                         {
                             \Yii::$app->authManager->addChild($permission, $roleChild);
-                            $this->stdoutN(' - success');
+                            $this->stdout(' - success' . "\n");
                         } catch(\Exception $e)
                         {
-                            $this->stdoutN(' - already exist');
+                            $this->stdout(' - already exist' . "\n");
                         }
                     }
                 }
@@ -281,16 +287,16 @@ class RbacController extends Controller
             {
                 foreach ($childPermissions as $name)
                 {
-                    $this->stdout(' assign child permission: ' . $name);
+                    $this->stdout("\t\tassign child permission: " . $name);
                     if ($permissionChild = \Yii::$app->authManager->getPermission($name))
                     {
                         try
                         {
                             \Yii::$app->authManager->addChild($permission, $permissionChild);
-                            $this->stdoutN(' - success');
+                            $this->stdout(' - success' . "\n");
                         } catch(\Exception $e)
                         {
-                            $this->stdoutN(' - already exist');
+                            $this->stdout(' - already exist' . "\n");
                         }
                     }
                 }
@@ -392,16 +398,16 @@ class RbacController extends Controller
     {
         if ($rules = ArrayHelper::getValue($config, 'rules'))
         {
-            $this->stdoutN("Init rules: " . count($rules));
+            $this->stdout("\tInit rules: " . count($rules) . "\n");
 
             foreach ($rules as $data)
             {
                 if ($rule = $this->_applyRule($data))
                 {
-                    $this->stdoutN(" - success: " . $rule->name);
+                    $this->stdout("\t\t- success: " . $rule->name . "\n");
                 } else
                 {
-                    $this->stdoutN(" - error config rule: " . Json::encode($data));
+                    $this->stdout("\t\t- error config rule: " . Json::encode($data) . "\n");
                 }
             }
         }
@@ -409,32 +415,32 @@ class RbacController extends Controller
 
         if ($roles = ArrayHelper::getValue($config, 'roles'))
         {
-            $this->stdoutN("Init roles: " . count($roles));
+            $this->stdout("\tInit roles: " . count($roles) . "\n");
 
             foreach ($roles as $data)
             {
                 if ($role = $this->_applyRole($data))
                 {
-                    $this->stdoutN(" - success: " . $role->name);
+                    $this->stdout("\t\t- success: " . $role->name . "\n");
                 } else
                 {
-                    $this->stdoutN(" - error config role: " . Json::encode($data));
+                    $this->stdout("\t\t- error config role: " . Json::encode($data) . "\n");
                 }
             }
         }
 
         if ($permissions = ArrayHelper::getValue($config, 'permissions'))
         {
-            $this->stdoutN("Init permissions: " . count($permissions));
+            $this->stdout("\tInit permissions: " . count($permissions) . "\n");
 
             foreach ($permissions as $data)
             {
                 if ($permission = $this->_applyPermission($data))
                 {
-                    $this->stdoutN(" - success: " . $permission->name);
+                    $this->stdout("\t\t- success: " . $permission->name . "\n");
                 } else
                 {
-                    $this->stdoutN(" - error config role: " . Json::encode($data));
+                    $this->stdout("\t\t- error config role: " . Json::encode($data) . "\n");
                 }
             }
         }
@@ -447,13 +453,13 @@ class RbacController extends Controller
     {
         if ($roles = ArrayHelper::getValue($config, 'roles'))
         {
-            $this->stdoutN("Assining roles: " . count($roles));
+            $this->stdout("\tAssining roles: " . count($roles) . "\n");
 
             foreach ($roles as $data)
             {
                 if ($role = $this->_assignRole($data))
                 {
-                    $this->stdoutN(" - success assigned: " . $role->name);
+                    $this->stdout("\t- success assigned: " . $role->name . "\n");
                 }
             }
         }
@@ -461,13 +467,13 @@ class RbacController extends Controller
 
         if ($permissions = ArrayHelper::getValue($config, 'permissions'))
         {
-            $this->stdoutN("Assining permissions: " . count($roles));
+            $this->stdout("\tAssining permissions: " . count($roles) . "\n");
 
             foreach ($permissions as $data)
             {
                 if ($permission = $this->_assignPermission($data))
                 {
-                    $this->stdoutN(" - success assigned: " . $permission->name);
+                    $this->stdout("\t- success assigned: " . $permission->name . "\n");
                 }
             }
         }
@@ -480,7 +486,7 @@ class RbacController extends Controller
      */
     public function loadConfig()
     {
-        $this->stdoutN("Scan all extensions");
+        $this->stdout("\tScan all extensions\n");
 
         $config = [];
 
@@ -494,31 +500,31 @@ class RbacController extends Controller
 
                     if (file_exists($permisssionsFile))
                     {
-                        $this->stdout(" - " . $permisssionsFile);
+                        $this->stdout("\t- " . $permisssionsFile);
 
                         $cfg = (array) include $permisssionsFile;
                         if ($cfg)
                         {
                             $config = ArrayHelper::merge($config, $cfg);
-                            $this->stdout(" (rules: " . count(ArrayHelper::getValue($cfg, 'rules', [])) . ';');
-                            $this->stdout(" roles: " . count(ArrayHelper::getValue($cfg, 'roles', [])) . ';');
-                            $this->stdout(" permissions: " . count(ArrayHelper::getValue($cfg, 'permissions', [])) . ';)');
-                            $this->stdoutN('');
+                            $this->stdout("(rules: " . count(ArrayHelper::getValue($cfg, 'rules', [])) . ';');
+                            $this->stdout("roles: " . count(ArrayHelper::getValue($cfg, 'roles', [])) . ';');
+                            $this->stdout("permissions: " . count(ArrayHelper::getValue($cfg, 'permissions', [])) . ';)');
+                            $this->stdout("\n");
                         } else
                         {
-                            $this->stdoutN(" (is empty data)");
+                            $this->stdout("(is empty data)");
                         }
                     }
                 }
             }
         }
 
-        $this->stdout("All config is ready");
+        $this->stdout("\tAll config is ready: ", Console::FG_GREEN);
 
         $this->stdout(" (rules: " . count(ArrayHelper::getValue($config, 'rules', [])) . ';');
         $this->stdout(" roles: " . count(ArrayHelper::getValue($config, 'roles', [])) . ';');
         $this->stdout(" permissions: " . count(ArrayHelper::getValue($config, 'permissions', [])) . ';)');
-        $this->stdoutN('');
+        $this->stdout("\n");
 
         return $config;
     }

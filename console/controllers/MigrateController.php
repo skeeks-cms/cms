@@ -26,13 +26,6 @@ class MigrateController extends \yii\console\controllers\MigrateController
 {
     protected $_runtimeMigrationPath = '@runtime/db-migrate';
 
-    public function init()
-    {
-        $this->migrationPath = \Yii::getAlias($this->_runtimeMigrationPath);
-        parent::init();
-
-    }
-
     /**
      * This method is invoked right before an action is to be executed (after all possible filters.)
      * It checks the existence of the [[migrationPath]].
@@ -41,15 +34,10 @@ class MigrateController extends \yii\console\controllers\MigrateController
      */
     public function beforeAction($action)
     {
-        if (parent::beforeAction($action)) {
+        $this->migrationPath = \Yii::getAlias($this->_runtimeMigrationPath);
+        $this->_copyMigrations();
 
-            $this->migrationPath = \Yii::getAlias($this->_runtimeMigrationPath);
-            $this->_copyMigrations();
-
-            return true;
-        } else {
-            return false;
-        }
+        return parent::beforeAction($action);
     }
 
     /**
@@ -59,7 +47,7 @@ class MigrateController extends \yii\console\controllers\MigrateController
      */
     protected function _copyMigrations()
     {
-        $this->stdout("Copy the migration files in a single directory\n");
+        $this->stdout("Copy the migration files in a single directory\n", Console::FG_YELLOW);
 
         $tmpMigrateDir = \Yii::getAlias($this->_runtimeMigrationPath);
 
@@ -68,11 +56,11 @@ class MigrateController extends \yii\console\controllers\MigrateController
 
         if (!is_dir($tmpMigrateDir))
         {
-            $this->stdout("Could not create a temporary directory migration\n", Console::FG_RED);
+            $this->stdout("Could not create a temporary directory migration\n");
             die;
         }
 
-        $this->stdout("\tCreated a directory migration\n", Console::FG_GREEN);
+        $this->stdout("\tCreated a directory migration\n");
 
         if ($dirs = $this->_findMigrationDirs())
         {
@@ -82,7 +70,7 @@ class MigrateController extends \yii\console\controllers\MigrateController
             }
         }
 
-        $this->stdout("\tThe copied files modules migrations\n", Console::FG_GREEN);
+        $this->stdout("\tThe copied files modules migrations\n");
 
         $appMigrateDir = \Yii::getAlias("@console/migrations");
         if (is_dir($appMigrateDir))
@@ -90,7 +78,7 @@ class MigrateController extends \yii\console\controllers\MigrateController
             FileHelper::copyDirectory($appMigrateDir, $tmpMigrateDir);
         }
 
-        $this->stdout("\tThe copied files app migrations\n", Console::FG_GREEN);
+        $this->stdout("\tThe copied files app migrations\n\n");
     }
 
 
