@@ -3,6 +3,8 @@ CHANGELOG
 
 2.7.pre
 -----------------
+ * Removed dependency yiisoft/yii2-gii
+ * Removed dependency yiisoft/yii2-debug
  * Big refactoring
  * deleted references to class skeeks\cms\App
  * Added new dependency ifsnop/mysqldump-php
