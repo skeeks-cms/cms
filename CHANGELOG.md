@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.7.pre
+2.7.0.alpha
 -----------------
  * Removed dependency yiisoft/yii2-gii
  * Removed dependency yiisoft/yii2-debug
