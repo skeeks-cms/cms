@@ -4,7 +4,7 @@ CHANGELOG
 2.7.1.pre
 -----------------
  * Fix bugs for windows
- * 
+ 
 2.7.0
 -----------------
  * It is ready
