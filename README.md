@@ -1,7 +1,7 @@
 SkeekS CMS (Yii2)
 ================
 
-[![skeeks!](http://cms.skeeks.com/uploads/all/02/bb/d1/02bbd1ed904fc44bdee66e33b661cf2c/sx-filter__skeeks-cms-components-imaging-filters-Thumbnail/15f3c42a5e338e459b5bfe72f1874494/sx-file.png?w=409&h=258)](http://en.cms.skeeks.com)  
+[![skeeks!](http://en.cms.skeeks.com/uploads/all/35/fd/33/35fd33aa306823dbaf53a0142d43b3fa.png)](http://en.cms.skeeks.com)  
 
 
 
