@@ -61,7 +61,7 @@ class ImagingController extends Controller
 
 
         $newFile                        = File::object($newFileSrc);
-        $strposFilter                   = strpos($newFileSrc, DIRECTORY_SEPARATOR . Imaging::THUMBNAIL_PREFIX);
+        $strposFilter                   = strpos($newFileSrc, "/" . Imaging::THUMBNAIL_PREFIX);
         if (!$strposFilter)
         {
             throw new \ErrorException("This is not a filter thumbnail: ". $newFileSrc);
