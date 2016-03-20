@@ -7,9 +7,9 @@ SkeekS CMS (Yii2)
 
 ##Links
 * [Web site](http://en.cms.skeeks.com)
+* [Web site (rus)](http://cms.skeeks.com)
 * [Author](http://skeeks.com)
 * [ChangeLog](https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md)
-* [Plans](https://github.com/skeeks-cms/cms/blob/master/PLANS.md)
 
 ## Info
 
