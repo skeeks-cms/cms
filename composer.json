@@ -1,14 +1,14 @@
 {
     "name": "skeeks/cms",
-    "description": "SkeekS CMS (Yii2 cms) — система управления интернет проектами, создание веб-проектов, система управления внутренним порталом компании",
+    "description": "SkeekS CMS — control panel and tools based on php framework Yii2",
     "keywords": ["framework", "cms", "skeeks", "sx", "skeeks cms", "app", "yii2", "extension"],
     "homepage": "http://cms.skeeks.com",
     "type": "yii2-extension",
     "license": "GPL-2.0+",
     "support": {
-        "issues": "http://cms.skeeks.com",
-        "wiki": "http://dev.cms.skeeks.com/docs/dev",
         "source": "https://github.com/skeeks-cms/cms",
+        "issues": "https://github.com/skeeks-cms/cms/issues",
+        "wiki": "http://en.cms.skeeks.com/docs",
         "authors": "http://skeeks.com"
     },
     "authors": [
