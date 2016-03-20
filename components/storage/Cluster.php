@@ -102,7 +102,7 @@ abstract class Cluster extends Model
      */
     public function getPublicSrc($clusterFileUniqSrc)
     {
-        return $this->publicBaseUrl . DIRECTORY_SEPARATOR . $clusterFileUniqSrc;
+        return $this->publicBaseUrl . "/" . $clusterFileUniqSrc;
     }
 
     /**
