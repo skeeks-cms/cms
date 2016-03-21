@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.7.1.pre
+2.7.1
 -----------------
  * Update smart content element filters
  * Fix bugs for windows
