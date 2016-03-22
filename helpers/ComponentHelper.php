@@ -22,7 +22,7 @@ class ComponentHelper extends Component
      * @param $behavior
      * @return bool
      */
-    static public function hasBehavior(Component $component, $behavior)
+    static public function hasBehavior($component, $behavior)
     {
         if ($behavior instanceof Behavior)
         {
@@ -30,6 +30,11 @@ class ComponentHelper extends Component
         } else if (is_string($behavior))
         {
             $behavior = (string) $behavior;
+        }
+
+        if (!method_exists($component, 'getBehaviors'))
+        {
+            return false;
         }
 
         $hasBehaviors = $component->getBehaviors();
