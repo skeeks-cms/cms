@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.1.pre
 -----------------
+ * Disabling skeeks cms panels, at the time of launch and debug modules gii
  * Fix admin bugs
  * Drop user is depricated columns (city, address, info, files, status_of_life)
  * Drop restrict index in cms_storage_file

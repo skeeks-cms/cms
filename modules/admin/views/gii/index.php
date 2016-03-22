@@ -7,7 +7,7 @@
  * @since 1.0.0
  */
 /* @var $this yii\web\View */
-use Yii;
+use \Yii;
 ?>
 <iframe src="<?= \skeeks\cms\helpers\UrlHelper::construct('gii'); ?>" width="100%"  height="900" id="sx-smart-frame"></iframe>
 
