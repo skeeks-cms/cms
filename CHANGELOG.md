@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+2.7.1.pre
+-----------------
+ * Drop user is depricated columns (city, address, info, files, status_of_life)
+ * Drop restrict index in cms_storage_file
+
 2.7.0.1
 -----------------
  * Update smart content element filters

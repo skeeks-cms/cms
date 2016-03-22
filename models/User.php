@@ -37,12 +37,6 @@ use skeeks\cms\models\behaviors\HasSubscribes;
 /**
  * This is the model class for table "{{%cms_user}}".
  *
- *
- * @property string $status_of_life @varsion > 2.4.9.1 is depricate
- * @property string $city           @varsion > 2.4.9.1 is depricated
- * @property string $address        @varsion > 2.4.9.1 is depricated
- * @property string $info           @varsion > 2.4.9.1 is depricatedd
- *
  * @property integer $id
  * @property string $username
  * @property string $auth_key
@@ -52,8 +46,6 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property integer $updated_at
  * @property string $name
  * @property integer $image_id
- * @property string $files
- *
  *
  * @property string $gender
  * @property string $active
@@ -300,8 +292,8 @@ class User
 
             [['created_at', 'updated_at', 'image_id'], 'integer'],
 
-            [['info', 'gender', 'status_of_life'], 'string'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'name', 'city', 'address'], 'string', 'max' => 255],
+            [['gender'], 'string'],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'name'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
 
             [['phone'], 'string'],
@@ -380,14 +372,10 @@ class User
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
             'name' => Module::t('user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
-            'city' => Yii::t('app', 'City'),
-            'address' => Yii::t('app', 'Address'),
-            'info' => Yii::t('app', 'Information'),
             'gender' => Yii::t('app', 'Gender'),
             'logged_at' => Yii::t('app', 'Logged At'),
             'last_activity_at' => Yii::t('app', 'Last Activity At'),
             'last_admin_activity_at' => Yii::t('app', 'Last Activity In The Admin At'),
-            'status_of_life' => Yii::t('app', 'Status'),
             'image_id' => Yii::t('app', 'Image'),
             'roleNames' => Yii::t('app', 'Группы'),
         ];
