@@ -396,7 +396,7 @@
 
                 onError: function( filename, type, status, statusText, response, uploadBtn )
                 {
-                    if (status = 413)
+                    if (status == 413)
                     {
                         self.triggerError({
                             'message' : 'Не удалось загрузить файл. Слишком большой.'
