@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.7.1.pre
+2.7.0.2
 -----------------
  * Fix upload errors
  * Disabling skeeks cms panels, at the time of launch and debug modules gii
