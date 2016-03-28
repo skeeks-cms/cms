@@ -25,6 +25,8 @@
     margin: 0;
     z-index: 1000000;
     border-bottom: 1px solid #ccc;
+    background: white !important;
+    font-size: 12px !important;
 }
 
 .skeeks-cms-toolbar-bottom {

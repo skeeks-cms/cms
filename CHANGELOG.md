@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.7.0.4.pre
+-----------------
+ * Styling toolbar
+
 2.7.0.3
 -----------------
  * Fixed an important bug, an incorrect config cache, after the agent
