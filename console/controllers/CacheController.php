@@ -61,6 +61,9 @@ class CacheController extends \yii\console\controllers\CacheController
                 FileHelper::createDirectory(\Yii::getAlias($path));
             }
         }
+
+        //It is important to the proper configuration is cached differently
+        \Yii::$app->cms->generateModulesConfigFile();
     }
 
     /**
