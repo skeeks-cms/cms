@@ -215,10 +215,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd()?>
 
+<!--
+<?/*= $form->fieldSet(\Yii::t('app','Additionally')) */?>
 
-<?= $form->fieldSet(\Yii::t('app','Additionally')) ?>
-
-    <?= $form->field($model, 'tree_menu_ids')->label(\Yii::t('app','Marks'))->widget(
+    <?/*= $form->field($model, 'tree_menu_ids')->label(\Yii::t('app','Marks'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\TreeMenu::find()->all(),
@@ -228,18 +228,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'multiple' => true,
             'controllerRoute' => 'cms/admin-tree-menu',
         ]
-        /*\skeeks\widget\chosen\Chosen::className(), [
-                'items' => \yii\helpers\ArrayHelper::map(
-                     \skeeks\cms\models\TreeMenu::find()->all(),
-                     "id",
-                     "name"
-                 ),
-                'multiple' => true
-        ]*/
-        )->hint(\Yii::t('app','You can link the current section to a few marks, and according to this, section will be displayed in different menus for example.'));
-    ?>
 
-<?= $form->fieldSetEnd() ?>
+        )->hint(\Yii::t('app','You can link the current section to a few marks, and according to this, section will be displayed in different menus for example.'));
+    */?>
+
+--><?/*= $form->fieldSetEnd() */?>
 
 
 <?
@@ -248,12 +241,12 @@ $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_colu
  * @var $content \skeeks\cms\models\CmsContent
  */
 ?>
-<? if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : ?>
-    <? foreach ($contents as $content) : ?>
-        <?= $form->fieldSet($content->name) ?>
+<?/* if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : */?><!--
+    <?/* foreach ($contents as $content) : */?>
+        <?/*= $form->fieldSet($content->name) */?>
 
 
-            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+            <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => $content->name,
                 'hint'              => \Yii::t('app',"Showing all elements of type '{name}' associated with this section. Taken into account only the main binding.",['name' => $content->name]),
                 'parentModel'       => $model,
@@ -273,11 +266,11 @@ $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_colu
                 'gridViewOptions'   => [
                     'columns' => (array) include $columnsFile
                 ],
-            ]); ?>
+            ]); */?>
 
-        <?= $form->fieldSetEnd() ?>
-    <? endforeach; ?>
-<? endif; ?>
+        <?/*= $form->fieldSetEnd() */?>
+    <?/* endforeach; */?>
+--><?/* endif; */?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 

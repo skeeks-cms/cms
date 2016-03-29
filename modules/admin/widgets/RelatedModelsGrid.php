@@ -22,10 +22,12 @@ class RelatedModelsGrid extends Widget
      */
     public $controllerRoute         = null;//'cms/admin-user-email';
 
+    public $namespace               = null;
+
     /**
      * @var string действие добавления связанной модели
      */
-    public $controllerCreateAction  = 'create';
+    public $controllerCreateAction      = 'create';
     public $controllerSortableAction  = 'sortable-priority';
 
     /**
@@ -63,6 +65,36 @@ class RelatedModelsGrid extends Widget
      */
     public $parentModel  = null;
 
+    public function init()
+    {
+        parent::init();
+
+        if ($this->namespace === null)
+        {
+            $id = [];
+            if (\Yii::$app->controller)
+            {
+                $id = [\Yii::$app->controller->getUniqueId()];
+            }
+
+            if (\Yii::$app->controller->action)
+            {
+                $id = [\Yii::$app->controller->action->getUniqueId()];
+            }
+
+            if ($this->controllerRoute)
+            {
+                $id[] = $this->controllerRoute;
+            }
+
+            if ($this->parentModel)
+            {
+                $id[] = $this->parentModel->className();
+            }
+
+            $this->namespace = "adminRelatedGrid__" . md5(implode("_", $id));
+        }
+    }
 
     public function run()
     {
@@ -147,4 +179,6 @@ class RelatedModelsGrid extends Widget
             'pjaxId'        => $pjaxId,
         ]);
     }
+
+
 }

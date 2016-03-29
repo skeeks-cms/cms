@@ -35,7 +35,11 @@ JS
     ); ?>
 
     <? $add = \Yii::t('app','Add');?>
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget(\yii\helpers\ArrayHelper::merge([
+    <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget(\yii\helpers\ArrayHelper::merge([
+        'settingsData' =>
+        [
+             'namespace' => $widget->namespace
+        ],
         'beforeTableLeft' => <<<HTML
         <a class="btn btn-default btn-sm" onclick="{$onclick}"><i class="glyphicon glyphicon-plus"></i>{$add}</a>
 HTML
