@@ -103,7 +103,9 @@ abstract class ViewModelAction extends Action
 
         if (Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
-            return "test: test";
+            return $this->controller->render($this->view ?: $this->id, [
+                'model' => $this->model
+            ]);
         } else
         {
             return $this->controller->render($this->view ?: $this->id, [

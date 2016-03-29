@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.0.4.pre
 -----------------
+ * Disabled ajax response {test: test} to the sections and pages of content elements
  * Styling toolbar
 
 2.7.0.3
