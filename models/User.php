@@ -444,7 +444,7 @@ class User
      */
     public static function findByPhone($phone)
     {
-        return static::findOne(['phone' => $email, 'active' => Cms::BOOL_Y]);
+        return static::findOne(['phone' => $phone, 'active' => Cms::BOOL_Y]);
 
         return null;
     }
