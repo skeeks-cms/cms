@@ -54,6 +54,10 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property integer $logged_at
  * @property integer $last_activity_at
  * @property integer $last_admin_activity_at
+ * @property string         $email
+ * @property string         $phone
+ * @property integer $email_is_approved
+ * @property integer $phone_is_approved
  *
  * @property string $lastActivityAgo
  * @property string $lastAdminActivityAgo
@@ -61,11 +65,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property CmsStorageFile $image
  * @property string $avatarSrc
 
- * @property string         $email
- * @property string         $phone
- *
- * @property CmsUserEmail         $cmsUserEmail
- * @property CmsUserEmail         $cmsUserPhone
+
  *
  * @property CmsUserEmail[]     $cmsUserEmails
  * @property CmsUserPhone[]     $cmsUserPhones
@@ -114,11 +114,6 @@ class User
 
         $this->on(self::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
         $this->on(self::EVENT_AFTER_INSERT,    [$this, "checkDataAfterInsert"]);
-
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_cmsSaveEmail"]);
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_cmsSavePhone"]);
-        $this->on(self::EVENT_AFTER_INSERT,     [$this, "_cmsSaveEmail"]);
-        $this->on(self::EVENT_AFTER_INSERT,     [$this, "_cmsSavePhone"]);
     }
 
     public function _cmsAfterSave($e)
@@ -193,69 +188,6 @@ class User
 
 
     /**
-     * После вставки пользователя, назначим ему необходимые роли
-     */
-    public function _cmsSaveEmail()
-    {
-        if ($this->_email)
-        {
-            if ($this->cmsUserEmail)
-            {
-
-                $this->cmsUserEmail->value  = $this->_email;
-                $this->cmsUserEmail->def    = Cms::BOOL_Y;
-
-                if (!$this->cmsUserEmail->save())
-                {
-                    /*print_r($this->cmsUserEmail->getErrors());
-                    die;*/
-                }
-
-            } else
-            {
-                $cmsUserEmail = new CmsUserEmail([
-                    'value' => $this->_email,
-                    'def'   => Cms::BOOL_Y,
-                ]);
-
-                $cmsUserEmail->save(false);
-
-                $cmsUserEmail->link('user', $this);
-            }
-        }
-    }
-
-
-    /**
-     * После вставки пользователя, назначим ему необходимые роли
-     */
-    public function _cmsSavePhone()
-    {
-        if ($this->_phone)
-        {
-            if ($this->cmsUserPhone)
-            {
-                $this->cmsUserPhone->value  = $this->_phone;
-                $this->cmsUserPhone->def    = Cms::BOOL_Y;
-
-                $this->cmsUserPhone->save();
-            } else
-            {
-                $cmsUserPhone = new CmsUserPhone([
-                    'value' => $this->_phone,
-                    'def'   => Cms::BOOL_Y,
-                ]);
-
-                $cmsUserPhone->save();
-
-                $cmsUserPhone->link('user', $this);
-            }
-        }
-    }
-
-
-
-    /**
      * @inheritdoc
      */
     public function behaviors()
@@ -290,35 +222,18 @@ class User
             ['gender', 'default', 'value' => 'men'],
             ['gender', 'in', 'range' => ['men', 'women']],
 
-            [['created_at', 'updated_at', 'image_id'], 'integer'],
+            [['created_at', 'updated_at', 'image_id', 'email_is_approved', 'phone_is_approved'], 'integer'],
 
             [['gender'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
 
-            [['phone'], 'string'],
+            [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::className()],
+            [['phone'], 'unique'],
 
-            [['phone'], 'unique', 'targetClass' => CmsUserPhone::className(), 'targetAttribute' => 'value',
-                'filter' => function(ActiveQuery $query)
-                {
-                    if ($this->cmsUserPhone)
-                    {
-                        $query->andWhere(['!=', 'id', $this->cmsUserPhone->id]);
-                    }
-                }
-            ],
 
-            [['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value',
-                'filter' => function(ActiveQuery $query)
-                {
-                    if ($this->cmsUserEmail)
-                    {
-                        $query->andWhere(['!=', 'id', $this->cmsUserEmail->id]);
-                    }
-                }
-            ],
-
+            [['email'], 'unique'],
             [['email'], 'email'],
 
             //[['username'], 'required'],
@@ -335,6 +250,8 @@ class User
                 $userLast = static::find()->orderBy("id DESC")->one();
                 return "id" . ($userLast->id + 1);
             }],
+
+            [['email_is_approved', 'phone_is_approved'], 'default', 'value' => 0],
 
             [['auth_key'], 'default', 'value' => function(self $model)
             {
@@ -379,6 +296,8 @@ class User
             'last_admin_activity_at' => Yii::t('app', 'Last Activity In The Admin At'),
             'image_id' => Yii::t('app', 'Image'),
             'roleNames' => Yii::t('app', 'Группы'),
+            'email_is_approved' => Yii::t('app', 'Email is approved'),
+            'phone_is_approved' => Yii::t('app', 'Phone is approved'),
         ];
     }
 
@@ -541,18 +460,7 @@ class User
      */
     public static function findByEmail($email)
     {
-        /**
-         * @var $cmsUserEmail CmsUserEmail
-         */
-        if ($cmsUserEmail = CmsUserEmail::find()->where(['value' => $email])->one())
-        {
-            if ($cmsUserEmail->user->active)
-            {
-                return $cmsUserEmail->user;
-            }
-        }
-
-        return null;
+        return static::findOne(['email' => $email, 'active' => Cms::BOOL_Y]);
     }
 
     /**
@@ -561,16 +469,7 @@ class User
      */
     public static function findByPhone($phone)
     {
-        /**
-         * @var $cmsUserPhone CmsUserPhone
-         */
-        if ($cmsUserPhone = CmsUserPhone::find()->where(['value' => $phone])->one())
-        {
-            if ($cmsUserPhone->user->active)
-            {
-                return $cmsUserPhone->user;
-            }
-        }
+        return static::findOne(['phone' => $email, 'active' => Cms::BOOL_Y]);
 
         return null;
     }
@@ -746,79 +645,6 @@ class User
             ]));
         }
     }
-
-
-    private $_email;
-    private $_phone;
-
-
-    /**
-     * @return string
-     */
-    public function setEmail($value)
-    {
-        $this->_email = $value;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function setPhone($value)
-    {
-        $this->_phone = $value;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function getCmsUserEmail()
-    {
-        $query = $this->getCmsUserEmails()->andWhere(['def' => Cms::BOOL_Y]);
-        $query->multiple = false;
-        return $query;
-    }
-
-
-
-    /**
-     * @return $this
-     */
-    public function getCmsUserPhone()
-    {
-        $query = $this->getCmsUserPhones()->andWhere(['def' => Cms::BOOL_Y]);
-        $query->multiple = false;
-        return $query;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getEmail()
-    {
-        if ($this->_email)
-        {
-            return $this->_email;
-        }
-
-        return $this->cmsUserEmail ? $this->cmsUserEmail->value : "";
-    }
-
-    /**
-     * @return string
-     */
-    public function getPhone()
-    {
-        if ($this->_phone)
-        {
-            return $this->_phone;
-        }
-
-        return $this->cmsUserPhone ? $this->cmsUserPhone->value : "";
-    }
-
 
 
 

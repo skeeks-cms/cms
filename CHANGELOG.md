@@ -1,9 +1,10 @@
 CHANGELOG
 ==============
 
-2.7.0.4.pre
+2.7.1.pre
 -----------------
- * Revert migrations
+ * Adding a field in the user table of email and phone
+ * Revert failed migrations
  * You can customize the grid AdminRelatedGridView
  * Disabled ajax response {test: test} to the sections and pages of content elements
  * Styling toolbar

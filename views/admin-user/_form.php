@@ -38,33 +38,21 @@ use common\models\User;
     </div>
 
 
+
     <div class="row">
         <div class="col-md-5">
             <?= $form->field($model, 'email')->textInput(); ?>
-
-            <? if ($model->email) : ?>
-
-                    <? if ($model->cmsUserEmail->approved !== \skeeks\cms\components\Cms::BOOL_Y) : ?>
-
-                        <? \yii\bootstrap\Alert::begin([
-                            'options' => [
-                              'class' => 'alert-warning',
-                          ],
-                        ]); ?>
-
-                            <?=\Yii::t('app','{email} not confirmed',['email' => 'Email'])?>
-                        <? \yii\bootstrap\Alert::end(); ?>
-
-                    <? else : ?>
-
-                    <? endif; ?>
-
+            <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+                <?= $form->field($model, 'email_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
             <? endif; ?>
         </div>
         <div class="col-md-5">
             <?= $form->field($model, 'phone')->textInput([
                 'placeholder' => '+7 903 722-28-73'
-            ])->hint(\Yii::t('app','Input format phone').': +7 903 722-28-73'); ?>
+            ]); ?>
+            <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+                <?= $form->field($model, 'phone_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
+            <? endif; ?>
         </div>
     </div>
 
