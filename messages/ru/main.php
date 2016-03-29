@@ -962,4 +962,6 @@ return
     "The ability to manage user groups"                          => "Вомзожность управлять группами пользователя",
     "Management will be available after saving"                          => "Управление будет доступно после сохранения",
 
+    "Email is approved"                          => "Email подтвержден",
+    "Phone is approved"                          => "Телефон подтвержден",
 ];

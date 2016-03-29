@@ -211,7 +211,7 @@ class User
             [['email'], 'email'],
 
             //[['username'], 'required'],
-            ['username', 'string', 'min' => 3, 'max' => 20],
+            ['username', 'string', 'min' => 3, 'max' => 25],
             [['username'], 'unique'],
             [['username'], \skeeks\cms\validators\LoginValidator::className()],
 

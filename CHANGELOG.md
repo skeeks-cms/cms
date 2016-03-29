@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.1.pre
 -----------------
+ * Minimal user name length is increased
  * Adding a field in the user table of email and phone
  * Revert failed migrations
  * You can customize the grid AdminRelatedGridView
