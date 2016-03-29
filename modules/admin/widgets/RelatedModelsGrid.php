@@ -92,7 +92,7 @@ class RelatedModelsGrid extends Widget
                 $id[] = $this->parentModel->className();
             }
 
-            $this->namespace = "adminRelatedGrid__" . md5(implode("_", $id));
+            $this->namespace = md5(serialize($id));
         }
     }
 
