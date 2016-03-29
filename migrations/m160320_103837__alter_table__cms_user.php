@@ -8,10 +8,18 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m220319_103837__alter_table__cms_user extends Migration
+class m160320_103837__alter_table__cms_user extends Migration
 {
     public function safeUp()
     {
+        //m220319_103837__alter_table__cms_user
+        if ($this->db->createCommand('SELECT * FROM migration WHERE version="m220319_103837__alter_table__cms_user"')->queryOne())
+        {
+            $this->db->createCommand()->delete('migration', 'version = "m220319_103837__alter_table__cms_user"')->execute();
+            return true;
+        }
+
+
         $this->dropIndex("city", "{{%cms_user}}");
         $this->dropIndex("address", "{{%cms_user}}");
 

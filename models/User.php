@@ -308,6 +308,7 @@ class User
                     }
                 }
             ],
+
             [['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value',
                 'filter' => function(ActiveQuery $query)
                 {
@@ -548,6 +549,26 @@ class User
             if ($cmsUserEmail->user->active)
             {
                 return $cmsUserEmail->user;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $phone
+     * @return null|CmsUser
+     */
+    public static function findByPhone($phone)
+    {
+        /**
+         * @var $cmsUserPhone CmsUserPhone
+         */
+        if ($cmsUserPhone = CmsUserPhone::find()->where(['value' => $phone])->one())
+        {
+            if ($cmsUserPhone->user->active)
+            {
+                return $cmsUserPhone->user;
             }
         }
 
