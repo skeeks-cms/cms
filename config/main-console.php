@@ -60,7 +60,6 @@ $config =
 
         'authManager' => [
             'class' => '\skeeks\cms\rbac\DbManager',
-            //'defaultRoles' => ['user'],
         ],
 
         //Админское меню

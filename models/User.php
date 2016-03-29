@@ -72,6 +72,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property UserAuthClient[]   $cmsUserAuthClients
  *
  * @property \yii\rbac\Role[]   $roles
+ * @property []   $roleNames
  *
  * @property string $displayName
  *
@@ -113,7 +114,6 @@ class User
         $this->on(self::EVENT_AFTER_UPDATE,     [$this, "_cmsAfterSave"]);
 
         $this->on(self::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "checkDataAfterInsert"]);
     }
 
     public function _cmsAfterSave($e)
@@ -157,32 +157,6 @@ class User
         if ($this->id == \Yii::$app->user->identity->id)
         {
             throw new Exception(\Yii::t('app','You can not delete yourself'));
-        }
-    }
-
-    /**
-     * После вставки пользователя, назначим ему необходимые роли
-     */
-    public function checkDataAfterInsert()
-    {
-        if ($this->_roleNames)
-        {
-            return false;
-        }
-
-        if (\Yii::$app->cms->registerRoles)
-        {
-            foreach (\Yii::$app->cms->registerRoles as $roleName)
-            {
-                if ($role = \Yii::$app->authManager->getRole($roleName))
-                {
-                    try
-                    {
-                        \Yii::$app->authManager->assign($role, $this->id);
-                    } catch(\Exception $e)
-                    {}
-                }
-            }
         }
     }
 
@@ -237,7 +211,7 @@ class User
             [['email'], 'email'],
 
             //[['username'], 'required'],
-            ['username', 'string', 'min' => 3, 'max' => 12],
+            ['username', 'string', 'min' => 3, 'max' => 20],
             [['username'], 'unique'],
             [['username'], \skeeks\cms\validators\LoginValidator::className()],
 
@@ -264,6 +238,7 @@ class User
             }],
 
             [['roleNames'], 'safe'],
+            [['roleNames'], 'default', 'value' => \Yii::$app->cms->registerRoles]
         ];
     }
 

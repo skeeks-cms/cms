@@ -32,6 +32,23 @@ class m160329_113837__update_data__cms_user extends Migration
                 }
             }
 
+            $data = \Yii::$app->db->createCommand('SELECT * FROM `cms_user_phone`')->queryAll();
+            if ($data)
+            {
+                foreach ($data as $row)
+                {
+                    if (ArrayHelper::getValue($row, 'value') && ArrayHelper::getValue($row, 'user_id') && (int) ArrayHelper::getValue($row, 'user_id') > 0)
+                    {
+                        \Yii::$app->db->createCommand()->update('cms_user', [
+                            'phone' => ArrayHelper::getValue($row, 'value')
+                        ], [
+                            'id' => ArrayHelper::getValue($row, 'user_id')
+                        ])->execute();
+                    }
+
+                }
+            }
+
             return true;
 
         } catch(\Exception $e)
