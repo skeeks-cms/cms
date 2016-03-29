@@ -4,6 +4,7 @@
     font: 11px Verdana, Arial, sans-serif;
     text-align: left;
     min-height: 40px;
+    color: black;
     overflow: auto;
     background: rgb(246,246,246);
     background: -moz-linear-gradient(top,  rgba(237,237,237,1) 0%, rgba(246,246,246,1) 53%, rgba(255,255,255,1) 100%);
