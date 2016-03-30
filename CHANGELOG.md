@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.7.1.1.pre
+-----------------
+ * Change filter element in content element grids
+
 2.7.1
 -----------------
  * Updated admin content elements in grids

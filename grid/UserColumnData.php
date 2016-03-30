@@ -31,17 +31,16 @@ class UserColumnData extends DataColumn
     {
         parent::init();
 
-        $this->filter = ArrayHelper::map(
+        /*$this->filter = ArrayHelper::map(
             \Yii::$app->cms->findUser()->all(),
             'id',
             'displayName'
-        );
+        );*/
 
-
-        /*$this->filter = \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
+        $this->filter = \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
             'model'             => $this->grid->filterModel,
             'attribute'         => $this->attribute,
-        ]);*/
+        ]);
     }
 
     /**

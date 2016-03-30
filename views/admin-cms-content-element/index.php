@@ -20,22 +20,23 @@ if ($content_id = \Yii::$app->request->get('content_id'))
      */
     $cmsContent = \skeeks\cms\models\CmsContent::findOne($content_id);
 }
-
-$columns = \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider);
-
 ?>
+<? $pjax = \yii\widgets\Pjax::begin(); ?>
 
-<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider'      => $dataProvider,
-    'filterModel'       => $searchModel,
-    'autoColumns'       => false,
-    'adminController'   => $controller,
-    'settingsData'  =>
-    [
-        'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
-    ],
-    'columns' => $columns
-]); ?>
+    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+        'dataProvider'      => $dataProvider,
+        'filterModel'       => $searchModel,
+        'autoColumns'       => false,
+        'pjax'              => $pjax,
+        'adminController'   => $controller,
+        'settingsData'  =>
+        [
+            'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
+        ],
+        'columns' => \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider)
+    ]); ?>
+
+<? \yii\widgets\Pjax::end() ?>
 
 <? \yii\bootstrap\Alert::begin([
     'options' => [

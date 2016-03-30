@@ -32,12 +32,16 @@ trait GridViewPjaxTrait
      */
     public $pjax;
 
+    protected $_pjaxCreated = false;
+
     public function pjaxBegin()
     {
         if ($this->enabledPjax)
         {
             if (!$this->pjax)
             {
+                $this->_pjaxCreated = true;
+
                 $pjaxClassName = $this->pjaxClassName;
 
                 $this->pjax = $pjaxClassName::begin(ArrayHelper::merge([
@@ -49,7 +53,7 @@ trait GridViewPjaxTrait
 
     public function pjaxEnd()
     {
-        if ($this->enabledPjax)
+        if ($this->enabledPjax && $this->_pjaxCreated)
         {
             $pjaxClassName = $this->pjax->className();
             $pjaxClassName::end();
