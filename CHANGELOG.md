@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.7.1.pre
+2.7.1
 -----------------
  * Updated admin content elements in grids
  * Minimal user name length is increased
