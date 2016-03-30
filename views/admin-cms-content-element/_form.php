@@ -196,7 +196,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <? if ($model->cmsContent->childrenContents) : ?>
 
     <?
-    $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_columns.php');
+
     /**
      * @var $content \skeeks\cms\models\CmsContent
      */
@@ -216,6 +216,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
             <? else:  ?>
                 <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                     'label'             => $childContent->name,
+                    'namespace'         => md5($model->className() . $childContent->id),
                     'parentModel'       => $model,
                     'relation'          => [
                         'content_id'                    => $childContent->id,
@@ -231,7 +232,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
                     'controllerRoute'   => 'cms/admin-cms-content-element',
                     'gridViewOptions'   => [
-                        'columns' => (array) include $columnsFile
+                        'columns' => (array) \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent)
                     ],
                 ]); ?>
 

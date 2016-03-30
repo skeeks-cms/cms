@@ -368,4 +368,267 @@ class AdminCmsContentElementController extends AdminModelEditorController
         ])->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
     }
 
+
+
+
+
+
+    /**
+     * @param CmsContent $cmsContent
+     * @return array
+     */
+    static public function getColumnsByContent($cmsContent = null, $dataProvider = null)
+    {
+        $autoColumns = [];
+
+        if (!$cmsContent)
+        {
+            return [];
+        }
+
+        $model = CmsContentElement::find()->where(['content_id' => $cmsContent->id])->one();
+
+        if (!$model)
+        {
+            $model = new CmsContentElement([
+                'content_id' => $cmsContent->id
+            ]);
+        }
+
+        if (is_array($model) || is_object($model))
+        {
+            foreach ($model as $name => $value) {
+                $autoColumns[] = [
+                    'attribute' => $name,
+                    'visible' => false,
+                    'format' => 'raw',
+                    'class' => \yii\grid\DataColumn::className(),
+                    'value' => function($model, $key, $index) use ($name)
+                    {
+                        if (is_array($model->{$name}))
+                        {
+                            return implode(",", $model->{$name});
+                        } else
+                        {
+                            return $model->{$name};
+                        }
+                    },
+                ];
+            }
+
+            $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
+            $searchRelatedPropertiesModel->initCmsContent($cmsContent);
+            $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+            if ($dataProvider)
+            {
+                $searchRelatedPropertiesModel->search($dataProvider);
+            }
+
+             /**
+             * @var $model \skeeks\cms\models\CmsContentElement
+             */
+            if ($model->relatedPropertiesModel)
+            {
+                foreach ($model->relatedPropertiesModel->toArray($model->relatedPropertiesModel->attributes()) as $name => $value) {
+
+
+                    $property = $model->relatedPropertiesModel->getRelatedProperty($name);
+                    $filter = '';
+
+                    if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
+                    {
+                        $propertyType = $property->createPropertyType();
+                            $options = \skeeks\cms\models\CmsContentElement::find()->active()->andWhere([
+                                'content_id' => $propertyType->content_id
+                            ])->all();
+
+                            $items = \yii\helpers\ArrayHelper::merge(['' => ''], \yii\helpers\ArrayHelper::map(
+                                $options, 'id', 'name'
+                            ));
+
+                        $filter = \yii\helpers\Html::activeDropDownList($searchRelatedPropertiesModel, $name, $items, ['class' => 'form-control']);
+
+                    } else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
+                    {
+                        $items = \yii\helpers\ArrayHelper::merge(['' => ''], \yii\helpers\ArrayHelper::map(
+                            $property->enums, 'id', 'value'
+                        ));
+
+                        $filter = \yii\helpers\Html::activeDropDownList($searchRelatedPropertiesModel, $name, $items, ['class' => 'form-control']);
+
+                    } else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING)
+                    {
+                        $filter = \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel, $name, [
+                            'class' => 'form-control'
+                        ]);
+                    }
+                    else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
+                    {
+                        $filter = "<div class='row'><div class='col-md-6'>" . \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel, $searchRelatedPropertiesModel->getAttributeNameRangeFrom($name), [
+                                        'class' => 'form-control',
+                                        'placeholder' => 'от'
+                                    ]) . "</div><div class='col-md-6'>" .
+                                        \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel, $searchRelatedPropertiesModel->getAttributeNameRangeTo($name), [
+                                        'class' => 'form-control',
+                                        'placeholder' => 'до'
+                                    ]) . "</div></div>"
+                                ;
+                    }
+
+                    $autoColumns[] = [
+                        'attribute' => $name,
+                        'label' => \yii\helpers\ArrayHelper::getValue($model->relatedPropertiesModel->attributeLabels(), $name),
+                        'visible' => false,
+                        'format' => 'raw',
+                        'filter' => $filter,
+                        'class' => \yii\grid\DataColumn::className(),
+                        'value' => function($model, $key, $index) use ($name)
+                        {
+                            /**
+                             * @var $model \skeeks\cms\models\CmsContentElement
+                             */
+                            $value = $model->relatedPropertiesModel->getSmartAttribute($name);
+                            if (is_array($value))
+                            {
+                                return implode(",", $value);
+                            } else
+                            {
+                                return $value;
+                            }
+                        },
+                    ];
+                }
+            }
+        }
+
+        return $autoColumns;
+    }
+
+
+    /**
+     * @param CmsContent $cmsContent
+     * @return array
+     */
+    static public function getDefaultColumns($cmsContent = null)
+    {
+        $columns = [
+            [
+                'class' => \skeeks\cms\grid\ImageColumn2::className(),
+            ],
+
+            'name',
+            ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+            [
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
+                'visible' => false
+            ],
+            [
+                'class' => \skeeks\cms\grid\PublishedAtColumn::className(),
+                'visible' => false
+            ],
+            [
+                'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+                'attribute' => "published_to",
+                'visible' => false
+            ],
+
+            ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
+            //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+
+            [
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function(\skeeks\cms\models\CmsContentElement $model)
+                {
+                    if (!$model->cmsTree)
+                    {
+                        return null;
+                    }
+
+                    $path = [];
+
+                    if ($model->cmsTree->parents)
+                    {
+                        foreach ($model->cmsTree->parents as $parent)
+                        {
+                            if ($parent->isRoot())
+                            {
+                                $path[] =  "[" . $parent->site->name . "] " . $parent->name;
+                            } else
+                            {
+                                $path[] =  $parent->name;
+                            }
+                        }
+                    }
+                    $path = implode(" / ", $path);
+                    return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
+                },
+                'format'    => 'raw',
+                'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
+                'attribute' => 'tree_id'
+            ],
+
+            [
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function(\skeeks\cms\models\CmsContentElement $model)
+                {
+                    $result = [];
+
+                    if ($model->cmsContentElementTrees)
+                    {
+                        foreach ($model->cmsContentElementTrees as $contentElementTree)
+                        {
+
+                            $site = $contentElementTree->tree->root->site;
+                            $result[] = "<small><a href='{$contentElementTree->tree->url}' target='_blank' data-pjax='0'>[{$site->name}]/.../{$contentElementTree->tree->name}</a></small>";
+
+                        }
+                    }
+
+                    return implode('<br />', $result);
+
+                },
+                'format' => 'raw',
+                'label' => \Yii::t('app','Additional sections'),
+                'visible' => false
+            ],
+
+            [
+                'attribute' => 'active',
+                'class' => \skeeks\cms\grid\BooleanColumn::className()
+            ],
+
+            [
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function(\skeeks\cms\models\CmsContentElement $model)
+                {
+
+                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
+                        'target' => '_blank',
+                        'title' => \Yii::t('app','Watch to site (opens new window)'),
+                        'data-pjax' => '0',
+                        'class' => 'btn btn-default btn-sm'
+                    ]);
+
+                },
+                'format' => 'raw'
+            ]
+        ];
+
+
+        return $columns;
+    }
+
+
+
+    /**
+     * @param CmsContent $model
+     * @return array
+     */
+    static public function getColumns($cmsContent = null, $dataProvider = null)
+    {
+        return \yii\helpers\ArrayHelper::merge(
+            static::getDefaultColumns($cmsContent),
+            static::getColumnsByContent($cmsContent, $dataProvider)
+        );
+    }
 }

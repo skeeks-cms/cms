@@ -107,6 +107,7 @@ class GridViewSettings extends Component
         if ($this->grid)
         {
             $columnsData = $this->grid->getColumnsKeyLabels();
+
             $url->setSystemParam('columns', $columnsData);
             $url->setSystemParam('selectedColumns', array_keys($this->grid->columns));
         }

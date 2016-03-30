@@ -11,126 +11,17 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 
 $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);
+
 if ($content_id = \Yii::$app->request->get('content_id'))
 {
     $dataProvider->query->andWhere(['content_id' => $content_id]);
-}
-
-
-$autoColumns = [];
-$model = \skeeks\cms\models\CmsContentElement::find()->where(['content_id' => $content_id])->one();
-
-
-
-if (is_array($model) || is_object($model))
-{
-    //Добавление колонок по моделе элемента
-    foreach ($model as $name => $value) {
-        $autoColumns[] = [
-            'attribute' => $name,
-            'visible' => false,
-            'format' => 'raw',
-            'class' => \yii\grid\DataColumn::className(),
-            'value' => function($model, $key, $index) use ($name)
-            {
-                if (is_array($model->{$name}))
-                {
-                    return implode(",", $model->{$name});
-                } else
-                {
-                    return $model->{$name};
-                }
-            },
-        ];
-    }
-
-    $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-    $searchRelatedPropertiesModel->initCmsContent($model->cmsContent);
-    $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
-    $searchRelatedPropertiesModel->search($dataProvider);
-
-     /**
-     * @var $model \skeeks\cms\models\CmsContentElement
+    /**
+     * @var $cmsContent \skeeks\cms\models\CmsContent
      */
-    if ($model->relatedPropertiesModel)
-    {
-        foreach ($model->relatedPropertiesModel->toArray($model->relatedPropertiesModel->attributes()) as $name => $value) {
-
-            $property = $model->relatedPropertiesModel->getRelatedProperty($name);
-            $filter = '';
-
-            if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
-            {
-                $propertyType = $property->createPropertyType();
-                    $options = \skeeks\cms\models\CmsContentElement::find()->active()->andWhere([
-                        'content_id' => $propertyType->content_id
-                    ])->all();
-
-                    $items = \yii\helpers\ArrayHelper::merge(['' => ''], \yii\helpers\ArrayHelper::map(
-                        $options, 'id', 'name'
-                    ));
-
-                $filter = \yii\helpers\Html::activeDropDownList($searchRelatedPropertiesModel, $name, $items, ['class' => 'form-control']);
-
-            } else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
-            {
-                $items = \yii\helpers\ArrayHelper::merge(['' => ''], \yii\helpers\ArrayHelper::map(
-                    $property->enums, 'id', 'value'
-                ));
-
-                $filter = \yii\helpers\Html::activeDropDownList($searchRelatedPropertiesModel, $name, $items, ['class' => 'form-control']);
-
-            } else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING)
-            {
-                $filter = \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel, $name, [
-                    'class' => 'form-control'
-                ]);
-            }
-            else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
-            {
-                $filter = "<div class='row'><div class='col-md-6'>" . \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel, $searchRelatedPropertiesModel->getAttributeNameRangeFrom($name), [
-                                'class' => 'form-control',
-                                'placeholder' => 'от'
-                            ]) . "</div><div class='col-md-6'>" .
-                                \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel, $searchRelatedPropertiesModel->getAttributeNameRangeTo($name), [
-                                'class' => 'form-control',
-                                'placeholder' => 'до'
-                            ]) . "</div></div>"
-                        ;
-            }
-
-
-
-            $autoColumns[] = [
-                'attribute' => $name,
-                'label' => \yii\helpers\ArrayHelper::getValue($model->relatedPropertiesModel->attributeLabels(), $name),
-                'visible' => false,
-                'format' => 'raw',
-                'filter' => $filter,
-                'class' => \yii\grid\DataColumn::className(),
-                'value' => function($model, $key, $index) use ($name)
-                {
-                    /**
-                     * @var $model \skeeks\cms\models\CmsContentElement
-                     */
-                    $value = $model->relatedPropertiesModel->getSmartAttribute($name);
-                    if (is_array($value))
-                    {
-                        return implode(",", $value);
-                    } else
-                    {
-                        return $value;
-                    }
-                },
-            ];
-        }
-    }
-
-
+    $cmsContent = \skeeks\cms\models\CmsContent::findOne($content_id);
 }
-$userColumns = include_once __DIR__ . "/_columns.php";
 
-$columns = \yii\helpers\ArrayHelper::merge($userColumns, $autoColumns);
+$columns = \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider);
 
 ?>
 

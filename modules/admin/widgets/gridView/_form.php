@@ -191,16 +191,18 @@ $this->registerJs(<<<JS
 
             _.each(this.get('selectedColumns'), function(value, key)
             {
-
-                $("<li>", {
-                    'data-value': value
-                }).text( $('option[value=' + value + ']', self.JQuerySelect).text() )
-                .on('dblclick', function()
+                if (value)
                 {
-                    $(this).remove();
-                    self.updateHiddenSelect();
-                })
-                .appendTo(self.JQueryVisibleSelected);
+                    $("<li>", {
+                        'data-value': value
+                    }).text( $('option[value=' + value + ']', self.JQuerySelect).text() )
+                    .on('dblclick', function()
+                    {
+                        $(this).remove();
+                        self.updateHiddenSelect();
+                    })
+                    .appendTo(self.JQueryVisibleSelected);
+                }
             });
         },
 

@@ -150,6 +150,7 @@ class RelatedModelsGrid extends Widget
             'pjaxOptions' => [
                 'id' => $pjaxId
             ],
+            'autoColumns' => false,
             /*"settingsData" =>
             [
                 'enabledPjaxPagination' => Cms::BOOL_Y

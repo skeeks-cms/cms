@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.1.pre
 -----------------
+ * Updated admin content elements in grids
  * Minimal user name length is increased
  * Adding a field in the user table of email and phone
  * Revert failed migrations
