@@ -85,6 +85,7 @@ class Storage extends Component
 
             curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl_session, CURLOPT_BINARYTRANSFER, true);
+            curl_setopt($curl_session, CURLOPT_FOLLOWLOCATION, true);
 
             $file_content = curl_exec($curl_session);
 

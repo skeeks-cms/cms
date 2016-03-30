@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.1.1.pre
 -----------------
+ * Remote download link files option is enabled CURLOPT_FOLLOWLOCATION
  * Change filter element in content element grids
 
 2.7.1
