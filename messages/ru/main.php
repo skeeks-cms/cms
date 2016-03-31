@@ -964,4 +964,7 @@ return
 
     "Email is approved"                          => "Email подтвержден",
     "Phone is approved"                          => "Телефон подтвержден",
+
+    "The maximum number of records per page"                          => "Допустимое количество записей на странице",
+    "The minimum number of records per page"                          => "Минимально допустимое количество записей на странице",
 ];

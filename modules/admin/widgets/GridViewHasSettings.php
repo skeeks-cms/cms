@@ -334,6 +334,7 @@ JS
 
         $this->dataProvider->getPagination()->defaultPageSize   = (int) $this->settings->pageSize;
         $this->dataProvider->getPagination()->pageParam         = $this->settings->pageParamName;
+        $this->dataProvider->getPagination()->pageSizeLimit     = [$this->settings->pageSizeLimitMin, $this->settings->pageSizeLimitMax];
 
         if ($this->settings->orderBy)
         {

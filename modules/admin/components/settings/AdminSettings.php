@@ -58,6 +58,8 @@ class AdminSettings extends Component
     //Настройки таблиц
     public $enabledPjaxPagination       = Cms::BOOL_Y;
     public $pageSize                    =   10;
+    public $pageSizeLimitMin            =   1;
+    public $pageSizeLimitMax            =   500;
     public $pageParamName               =   "page";
 
     //Настройки ckeditor
@@ -146,6 +148,8 @@ class AdminSettings extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['languageCode', 'pageParamName', 'enabledPjaxPagination'], 'string'],
             [['pageSize'], 'integer'],
+            [['pageSizeLimitMin'], 'integer'],
+            [['pageSizeLimitMax'], 'integer'],
             [['ckeditorCodeSnippetGeshi'], 'string'],
             [['ckeditorCodeSnippetTheme'], 'string'],
             [['enableCustomConfirm', 'enableCustomPromt', 'pageSize'], 'string'],
@@ -168,6 +172,8 @@ class AdminSettings extends Component
             'enabledPjaxPagination'             => \Yii::t('app','Turning ajax navigation'),
             'pageParamName'                     => \Yii::t('app','Parameter name pages, pagination'),
             'pageSize'                          => \Yii::t('app','Number of records on one page'),
+            'pageSizeLimitMin'                  => \Yii::t('app','The maximum number of records per page'),
+            'pageSizeLimitMax'                  => \Yii::t('app','The minimum number of records per page'),
 
             'ckeditorPreset'                    => \Yii::t('app','Instruments'),
             'ckeditorSkin'                      => \Yii::t('app','Theme of formalization'),

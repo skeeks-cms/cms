@@ -10,6 +10,8 @@
     <?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
         <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
         <?= $form->fieldInputInt($model, 'pageSize'); ?>
+        <?= $form->fieldInputInt($model, 'pageSizeLimitMin'); ?>
+        <?= $form->fieldInputInt($model, 'pageSizeLimitMax'); ?>
         <?= $form->field($model, 'pageParamName')->textInput(); ?>
     <?= $form->fieldSetEnd(); ?>
 

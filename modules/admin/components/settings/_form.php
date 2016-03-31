@@ -27,6 +27,8 @@ use yii\helpers\Html;
 <?= $form->fieldSet(\Yii::t('app','Setting tables')); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
     <?= $form->fieldInputInt($model, 'pageSize'); ?>
+    <?= $form->fieldInputInt($model, 'pageSizeLimitMin'); ?>
+    <?= $form->fieldInputInt($model, 'pageSizeLimitMax'); ?>
     <?= $form->field($model, 'pageParamName')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 

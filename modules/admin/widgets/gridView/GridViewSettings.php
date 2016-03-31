@@ -30,6 +30,10 @@ class GridViewSettings extends Component
      * @var int
      */
     public $pageSize;
+
+    public $pageSizeLimitMin;
+    public $pageSizeLimitMax;
+
     /**
      * @var string
      */
@@ -54,6 +58,8 @@ class GridViewSettings extends Component
     public function init()
     {
         $this->pageSize                 = \Yii::$app->admin->pageSize;
+        $this->pageSizeLimitMin         = \Yii::$app->admin->pageSizeLimitMin;
+        $this->pageSizeLimitMax         = \Yii::$app->admin->pageSizeLimitMax;
         $this->pageParamName            = \Yii::$app->admin->pageParamName;
         $this->enabledPjaxPagination    = \Yii::$app->admin->enabledPjaxPagination;
 
@@ -67,6 +73,8 @@ class GridViewSettings extends Component
             'enabledPjaxPagination'     => \Yii::t('app','Inclusion {ajax} navigation',['ajax' => 'ajax']),
             'pageParamName'             => \Yii::t('app','Parameter name pages, pagination'),
             'pageSize'                  => \Yii::t('app','Number of records on one page'),
+            'pageSizeLimitMin'          => \Yii::t('app','The maximum number of records per page'),
+            'pageSizeLimitMax'          => \Yii::t('app','The minimum number of records per page'),
 
             'orderBy'                   => \Yii::t('app','Sort by what parameter'),
             'order'                     => \Yii::t('app','sorting direction'),
@@ -81,7 +89,9 @@ class GridViewSettings extends Component
         [
             [['enabledPjaxPagination'], 'string'],
             [['pageParamName'], 'string'],
-            [['pageSize'], 'string'],
+            [['pageSize'], 'integer'],
+            [['pageSizeLimitMin'], 'integer'],
+            [['pageSizeLimitMax'], 'integer'],
             [['orderBy'], 'string'],
             [['order'], 'integer'],
             [['visibleColumns'], 'safe'],
