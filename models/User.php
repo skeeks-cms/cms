@@ -205,6 +205,7 @@ class User
             [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::className()],
             [['phone'], 'unique'],
+            [['phone', 'email'], 'default', 'value' => null],
 
 
             [['email'], 'unique'],

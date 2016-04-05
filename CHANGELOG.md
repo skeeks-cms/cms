@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.1.1.pre
 -----------------
+ * Fixed user edit bugs
  * Added the ability to configure the maximum and minimum display records in tables
  * Remote download link files option is enabled CURLOPT_FOLLOWLOCATION
  * Change filter element in content element grids

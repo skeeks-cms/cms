@@ -75,8 +75,9 @@ use yii\widgets\ActiveForm;
  *
  * @property CmsLang[]                          $languages
  *
- * @property \skeeks\cms\modules\admin\Module            $moduleAdmin
- * @property \skeeks\cms\Module                          $moduleCms
+ * @property \skeeks\cms\modules\admin\Module   $moduleAdmin
+ * @property \skeeks\cms\Module                 $moduleCms
+ * @property CmsLang                            $cmsLanguage
  *
  * @package skeeks\cms\components
  */
@@ -1067,5 +1068,14 @@ $fileContent .= '];';
         }
 
         return new ComposerHelper();
+    }
+
+
+    /**
+     * @return array|null|CmsLang
+     */
+    public function getCmsLanguage()
+    {
+        return CmsLang::find()->where(['code' => $this->languageCode])->one();
     }
 }
