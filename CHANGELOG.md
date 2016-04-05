@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.7.1.1.pre
+2.7.1.1
 -----------------
  * Fixed user edit bugs
  * Added the ability to configure the maximum and minimum display records in tables
