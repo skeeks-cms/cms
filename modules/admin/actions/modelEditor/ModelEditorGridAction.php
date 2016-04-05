@@ -103,10 +103,6 @@ class ModelEditorGridAction extends AdminModelEditorAction
             'gridConfig' => $gridConfig
         ];
 
-
-
-
-
         return parent::run();
     }
 
@@ -125,6 +121,7 @@ class ModelEditorGridAction extends AdminModelEditorAction
             $result = parent::render($viewName);
         } catch (\Exception $e)
         {
+            \Yii::error($e->getMessage(), 'template-render');
             $result = $this->controller->render("@skeeks/cms/modules/admin/views/base-actions/grid-standart", (array) $this->viewParams);
         }
 
