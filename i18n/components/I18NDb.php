@@ -56,7 +56,7 @@ class I18NDb extends I18N
 
     public static function handleMissingTranslation(MissingTranslationEvent $event)
     {
-        \Yii::info("@DB: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @");
+        \Yii::info("@DB: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @", self::className() . "::handleMissingTranslation");
 
         $driver = \Yii::$app->getDb()->getDriverName();
         $caseInsensitivePrefix = $driver === 'mysql' ? 'binary' : '';
@@ -70,7 +70,7 @@ class I18NDb extends I18N
 
         if (!$sourceMessage)
         {
-            \Yii::info("@WRITE TO DB: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @");
+            \Yii::info("@WRITE TO DB: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @", self::className() . "::handleMissingTranslation");
 
             $sourceMessage = new SourceMessage();
             $sourceMessage->setAttributes([

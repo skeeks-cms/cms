@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.7.1.2.pre
+-----------------
+ * Update log message group
+
 2.7.1.1
 -----------------
  * Fixed user edit bugs
