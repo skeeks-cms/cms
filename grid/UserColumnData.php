@@ -37,10 +37,14 @@ class UserColumnData extends DataColumn
             'displayName'
         );*/
 
-        $this->filter = \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
-            'model'             => $this->grid->filterModel,
-            'attribute'         => $this->attribute,
-        ]);
+        if ($this->grid->filterModel && $this->attribute)
+        {
+            $this->filter = \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
+                'model'             => $this->grid->filterModel,
+                'attribute'         => $this->attribute,
+            ]);
+        }
+
     }
 
     /**

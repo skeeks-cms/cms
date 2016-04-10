@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-2.7.1.2.pre
+2.7.1.2
 -----------------
+ * Fixed user column data
  * Update log message group
 
 2.7.1.1
