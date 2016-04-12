@@ -90,9 +90,16 @@ $sortableString = [];
                                             ]);
 
                                             $cmsWidgetData = \yii\helpers\Json::encode($cmsWidgetData);
+
+                                            $openClose = \Yii::t('app', 'Expand/Collapse');
+
                                         $actions = <<<HTML
 <a href="#sx-permissions-for-controller" onclick='sx.Dashboard.editConfigWidget({$cmsWidgetData}); return false;'>
     <i class="glyphicon glyphicon-cog" data-sx-widget="tooltip-b" data-original-title="Настроить" style="color: white;"></i>
+</a>
+
+<a href="#" class="sx-btn-trigger-full">
+    <i class="glyphicon glyphicon-fullscreen" data-sx-widget="tooltip-b" data-original-title="{$openClose}" style="color: white;"></i>
 </a>
 
 <a href="#sx-permissions-for-controller" onclick='sx.Dashboard.removeWidget({$cmsWidgetData}); return false;'>

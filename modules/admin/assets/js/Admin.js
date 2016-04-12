@@ -26,7 +26,7 @@
             this.readyWindowTrigger = false;
             var self = this;
             //Если window не будет готово через 200 мс, покажем загрузку.
-            _.delay(function()
+            /*_.delay(function()
             {
                 if (self.readyWindowTrigger === false)
                 {
@@ -36,7 +36,7 @@
                     });
                 }
 
-            }, 200);
+            }, 200);*/
         },
 
         _onWindowReady: function()
@@ -44,7 +44,7 @@
             var self = this;
             this.readyWindowTrigger = true;
 
-            _.defer(function()
+            /*_.defer(function()
             {
                 $(".sx-show-onWindowReady").slideDown(300, function()
                 {});
@@ -57,7 +57,7 @@
                     self.onWindowReadyBlocker.unblock();
                 }
 
-            }, 200);
+            }, 200);*/
 
         },
 

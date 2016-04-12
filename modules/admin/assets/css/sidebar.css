@@ -12,16 +12,6 @@
     width: 270px;
 }
 
-.sx-bg-glass
-{
-    background: rgba(208, 208, 208, 0.32);
-}
-
-.sx-bg-glass-hover:hover
-{
-    background: rgba(208, 208, 208, 0.5);
-}
-
     .sx-sidebar .sidebar-collapse
     {
         margin-bottom: 70px;

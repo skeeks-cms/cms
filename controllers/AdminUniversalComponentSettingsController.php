@@ -9,7 +9,6 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\StringHelper;
-use skeeks\cms\models\TreeMenu;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use yii\helpers\Json;

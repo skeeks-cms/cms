@@ -282,7 +282,7 @@ trait HasComponentDbSettingsTrait
             }
         }
 
-        return UrlHelper::construct('cms/admin-component-settings/index', [
+        return UrlHelper::construct('/cms/admin-component-settings/index', [
             'componentClassName'                => $this->className(),
             'attributes'                        => $attributes,
             'componentNamespace'                => $this->namespace,

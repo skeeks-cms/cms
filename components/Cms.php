@@ -419,19 +419,6 @@ class Cms extends \skeeks\cms\base\Component
             $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
         }
 
-        /*if ($this->debugEnabled === self::BOOL_Y)
-        {*/
-            /**
-             * @var $debugModule \yii\debug\Module
-             */
-            /*if (\Yii::$app->has('debug'))
-            {
-                $debugModule = \Yii::$app->getModule('debug');
-                $debugModule->allowedIPs = explode(',', $this->debugAllowedIPs);
-                $debugModule->bootstrap(\Yii::$app);
-            }
-        }*/
-
         if ($this->enabledHttpAuth == self::BOOL_Y)
         {
             $this->executeHttpAuth();

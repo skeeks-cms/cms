@@ -122,5 +122,36 @@ HTML;
     {
             echo Html::endTag('div');
         echo Html::endTag('div');
+
+        self::registerJs();
+    }
+
+    static protected $_isRegisteredJs = null;
+
+    static public function registerJs()
+    {
+        if (self::$_isRegisteredJs === true)
+        {
+            return false;
+        }
+
+        self::$_isRegisteredJs = true;
+
+        \Yii::$app->view->registerJs(<<<JS
+        $(".sx-btn-trigger-full").on('click', function()
+        {
+            var panel = $(this).closest('.sx-panel');
+            if (panel.hasClass('sx-panel-full'))
+            {
+                 panel.removeClass('sx-panel-full');
+            } else
+            {
+                panel.addClass('sx-panel-full');
+            }
+
+            return false;
+        });
+JS
+);
     }
 }

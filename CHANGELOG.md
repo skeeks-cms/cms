@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.2.pre
 -----------------
+ * Removed skeeks\cms\models\TreeMenu
  * Rewrite admin actions
  * Removed skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction
 

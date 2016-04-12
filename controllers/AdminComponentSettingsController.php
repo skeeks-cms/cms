@@ -14,6 +14,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use yii\base\ActionEvent;
+use yii\base\Theme;
 use yii\base\UserException;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -77,6 +78,19 @@ class AdminComponentSettingsController extends AdminController
             }*/
 
             $this->_component = $component;
+
+            //TODO: Добавить возможность настройки
+            \Yii::$app->view->theme = new Theme([
+                'pathMap' =>
+                [
+                    '@app/views' =>
+                    [
+                        '@skeeks/cms/modules/admin/views',
+                    ]
+                ]
+            ]);
+
+            \Yii::$app->language = \Yii::$app->admin->languageCode;
 
             return true;
         } else {

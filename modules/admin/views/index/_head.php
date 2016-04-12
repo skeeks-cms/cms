@@ -7,19 +7,8 @@ $modelWidget = new \skeeks\cms\models\CmsDashboardWidget();
 $modelWidget->cms_dashboard_id = $dashboard->id;
 $model->columns = 1;
 
-$this->registerCss(<<<CSS
-.sx-dashboard-head
-{
-    padding: 10px 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.46);
-}
-
-
-
-CSS
-);
 ?>
-<div class="row sx-dashboard-head sx-bg-glass sx-bg-glass-hover">
+<div class="row sx-main-head sx-bg-glass sx-bg-glass-hover">
     <div class="col-md-6 pull-left">
         <a href="#sx-dashboard-create" class="btn btn-default btn-primary sx-fancybox"><i class="glyphicon glyphicon-plus"></i> <?= \Yii::t('app', 'Add dashboard'); ?></a>
     </div>

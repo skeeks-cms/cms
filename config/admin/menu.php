@@ -251,12 +251,6 @@ return
                     ],
 
                     [
-                        "label"     => \Yii::t('app',"Section markers"),
-                        "url"       => ["cms/admin-tree-menu"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.tree.menu.png']
-                    ],
-
-                    [
                         "label"     => \Yii::t('app',"Server file storage"),
                         "url"       => ["cms/admin-storage/index"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],
