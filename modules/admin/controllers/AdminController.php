@@ -29,24 +29,21 @@ use yii\behaviors\BlameableBehavior;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\Inflector;
+use yii\web\Application;
 use yii\web\ForbiddenHttpException;
 
 /**
- * @property AdminAction[]      $actions
  * @property string             $permissionName
  *
  * Class AdminController
  * @package skeeks\cms\modules\admin\controllers
  */
-abstract class AdminController extends Controller
+abstract class AdminController extends \yii\web\Controller
 {
-    const EVENT_INIT                   = 'event.adminController.init';
+    const EVENT_INIT                    = 'event.adminController.init';
 
-    /**
-     * @var null
-     * @see parrent::$beforeRender
-     */
-    public $beforeRender    = null;
+    const LAYOUT_EMPTY                  = 'main-empty';
+    const LAYOUT_MAIN                   = 'main';
 
     /**
      * @var string Понятное название контроллера, будет добавлено в хлебные крошки и title страницы
@@ -54,20 +51,7 @@ abstract class AdminController extends Controller
     public $name           = '';
 
     /**
-     * @var null|AdminAction[]
-     */
-    protected $_actions    = null;
-
-    /**
-     * После инициализации, контроллера, любой компонент, может добавить свои дейсвия, они будут добавлены к текущим дейсвоиям контроллера.
-     * @see init()
-     * @see actions()
-     * @var array
-     */
-    public $eventActions = [];
-
-
-    /**
+     * The name of the privilege of access to this controller
      * @return string
      */
     public function getPermissionName()
@@ -154,26 +138,12 @@ abstract class AdminController extends Controller
     public function init()
     {
         parent::init();
-
-        self::onceInit();
+        static::onceInit();
 
         if (!$this->name)
         {
             $this->name = \Yii::t('app','The name of the controller'); //Inflector::humanize($this->id);
         }
-
-        //TODO: Добавить возможность настройки
-        /*\Yii::$app->view->theme = new Theme([
-            'pathMap' =>
-            [
-                '@app/views' =>
-                [
-                    '@skeeks/cms/modules/admin/views',
-                ]
-            ]
-        ]);*/
-
-        $this->layout = \Yii::$app->cms->moduleAdmin->layout;
 
         \Yii::$app->trigger(self::EVENT_INIT, new AdminInitEvent([
             'name'          => self::EVENT_INIT,
@@ -181,7 +151,15 @@ abstract class AdminController extends Controller
         ]));
     }
 
+    /**
+     * @var bool
+     */
     static private $_onceInit = false;
+
+    /**
+     * A one-time initialization of one scenario
+     * @return bool
+     */
     static public function onceInit()
     {
         if (self::$_onceInit === true)
@@ -191,56 +169,78 @@ abstract class AdminController extends Controller
 
         \Yii::$app->cmsMarkeplace->info;
 
+        //TODO: Добавить возможность настройки
+        \Yii::$app->view->theme = new Theme([
+            'pathMap' =>
+            [
+                '@app/views' =>
+                [
+                    '@skeeks/cms/modules/admin/views',
+                ]
+            ]
+        ]);
+
+        \Yii::$app->cms->moduleAdmin;
+
+        //Если http авторизация на сайте отключена а в админке включена
+        if (\Yii::$app->cms->enabledHttpAuth  == "N" && \Yii::$app->cms->enabledHttpAuthAdmin == "Y")
+        {
+            \Yii::$app->cms->executeHttpAuth();
+        }
+
         self::$_onceInit = true;
     }
+
     /**
-     * @return array
+     * @param \yii\base\Action $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
      */
-    public function actions()
+    public function beforeAction($action)
     {
-        return ArrayHelper::merge($this->eventActions, []);
+        $this->_initMetaData();
+        $this->_initBreadcrumbsData();
+
+        return parent::beforeAction($action);
     }
 
     /**
-     * Массив объектов действий доступных для текущего контроллера
-     * Используется при построении меню.
-     * @see ControllerActions
-     * @return AdminAction[]
+     * @return $this
      */
-    public function getActions()
+    protected function _initMetaData()
     {
-        if ($this->_actions !== null)
+        $data = [];
+        $data[] = \Yii::$app->name;
+        $data[] = $this->name;
+
+        if ($this->action && property_exists($this->action, 'name'))
         {
-            return $this->_actions;
+            $data[] = $this->action->name;
         }
-
-        $actions = $this->actions();
-
-        if ($actions)
-        {
-            foreach ($actions as $id => $data)
-            {
-                $action                 = $this->createAction($id);
-
-                if ($action->isVisible())
-                {
-                    $this->_actions[$id]    = $action;
-                }
-            }
-        } else
-        {
-            $this->_actions = [];
-        }
-
-        //Сортировка по приоритетам
-        if ($this->_actions)
-        {
-            ArrayHelper::multisort($this->_actions, 'priority');
-
-        }
-
-        return $this->_actions;
+        $this->view->title = implode(" / ", $data);
+        return $this;
     }
 
+    /**
+     * @return $this
+     */
+    protected function _initBreadcrumbsData()
+    {
+        $baseRoute = $this->module instanceof Application ? $this->id : ("/" . $this->module->id . "/" . $this->id);
 
+        if ($this->name)
+        {
+            $this->view->params['breadcrumbs'][] = [
+                'label' => $this->name,
+                'url' => UrlHelper::constructCurrent()->setRoute($baseRoute. '/' . $this->defaultAction)->enableAdmin()->toString()
+            ];
+        }
+
+        if ($this->action && property_exists($this->action, 'name'))
+        {
+             $this->view->params['breadcrumbs'][] = $this->action->name;
+        }
+
+        return $this;
+    }
 }

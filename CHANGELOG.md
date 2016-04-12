@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+2.7.2.pre
+-----------------
+ * Rewrite admin actions
+ * Removed skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction
+
 2.7.1.2
 -----------------
  * Fixed column ids

@@ -20,8 +20,27 @@ if ($content_id = \Yii::$app->request->get('content_id'))
      */
     $cmsContent = \skeeks\cms\models\CmsContent::findOne($content_id);
 }
+
+$filter = new \yii\base\DynamicModel([
+    'query',
+]);
+
+$filter->addRule('query', 'string');
+
 ?>
 <? $pjax = \yii\widgets\Pjax::begin(); ?>
+
+    <? $form = \skeeks\cms\base\widgets\ActiveForm::begin([
+        'method' => 'get',
+        //'usePjax' => false,
+        'enableAjaxValidation' => false,
+        /*'options' =>
+        [
+            'data-pjax' => true
+        ]*/
+    ]); ?>
+        <?/*= $form->field($filter, 'query'); */?>
+    <? $form::end(); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
         'dataProvider'      => $dataProvider,

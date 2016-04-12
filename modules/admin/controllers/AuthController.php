@@ -209,7 +209,8 @@ class AuthController extends AdminController
     public function actionAuth()
     {
         $this->view->title = \Yii::t('app','Authorization');
-        $this->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized.php';
+
+        $this->layout = 'unauthorized';
 
         $goUrl = "";
         $loginModel             = new LoginFormUsernameOrEmail();

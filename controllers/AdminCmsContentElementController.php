@@ -55,26 +55,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $actions = ArrayHelper::merge(parent::actions(),
             [
 
-                'index' =>
-                [
-                    "dataProviderCallback" => function(ActiveDataProvider $dataProvider)
-                    {
-                        $query = $dataProvider->query;
-                        /**
-                         * @var ActiveQuery $query
-                         */
-                        //$query->select(['app_company.*', 'count(`app_company_officer_user`.`id`) as countOfficer']);
-
-                        $query->with('image');
-                        $query->with('cmsTree');
-                        $query->with('cmsContentElementTrees');
-                        $query->with('cmsContent');
-                        $query->with('relatedProperties');
-                        $query->with('relatedElementProperties');
-                        $query->with('cmsContentElementTrees.tree');
-                    },
-                ],
-
                 "create" =>
                 [
                     'class'         => AdminModelEditorCreateAction::className(),
@@ -86,13 +66,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'class'         => AdminOneModelEditAction::className(),
                     "callback"      => [$this, 'update'],
                 ],
-
-                /*'settings' =>
-                [
-                    'class'         => AdminModelEditorAction::className(),
-                    'name'          => 'Настройки',
-                    "icon"          => "glyphicon glyphicon-cog",
-                ],*/
 
                 "activate-multi" =>
                 [
@@ -567,7 +540,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 'attribute' => 'tree_id'
             ],
 
-            [
+            'additionalSections' => [
                 'class'     => \yii\grid\DataColumn::className(),
                 'value'     => function(\skeeks\cms\models\CmsContentElement $model)
                 {

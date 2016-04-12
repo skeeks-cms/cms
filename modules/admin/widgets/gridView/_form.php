@@ -7,21 +7,6 @@
  */
 /* @var $this yii\web\View */
 ?>
-    <?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
-        <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
-        <?= $form->fieldInputInt($model, 'pageSize'); ?>
-        <?= $form->fieldInputInt($model, 'pageSizeLimitMin'); ?>
-        <?= $form->fieldInputInt($model, 'pageSizeLimitMax'); ?>
-        <?= $form->field($model, 'pageParamName')->textInput(); ?>
-    <?= $form->fieldSetEnd(); ?>
-
-    <?= $form->fieldSet(\Yii::t('app','Priority')); ?>
-        <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
-        <?= $form->fieldSelect($model, 'order', [
-            SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
-            SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
-        ]); ?>
-    <?= $form->fieldSetEnd(); ?>
 
     <? $columns         = \skeeks\cms\helpers\UrlHelper::constructCurrent()->getSystem('columns'); ?>
     <? $selectedColumns = \skeeks\cms\helpers\UrlHelper::constructCurrent()->getSystem('selectedColumns'); ?>
@@ -60,6 +45,24 @@
 
         <?= $form->fieldSetEnd(); ?>
     <? endif; ?>
+
+    <?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
+        <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
+        <?= $form->fieldInputInt($model, 'pageSize'); ?>
+        <?= $form->fieldInputInt($model, 'pageSizeLimitMin'); ?>
+        <?= $form->fieldInputInt($model, 'pageSizeLimitMax'); ?>
+        <?= $form->field($model, 'pageParamName')->textInput(); ?>
+    <?= $form->fieldSetEnd(); ?>
+
+    <?= $form->fieldSet(\Yii::t('app','Priority')); ?>
+        <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
+        <?= $form->fieldSelect($model, 'order', [
+            SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
+            SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
+        ]); ?>
+    <?= $form->fieldSetEnd(); ?>
+
+
 
 <?
 

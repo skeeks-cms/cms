@@ -26,19 +26,16 @@ class AdminFileManagerController extends AdminController
 {
     public function init()
     {
-        $this->name                   = "Файловый менеджер";
+        if (!$this->name)
+        {
+            $this->name                   = "Файловый менеджер";
+        }
+
         parent::init();
     }
 
-    public function actions()
+    public function actionIndex()
     {
-        return
-        [
-            "index" =>
-            [
-                "class"        => AdminAction::className(),
-                "name"         => "Файловый менеджер",
-            ],
-        ];
+        return $this->render($this->action->id);
     }
 }

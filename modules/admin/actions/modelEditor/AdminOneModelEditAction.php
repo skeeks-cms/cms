@@ -51,55 +51,15 @@ class AdminOneModelEditAction extends AdminModelEditorAction
         ]);
     }
 
-    /**
-     * Инициализация данных для заголовков страницы
-     *
-     * @return $this
-     */
-    protected function _initMetadata()
+    public function run()
     {
-        $this->controller->view->title = $this->controller->model->{$this->controller->modelShowAttribute} . " / " . $this->name . " / " . $this->controller->name;
-        return $this;
+        if (!$this->controller->model)
+        {
+            return $this->controller->redirect($this->controller->indexUrl);
+        }
+
+        return parent::run();
     }
-
-    /**
-     * Формируем данные для хлебных крошек.
-     * Эти данные в layout - е будут передаваться в нужный виджет.
-     *
-     * @return $this
-     */
-    protected function _initBreadcrumbsData()
-    {
-        $baseRoute = $this->controller->module instanceof Application ? $this->controller->id : ("/" . $this->controller->module->id . "/" . $this->controller->id);
-
-        if ($this->controller->name)
-        {
-            $this->controller->view->params['breadcrumbs'][] = [
-                'label' => $this->controller->name,
-                'url' => $this->controller->getIndexUrl()
-            ];
-        }
-
-        if ($this->controller->model)
-        {
-            $this->controller->view->params['breadcrumbs'][] = [
-                'label' => $this->controller->model->{$this->controller->modelShowAttribute},
-                'url' => UrlHelper::constructCurrent()->setRoute($baseRoute . '/' . $this->controller->modelDefaultAction)->set(
-                    $this->controller->requestPkParamName, $this->controller->model->{$this->controller->modelPkAttribute}
-                )->enableAdmin()->normalizeCurrentRoute()->toString()
-            ];
-        }
-
-
-        if (count($this->controller->actions) > 1)
-        {
-            $this->controller->view->params['breadcrumbs'][] = $this->name;
-        }
-
-        return $this;
-    }
-
-
     /**
      * @return UrlHelper
      */

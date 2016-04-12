@@ -33,6 +33,7 @@ use skeeks\cms\modules\admin\controllers\helpers\ActionModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
+use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\modules\admin\widgets\ControllerModelActions;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\ActionEvent;
@@ -51,6 +52,8 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
+ * @property string $indexUrl
+ * @property AdminAction[] $actions
  * @property \yii\db\ActiveRecord $model
  *
  * Class AdminModelEditorController
@@ -245,26 +248,11 @@ class AdminModelEditorController extends AdminController
      */
     public function beforeAction($action)
     {
-        if (parent::beforeAction($action))
-        {
-            if ($action instanceof AdminOneModelEditAction)
-            {
-                if (($this->model !== null))
-                {
-                    return true;
-                } else
-                {
-                    //throw new NotFoundHttpException('Не найдено');
-                    $this->redirect($this->getIndexUrl());
-                }
-            }
+        $this->_initActionsData();
 
-            return true;
-        } else
-        {
-            return false;
-        }
+        return parent::beforeAction($action);
     }
+
 
     /**
      * @return ActiveRecord
@@ -275,12 +263,12 @@ class AdminModelEditorController extends AdminController
         if ($this->_model === null)
         {
             $pk             = \Yii::$app->request->get($this->requestPkParamName);
+
             if ($pk)
             {
                 $modelClass     = $this->modelClassName;
                 $this->_model   = $modelClass::findOne($pk);
             }
-
         }
 
         return $this->_model;
@@ -338,6 +326,89 @@ class AdminModelEditorController extends AdminController
 
         return $this->_multiActions;
     }
+
+
+    /**
+     * Рендер действий текущего контроллера
+     * Сразу запускаем нужный виджет и формируем готовый html
+     *
+     * @return $this
+     */
+    protected function _initActionsData()
+    {
+        if (count($this->actions) > 1)
+        {
+            $this->view->params["actions"] = ControllerActions::begin([
+                "activeActionId"        => $this->action->id,
+                "controller"            => $this,
+            ])->run();
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return $this
+     */
+    protected function _initMetaData()
+    {
+        $data = [];
+        $data[] = \Yii::$app->name;
+        $data[] = $this->name;
+
+        if ($this->action instanceof AdminOneModelEditAction)
+        {
+            $data[] = $this->model->{$this->modelShowAttribute};
+        }
+
+        if ($this->action && property_exists($this->action, 'name'))
+        {
+            $data[] = $this->action->name;
+        }
+        $this->view->title = implode(" / ", $data);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _initBreadcrumbsData()
+    {
+        $baseRoute = $this->module instanceof Application ? $this->id : ("/" . $this->module->id . "/" . $this->id);
+
+        if ($this->name)
+        {
+            $this->view->params['breadcrumbs'][] = [
+                'label' => $this->name,
+                'url' => UrlHelper::constructCurrent()->setRoute($baseRoute. '/' . $this->defaultAction)->enableAdmin()->toString()
+            ];
+        }
+
+        if ($this->action instanceof AdminOneModelEditAction)
+        {
+            $this->view->params['breadcrumbs'][] = [
+                'label' => $this->model->{$this->modelShowAttribute},
+                'url' => UrlHelper::constructCurrent()->setRoute($baseRoute . '/' . $this->modelDefaultAction)->set(
+                    $this->requestPkParamName, $this->model->{$this->modelPkAttribute}
+                )->enableAdmin()->normalizeCurrentRoute()->toString()
+            ];
+        }
+
+
+        if ($this->action && property_exists($this->action, 'name'))
+        {
+             $this->view->params['breadcrumbs'][] = $this->action->name;
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @var null|AdminAction[]
+     */
+    protected $_actions    = null;
 
     /**
      * Массив объектов действий доступных для текущего контроллера

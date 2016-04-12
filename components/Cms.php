@@ -24,7 +24,6 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelSystemAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
@@ -435,7 +434,7 @@ class Cms extends \skeeks\cms\base\Component
 
         if ($this->enabledHttpAuth == self::BOOL_Y)
         {
-            $this->_goHttpAuth();
+            $this->executeHttpAuth();
         }
 
         //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
@@ -490,34 +489,10 @@ class Cms extends \skeeks\cms\base\Component
                 \Yii::$app->user->identity->updateLastAdminActivity();
             }
         });
-
-
-
-
-        \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
-
-            //Если http авторизация на сайте отключена а в админке включена
-            if ($this->enabledHttpAuth  == self::BOOL_N && $this->enabledHttpAuthAdmin == self::BOOL_Y && $this->moduleAdmin()->requestIsAdmin())
-            {
-                $this->_goHttpAuth();
-            }
-
-            if ($e->controller instanceof AdminModelEditorController)
-            {
-                $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
-                    'related-properties' =>
-                        [
-                            'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                            'name'          => \Yii::t('app', 'Additional properties'),
-                            "icon"          => "glyphicon glyphicon-plus-sign",
-                        ],
-                ]);
-            }
-        });
     }
 
 
-    protected function _goHttpAuth()
+    public function executeHttpAuth()
     {
         if (!isset($_SERVER['PHP_AUTH_PW']))
         {
