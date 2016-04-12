@@ -169,18 +169,20 @@ abstract class AdminController extends \yii\web\Controller
 
         \Yii::$app->cmsMarkeplace->info;
 
-        //TODO: Добавить возможность настройки
-        \Yii::$app->view->theme = new Theme([
-            'pathMap' =>
-            [
-                '@app/views' =>
-                [
-                    '@skeeks/cms/modules/admin/views',
-                ]
-            ]
-        ]);
 
-        \Yii::$app->cms->moduleAdmin;
+        if (\Yii::$app->cms->moduleAdmin->requestIsAdmin())
+        {
+            //TODO: Добавить возможность настройки
+            \Yii::$app->view->theme = new Theme([
+                'pathMap' =>
+                [
+                    '@app/views' =>
+                    [
+                        '@skeeks/cms/modules/admin/views',
+                    ]
+                ]
+            ]);
+        }
 
         //Если http авторизация на сайте отключена а в админке включена
         if (\Yii::$app->cms->enabledHttpAuth  == "N" && \Yii::$app->cms->enabledHttpAuthAdmin == "Y")

@@ -25,8 +25,6 @@ use yii\web\NotFoundHttpException;
  */
 class UserController extends Controller
 {
-    const EVENT_INIT                   = 'event.userController.init';
-
     /**
      * @var null|AdminAction[]
      */
