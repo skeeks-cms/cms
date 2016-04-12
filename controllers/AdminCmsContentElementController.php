@@ -599,6 +599,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             [
                 'class'     => \yii\grid\DataColumn::className(),
+                'label'     => "Смотреть",
                 'value'     => function(\skeeks\cms\models\CmsContentElement $model)
                 {
 

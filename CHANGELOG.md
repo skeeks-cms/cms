@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.1.2
 -----------------
+ * Fixed column ids
  * Fixed user column data
  * Update log message group
 

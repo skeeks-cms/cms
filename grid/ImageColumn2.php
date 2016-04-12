@@ -18,6 +18,7 @@ class ImageColumn2 extends DataColumn
     public $filter          = false;
     public $maxWidth        = "50";
     public $relationName    = "image";
+    public $label           = "Изображение";
     /**
      * @inheritdoc
      */
