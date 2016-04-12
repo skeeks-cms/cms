@@ -193,9 +193,9 @@ class AdminProfileController extends AdminModelEditorController
         $model = $this->model;
 
 
-        return $this->output(\Yii::$app->cms->moduleCms()->renderFile('admin-user/file-manager.php', [
+        return $this->render('@skeeks/cms/views/admin-user/file-manager', [
             'model' => $model
-        ]));
+        ]);
 
     }
 
