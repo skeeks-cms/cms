@@ -77,12 +77,12 @@ $config =
             'showScriptName' => false,
             'suffix' => '',
             'rules' => [
-                'cms-admin' => ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //админка
+                'cms-admin' => ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //admin panel
 
                 'robots.txt'                            => 'cms/seo/robots',
                 'sitemap.xml'                           => 'cms/seo/sitemap',
 
-                '~<_c:(profile)>'                        => 'cms/user/profile',
+                '~<_c:(profile)>'             => 'cms/profile/index',
                 'u'                           => 'cms/user/index',
                 'u/<username>'                => 'cms/user/view',
                 'u/<username>/<action>'       => 'cms/user/<action>',
@@ -91,9 +91,10 @@ $config =
 
                 'skeeks-cms'                            => 'cms/cms/index',
                 'skeeks-cms/<action>'                   => 'cms/cms/<action>',
+
                 'search'                                => 'cms/search/result',
 
-                "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'], //админка
+                "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'], //Resize image on request
             ]
         ],
 

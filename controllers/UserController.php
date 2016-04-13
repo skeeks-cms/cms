@@ -10,7 +10,9 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\actions\user\UserAction;
 use skeeks\cms\base\Controller;
 use skeeks\cms\components\Cms;
+use skeeks\cms\filters\CmsAccessControl;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
 use Yii;
@@ -20,131 +22,113 @@ use yii\rest\UpdateAction;
 use yii\web\NotFoundHttpException;
 
 /**
+ * @property CmsUser    $user
+ * @property bool       $isOwner
+ *
  * Class UserController
  * @package skeeks\cms\controllers
  */
 class UserController extends Controller
 {
-    /**
-     * @var null|AdminAction[]
-     */
-    protected $_actions    = null;
+    const REQUEST_PARAM_USERNAME = "username";
 
     /**
-     * @var User
+     * @var CmsUser
      */
-    public $user = null;
+    public $_user = false;
+
+    public function init()
+    {
+        if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && !$this->user)
+        {
+            throw new NotFoundHttpException("User not found or inactive");
+        }
+    }
+
 
     /**
      * @return array
      */
-    public function actions()
+    public function behaviors()
     {
-        return [
-            "view" =>
+        return
+        [
+            //Closed all by default
+            'access' =>
             [
-                'class'         => UserAction::className(),
-                "name"          => "Профиль",
-                "icon"          => "glyphicon glyphicon-trash",
+                'class'         => CmsAccessControl::className(),
+                'rules' =>
+                [
+                    [
+                        'allow'         => true,
+                        'matchCallback' => function($rule, $action)
+                        {
+                            return $this->isOwner;
+                        }
+                    ]
+                ]
             ],
-
-            "edit" =>
-            [
-                'class'         => UserAction::className(),
-                "name"          => "Настройки",
-                "icon"          => "fa fa-cog",
-            ]
         ];
     }
 
     /**
-     * @return \yii\web\Response
+     * @return bool
      */
-    public function actionProfile()
+    public function getIsOwner()
     {
-        return $this->redirect(\Yii::$app->user->identity->getPageUrl());
+        return (bool) ($this->user->id == \Yii::$app->user->id);
     }
 
     /**
-     * Массив объектов действий доступных для текущего контроллера
-     * Используется при построении меню.
-     * @see ControllerActions
-     * @return AdminAction[]
-     */
-    public function getActions()
-    {
-        if ($this->_actions !== null)
-        {
-            return $this->_actions;
-        }
-
-        $actions = $this->actions();
-
-        if ($actions)
-        {
-            foreach ($actions as $id => $data)
-            {
-                $action                 = $this->createAction($id);
-
-                if ($action->isVisible())
-                {
-                    $this->_actions[$id]    = $action;
-                }
-            }
-        } else
-        {
-            $this->_actions = [];
-        }
-
-        //Сортировка по приоритетам
-        if ($this->_actions)
-        {
-            ArrayHelper::multisort($this->_actions, 'priority');
-
-        }
-
-        return $this->_actions;
-    }
-
-
-    /**
-     * @param $username
+     * @return array|bool|null|CmsUser|\yii\db\ActiveRecord
      * @throws \yii\db\Exception
      */
-    public function initUser($username)
+    public function getUser()
     {
-        $this->user = \Yii::$app->cms->findUser()->where([
+        if ($this->_user !== false)
+        {
+            return $this->_user;
+        }
+
+        if (!$username = \Yii::$app->request->get(static::REQUEST_PARAM_USERNAME))
+        {
+            $this->_user = null;
+            return false;
+        }
+
+        $this->_user = \Yii::$app->cms->findUser()->where([
             "username"  => $username,
             'active'    => Cms::BOOL_Y
         ])->one();
 
-        if (!$this->user)
-        {
-            throw new NotFoundHttpException;
-        }
+        return $this->_user;
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getViewParams()
+    public function actionView()
     {
-        return [
-            'action'        => $this->action,
-            'controller'    => $this,
-            'model'         => $this->user
-        ];
+        return $this->render($this->action->id);
     }
+
+    /**
+     * @return string
+     */
+    public function actionEdit()
+    {
+        return $this->render($this->action->id);
+    }
+
+
 
 
     /**
      * @param $username
      * @return string
      */
-    public function actionChangePassword($username)
+    public function actionChangePassword()
     {
-        $this->initUser($username);
-
         $modelForm = new PasswordChangeForm([
             'user' => $this->user
         ]);
@@ -170,7 +154,7 @@ class UserController extends Controller
             return $rr;
         }
 
-        return $this->render($this->action->id, $this->getViewParams());
+        return $this->render($this->action->id);
     }
 
 
@@ -178,9 +162,8 @@ class UserController extends Controller
      * @param $username
      * @return string
      */
-    public function actionEditInfo($username)
+    public function actionEditInfo()
     {
-        $this->initUser($username);
         $model = $this->user;
 
         $rr = new RequestResponse();
@@ -204,7 +187,7 @@ class UserController extends Controller
             return $rr;
         }
 
-        return $this->render($this->action->id, $this->getViewParams());
+        return $this->render($this->action->id);
     }
 
 }

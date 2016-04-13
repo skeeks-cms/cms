@@ -3,6 +3,10 @@ CHANGELOG
 
 2.7.2.pre
 -----------------
+ * Completely rewritten mechanism of personal user cabinet
+ * Remove the old classes
+ * Sitemap updated
+ * Removed UserAction
  * Closed personal user profiles!
  * Removed skeeks\cms\models\TreeMenu
  * Rewrite admin actions

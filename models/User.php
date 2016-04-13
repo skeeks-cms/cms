@@ -54,8 +54,8 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property integer $logged_at
  * @property integer $last_activity_at
  * @property integer $last_admin_activity_at
- * @property string         $email
- * @property string         $phone
+ * @property string  $email
+ * @property string  $phone
  * @property integer $email_is_approved
  * @property integer $phone_is_approved
  *
@@ -75,6 +75,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property []   $roleNames
  *
  * @property string $displayName
+ * @property string $profileUrl
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
  * @property CmsContentElement[] $favoriteCmsContentElements
@@ -386,9 +387,27 @@ class User
     }
 
 
+    /**
+     *
+     * TODO: Is depricated > 2.7.1
+     *
+     * @param string $action
+     * @param array $params
+     * @return string
+     */
     public function getPageUrl($action = 'view', $params = [])
     {
+        return $this->getProfileUrl($action, $params);
+    }
 
+
+    /**
+     * @param string $action
+     * @param array $params
+     * @return string
+     */
+    public function getProfileUrl($action = 'view', $params = [])
+    {
         $params = ArrayHelper::merge([
             "cms/user/" . $action,
             "username" => $this->username

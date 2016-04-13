@@ -11,6 +11,7 @@ use skeeks\cms\base\Controller;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\Tree;
 use Yii;
+use yii\helpers\Url;
 use yii\web\Response;
 
 /**
@@ -52,8 +53,8 @@ class SeoController extends Controller
                     [
                         "loc"           => $tree->url,
                         "lastmod"       => $this->_lastMod($tree),
-                        "priority"      => $this->_calculatePriority($tree),
-                        "changefreq"    => "daily",
+                        //"priority"      => $this->_calculatePriority($tree),
+                        //"changefreq"    => "daily",
                     ];
                 }
             }
@@ -76,14 +77,18 @@ class SeoController extends Controller
                 [
                     "loc"           => $model->absoluteUrl,
                     "lastmod"       => $this->_lastMod($model),
-                    "priority"      => "0.3",
-                    "changefreq"    => "daily",
+                    //"priority"      => "0.3",
+                    //"changefreq"    => "daily",
                 ];
             }
         }
 
+        $result[] = [
+            'loc' => Url::to(['/skeeks-cms'])
+        ];
+
         \Yii::$app->response->format = Response::FORMAT_XML;
-        $this->layout = false;
+        $this->layout                = false;
 
         //Генерация sitemap вручную, не используем XmlResponseFormatter
         \Yii::$app->response->content =  $this->render($this->action->id, [

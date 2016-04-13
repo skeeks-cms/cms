@@ -16,9 +16,8 @@ HTML;
 <? foreach($data as $item) : ?>
 <url>
     <loc><?= $item['loc']; ?></loc>
-    <lastmod><?= $item['lastmod']; ?></lastmod>
-    <changefreq><?= $item['changefreq']; ?></changefreq>
-    <priority><?= $item['priority']; ?></priority>
+    <? if (isset($item['lastmod'])) : ?><lastmod><?= $item['lastmod']; ?></lastmod><? endif; ?>
+
 </url>
 <? endforeach; ?>
 </urlset>
