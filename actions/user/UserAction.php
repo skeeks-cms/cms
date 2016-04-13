@@ -9,6 +9,7 @@ namespace skeeks\cms\actions\user;
 
 use skeeks\cms\controllers\ProfileController;
 use skeeks\cms\controllers\UserController;
+use skeeks\cms\filters\CmsAccessControl;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
@@ -17,6 +18,7 @@ use yii\base\Action;
 use yii\base\InvalidParamException;
 use yii\helpers\Inflector;
 use yii\web\Application;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ViewAction;
 use Yii;
@@ -74,6 +76,12 @@ class UserAction extends Action
 
 
     /**
+     * @var null
+     */
+    public $isPublic    = false;
+
+
+    /**
      * @var
      */
     public $callback;
@@ -125,6 +133,11 @@ class UserAction extends Action
     public function run($username)
     {
         $this->controller->initUser($username);
+
+        if (!$this->isPublic && $this->controller->user->id != \Yii::$app->user->id)
+        {
+            throw new ForbiddenHttpException;
+        }
 
         $viewName = $this->resolveViewName();
 

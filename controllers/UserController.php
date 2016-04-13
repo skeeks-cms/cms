@@ -31,42 +31,16 @@ class UserController extends Controller
     protected $_actions    = null;
 
     /**
-     * После инициализации, контроллера, любой компонент, может добавить свои дейсвия, они будут добавлены к текущим дейсвоиям контроллера.
-     * @see init()
-     * @see actions()
-     * @var array
-     */
-    public $eventActions = [];
-
-
-    /**
      * @var User
      */
     public $user = null;
-
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [];
-    }
-
-
-    public function init()
-    {
-        parent::init();
-    }
-
-
 
     /**
      * @return array
      */
     public function actions()
     {
-        return ArrayHelper::merge($this->eventActions, [
+        return [
             "view" =>
             [
                 'class'         => UserAction::className(),
@@ -80,7 +54,7 @@ class UserController extends Controller
                 "name"          => "Настройки",
                 "icon"          => "fa fa-cog",
             ]
-        ]);
+        ];
     }
 
     /**
