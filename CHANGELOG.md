@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.2.pre
 -----------------
+ * Removed columns files_depricated in cms_tree and cms_content_element
  * Completely rewritten mechanism of personal user cabinet
  * Remove the old classes
  * Sitemap updated
