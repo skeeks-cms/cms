@@ -47,6 +47,7 @@ use yii\db\ActiveRecord;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
+use yii\web\Application;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -375,7 +376,7 @@ class AdminModelEditorController extends AdminController
      */
     protected function _initBreadcrumbsData()
     {
-        $baseRoute = $this->module instanceof Application ? $this->id : ("/" . $this->module->id . "/" . $this->id);
+        $baseRoute = $this->module instanceof Application ? "/" . $this->id : ("/" . $this->module->id . "/" . $this->id);
 
         if ($this->name)
         {
@@ -525,7 +526,7 @@ class AdminModelEditorController extends AdminController
      */
     public function getIndexUrl()
     {
-        return UrlHelper::construct($this->id . '/' . $this->action->id)->enableAdmin()->setRoute($this->defaultAction)->normalizeCurrentRoute()->toString();
+        return UrlHelper::construct("/" . $this->id . '/' . $this->action->id)->enableAdmin()->setRoute($this->defaultAction)->normalizeCurrentRoute()->toString();
     }
 
 
