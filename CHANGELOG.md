@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.7.2.pre
+-----------------
+ * Correcting typos
+
 2.7.2.alpha
 -----------------
  * Removed is deprecated
