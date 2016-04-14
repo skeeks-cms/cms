@@ -134,7 +134,7 @@ class AuthController extends AdminController
             if ($user->save(false))
             {
 
-                \Yii::$app->mailer->setViewPath(\Yii::$app->cms->moduleCms()->basePath . '/mail');
+                \Yii::$app->mailer->setViewPath(\Yii::$app->cms->moduleCms->basePath . '/mail');
 
                 \Yii::$app->mailer->compose('newPassword', ['user' => $user, 'password' => $password])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])

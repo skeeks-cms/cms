@@ -93,16 +93,14 @@ class Cms extends \skeeks\cms\base\Component
     const EVENT_APP = 'cms.event.app';
 
     /**
-     * Можно задать название и описание компонента
      * @return array
      */
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Базовый модуль CMS',
+            "version"               => \Yii::$app->cms->extension->version,
         ]);
     }
-
 
     public function renderConfigForm(ActiveForm $form)
     {
@@ -414,6 +412,11 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected function _initWeb()
     {
+        if (\Yii::$app->admin->requestIsAdmin)
+        {
+            $this->moduleAdmin;
+        }
+
         if (!$this->noImageUrl)
         {
             $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
@@ -448,7 +451,7 @@ class Cms extends \skeeks\cms\base\Component
         {
             if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
             {
-                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', $this->moduleCms->descriptor->toString());
+                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', $this->descriptor->toString());
 
                 /**
                  * @var $view View
@@ -458,7 +461,7 @@ class Cms extends \skeeks\cms\base\Component
                 {
                     $view->registerMetaTag([
                         "name"      => base64_decode(self::$_huck),
-                        "content"   => $this->moduleCms->descriptor->toString()
+                        "content"   => $this->descriptor->toString()
                     ], self::$_huck);
                 }
             }
@@ -471,7 +474,7 @@ class Cms extends \skeeks\cms\base\Component
             $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
             $e->identity->save(false);
 
-            if ($this->moduleAdmin()->requestIsAdmin())
+            if (\Yii::$app->admin->requestIsAdmin)
             {
                 \Yii::$app->user->identity->updateLastAdminActivity();
             }

@@ -184,7 +184,6 @@ return
     "Mission complete"      => "Задание выполнено",
 
     "system administration" => "система администрирования",
-    "The module is part of the module cms, it contains all the necessary elements for admin" => "Модуль входит в состав модуля cms, содержит все необходимые элементы для админки",
     "Main"                  => "Основное",
     "Language settings"     => "Языковые настройки",
     "Setting tables"        => "Настройка таблиц",
@@ -751,7 +750,6 @@ return
     "Upload"                => "Загрузить",
     "Upload from your computer" => "Загрузить с компьютера",
     "Upload by link {http}" => "Загрузить по ссылке {http}",
-    "Basic module {cms}, without it nothing will work and the whole world will collapse." => "Базовый модуль {cms}, без него не будет работать ничего и весь мир рухнет.",
 
     "This action is designed to work with: {controller}" => "Данное действие предназначено для работы с: {controller}",
     "Event management {cms}" => "Управление событиями {cms}",

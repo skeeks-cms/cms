@@ -36,7 +36,7 @@ use yii\helpers\Html;
 
             <tr>
                 <td valign="center" style="width:50px;">
-                  <a href="<?= \Yii::$app->cms->moduleCms()->getDescriptor()->homepage; ?>" target="_blank" style="width: 50px;">
+                  <a href="<?= \Yii::$app->cms->descriptor->homepage; ?>" target="_blank" style="width: 50px;">
                       <img src="<?= \Yii::$app->cms->logo(); ?>">
                   </a>
               </td>

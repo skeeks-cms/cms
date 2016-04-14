@@ -30,7 +30,7 @@ class Controller extends YiiController
     public function startTool()
     {
         $this->stdoutN('Yii2 (' . \Yii::getVersion() . ')');
-        $this->stdoutN(\Yii::$app->cms->moduleCms()->getDescriptor()->toString());
+        $this->stdoutN(\Yii::$app->cms->descriptor);
         $this->stdoutN('App:' . \Yii::$app->id);
         $this->hr();
         return $this;

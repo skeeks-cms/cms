@@ -93,7 +93,8 @@ $config =
 
         'cms' =>
         [
-            'class' => 'skeeks\cms\ConsoleModule',
+            'class' => 'skeeks\cms\Module',
+            'controllerNamespace' => 'skeeks\cms\console\controllers'
         ],
     ],
 ];

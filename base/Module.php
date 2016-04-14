@@ -97,23 +97,4 @@ abstract class Module extends \yii\base\Module
         return (string) $this->getDescriptor()->version;
     }
 
-
-    /**
-     *
-     * TODO: is depricated (начиная с версии 1.1.5)
-     * Использовать: \Yii::$app->view->render("@skeeks/cms/views/test")
-     *
-     * Берет файл относительно views модуля и рендерит его
-     *
-     * @param string $filePath helpers/test.php
-     * @param array $data
-     * @param null $context
-     * @return string
-     */
-    public function renderFile($filePath, $data = [], $context = null)
-    {
-        return \Yii::$app->view->renderFile($this->getViewPath() . "/" . $filePath, $data, $context);
-    }
-
-
 }

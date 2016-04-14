@@ -16,7 +16,7 @@ $config =
     "name"          => "SkeekS CMS",
     'vendorPath'    => VENDOR_DIR,
     'language'      => 'ru',
-    'bootstrap'     => ['cms', 'log', 'cmsToolbar', 'seo'],
+    'bootstrap'     => ['cms', 'cmsToolbar', 'seo'],
 
     'components' => [
 

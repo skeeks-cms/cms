@@ -245,12 +245,6 @@ return
                     ],
 
                     [
-                        "label"     => \Yii::t('app',"Database of translations"),
-                        "url"       => ["cms/admin-message/index"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/lang.png']
-                    ],
-
-                    [
                         "label"     => \Yii::t('app',"Server file storage"),
                         "url"       => ["cms/admin-storage/index"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/servers.png'],

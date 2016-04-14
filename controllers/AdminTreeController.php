@@ -230,7 +230,7 @@ class AdminTreeController extends AdminModelEditorController
 
             $dataProvider->query->andWhere(['pid' => $parent->primaryKey]);
 
-            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-tree");
+            $controller = \Yii::$app->cms->moduleCms->createControllerByID("admin-tree");
 
             return $this->render('new-children', [
                 'model'         => new Tree(),

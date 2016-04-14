@@ -13,6 +13,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\modules\admin\assets\AdminAsset;
 use skeeks\cms\modules\admin\base\AdminDashboardWidget;
+use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\dashboards\AboutCmsDashboard;
 use skeeks\cms\modules\admin\dashboards\CmsInformDashboard;
 use skeeks\cms\modules\admin\dashboards\ContentElementListDashboard;
@@ -26,6 +27,8 @@ use yii\widgets\ActiveForm;
  * @property CmsLang $cmsLanguage
  * @property [] $dasboardWidgets
  * @property [] $dasboardWidgetsLabels
+ *
+ * @property bool $requestIsAdmin
  *
  * Class AdminSettings
  * @package skeeks\cms\modules\admin\components\settings
@@ -318,6 +321,45 @@ JS
     public function getCmsLanguage()
     {
         return CmsLang::find()->where(['code' => $this->languageCode])->one();
+    }
+
+
+    protected $_requestIsAdmin = null;
+
+    /**
+     * @return bool
+     */
+    public function getRequestIsAdmin()
+    {
+        if ($this->_requestIsAdmin !== null)
+        {
+            return $this->_requestIsAdmin;
+        }
+
+        if (\Yii::$app->urlManager->rules)
+        {
+            foreach (\Yii::$app->urlManager->rules as $rule)
+            {
+                if ($rule instanceof UrlRule)
+                {
+                    $urlRuleAdmin = $rule;
+
+                    $request        = \Yii::$app->request;
+                    $pathInfo       = $request->getPathInfo();
+                    $params         = $request->getQueryParams();
+                    $firstPrefix    = substr($pathInfo, 0, strlen($urlRuleAdmin->adminPrefix));
+
+                    if ($firstPrefix == $urlRuleAdmin->adminPrefix)
+                    {
+                        $this->_requestIsAdmin = true;
+                        return $this->_requestIsAdmin;
+                    }
+                }
+            }
+        }
+
+        $this->_requestIsAdmin = false;
+        return $this->_requestIsAdmin;
     }
 
 }

@@ -316,7 +316,7 @@ JS
         //\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS) version > 2.0.13
         if (\Yii::$app->user->can(CmsManager::PERMISSION_CONTROLL_PANEL))
         {
-            if (!\Yii::$app->cms->moduleAdmin()->requestIsAdmin() && (!\Yii::$app->controller instanceof AdminController) && !in_array(\Yii::$app->controller->module->id, ['debug', 'gii']))
+            if (!\Yii::$app->admin->requestIsAdmin && (!\Yii::$app->controller instanceof AdminController) && !in_array(\Yii::$app->controller->module->id, ['debug', 'gii']))
             {
                 return true;
             }

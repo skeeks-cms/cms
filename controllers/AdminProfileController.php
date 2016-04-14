@@ -232,9 +232,9 @@ class AdminProfileController extends AdminModelEditorController
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
             }
 
-            return $this->output(\Yii::$app->cms->moduleCms()->renderFile('admin-user/change-password.php', [
+            return $this->render('@skeeks/cms/views/admin-user/change-password.php', [
                 'model' => $modelForm
-            ]));
+            ]);
 
             /*return $this->render('_form-change-password', [
                 'model' => $modelForm,

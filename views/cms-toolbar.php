@@ -12,9 +12,9 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
 
 <div id="skeeks-cms-toolbar" class="skeeks-cms-toolbar-top hidden-print" <?= \Yii::$app->cmsToolbar->isOpen != \skeeks\cms\components\Cms::BOOL_Y ? "style='display: none;'": ""?>>
     <div class="skeeks-cms-toolbar-block title">
-        <a href="<?= \Yii::$app->cms->moduleCms()->getDescriptor()->homepage; ?>" title="<?=\Yii::t('app','The current version {cms} ',['cms' => 'SkeekS SMS'],\Yii::$app->admin->languageCode)?> <?= \Yii::$app->cms->moduleCms()->descriptor->version; ?>" target="_blank">
+        <a href="<?= \Yii::$app->cms->descriptor->homepage; ?>" title="<?=\Yii::t('app','The current version {cms} ',['cms' => 'SkeekS SMS'],\Yii::$app->admin->languageCode)?> <?= \Yii::$app->cms->descriptor->version; ?>" target="_blank">
             <img width="29" height="30" alt="" src="<?= \Yii::$app->cms->logo(); ?>">
-             <span class="label"><?= \Yii::$app->cms->moduleCms()->descriptor->version; ?></span>
+             <span class="label"><?= \Yii::$app->cms->descriptor->version; ?></span>
         </a>
     </div>
 

@@ -12,7 +12,7 @@ $packageModel = \skeeks\cms\components\marketplace\models\PackageModel::fetchByC
 ?>
 
 <div id="sx-search" style="margin-bottom: 10px;">
-    <p><b><a data-pjax="0" target="_blank" href="<?= $packageModel->url; ?>"><?=\Yii::t('app','{yii} Version',['yii' => 'SkeekS CMS'])?></a>: </b> <?= \Yii::$app->cms->moduleCms->descriptor->version; ?></p>
+    <p><b><a data-pjax="0" target="_blank" href="<?= $packageModel->url; ?>"><?=\Yii::t('app','{yii} Version',['yii' => 'SkeekS CMS'])?></a>: </b> <?= \Yii::$app->cms->descriptor->version; ?></p>
     <p><b><?=\Yii::t('app','{yii} Version',['yii' => 'Yii'])?>: </b> <?= Yii::getVersion(); ?></p>
 </div>
 <hr />

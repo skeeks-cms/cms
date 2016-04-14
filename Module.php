@@ -19,31 +19,9 @@ use yii\web\View;
  * Class Module
  * @package skeeks\cms
  */
-class Module extends base\Module implements BootstrapInterface
+class Module extends base\Module
 {
     public $controllerNamespace = 'skeeks\cms\controllers';
-
-    public function bootstrap($app)
-    {}
-
-    /**
-     * Используем свой layout
-     * @var string
-     */
-    //public $layout ='@skeeks/cms/modules/admin/views/layouts/main.php';
-    /**
-     * @return array
-     */
-    static public function descriptorConfig()
-    {
-        return array_merge(parent::descriptorConfig(), [
-            //"version"               => file_get_contents(__DIR__ . "/VERSION"),
-            "version"               => \Yii::$app->cms->extension->version,
-
-            "name"                  => "SkeekS CMS",
-            "description"           => \Yii::t('app',"Basic module {cms}, without it nothing will work and the whole world will collapse."),
-        ]);
-    }
 
     static public $isRegisteredTranslations = false;
 
@@ -57,25 +35,29 @@ class Module extends base\Module implements BootstrapInterface
     {
         if (self::$isRegisteredTranslations === false)
         {
-            \Yii::$app->i18n->translations['skeeks/cms/user'] = [
-                'class' => 'yii\i18n\PhpMessageSource',
-                'sourceLanguage' => 'en-US',
-                'basePath' => '@skeeks/cms/messages',
-                'fileMap' => [
-                    'skeeks/cms/user' => 'user.php',
-                ],
-                'on missingTranslation' => \Yii::$app->i18n->missingTranslationHandler
-            ];
+            if (!isset(\Yii::$app->i18n->translations['skeeks/cms/user']))
+            {
+                \Yii::$app->i18n->translations['skeeks/cms/user'] = [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@skeeks/cms/messages',
+                    'fileMap' => [
+                        'skeeks/cms/user' => 'user.php',
+                    ],
+                ];
+            }
 
-            \Yii::$app->i18n->translations['skeeks/cms/v2'] = [
-                'class' => 'yii\i18n\PhpMessageSource',
-                'sourceLanguage' => 'en-US',
-                'basePath' => '@skeeks/cms/messages',
-                'fileMap' => [
-                    'skeeks/cms/v2' => 'v2.php',
-                ],
-                'on missingTranslation' => \Yii::$app->i18n->missingTranslationHandler
-            ];
+
+            if (!isset(\Yii::$app->i18n->translations['skeeks/cms/v2']))
+            {
+                \Yii::$app->i18n->translations['skeeks/cms/v2'] = [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@skeeks/cms/messages',
+                    'fileMap' => [
+                        'skeeks/cms/v2' => 'v2.php',
+                    ],
+                ];
+            }
+
 
             self::$isRegisteredTranslations = true;
         }

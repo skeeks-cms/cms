@@ -161,7 +161,7 @@ class Tree
             $isOpen     = false;
             $isActive   = false;
 
-            $controller = \Yii::$app->cms->moduleCms()->createControllerByID("admin-tree");
+            $controller = \Yii::$app->cms->moduleCms->createControllerByID("admin-tree");
             $controller->setModel($model);
 
             $child = "";

@@ -42,7 +42,7 @@ JS
 
     ); ?>
     <hr />
-    <p><b><a data-pjax="0" href="<?= \skeeks\cms\models\CmsExtension::getInstance('skeeks/cms')->adminUrl; ?>"><?=\Yii::t('app','{yii} Version',['yii' => 'SkeekS CMS'])?></a>: </b> <?= \Yii::$app->cms->moduleCms->descriptor->version; ?></p>
+    <p><b><a data-pjax="0" href="<?= \skeeks\cms\models\CmsExtension::getInstance('skeeks/cms')->adminUrl; ?>"><?=\Yii::t('app','{yii} Version',['yii' => 'SkeekS CMS'])?></a>: </b> <?= \Yii::$app->cms->descriptor->version; ?></p>
     <p><b><?=\Yii::t('app','{yii} Version',['yii' => 'Yii'])?>: </b> <?= Yii::getVersion(); ?></p>
     <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 </div>

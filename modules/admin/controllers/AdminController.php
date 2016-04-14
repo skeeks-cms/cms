@@ -169,8 +169,7 @@ abstract class AdminController extends \yii\web\Controller
 
         \Yii::$app->cmsMarkeplace->info;
 
-
-        if (\Yii::$app->cms->moduleAdmin->requestIsAdmin())
+        if (\Yii::$app->admin->requestIsAdmin)
         {
             //TODO: Добавить возможность настройки
             \Yii::$app->view->theme = new Theme([

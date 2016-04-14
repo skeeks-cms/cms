@@ -8,6 +8,9 @@
 namespace skeeks\cms\base;
 
 /**
+ * @property string $copyright
+ * @property string $powered
+ *
  * Class ComponentDescriptor
  * @package skeeks\cms\base
  */

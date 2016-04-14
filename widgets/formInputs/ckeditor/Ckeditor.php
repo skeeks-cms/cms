@@ -30,7 +30,7 @@ class Ckeditor extends CKEditorWidget
 
     public function __construct($config = [])
     {
-        if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
+        if (\Yii::$app->admin->requestIsAdmin)
         {
             $config = ArrayHelper::merge(\Yii::$app->admin->getCkeditorOptions(), $config);
         }

@@ -57,7 +57,7 @@ JS
 
 <div class="navbar" role="navigation">
     <div class="navbar-header sx-header-logo">
-        <?= Html::a("<span><img src='" . \Yii::$app->cms->logo() . "' /> " . \Yii::$app->cms->moduleCms()->getDescriptor()->name . "</span>", \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
+        <?= Html::a("<span><img src='" . \Yii::$app->cms->logo() . "' /> " . \Yii::$app->cms->descriptor->name . "</span>", \Yii::$app->cms->moduleAdmin()->createUrl(["admin/index/index"]), ["class" => "navbar-brand"]); ?>
     </div>
 
     <ul class="nav navbar-nav navbar-right visible-md visible-lg">

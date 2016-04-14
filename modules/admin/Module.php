@@ -28,26 +28,7 @@ class Module extends CmsModule
     const SYSTEM_QUERY_NO_ACTIONS_MODEL = 'no-actions';
     const SYSTEM_QUERY_EMPTY_LAYOUT     = 'sx-empty-layout';
 
-    const EVENT_READY                   = 'event.adminModule.ready';
-
     public $controllerNamespace = 'skeeks\cms\modules\admin\controllers';
-
-    /**
-     * Используем свой layout
-     * @var string
-     */
-    public $layout = '@skeeks/cms/modules/admin/views/layouts/main';
-
-    /**
-     * @return array
-     */
-    static public function descriptorConfig()
-    {
-        return array_merge(parent::descriptorConfig(), [
-            "name"          => \Yii::$app->cms->moduleCms()->getName() . " — " . \Yii::t('app','system administration'),
-            "description"   => \Yii::t('app',"The module is part of the module cms, it contains all the necessary elements for admin"),
-        ]);
-    }
 
     public $noImage = '';
 
@@ -57,7 +38,7 @@ class Module extends CmsModule
 
         \Yii::setAlias('@admin/views', $this->viewPath);
 
-        if ($this->requestIsAdmin())
+        if (\Yii::$app->admin->requestIsAdmin)
         {
             if (!$this->noImage)
             {
@@ -65,7 +46,7 @@ class Module extends CmsModule
                 //$this->noImage = \Yii::$app->getAssetManager()->getAssetUrl(AdminAsset::register(\Yii::$app->view), "images/no-photo.gif");
             }
 
-            \Yii::beginProfile('admin loading');
+            /*\Yii::beginProfile('admin loading');
 
             //Загрузка всех компонентов.
             $components = \Yii::$app->getComponents();
@@ -84,20 +65,9 @@ class Module extends CmsModule
                 'name' => self::EVENT_READY
             ]));
 
-            \Yii::endProfile('admin loading');
+            \Yii::endProfile('admin loading');*/
         }
     }
-
-    /**
-     * Версия
-     *
-     * @return string
-     */
-    public function getVersion()
-    {
-        return (string) \Yii::$app->cms->moduleCms()->getVersion();
-    }
-
 
     /**
      * @param array $data
@@ -107,38 +77,5 @@ class Module extends CmsModule
     {
         $data[UrlRule::ADMIN_PARAM_NAME] = UrlRule::ADMIN_PARAM_VALUE;
         return \Yii::$app->urlManager->createUrl($data);
-    }
-
-    /**
-     * @return bool
-     */
-    public function requestIsAdmin()
-    {
-        if (\Yii::$app->urlManager->rules)
-        {
-            foreach (\Yii::$app->urlManager->rules as $rule)
-            {
-                if ($rule instanceof UrlRule)
-                {
-                    $urlRuleAdmin = $rule;
-
-
-                    $request = \Yii::$app->request;
-                    $pathInfo       = $request->getPathInfo();
-                    $params         = $request->getQueryParams();
-                    $firstPrefix    = substr($pathInfo, 0, strlen($urlRuleAdmin->adminPrefix));
-
-                    if ($firstPrefix == $urlRuleAdmin->adminPrefix)
-                    {
-                        return true;
-                    }
-
-                }
-            }
-        }
-
-
-
-        return false;
     }
 }

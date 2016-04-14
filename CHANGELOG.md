@@ -3,6 +3,8 @@ CHANGELOG
 
 2.7.2.pre
 -----------------
+ * Removed I18NDb. In a separate package skeeks/cms-i18n-db
+ * Disabled event ADMIN_READY
  * Updated translation functionality
  * Removed columns files_depricated in cms_tree and cms_content_element
  * Completely rewritten mechanism of personal user cabinet

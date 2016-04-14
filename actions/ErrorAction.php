@@ -77,7 +77,7 @@ class ErrorAction extends \yii\web\ErrorAction
             return (array) $rr;
         } else
         {
-            if (\Yii::$app->cms->moduleAdmin()->requestIsAdmin())
+            if (\Yii::$app->admin->requestIsAdmin)
             {
                 if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
                 {
