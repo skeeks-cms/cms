@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.7.2.pre
+2.7.2.alpha
 -----------------
  * Removed is deprecated
  * Rewritten cmsToolbar
