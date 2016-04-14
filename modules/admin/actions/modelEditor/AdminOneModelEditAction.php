@@ -53,6 +53,11 @@ class AdminOneModelEditAction extends AdminModelEditorAction
 
     public function run()
     {
+        if ($this->callback)
+        {
+            return $this->runCallback();
+        }
+
         if (!$this->controller->model)
         {
             return $this->controller->redirect($this->controller->indexUrl);

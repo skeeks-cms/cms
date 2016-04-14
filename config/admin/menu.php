@@ -241,7 +241,7 @@ return
                     [
                         "label"     => \Yii::t('app',"Languages"),
                         "url"       => ["cms/admin-cms-lang"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/lang.png']
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/ru.png']
                     ],
 
                     [

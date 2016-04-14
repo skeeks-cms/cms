@@ -109,11 +109,17 @@ class SourceMessage extends ActiveRecord
 
     public function isTranslated()
     {
-        foreach ($this->messages as $message) {
+        if ($this->messages)
+        {
+            return true;
+        }
+
+        return false;
+        /*foreach ($this->messages as $message) {
             if (!$message->translation) {
                 return false;
             }
         }
-        return true;
+        return true;*/
     }
 }

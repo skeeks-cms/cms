@@ -34,6 +34,11 @@ class AdminOneModelUpdateAction extends AdminOneModelEditAction
 
     public function run()
     {
+        if ($this->callback)
+        {
+            return $this->runCallback();
+        }
+
         $model          = $this->controller->model;
         $scenarios      = $model->scenarios();
 

@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.2.pre
 -----------------
+ * Updated translation functionality
  * Removed columns files_depricated in cms_tree and cms_content_element
  * Completely rewritten mechanism of personal user cabinet
  * Remove the old classes

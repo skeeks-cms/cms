@@ -9,6 +9,7 @@
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $model \skeeks\cms\models\CmsContentElement */
+$dataProvider->query->with('messages');
 ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
@@ -47,7 +48,7 @@
         [
             'attribute' => 'status',
             'value' => function ($model, $index, $widget) {
-                /** @var SourceMessage $model */
+                /** @var \skeeks\cms\models\SourceMessage $model */
                 return $model->isTranslated() ? 'Translated' : 'Not translated';
             },
             'filter' => $searchModel->getStatus()

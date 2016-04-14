@@ -120,7 +120,7 @@ class AdminMessageController extends AdminModelEditorController
             if (Model::loadMultiple($model->messages, \Yii::$app->getRequest()->post()) && Model::validateMultiple($model->messages))
             {
                 $model->saveMessages();
-                //\Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -134,7 +134,7 @@ class AdminMessageController extends AdminModelEditorController
 
             } else
             {
-                //\Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
             }
 
 

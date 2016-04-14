@@ -91,7 +91,12 @@ JS
         <? if ($langs = \skeeks\cms\models\CmsLang::find()->active()->all()) : ?>
             <ul class="dropdown-menu ">
             <? foreach ($langs as $lang) : ?>
-                <li><a href="#" onclick="sx.ChangeLang.setLang('<?= $lang->code; ?>'); return false;">[<?= $lang->code; ?>] <?= $lang->name; ?></a></li>
+                <li><a href="#" onclick="sx.ChangeLang.setLang('<?= $lang->code; ?>'); return false;">[<?= $lang->code; ?>] <?= $lang->name; ?>
+                    <? if($lang->image->src) : ?>
+                        <img class="pull-right" height="20" style="margin-top: 10px;" src="<?= $lang->image->src; ?>" />
+                    <? endif; ?>
+                    </a>
+                </li>
             <? endforeach; ?>
             </ul>
         <? endif;  ?>
