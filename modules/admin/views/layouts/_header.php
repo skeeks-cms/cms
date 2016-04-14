@@ -123,16 +123,16 @@ JS
 
     <li class="dropdown sx-left-border">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding: 0px;" data-sx-widget="tooltip-b" data-original-title="<?=\Yii::t('app','Your profile')?>">
-            <? if (Yii::$app->cms->getAuthUser()->image) : ?>
-                <img src="<?= Yii::$app->cms->getAuthUser()->getAvatarSrc(); ?>" width="49" height="49"/>
+            <? if (\Yii::$app->user->identity->image) : ?>
+                <img src="<?= \Yii::$app->user->identity->avatarSrc; ?>" width="49" height="49"/>
             <? else : ?>
-                <img src="<?= Yii::$app->cms->moduleAdmin()->noImage; ?>" width="49" height="49"/>
+                <img src="<?= Yii::$app->cms->moduleAdmin->noImage; ?>" width="49" height="49"/>
             <? endif; ?>
         </a>
         <!--sx-dropdown-menu-left-->
         <ul class="dropdown-menu ">
             <li class="dropdown-menu-header text-center">
-                <strong><?= Yii::$app->cms->getAuthUser()->username ?></strong>
+                <strong><?= \Yii::$app->user->identity->username ?></strong>
             </li>
             <li><a href="<?= UrlHelper::construct("cms/admin-profile/update")->enableAdmin() ?>"><i class="glyphicon glyphicon-user"></i> <?=\Yii::t('app','Profile')?></a></li>
             <!--<li><a href="#"><i class="fa fa-envelope-o"></i> Сообщения <span class="label label-info">42</span></a></li>-->

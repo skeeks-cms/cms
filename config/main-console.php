@@ -15,6 +15,7 @@ $config =
 [
     'id'            => 'skeeks-cms-app',
     "name"          => "SkeekS CMS",
+    'language'      => 'ru',
     'vendorPath'    => VENDOR_DIR,
 
     'components' => [

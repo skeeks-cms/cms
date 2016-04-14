@@ -1,51 +1,166 @@
 <?php
 /**
- * TreeController
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 23.10.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 14.04.2016
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\actions\ViewModelAction;
-use skeeks\cms\actions\ViewModelActionSeo;
 use skeeks\cms\base\Controller;
+use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
-use skeeks\cms\models\User;
 use Yii;
-use skeeks\cms\models\searchs\User as UserSearch;
+use yii\web\NotFoundHttpException;
 
 /**
- * Class UserController
+ * @property CmsTree $model
+ *
+ * Class TreeController
  * @package skeeks\cms\controllers
  */
 class TreeController extends Controller
 {
     /**
-     * @inheritdoc
+     * @var CmsTree
      */
-    public function actions()
+    public $_model = false;
+
+    public function init()
     {
-        return
-        [
-            'view' =>
-            [
-                'class'     => 'skeeks\cms\actions\ViewModelActionTree',
-                'view'      => 'default',
-                'callback'  =>  [$this, 'viewTree']
-            ],
-        ];
+        if ($this->model && \Yii::$app->cmsToolbar)
+        {
+            $controller = \Yii::$app->createController('cms/admin-tree')[0];
+            $adminControllerRoute = ['cms/admin-tree/update', $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}];
+
+            $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();
+
+            \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
+        }
+
+        parent::init();
     }
 
     /**
-     * @param ViewModelActionSeo $action
+     * @return array|bool|null|CmsTree|\yii\db\ActiveRecord
      */
-    public function viewTree(ViewModelAction $action)
+    public function getModel()
     {
-        \Yii::$app->cms->setCurrentTree($action->model);
-        \Yii::$app->breadcrumbs->setPartsByTree($action->model);
+        if ($this->_model !== false)
+        {
+            return $this->_model;
+        }
+
+        if (!$id = \Yii::$app->request->get('id'))
+        {
+            $this->_model = null;
+            return false;
+        }
+
+        $this->_model = CmsTree::find()->where([
+            'id' => $id
+        ])->one();
+
+        return $this->_model;
+    }
+
+    /**
+     * @return $this|string
+     * @throws NotFoundHttpException
+     */
+    public function actionView()
+    {
+        if (!$this->model)
+        {
+            throw new NotFoundHttpException(\Yii::t('app', 'Page not found'));
+        }
+
+        \Yii::$app->cms->setCurrentTree($this->model);
+        \Yii::$app->breadcrumbs->setPartsByTree($this->model);
+
+        if ($this->model->redirect || $this->model->redirect_tree_id)
+        {
+            return \Yii::$app->response->redirect($this->model->url, $this->model->redirect_code);
+        }
+
+        $viewFile = $this->action->id;
+        //Пробуем рендерить view для текущего типа страницы
+        if ($this->model)
+        {
+            //Если у раздела указан персональный шаблон, рендерим его, иначе шаблон типа страницы
+            if ($this->model->view_file)
+            {
+                $viewFile = $this->model->view_file;
+
+            } else if ($this->model->treeType)
+            {
+                if ($this->model->treeType->viewFile)
+                {
+                    $viewFile = $this->model->treeType->viewFile;
+                } else
+                {
+                    $viewFile = $this->model->treeType->code;
+                }
+            }
+        }
+
+        $this->_initStandartMetaData();
+
+        return $this->render($viewFile, [
+            'model' => $this->model
+        ]);
+    }
+
+    /**
+     *
+     * TODO: Вынести в seo компонент
+     *
+     * Установка метаданных страницы
+     * @return $this
+     */
+    protected function _initStandartMetaData()
+    {
+        $model = $this->model;
+
+        if ($title = $model->meta_title)
+        {
+            $this->view->title = $title;
+        } else
+        {
+            if (isset($model->name))
+            {
+                $this->view->title = $model->name;
+            }
+        }
+
+        if ($meta_keywords = $model->meta_keywords)
+        {
+            $this->view->registerMetaTag([
+                "name"      => 'keywords',
+                "content"   => $meta_keywords
+            ], 'keywords');
+        }
+
+        if ($meta_descripption = $model->meta_description)
+        {
+            $this->view->registerMetaTag([
+                "name"      => 'description',
+                "content"   => $meta_descripption
+            ], 'description');
+        }
+        else
+        {
+            if (isset($model->name))
+            {
+                $this->view->registerMetaTag([
+                    "name"      => 'description',
+                    "content"   => $model->name
+                ], 'description');
+            }
+        }
+
+        return $this;
     }
 }

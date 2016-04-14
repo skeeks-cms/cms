@@ -64,7 +64,7 @@ class SignupForm extends Model
         return [
             ['username', 'filter', 'filter' => 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => \Yii::t('app','This login is already in use by another user.')],
+            ['username', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('app','This login is already in use by another user.')],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'filter', 'filter' => 'trim'],
@@ -91,7 +91,7 @@ class SignupForm extends Model
             /**
              * @var User $user
              */
-            $userClassName          = \Yii::$app->cms->getUserClassName();
+            $userClassName          = \Yii::$app->user->identityClass;
             $user                   = new $userClassName();
 
             if ($this->scenario == self::SCENARION_FULLINFO)

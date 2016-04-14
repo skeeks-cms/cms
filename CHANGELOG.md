@@ -3,6 +3,9 @@ CHANGELOG
 
 2.7.2.pre
 -----------------
+ * Removed is deprecated
+ * Rewritten cmsToolbar
+ * Rewritten view actions
  * Removed I18NDb. In a separate package skeeks/cms-i18n-db
  * Disabled event ADMIN_READY
  * Updated translation functionality

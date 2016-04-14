@@ -20,7 +20,7 @@ use \yii\helpers\Html;
 
         <?= $form->field($model, 'to')->textInput([
             'placeholder'   => 'email',
-            'value'         => \Yii::$app->cms->getAuthUser()->email,
+            'value'         => \Yii::$app->user->identity->email,
         ]); ?>
 
         <?= $form->field($model, 'from')->textInput([

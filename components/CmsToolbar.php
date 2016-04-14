@@ -222,6 +222,12 @@ JS
     }
 
     /**
+     * @var string
+     */
+    public $editUrl = "";
+
+
+    /**
      * Renders mini-toolbar at the end of page body.
      *
      * @param \yii\base\Event $event
@@ -235,42 +241,7 @@ JS
             return;
         }
 
-        $editModel = null;
-        $urlEditModel = "";
         $urlUserEdit = UrlHelper::construct('cms/admin-profile/update')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
-        if (is_subclass_of(\Yii::$app->controller->action, ViewModelAction::className()))
-        {
-            if ($editModel = \Yii::$app->controller->action->model)
-            {
-                $adminControllerRoute = '';
-
-                if ($editModel instanceof CmsContentElement)
-                {
-                    $controller = \Yii::$app->createController('cms/admin-cms-content-element')[0];
-                    $adminControllerRoute = ['cms/admin-cms-content-element/update', $controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}, 'content_id' => $editModel->cmsContent->id];
-
-                    $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
-                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
-
-                } else if ($editModel instanceof \skeeks\cms\models\Tree)
-                {
-                    $controller = \Yii::$app->createController('cms/admin-tree')[0];
-                    $adminControllerRoute = ['cms/admin-tree/update', $controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}];
-
-                    $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
-                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
-
-                } else if ($editModel instanceof User)
-                {
-                    $controller = \Yii::$app->createController('cms/admin-user')[0];
-                    $adminControllerRoute = ['cms/admin-user/update', $controller->requestPkParamName => $editModel->{$controller->modelPkAttribute}];
-
-                    $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
-                        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
-                }
-            }
-        }
-
 
         $clientOptions = [
             'infoblockSettings'             => [
@@ -300,10 +271,9 @@ JS
 
         echo $view->render('@skeeks/cms/views/cms-toolbar', [
             'clientOptions'     => $clientOptions,
-            'urlEditModel'      => $urlEditModel,
-            'editModel'         => $editModel,
-            'urlUserEdit'         => $urlUserEdit,
-            'urlSettings'         => UrlHelper::construct('cms/admin-settings')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+            'editUrl'           => $this->editUrl,
+            'urlUserEdit'       => $urlUserEdit,
+            'urlSettings'       => UrlHelper::construct('cms/admin-settings')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
         ]);
     }
 

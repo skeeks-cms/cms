@@ -146,7 +146,7 @@ class AuthController extends Controller
 
                 if (!$user)
                 {
-                    $userClassName = \Yii::$app->cms->getUserClassName();
+                    $userClassName = \Yii::$app->user->identityClass;
                     $user                   = new $userClassName();
                     $user->populate();
 
@@ -523,7 +523,7 @@ class AuthController extends Controller
             return $this->goHome();
         }
 
-        $className  = \Yii::$app->cms->getUserClassName();
+        $className  = \Yii::$app->user->identityClass;
         $user       = $className::findByPasswordResetToken($token);
 
         if ($user)

@@ -33,8 +33,8 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
 
     <div class="skeeks-cms-toolbar-block sx-profile">
         <a href="<?= $urlUserEdit; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlUserEdit; ?>'); return false;" title="<?=\Yii::t('app','It is you, go to edit your data',[],\Yii::$app->admin->languageCode)?>">
-            <img src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->cms->getAuthUser()->getAvatarSrc()); ?>"/>
-            <span class="label label-info"><?= \Yii::$app->cms->getAuthUser()->getDisplayName(); ?></span>
+            <img src="<?= \skeeks\cms\helpers\Image::getSrc(\Yii::$app->user->identity->avatarSrc); ?>"/>
+            <span class="label label-info"><?= \Yii::$app->user->identity->displayName; ?></span>
         </a>
         <!--<a href="<?/*= $urlEditModel; */?>" onclick="new sx.classes.toolbar.Dialog('<?/*= $urlEditModel; */?>'); return false;" title="Выход">
              <span class="label">Выход</span>
@@ -43,9 +43,9 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
 
     </div>
 
-    <? if ($urlEditModel && $editModel) : ?>
+    <? if ($editUrl) : ?>
         <div class="skeeks-cms-toolbar-block">
-            <a href="<?= $urlEditModel; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $urlEditModel; ?>'); return false;" title="<?=\Yii::t('app','Edit the current page',[],\Yii::$app->admin->languageCode)?>">
+            <a href="<?= $editUrl; ?>" onclick="new sx.classes.toolbar.Dialog('<?= $editUrl; ?>'); return false;" title="<?=\Yii::t('app','Edit the current page',[],\Yii::$app->admin->languageCode)?>">
                  <span class="label"><?=\Yii::t('app','Edit',[],\Yii::$app->admin->languageCode)?></span>
             </a>
         </div>

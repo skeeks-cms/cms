@@ -12,6 +12,7 @@ use skeeks\cms\base\Controller;
 use skeeks\cms\components\Cms;
 use skeeks\cms\filters\CmsAccessControl;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
@@ -42,7 +43,18 @@ class UserController extends Controller
         if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && !$this->user)
         {
             throw new NotFoundHttpException("User not found or inactive");
+        } else if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && \Yii::$app->cmsToolbar)
+        {
+            $controller = \Yii::$app->createController('cms/admin-user')[0];
+            $adminControllerRoute = ['cms/admin-user/update', $controller->requestPkParamName => $this->user->{$controller->modelPkAttribute}];
+
+            $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();
+
+            \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
         }
+
+
     }
 
 
@@ -96,7 +108,8 @@ class UserController extends Controller
             return false;
         }
 
-        $this->_user = \Yii::$app->cms->findUser()->where([
+        $userClass = \Yii::$app->user->identityClass;
+        $this->_user = $userClass::find()->where([
             "username"  => $username,
             'active'    => Cms::BOOL_Y
         ])->one();

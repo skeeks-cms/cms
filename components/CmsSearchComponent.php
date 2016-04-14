@@ -6,7 +6,6 @@
  * @date 19.03.2015
  */
 namespace skeeks\cms\components;
-use skeeks\cms\actions\ViewModelAction;
 use skeeks\cms\assets\CmsToolbarAsset;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
