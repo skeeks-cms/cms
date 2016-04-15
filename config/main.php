@@ -60,6 +60,16 @@ $config =
 
         'i18n' => [
             'class' => 'skeeks\cms\i18n\components\I18N',
+            'translations' =>
+            [
+                'skeeks/cms/user' => [
+                    'class'             => 'yii\i18n\PhpMessageSource',
+                    'basePath'          => '@skeeks/cms/messages',
+                    'fileMap' => [
+                        'skeeks/cms/user' => 'user.php',
+                    ],
+                ]
+            ]
         ],
 
         'mailer' => [
@@ -183,11 +193,6 @@ $config =
         'dbDump' =>
         [
             'class' => '\skeeks\cms\components\db\DbDumpComponent',
-        ],
-
-        'cmsSearch' =>
-        [
-            'class' => '\skeeks\cms\components\CmsSearchComponent',
         ],
 
         'cmsMarkeplace' =>

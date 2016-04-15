@@ -266,7 +266,7 @@ class User
             'active' => Yii::t('app', 'Active'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Module::t('user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
+            'name' => \Yii::t('skeeks/cms/user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
             'gender' => Yii::t('app', 'Gender'),
             'logged_at' => Yii::t('app', 'Logged At'),
             'last_activity_at' => Yii::t('app', 'Last Activity At'),

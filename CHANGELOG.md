@@ -3,6 +3,8 @@ CHANGELOG
 
 2.8.pre
 -----------------
+ * i18n update
+ * Removed cmsSearch. In a separate package skeeks/cms-search
  * Remove the old properties of CMS components
  * Agent Management Settings moved to the config
  * \Yii::setAlias('template', '@app/views/'); is removed

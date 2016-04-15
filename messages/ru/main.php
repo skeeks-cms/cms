@@ -132,9 +132,6 @@ return
     "This user can not be removed" => "Этого пользователя нельзя удалить",
     "You can not delete yourself" => "Нельзя удалять самого себя",
 
-    "Search Phrase"         => "Поисковая фраза",
-    "Documents Found"       => "Найдено документов",
-    "Pages Count"           => "Количество страниц",
     "Template"           => "Шаблон",
     "Type of child partitions by default"           => "Тип дочерних разделов по умолчанию",
     "If this parameter is not specified, the child partition is created of the same type as the current one."           => "Если этот параметр не будет указан, то дочерний раздел будет создан того же типа что и текущий.",
