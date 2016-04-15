@@ -3,6 +3,7 @@ CHANGELOG
 
 2.7.2.pre
 -----------------
+ * \Yii::setAlias('template', '@app/views/'); is removed
  * Correcting typos
 
 2.7.2.alpha

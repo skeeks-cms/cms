@@ -308,6 +308,7 @@ class Cms extends \skeeks\cms\base\Component
             \Yii::$app->name = $this->appName;
         }
 
+        //Язык
         if ($this->languageCode)
         {
             \Yii::$app->language = $this->languageCode;
@@ -339,8 +340,6 @@ class Cms extends \skeeks\cms\base\Component
                 }
             }
         }
-        //TODO: may be is depricated. While better to use '@app/views/'
-        \Yii::setAlias('template', '@app/views/');
 
         $this->emailTemplates = ArrayHelper::merge($this->emailTemplatesDefault, (array) $this->emailTemplates);
 
