@@ -30,6 +30,27 @@ $config =
             'schemaCacheDuration' => 3600,
         ],
 
+        'cms' =>
+        [
+            'class'                         => '\skeeks\cms\components\Cms',
+
+            'template'                      => "default",
+            'templates'                     =>
+            [
+                'default' =>
+                [
+                    'name'          => 'Базовый шаблон (по умолчанию)',
+                    /*'pathMap'       =>
+                    [
+                        '@app/views' =>
+                        [
+                            '@app/templates/default',
+                        ],
+                    ]*/
+                ]
+            ],
+        ],
+
         'user' => [
             'class'             => '\yii\web\User',
             'identityClass'     => 'skeeks\cms\models\CmsUser',
@@ -38,7 +59,6 @@ $config =
         ],
 
         'i18n' => [
-            //'class' => 'skeeks\cms\i18n\components\I18NDb',
             'class' => 'skeeks\cms\i18n\components\I18N',
         ],
 
@@ -79,8 +99,8 @@ $config =
             'rules' => [
                 'cms-admin' => ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //admin panel
 
-                'robots.txt'                            => 'cms/seo/robots',
-                'sitemap.xml'                           => 'cms/seo/sitemap',
+                'robots.txt'                  => 'cms/seo/robots',
+                'sitemap.xml'                 => 'cms/seo/sitemap',
 
                 '~<_c:(profile)>'             => 'cms/profile/index',
                 'u'                           => 'cms/user/index',
@@ -127,7 +147,6 @@ $config =
             ],
         ],
 
-        //Админское меню
         'adminMenu' =>
         [
             'class' => '\skeeks\cms\modules\admin\components\Menu',
@@ -142,28 +161,6 @@ $config =
         [
             'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
         ],
-
-        'cms' =>
-        [
-            'class'                         => '\skeeks\cms\components\Cms',
-
-            'template'                      => "default",
-            'templates'                     =>
-            [
-                'default' =>
-                [
-                    'name'          => 'Базовый шаблон (по умолчанию)',
-                    /*'pathMap'       =>
-                    [
-                        '@app/views' =>
-                        [
-                            '@app/templates/default',
-                        ],
-                    ]*/
-                ]
-            ],
-        ],
-
 
         'imaging' =>
         [

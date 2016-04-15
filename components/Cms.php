@@ -108,6 +108,18 @@ class Cms extends \skeeks\cms\base\Component
     const BOOL_Y = "Y";
     const BOOL_N = "N";
 
+
+    /**
+     * @var bool агенты на хитах
+     */
+    public $enabledHitAgents                = true;
+
+    /**
+     * @var int Интервал выполенения агентов на хитах
+     */
+    public $hitAgentsInterval               = 60;
+
+
     /**
      * @var string E-Mail администратора сайта (отправитель по умолчанию).
      */
@@ -154,17 +166,6 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $passwordResetTokenExpire        = 3600;
 
-    /**
-     * @var string агенты на хитах
-     */
-    public $enabledHitAgents                = self::BOOL_Y;
-
-    /**
-     * @var int Интервал выполенения агентов на хитах
-     */
-    public $hitAgentsInterval               = 60;
-
-
 
     /**
      * @var bool Включить http вторизацию на сайте
@@ -178,22 +179,6 @@ class Cms extends \skeeks\cms\base\Component
 
     public $httpAuthLogin                  = "";
     public $httpAuthPassword               = "";
-
-    /**
-     * Настройки дебага
-     * @var string
-     */
-    public $debugEnabled                   = self::BOOL_N;
-    public $debugAllowedIPs                = "*";
-    /**
-     * Настройки генератора кода
-     * @var string
-     */
-    public $giiEnabled                   = self::BOOL_N;
-    public $giiAllowedIPs                = "*";
-
-    public $licenseKey                   = "";
-
 
     /**
      * Схема временных папок
@@ -366,17 +351,31 @@ class Cms extends \skeeks\cms\base\Component
      */
     public function beforeSendEmail(\yii\mail\MailEvent $event)
     {
-        if ($this->notifyAdminEmailsToArray())
-        {
-            $event->message->setCc($this->notifyAdminEmailsToArray());
-        }
 
-
+        $hiddenEmails = [];
         if ($emails = $this->notifyAdminEmailsHiddenToArray())
         {
+            $hiddenEmails = $this->notifyAdminEmailsHiddenToArray();
             $event->message->setBcc($this->notifyAdminEmailsHiddenToArray());
         }
 
+        if ($this->notifyAdminEmailsToArray())
+        {
+            $emails = [];
+            foreach ($this->notifyAdminEmailsToArray() as $email)
+            {
+                //If this email is already in the list of hidden, no longer send.
+                if (!in_array($email, $hiddenEmails))
+                {
+                    $emails[] = $email;
+                }
+            }
+
+            if ($emails)
+            {
+                $event->message->setCc($this->notifyAdminEmailsToArray());
+            }
+        }
     }
 
     /**
@@ -411,7 +410,7 @@ class Cms extends \skeeks\cms\base\Component
         }
 
         //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
-        if ($this->enabledHitAgents == self::BOOL_Y)
+        if ($this->enabledHitAgents)
         {
             $key = 'Agents';
             Yii::beginProfile("Enabled agents on the hits");
@@ -449,8 +448,6 @@ class Cms extends \skeeks\cms\base\Component
                 }
             }
         });
-
-
 
         \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
         {
@@ -553,18 +550,11 @@ class Cms extends \skeeks\cms\base\Component
             [['adminEmail'], 'email'],
             [['emailTemplate'], 'string'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
-            [['hitAgentsInterval'], 'integer', 'min' => 60],
-            [['enabledHitAgents'], 'string'],
             [['registerRoles'], 'safe'],
             [['enabledHttpAuthAdmin'], 'string'],
             [['enabledHttpAuth'], 'string'],
             [['httpAuthLogin'], 'string'],
             [['httpAuthPassword'], 'string'],
-            [['debugEnabled'], 'string'],
-            [['debugAllowedIPs'], 'string'],
-            [['giiEnabled'], 'string'],
-            [['giiAllowedIPs'], 'string'],
-            [['licenseKey'], 'string'],
 
             [['notifyAdminEmails'], function($attribute)
             {
@@ -617,18 +607,11 @@ class Cms extends \skeeks\cms\base\Component
             'emailTemplate'             => 'Шаблон для email',
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
-            'enabledHitAgents'          => 'Выполнение агентов на хитах',
-            'hitAgentsInterval'         => 'Интервал выполнения агентов на хитах',
             'registerRoles'             => 'При регистрации добавлять в группу',
             'enabledHttpAuth'           => 'Использовать http авторизацию на сайте',
             'enabledHttpAuthAdmin'      => 'Использовать http авторизацию в административной части',
             'httpAuthLogin'             => 'Логин',
             'httpAuthPassword'          => 'Пароль',
-            'debugEnabled'              => 'Включение режима отладки',
-            'debugAllowedIPs'           => 'Включение режима отладки для ip адресов',
-            'giiEnabled'                => 'Генератор кода включен',
-            'giiAllowedIPs'             => 'Включение генератора кода для ip адресов',
-            'licenseKey'                => 'Лицензионный ключ',
         ]);
     }
 
