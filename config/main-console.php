@@ -74,11 +74,6 @@ $config =
             'class' => '\skeeks\cms\components\db\DbDumpComponent',
         ],
 
-        'cmsSearch' =>
-        [
-            'class' => '\skeeks\cms\components\CmsSearchComponent',
-        ],
-
         'console' =>
         [
             'class' => 'skeeks\cms\components\ConsoleComponent',
