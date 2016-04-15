@@ -3,6 +3,9 @@ CHANGELOG
 
 2.8.pre
 -----------------
+
+2.7.2-alpha2
+-----------------
  * i18n update
  * Removed cmsSearch. In a separate package skeeks/cms-search
  * Remove the old properties of CMS components
