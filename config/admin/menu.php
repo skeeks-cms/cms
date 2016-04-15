@@ -339,46 +339,6 @@ return
                 ],
             ],
 
-
-            [
-
-                "label"     => \Yii::t('app',"Searching"),
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/search.png'],
-
-                'items' =>
-                [
-                    [
-                        "label" => \Yii::t('app',"Settings"),
-                        "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\components\CmsSearchComponent'],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings-big.png'],
-                        "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
-                        {
-                            return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
-                        },
-                    ],
-
-                    [
-                        "label"     => \Yii::t('app',"Statistic"),
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/statistics.png'],
-
-                        'items' =>
-                        [
-                            [
-                                "label" => \Yii::t('app',"Jump list"),
-                                "url"   => ["cms/admin-search-phrase"],
-                            ],
-
-                            [
-                                "label" => \Yii::t('app',"Phrase list"),
-                                "url"   => ["cms/admin-search-phrase-group"],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-
-
-
             [
                 'label'     => \Yii::t('app','Instruments'),
                 'priority'  => 0,
