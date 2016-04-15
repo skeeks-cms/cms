@@ -1,8 +1,10 @@
 CHANGELOG
 ==============
 
-2.7.2.pre
+2.8.pre
 -----------------
+ * Remove the old properties of CMS components
+ * Agent Management Settings moved to the config
  * \Yii::setAlias('template', '@app/views/'); is removed
  * Correcting typos
 

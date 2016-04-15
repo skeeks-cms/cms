@@ -97,7 +97,10 @@ $config =
             'showScriptName' => false,
             'suffix' => '',
             'rules' => [
-                'cms-admin' => ["class" => 'skeeks\cms\modules\admin\components\UrlRule', 'adminPrefix' => '~sx'], //admin panel
+                'cms-admin' => [
+                    "class" => 'skeeks\cms\modules\admin\components\UrlRule',
+                    'adminPrefix' => '~sx'
+                ], //admin panel
 
                 'robots.txt'                  => 'cms/seo/robots',
                 'sitemap.xml'                 => 'cms/seo/sitemap',
