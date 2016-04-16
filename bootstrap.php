@@ -39,13 +39,6 @@ if (ENABLE_MODULES_CONF)
     $config->appendFiles($modulesConfigFiles); //добавлены пути к конфигам всех файлов
 }
 
-$config->appendFiles([
-    COMMON_CONFIG_DIR . '/main.php',                    //common для текущего окружения
-    COMMON_ENV_CONFIG_DIR . '/main.php',                //common для текущего окружения
-    APP_CONFIG_DIR . '/main.php',                       //app общий
-    APP_ENV_CONFIG_DIR . '/main.php',                   //app для текущего окружения
-]);
-
 $config->cacheDir   = APP_RUNTIME_DIR;
 $config->cache      = CONFIG_CACHE;
 $config->name       = 'config_' . APP_TYPE;
@@ -56,5 +49,40 @@ $config->appendDependency(PHP_VERSION); //кэш будет сбрасывать
 $config->appendDependency(filemtime(COMMON_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(filemtime(APP_CONFIG_DIR . '/main.php')); //кэш будет сбрасываться при редактировании файла с общим конфигом
 $config->appendDependency(filemtime(COMMON_CONFIG_DIR . '/db.php')); //кэш будет сбрасываться при включении и отключении модульных конфигов
-//$config->appendDependency((int) ENABLE_MODULES_CONF); //кэш будет сбрасываться при включении и отключении модульных конфигов
-return $config;
+
+
+$configData = $config->getResult();
+
+$configCommon = [];
+if (file_exists(COMMON_CONFIG_DIR . '/main.php'))
+{
+    $configCommon = (array) include COMMON_CONFIG_DIR . '/main.php';
+}
+
+$configCommonEnv = [];
+if (file_exists(COMMON_ENV_CONFIG_DIR . '/main.php'))
+{
+    $configCommonEnv = (array) include COMMON_ENV_CONFIG_DIR . '/main.php';
+}
+
+$configApp = [];
+if (file_exists(APP_CONFIG_DIR . '/main.php'))
+{
+    $configApp = (array) include APP_CONFIG_DIR . '/main.php';
+}
+
+$configAppEnv = [];
+if (file_exists(APP_ENV_CONFIG_DIR . '/main.php'))
+{
+    $configAppEnv = (array) include APP_ENV_CONFIG_DIR . '/main.php';
+}
+
+$configData = \yii\helpers\ArrayHelper::merge(
+    $configData,
+    $configCommon,
+    $configCommonEnv,
+    $configApp,
+    $configAppEnv
+);
+
+return $configData;

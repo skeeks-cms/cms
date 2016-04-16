@@ -9,7 +9,7 @@
 //Определение всех неопределенных необходимых констант
 require(__DIR__ . '/global.php');
 //Стандартный загрузчик конфигов
-$config = require(__DIR__ . '/bootstrap.php');
-//$config->appendDependency(Yii::getVersion()); //Так можно подмешать чего либо к сбросу кэша
-$application = new yii\web\Application($config->getResult());
+$config = (array) require(__DIR__ . '/bootstrap.php');
+
+$application = new yii\web\Application($config);
 $application->run();

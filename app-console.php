@@ -20,9 +20,8 @@ defined('APP_TYPE') or define('APP_TYPE', 'console');
 //Определение всех неопределенных необходимых констант
 require(__DIR__ . '/global.php');
 //Стандартный загрузчик конфигов
-$config = require(__DIR__ . '/bootstrap.php');
+$config = (array) require(__DIR__ . '/bootstrap.php');
 
-//$config->appendDependency(Yii::getVersion()); //Так можно подмешать чего либо к сбросу кэша
-$application = new yii\console\Application($config->getResult());
+$application = new yii\console\Application($config);
 $exitCode = $application->run();
 exit($exitCode);
