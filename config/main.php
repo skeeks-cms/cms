@@ -16,7 +16,7 @@ $config =
     "name"          => "SkeekS CMS",
     'vendorPath'    => VENDOR_DIR,
     'language'      => 'ru',
-    'bootstrap'     => ['cms', 'cmsToolbar', 'seo'],
+    'bootstrap'     => ['cms', 'cmsToolbar'],
 
     'components' => [
 
@@ -112,9 +112,6 @@ $config =
                     'adminPrefix' => '~sx'
                 ], //admin panel
 
-                'robots.txt'                  => 'cms/seo/robots',
-                'sitemap.xml'                 => 'cms/seo/sitemap',
-
                 '~<_c:(profile)>'             => 'cms/profile/index',
                 'u'                           => 'cms/user/index',
                 'u/<username>'                => 'cms/user/view',
@@ -161,11 +158,6 @@ $config =
         'adminMenu' =>
         [
             'class' => '\skeeks\cms\modules\admin\components\Menu',
-        ],
-
-        'seo' =>
-        [
-            'class' => '\skeeks\cms\components\Seo'
         ],
 
         'admin' =>

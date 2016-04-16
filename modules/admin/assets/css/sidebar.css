@@ -140,15 +140,16 @@
 
             .sidebar ul.nav.nav-sidebar li a .sx-icon
             {
-                width: 33px;
+                width: 35px;
                 position: relative;
                 float: left;
             }
 
                 .sidebar ul.nav.nav-sidebar li a .sx-icon img
                 {
-                    width: 16px;
+                    width: 20px;
                     margin-left: 7px;
+                    margin-top: -3px;
                 }
 
                 .sidebar ul.nav.nav-sidebar li a .txt
