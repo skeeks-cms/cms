@@ -107,7 +107,7 @@ CSS
     <?/*= $form->field($model, 'status_of_life')->textarea(); */?>
 --><?/*= $form->fieldSetEnd(); */?>
 
-<? if (!$model->isNewRecord) : ?>
+<? if (!$model->isNewRecord && class_exists('\skeeks\cms\authclient\models\UserAuthClient')) : ?>
     <?= $form->fieldSet(\Yii::t('app','Social profiles'))?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => \Yii::t('app',"Social profiles"),
