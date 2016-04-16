@@ -166,20 +166,6 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $passwordResetTokenExpire        = 3600;
 
-
-    /**
-     * @var bool Включить http вторизацию на сайте
-     */
-    public $enabledHttpAuth                = self::BOOL_N;
-
-    /**
-     * @var bool Включить http авторизацию только для админки
-     */
-    public $enabledHttpAuthAdmin           = self::BOOL_N;
-
-    public $httpAuthLogin                  = "";
-    public $httpAuthPassword               = "";
-
     /**
      * Схема временных папок
      * Чистятся в момент нажатия на кнопку чистки временных файлов
@@ -404,11 +390,6 @@ class Cms extends \skeeks\cms\base\Component
             $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
         }
 
-        if ($this->enabledHttpAuth == self::BOOL_Y)
-        {
-            $this->executeHttpAuth();
-        }
-
         //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
         if ($this->enabledHitAgents)
         {
@@ -462,38 +443,6 @@ class Cms extends \skeeks\cms\base\Component
     }
 
 
-    public function executeHttpAuth()
-    {
-        if (!isset($_SERVER['PHP_AUTH_PW']))
-        {
-            $this->_authentificateHttp();
-        }
-
-        if(!@$_SERVER['PHP_AUTH_PW'])
-        {
-            $this->_authentificateHttp();
-        }
-
-        else
-        {
-            if (@$_SERVER['PHP_AUTH_USER'] != $this->httpAuthLogin || @$_SERVER['PHP_AUTH_PW'] != $this->httpAuthPassword)
-            {
-                $this->_authentificateHttp();
-            }
-        }
-    }
-
-    /**
-     *
-     */
-    protected function _authentificateHttp()
-    {
-        Header("WWW-Authenticate: Basic realm=\"SkeekS CMS\"");
-        Header("HTTP/1.0 401 Unauthorized");
-        echo "SkeekS CMS Authorization required.";
-        exit;
-    }
-
     protected function _installAgents()
     {
         //Вставка агентов
@@ -540,10 +489,6 @@ class Cms extends \skeeks\cms\base\Component
             [['emailTemplate'], 'string'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['registerRoles'], 'safe'],
-            [['enabledHttpAuthAdmin'], 'string'],
-            [['enabledHttpAuth'], 'string'],
-            [['httpAuthLogin'], 'string'],
-            [['httpAuthPassword'], 'string'],
 
             [['notifyAdminEmails'], function($attribute)
             {
@@ -597,10 +542,6 @@ class Cms extends \skeeks\cms\base\Component
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'registerRoles'             => 'При регистрации добавлять в группу',
-            'enabledHttpAuth'           => 'Использовать http авторизацию на сайте',
-            'enabledHttpAuthAdmin'      => 'Использовать http авторизацию в административной части',
-            'httpAuthLogin'             => 'Логин',
-            'httpAuthPassword'          => 'Пароль',
         ]);
     }
 

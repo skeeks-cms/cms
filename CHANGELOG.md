@@ -6,6 +6,7 @@ CHANGELOG
 
 2.8.0-alpha.pre
 -----------------
+ * Removed http auth
  * Removed DescriptionFullColumn, DescriptionShortColumn
  * Removed _ide/_back
  * Removed seo. In a separate package skeeks/cms-seo

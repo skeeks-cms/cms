@@ -183,12 +183,6 @@ abstract class AdminController extends \yii\web\Controller
             ]);
         }
 
-        //Если http авторизация на сайте отключена а в админке включена
-        if (\Yii::$app->cms->enabledHttpAuth  == "N" && \Yii::$app->cms->enabledHttpAuthAdmin == "Y")
-        {
-            \Yii::$app->cms->executeHttpAuth();
-        }
-
         self::$_onceInit = true;
     }
 
