@@ -76,11 +76,6 @@ class Seo extends Component
     public $countersContent         = ""; //Содержимое счетчиков
 
 
-    public $useLastDelimetrContentElements              = false;
-
-
-    public $useLastDelimetrTree                         = false;
-
     /**
      * @var array
      */
@@ -102,8 +97,6 @@ class Seo extends Component
             [['enableKeywordsGenerator', 'minKeywordLenth', 'maxKeywordsLength'], 'integer'],
             ['robotsContent', 'string'],
             ['countersContent', 'string'],
-            ['useLastDelimetrContentElements', 'boolean'],
-            ['useLastDelimetrTree', 'boolean'],
         ]);
     }
 
@@ -115,8 +108,6 @@ class Seo extends Component
             'maxKeywordsLength'                      => 'Длинна ключевых слов',
             'robotsContent'                          => 'Robots.txt файл',
             'countersContent'                        => 'Коды счетчиков',
-            'useLastDelimetrContentElements'         => 'Использовать слэш на конце адресов страниц элементов контента',
-            'useLastDelimetrTree'                    => 'Использовать слэш на конце адресов страниц разделов',
         ]);
     }
 

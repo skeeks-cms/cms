@@ -33,8 +33,3 @@ use yii\helpers\Html;
 <?= $form->fieldSet('Коды счетчиков'); ?>
     <?= $form->field($model, 'countersContent')->textarea(['rows' => 20]); ?>
 <?= $form->fieldSetEnd(); ?>
-
-<?= $form->fieldSet('Адресация страниц'); ?>
-    <?= $form->field($model, 'useLastDelimetrTree')->radioList(\Yii::$app->formatter->booleanFormat)->hint(''); ?>
-    <?= $form->field($model, 'useLastDelimetrContentElements')->radioList(\Yii::$app->formatter->booleanFormat)->hint(''); ?>
-<?= $form->fieldSetEnd(); ?>

@@ -40,6 +40,8 @@ class UrlRuleContentElement
     {
         if ($route == 'cms/content-element/view')
         {
+            $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
+
             $id                     = (int) ArrayHelper::getValue($params, 'id');
             $contentElement         = ArrayHelper::getValue($params, 'model');
 
@@ -74,10 +76,11 @@ class UrlRuleContentElement
 
             if ($contentElement->cmsTree)
             {
-                $url = $contentElement->cmsTree->dir . DIRECTORY_SEPARATOR;
+                $url = $contentElement->cmsTree->dir . "/";
             }
 
-            $url .= $contentElement->id . '-' . $contentElement->code . ((bool) \Yii::$app->seo->useLastDelimetrContentElements ? DIRECTORY_SEPARATOR : "");
+            //$url .= $contentElement->id . '-' . $contentElement->code . ((bool) \Yii::$app->seo->useLastDelimetrContentElements ? DIRECTORY_SEPARATOR : "");
+            $url .= $contentElement->id . '-' . $contentElement->code . $suffix;
 
             ArrayHelper::remove($params, 'id');
             ArrayHelper::remove($params, 'code');
@@ -101,8 +104,23 @@ class UrlRuleContentElement
      */
     public function parseRequest($manager, $request)
     {
+
+        if ($this->mode === self::CREATION_ONLY) {
+            return false;
+        }
+
+        if (!empty($this->verb) && !in_array($request->getMethod(), $this->verb, true)) {
+            return false;
+        }
+
         $pathInfo           = $request->getPathInfo();
+        if ($this->host !== null) {
+            $pathInfo = strtolower($request->getHostInfo()) . ($pathInfo === '' ? '' : '/' . $pathInfo);
+        }
+
+
         $params             = $request->getQueryParams();
+        $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
         $treeNode           = null;
 
         if (!$pathInfo)
@@ -115,13 +133,6 @@ class UrlRuleContentElement
             return false;
         }
 
-        //Если урл преобразован, редирректим по новой
-        $pathInfoNormal = $this->_normalizeDir($pathInfo);
-        if ($pathInfo != $pathInfoNormal)
-        {
-            //\Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
-        }
-
 
         return ['cms/content-element/view', [
             'id'    => $matches['id'],
@@ -129,41 +140,5 @@ class UrlRuleContentElement
         ]];
     }
 
-    /**
-     * Преобразование path, убираем лишние слэши, если надо добавляем последний слэш
-     * @param $pathInfo
-     * @return string
-     */
-    protected function _normalizeDir($pathInfo)
-    {
-        $pathInfoNormal     = $this->_filterNormalizeDir($pathInfo);
-
-        if ((bool) \Yii::$app->seo->useLastDelimetrContentElements)
-        {
-            return $pathInfoNormal . DIRECTORY_SEPARATOR;
-        } else
-        {
-            return $pathInfoNormal;
-        }
-    }
-
-    /**
-     * @param string $dir
-     * @return string
-     */
-    protected function _filterNormalizeDir($dir)
-    {
-        $result = [];
-
-        $data = explode(DIRECTORY_SEPARATOR, $dir);
-        foreach ($data as $value)
-        {
-            if ($value)
-            {
-                $result[] = $value;
-            }
-        }
-        return implode(DIRECTORY_SEPARATOR, $result);
-    }
 
 }

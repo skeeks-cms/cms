@@ -4,6 +4,11 @@ CHANGELOG
 2.8.pre
 -----------------
 
+2.8.0-alpha.pre
+-----------------
+ * Removed some settings in seo component
+ * Rewritten classes urlRules
+
 2.7.2-alpha2
 -----------------
  * i18n update

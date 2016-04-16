@@ -40,6 +40,8 @@ class UrlRuleTree
     {
         if ($route == 'cms/tree/view')
         {
+            $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
+
             $id          = (int) ArrayHelper::getValue($params, 'id');
             $treeModel   = ArrayHelper::getValue($params, 'model');
 
@@ -68,7 +70,8 @@ class UrlRuleTree
 
             if ($tree->dir)
             {
-                $url = $tree->dir . ((bool) \Yii::$app->seo->useLastDelimetrTree ? DIRECTORY_SEPARATOR : "") . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
+                //$url = $tree->dir . ((bool) \Yii::$app->seo->useLastDelimetrTree ? DIRECTORY_SEPARATOR : "") . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
+                $url = $tree->dir . $suffix;
             } else
             {
                 $url = "";
@@ -94,33 +97,29 @@ class UrlRuleTree
      */
     public function parseRequest($manager, $request)
     {
+        if ($this->mode === self::CREATION_ONLY) {
+            return false;
+        }
+
+        if (!empty($this->verb) && !in_array($request->getMethod(), $this->verb, true)) {
+            return false;
+        }
+
         $pathInfo           = $request->getPathInfo();
+        if ($this->host !== null) {
+            $pathInfo = strtolower($request->getHostInfo()) . ($pathInfo === '' ? '' : '/' . $pathInfo);
+        }
+
+
         $params             = $request->getQueryParams();
+        $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
         $treeNode           = null;
 
-        if (!$pathInfo)
+        $originalDir = $pathInfo;
+        if ($suffix)
         {
-            return $this->_go();
+            $originalDir = substr($pathInfo, 0, (strlen($pathInfo) - strlen($suffix)));
         }
-
-        //Если урл преобразован, редирректим по новой
-        $pathInfoNormal = $this->_normalizeDir($pathInfo);
-
-        if ($pathInfo != $pathInfoNormal)
-        {
-            //\Yii::$app->response->redirect(DIRECTORY_SEPARATOR . $pathInfoNormal . ($params ? '?' . http_build_query($params) : '') );
-        }
-
-        return $this->_go($pathInfoNormal);
-    }
-
-    protected function _go($normalizeDir = null)
-    {
-        if (\Yii::$app->seo->useLastDelimetrTree)
-        {
-            $normalizeDir = substr($normalizeDir, 0, (strlen($normalizeDir) - 1));
-        }
-
 
         $dependency = new TagDependency([
             'tags'      =>
@@ -130,7 +129,7 @@ class UrlRuleTree
         ]);
 
 
-        if (!$normalizeDir) //главная страница
+        if (!$pathInfo) //главная страница
         {
             $treeNode = Tree::getDb()->cache(function ($db) {
                 return Tree::find()->where([
@@ -139,23 +138,11 @@ class UrlRuleTree
                 ])->one();
             }, null, $dependency);
 
-            /*$treeNode = Tree::find()->where([
-                "site_code"         => \Yii::$app->cms->site->code,
-                "level"             => 0,
-            ])->one();*/
-
-
         } else //второстепенная страница
         {
-            /*$treeNode = Tree::getDb()->cache(function ($db) {
-                return Tree::find()->where([
-                    (new Tree())->dirAttrName       => $normalizeDir,
-                    "site_code"                     => \Yii::$app->cms->site->code,
-                ])->one();
-            }, null, $dependency);*/
 
             $treeNode = Tree::find()->where([
-                "dir"                           => $normalizeDir,
+                "dir"                           => $originalDir,
                 "site_code"                     => \Yii::$app->cms->site->code,
             ])->one();
         }
@@ -171,43 +158,5 @@ class UrlRuleTree
         {
             return false;
         }
-    }
-
-
-    /**
-     * Преобразование path, убираем лишние слэши, если надо добавляем последний слэш
-     * @param $pathInfo
-     * @return string
-     */
-    protected function _normalizeDir($pathInfo)
-    {
-        $pathInfoNormal     = $this->_filterNormalizeDir($pathInfo);
-
-        if ((bool) \Yii::$app->seo->useLastDelimetrTree)
-        {
-            return $pathInfoNormal . "/";
-        } else
-        {
-            return $pathInfoNormal;
-        }
-    }
-
-    /**
-     * @param string $dir
-     * @return string
-     */
-    protected function _filterNormalizeDir($dir)
-    {
-        $result = [];
-
-        $data = explode(DIRECTORY_SEPARATOR, $dir);
-        foreach ($data as $value)
-        {
-            if ($value)
-            {
-                $result[] = $value;
-            }
-        }
-        return implode(DIRECTORY_SEPARATOR, $result);
     }
 }
