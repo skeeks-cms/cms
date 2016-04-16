@@ -6,6 +6,7 @@ CHANGELOG
 
 2.8.0-alpha.pre
 -----------------
+ * Removed _ide/_back
  * Removed seo. In a separate package skeeks/cms-seo
  * Removed some settings in seo component
  * Rewritten classes urlRules
