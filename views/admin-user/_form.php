@@ -108,15 +108,15 @@ CSS
 --><?/*= $form->fieldSetEnd(); */?>
 
 <? if (!$model->isNewRecord && class_exists('\skeeks\cms\authclient\models\UserAuthClient')) : ?>
-    <?= $form->fieldSet(\Yii::t('app','Social profiles'))?>
+    <?= $form->fieldSet(\Yii::t('skeeks/authclient','Social profiles'))?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-            'label'             => \Yii::t('app',"Social profiles"),
+            'label'             => \Yii::t('skeeks/authclient',"Social profiles"),
             'hint'              => "",
             'parentModel'       => $model,
             'relation'          => [
                 'user_id' => 'id'
             ],
-            'controllerRoute'   => 'cms/admin-user-auth-client',
+            'controllerRoute'   => 'authclient/admin-user-auth-client',
             'gridViewOptions'   => [
                 'columns' => [
                     'displayName'

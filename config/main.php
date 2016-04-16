@@ -112,7 +112,6 @@ $config =
                     'adminPrefix' => '~sx'
                 ], //admin panel
 
-                '~<_c:(profile)>'             => 'cms/profile/index',
                 'u'                           => 'cms/user/index',
                 'u/<username>'                => 'cms/user/view',
                 'u/<username>/<action>'       => 'cms/user/<action>',
