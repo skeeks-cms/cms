@@ -63,10 +63,9 @@ $config =
             'class' => '\skeeks\cms\rbac\DbManager',
         ],
 
-        //Админское меню
-        'adminMenu' =>
+        'admin' =>
         [
-            'class' => '\skeeks\cms\modules\admin\components\Menu',
+            'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
         ],
 
         'dbDump' =>

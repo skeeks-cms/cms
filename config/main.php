@@ -155,11 +155,6 @@ $config =
             ],
         ],
 
-        'adminMenu' =>
-        [
-            'class' => '\skeeks\cms\modules\admin\components\Menu',
-        ],
-
         'admin' =>
         [
             'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'

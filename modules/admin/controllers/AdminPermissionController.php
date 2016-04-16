@@ -110,7 +110,7 @@ class AdminPermissionController extends AdminModelEditorController
         {
             $auth = Yii::$app->authManager;
 
-            foreach (\Yii::$app->adminMenu->getData() as $group)
+            foreach (\Yii::$app->admin->menu->getData() as $group)
             {
                 if (is_array($group))
                 {

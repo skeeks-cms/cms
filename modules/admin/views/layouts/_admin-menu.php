@@ -16,7 +16,7 @@
     <div class="inner-wrapper scrollbar-macosx">
         <div class="sidebar-collapse sx-sidebar-collapse">
 
-<? if ($items = \Yii::$app->adminMenu->items) : ?>
+<? if ($items = \Yii::$app->admin->menu->items) : ?>
     <? foreach ($items as $adminMenuItem) : ?>
         <? if ($adminMenuItem->isAllowShow() && $adminMenuItem->items) : ?>
             <div class="sidebar-menu <?= $adminMenuItem->isActive() ? ' sx-opened' : '' ?>" id="<?= $adminMenuItem->code; ?>">

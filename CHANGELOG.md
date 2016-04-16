@@ -6,6 +6,7 @@ CHANGELOG
 
 2.8.0-alpha.pre
 -----------------
+ * Change component connect admin menu
  * Removed http auth
  * Removed DescriptionFullColumn, DescriptionShortColumn
  * Removed _ide/_back
