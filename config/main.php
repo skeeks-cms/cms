@@ -185,20 +185,6 @@ $config =
             'class' => '\skeeks\cms\components\marketplace\MarketplaceApi',
         ],
 
-
-        'authClientCollection' =>
-        [
-            'class' => 'skeeks\cms\authclient\Collection',
-
-            'clients' =>
-            []
-        ],
-
-        'authClientSettings' =>
-        [
-            'class' => 'skeeks\cms\authclient\AuthClientSettings',
-        ],
-
         'console' =>
         [
             'class' => 'skeeks\cms\components\ConsoleComponent',

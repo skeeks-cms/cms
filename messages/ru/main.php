@@ -470,7 +470,6 @@ return
     "User properties"       => "Свойства пользователей",
     "The base of {email} addresses" => "База {email} адресов",
     "Base phones"           => "База телефонов",
-    "Social profiles"       => "Социальные профили",
     "Roles"                 => "Роли",
     "Privileges"            => "Привилегии",
     "Searching"             => "Поиск",
@@ -753,14 +752,7 @@ return
     "Managment {email} templates" => "Управление {email} шаблонами",
     "Event"                 => "Событие",
 
-    "Are common"            => "Общие",
-    "Create application at page" => "Создайте приложение на странице",
-    ", and get its settings." => ", и получите его настройки.",
-    "Optional parameter, if not filled will be used {yii}" => "Необязательный параметр, если не заполнен будет использован {yii}",
-
-    "Authorization through social networks" => "Авторизация через соц. сети",
     "Enable"                => "Включить",
-    "Enable authorization through {github}" => "Включить авторизацию через {github}",
     "Handler"               => "Обработчик",
     "This behavior is designed only to work with {class}" => "Данное поведение рассчитано только для работы с {class}",
 

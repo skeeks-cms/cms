@@ -315,13 +315,6 @@ return
                     ],
 
                     [
-                        "label"     => \Yii::t('app',"Social profiles"),
-                        "url"       => ["cms/admin-user-auth-client"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/facebook.png']
-                    ],
-
-
-                    [
                         "label"     => \Yii::t('app','Roles'),
                         "url"       => ["admin/admin-role"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
