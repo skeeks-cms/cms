@@ -6,6 +6,7 @@ CHANGELOG
 
 2.8.0-alpha.pre
 -----------------
+ * Removed class skeeks\cms\base\console\Controller
  * Removed authclient. In a separate package skeeks/cms-authclient
  * Change component connect admin menu
  * Removed http auth

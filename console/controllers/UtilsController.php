@@ -7,7 +7,6 @@
  */
 namespace skeeks\cms\console\controllers;
 
-use skeeks\cms\base\console\Controller;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsSearchPhrase;
@@ -15,13 +14,14 @@ use skeeks\cms\models\StorageFile;
 use skeeks\sx\Dir;
 use Yii;
 use yii\base\Event;
+use yii\console\Controller;
 use yii\console\controllers\HelpController;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\FileHelper;
 
 /**
- * Полезные утилиты SkeekS CMS
+ * Productivity SkeekS CMS
  *
  * @package skeeks\cms\console\controllers
  */

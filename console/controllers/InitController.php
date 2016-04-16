@@ -7,11 +7,11 @@
  */
 namespace skeeks\cms\console\controllers;
 
-use skeeks\cms\base\console\Controller;
 use skeeks\cms\helpers\FileHelper;
+use yii\console\Controller;
 
 /**
- * Полезные утилиты SkeekS CMS
+ * Project SkeekS CMS initialization
  *
  * @package skeeks\cms\console\controllers
  */

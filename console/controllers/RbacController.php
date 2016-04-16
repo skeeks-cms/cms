@@ -7,7 +7,6 @@
  */
 namespace skeeks\cms\console\controllers;
 
-use skeeks\cms\base\console\Controller;
 use skeeks\cms\models\User;
 use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
@@ -15,14 +14,14 @@ use skeeks\cms\rbac\AuthorRule;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
 use yii\base\Exception;
+use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\Json;
 use yii\rbac\Rule;
 
 /**
- * Настройка прав доступа
- *
+ * Setting permissions
  *
  * Class RbacController
  * @package skeeks\cms\controllers
