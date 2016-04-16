@@ -32,11 +32,11 @@ define("SKEEKS_DIR", __DIR__);
 define("SKEEKS_CONFIG_DIR", SKEEKS_DIR . '/config');
 
 //Корень проекта
-defined('ROOT_DIR') or die('Please specify the constant "ROOT_DIR" in index_.php in your application.');
+defined('ROOT_DIR') or die('Please specify the constant "ROOT_DIR" in index.php in your application.');
 //Корень запущеного приложения
-defined('APP_DIR') or die('Please specify the constant "APP_DIR" in index_.php in your application.');
+defined('APP_DIR') or die('Please specify the constant "APP_DIR" in index.php in your application.');
 //Корень запущеного приложения
-defined('APP_CONFIG_DIR') or die('Please specify the constant "APP_CONFIG_DIR" in index_.php in your application.');
+defined('APP_CONFIG_DIR') or die('Please specify the constant "APP_CONFIG_DIR" in index.php in your application.');
 
 defined('APP_TYPE') or define('APP_TYPE', 'web');
 
