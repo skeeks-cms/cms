@@ -23,27 +23,6 @@ use yii\web\Response;
  */
 class ToolsController extends Controller
 {
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return [
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => null,
-            ],
-        ];
-    }
 
     /**
      * Выбор файла
