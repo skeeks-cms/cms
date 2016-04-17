@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed agents. In a separate package skeeks/cms-agent
  * Removed class ConnectToDbForm
  * Removed class DbDsnHelper
  * Removed StatusColumn class

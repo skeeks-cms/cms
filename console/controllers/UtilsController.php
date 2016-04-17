@@ -98,27 +98,6 @@ class UtilsController extends Controller
         ]));
     }
 
-    /**
-     * Выполнить агентов
-     */
-    public function actionAgentsExecute()
-    {
-        /**
-         * Поиск агентов к выполнению
-         */
-        $agents = CmsAgent::findForExecute()->all();
-
-        \Yii::info('Agents execute: ' . count($agents), CmsAgent::className());
-
-        if ($agents)
-        {
-            foreach ($agents as $agent)
-            {
-                $agent->execute();
-            }
-        }
-    }
-
 
     /**
      * Читка всех сгенерированных миниатюр

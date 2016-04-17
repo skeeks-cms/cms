@@ -8,25 +8,11 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\assets\CmsAsset;
-use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\base\Module;
-use skeeks\cms\controllers\AdminCmsContentElementController;
-use skeeks\cms\events\LoginEvent;
 use skeeks\cms\helpers\ComposerHelper;
-use skeeks\cms\mail\Message;
-use skeeks\cms\models\CmsAgent;
-use skeeks\cms\models\CmsEvent;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
-use skeeks\cms\models\CmsSiteDomain;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
@@ -42,10 +28,8 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTextarea;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTextInput;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTree;
 use skeeks\cms\models\Site;
-use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
-use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeColor;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
@@ -107,18 +91,6 @@ class Cms extends \skeeks\cms\base\Component
 
     const BOOL_Y = "Y";
     const BOOL_N = "N";
-
-
-    /**
-     * @var bool агенты на хитах
-     */
-    public $enabledHitAgents                = true;
-
-    /**
-     * @var int Интервал выполенения агентов на хитах
-     */
-    public $hitAgentsInterval               = 60;
-
 
     /**
      * @var string E-Mail администратора сайта (отправитель по умолчанию).
@@ -322,7 +294,6 @@ class Cms extends \skeeks\cms\base\Component
         if (\Yii::$app instanceof Application)
         {
             //console init
-            $this->_initConsole();
         } else
         {
             //web init
@@ -365,17 +336,6 @@ class Cms extends \skeeks\cms\base\Component
     }
 
     /**
-     * Продолжение инициализации только в случае работы console приложения
-     */
-    protected function _initConsole()
-    {
-        \Yii::$app->on(self::EVENT_AFTER_UPDATE, function(Event $e)
-        {
-            $this->_installAgents();
-        });
-    }
-
-    /**
      * Продолжение инициализации только в случае работы web приложения
      */
     protected function _initWeb()
@@ -390,26 +350,6 @@ class Cms extends \skeeks\cms\base\Component
             $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
         }
 
-        //Выполнение агентов на хитах, должны быть  включены в настройка, нужна system.
-        if ($this->enabledHitAgents)
-        {
-            $key = 'Agents';
-            Yii::beginProfile("Enabled agents on the hits");
-                $data = \Yii::$app->cache->get($key);
-                if ($data === false)
-                {
-                    Yii::beginProfile("Execute");
-                        $result = \Yii::$app->console->execute("cd " . ROOT_DIR . '; php yii cms/utils/agents-execute;');
-                        \Yii::$app->cache->set($key, '1', (int) $this->hitAgentsInterval);
-                    Yii::endProfile("Execute");
-                }
-            Yii::endProfile("Enabled agents on the hits");
-        }
-
-
-        /**
-         * Генерация SEO метатегов.
-         * */
         \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
         {
             if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
@@ -442,43 +382,6 @@ class Cms extends \skeeks\cms\base\Component
         });
     }
 
-
-    protected function _installAgents()
-    {
-        //Вставка агентов
-        if (!CmsAgent::find()->where(['name' => 'cms/db/refresh'])->one())
-        {
-            ( new CmsAgent([
-                'name'              => 'cms/db/refresh',
-                'description'       => 'Инвалидация кэша структуры таблиц',
-                'agent_interval'    => 3600*3, //раз в три часа
-                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*3,
-                'is_period'         => Cms::BOOL_N
-            ]) )->save();
-        }
-
-        if (!CmsAgent::find()->where(['name' => 'cms/cache/flush-runtimes'])->one())
-        {
-            ( new CmsAgent([
-                'name'              => 'cms/cache/flush-runtimes',
-                'description'       => 'Чистка временных диррикторий',
-                'agent_interval'    => 3600*24,
-                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,
-                'is_period'         => Cms::BOOL_N
-            ]) )->save();
-        }
-
-        if (!CmsAgent::find()->where(['name' => 'cms/db/dump'])->one())
-        {
-            ( new CmsAgent([
-                'name'              => 'cms/db/dump',
-                'description'       => 'Бэкап базы данных',
-                'agent_interval'    => 3600*24, //раз в три часа
-                'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*24,
-                'is_period'         => Cms::BOOL_N
-            ]) )->save();
-        }
-    }
 
     public function rules()
     {
