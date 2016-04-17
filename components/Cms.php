@@ -154,34 +154,6 @@ class Cms extends \skeeks\cms\base\Component
 
 
     /**
-     * @var array Возможные шаблоны сайта
-     */
-    public $templatesDefault       =
-    [
-        'default' =>
-        [
-            'name'          => 'Базовый шаблон (по умолчанию)',
-            'pathMap'       =>
-            [
-                '@app/views' =>
-                [
-                    '@app/templates/default',
-                ],
-            ]
-        ]
-    ];
-
-    /**
-     * @var array Возможные шаблоны сайта
-     */
-    public $templates       = [];
-    /**
-     * @var string шаблон
-     */
-    public $template                        = "default";
-
-
-    /**
      * @var array Возможные шаблоны email
      */
     public $emailTemplatesDefault       =
@@ -259,24 +231,6 @@ class Cms extends \skeeks\cms\base\Component
         if (!file_exists(AUTO_GENERATED_MODULES_FILE))
         {
             $this->generateModulesConfigFile();
-        }
-
-        //init view theme
-        $this->templates = ArrayHelper::merge($this->templatesDefault, (array) $this->templates);
-        foreach ($this->templates as $code => $templateData)
-        {
-            if ($code == $this->template)
-            {
-                if ($pathMap = ArrayHelper::getValue($templateData, 'pathMap'))
-                {
-                    if (is_array($pathMap))
-                    {
-                        \Yii::$app->view->theme = new Theme([
-                            'pathMap' => $pathMap
-                        ]);
-                    }
-                }
-            }
         }
 
         $this->emailTemplates = ArrayHelper::merge($this->emailTemplatesDefault, (array) $this->emailTemplates);
@@ -420,8 +374,6 @@ class Cms extends \skeeks\cms\base\Component
             'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
-            'template'                  => 'Шаблон',
-            'templates'                 => 'Возможные шаблон',
             'emailTemplate'             => 'Шаблон для email',
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',

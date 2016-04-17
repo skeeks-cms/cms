@@ -11,12 +11,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\WidgetConfig */
 
-$templates = [];
-
-foreach (\Yii::$app->cms->templates as $code => $data)
-{
-    $templates[$code] = \yii\helpers\ArrayHelper::getValue($data, 'name');
-}
 
 $emailTemplates = [];
 
@@ -36,12 +30,6 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     <?= $form->field($model, 'noImageUrl')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\OneImage::className()
     )->hint('Это изображение показывается в тех случаях, когда не найдено основное.'); ?>
-
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Шаблоны/отображение'
-    ])?>
-
-    <?= $form->fieldSelect($model, 'template', $templates); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => 'Языковые настройки'

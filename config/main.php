@@ -33,22 +33,6 @@ $config =
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
-
-            'template'                      => "default",
-            'templates'                     =>
-            [
-                'default' =>
-                [
-                    'name'          => 'Базовый шаблон (по умолчанию)',
-                    /*'pathMap'       =>
-                    [
-                        '@app/views' =>
-                        [
-                            '@app/templates/default',
-                        ],
-                    ]*/
-                ]
-            ],
         ],
 
         'user' => [
