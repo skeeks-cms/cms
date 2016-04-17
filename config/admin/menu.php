@@ -272,11 +272,6 @@ return
                         'items'     => componentsMenu()
                     ],
 
-                    [
-                        "label"     => \Yii::t('app',"Agents"),
-                        "url"       => ["cms/admin-cms-agent"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clock.png'],
-                    ],
                 ],
             ],
 

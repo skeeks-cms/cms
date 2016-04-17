@@ -75,31 +75,6 @@ class UtilsController extends Controller
     }
 
     /**
-     * Сообщение всем подключенным компонентам, что нужно обновление завершено
-     * В этот момент компоненты, могут выполнить какой либо код, например добавить агентов или email событий
-     */
-    public function actionTriggerAfterUpdate()
-    {
-        //Загрузка всех компонентов.
-        $components = \Yii::$app->getComponents();
-        foreach ($components as $id => $data)
-        {
-            try
-            {
-                \Yii::$app->get($id);
-            } catch (\Exception $e)
-            {
-                continue;
-            }
-        }
-
-        \Yii::$app->trigger(Cms::EVENT_AFTER_UPDATE, new Event([
-            'name' => Cms::EVENT_AFTER_UPDATE
-        ]));
-    }
-
-
-    /**
      * Читка всех сгенерированных миниатюр
      */
     public function actionClearAllThumbnails()
