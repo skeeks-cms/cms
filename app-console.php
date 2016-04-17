@@ -17,11 +17,17 @@ defined('CONFIG_CACHE') or define('CONFIG_CACHE', false);
 
 defined('APP_TYPE') or define('APP_TYPE', 'console');
 
-//Определение всех неопределенных необходимых констант
+//Determination of uncertainty must be constants
 require(__DIR__ . '/global.php');
-//Стандартный загрузчик конфигов
-$config = (array) require(__DIR__ . '/bootstrap.php');
+//Standard loader
+require(__DIR__ . '/bootstrap.php');
 
-$application = new yii\console\Application($config);
+//Result config
+$config = \yii\helpers\ArrayHelper::merge(
+    (array) require(__DIR__ . '/auto-config.php'),
+    (array) require(__DIR__ . '/app-config.php')
+);
+
+$application = new yii\web\Application($config);
 $exitCode = $application->run();
 exit($exitCode);

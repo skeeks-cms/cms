@@ -6,10 +6,16 @@
  * @date 31.03.2015
  * @var \skeeks\cms\Config $config
  */
-//Определение всех неопределенных необходимых констант
+//Determination of uncertainty must be constants
 require(__DIR__ . '/global.php');
-//Стандартный загрузчик конфигов
-$config = (array) require(__DIR__ . '/bootstrap.php');
+//Standard loader
+require(__DIR__ . '/bootstrap.php');
+
+//Result config
+$config = \yii\helpers\ArrayHelper::merge(
+    (array) require(__DIR__ . '/auto-config.php'),
+    (array) require(__DIR__ . '/app-config.php')
+);
 
 $application = new yii\web\Application($config);
 $application->run();
