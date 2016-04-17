@@ -28,6 +28,6 @@ $config = \yii\helpers\ArrayHelper::merge(
     (array) require(__DIR__ . '/app-config.php')
 );
 
-$application = new yii\web\Application($config);
+$application = new yii\console\Application($config);
 $exitCode = $application->run();
 exit($exitCode);
