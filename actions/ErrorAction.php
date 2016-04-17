@@ -81,7 +81,7 @@ class ErrorAction extends \yii\web\ErrorAction
             {
                 if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
                 {
-                    $this->controller->layout = \Yii::$app->cms->moduleAdmin()->layout;
+                    $this->controller->layout = \Yii::$app->cms->moduleAdmin->layout;
                     return $this->controller->render('@admin/views/error/error', [
                         'message' => nl2br(Html::encode($message))
                     ]);

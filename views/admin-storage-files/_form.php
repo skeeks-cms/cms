@@ -130,17 +130,6 @@ CSS
     <?= $form->fieldSetEnd(); ?>
 <? endif; ?>
 
-<?/*= $form->field($model, 'description')->textarea() */?><!--
---><?/*= $form->field($model, 'multiValue')->textarea() */?>
-<!--
---><?/*= $form->field($model, 'value')->widget(
-    \skeeks\cms\widgets\formInputs\multiLangAndSiteTextarea\multiLangAndSiteTextarea::className(),
-    [
-        'lang' => \skeeks\cms\App::moduleAdmin()->getCurrentLang(),
-        'site' => \skeeks\cms\App::moduleAdmin()->getCurrentSite(),
-    ]
-);
-*/?>
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 </div>

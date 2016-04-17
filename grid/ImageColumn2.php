@@ -30,7 +30,7 @@ class ImageColumn2 extends DataColumn
             $src            = \Yii::$app->imaging->getImagingUrl($file->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
         } else
         {
-            $src            = \Yii::$app->cms->moduleAdmin()->noImage;
+            $src            = \Yii::$app->cms->moduleAdmin->noImage;
             $originalSrc    = $src;
         }
 

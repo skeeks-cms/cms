@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed Cms::moduleAdmin()
  * Removed templates. In a separate package skeeks/cms-view
  * Configs updated
  * Removed admin. In a separate package skeeks/cms-admin
