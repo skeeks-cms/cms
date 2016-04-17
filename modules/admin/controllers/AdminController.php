@@ -11,7 +11,6 @@ use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\components\UrlRule;
-use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use skeeks\cms\modules\admin\filters\AccessRule;
@@ -40,8 +39,6 @@ use yii\web\ForbiddenHttpException;
  */
 abstract class AdminController extends \yii\web\Controller
 {
-    const EVENT_INIT                    = 'event.adminController.init';
-
     const LAYOUT_EMPTY                  = 'main-empty';
     const LAYOUT_MAIN                   = 'main';
 
@@ -144,11 +141,6 @@ abstract class AdminController extends \yii\web\Controller
         {
             $this->name = \Yii::t('app','The name of the controller'); //Inflector::humanize($this->id);
         }
-
-        \Yii::$app->trigger(self::EVENT_INIT, new AdminInitEvent([
-            'name'          => self::EVENT_INIT,
-            'controller'    => $this
-        ]));
     }
 
     /**
