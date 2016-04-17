@@ -45,9 +45,6 @@
         "giggsey/libphonenumber-for-php": "~7.0",
         "ifsnop/mysqldump-php":"*"
     },
-    "scripts": {
-        "post-update-cmd": "skeeks\\cms\\ComposerTest::postUpdate"
-    },
     "minimum-stability" : "dev",
     "prefer-stable" : true,
     "autoload": {
