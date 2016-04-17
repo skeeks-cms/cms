@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/../cms-shop/config/agents.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config/agents.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/helpers/ComponentHelper.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/migrations/m160215_093837__create_table__cms_dashboard.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/models/CmsDashboard.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/admin/base/AdminDashboardWidget.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/admin/base/AdminDashboardWidgetRenderable.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/admin/controllers/ErrorController.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/admin/dashboards/CmsInformDashboard.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/admin/views/error/error.php" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/admin/views/index/edit-dashboard-widget.php" charset="UTF-8" />
+  </component>
+</project>

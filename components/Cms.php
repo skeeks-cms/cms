@@ -67,11 +67,6 @@ use yii\widgets\ActiveForm;
 class Cms extends \skeeks\cms\base\Component
 {
     /**
-     * Событие срабатываемое после выполнения процесса установки или обновления cms
-     */
-    const EVENT_AFTER_UPDATE = 'cms.event.after.update';
-
-    /**
      * @return array
      */
     static public function descriptorConfig()

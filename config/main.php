@@ -59,7 +59,7 @@ $config =
         ],
 
         'i18n' => [
-            'class' => 'skeeks\cms\i18n\components\I18N',
+            'class' => 'skeeks\cms\i18n\I18N',
             'translations' =>
             [
                 'skeeks/cms/user' => [

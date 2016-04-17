@@ -96,12 +96,6 @@ return
     'Schema Cache Duration (sec)'   => 'Время кэша структуры (сек)',
 
     "Rule"                  => "Правило",
-
-    "Last Execution At"     => "Дата последнего запуска",
-    "Next Execution At"     => "Дата и время следующего запуска",
-    "Agent's Function"      => "Функция агента",
-    "Interval (sec)"        => "Интервал (сек.)",
-    "Periodic"              => "Периодический",
     "Component"             => "Компонент",
 
     "The Name One Element"  => "Название одного элемента",
