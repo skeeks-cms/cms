@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed admin. In a separate package skeeks/cms-admin
  * Removed AdminController::EVENT_INIT
  * Renamed i18N component
  * Removed Cms::TRIGGER_AFTER_UPDATE

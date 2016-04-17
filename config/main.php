@@ -107,11 +107,6 @@ $config =
             'showScriptName' => false,
             'suffix' => '',
             'rules' => [
-                'cms-admin' => [
-                    "class" => 'skeeks\cms\modules\admin\components\UrlRule',
-                    'adminPrefix' => '~sx'
-                ], //admin panel
-
                 'u'                           => 'cms/user/index',
                 'u/<username>'                => 'cms/user/view',
                 'u/<username>/<action>'       => 'cms/user/<action>',
@@ -154,11 +149,6 @@ $config =
             ],
         ],
 
-        'admin' =>
-        [
-            'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings'
-        ],
-
         'imaging' =>
         [
             'class' => '\skeeks\cms\components\Imaging',
@@ -193,11 +183,6 @@ $config =
 
 
     'modules' => [
-
-        'admin' =>
-        [
-            'class' => '\skeeks\cms\modules\admin\Module'
-        ],
 
         'cms' =>
         [
