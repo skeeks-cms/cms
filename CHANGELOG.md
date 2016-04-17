@@ -1,11 +1,10 @@
 CHANGELOG
 ==============
 
-2.8.pre
+3.0.0-alpha.pre
 -----------------
-
-2.8.0-alpha.pre
------------------
+ * Removed class ConnectToDbForm
+ * Removed class DbDsnHelper
  * Removed StatusColumn class
  * Fixed serious bug not allowing to use configuration files function. For example: on beforeRequest => function ($e){};
  * Removed captcha
