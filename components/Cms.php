@@ -281,7 +281,6 @@ class Cms extends \skeeks\cms\base\Component
 
         $this->emailTemplates = ArrayHelper::merge($this->emailTemplatesDefault, (array) $this->emailTemplates);
 
-
         //Отлов событий отправки сообщений с сайта, и их модификация.
         \yii\base\Event::on(\yii\mail\BaseMailer::className(), \yii\mail\BaseMailer::EVENT_BEFORE_SEND, [$this, 'beforeSendEmail']);
 
@@ -292,7 +291,41 @@ class Cms extends \skeeks\cms\base\Component
         } else
         {
             //web init
-            $this->_initWeb();
+            if (!$this->noImageUrl)
+            {
+                $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
+            }
+
+            \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
+            {
+                if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+                {
+                    \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', $this->descriptor->name . " {$this->descriptor->homepage}");
+
+                    /**
+                     * @var $view View
+                     */
+                    $view = $e->sender;
+                    if (!isset($view->metaTags[self::$_huck]))
+                    {
+                        $view->registerMetaTag([
+                            "name"      => base64_decode(self::$_huck),
+                            "content"   => $this->descriptor->name . " — {$this->descriptor->homepage}"
+                        ], self::$_huck);
+                    }
+                }
+            });
+
+            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
+            {
+                $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
+                $e->identity->save(false);
+
+                if (\Yii::$app->admin->requestIsAdmin)
+                {
+                    \Yii::$app->user->identity->updateLastAdminActivity();
+                }
+            });
         }
     }
 
@@ -328,53 +361,6 @@ class Cms extends \skeeks\cms\base\Component
                 $event->message->setCc($this->notifyAdminEmailsToArray());
             }
         }
-    }
-
-    /**
-     * Продолжение инициализации только в случае работы web приложения
-     */
-    protected function _initWeb()
-    {
-        if (\Yii::$app->admin->requestIsAdmin)
-        {
-            $this->moduleAdmin;
-        }
-
-        if (!$this->noImageUrl)
-        {
-            $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
-        }
-
-        \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
-        {
-            if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-            {
-                \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', $this->descriptor->name . " {$this->descriptor->homepage}");
-
-                /**
-                 * @var $view View
-                 */
-                $view = $e->sender;
-                if (!isset($view->metaTags[self::$_huck]))
-                {
-                    $view->registerMetaTag([
-                        "name"      => base64_decode(self::$_huck),
-                        "content"   => $this->descriptor->name . " — {$this->descriptor->homepage}"
-                    ], self::$_huck);
-                }
-            }
-        });
-
-        \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
-        {
-            $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
-            $e->identity->save(false);
-
-            if (\Yii::$app->admin->requestIsAdmin)
-            {
-                \Yii::$app->user->identity->updateLastAdminActivity();
-            }
-        });
     }
 
 
