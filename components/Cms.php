@@ -390,17 +390,6 @@ class Cms extends \skeeks\cms\base\Component
     }
 
 
-
-    /**
-     * TODO: is depricated
-     * @return null|\skeeks\cms\Module
-     */
-    static public function moduleCms()
-    {
-        return \Yii::$app->getModule("cms");
-    }
-
-
     /**
      * @return null|\skeeks\cms\modules\admin\Module
      */
