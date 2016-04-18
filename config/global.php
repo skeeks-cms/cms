@@ -20,34 +20,10 @@ if (file_exists($globalFileInited))
     require $globalFileInited;
 }
 
-//Возможные имена для getenv; Которые необходимо проверять
-if (!defined('GETENV_POSSIBLE_NAMES'))
-{
-    define('GETENV_POSSIBLE_NAMES', 'env,environment');
-}
-
-
 //Если Yii окружение не определено раньше в index_.php или @app/config/global.php
 if (!defined('YII_ENV'))
 {
-    $env = '';
-    $checkNames = explode(',', GETENV_POSSIBLE_NAMES);
-    foreach ($checkNames as $name)
-    {
-        $name   = trim($name);
-        if ($env = getenv($name))
-        {
-            break;
-        }
-    }
-
-    if ($env)
-    {
-        define('YII_ENV', $env);
-    } else
-    {
-        define('YII_ENV', 'dev');
-    }
+    define('YII_ENV', 'dev');
 }
 
 define('COMMON_ENV_CONFIG_DIR', COMMON_CONFIG_DIR . '/env/' . YII_ENV);
