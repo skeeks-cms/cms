@@ -354,11 +354,6 @@ return
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/email.png'],
                     ],
 
-                    [
-                        "label"     => \Yii::t('app',"Clearing temporary data"),
-                        "url"       => ["admin/clear"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/clear.png'],
-                    ],
 
                     [
                         "label"     => \Yii::t('app',"Work to database"),

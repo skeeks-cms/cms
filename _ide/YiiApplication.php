@@ -12,7 +12,6 @@
 namespace yii\web;
 
 use skeeks\cms\_ide\UserIde;
-use skeeks\cms\authclient\AuthClientSettings;
 use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsToolbar;
@@ -23,10 +22,7 @@ use skeeks\cms\components\Imaging;
 use skeeks\cms\components\marketplace\MarketplaceApi;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\i18n\components\I18N;
-use skeeks\cms\mail\Mailer;
-use skeeks\cms\modules\admin\components\Menu;
 use skeeks\cms\modules\admin\components\settings\AdminSettings;
-use skeeks\cms\authclient\Collection;
 
 /**
  *
@@ -36,11 +32,8 @@ use skeeks\cms\authclient\Collection;
  * @property Imaging                        $imaging
  * @property Breadcrumbs                    $breadcrumbs
  * @property CmsToolbar                     $cmsToolbar
- * @property Mailer                         $mailer
  * @property AdminSettings                  $admin
  * @property CurrentSite                    $currentSite
- * @property Collection                     $authClientCollection
- * @property AuthClientSettings             $authClientSettings
  * @property DbDumpComponent                $dbDump
  * @property MarketplaceApi                 $cmsMarkeplace
  * @property ConsoleComponent               $console
