@@ -469,15 +469,6 @@ $fileContent .= '];';
         return array_merge($this->basePropertyTypes(), $this->userPropertyTypes());
     }
 
-
-    /**
-     * @return Extension
-     */
-    public function getExtension()
-    {
-        return CmsExtension::getInstance('skeeks/cms');
-    }
-
     /**
      * @return array|null|CmsLang
      */
