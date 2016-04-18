@@ -53,8 +53,6 @@ defined('CONFIG_CACHE') or define("CONFIG_CACHE", true);
 //Временный файл, в котором храняться пути к подключенным модулям
 defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", COMMON_RUNTIME_DIR . '/sx-auto-generated-config.php' );
 
-//Включить в конфиги, мерж конфигов всех модулей
-defined('ENABLE_MODULES_CONF') or define('ENABLE_MODULES_CONF', true);
 /**
  * Глобальный файл где задается настройка окружения.
  * Если файла не будет создано, то окружение будет считано функцией getenv() или по другому прниципу

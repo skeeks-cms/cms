@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed global const ENABLED_MODULES_CONF
  * Removed mailer. In a separate package skeeks/cms-mailer
  * Removed Cms::moduleCms()
  * Removed Cms::moduleAdmin()
