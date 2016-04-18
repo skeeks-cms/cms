@@ -29,7 +29,6 @@ use skeeks\cms\modules\admin\components\settings\AdminSettings;
  * @property Imaging                        $imaging
  * @property Breadcrumbs                    $breadcrumbs
  * @property CmsToolbar                     $cmsToolbar
- * @property AdminSettings                  $admin
  * @property CurrentSite                    $currentSite
  * @property DbDumpComponent                $dbDump
  * @property ConsoleComponent               $console
@@ -42,16 +41,3 @@ use skeeks\cms\modules\admin\components\settings\AdminSettings;
  */
 class Application
 {}
-
-
-namespace yii\mail;
-/**
- * Class MailEvent
- */
-class MailEvent
-{
-    /**
-     * @var \skeeks\cms\mail\Message the mail message being send.
-     */
-    public $message;
-}
