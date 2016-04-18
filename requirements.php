@@ -11,7 +11,6 @@
  */
 // you may need to adjust this path to the correct Yii framework path
 
-define("APP_DIR",               __DIR__);
 define("APP_CONFIG_DIR",        realpath(__DIR__ . '/../config'));
 define("APP_RUNTIME_DIR",       realpath(__DIR__ . '/../runtime'));
 define("ROOT_DIR",              dirname(dirname(__DIR__)));

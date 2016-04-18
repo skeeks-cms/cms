@@ -58,7 +58,7 @@ trait HasComponentDbSettingsTrait
     public function getCacheKey()
     {
         return implode([
-            APP_DIR,
+            \Yii::getAlias('@webroot'),
             $this->className(),
             $this->namespace,
             \Yii::$app->currentSite->site->code,

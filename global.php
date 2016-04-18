@@ -29,8 +29,6 @@
 //Корень проекта
 defined('ROOT_DIR') or die('Please specify the constant "ROOT_DIR" in index.php in your application.');
 //Корень запущеного приложения
-defined('APP_DIR') or die('Please specify the constant "APP_DIR" in index.php in your application.');
-//Корень запущеного приложения
 defined('APP_CONFIG_DIR') or die('Please specify the constant "APP_CONFIG_DIR" in index.php in your application.');
 
 defined('APP_TYPE') or define('APP_TYPE', 'web');
@@ -54,4 +52,4 @@ defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", 
  */
 defined('APP_ENV_GLOBAL_FILE') or define('APP_ENV_GLOBAL_FILE', ROOT_DIR . '/global.php');
 //Определение всех неопределенных необходимых констант
-require(SKEEKS_DIR . '/config/global.php');
+require(__DIR__ . '/config/global.php');
