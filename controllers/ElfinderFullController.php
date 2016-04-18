@@ -89,7 +89,7 @@ class ElfinderFullController extends ElfinderController
 
             $this->roots[] =
             [
-                'basePath'  => BACKUP_DIR,
+                'basePath'  => ROOT_DIR . "/backup",
                 'name'      => 'Бэкапы'
             ];
         }

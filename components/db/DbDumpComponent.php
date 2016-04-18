@@ -35,7 +35,7 @@ class DbDumpComponent extends Component
 
         if (!$this->backupDirPath)
         {
-            $this->backupDirPath = BACKUP_DIR . "/db";
+            $this->backupDirPath = ROOT_DIR . "/backup/db";
         }
 
         /**

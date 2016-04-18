@@ -17,7 +17,6 @@
 //define('CONFIG_CACHE',            true);                    //Включить или отключить кэширование конфигов, по умолчанию включено, сильно разгружает проект. Много логики и мержа конфигов. Эта опция полностью отключает все эти хитрые мержи.
 //define("COMMON_CONFIG_DIR",       ROOT_DIR . '/common/config');  //Общие конфиги
 //define("VENDOR_DIR",              ROOT_DIR . '/vendor');    //Вендоры
-//define("BACKUP_DIR",              ROOT_DIR . '/backup');    //Дирриктория для бекапов
 
 /**
  * Будут определены по ходу выполенения кода
@@ -33,23 +32,18 @@ defined('APP_TYPE') or define('APP_TYPE', 'web');
 
 defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', ROOT_DIR . '/common/config');
 defined('VENDOR_DIR') or define('VENDOR_DIR', ROOT_DIR . '/vendor');
-//Дирриктория для бекапов
-defined('BACKUP_DIR') or define('BACKUP_DIR', ROOT_DIR . '/backup');
 
 //Использовать кэширование конфигов
 defined('CONFIG_CACHE') or define("CONFIG_CACHE", true);
 
 //Временный файл, в котором храняться пути к подключенным модулям
-defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", ROOT_DIR . '/auto-config-map.php' );
+defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", VENDOR_DIR . '/skeeks/auto-config-map.php' );
 
 /**
  * Глобальный файл где задается настройка окружения.
  * Если файла не будет создано, то окружение будет считано функцией getenv() или по другому прниципу
  */
 defined('APP_ENV_GLOBAL_FILE') or define('APP_ENV_GLOBAL_FILE', ROOT_DIR . '/global.php');
-
-
-
 
 
 //Проверка файла который создается скриптом в момент установки проекта, если он создан, то прочитаются его настройки.

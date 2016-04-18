@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed global const BACKUP_DIR
  * Removed global const COMMON_RUNTIME_DIR
  * Removed global const APP_DIR
  * Removed global const SKEEKS_DIR
