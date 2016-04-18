@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\models\User;
 use yii\base\Model;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class SignupForm
@@ -118,7 +119,14 @@ class SignupForm extends Model
 
                 if ($user)
                 {
-                    \Yii::$app->mailer->compose('register-by-email', [
+                    \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
+                        '@app/mail' =>
+                        [
+                            '@skeeks/cms/mail-templates'
+                        ]
+                    ]);
+
+                    \Yii::$app->mailer->compose('@app/mail/register-by-email', [
                         'user'      => $user,
                         'password'  => $password
                     ])
@@ -153,7 +161,15 @@ class SignupForm extends Model
             }
 
             if ($user->save()) {
-                return \Yii::$app->mailer->compose('password-reset-token', ['user' => $user])
+
+                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
+                    '@app/mail' =>
+                    [
+                        '@skeeks/cms/mail'
+                    ]
+                ]);
+
+                return \Yii::$app->mailer->compose('@app/mail/password-reset-token', ['user' => $user])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
                     ->setTo($this->email)
                     ->setSubject(\Yii::t('app','Password reset for ') . \Yii::$app->cms->appName)

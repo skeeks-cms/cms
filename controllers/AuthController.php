@@ -320,7 +320,14 @@ class AuthController extends Controller
 
             if ($user->save()) {
 
-                \Yii::$app->mailer->compose('@skeeks/cms/mail/new-password', [
+                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
+                    '@app/mail' =>
+                    [
+                        '@skeeks/cms/mail-templates'
+                    ]
+                ]);
+
+                \Yii::$app->mailer->compose('@app/mail/new-password', [
                         'user'      => $user,
                         'password'  => $password
                     ])

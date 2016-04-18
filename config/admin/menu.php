@@ -349,13 +349,6 @@ return
                     ],
 
                     [
-                        "label"     => \Yii::t('app',"Sending {email}",['email' => 'email']),
-                        "url"       => ["admin/email"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/email.png'],
-                    ],
-
-
-                    [
                         "label"     => \Yii::t('app',"Work to database"),
                         "url"       => ["admin/db"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],

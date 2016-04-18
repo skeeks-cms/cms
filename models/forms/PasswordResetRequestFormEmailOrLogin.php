@@ -9,6 +9,7 @@
  */
 namespace skeeks\cms\models\forms;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\web\User;
 
 /**
@@ -99,7 +100,15 @@ class PasswordResetRequestFormEmailOrLogin extends Model
                 }
 
 
-                $message = \Yii::$app->mailer->compose('@skeeks/cms/mail/password-reset-token', [
+                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
+                    '@app/mail' =>
+                    [
+                        '@skeeks/cms/mail-templates'
+                    ]
+                ]);
+
+
+                $message = \Yii::$app->mailer->compose('@app/mail/password-reset-token', [
                         'user'      => $user,
                         'resetLink' => $resetLink
                     ])
