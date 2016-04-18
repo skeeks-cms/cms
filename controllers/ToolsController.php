@@ -9,11 +9,11 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\modules\admin\widgets\UserLastActivityWidget;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\Controller;
 use yii\web\Response;
 
 

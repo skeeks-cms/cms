@@ -7,7 +7,6 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\base\Controller;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
@@ -15,6 +14,7 @@ use Yii;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\web\Controller;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 

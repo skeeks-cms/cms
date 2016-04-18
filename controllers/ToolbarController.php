@@ -11,11 +11,11 @@
 namespace skeeks\cms\controllers;
 
 
-use skeeks\cms\base\Controller;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsComponentSettings;
 use Yii;
+use yii\web\Controller;
 use yii\web\Response;
 
 

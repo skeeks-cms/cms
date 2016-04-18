@@ -9,10 +9,10 @@
  */
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
+use yii\web\Controller;
 use yii\web\Response;
 
 

@@ -12,6 +12,7 @@
 namespace skeeks\cms\base;
 use yii\base\Exception;
 use yii\base\InvalidParamException;
+use yii\helpers\ArrayHelper;
 use yii\web\Application;
 use yii\web\Controller as YiiWebController;
 
@@ -22,62 +23,36 @@ use yii\web\Controller as YiiWebController;
 class Controller extends YiiWebController
 {
     /**
-     * Использвается в методе render, для начала попробуем поискать шаблон в проекте, затем по умолчанию по правилам yii
-     * @var string
-     */
-    public $beforeRender = '@app/views/modules/';
-
-    /**
-     *
-     * Если не хочется рендерить шаблон текущего действия, можно воспользоваться этой функцией.
-     * @see parent::render()
-     * @param string $output
-     * @return string
-     */
-    public function output($output)
-    {
-        $layoutFile = $this->findLayoutFile($this->getView());
-        if ($layoutFile !== false) {
-            return $this->getView()->renderFile($layoutFile, ['content' => $output], $this);
-        } else {
-            return $output;
-        }
-    }
-
-
-    /**
      * @param string $view
      * @param array $params
      * @return string
      */
     public function render($view, $params = [])
     {
-        if (!$this->beforeRender || $this->module instanceof Application)
+        if ($this->module instanceof Application)
         {
             return parent::render($view, $params);
         }
 
+        $viewDir = "@app/views/modules/" . $this->module->id . '/' . $this->id;
+        $viewApp = $viewDir . '/' . $view;
 
-        try
+        if (isset(\Yii::$app->view->theme->pathMap['@app/views']))
         {
-            $viewApp = $this->beforeRender . $this->module->id . '/' . $this->id . '/' . $view;
-            return parent::render($viewApp, $params);
-
-            /*$this->viewPath = $this->beforeRender . $this->module->id . '/' . $this->id;
-            return parent::render($view, $params);*/
-
-        }  catch (InvalidParamException $e)
-        {
-            \Yii::error($e->getMessage());
-
-            try
+            $tmpPaths = [];
+            foreach (\Yii::$app->view->theme->pathMap['@app/views'] as $path)
             {
-                return parent::render($view, $params);
-            } catch (InvalidParamException $e)
-            {
-                return $this->output($e->getMessage());
+                $tmpPaths[] = $path . "/modules/" . $this->module->id . '/' . $this->id;
             }
+
+            $tmpPaths[] = $this->viewPath;
+
+            \Yii::$app->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->view->theme->pathMap, [
+                $viewDir => $tmpPaths
+            ]);
         }
+
+        return parent::render($viewApp, $params);
     }
 
 

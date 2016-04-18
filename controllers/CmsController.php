@@ -11,19 +11,19 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use yii\db\Exception;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\web\Controller;
 
 /**
  * Class CmsController
  * @package skeeks\cms\controllers
  */
-class CmsController extends \yii\web\Controller
+class CmsController extends Controller
 {
     public function actionIndex()
     {

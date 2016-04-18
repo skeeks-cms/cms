@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Cancel use cms base controller
  * Fixed email submit and templates
  * Removed mailer. In a separate package skeeks/cms-mailer
  * Fixed set unsafe attributes in the base component
