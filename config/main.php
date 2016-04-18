@@ -56,10 +56,6 @@ $config =
             ]
         ],
 
-        'mailer' => [
-            'class'         => 'skeeks\cms\mail\Mailer',
-        ],
-
         'cmsToolbar' =>
         [
             'class' => 'skeeks\cms\components\CmsToolbar',
@@ -151,11 +147,6 @@ $config =
         'dbDump' =>
         [
             'class' => '\skeeks\cms\components\db\DbDumpComponent',
-        ],
-
-        'cmsMarkeplace' =>
-        [
-            'class' => '\skeeks\cms\components\marketplace\MarketplaceApi',
         ],
 
         'console' =>

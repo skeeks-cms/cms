@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed marketplace. In a separate package skeeks/cms-marketplace
  * Cancel use cms base controller
  * Fixed email submit and templates
  * Removed mailer. In a separate package skeeks/cms-mailer

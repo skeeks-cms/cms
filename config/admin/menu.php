@@ -395,42 +395,6 @@ return
     ],
 
 
-    'marketplace' =>
-    [
-        'priority'  => 400,
-        'label'     => \Yii::t('app','Marketplace'),
-        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png'],
-
-        'items' =>
-        [
-
-            [
-                "label"     => \Yii::t('app',"Catalog"),
-                "url"       => ["cms/admin-marketplace/catalog"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/marketplace.png']
-            ],
-
-            [
-                "label"     => \Yii::t('app',"Installed"),
-                "url"       => ["cms/admin-marketplace/index"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installed.png']
-            ],
-
-            [
-                "label"     => \Yii::t('app',"Install{s}Delete",['s' => '/']),
-                "url"       => ["cms/admin-marketplace/install"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/installer.png']
-            ],
-
-            [
-                "label"     => \Yii::t('app',"Updated platforms"),
-                "url"       => ["cms/admin-marketplace/update"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update-2.png']
-            ],
-        ]
-    ],
-
-
     'other' =>
     [
         'priority'  => 500,
