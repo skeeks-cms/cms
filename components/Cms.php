@@ -93,16 +93,6 @@ class Cms extends \skeeks\cms\base\Component
     public $adminEmail                  = 'admin@skeeks.com';
 
     /**
-     * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
-     */
-    public $notifyAdminEmailsHidden     = '';
-
-    /**
-     * @var string E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения.
-     */
-    public $notifyAdminEmails           = '';
-
-    /**
      * @var string
      */
     public $appName;
@@ -151,35 +141,6 @@ class Cms extends \skeeks\cms\base\Component
             '@frontend/web/assets'
         ]
     ];
-
-
-    /**
-     * @var array Возможные шаблоны email
-     */
-    public $emailTemplatesDefault       =
-    [
-        'default' =>
-        [
-            'name'          => 'Базовый шаблон (по умолчанию)',
-            'pathMap'       =>
-            [
-                '@app/mail' =>
-                [
-                    '@app/mail',
-                    '@skeeks/cms/mail',
-                ],
-            ]
-        ]
-    ];
-    /**
-     * @var array Возможные шаблоны email
-     */
-    public $emailTemplates       = [];
-
-    /**
-     * @var string шаблон
-     */
-    public $emailTemplate                        = "default";
 
 
     /**
@@ -233,12 +194,6 @@ class Cms extends \skeeks\cms\base\Component
             $this->generateModulesConfigFile();
         }
 
-        $this->emailTemplates = ArrayHelper::merge($this->emailTemplatesDefault, (array) $this->emailTemplates);
-
-        //Отлов событий отправки сообщений с сайта, и их модификация.
-        \yii\base\Event::on(\yii\mail\BaseMailer::className(), \yii\mail\BaseMailer::EVENT_BEFORE_SEND, [$this, 'beforeSendEmail']);
-
-
         if (\Yii::$app instanceof Application)
         {
             //console init
@@ -283,86 +238,14 @@ class Cms extends \skeeks\cms\base\Component
         }
     }
 
-    /**
-     * Перехват отправки всех email с сайта.
-     *
-     * @param \yii\mail\MailEvent $event
-     */
-    public function beforeSendEmail(\yii\mail\MailEvent $event)
-    {
-
-        $hiddenEmails = [];
-        if ($emails = $this->notifyAdminEmailsHiddenToArray())
-        {
-            $hiddenEmails = $this->notifyAdminEmailsHiddenToArray();
-            $event->message->setBcc($this->notifyAdminEmailsHiddenToArray());
-        }
-
-        if ($this->notifyAdminEmailsToArray())
-        {
-            $emails = [];
-            foreach ($this->notifyAdminEmailsToArray() as $email)
-            {
-                //If this email is already in the list of hidden, no longer send.
-                if (!in_array($email, $hiddenEmails))
-                {
-                    $emails[] = $email;
-                }
-            }
-
-            if ($emails)
-            {
-                $event->message->setCc($this->notifyAdminEmailsToArray());
-            }
-        }
-    }
-
-
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'notifyAdminEmails', 'notifyAdminEmailsHidden', 'appName', 'template', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'appName', 'template', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
-            [['emailTemplate'], 'string'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['registerRoles'], 'safe'],
-
-            [['notifyAdminEmails'], function($attribute)
-            {
-                if ($emails = $this->notifyAdminEmailsToArray())
-                {
-                    foreach ($emails as $email)
-                    {
-                        $validator = new EmailValidator();
-
-                        if (!$validator->validate($email, $error))
-                        {
-                            $this->addError($attribute, $email . ' — некорректный email адрес');
-                            return false;
-                        }
-                    }
-                }
-
-            }],
-
-            [['notifyAdminEmailsHidden'], function($attribute)
-            {
-                if ($emails = $this->notifyAdminEmailsHiddenToArray())
-                {
-                    foreach ($emails as $email)
-                    {
-                        $validator = new EmailValidator();
-
-                        if (!$validator->validate($email, $error))
-                        {
-                            $this->addError($attribute, $email . ' — некорректный email адрес');
-                            return false;
-                        }
-                    }
-                }
-
-            }],
         ]);
     }
 
@@ -370,11 +253,8 @@ class Cms extends \skeeks\cms\base\Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'adminEmail'                => 'Основной Email Администратора сайта',
-            'notifyAdminEmailsHidden'   => 'Email адреса уведомлений (скрытая копия)',
-            'notifyAdminEmails'         => 'Email адреса уведомлений',
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
-            'emailTemplate'             => 'Шаблон для email',
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'registerRoles'             => 'При регистрации добавлять в группу',
@@ -527,23 +407,6 @@ $fileContent .= '];';
         $file = new File(AUTO_GENERATED_MODULES_FILE);
         return $file->isExist();
 
-    }
-
-
-    /**
-     * @return array
-     */
-    public function notifyAdminEmailsToArray()
-    {
-        return $this->notifyAdminEmails ? explode(",", $this->notifyAdminEmails) : [];
-    }
-
-    /**
-     * @return array
-     */
-    public function notifyAdminEmailsHiddenToArray()
-    {
-        return $this->notifyAdminEmailsHidden ? explode(",", $this->notifyAdminEmailsHidden) : [];
     }
 
     /**

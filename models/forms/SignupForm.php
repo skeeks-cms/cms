@@ -118,7 +118,7 @@ class SignupForm extends Model
 
                 if ($user)
                 {
-                    \Yii::$app->mailer->compose('registerByEmail', [
+                    \Yii::$app->mailer->compose('register-by-email', [
                         'user'      => $user,
                         'password'  => $password
                     ])
@@ -153,7 +153,7 @@ class SignupForm extends Model
             }
 
             if ($user->save()) {
-                return \Yii::$app->mailer->compose('passwordResetToken', ['user' => $user])
+                return \Yii::$app->mailer->compose('password-reset-token', ['user' => $user])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
                     ->setTo($this->email)
                     ->setSubject(\Yii::t('app','Password reset for ') . \Yii::$app->cms->appName)

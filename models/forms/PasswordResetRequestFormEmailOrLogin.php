@@ -99,7 +99,7 @@ class PasswordResetRequestFormEmailOrLogin extends Model
                 }
 
 
-                $message = \Yii::$app->mailer->compose('@skeeks/cms/mail/passwordResetToken', [
+                $message = \Yii::$app->mailer->compose('@skeeks/cms/mail/password-reset-token', [
                         'user'      => $user,
                         'resetLink' => $resetLink
                     ])

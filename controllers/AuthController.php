@@ -320,7 +320,7 @@ class AuthController extends Controller
 
             if ($user->save()) {
 
-                \Yii::$app->mailer->compose('@skeeks/cms/mail/newPassword', [
+                \Yii::$app->mailer->compose('@skeeks/cms/mail/new-password', [
                         'user'      => $user,
                         'password'  => $password
                     ])

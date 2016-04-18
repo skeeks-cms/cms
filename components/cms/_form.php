@@ -46,10 +46,6 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     ])?>
 
     <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.'); ?>
-    <?= $form->field($model, 'notifyAdminEmailsHidden')->textarea()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Скрытая копия!'); ?>
-    <?= $form->field($model, 'notifyAdminEmails')->textarea()->hint('E-Mail адрес или список адресов через запятую на который будут дублироваться все исходящие сообщения. Эти email адреса будут отображаться в открытой копии.'); ?>
-
-    <?= $form->fieldSelect($model, 'emailTemplate', $emailTemplates); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
