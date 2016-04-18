@@ -15,8 +15,7 @@
 //define('YII_ENV',                 'dev');                   //Необязательная константа, если не будет определена, то определение произойдет по ходу выполнения проекта
 //define('YII_DEBUG',               true);                    //Необязательная константа, если не будет определена, то определение произойдет по ходу выполнения проекта
 //define('CONFIG_CACHE',            true);                    //Включить или отключить кэширование конфигов, по умолчанию включено, сильно разгружает проект. Много логики и мержа конфигов. Эта опция полностью отключает все эти хитрые мержи.
-//define("COMMON_DIR",              ROOT_DIR . '/common');    //Где общая папка
-//define("COMMON_CONFIG_DIR",       COMMON_DIR . '/config');  //Общие конфиги
+//define("COMMON_CONFIG_DIR",       ROOT_DIR . '/common/config');  //Общие конфиги
 //define("VENDOR_DIR",              ROOT_DIR . '/vendor');    //Вендоры
 //define("BACKUP_DIR",              ROOT_DIR . '/backup');    //Дирриктория для бекапов
 
@@ -32,8 +31,7 @@ defined('APP_CONFIG_DIR') or die('Please specify the constant "APP_CONFIG_DIR" i
 
 defined('APP_TYPE') or define('APP_TYPE', 'web');
 
-defined('COMMON_DIR') or define('COMMON_DIR', ROOT_DIR . '/common');
-defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', COMMON_DIR . '/config');
+defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', ROOT_DIR . '/common/config');
 defined('VENDOR_DIR') or define('VENDOR_DIR', ROOT_DIR . '/vendor');
 //Дирриктория для бекапов
 defined('BACKUP_DIR') or define('BACKUP_DIR', ROOT_DIR . '/backup');
