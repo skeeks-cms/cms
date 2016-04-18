@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed global const SKEEKS_DIR
  * Removed global const GETENV_POSSIBLE_NAMES
  * Removed global const ENABLED_MODULES_CONF
  * Removed mailer. In a separate package skeeks/cms-mailer

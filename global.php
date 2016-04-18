@@ -26,10 +26,6 @@
  * COMMON_ENV_CONFIG_DIR    //Дирриктория с конфигами common для текущего окружения
  * APP_ENV_CONFIG_DIR       //Дирриктория с конфигами текущего приложения для текущего окружения
  */
-
-define("SKEEKS_DIR", __DIR__);
-define("SKEEKS_CONFIG_DIR", SKEEKS_DIR . '/config');
-
 //Корень проекта
 defined('ROOT_DIR') or die('Please specify the constant "ROOT_DIR" in index.php in your application.');
 //Корень запущеного приложения
