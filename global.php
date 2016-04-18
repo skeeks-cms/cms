@@ -17,7 +17,6 @@
 //define('CONFIG_CACHE',            true);                    //Включить или отключить кэширование конфигов, по умолчанию включено, сильно разгружает проект. Много логики и мержа конфигов. Эта опция полностью отключает все эти хитрые мержи.
 //define("COMMON_DIR",              ROOT_DIR . '/common');    //Где общая папка
 //define("COMMON_CONFIG_DIR",       COMMON_DIR . '/config');  //Общие конфиги
-//define("COMMON_RUNTIME_DIR",      COMMON_DIR . '/runtime'); //Временные файлы
 //define("VENDOR_DIR",              ROOT_DIR . '/vendor');    //Вендоры
 //define("BACKUP_DIR",              ROOT_DIR . '/backup');    //Дирриктория для бекапов
 
@@ -35,7 +34,6 @@ defined('APP_TYPE') or define('APP_TYPE', 'web');
 
 defined('COMMON_DIR') or define('COMMON_DIR', ROOT_DIR . '/common');
 defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', COMMON_DIR . '/config');
-defined('COMMON_RUNTIME_DIR') or define('COMMON_RUNTIME_DIR', COMMON_DIR . '/runtime');
 defined('VENDOR_DIR') or define('VENDOR_DIR', ROOT_DIR . '/vendor');
 //Дирриктория для бекапов
 defined('BACKUP_DIR') or define('BACKUP_DIR', ROOT_DIR . '/backup');
@@ -44,12 +42,69 @@ defined('BACKUP_DIR') or define('BACKUP_DIR', ROOT_DIR . '/backup');
 defined('CONFIG_CACHE') or define("CONFIG_CACHE", true);
 
 //Временный файл, в котором храняться пути к подключенным модулям
-defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", COMMON_RUNTIME_DIR . '/sx-auto-generated-config.php' );
+defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", ROOT_DIR . '/auto-config-map.php' );
 
 /**
  * Глобальный файл где задается настройка окружения.
  * Если файла не будет создано, то окружение будет считано функцией getenv() или по другому прниципу
  */
 defined('APP_ENV_GLOBAL_FILE') or define('APP_ENV_GLOBAL_FILE', ROOT_DIR . '/global.php');
-//Определение всех неопределенных необходимых констант
-require(__DIR__ . '/config/global.php');
+
+
+
+
+
+//Проверка файла который создается скриптом в момент установки проекта, если он создан, то прочитаются его настройки.
+$globalFileInited = APP_ENV_GLOBAL_FILE;
+if (file_exists($globalFileInited))
+{
+    require $globalFileInited;
+}
+
+//Если Yii окружение не определено раньше в index_.php или @app/config/global.php
+if (!defined('YII_ENV'))
+{
+    define('YII_ENV', 'dev');
+}
+
+define('COMMON_ENV_CONFIG_DIR', COMMON_CONFIG_DIR . '/env/' . YII_ENV);
+define('APP_ENV_CONFIG_DIR',    APP_CONFIG_DIR . '/env/' . YII_ENV);
+
+//TODO хорошо бы добавитьл, чтение фйлов global для для текущего приложения, и текущего окружения, но пока обойдемся, не хочется покдлючить много файлов.
+//TODO можно вынести это в отдельную константу
+
+//Здесь уже определена константа YII_ENV, на нее можно опираться
+if (!defined('YII_DEBUG'))
+{
+    //Пытаемся подключить global.php для нужного окружения, общего приложения
+    $envGlobal = COMMON_ENV_CONFIG_DIR . '/global.php';
+
+    if (file_exists($envGlobal))
+    {
+        include $envGlobal;
+    }
+}
+
+if (!defined('YII_DEBUG'))
+{
+    //Пытаемся подключить global.php для нужного окружения, общего приложения
+    $envGlobal = COMMON_CONFIG_DIR . '/global.php';
+
+    if (file_exists($envGlobal))
+    {
+        include $envGlobal;
+    }
+}
+
+//А мы все равно ее определим
+if (!defined('YII_DEBUG'))
+{
+    //TODO: можно вынести в еще одну константу, типо для каких окружений включить или отключать дебаг.
+    if (YII_ENV == 'prod')
+    {
+        defined('YII_DEBUG') or define('YII_DEBUG', false);
+    } else
+    {
+        defined('YII_DEBUG') or define('YII_DEBUG', true);
+    }
+}
