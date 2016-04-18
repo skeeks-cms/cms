@@ -11,13 +11,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\WidgetConfig */
 
-
-$emailTemplates = [];
-
-foreach (\Yii::$app->cms->emailTemplates as $code => $data)
-{
-    $emailTemplates[$code] = \yii\helpers\ArrayHelper::getValue($data, 'name');
-}
 ?>
 
 <?= $form->fieldSet(\Yii::t('app', 'Main')); ?>
@@ -27,28 +20,21 @@ foreach (\Yii::$app->cms->emailTemplates as $code => $data)
     ])?>
     <?= $form->field($model, 'appName')->textInput()->hint(''); ?>
 
+    <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.'); ?>
+
     <?= $form->field($model, 'noImageUrl')->widget(
         \skeeks\cms\modules\admin\widgets\formInputs\OneImage::className()
     )->hint('Это изображение показывается в тех случаях, когда не найдено основное.'); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Языковые настройки'
-    ])?>
+<?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet('Языковые настройки'); ?>
     <?= $form->fieldSelect($model, 'languageCode', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsLang::find()->active()->all(),
         'code',
         'name'
     )); ?>
-
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Email'
-    ])?>
-
-    <?= $form->field($model, 'adminEmail')->textInput()->hint('E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.'); ?>
-
 <?= $form->fieldSetEnd(); ?>
-
 
 <?= $form->fieldSet('Безопасность'); ?>
     <?= $form->fieldInputInt($model, 'passwordResetTokenExpire')->hint('Другими словами, ссылки на восстановление пароля перестанут работать через указанное время'); ?>

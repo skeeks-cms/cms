@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Fixed set unsafe attributes in the base component
  * Removed global const BACKUP_DIR
  * Removed global const COMMON_RUNTIME_DIR
  * Removed global const APP_DIR
