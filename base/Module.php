@@ -77,24 +77,4 @@ abstract class Module extends \yii\base\Module
         return $result;
     }
 
-    /**
-     * Название модуля
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->getDescriptor()->name;
-    }
-
-    /**
-     * Версия
-     *
-     * @return string
-     */
-    public function getVersion()
-    {
-        return (string) $this->getDescriptor()->version;
-    }
-
 }

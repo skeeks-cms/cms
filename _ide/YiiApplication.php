@@ -19,15 +19,12 @@ use skeeks\cms\components\ConsoleComponent;
 use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\db\DbDumpComponent;
 use skeeks\cms\components\Imaging;
-use skeeks\cms\components\marketplace\MarketplaceApi;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\i18n\components\I18N;
 use skeeks\cms\modules\admin\components\settings\AdminSettings;
 
 /**
- *
  * @property Storage                        $storage
- * @property Menu                           $adminMenu
  * @property Cms                            $cms
  * @property Imaging                        $imaging
  * @property Breadcrumbs                    $breadcrumbs
@@ -35,7 +32,6 @@ use skeeks\cms\modules\admin\components\settings\AdminSettings;
  * @property AdminSettings                  $admin
  * @property CurrentSite                    $currentSite
  * @property DbDumpComponent                $dbDump
- * @property MarketplaceApi                 $cmsMarkeplace
  * @property ConsoleComponent               $console
  * @property I18N                           $i18n
  *

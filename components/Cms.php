@@ -52,9 +52,6 @@ use yii\widgets\ActiveForm;
 /**
  * @property CmsSite                            $site
  * @property Tree                               $currentTree
- * @property ComposerHelper                     $composer
- * @property ComposerHelper                     $appComposer
- * @property Extension                          $extension
  *
  * @property CmsLang[]                          $languages
  *
@@ -72,7 +69,7 @@ class Cms extends \skeeks\cms\base\Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            "version"               => \Yii::$app->cms->extension->version,
+            "version"  => ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version'),
         ]);
     }
 
@@ -482,75 +479,10 @@ $fileContent .= '];';
     }
 
     /**
-     * @return ComposerHelper
-     */
-    public function getComposer()
-    {
-        $extension = CmsExtension::getInstance('skeeks/cms');
-        return $extension->composer;
-    }
-
-    /**
-     * @return ComposerHelper
-     */
-    public function getAppComposer()
-    {
-        $composerFile = ROOT_DIR . "/composer.json";
-        if (file_exists($composerFile))
-        {
-            $data = file_get_contents($composerFile);
-            $data = Json::decode($data);
-
-            return new ComposerHelper([
-                'data' => (array) $data
-            ]);
-        }
-
-        return new ComposerHelper();
-    }
-
-
-    /**
      * @return array|null|CmsLang
      */
     public function getCmsLanguage()
     {
-        return CmsLang::find()->where(['code' => $this->languageCode])->one();
+        return CmsLang::find()->where(['code' => \Yii::$app->language])->one();
     }
-
-
-
-
-
-
-
-    /**
-     *
-     * TODO: is depricated > 2.7.1
-     * Вернутся модули только которые instanceof skeeks\cms\Module
-     * При этом происходит загрузка всех зарегистрированных модулей приложения, это не очень оптимально.
-     * Используется для админки, только если срабатывает роут админки, в сайтовой части данной неоптимальности нет.
-     *
-     * @return Module[]
-     */
-    static public function getModules()
-    {
-        $result = [];
-        $allModules = array_keys(\Yii::$app->getModules());
-        if ($allModules)
-        {
-            foreach ($allModules as $key)
-            {
-                $moduleObject = \Yii::$app->getModule($key);
-
-                if ($moduleObject instanceof Module)
-                {
-                    $result[$key] = $moduleObject;
-                }
-            }
-        }
-
-        return $result;
-    }
-
 }
