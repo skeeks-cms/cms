@@ -34,6 +34,11 @@ class Controller extends YiiWebController
             return parent::render($view, $params);
         }
 
+        if (strpos($view, '/') && !strpos($view, '@app/views'))
+        {
+            return parent::render($view, $params);
+        }
+
         $viewDir = "@app/views/modules/" . $this->module->id . '/' . $this->id;
         $viewApp = $viewDir . '/' . $view;
 
