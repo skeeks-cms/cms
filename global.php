@@ -53,7 +53,7 @@ if (file_exists($globalFileInited))
     require $globalFileInited;
 }
 
-//Если Yii окружение не определено раньше в index_.php или @app/config/global.php
+//Если Yii окружение не определено раньше в index.php или @app/config/global.php
 if (!defined('YII_ENV'))
 {
     define('YII_ENV', 'dev');
@@ -62,8 +62,6 @@ if (!defined('YII_ENV'))
 define('COMMON_ENV_CONFIG_DIR', COMMON_CONFIG_DIR . '/env/' . YII_ENV);
 define('APP_ENV_CONFIG_DIR',    APP_CONFIG_DIR . '/env/' . YII_ENV);
 
-//TODO хорошо бы добавитьл, чтение фйлов global для для текущего приложения, и текущего окружения, но пока обойдемся, не хочется покдлючить много файлов.
-//TODO можно вынести это в отдельную константу
 
 //Здесь уже определена константа YII_ENV, на нее можно опираться
 if (!defined('YII_DEBUG'))

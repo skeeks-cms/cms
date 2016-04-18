@@ -133,7 +133,7 @@ class Cms extends \skeeks\cms\base\Component
     [
         'runtime' =>
         [
-            '@common/runtime', '@frontend/runtime', '@console/runtime'
+            '@frontend/runtime', '@console/runtime'
         ],
 
         'assets' =>
