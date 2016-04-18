@@ -10,10 +10,10 @@ $config             = new \skeeks\cms\Config(); //добавлены пути к
 
 if (APP_TYPE == 'web')
 {
-    $config->appendFiles([__DIR__ . '/main.php']); //добавлены пути к конфигам cms
+    $config->appendFiles([__DIR__ . '/config/main.php']); //добавлены пути к конфигам cms
 } else if (APP_TYPE == 'console')
 {
-    $config->appendFiles([__DIR__ . '/main-console.php']); //добавлены пути к конфигам cms
+    $config->appendFiles([__DIR__ . '/config/main-console.php']); //добавлены пути к конфигам cms
 }
 
 $modulesConfigFiles = [];

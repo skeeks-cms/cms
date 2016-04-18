@@ -141,7 +141,8 @@ trait HasComponentDbSettingsTrait
 
         if ($settings)
         {
-            $this->setAttributes($settings, false);
+            $this->attributes = $settings;
+            //$this->setAttributes($settings, false);
         }
 
         return $this;

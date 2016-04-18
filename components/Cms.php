@@ -241,7 +241,7 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'appName', 'template', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'appName', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
