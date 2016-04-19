@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Begain using kartik-v/yii2-datecontrol
  * Changed menu
  * Removed ssh. In a separate package skeeks/cms-ssh-console
  * Removed yiisoft/yii2-swiftmailer dependency
