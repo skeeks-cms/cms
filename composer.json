@@ -27,7 +27,6 @@
         "yiisoft/yii2": "*",
         "yiisoft/yii2-jui": "*",
         "yiisoft/yii2-bootstrap": "*",
-        "yiisoft/yii2-swiftmailer": "*",
         "skeeks/cms-admin": "dev-master",
         "skeeks/cms-marketplace": "dev-master",
         "skeeks/yii2-imagine": "*",
