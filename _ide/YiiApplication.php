@@ -19,8 +19,7 @@ use skeeks\cms\components\ConsoleComponent;
 use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\storage\Storage;
-use skeeks\cms\i18n\components\I18N;
-use skeeks\cms\modules\admin\components\settings\AdminSettings;
+use skeeks\cms\i18n\I18N;
 
 /**
  * @property Storage                        $storage
