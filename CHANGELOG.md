@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed ssh. In a separate package skeeks/cms-ssh-console
  * Removed yiisoft/yii2-swiftmailer dependency
  * Removed skeeks/cms/base/Module
  * Removed dbDump. In a separate package skeeks/cms-db-dumper
