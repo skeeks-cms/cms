@@ -1,13 +1,4 @@
 <?php
-/**
- * cms
- *
- * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 02.11.2014
- * @since 1.0.0
- */
 return
 [
     "Meta Title"            =>  "Заголовок (Meta title)",
@@ -16,6 +7,7 @@ return
 
     "Database of translations"  =>  "База переводов",
     "Message"                   =>  "Сообщение",
+    "Users"                 =>  "Пользователи",
 
     "Update"                =>  "Обновить",
     "Save"                  =>  "Сохранить",

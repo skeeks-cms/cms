@@ -46,6 +46,14 @@ $config =
             'class' => 'skeeks\cms\i18n\I18N',
             'translations' =>
             [
+                'skeeks/cms' => [
+                    'class'             => 'yii\i18n\PhpMessageSource',
+                    'basePath'          => '@skeeks/cms/messages',
+                    'fileMap' => [
+                        'skeeks/cms' => 'main.php',
+                    ],
+                ],
+
                 'skeeks/cms/user' => [
                     'class'             => 'yii\i18n\PhpMessageSource',
                     'basePath'          => '@skeeks/cms/messages',
