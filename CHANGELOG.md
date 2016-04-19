@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed skeeks/cms/base/Module
  * Removed dbDump. In a separate package skeeks/cms-db-dumper
  * Removed marketplace. In a separate package skeeks/cms-marketplace
  * Cancel use cms base controller

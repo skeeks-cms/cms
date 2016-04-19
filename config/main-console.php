@@ -63,11 +63,6 @@ $config =
             'class' => '\skeeks\cms\rbac\DbManager',
         ],
 
-        'dbDump' =>
-        [
-            'class' => '\skeeks\cms\components\db\DbDumpComponent',
-        ],
-
         'console' =>
         [
             'class' => 'skeeks\cms\components\ConsoleComponent',
