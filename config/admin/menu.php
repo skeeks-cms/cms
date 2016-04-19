@@ -348,17 +348,6 @@ return
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.infoblock.png'],
                     ],
 
-                    [
-                        "label"     => \Yii::t('app',"Work to database"),
-                        "url"       => ["admin/db"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.bd_arch.png'],
-                    ],
-
-                    /*[
-                        "label"     => "Обновления",
-                        "url"       => ["admin/update"],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/update.png'],
-                    ],*/
 
                     [
                         "label"     => \Yii::t('app',"{ssh} console",['ssh' => 'Ssh']),

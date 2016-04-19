@@ -17,7 +17,6 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ConsoleComponent;
 use skeeks\cms\components\CurrentSite;
-use skeeks\cms\components\db\DbDumpComponent;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\i18n\components\I18N;
@@ -30,7 +29,6 @@ use skeeks\cms\modules\admin\components\settings\AdminSettings;
  * @property Breadcrumbs                    $breadcrumbs
  * @property CmsToolbar                     $cmsToolbar
  * @property CurrentSite                    $currentSite
- * @property DbDumpComponent                $dbDump
  * @property ConsoleComponent               $console
  * @property I18N                           $i18n
  *
