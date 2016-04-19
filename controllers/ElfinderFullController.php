@@ -42,55 +42,14 @@ class ElfinderFullController extends ElfinderController
                 'basePath'  =>  ROOT_DIR,
                 'path'      => '/',
                 'name'      => 'ROOT_DIR'
-            ]
+            ];
 
-            ;$this->roots[] =
+            $this->roots[] =
             [
                 'baseUrl'   =>'@web',
                 'basePath'  =>'@webroot',
                 'path'      => '/',
                 'name'      => 'Корень (robots.txt тут)'
-            ];
-
-            $this->roots[] =
-            [
-                'class' => 'mihaildev\elfinder\UserPath',
-                'path'  => 'uploads/users/{id}',
-                'name'  => 'Личные файлы'
-            ];
-
-            $this->roots[] =
-            [
-                'basePath'  => '@frontend',
-                'path'      => 'views',
-                'name'      => 'frontend/views'
-            ];
-
-            $this->roots[] =
-            [
-                'basePath'  => '@frontend',
-                'path'      => 'runtime',
-                'name'      => 'frontend/runtime'
-            ];
-
-            $this->roots[] =
-            [
-                'basePath'  => '@console',
-                'path'      => 'runtime',
-                'name'      => 'console/runtime'
-            ];
-
-            $this->roots[] =
-            [
-                'basePath'  =>'@webroot',
-                'path'      => 'assets',
-                'name'      => 'Временные js и css'
-            ];
-
-            $this->roots[] =
-            [
-                'basePath'  => ROOT_DIR . "/backup",
-                'name'      => 'Бэкапы'
             ];
         }
 
