@@ -19,7 +19,7 @@ use yii\web\View;
  * Class Module
  * @package skeeks\cms
  */
-class Module extends base\Module
+class Module extends \yii\base\Module
 {
     public $controllerNamespace = 'skeeks\cms\controllers';
 }

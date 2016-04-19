@@ -56,24 +56,6 @@ class UtilsController extends Controller
         $this->stdout(implode("\n", $commands));
     }
 
-
-
-
-    /**
-     * Удаление старых поисковых запросов
-     */
-    public function actionClearSearchPhrase()
-    {
-        if (\Yii::$app->cmsSearch->phraseLiveTime)
-        {
-            $deleted = CmsSearchPhrase::deleteAll([
-                '<=', 'created_at', \Yii::$app->formatter->asTimestamp(time()) - (int) \Yii::$app->cmsSearch->phraseLiveTime
-            ]);
-
-            \Yii::info("Удалено поисковых запросов: " . $deleted);
-        }
-    }
-
     /**
      * Читка всех сгенерированных миниатюр
      */
