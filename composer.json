@@ -28,6 +28,7 @@
         "yiisoft/yii2-jui": "*",
         "yiisoft/yii2-bootstrap": "*",
         "skeeks/cms-admin": "dev-master",
+        "skeeks/cms-rbac": "dev-master",
         "skeeks/cms-marketplace": "dev-master",
         "skeeks/yii2-imagine": "*",
         "skeeks/yii2-sx": "*",
