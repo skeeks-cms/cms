@@ -59,10 +59,6 @@ $config =
             'class' => '\skeeks\cms\components\Imaging',
         ],
 
-        'authManager' => [
-            'class' => '\skeeks\cms\rbac\DbManager',
-        ],
-
         'console' =>
         [
             'class' => 'skeeks\cms\components\ConsoleComponent',

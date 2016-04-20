@@ -85,10 +85,6 @@ $config =
             ],
         ],
 
-        'authManager' => [
-            'class' => '\skeeks\cms\rbac\DbManager',
-        ],
-
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
             'enablePrettyUrl' => true,
