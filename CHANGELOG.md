@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Removed skeeks\cms\helpers\Request
  * Begain using kartik-v/yii2-datecontrol
  * Changed menu
  * Removed ssh. In a separate package skeeks/cms-ssh-console
