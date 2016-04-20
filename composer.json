@@ -46,7 +46,7 @@
         "giggsey/libphonenumber-for-php": "~7.0"
     },
     "scripts": {
-        "post-update-cmd": "skeeks\\cms\\console\\ComposerUpdate::postUpdate",
+        "post-update-cmd": "skeeks\\cms\\console\\ComposerUpdate::postUpdate"
     },
     "autoload": {
         "psr-4": {
