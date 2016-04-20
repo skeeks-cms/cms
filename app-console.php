@@ -12,8 +12,6 @@
 defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
-defined('APP_TYPE') or define('APP_TYPE', 'console');
-
 //Determination of uncertainty must be constants
 require(__DIR__ . '/global.php');
 //Standard loader

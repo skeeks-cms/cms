@@ -352,6 +352,7 @@ class Cms extends \skeeks\cms\base\Component
             ], $configs
         ));
 
+
         $result = [];
         foreach ($configs as $filePath)
         {
