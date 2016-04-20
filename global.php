@@ -23,8 +23,7 @@
  * APP_ENV_CONFIG_DIR       //Дирриктория с конфигами текущего приложения для текущего окружения
  */
 //Корень запущеного приложения
-defined('APP_CONFIG_DIR') or die('Please specify the constant "APP_CONFIG_DIR" in index.php in your application.');defined('APP_TYPE') or define('APP_TYPE', 'web');
-defined('APP_TYPE') or define('APP_TYPE', 'web');
+defined('APP_CONFIG_DIR') or die('Please specify the constant "APP_CONFIG_DIR" in index.php in your application.');
 
 //Корень проекта
 defined('ROOT_DIR') or die('Please specify the constant "ROOT_DIR" in index.php in your application.');
@@ -32,8 +31,8 @@ defined('VENDOR_DIR') or define('VENDOR_DIR', ROOT_DIR . '/vendor');
 
 defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', ROOT_DIR . '/common/config');
 
-defined('TMP_CONFIG_FILE_EXTENSIONS') or define("TMP_CONFIG_FILE_EXTENSIONS", COMMON_CONFIG_DIR . '/tmp-config-extensions.cache.conf' );
-defined('TMP_CONSOLE_CONFIG_FILE_EXTENSIONS') or define("TMP_CONSOLE_CONFIG_FILE_EXTENSIONS", COMMON_CONFIG_DIR . '/tmp-console-config-extensions.cache.conf' );
+define("TMP_CONFIG_FILE_EXTENSIONS", VENDOR_DIR . '/skeeks/tmp-config-extensions.cache.conf' );
+define("TMP_CONSOLE_CONFIG_FILE_EXTENSIONS", VENDOR_DIR . '/skeeks/tmp-console-config-extensions.cache.conf' );
 
 /**
  * Глобальный файл где задается настройка окружения.

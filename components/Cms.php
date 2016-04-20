@@ -189,21 +189,9 @@ class Cms extends \skeeks\cms\base\Component
 
         if (\Yii::$app instanceof Application)
         {
-            //console init
-            //Генерация файла с подключением настроек extensions если его нет
-            if (!file_exists(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS))
-            {
-                $this->generateTmpConsoleConfig();
-            }
 
         } else
         {
-            //Генерация файла с подключением настроек extensions если его нет
-            if (!file_exists(TMP_CONFIG_FILE_EXTENSIONS))
-            {
-                $this->generateTmpConfig();
-            }
-
             //web init
             if (!$this->noImageUrl)
             {
@@ -336,7 +324,10 @@ class Cms extends \skeeks\cms\base\Component
         }
 
         $file = new File(TMP_CONFIG_FILE_EXTENSIONS);
-        $file->remove();
+        if ($file->isExist())
+        {
+            $file->remove();
+        }
         $file->write(serialize($result));
         return $file->isExist();
     }
@@ -362,7 +353,10 @@ class Cms extends \skeeks\cms\base\Component
         }
 
         $file = new File(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS);
-        $file->remove();
+        if ($file->isExist())
+        {
+            $file->remove();
+        }
         $file->write(serialize($result));
         return $file->isExist();
     }

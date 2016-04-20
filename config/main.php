@@ -9,7 +9,6 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
-
 $config =
 [
     'id'            => 'skeeks-cms-app',
@@ -77,10 +76,6 @@ $config =
                 [
                     'class'                 => 'skeeks\cms\components\storage\ClusterLocal',
                     'priority'              => 100,
-
-                    "name"                  => \Yii::t('app',"Local storage"),
-                    "publicBaseUrl"         => "/uploads/all",
-                    "rootBasePath"          =>  \Yii::getAlias("@frontend/web/uploads/all"),
                 ]
             ],
         ],

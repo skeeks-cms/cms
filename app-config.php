@@ -5,7 +5,6 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.04.2016
  */
-
 $configCommon = [];
 if (file_exists(COMMON_CONFIG_DIR . '/main.php'))
 {

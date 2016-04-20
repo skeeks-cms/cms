@@ -22,6 +22,22 @@ use \skeeks\sx\Dir;
  */
 class ClusterLocal extends Cluster
 {
+    public function init()
+    {
+        if (!$this->name)
+        {
+            $this->name = \Yii::t('app',"Local storage");
+        }
+        if (!$this->publicBaseUrl)
+        {
+            $this->name = "/uploads/all";
+        }
+        if (!$this->rootBasePath)
+        {
+            $this->name = \Yii::getAlias("@frontend/web/uploads/all");
+        }
+        parent::init();
+    }
     /**
      * @var bool
      */
