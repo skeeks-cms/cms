@@ -44,4 +44,53 @@ class FileHelper extends \yii\helpers\FileHelper
 
         return null;
     }
+
+    /**
+     *
+     * Search for files on all connected extensions
+     *
+     * @param string $fileName
+     * @return array
+     */
+    static public function findExtensionsFiles($fileName = '/config/main.php', $onlyFileExists = true)
+    {
+        $configs     = [];
+
+        $fileNames = [];
+        if (is_string($fileName))
+        {
+            $fileNames[] = $fileName;
+        } else if (is_array($fileName))
+        {
+            $fileNames = $fileName;
+        }
+
+        foreach ((array) \Yii::$app->extensions as $code => $data)
+        {
+            if (is_array($data['alias']))
+            {
+                $configTmp  = [];
+
+                foreach ($data['alias'] as $code => $path)
+                {
+                    foreach ($fileNames as $fileName)
+                    {
+                        $file = $path . $fileName;
+                        if ($onlyFileExists === true)
+                        {
+                            if (file_exists($file))
+                            {
+                                $configs[] = $file;
+                            }
+                        } else
+                        {
+                            $configs[] = $file;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $configs;
+    }
 }

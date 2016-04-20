@@ -14,7 +14,6 @@
  */
 //define('YII_ENV',                 'dev');                   //Необязательная константа, если не будет определена, то определение произойдет по ходу выполнения проекта
 //define('YII_DEBUG',               true);                    //Необязательная константа, если не будет определена, то определение произойдет по ходу выполнения проекта
-//define('CONFIG_CACHE',            true);                    //Включить или отключить кэширование конфигов, по умолчанию включено, сильно разгружает проект. Много логики и мержа конфигов. Эта опция полностью отключает все эти хитрые мержи.
 //define("COMMON_CONFIG_DIR",       ROOT_DIR . '/common/config');  //Общие конфиги
 //define("VENDOR_DIR",              ROOT_DIR . '/vendor');    //Вендоры
 
@@ -33,11 +32,8 @@ defined('VENDOR_DIR') or define('VENDOR_DIR', ROOT_DIR . '/vendor');
 
 defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', ROOT_DIR . '/common/config');
 
-//Использовать кэширование конфигов
-defined('CONFIG_CACHE') or define("CONFIG_CACHE", true);
-
-//Временный файл, в котором храняться пути к подключенным модулям
-defined('AUTO_GENERATED_MODULES_FILE') or define("AUTO_GENERATED_MODULES_FILE", VENDOR_DIR . '/skeeks/extensions.php' );
+defined('TMP_CONFIG_FILE_EXTENSIONS') or define("TMP_CONFIG_FILE_EXTENSIONS", COMMON_CONFIG_DIR . '/tmp-config-extensions.cache.conf' );
+defined('TMP_CONSOLE_CONFIG_FILE_EXTENSIONS') or define("TMP_CONSOLE_CONFIG_FILE_EXTENSIONS", COMMON_CONFIG_DIR . '/tmp-console-config-extensions.cache.conf' );
 
 /**
  * Глобальный файл где задается настройка окружения.

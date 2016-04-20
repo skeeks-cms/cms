@@ -12,8 +12,6 @@
 defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
-defined('CONFIG_CACHE') or define('CONFIG_CACHE', false);
-
 defined('APP_TYPE') or define('APP_TYPE', 'console');
 
 //Determination of uncertainty must be constants
@@ -23,7 +21,7 @@ require(__DIR__ . '/bootstrap.php');
 
 //Result config
 $config = \yii\helpers\ArrayHelper::merge(
-    (array) require(__DIR__ . '/auto-config.php'),
+    (array) require(__DIR__ . '/tmp-config-console-extensions.php'),
     (array) require(__DIR__ . '/app-config.php')
 );
 

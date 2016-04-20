@@ -10,6 +10,7 @@ namespace skeeks\cms\components;
 use skeeks\cms\assets\CmsAsset;
 use skeeks\cms\base\Module;
 use skeeks\cms\helpers\ComposerHelper;
+use skeeks\cms\helpers\FileHelper;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
@@ -185,17 +186,24 @@ class Cms extends \skeeks\cms\base\Component
             $this->languageCode = \Yii::$app->language;
         }
 
-        //Генерация файла с подключением настроек extensions если его нет
-        if (!file_exists(AUTO_GENERATED_MODULES_FILE))
-        {
-            $this->generateModulesConfigFile();
-        }
 
         if (\Yii::$app instanceof Application)
         {
             //console init
+            //Генерация файла с подключением настроек extensions если его нет
+            if (!file_exists(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS))
+            {
+                $this->generateTmpConsoleConfig();
+            }
+
         } else
         {
+            //Генерация файла с подключением настроек extensions если его нет
+            if (!file_exists(TMP_CONFIG_FILE_EXTENSIONS))
+            {
+                $this->generateTmpConfig();
+            }
+
             //web init
             if (!$this->noImageUrl)
             {
@@ -308,102 +316,52 @@ class Cms extends \skeeks\cms\base\Component
         return $this->_tree;
     }
 
-
     /**
-     *
-     * Взять все установленные расширения, и вернуть пути к конфигам
-     *
-     * @param string|array $fileName
-     * @return array
+     * @return bool
      */
-    public function findConfigFiles($fileName = '/config/main.php')
+    public function generateTmpConfig()
     {
-        $config     = [];
+        $configs = FileHelper::findExtensionsFiles(['/config/main.php']);
+        $configs = array_unique(array_merge(
+            [
+                \Yii::getAlias('@skeeks/cms/config/main.php')
+            ], $configs
+        ));
 
-        $fileNames = [];
-        if (is_string($fileName))
+        $result = [];
+        foreach ($configs as $filePath)
         {
-            $fileNames[] = $fileName;
-        } else if (is_array($fileName))
-        {
-            $fileNames = $fileName;
+            $fileData = (array) include $filePath;
+            $result = \yii\helpers\ArrayHelper::merge($result, $fileData);
         }
 
-        foreach ((array) \Yii::$app->extensions as $code => $data)
-        {
-            if (is_array($data['alias']))
-            {
-                $configTmp  = [];
-
-                foreach ($data['alias'] as $code => $path)
-                {
-                    foreach ($fileNames as $fileName)
-                    {
-                        $file = new \skeeks\sx\File($path . $fileName);
-                        if ($file->isExist())
-                        {
-                            $config[] = $file->getPath();
-                        }
-                    }
-                }
-            }
-        }
-
-        return $config;
+        $file = new File(TMP_CONFIG_FILE_EXTENSIONS);
+        $file->write(serialize($result));
+        return $file->isExist();
     }
 
     /**
-     * Пройтись по всем расширениям уставноленным в проект, и сгенерировать конфиг файл.
      * @return bool
      */
-    public function generateModulesConfigFile()
+    public function generateTmpConsoleConfig()
     {
-        $configs            = $this->findConfigFiles(['/config/main.php']);
-        $configsConsole     = $this->findConfigFiles(['/config/main-console.php']);
+        $configs = FileHelper::findExtensionsFiles(['/config/main-console.php']);
+        $configs = array_unique(array_merge(
+            [
+                \Yii::getAlias('@skeeks/cms/config/main-console.php')
+            ], $configs
+        ));
 
-        if ($configs || $configsConsole)
+        $result = [];
+        foreach ($configs as $filePath)
         {
-
-            $date = date("dd.mm.YY", time());
-            $fileContent = <<<PHP
-<?php
-/**
- * Автоматически сгенерированные конфиг, можно просто удалить этот файл.
- *
- * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date {$date}
- * @since 1.0.0
- */
- return [
-
-PHP;
-            $fileContent .= "'web' => [\n";
-
-            foreach ($configs as $filePach)
-            {
-                $fileContent .= "\"" . $filePach . "\", \n";
-            }
-            $fileContent .= "],\n";
-
-            $fileContent .= "'console' => [\n";
-
-            foreach ($configsConsole as $filePach)
-            {
-                $fileContent .= "\"" . $filePach . "\", \n";
-            }
-            $fileContent .= "]\n";
-
-$fileContent .= '];';
-
-            $file = new File(AUTO_GENERATED_MODULES_FILE);
-            $file->write($fileContent);
+            $fileData = (array) include $filePath;
+            $result = \yii\helpers\ArrayHelper::merge($result, $fileData);
         }
 
-        $file = new File(AUTO_GENERATED_MODULES_FILE);
+        $file = new File(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS);
+        $file->write(serialize($result));
         return $file->isExist();
-
     }
 
     /**

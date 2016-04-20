@@ -63,7 +63,8 @@ class CacheController extends \yii\console\controllers\CacheController
         }
 
         //It is important to the proper configuration is cached differently
-        \Yii::$app->cms->generateModulesConfigFile();
+        \Yii::$app->cms->generateTmpConsoleConfig();
+        \Yii::$app->cms->generateTmpConfig();
     }
 
     /**
@@ -89,9 +90,10 @@ class CacheController extends \yii\console\controllers\CacheController
     /**
      * Генерация файла со списком модулей
      */
-    public function actionFlushTmpConfigMap()
+    public function actionFlushTmpConfig()
     {
-        \Yii::$app->cms->generateModulesConfigFile();
+        \Yii::$app->cms->generateTmpConfig();
+        \Yii::$app->cms->generateTmpConsoleConfig();
         $this->stdout("Clear tmp config file success\n");
     }
 }

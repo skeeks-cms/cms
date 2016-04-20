@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * Rewrote the logic configuration files download
  * To use \Yii::$app->langugae
  * Removed rbac. In a separate package skeeks/cms-rbac
  * Removed skeeks\cms\helpers\Request
