@@ -336,6 +336,7 @@ class Cms extends \skeeks\cms\base\Component
         }
 
         $file = new File(TMP_CONFIG_FILE_EXTENSIONS);
+        $file->remove();
         $file->write(serialize($result));
         return $file->isExist();
     }
@@ -352,15 +353,16 @@ class Cms extends \skeeks\cms\base\Component
             ], $configs
         ));
 
-
         $result = [];
         foreach ($configs as $filePath)
         {
             $fileData = (array) include $filePath;
+
             $result = \yii\helpers\ArrayHelper::merge($result, $fileData);
         }
 
         $file = new File(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS);
+        $file->remove();
         $file->write(serialize($result));
         return $file->isExist();
     }
