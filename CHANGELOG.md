@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha.pre
 -----------------
+ * To use \Yii::$app->langugae
  * Removed rbac. In a separate package skeeks/cms-rbac
  * Removed skeeks\cms\helpers\Request
  * Begain using kartik-v/yii2-datecontrol
