@@ -456,8 +456,6 @@ return
     "User properties"       => "Свойства пользователей",
     "The base of {email} addresses" => "База {email} адресов",
     "Base phones"           => "База телефонов",
-    "Roles"                 => "Роли",
-    "Privileges"            => "Привилегии",
     "Searching"             => "Поиск",
     "Statistic"             => "Статистика",
     "Jump list"             => "Список переходов",
