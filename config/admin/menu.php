@@ -229,7 +229,8 @@ return
             [
                 "label"     => \Yii::t('skeeks/cms',"User management"),
                 "url"       => ["cms/admin-user"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png']
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png'],
+                'priority'  => 0
             ],
 
             [
@@ -248,22 +249,6 @@ return
                 "label"     => \Yii::t('skeeks/cms',"Base phones"),
                 "url"       => ["cms/admin-user-phone"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/phone.png']
-            ],
-
-            [
-                "label"     => \Yii::t('skeeks/cms','Roles'),
-                "url"       => ["admin/admin-role"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.users_role.png'],
-                'enabled'   => true,
-                'priority'  => 0,
-            ],
-
-            [
-                "label"     => \Yii::t('skeeks/cms','Privileges'),
-                "url"       => ["admin/admin-permission"],
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/access.png'],
-                'enabled'   => true,
-                'priority'  => 0,
             ],
         ]
     ],
