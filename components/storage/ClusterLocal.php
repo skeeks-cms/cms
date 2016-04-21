@@ -30,11 +30,11 @@ class ClusterLocal extends Cluster
         }
         if (!$this->publicBaseUrl)
         {
-            $this->name = "/uploads/all";
+            $this->publicBaseUrl = "/uploads/all";
         }
         if (!$this->rootBasePath)
         {
-            $this->name = \Yii::getAlias("@frontend/web/uploads/all");
+            $this->rootBasePath = \Yii::getAlias("@frontend/web/uploads/all");
         }
         parent::init();
     }

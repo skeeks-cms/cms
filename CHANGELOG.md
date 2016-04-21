@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-alpha2
 -----------------
+ * Fix bugs cluster local
  * Changed dependence composer
 
 3.0.0-alpha1
