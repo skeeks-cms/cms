@@ -31,8 +31,8 @@ defined('VENDOR_DIR') or define('VENDOR_DIR', ROOT_DIR . '/vendor');
 
 defined('COMMON_CONFIG_DIR') or define('COMMON_CONFIG_DIR', ROOT_DIR . '/common/config');
 
-define("TMP_CONFIG_FILE_EXTENSIONS", VENDOR_DIR . '/skeeks/tmp-config-extensions.cache.conf' );
-define("TMP_CONSOLE_CONFIG_FILE_EXTENSIONS", VENDOR_DIR . '/skeeks/tmp-console-config-extensions.cache.conf' );
+define("TMP_CONFIG_FILE_EXTENSIONS", VENDOR_DIR . '/skeeks/tmp-config-extensions.php' );
+define("TMP_CONSOLE_CONFIG_FILE_EXTENSIONS", VENDOR_DIR . '/skeeks/tmp-console-config-extensions.php' );
 
 /**
  * Глобальный файл где задается настройка окружения.

@@ -323,13 +323,19 @@ class Cms extends \skeeks\cms\base\Component
             $result = \yii\helpers\ArrayHelper::merge($result, $fileData);
         }
 
-        $file = new File(TMP_CONFIG_FILE_EXTENSIONS);
-        if ($file->isExist())
-        {
-            $file->remove();
+        if (!file_exists(dirname(TMP_CONFIG_FILE_EXTENSIONS))) {
+            mkdir(dirname(TMP_CONFIG_FILE_EXTENSIONS), 0777, true);
         }
-        $file->write(serialize($result));
-        return $file->isExist();
+
+        $string = var_export($result, true);
+        file_put_contents(TMP_CONFIG_FILE_EXTENSIONS, "<?php\n\nreturn $string;\n");
+
+        // invalidate opcache of extensions.php if exists
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate(TMP_CONFIG_FILE_EXTENSIONS, true);
+        }
+
+        return file_exists(TMP_CONFIG_FILE_EXTENSIONS);
     }
 
     /**
@@ -352,13 +358,19 @@ class Cms extends \skeeks\cms\base\Component
             $result = \yii\helpers\ArrayHelper::merge($result, $fileData);
         }
 
-        $file = new File(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS);
-        if ($file->isExist())
-        {
-            $file->remove();
+        if (!file_exists(dirname(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS))) {
+            mkdir(dirname(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS), 0777, true);
         }
-        $file->write(serialize($result));
-        return $file->isExist();
+
+        $string = var_export($result, true);
+        file_put_contents(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS, "<?php\n\nreturn $string;\n");
+
+        // invalidate opcache of extensions.php if exists
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS, true);
+        }
+
+        return file_exists(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS);
     }
 
     /**
