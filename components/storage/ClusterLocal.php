@@ -114,7 +114,6 @@ class ClusterLocal extends Cluster
         return true;
     }
 
-
     public function update($clusterFileUniqSrc, $file)
     {}
 
