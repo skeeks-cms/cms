@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0-alpha3.pre
+-----------------
+ * Removed @admin/views
+
 3.0.0-alpha2
 -----------------
  * Fix bugs cluster local

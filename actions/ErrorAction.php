@@ -82,14 +82,14 @@ class ErrorAction extends \yii\web\ErrorAction
                 if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
                 {
                     $this->controller->layout = \Yii::$app->cms->moduleAdmin->layout;
-                    return $this->controller->render('@admin/views/error/error', [
+                    return $this->controller->render('@skeeks/cms/modules/admin/views/error/error', [
                         'message' => nl2br(Html::encode($message))
                     ]);
                 } else
                 {
-                    $this->controller->layout = '@admin/views/layouts/unauthorized';
+                    $this->controller->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized';
 
-                    return $this->controller->render('@admin/views/error/unauthorized-403', [
+                    return $this->controller->render('@skeeks/cms/modules/admin/views/error/unauthorized-403', [
                         'message' => nl2br(Html::encode($message))
                     ]);
                 }
