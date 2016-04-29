@@ -12,28 +12,15 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsSite;
-use skeeks\cms\models\forms\ViewFileEditModel;
-use skeeks\cms\models\Search;
-use skeeks\cms\models\Tree;
-use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
-use skeeks\cms\modules\admin\widgets\ControllerActions;
-use skeeks\cms\modules\admin\widgets\DropdownControllerActions;
+use skeeks\cms\modules\admin\widgets\UserLastActivityWidget;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
-use yii\behaviors\AttributeBehavior;
-use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\web\Cookie;
+use yii\web\Controller;
+use yii\web\Response;
 
 /**
  * Class AdminUserController
@@ -47,12 +34,13 @@ class AdminToolsController extends AdminController
      */
     public function behaviors()
     {
-        return
+        return ArrayHelper::merge(parent::behaviors(),
         [
             //Проверка доступа к админ панели
-            'adminAccess' =>
+            'adminViewEditAccess' =>
             [
                 'class' => AdminAccessControl::className(),
+                'only' => ['view-file-edit'],
                 'rules' =>
                 [
                     [
@@ -64,13 +52,22 @@ class AdminToolsController extends AdminController
                     ],
                 ]
             ],
-        ];
+        ]);
     }
 
     public function init()
     {
         $this->name                   = "Управление шаблоном";
         parent::init();
+    }
+
+    /**
+     * The name of the privilege of access to this controller
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return '';
     }
 
     public function actionViewFileEdit()
@@ -103,5 +100,103 @@ class AdminToolsController extends AdminController
         return $this->render($this->action->id, [
             'model' => $model
         ]);
+    }
+
+
+
+
+
+    public function getPermissionName()
+    {
+        return '';
+    }
+
+    /**
+     * Выбор файла
+     * @return string
+     */
+    public function actionSelectFile()
+    {
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
+        \Yii::$app->cmsToolbar->enabled = 0;
+
+        $model = null;
+        $className = \Yii::$app->request->get('className');
+        $pk = \Yii::$app->request->get('pk');
+
+        if ($className && $pk)
+        {
+            if ($model = $className::findOne($pk))
+            {
+
+            }
+        }
+
+
+        return $this->render($this->action->id, [
+            'model' => $model
+        ]);
+    }
+
+    /**
+     * Выбор элемента контента
+     * @return string
+     */
+    public function actionSelectCmsElement()
+    {
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
+        \Yii::$app->cmsToolbar->enabled = 0;
+
+        return $this->render($this->action->id);
+    }
+
+    /**
+     * Выбор элемента контента
+     * @return string
+     */
+    public function actionSelectCmsUser()
+    {
+        $this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
+        \Yii::$app->cmsToolbar->enabled = 0;
+
+        return $this->render($this->action->id);
+    }
+
+    /**
+     * Данные о текущем пользователе
+     * @return RequestResponse
+     */
+    public function actionGetUser()
+    {
+        $rr = new RequestResponse();
+
+        $rr->data = [
+            'identity'  => \Yii::$app->user->identity,
+            'user'      => \Yii::$app->user,
+        ];
+
+        return $rr;
+    }
+
+    /**
+     * Данные о текущем пользователе
+     * @return RequestResponse
+     */
+    public function actionAdminLastActivity()
+    {
+        $rr = new RequestResponse();
+
+        if (!\Yii::$app->user->isGuest)
+        {
+            $rr->data = (new UserLastActivityWidget())->getOptions();
+        } else
+        {
+            $rr->data = [
+                'isGuest' => true
+            ];
+        }
+
+
+        return $rr;
     }
 }

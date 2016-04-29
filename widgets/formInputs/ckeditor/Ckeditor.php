@@ -49,7 +49,7 @@ class Ckeditor extends CKEditorWidget
             ];
         }
 
-        $this->clientOptions['filebrowserImageBrowseUrl'] = UrlHelper::construct('cms/tools/select-file', $additionalData)
+        $this->clientOptions['filebrowserImageBrowseUrl'] = UrlHelper::construct('cms/admin-tools/select-file', $additionalData)
             ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
             ->enableAdmin()
             ->toString();

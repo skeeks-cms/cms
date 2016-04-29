@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.0.0-alpha3.pre
+3.0.0-beta
 -----------------
+ * Fixed a critical bug for downloading files by unauthorized users
  * Removed @admin/views
 
 3.0.0-alpha2

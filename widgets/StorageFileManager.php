@@ -118,7 +118,7 @@ HTML;
     public function defaultClientOptions($group = '')
     {
         $urlData = [
-            "cms/storage-files/upload",
+            "cms/admin-storage-files/upload",
 
         ];
 
@@ -153,7 +153,7 @@ HTML;
     private function _getSourceRemoteUploadOptions()
     {
         $urlData = [
-            "cms/storage-files/remote-upload",
+            "cms/admin-storage-files/remote-upload",
         ];
 
         if ($this->fileGroup)
