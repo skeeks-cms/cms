@@ -104,13 +104,6 @@ class AdminToolsController extends AdminController
 
 
 
-
-
-    public function getPermissionName()
-    {
-        return '';
-    }
-
     /**
      * Выбор файла
      * @return string
