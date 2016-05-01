@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0-beta2
+-----------------
+ * Updated CmsAccessControl
+
 3.0.0-beta
 -----------------
  * Fixed a critical bug for downloading files by unauthorized users

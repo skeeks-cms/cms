@@ -35,6 +35,7 @@ class CmsAccessControl extends \yii\filters\AccessControl
 
             if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
             {
+                \Yii::$app->getResponse()->redirect($authUrl);
                 $rr->redirect = $authUrl;
                 return (array) $rr;
             } else
