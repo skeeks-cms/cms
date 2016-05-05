@@ -100,9 +100,25 @@ class UrlHelper
      * @param array $data
      * @return static
      */
-    static public function construct($route = "", $data = [])
+    static public function construct($route, $data = [])
     {
-        return new static($route, $data);
+        if (is_string($route))
+        {
+            return new static($route, $data);
+        } else if (is_array($route))
+        {
+            $routeString = $route[0];
+
+            unset($route[0]);
+            if ($route)
+            {
+                $data = ArrayHelper::merge($route, $data);
+            }
+
+            return new static($routeString, $data);
+        }
+
+        throw new \InvalidArgumentException('Url not create');
     }
 
     /**

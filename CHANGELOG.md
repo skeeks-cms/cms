@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0-beta3
+-----------------
+ * Changes in UrlHelper::construct();
+
 3.0.0-beta2
 -----------------
  * Updated CmsAccessControl
