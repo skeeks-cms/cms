@@ -7,6 +7,15 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 ?>
 <?php $form = ActiveForm::begin(); ?>
 
+<?
+\skeeks\cms\modules\admin\assets\JqueryMaskInputAsset::register($this);
+$id = \yii\helpers\Html::getInputId($model, 'value');
+$this->registerJs(<<<JS
+$("#{$id}").mask("+7 999 999-99-99");
+JS
+);
+?>
+
     <?= $form->field($model, 'value')->textInput([
         'placeholder' => '+7 903 722-28-73'
     ])->hint('Формат ввода телефона: +7 903 722-28-73'); ?>

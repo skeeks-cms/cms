@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0-beta5
+-----------------
+ * Added phone Mask
+
 3.0.0-beta4
 -----------------
  * mihaildev/yii2-elfinder: 1.1.3

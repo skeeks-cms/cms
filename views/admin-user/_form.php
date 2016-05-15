@@ -47,6 +47,15 @@ use common\models\User;
             <? endif; ?>
         </div>
         <div class="col-md-5">
+            <?
+\skeeks\cms\modules\admin\assets\JqueryMaskInputAsset::register($this);
+$id = \yii\helpers\Html::getInputId($model, 'phone');
+$this->registerJs(<<<JS
+$("#{$id}").mask("+7 999 999-99-99");
+JS
+);
+?>
+
             <?= $form->field($model, 'phone')->textInput([
                 'placeholder' => '+7 903 722-28-73'
             ]); ?>

@@ -9,7 +9,7 @@
  */
 namespace skeeks\cms\_ide;
 /**
- * @property \yii\web\IdentityInterface|\skeeks\cms\models\User $identity
+ * @property \yii\web\IdentityInterface|\skeeks\cms\models\User|\common\models\User $identity
  *
  * Class UserIde
  * @package skeeks\cms\_ide
