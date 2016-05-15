@@ -27,14 +27,6 @@ class ComboTextInputWidget extends InputWidget
     const CONTROLL_EDITOR   = "editor";
     const CONTROLL_HTML     = "html";
 
-    /**
-     * @var array Возможные редакторы.
-     */
-    /*static public $editors = [
-        self::CONTROLL_TEXT          => 'Текст',
-        self::CONTROLL_EDITOR        => 'Визуальный редактор',
-        self::CONTROLL_HTML          => 'HTML',
-    ];*/
     static public function editors()
     {
         return [
@@ -44,6 +36,7 @@ class ComboTextInputWidget extends InputWidget
         ];
     }
 
+    public $defaultEditor = "text";
 
     /**
      * @var array Опции текстового поля по умолчанию.

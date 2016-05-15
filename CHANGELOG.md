@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-beta5
 -----------------
+ * Changes in compoWidget
  * Added phone Mask
 
 3.0.0-beta4

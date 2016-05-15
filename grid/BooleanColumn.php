@@ -80,7 +80,10 @@ class BooleanColumn extends DataColumn
         if (empty($this->falseLabel)) {
             $this->falseLabel = \Yii::t('app', 'нет');
         }
-        $this->filter = [$this->trueValue => $this->trueLabel, $this->falseValue => $this->falseLabel];
+        if (!$this->filter)
+        {
+            $this->filter = [$this->trueValue => $this->trueLabel, $this->falseValue => $this->falseLabel];
+        }
         if (empty($this->trueIcon)) {
             $this->trueIcon = '<span class="glyphicon glyphicon-ok text-success" title="' . $this->trueLabel . '"></span>';
         }
