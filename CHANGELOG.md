@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0-beta6
+-----------------
+ * Fixed admin bug
+
 3.0.0-beta5
 -----------------
  * Changes in compoWidget

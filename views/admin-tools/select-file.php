@@ -89,7 +89,7 @@ JS
                     <?= $form->field($model, $fieldName)->widget(
                         \skeeks\cms\widgets\formInputs\StorageImage::className(),
                         [
-                            'viewItemTemplate' => '@skeeks/cms/views/tools/one-file'
+                            'viewItemTemplate' => '@skeeks/cms/views/admin-tools/one-file'
                         ]
                     ); ?>
 
@@ -101,7 +101,7 @@ JS
                     <?= $form->field($model, $relationName)->widget(
                         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
                         [
-                            'viewItemTemplate' => '@skeeks/cms/views/tools/one-file'
+                            'viewItemTemplate' => '@skeeks/cms/views/admin-tools/one-file'
                         ]
                     ); ?>
 
