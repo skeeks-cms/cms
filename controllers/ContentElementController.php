@@ -110,7 +110,7 @@ class ContentElementController extends Controller
             throw new NotFoundHttpException(\Yii::t('app', 'Page not found'));
         }
 
-        $contentElement     = $action->model;
+        $contentElement     = $this->model;
         $tree               = $contentElement->cmsTree;
 
         if ($tree)

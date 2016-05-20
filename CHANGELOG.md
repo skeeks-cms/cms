@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0-beta7
+-----------------
+ * Fixed a serious bug
+
 3.0.0-beta6
 -----------------
  * Fixed admin bug
