@@ -1,18 +1,12 @@
 CHANGELOG
 ==============
 
-3.0.0-beta7
------------------
- * Fixed a serious bug
-
-3.0.0-beta6
------------------
- * Fixed admin bug
-
-3.0.0-beta5
+3.0.0-beta5.pre
 -----------------
  * Changes in compoWidget
  * Added phone Mask
+ * Fixed admin bug
+ * Fixed a serious bug
 
 3.0.0-beta4
 -----------------
