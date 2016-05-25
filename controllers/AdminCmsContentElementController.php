@@ -12,6 +12,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
+use skeeks\cms\models\searchs\CmsContentElementSearch;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
@@ -54,6 +55,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(),
             [
+
+                "index" =>
+                [
+                    'modelSearchClassName' => CmsContentElementSearch::className()
+                ],
 
                 "create" =>
                 [
