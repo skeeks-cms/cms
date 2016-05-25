@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-beta5.pre
 -----------------
+ * Loading forms with default values
  * Adding filters in admin
  * Changes in compoWidget
  * Added phone Mask

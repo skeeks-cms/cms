@@ -14,6 +14,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\models\searchs\CmsUserSearch;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
@@ -53,6 +54,11 @@ class AdminUserController extends AdminModelEditorController
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
+
+            "index" =>
+            [
+                'modelSearchClassName' => CmsUserSearch::className()
+            ],
 
             'create' =>
             [

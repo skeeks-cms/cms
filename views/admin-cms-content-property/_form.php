@@ -7,6 +7,10 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
+if ($model->isNewRecord)
+{
+    $model->loadDefaultValues();
+}
 ?>
 
 <?php $form = ActiveForm::begin(); ?>

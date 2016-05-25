@@ -215,6 +215,14 @@ class Cms extends \skeeks\cms\base\Component
                             "content"   => $this->descriptor->name . " — {$this->descriptor->homepage}"
                         ], self::$_huck);
                     }
+
+                    if (!isset($view->metaTags['cmsmagazine']))
+                    {
+                        $view->registerMetaTag([
+                            "name"      => 'cmsmagazine',
+                            "content"   => "7170fe3a42c6f80cd95fd8bce765333d"
+                        ], 'cmsmagazine');
+                    }
                 }
             });
 

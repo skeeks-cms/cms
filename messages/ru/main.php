@@ -898,4 +898,18 @@ return
     "The maximum number of records per page"                          => "Допустимое количество записей на странице",
     "The minimum number of records per page"                          => "Минимально допустимое количество записей на странице",
     "Expand/Collapse"                          => "Развернуть/Свернуть",
+
+
+    "Search name and description"             => "Поиск по названию и описанию",
+    "Search by name"                          => "Поиск по названию",
+    "Section"                                 => "Раздел",
+    "Search"                                  => "Поиск",
+    "Created date (from)"                     => "Дата создания (от)",
+    "Created (up to)"                         => "Дата создания (до)",
+    "Updated time (from)"                     => "Время обновления (от)",
+    "Updated time (up to)"                    => "Время обновления (до)",
+    "Time of publication (from)"              => "Время публикации (от)",
+    "Time of publication (up to)"             => "Время публикации (до)",
+    "Image"                                   => "Изображение",
+    "The presence of such images"             => "Наличие подробного изображения",
 ];

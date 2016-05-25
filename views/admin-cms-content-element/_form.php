@@ -11,6 +11,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
  if ($model->isNewRecord)
  {
+     $model->loadDefaultValues();
+
      if ($tree_id = \Yii::$app->request->get("tree_id"))
      {
          $model->tree_id = $tree_id;

@@ -31,7 +31,14 @@ if ($content_id = \Yii::$app->request->get('content_id'))
         <?= \yii\helpers\Html::hiddenInput('content_id', $content_id) ?>
 
         <?= $form->field($searchModel, 'id'); ?>
-        <?= $form->field($searchModel, 'name')->setVisible(); ?>
+
+        <?= $form->field($searchModel, 'q')->textInput([
+            'placeholder' => \Yii::t('skeeks/cms', 'Search name and description')
+        ])->setVisible(); ?>
+
+        <?= $form->field($searchModel, 'name')->textInput([
+            'placeholder' => \Yii::t('skeeks/cms', 'Search by name')
+        ]) ?>
 
         <?= $form->field($searchModel, 'active')->listBox(\yii\helpers\ArrayHelper::merge([
             '' => ' - '
