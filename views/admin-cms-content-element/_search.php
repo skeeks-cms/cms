@@ -75,6 +75,6 @@
         $searchRelatedPropertiesModel->initProperties($cmsContent->cmsContentProperties);
         $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
     ?>
-    <?= $form->relatedFields($searchModel, $searchRelatedPropertiesModel); ?>
+    <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
 
 <? $form::end(); ?>

@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0-rc2
 -----------------
+ * Revision filters
  * Fixed bugs
 
 3.0.0-rc1

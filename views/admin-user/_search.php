@@ -57,6 +57,6 @@
         $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
         $searchRelatedPropertiesModel->search($dataProvider, $searchModel::tableName());
     ?>
-    <?= $form->relatedFields($searchModel, $searchRelatedPropertiesModel); ?>
+    <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
 
 <? $form::end(); ?>
