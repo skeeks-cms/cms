@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.0-beta5
+3.0.0-rc1
 -----------------
  * Revision filters
  * Loading forms with default values
