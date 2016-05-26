@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0-rc2
+-----------------
+ * Fixed bugs
+
 3.0.0-rc1
 -----------------
  * Revision filters

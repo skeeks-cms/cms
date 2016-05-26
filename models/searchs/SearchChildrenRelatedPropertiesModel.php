@@ -26,8 +26,10 @@ class SearchChildrenRelatedPropertiesModel extends SearchRelatedPropertiesModel
     /**
      * @param ActiveDataProvider $activeDataProvider
      */
-    public function search(ActiveDataProvider $activeDataProvider)
+    public function search(ActiveDataProvider $activeDataProvider, $tableName = 'cms_content_element')
     {
+        $classSearch = $this->propertyElementClassName;
+
         /**
          * @var $activeQuery ActiveQuery
          */
@@ -49,7 +51,7 @@ class SearchChildrenRelatedPropertiesModel extends SearchRelatedPropertiesModel
                 {
                     $elementIds = [];
 
-                    $query = CmsContentElementProperty::find()->select(['element_id'])->where([
+                    $query = $classSearch::find()->select(['element_id'])->where([
                         "property_id"   => $property->id
                     ])->indexBy('element_id');
 
@@ -84,7 +86,7 @@ class SearchChildrenRelatedPropertiesModel extends SearchRelatedPropertiesModel
 
                     $applyFilters = true;
 
-                    $elementIds = CmsContentElementProperty::find()->select(['element_id'])->where([
+                    $elementIds = $classSearch::find()->select(['element_id'])->where([
                         "value"         => $value,
                         "property_id"   => $property->id
                     ])->indexBy('element_id')->all();
@@ -116,7 +118,8 @@ class SearchChildrenRelatedPropertiesModel extends SearchRelatedPropertiesModel
 
         if ($applyFilters)
         {
-            $activeQuery->andWhere(['cms_content_element.id' => $elementIdsGlobal]);
+            //$activeQuery->andWhere(['cms_content_element.id' => $elementIdsGlobal]);
+            $activeQuery->andWhere([$tableName . '.id' => $elementIdsGlobal]);
         }
 
     }
