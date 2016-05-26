@@ -194,6 +194,7 @@ class CmsContentElementSearch extends CmsContentElement
     public function attributes()
     {
         $class = new \ReflectionClass($this);
+
         $names = [];
         foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             if (!$property->isStatic()) {

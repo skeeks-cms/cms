@@ -11,6 +11,8 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use Yii;
+use yii\helpers\ArrayHelper;
+
 /**
  * This is the model class for table "{{%cms_content_property}}".
  *
@@ -57,7 +59,7 @@ class CmsContentProperty extends RelatedPropertyModel
 
     public function attributeLabels()
     {
-        return array_merge(parent::attributeLabels(), [
+        return ArrayHelper::merge(parent::attributeLabels(), [
             'content_id' => Yii::t('app', 'Linked to content'),
         ]);
     }
@@ -68,9 +70,11 @@ class CmsContentProperty extends RelatedPropertyModel
      */
     public function rules()
     {
-        return array_merge(parent::rules(), [
+        $rules = ArrayHelper::merge(parent::rules(), [
             [['content_id'], 'integer'],
             [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('app','For the content of this code is already in use.')],
         ]);
+
+        return $rules;
     }
 }

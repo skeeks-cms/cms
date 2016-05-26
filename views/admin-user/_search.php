@@ -1,70 +1,62 @@
 <?php
 /**
- * _search
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 30.10.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @date 26.05.2016
  */
 
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-
 /* @var $this yii\web\View */
-/* @var $model common\models\searchs\Game */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $searchModel common\models\searchs\Game */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
 ?>
-
-<div class="game-search">
-
-    <?php $form = ActiveForm::begin([
-        'action' => ['index'],
-        'method' => 'get',
+<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+        'action' => '/' . \Yii::$app->request->pathInfo,
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <?= $form->field($searchModel, 'q')->setVisible(); ?>
 
-    <?= $form->field($model, 'created_by') ?>
+    <?= $form->field($searchModel, 'id'); ?>
 
-    <?= $form->field($model, 'updated_by') ?>
+    <?= $form->field($searchModel, 'active')->listBox(\yii\helpers\ArrayHelper::merge([
+        '' => ' - '
+    ], \Yii::$app->cms->booleanFormat()), [
+        'size' => 1
+    ]); ?>
 
-    <?= $form->field($model, 'created_at') ?>
+    <?= $form->field($searchModel, 'has_image')->checkbox(\Yii::$app->formatter->booleanFormat, false); ?>
 
-    <?= $form->field($model, 'updated_at') ?>
+    <?= $form->field($searchModel, 'name') ?>
+    <?= $form->field($searchModel, 'username') ?>
+    <?= $form->field($searchModel, 'email') ?>
+    <?= $form->field($searchModel, 'phone') ?>
 
-    <?php // echo $form->field($model, 'name') ?>
+    <?= $form->field($searchModel, 'created_at_from')->widget(
+        \kartik\datetime\DateTimePicker::className()
+    ); ?>
+    <?= $form->field($searchModel, 'created_at_to')->widget(
+        \kartik\datetime\DateTimePicker::className()
+    ); ?>
 
-    <?php // echo $form->field($model, 'description_short') ?>
+    <?= $form->field($searchModel, 'updated_at_from')->widget(
+        \kartik\datetime\DateTimePicker::className()
+    ); ?>
+    <?= $form->field($searchModel, 'updated_at_to')->widget(
+        \kartik\datetime\DateTimePicker::className()
+    ); ?>
 
-    <?php // echo $form->field($model, 'description_full') ?>
 
-    <?php // echo $form->field($model, 'release_year') ?>
+    <?
+        /**
+         * @var $searchModel \skeeks\cms\models\CmsUser
+         */
+        $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
+        $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\models\CmsUserProperty::className();
+        $searchRelatedPropertiesModel->initProperties($searchModel->relatedProperties);
+        $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+        $searchRelatedPropertiesModel->search($dataProvider, $searchModel::tableName());
+    ?>
+    <?= $form->relatedFields($searchModel, $searchRelatedPropertiesModel); ?>
 
-    <?php // echo $form->field($model, 'release_mounth') ?>
-
-    <?php // echo $form->field($model, 'release_day') ?>
-
-    <?php // echo $form->field($model, 'meta_title') ?>
-
-    <?php // echo $form->field($model, 'meta_description') ?>
-
-    <?php // echo $form->field($model, 'meta_keywords') ?>
-
-    <?php // echo $form->field($model, 'developer') ?>
-
-    <?php // echo $form->field($model, 'publisher') ?>
-
-    <?php // echo $form->field($model, 'image') ?>
-
-    <?php // echo $form->field($model, 'image_cover') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
-
-</div>
+<? $form::end(); ?>

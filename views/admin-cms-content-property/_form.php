@@ -7,18 +7,15 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
-if ($model->isNewRecord)
-{
-    $model->loadDefaultValues();
-}
+
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
 
 <?= $form->fieldSet(\Yii::t('app','Basic settings')) ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'active') ?>
-    <?= $form->fieldRadioListBoolean($model, 'is_required') ?>
+    <?= $form->field($model, 'active')->radioList(\Yii::$app->cms->booleanFormat()) ?>
+    <?= $form->field($model, 'is_required')->radioList(\Yii::$app->cms->booleanFormat()) ?>
 
 
 <? if ($content_id = \Yii::$app->request->get('content_id')) : ?>
@@ -63,10 +60,9 @@ if ($model->isNewRecord)
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'searchable') ?>
-    <?= $form->fieldRadioListBoolean($model, 'filtrable') ?>
-    <?= $form->fieldRadioListBoolean($model, 'smart_filtrable') ?>
-    <?= $form->fieldRadioListBoolean($model, 'with_description') ?>
+    <?= $form->field($model, 'searchable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
+    <?= $form->field($model, 'filtrable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
+    <?= $form->field($model, 'with_description')->radioList(\Yii::$app->cms->booleanFormat()) ?>
 <?= $form->fieldSetEnd(); ?>
 
 

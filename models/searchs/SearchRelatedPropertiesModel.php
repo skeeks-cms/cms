@@ -24,6 +24,7 @@ use yii\helpers\ArrayHelper;
 class SearchRelatedPropertiesModel extends DynamicModel
 {
     /**
+     * TODO: IS DEPRECATED > 3.0
      * @var CmsContent
      */
     public $cmsContent = null;
@@ -32,7 +33,15 @@ class SearchRelatedPropertiesModel extends DynamicModel
      */
     public $properties = [];
 
+    /**
+     * @var string
+     */
+    public $propertyElementClassName = '\skeeks\cms\models\CmsContentElementProperty';
 
+    /**
+     * TODO: IS DEPRECATED > 3.0
+     * @param CmsContent $cmsContent
+     */
     public function initCmsContent(CmsContent $cmsContent)
     {
         $this->cmsContent = $cmsContent;
@@ -42,23 +51,28 @@ class SearchRelatedPropertiesModel extends DynamicModel
          */
         if ($props = $this->cmsContent->cmsContentProperties)
         {
-            foreach ($props as $prop)
+            $this->initProperties($props);
+        }
+    }
+
+
+    public function initProperties($props = [])
+    {
+        foreach ($props as $prop)
+        {
+            if ($prop->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
             {
-                if ($prop->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
-                {
-                    $this->defineAttribute($this->getAttributeNameRangeFrom($prop->code), '');
-                    $this->defineAttribute($this->getAttributeNameRangeTo($prop->code), '');
+                $this->defineAttribute($this->getAttributeNameRangeFrom($prop->code), '');
+                $this->defineAttribute($this->getAttributeNameRangeTo($prop->code), '');
 
-                    $this->addRule([$this->getAttributeNameRangeFrom($prop->code), $this->getAttributeNameRangeTo($prop->code)], "safe");
-
-                }
-
-                $this->defineAttribute($prop->code, "");
-                $this->addRule([$prop->code], "safe");
-
-                $this->properties[$prop->code] = $prop;
+                $this->addRule([$this->getAttributeNameRangeFrom($prop->code), $this->getAttributeNameRangeTo($prop->code)], "safe");
 
             }
+
+            $this->defineAttribute($prop->code, "");
+            $this->addRule([$prop->code], "safe");
+
+            $this->properties[$prop->code] = $prop;
         }
     }
 
@@ -127,8 +141,11 @@ class SearchRelatedPropertiesModel extends DynamicModel
     /**
      * @param ActiveDataProvider $activeDataProvider
      */
-    public function search(ActiveDataProvider $activeDataProvider)
+    public function search(ActiveDataProvider $activeDataProvider, $tableName = 'cms_content_element')
     {
+
+        $classSearch = $this->propertyElementClassName;
+
         /**
          * @var $activeQuery ActiveQuery
          */
@@ -150,7 +167,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
                 {
                     $elementIds = [];
 
-                    $query = CmsContentElementProperty::find()->select(['element_id'])->where([
+                    $query = $classSearch::find()->select(['element_id'])->where([
                         "property_id"   => $property->id
                     ])->indexBy('element_id');
 
@@ -185,10 +202,27 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
                     $applyFilters = true;
 
-                    $elementIds = CmsContentElementProperty::find()->select(['element_id'])->where([
-                        "value"         => $value,
-                        "property_id"   => $property->id
-                    ])->indexBy('element_id')->all();
+                    if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING)
+                    {
+                        $elementIds = $classSearch::find()->select(['element_id'])
+                            ->where([
+                                "property_id"   => $property->id
+                            ])
+                            ->andWhere([
+                                'like', 'value', $value
+                            ])
+                        ->indexBy('element_id')
+                        ->all();
+
+                    } else
+                    {
+                        $elementIds = $classSearch::find()->select(['element_id'])->where([
+                            "value"         => $value,
+                            "property_id"   => $property->id
+                        ])
+                        ->indexBy('element_id')
+                        ->all();
+                    }
                 }
 
                 $elementIds = array_keys($elementIds);
@@ -216,7 +250,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
         if ($applyFilters)
         {
-            $activeQuery->andWhere(['cms_content_element.id' => $elementIdsGlobal]);
+            $activeQuery->andWhere([$tableName . '.id' => $elementIdsGlobal]);
         }
 
     }

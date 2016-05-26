@@ -141,7 +141,7 @@ abstract class RelatedPropertyModel extends Core
      */
     public function rules()
     {
-        return array_merge(parent::rules(), [
+        return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'multiple_cnt', 'version'], 'integer'],
             [['name', 'component'], 'required'],
             [['component_settings'], 'safe'],

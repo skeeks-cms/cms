@@ -16,42 +16,10 @@
 ?>
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-        'action' => '/' . \Yii::$app->request->pathInfo,
+    <?php echo $this->render('_search', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider
     ]); ?>
-
-        <?= $form->field($searchModel, 'q')->setVisible(); ?>
-
-        <?= $form->field($searchModel, 'id'); ?>
-
-        <?= $form->field($searchModel, 'active')->listBox(\yii\helpers\ArrayHelper::merge([
-            '' => ' - '
-        ], \Yii::$app->cms->booleanFormat()), [
-            'size' => 1
-        ]); ?>
-
-        <?= $form->field($searchModel, 'has_image')->checkbox(\Yii::$app->formatter->booleanFormat, false); ?>
-
-        <?= $form->field($searchModel, 'name') ?>
-        <?= $form->field($searchModel, 'username') ?>
-        <?= $form->field($searchModel, 'email') ?>
-        <?= $form->field($searchModel, 'phone') ?>
-
-        <?= $form->field($searchModel, 'created_at_from')->widget(
-            \kartik\datetime\DateTimePicker::className()
-        ); ?>
-        <?= $form->field($searchModel, 'created_at_to')->widget(
-            \kartik\datetime\DateTimePicker::className()
-        ); ?>
-
-        <?= $form->field($searchModel, 'updated_at_from')->widget(
-            \kartik\datetime\DateTimePicker::className()
-        ); ?>
-        <?= $form->field($searchModel, 'updated_at_to')->widget(
-            \kartik\datetime\DateTimePicker::className()
-        ); ?>
-
-    <? $form::end(); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
         'dataProvider'  => $dataProvider,
