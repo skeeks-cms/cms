@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.0-rc2.pre
+3.0.0-rc2
 -----------------
  * Revision filters
  * Fixed bugs
