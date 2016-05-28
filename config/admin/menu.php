@@ -323,11 +323,11 @@ return
 
                 'items' =>
                 [
-                    [
+                    /*[
                         "label"     => \Yii::t('skeeks/cms',"Checking system"),
                         "url"       => ["admin/checker"],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/tools.png'],
-                    ],
+                    ],*/
 
                     [
                         "label"     => \Yii::t('skeeks/cms',"Information"),
