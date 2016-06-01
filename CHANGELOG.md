@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.0.1.pre
+-----------------
+ * Fixed bug. Edit view files
+
 3.0.0
 -----------------
  * Stable release

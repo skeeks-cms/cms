@@ -12,6 +12,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\forms\ViewFileEditModel;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\UserLastActivityWidget;
