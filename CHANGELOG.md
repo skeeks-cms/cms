@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.0.1.pre
+3.0.0.1
 -----------------
  * Fixed bug. Edit view files
 
