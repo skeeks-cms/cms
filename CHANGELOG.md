@@ -4,7 +4,7 @@ CHANGELOG
 3.0.0.2.pre
 -----------------
  * Fixed bug. http://prntscr.com/bdg9n5
- * 
+ 
 3.0.0.1
 -----------------
  * Fixed bug. Edit view files
