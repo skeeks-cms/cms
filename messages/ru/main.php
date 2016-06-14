@@ -912,4 +912,7 @@ return
     "Time of publication (up to)"             => "Время публикации (до)",
     "Image"                                   => "Изображение",
     "The presence of such images"             => "Наличие подробного изображения",
+
+
+    "This Email is already in use by another user"             => "Этот Email уже занят другим пользователем",
 ];

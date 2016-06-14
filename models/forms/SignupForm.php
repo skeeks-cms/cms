@@ -71,9 +71,9 @@ class SignupForm extends Model
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            //['email', 'unique', 'targetClass' => \Yii::$app->cms->getUserClassName(), 'message' => 'Этот Email уже занят другим пользователем.'],
+            ['email', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('app', 'This Email is already in use by another user')],
 
-            [['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value'],
+            //[['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value'],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
