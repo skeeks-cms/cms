@@ -64,6 +64,7 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  *
  * @property CmsStorageFile $image
  * @property string $avatarSrc
+ * @property string $profileUrl
 
 
  *

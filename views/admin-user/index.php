@@ -71,6 +71,23 @@
                 'attribute'     => "active",
             ],
 
+            [
+                'class'     => \yii\grid\DataColumn::className(),
+                'label'     => "Смотреть",
+                'value'     => function(\skeeks\cms\models\CmsUser $model)
+                {
+
+                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->getProfileUrl(), [
+                        'target' => '_blank',
+                        'title' => \Yii::t('app','Watch to site (opens new window)'),
+                        'data-pjax' => '0',
+                        'class' => 'btn btn-default btn-sm'
+                    ]);
+
+                },
+                'format' => 'raw'
+            ]
+
         ],
     ]); ?>
 

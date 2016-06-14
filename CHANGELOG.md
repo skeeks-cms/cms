@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.0.2.pre
 -----------------
+ * User admin grid
  * Fixed register bug
  * Fixed bug. http://prntscr.com/bdg9n5
 
