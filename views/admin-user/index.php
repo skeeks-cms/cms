@@ -37,7 +37,21 @@
             'username',
             'name',
             'email',
+            [
+                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute'     => "email_is_approved",
+                'trueValue'     => 1,
+                'falseValue'     => 0,
+            ],
+
             'phone',
+
+            [
+                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute'     => "phone_is_approved",
+                'trueValue'     => 1,
+                'falseValue'     => 0,
+            ],
 
 
             ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
@@ -48,6 +62,14 @@
 
             [
                 'class'     => \yii\grid\DataColumn::className(),
+                'filter'     => \yii\helpers\Html::activeListBox($searchModel, 'role',
+                    \yii\helpers\ArrayHelper::merge([
+                        '' => ' - '
+                    ], \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'))
+                    , [
+                    'size' => 1,
+                    'class' => 'form-control'
+                ]),
                 'value'     => function(\skeeks\cms\models\User $model)
                 {
                     $result = [];
@@ -63,13 +85,14 @@
                     return implode(', ', $result);
                 },
                 'format'    => 'html',
-                'label'     => \Yii::t('app','Roles'),
+                'label'     => \Yii::t('skeeks/cms','Roles'),
             ],
 
             [
                 'class'         => \skeeks\cms\grid\BooleanColumn::className(),
                 'attribute'     => "active",
             ],
+
 
             [
                 'class'     => \yii\grid\DataColumn::className(),
@@ -86,7 +109,15 @@
 
                 },
                 'format' => 'raw'
-            ]
+            ],
+
+
+            [
+                'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+                'attribute' => 'last_activity_at',
+                'visible' => false,
+            ],
+
 
         ],
     ]); ?>

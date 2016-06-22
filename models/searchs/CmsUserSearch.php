@@ -12,6 +12,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\CmsUser;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
@@ -27,6 +28,8 @@ class CmsUserSearch extends CmsUser
 
     public $q;
 
+    public $role;
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -37,6 +40,7 @@ class CmsUserSearch extends CmsUser
             ['updated_at_to', 'integer'],
             ['has_image', 'integer'],
             ['q', 'string'],
+            ['role', 'string'],
         ]);
     }
 
@@ -53,6 +57,7 @@ class CmsUserSearch extends CmsUser
             'has_image' => \Yii::t('skeeks/cms', 'Image'),
 
             'q' => \Yii::t('skeeks/cms', 'Search'),
+            'role' => \Yii::t('skeeks/cms', 'Role'),
         ]);
     }
 
@@ -68,7 +73,9 @@ class CmsUserSearch extends CmsUser
         {
             return $activeDataProvider;
         }
-
+        /**
+         * @var $query ActiveQuery
+         */
         $query = $activeDataProvider->query;
 
         //Standart
@@ -136,6 +143,15 @@ class CmsUserSearch extends CmsUser
                 ['like', $this->tableName() . '.email', $this->q],
                 ['like', $this->tableName() . '.phone', $this->q],
                 ['like', $this->tableName() . '.username', $this->q],
+            ]);
+        }
+
+        if ($this->role)
+        {
+            $query->innerJoin('auth_assignment', 'auth_assignment.user_id = cms_user.id');
+
+            $query->andFilterWhere([
+                'auth_assignment.item_name' => $this->role
             ]);
         }
 

@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
+ * @copyright 2010 SkeekS (пїЅпїЅпїЅпїЅпїЅ)
  * @date 26.05.2016
  */
 
@@ -18,6 +18,11 @@
     <?= $form->field($searchModel, 'q')->setVisible(); ?>
 
     <?= $form->field($searchModel, 'id'); ?>
+    <?= $form->field($searchModel, 'role')->listBox(\yii\helpers\ArrayHelper::merge([
+        '' => ' - '
+    ], \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description')), [
+        'size' => 1
+    ]); ?>
 
     <?= $form->field($searchModel, 'active')->listBox(\yii\helpers\ArrayHelper::merge([
         '' => ' - '
@@ -26,6 +31,18 @@
     ]); ?>
 
     <?= $form->field($searchModel, 'has_image')->checkbox(\Yii::$app->formatter->booleanFormat, false); ?>
+
+    <?= $form->field($searchModel, 'email_is_approved')->listBox(\yii\helpers\ArrayHelper::merge([
+        '' => ' - '
+    ], \Yii::$app->formatter->booleanFormat), [
+        'size' => 1
+    ]); ?>
+
+    <?= $form->field($searchModel, 'phone_is_approved')->listBox(\yii\helpers\ArrayHelper::merge([
+        '' => ' - '
+    ], \Yii::$app->formatter->booleanFormat), [
+        'size' => 1
+    ]); ?>
 
     <?= $form->field($searchModel, 'name') ?>
     <?= $form->field($searchModel, 'username') ?>

@@ -915,4 +915,6 @@ return
 
 
     "This Email is already in use by another user"             => "Этот Email уже занят другим пользователем",
+    "Role"             => "Роль",
+    "Roles"             => "Роли",
 ];

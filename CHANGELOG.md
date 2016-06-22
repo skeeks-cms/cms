@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.0.0.2.pre
+3.0.1.pre
 -----------------
+ * Finalization of users
  * User admin grid
  * Fixed register bug
  * Fixed bug. http://prntscr.com/bdg9n5
