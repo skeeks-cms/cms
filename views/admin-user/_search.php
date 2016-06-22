@@ -63,6 +63,13 @@
         \kartik\datetime\DateTimePicker::className()
     ); ?>
 
+    <?= $form->field($searchModel, 'auth_at_from')->widget(
+        \kartik\datetime\DateTimePicker::className()
+    ); ?>
+    <?= $form->field($searchModel, 'auth_at_to')->widget(
+        \kartik\datetime\DateTimePicker::className()
+    ); ?>
+
 
     <?
         /**

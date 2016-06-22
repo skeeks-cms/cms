@@ -917,4 +917,6 @@ return
     "This Email is already in use by another user"             => "Этот Email уже занят другим пользователем",
     "Role"             => "Роль",
     "Roles"             => "Роли",
+    "The last authorization (up from)"             => "Время последней авторизации (от)",
+    "The last authorization (up to)"             => "Время последней авторизации (до)",
 ];

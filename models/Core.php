@@ -86,14 +86,14 @@ abstract class Core extends ActiveRecord
      */
     public function getCreatedBy()
     {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
+        return $this->hasOne(\Yii::$app->user->identityClass, ['id' => 'created_by']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getUpdatedBy()
     {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
+        return $this->hasOne(\Yii::$app->user->identityClass, ['id' => 'updated_by']);
     }
 
     /**

@@ -24,6 +24,9 @@ class CmsUserSearch extends CmsUser
     public $updated_at_from;
     public $updated_at_to;
 
+    public $auth_at_from;
+    public $auth_at_to;
+
     public $has_image;
 
     public $q;
@@ -38,6 +41,8 @@ class CmsUserSearch extends CmsUser
             ['created_at_to', 'integer'],
             ['updated_at_from', 'integer'],
             ['updated_at_to', 'integer'],
+            ['auth_at_from', 'integer'],
+            ['auth_at_to', 'integer'],
             ['has_image', 'integer'],
             ['q', 'string'],
             ['role', 'string'],
@@ -53,6 +58,9 @@ class CmsUserSearch extends CmsUser
 
             'updated_at_from' => \Yii::t('skeeks/cms', 'Updated time (from)'),
             'updated_at_to' => \Yii::t('skeeks/cms', 'Updated time (up to)'),
+
+            'auth_at_from' => \Yii::t('skeeks/cms', 'The last authorization (up from)'),
+            'auth_at_to' => \Yii::t('skeeks/cms', 'The last authorization (up to)'),
 
             'has_image' => \Yii::t('skeeks/cms', 'Image'),
 
@@ -123,6 +131,22 @@ class CmsUserSearch extends CmsUser
         {
             $query->andFilterWhere([
                 '<=', $this->tableName() . '.created_at', \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_to))
+            ]);
+        }
+
+
+
+        if ($this->auth_at_from)
+        {
+            $query->andFilterWhere([
+                '>=', $this->tableName() . '.logged_at', \Yii::$app->formatter->asTimestamp(strtotime($this->auth_at_from))
+            ]);
+        }
+
+        if ($this->auth_at_to)
+        {
+            $query->andFilterWhere([
+                '<=', $this->tableName() . '.logged_at', \Yii::$app->formatter->asTimestamp(strtotime($this->auth_at_to))
             ]);
         }
 
