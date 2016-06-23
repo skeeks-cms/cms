@@ -35,7 +35,6 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeColor;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
-use skeeks\sx\File;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
