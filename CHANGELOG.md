@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.1.pre
 -----------------
+ * Removed UserAuthClient
  * Finalization of users
  * User admin grid
  * Fixed register bug
