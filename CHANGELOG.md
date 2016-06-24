@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.1.pre
+3.0.1
 -----------------
  * Removed UserAuthClient
  * Finalization of users
