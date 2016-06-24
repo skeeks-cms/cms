@@ -12,7 +12,7 @@
 namespace skeeks\cms\models;
 
 use Imagine\Image\ManipulatorInterface;
-
+use skeeks\cms\authclient\models\UserAuthClient;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
