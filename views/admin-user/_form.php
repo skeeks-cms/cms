@@ -35,7 +35,7 @@ if ($model->isNewRecord)
 
     <div class="row">
         <div class="col-md-5">
-            <?= $form->field($model, 'username')->textInput(['maxlength' => 12])->hint(\Yii::t('app','The unique username. Used for authorization and to form links to personal cabinet.')); ?>
+            <?= $form->field($model, 'username')->textInput(['maxlength' => 25])->hint(\Yii::t('app','The unique username. Used for authorization and to form links to personal cabinet.')); ?>
         </div>
         <div class="col-md-5">
             <?= $form->field($model, 'name')->textInput(); ?>

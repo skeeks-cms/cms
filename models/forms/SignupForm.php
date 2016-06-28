@@ -16,6 +16,7 @@ use skeeks\cms\models\User;
 use yii\base\Model;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * Class SignupForm
@@ -115,9 +116,7 @@ class SignupForm extends Model
                 $user->email            = $this->email;
                 $user->generateAuthKey();
 
-                $user->save();
-
-                if ($user)
+                if ($user->save())
                 {
                     \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
                         '@app/mail' =>
@@ -134,9 +133,13 @@ class SignupForm extends Model
                         ->setTo($user->email)
                         ->setSubject(\Yii::t('app','Sign up at site') . \Yii::$app->cms->appName)
                         ->send();
-                }
 
-                return $user;
+                    return $user;
+                } else
+                {
+                    \Yii::error("User rgister by email error: {$user->username} " . Json::encode($user->getFirstErrors()), 'RegisterError');
+                    return null;
+                }
             }
 
         }

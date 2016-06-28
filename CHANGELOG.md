@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.1.1
+-----------------
+ * Generate username
+
 3.0.1
 -----------------
  * Removed UserAuthClient

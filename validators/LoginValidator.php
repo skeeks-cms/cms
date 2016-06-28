@@ -20,7 +20,7 @@ class LoginValidator extends Validator
     {
         $string = $model->{$attribute};
 
-        if (!preg_match('/^[a-z]{1}[a-z0-9]+$/', $string))
+        if (!preg_match('/^[a-z]{1}[a-z0-9_]+$/', $string))
         {
             $this->addError($model, $attribute, \Yii::t('app','Use only letters (lowercase) and numbers. Must begin with a letter. Example {sample}',['sample' => 'demo1']));
             return false;

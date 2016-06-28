@@ -28,6 +28,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\StringHelper;
 use yii\validators\EmailValidator;
 use yii\validators\UniqueValidator;
 use yii\web\IdentityInterface;
@@ -594,8 +595,18 @@ class User
      */
     public function generateUsername()
     {
+        /*if ($this->email)
+        {
+            $userName = \skeeks\cms\helpers\StringHelper::substr($this->email, 0, strpos() );
+        }*/
+
         $userLast = static::find()->orderBy("id DESC")->one();
         $this->username = "id" . ($userLast->id + 1);
+
+        if (static::find()->where(['username' => $this->username])->one())
+        {
+            $this->username = $this->username . "_" . \skeeks\cms\helpers\StringHelper::substr( md5(time()), 0, 6);
+        }
 
         return $this;
     }
