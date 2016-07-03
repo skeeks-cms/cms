@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.1.1
 -----------------
+ * Added handling of absence js and css files
  * Generate username
 
 3.0.1

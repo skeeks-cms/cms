@@ -17,8 +17,11 @@ use Yii;
 use yii\base\Action;
 use yii\base\Exception;
 use yii\base\UserException;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\StringHelper;
 use yii\helpers\Url;
+use yii\web\Response;
 
 /**
  * Class ErrorAction
@@ -96,6 +99,29 @@ class ErrorAction extends \yii\web\ErrorAction
 
             } else
             {
+                //All requests are to our backend
+                //TODO::Add image processing
+                $info = pathinfo(\Yii::$app->request->pathInfo);
+                if ($extension = ArrayHelper::getValue($info, 'extension'))
+                {
+                    $extension = \skeeks\cms\helpers\StringHelper::strtolower($extension);
+                    if (in_array($extension, ['js', 'css']))
+                    {
+                        \Yii::$app->response->format = Response::FORMAT_RAW;
+                        if ($extension == 'js')
+                        {
+                            \Yii::$app->response->headers->set('Content-Type', 'application/javascript');
+                        }
+                        if ($extension == 'css')
+                        {
+                            \Yii::$app->response->headers->set('Content-Type', 'text/css');
+                        }
+
+                        $url = \Yii::$app->request->absoluteUrl;
+                        return "/* File: '{$url}' not found */";
+                    }
+                }
+
                 return $this->controller->render($this->view ?: $this->id, [
                     'name' => $name,
                     'message' => $message,
