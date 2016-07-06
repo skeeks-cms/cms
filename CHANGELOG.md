@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.1.2.pre
+-----------------
+ * Fixed notices
+
 3.0.1.1
 -----------------
  * Added handling of absence js and css files

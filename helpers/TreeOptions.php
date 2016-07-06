@@ -96,7 +96,7 @@ class TreeOptions extends \skeeks\cms\models\Tree
         $this->_tmpResult = [];
         if (!$this->isNewRecord && $includeSelf)
         {
-            $this->_tmpResult[$id] = $this;
+            $this->_tmpResult[$this->id] = $this;
         }
         return $this->_buildTreeArrayRecursive($this, $this->_filter);
     }
