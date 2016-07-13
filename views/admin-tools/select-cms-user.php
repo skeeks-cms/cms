@@ -79,7 +79,7 @@ JS
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
     'dataProvider'      => $dataProvider,
     'filterModel'       => $searchModel,
-    'adminController'   => $controller,
+    'adminController'   => @$controller,
     'enabledCheckbox'   => false,
     'columns' => [
 
