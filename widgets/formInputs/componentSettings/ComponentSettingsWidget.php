@@ -55,6 +55,8 @@ class ComponentSettingsWidget extends InputWidget
         {
             $name   = Html::getInputName($this->model, $this->attribute);
 
+            $value = null;
+
             if (is_array($this->model->{$this->attribute}))
             {
                 $value  = StringHelper::base64EncodeUrl(serialize((array) $this->model->{$this->attribute}));

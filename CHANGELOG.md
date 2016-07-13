@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.1.3.pre
+-----------------
+ * Fixed notices
+
 3.0.1.2
 -----------------
  * Fixed notices
