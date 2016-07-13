@@ -272,9 +272,11 @@ class RelatedPropertiesModel extends DynamicModel
             {
                 if ($property->enums)
                 {
-                    $enum = array_shift($property->enums);
+                    //TODO:: it is necessary to verify in the future
+                    $enums = (array) $property->enums;
+                    $enum = array_shift($enums);
 
-                    foreach ($property->enums as $enum)
+                    foreach ($enums as $enum)
                     {
                         if ($enum->id == $value)
                         {
