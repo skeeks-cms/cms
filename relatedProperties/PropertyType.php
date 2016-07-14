@@ -126,7 +126,8 @@ abstract class PropertyType extends Model implements ConfigFormInterface
 
         if ($this->property->name)
         {
-            $field->label($this->property->name);
+            $label = $this->property->name;
+            $field->label($label);
         } else
         {
             $field->label(false);
