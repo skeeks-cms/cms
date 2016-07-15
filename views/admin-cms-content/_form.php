@@ -106,23 +106,7 @@ use common\models\User;
             'relation'          => [
                 'content_id' => 'id'
             ],
-
-            'sort'              => [
-                'defaultOrder' =>
-                [
-                    'priority' => SORT_ASC
-                ]
-            ],
-
             'controllerRoute'   => 'cms/admin-cms-content-property',
-
-            'dataProviderCallback' => function($dataProvider)
-            {
-                /**
-                 * @var \yii\data\BaseDataProvider $dataProvider
-                */
-                $dataProvider->getPagination()->defaultPageSize   = 5000;
-            },
 
             'gridViewOptions'   => [
                 'sortable' => true,

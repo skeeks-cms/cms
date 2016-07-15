@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.1.3.pre
 -----------------
+ * Fixed sort grid
  * Fixed notices
 
 3.0.1.2

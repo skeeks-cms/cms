@@ -39,7 +39,7 @@
         'columns' => [
             [
                 'class'     => \yii\grid\DataColumn::className(),
-                'value'     => function(\skeeks\cms\models\User $model, $key, $index, $this)
+                'value'     => function(\skeeks\cms\models\User $model, $key, $index)
                 {
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-cog"></i>',
                     \skeeks\cms\helpers\UrlHelper::constructCurrent()->setRoute('cms/admin-component-settings/user')->set('user_id', $model->id)->toString(),
