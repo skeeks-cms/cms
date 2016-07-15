@@ -47,22 +47,6 @@ use common\models\User;
             'relation'          => [
                 'tree_type_id' => 'id'
             ],
-
-            'sort'              => [
-                'defaultOrder' =>
-                [
-                    'priority' => SORT_ASC
-                ]
-            ],
-
-            'dataProviderCallback' => function($dataProvider)
-            {
-                /**
-                 * @var \yii\data\BaseDataProvider $dataProvider
-                */
-                $dataProvider->getPagination()->defaultPageSize   = 5000;
-            },
-
             'controllerRoute'   => 'cms/admin-cms-tree-type-property',
             'gridViewOptions'   => [
                 'sortable' => true,

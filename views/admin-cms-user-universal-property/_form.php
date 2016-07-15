@@ -62,22 +62,6 @@ if ($model->isNewRecord)
         'relation'          => [
             'property_id' => 'id'
         ],
-
-        'sort'              => [
-            'defaultOrder' =>
-            [
-                'priority' => SORT_ASC
-            ]
-        ],
-
-        'dataProviderCallback' => function($dataProvider)
-        {
-            /**
-             * @var \yii\data\BaseDataProvider $dataProvider
-            */
-            $dataProvider->getPagination()->defaultPageSize   = 5000;
-        },
-
         'controllerRoute'   => 'cms/admin-cms-user-universal-property-enum',
         'gridViewOptions'   => [
             'sortable' => true,

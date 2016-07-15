@@ -28,14 +28,6 @@ use common\models\User;
         'relation'          => [
             'content_type' => 'code'
         ],
-
-        'sort'              => [
-            'defaultOrder' =>
-            [
-                'priority' => SORT_ASC
-            ]
-        ],
-
         'controllerRoute'   => 'cms/admin-cms-content',
         'gridViewOptions'   => [
             'sortable' => true,

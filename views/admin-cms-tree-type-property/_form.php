@@ -76,22 +76,6 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         'relation'          => [
             'property_id' => 'id'
         ],
-
-        'sort'              => [
-            'defaultOrder' =>
-            [
-                'priority' => SORT_ASC
-            ]
-        ],
-
-        'dataProviderCallback' => function($dataProvider)
-        {
-            /**
-             * @var \yii\data\BaseDataProvider $dataProvider
-            */
-            $dataProvider->getPagination()->defaultPageSize   = 5000;
-        },
-
         'controllerRoute'   => 'cms/admin-cms-tree-type-property-enum',
         'gridViewOptions'   => [
             'sortable' => true,
