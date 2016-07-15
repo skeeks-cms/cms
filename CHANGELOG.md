@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.1.3.pre
+3.0.1.3
 -----------------
  * Fixed sort grid
  * Fixed notices
