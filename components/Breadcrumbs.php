@@ -86,7 +86,7 @@ class Breadcrumbs extends Component
         if (!$baseData)
         {
             $baseData = [
-                'name' => \Yii::t('app', 'Home'),
+                'name' => \Yii::t('yii', 'Home'),
                 'url' => '/'
             ];
         }
