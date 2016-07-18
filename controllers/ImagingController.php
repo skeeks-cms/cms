@@ -147,7 +147,9 @@ class ImagingController extends Controller
                 }
             }
 
-            return \Yii::$app->response->redirect(\Yii::$app->request->getUrl() . ($params ? $prams . '&sx-refresh' : '?sx-refresh'), 302);
+            return \Yii::$app->response->redirect(\Yii::$app->request->getUrl() . ($params ?
+                    ""//"?" . http_build_query($params) . '&sx-refresh'
+                    : '?sx-refresh'), 302);
 
         } catch(\Exception $e)
         {
