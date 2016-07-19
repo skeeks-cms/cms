@@ -7,6 +7,7 @@
  */
 
 namespace skeeks\cms\widgets;
+use skeeks\cms\helpers\UrlHelper;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 
@@ -119,7 +120,6 @@ HTML;
     {
         $urlData = [
             "cms/admin-storage-files/upload",
-
         ];
 
 
@@ -128,7 +128,7 @@ HTML;
             $urlData["group"] = $this->fileGroup;
         }
 
-        $backendSimpleUpload = \Yii::$app->urlManager->createUrl($urlData);
+        $backendSimpleUpload = UrlHelper::construct($urlData)->enableAdmin()->toString();
 
         //Опции которые перетирать нельзя
         $mainOptions =
@@ -140,7 +140,6 @@ HTML;
             "disabledClass"     => 'disabled',
             "responseType"      => 'json',
             "multiple"          => true,
-
         ];
 
         $result['simpleUpload']['options'] = $mainOptions;
