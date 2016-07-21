@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.1.6.pre
 -----------------
+ * Fixed admin urls
  * Change admin urls
 
 3.0.1.5
