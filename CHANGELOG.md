@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.1.6.pre
+3.0.1.6
 -----------------
  * Fixed admin urls
  * Change admin urls
