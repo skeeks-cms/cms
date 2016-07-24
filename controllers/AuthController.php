@@ -51,7 +51,9 @@ class AuthController extends Controller
                 'only' => ['logout', 'login'],
                 'rules' => [
                     [
-                        'actions' => ['login'],
+                        'actions' => [
+                            'login',
+                        ],
                         'allow' => true,
                         'roles' => ['?'],
                     ],
@@ -251,7 +253,6 @@ class AuthController extends Controller
             'model' => $model,
         ]);
     }
-
     /**
      * Восстановлеине пароля
      * @return string|Response
@@ -346,4 +347,6 @@ class AuthController extends Controller
 
         return $this->render('reset-password', (array) $rr);
     }
+
+
 }

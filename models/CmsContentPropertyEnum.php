@@ -15,7 +15,6 @@ use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\relatedProperties\models\RelatedPropertyEnumModel;
-use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\db\BaseActiveRecord;
 
