@@ -2,19 +2,13 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 09.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (—ÍËÍ—)
+ * @date 29.07.2016
  */
-
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\relatedProperties\models\RelatedPropertyEnumModel;
 use Yii;
-use yii\db\BaseActiveRecord;
 
 /**
  * This is the model class for table "{{%cms_content_property_enum}}".
