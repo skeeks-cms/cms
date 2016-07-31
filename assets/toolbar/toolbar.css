@@ -59,6 +59,7 @@
 
 .skeeks-cms-toolbar-block img {
     vertical-align: middle;
+    display: inherit;
 }
 
 #skeeks-cms-toolbar .label {

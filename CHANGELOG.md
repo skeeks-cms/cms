@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.1.8.pre
 -----------------
+ * Fixed css for toolbar
  * Fixed bug
 
 3.0.1.7
