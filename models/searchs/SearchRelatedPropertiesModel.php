@@ -94,7 +94,14 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
         foreach ($this->attributes() as $code)
         {
-            $result[$code] = $this->getProperty($code)->name;
+            if ($property = $this->getProperty($code))
+            {
+                $result[$code] = $property->name;
+            } else
+            {
+                $result[$code] = $code;
+            }
+
         }
 
         return $result;
