@@ -919,4 +919,5 @@ return
     "Roles"             => "Роли",
     "The last authorization (up from)"             => "Время последней авторизации (от)",
     "The last authorization (up to)"             => "Время последней авторизации (до)",
+    "Site management"             => "Управление сайтами",
 ];

@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.1.8
 -----------------
+ * Add site and lang filters
  * Fixed search element
  * Fixed css for toolbar
  * Fixed bug

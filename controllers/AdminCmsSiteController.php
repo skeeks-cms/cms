@@ -24,7 +24,7 @@ class AdminCmsSiteController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                   = "Управление сайтами";
+        $this->name                   = \Yii::t("app", "Site management");
         $this->modelShowAttribute      = "name";
         $this->modelClassName          = CmsSite::className();
 
@@ -38,41 +38,6 @@ class AdminCmsSiteController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-
-
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns"      => [
-                        [
-                            'class' => \skeeks\cms\grid\ImageColumn2::className(),
-                        ],
-                        'name',
-                        'code',
-
-                        [
-                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => "active"
-                        ],
-
-                        [
-                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => "def"
-                        ],
-
-                        'priority',
-
-                    ],
-                ],
-
                 "def-multi" =>
                 [
                     'class'             => AdminMultiModelEditAction::className(),

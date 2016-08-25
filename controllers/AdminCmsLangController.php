@@ -39,31 +39,6 @@ class AdminCmsLangController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns"      => [
-                        [
-                            'class' => \skeeks\cms\grid\ImageColumn2::className(),
-                        ],
-                        'name',
-                        'code',
-                        [
-                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => "active"
-                        ],
-                        'priority',
-                    ],
-                ],
-
                 "activate-multi" =>
                 [
                     'class'             => AdminMultiModelEditAction::className(),
