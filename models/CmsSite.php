@@ -17,6 +17,7 @@ use skeeks\cms\traits\ValidateRulesTrait;
 use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -65,6 +66,25 @@ class CmsSite extends Core
         $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'beforeInsertChecks']);
         $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'beforeUpdateChecks']);
 
+        $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE, [$this, 'beforeDeleteRemoveTree']);
+
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function beforeDeleteRemoveTree()
+    {
+        //Before delete site delete all tree
+        foreach ($this->cmsTrees as $tree)
+        {
+            $tree->delete();
+            /*if (!$tree->delete())
+            {
+                throw new Exception('Not deleted tree');
+            }*/
+        }
     }
 
     public function behaviors()
