@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.1.8.pre
+3.0.1.8
 -----------------
  * Fixed search element
  * Fixed css for toolbar
