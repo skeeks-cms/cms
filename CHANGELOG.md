@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.1.9.pre
+-----------------
+ * i18n logs
+
 3.0.1.8
 -----------------
  * Add site and lang filters

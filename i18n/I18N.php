@@ -32,7 +32,7 @@ class I18N extends \yii\i18n\I18N
 
     public static function handleMissingTranslation(MissingTranslationEvent $event)
     {
-        \Yii::info("@MISSING: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @");
+        \Yii::info("@MISSING: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @", self::className());
 
         if ($event->category != 'app')
         {
