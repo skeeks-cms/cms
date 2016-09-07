@@ -61,6 +61,25 @@ $config =
         'i18n' => [
             'class' => 'skeeks\cms\i18n\I18N',
         ],
+
+        'urlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'suffix' => '',
+            'rules' => [
+                'u'                           => 'cms/user/index',
+                'u/<username>'                => 'cms/user/view',
+                'u/<username>/<action>'       => 'cms/user/<action>',
+
+                '~<_a:(login|logout|register|forget|reset-password)>'                   => 'cms/auth/<_a>',
+
+                'skeeks-cms'                            => 'cms/cms/index',
+                'skeeks-cms/<action>'                   => 'cms/cms/<action>',
+
+                "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'], //Resize image on request
+            ]
+        ],
     ],
 
 
