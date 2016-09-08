@@ -152,7 +152,6 @@ return
     "Sign up at site"      => "Регистрация на сайте ",
     "Sign up"               => "Зарегистрироваться",
 
-    "This action is designed to work with the controller: " => "Это действие рассчитано для работы с контроллером: ",
     "Saved"                 => "Сохранено",
     "Could not save"        => "Не удалось сохранить",
     "No records found"      => "Записи не найдены",
@@ -160,25 +159,17 @@ return
 
     "system administration" => "система администрирования",
     "Main"                  => "Основное",
-    "Language settings"     => "Языковые настройки",
-    "Setting tables"        => "Настройка таблиц",
-    "Setting the visual editor" => "Настройка визуального редактора",
-    "It will be activated this plugin" => "Будет задейстaвован этот плагин",
-    "If a user, for a specified time, not active in the admin panel, it will be prompted for a password." => "Если пользователь, в течение указанного времени, не проявит активность в админ панели, у него будет запрошен пароль.",
-    "Access"                => "Доступ",
-    "Access to the administrate area" => "Доступ к административной части",
-    "Access to edit dashboards"     => "Возможность управлять рабочими столами",
-    "The ability to create records" => "Возможность создания записей",
-    "The ability to update records" => "Возможность обновления записей",
-    "The ability to update service information at records" => "Возможность обновления служебной информации записей",
-    "Ability to delete records" => "Возможность удаления записей",
 
-    "Control recodrs"       => "Управление записями",
-    "Control only own records" => "Управление только собственными записями",
-    "The ability to update own records" => "Возможность обновления своих записей",
-    "Ability to delete own records" => "Возможность удаления своих записей",
+    "Access"                => "Доступ",
+
+
+
     "Security"              => "Безопасность",
-    "topics"                => "темы",
+
+    "Sort by what parameter" => "По какому параметру сортировать",
+    "sorting direction"     => "направление сортировки",
+    "Sorting direction"     => "Направление сортировки",
+    "Display column"        => "Отображаемые колонки",
 
     "Setting the admin panel" => "Настройки админ панели",
     "Additional css and js admin area" => "Дополнительные css и js админки",
@@ -194,8 +185,6 @@ return
     "Use code highlighting" => "Использовать подсветку кода",
     "Theme of {theme} code" => "Тема {theme} подсветки кода",
     "Time through which block user" => "Время, через которое блокировать пользователя",
-
-    "Incorrectly configured module {admin} to {skeeks_cms}" => "Некорректно сконфигурирован модуль {admin} для {skeeks_cms}",
 
     "The name of the controller" => "Название контроллера",
 
@@ -377,19 +366,7 @@ return
     "Pagination"            => "Постраничная навигация",
     "from smaller to larger" => "от меньшего к большему",
     "from highest to lowest" => "от большего к меньшему",
-    "Table fields"          => "Поля таблицы",
-    "Available fields"      => "Доступные поля",
-    "Double-click for item, turn it on" => "Двойной клик по пункту, включит его",
-    "Included fields"       => "Включенные поля",
-    "Double-click for item, turn it off. You can also change the order of items by dragging them." => "Двойной клик по пункту, выключит его. Так же можно менять порядок пуктов перетаскивая их.",
 
-    "Table settings"        => "Настройки таблицы",
-    "Inclusion {ajax} navigation" => "Включение {ajax} навигации",
-    "Sort by what parameter" => "По какому параметру сортировать",
-    "sorting direction"     => "направление сортировки",
-    "Sorting direction"     => "Направление сортировки",
-    "Display column"        => "Отображаемые колонки",
-    "Increase"              => "Увеличить",
 
     "Incorrectly configured widget, you must pass an controller object to which is built widget" => "Некорректно сконфигурирован виджет, необходимо передать объект контроллера для которого сроится виджет",
     "For this controller can not build action" => "У данного контроллера нельзя построить действия",
@@ -651,12 +628,10 @@ return
     "The installation process of extension (Progress" => "Процесс установки расширения (Выполнено",
     "Stage"                 => "Этап",
 
-    "see help"              => "посмотреть хелп",
     "Update and Installation" => "Обновление и установка",
     "updating project"      => "обновление проекта",
     "simulation of update"  => "симуляция обновления",
     "Utilities"             => "Утилиты",
-    "watch the kernel modification" => "смотреть модицикации ядра",
     "list of database backups" => "список бэкапов базы",
     "reset cache of table structure" => "сброс кэша структуры таблиц",
     "installing migration"  => "установка миграций",
@@ -665,7 +640,6 @@ return
     "example help of a sertain controller" => "пример хелпа определнного контроллера",
     "example help of a sertain action" => "пример хелпа определнного действия",
     "complete update of  project"     => "полное обновление проекта",
-    "watch the kernel modification" => "смотреть модификации ядра",
     "installing package"    => "установка пакета",
     "check the installation or update" => "проверка установки или обновления",
     "quick commands"        => "быстрые команды",
@@ -682,7 +656,6 @@ return
     "Upload from your computer" => "Загрузить с компьютера",
     "Upload by link {http}" => "Загрузить по ссылке {http}",
 
-    "This action is designed to work with: {controller}" => "Данное действие предназначено для работы с: {controller}",
     "Event management {cms}" => "Управление событиями {cms}",
     "Managment {email} templates" => "Управление {email} шаблонами",
     "Event"                 => "Событие",
@@ -848,16 +821,11 @@ return
     "Take into consideration activity time" => "Учитывать время активности",
 
 
-    "Editing view files" => "Редактирование шаблонов",
-    "The ability to edit view files" => "Возможно редактировать файлы представлений",
-    "The ability to edit settings" => "Возможность управять настройками",
-
     "Choose"        => "Выбрать",
     "Dashboards"    => "Рабочие столы",
     "Dashboard"     => "Рабочий стол",
 
     "Add dashboard"                         => "Добавить рабочий стол",
-    "Number of columns"                     => "Количество колонок",
     "Basic widgets"                         => "Базовые виджеты",
     "Add widget"                            => "Добавить виджет",
     "Disk space"                            => "Место на диске",
@@ -881,7 +849,6 @@ return
 
     "Groups"                          => "Группы",
     "Images/Files"                          => "Изображения/Файлы",
-    "The ability to manage user groups"                          => "Вомзожность управлять группами пользователя",
     "Management will be available after saving"                          => "Управление будет доступно после сохранения",
 
     "Email is approved"                          => "Email подтвержден",
@@ -894,15 +861,12 @@ return
 
     "Search name and description"             => "Поиск по названию и описанию",
     "Search by name"                          => "Поиск по названию",
-    "Section"                                 => "Раздел",
-    "Search"                                  => "Поиск",
     "Created date (from)"                     => "Дата создания (от)",
     "Created (up to)"                         => "Дата создания (до)",
     "Updated time (from)"                     => "Время обновления (от)",
     "Updated time (up to)"                    => "Время обновления (до)",
     "Time of publication (from)"              => "Время публикации (от)",
     "Time of publication (up to)"             => "Время публикации (до)",
-    "Image"                                   => "Изображение",
     "The presence of such images"             => "Наличие подробного изображения",
 
 
