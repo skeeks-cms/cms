@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.0.3.pre
+-----------------
+ * Fixed https://github.com/skeeks-cms/cms-admin/issues/2
+
 3.0.2
 -----------------
  * UrlManager configuration for the console application

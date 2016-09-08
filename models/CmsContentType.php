@@ -11,11 +11,13 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use Yii;
+use yii\base\Exception;
 
 /**
  * This is the model class for table "cms_content_type".
@@ -49,6 +51,21 @@ class CmsContentType extends Core
         return array_merge(parent::behaviors(), []);
     }
 
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, '_actionBeforeDelete']);
+    }
+
+    public function _actionBeforeDelete($e)
+    {
+        if ($this->cmsContents)
+        {
+            throw new Exception(\Yii::t('skeeks/cms', "Before you delete this type of content you want to delete the contents invested in it"));
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -73,7 +90,7 @@ class CmsContentType extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
-            [['name', 'code'], 'required'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 32],
             [['code'], 'unique'],

@@ -5,8 +5,7 @@ return
     "Meta Keywords"         =>  "Ключевые слова (Meta Keywords)",
     "Meta Description"      =>  "Описание (Meta Description)",
 
-    "Database of translations"  =>  "База переводов",
-    "Message"                   =>  "Сообщение",
+    "Message"               =>  "Сообщение",
     "Users"                 =>  "Пользователи",
 
     "Update"                =>  "Обновить",
@@ -30,12 +29,10 @@ return
     "Description Short"     =>  "Короткое описание",
     "Description Full"      =>  "Подробное описание",
     "Description"           =>  "Описание",
-    "Seo Page Name"         =>  "Название для url (SEO)",
 
     "Descending"            => "По убыванию",
     "Ascending"             => "По возрастанию",
 
-    "Count Comment"         =>  "Количество комментариев",
     "Priority"              =>  "Сортировка",
 
     "Active"                =>  "Активность",
@@ -47,7 +44,6 @@ return
     "Default"               =>  "По умолчанию",
     "Lang"                  =>  "Язык",
     "Component Settings"    =>  "Настройки компонента",
-    "Component settings"    =>  "Настройки компонента",
     "Smart Filtrable"       =>  "Показывать в умном фильтре",
     "With Description"      =>  "Выводить поле для описания значения",
     "Searchable"            =>  "Значения свойства участвуют в поиске",
@@ -80,12 +76,9 @@ return
     "Content"               => "Контент",
 
     "Host"                  => "Хост",
-    'DB Name'               => 'Имя базы данных',
     'Username'              => 'Пользователь',
     'Password'              => 'Пароль',
     'Charset'               => 'Кодировка',
-    'Enable Schema Cache'   => 'Включить кэширование схемы',
-    'Schema Cache Duration (sec)'   => 'Время кэша структуры (сек)',
 
     "Rule"                  => "Правило",
     "Component"             => "Компонент",
@@ -93,18 +86,18 @@ return
     "The Name One Element"  => "Название одного элемента",
     "The Name Of The Elements (Plural)" => "Название элементов (множественное число)",
     "View Mode Sections And Elements" => "Режим просмотра разделов и элементов",
-    "The Interface Binding Element To Sections" => "Интерфейс привязки элемента к разделам",
-    "To Index For Search Module" => "Индексировать для модуля поиска",
+    "The Interface Binding Element to Sections" => "Интерфейс привязки элемента к разделам",
+    "To index for search module" => "Индексировать для модуля поиска",
 
-    "The Main Section"      => "Основной раздел",
-    "Main Image (announcement)"  => "Главное изображение (для анонса)",
-    "Main Image"            => "Главное изображение",
+    "The main section"              => "Основной раздел",
+    "Main Image (announcement)"     => "Главное изображение (для анонса)",
+    "Main Image"                    => "Главное изображение",
 
     "Elements"              => "Элементы",
     "Element"               => "Элемент",
 
-    "Linked to content"     => "Связь с контентом",
-    "Linked To Section's Type" => "Связь с типом раздела",
+    "Linked to content"         => "Связь с контентом",
+    "Linked To Section's Type"  => "Связь с типом раздела",
 
     "For the content of this code is already in use." => "Для данного контента этот код уже занят.",
     "For this section of the code is already in use." => "Для данного раздела этот код уже занят.",
@@ -114,11 +107,10 @@ return
     "Version"               => "Версия",
     "Aliases"               => "Алиасы",
 
-    "composer.json not found in the package {name}" => "composer.json не найден в пакете {name}",
     "This user can not be removed" => "Этого пользователя нельзя удалить",
     "You can not delete yourself" => "Нельзя удалять самого себя",
 
-    "Template"           => "Шаблон",
+    "Template"                                      => "Шаблон",
     "Type of child partitions by default"           => "Тип дочерних разделов по умолчанию",
     "If this parameter is not specified, the child partition is created of the same type as the current one."           => "Если этот параметр не будет указан, то дочерний раздел будет создан того же типа что и текущий.",
     "The path to the template. If not specified, the pattern will be the same code."           => "Путь к шаблону. Если не будет указан, то шаблон будет совпадать с кодом.",
@@ -920,4 +912,5 @@ return
     "The last authorization (up from)"             => "Время последней авторизации (от)",
     "The last authorization (up to)"             => "Время последней авторизации (до)",
     "Site management"             => "Управление сайтами",
+    "Before you delete this type of content you want to delete the contents invested in it"             => "Перед удалением данного типа контента, необходимо удалить вложенные в него контенты",
 ];

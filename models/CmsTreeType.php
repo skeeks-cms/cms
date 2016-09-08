@@ -61,7 +61,7 @@ class CmsTreeType extends Core
             'active' => Yii::t('app', 'Active'),
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
-            'index_for_search' => Yii::t('app', 'To Index For Search Module'),
+            'index_for_search' => Yii::t('app', 'To index for search module'),
             'name_meny' => Yii::t('app', 'Name Meny'),
             'name_one' => Yii::t('app', 'Name One'),
             'viewFile' => Yii::t('app', 'Template'),

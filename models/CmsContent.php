@@ -104,11 +104,11 @@ class CmsContent extends Core
             'priority' => Yii::t('app', 'Priority'),
             'description' => Yii::t('app', 'Description'),
             'content_type' => Yii::t('app', 'Content Type'),
-            'index_for_search' => Yii::t('app', 'To Index For Search Module'),
-            'tree_chooser' => Yii::t('app', 'The Interface Binding Element To Sections'),
+            'index_for_search' => Yii::t('app', 'To index for search module'),
+            'tree_chooser' => Yii::t('app', 'The Interface Binding Element to Sections'),
             'list_mode' => Yii::t('app', 'View Mode Sections And Elements'),
             'name_meny' => Yii::t('app', 'The Name Of The Elements (Plural)'),
-            'name_one' => Yii::t('app', 'Name One Element'),
+            'name_one' => Yii::t('app', 'The Name One Element'),
 
             'default_tree_id' => Yii::t('app', 'Default Section'),
             'is_allow_change_tree' => Yii::t('app', 'Is Allow Change Default Section'),
@@ -135,7 +135,7 @@ class CmsContent extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id'], 'integer'],
-            [['name', 'content_type', 'code'], 'required'],
+            [['name', 'content_type'], 'required'],
             [['description'], 'string'],
             [['meta_title_template'], 'string'],
             [['meta_description_template'], 'string'],
@@ -161,6 +161,11 @@ class CmsContent extends Core
             ['parent_content_on_delete', 'default', 'value'             => self::CASCADE],
 
             ['parent_content_id', 'integer'],
+
+            ['code', 'default', 'value' => function($model, $attribute)
+            {
+                return "sxauto" . md5(rand(1, 10) . time());
+            }],
         ]);
     }
 
