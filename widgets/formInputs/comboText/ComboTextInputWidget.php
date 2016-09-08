@@ -30,8 +30,8 @@ class ComboTextInputWidget extends InputWidget
     static public function editors()
     {
         return [
-            self::CONTROLL_TEXT          => \Yii::t('app','Text'),
-            self::CONTROLL_EDITOR        => \Yii::t('app','Visual Editor'),
+            self::CONTROLL_TEXT          => \Yii::t('skeeks/cms','Text'),
+            self::CONTROLL_EDITOR        => \Yii::t('skeeks/cms','Visual Editor'),
             self::CONTROLL_HTML          => 'HTML',
         ];
     }

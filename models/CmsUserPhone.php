@@ -74,12 +74,12 @@ class CmsUserPhone extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User'),
-            'value' => \Yii::t('app',"Phone Number"),
-            'approved' => \Yii::t('app',"Approved"),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'user_id' => Yii::t('skeeks/cms', 'User'),
+            'value' => \Yii::t('skeeks/cms',"Phone Number"),
+            'approved' => \Yii::t('skeeks/cms',"Approved"),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
             'def' => 'Def',
         ];
     }

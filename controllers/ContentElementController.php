@@ -107,7 +107,7 @@ class ContentElementController extends Controller
     public function actionView()
     {
         if (!$this->model) {
-            throw new NotFoundHttpException(\Yii::t('app', 'Page not found'));
+            throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Page not found'));
         }
 
         $contentElement     = $this->model;

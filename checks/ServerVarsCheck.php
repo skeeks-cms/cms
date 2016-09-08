@@ -16,9 +16,9 @@ class ServerVarsCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = \Yii::t('app',"The values of server variables");
-        $txt1 = \Yii::t('app','Check the values of variables defined by the web server.');
-        $txt2 = \Yii::t('app','value HTTP_HOST is taken based on the name of this virtual host (domain). Invalid domain leads to the fact that some browsers (ie, Internet Explorer 6) refuse to maintain his cookie, as a consequence - not stored authorization.');
+        $this->name             = \Yii::t('skeeks/cms',"The values of server variables");
+        $txt1 = \Yii::t('skeeks/cms','Check the values of variables defined by the web server.');
+        $txt2 = \Yii::t('skeeks/cms','value HTTP_HOST is taken based on the name of this virtual host (domain). Invalid domain leads to the fact that some browsers (ie, Internet Explorer 6) refuse to maintain his cookie, as a consequence - not stored authorization.');
         $this->description      = <<<HTML
 <p>
 {$txt1}
@@ -28,8 +28,8 @@ class ServerVarsCheck extends CheckComponent
 </p>
 HTML;
 ;
-        $this->errorText    = \Yii::t('app',"Incorrect");
-        $this->successText  = \Yii::t('app','Correct');
+        $this->errorText    = \Yii::t('skeeks/cms',"Incorrect");
+        $this->successText  = \Yii::t('skeeks/cms','Correct');
 
         parent::init();
     }
@@ -43,7 +43,7 @@ HTML;
 			if (!preg_match('#^[a-z0-9\-\.]{2,192}\.(xn--)?[a-z0-9]{2,63}$#i', $host))
             {
                 $val = htmlspecialchars($_SERVER['HTTP_HOST']);
-                $this->addError(\Yii::t('app','The current domain is not valid ({val}). It may only contain numbers, letters and hyphens. It must contain the point.',['val' => $val]));
+                $this->addError(\Yii::t('skeeks/cms','The current domain is not valid ({val}). It may only contain numbers, letters and hyphens. It must contain the point.',['val' => $val]));
             }
 		}
     }

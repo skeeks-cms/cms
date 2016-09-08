@@ -11,7 +11,7 @@ return [
         'class'     => \yii\grid\DataColumn::className(),
         'value'     => function($model)
         {
-            return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose'), $model->id, [
+            return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms','Choose'), $model->id, [
                 'class' => 'btn btn-primary sx-row-action',
                 'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode(array_merge($model->toArray(), [
                     'url' => $model->url
@@ -104,7 +104,7 @@ return [
 
         },
         'format' => 'raw',
-        'label' => \Yii::t('app','Additional sections'),
+        'label' => \Yii::t('skeeks/cms','Additional sections'),
     ],
 
     [
@@ -119,7 +119,7 @@ return [
 
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
                 'target' => '_blank',
-                'title' => \Yii::t('app','Watch to site (opens new window)'),
+                'title' => \Yii::t('skeeks/cms','Watch to site (opens new window)'),
                 'data-pjax' => '0',
                 'class' => 'btn btn-default btn-sm'
             ]);

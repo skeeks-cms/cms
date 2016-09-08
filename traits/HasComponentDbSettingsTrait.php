@@ -49,7 +49,7 @@ trait HasComponentDbSettingsTrait
 
         } catch (\Exception $e)
         {
-            \Yii::error(\Yii::t('app','{cms} component error load defaul settings',['cms' => 'Cms']).': ' . $e->getMessage());
+            \Yii::error(\Yii::t('skeeks/cms','{cms} component error load defaul settings',['cms' => 'Cms']).': ' . $e->getMessage());
         }
 
         return $this;

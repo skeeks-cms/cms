@@ -11,7 +11,7 @@ $imageFile = $model;
     <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
 </a>
 <div class="sx-controlls">
-    <?= \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose file'), $model->src, [
+    <?= \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms','Choose file'), $model->src, [
             'class' => 'btn btn-primary btn-xs',
             'onclick' => 'sx.SelectFile.submit("' . $model->src . '"); return false;',
             'data-pjax' => 0

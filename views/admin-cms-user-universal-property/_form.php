@@ -16,17 +16,17 @@ if ($model->isNewRecord)
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Basic settings')) ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Basic settings')) ?>
 
     <?= $form->fieldRadioListBoolean($model, 'active') ?>
     <?= $form->fieldRadioListBoolean($model, 'is_required') ?>
 
 
     <?= $form->fieldSelect($model, 'component', [
-        \Yii::t('app','Base types')          => \Yii::$app->cms->basePropertyTypes(),
-        \Yii::t('app','Custom types') => \Yii::$app->cms->userPropertyTypes(),
+        \Yii::t('skeeks/cms','Base types')          => \Yii::$app->cms->basePropertyTypes(),
+        \Yii::t('skeeks/cms','Custom types') => \Yii::$app->cms->userPropertyTypes(),
     ])
-        ->label(\Yii::t('app',"Property type"))
+        ->label(\Yii::t('skeeks/cms',"Property type"))
         ;
     ?>
     <?= $form->field($model, 'component_settings')->label(false)->widget(
@@ -41,7 +41,7 @@ if ($model->isNewRecord)
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Additionally')) ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) ?>
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
 
@@ -53,11 +53,11 @@ if ($model->isNewRecord)
 
 
 <? if (!$model->isNewRecord) : ?>
-<?= $form->fieldSet(\Yii::t('app','Values for list')) ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Values for list')) ?>
 
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => \Yii::t('app',"Values for list"),
-        'hint'              => \Yii::t('app',"You can snap to the element number of properties, and set the value to them"),
+        'label'             => \Yii::t('skeeks/cms',"Values for list"),
+        'hint'              => \Yii::t('skeeks/cms',"You can snap to the element number of properties, and set the value to them"),
         'parentModel'       => $model,
         'relation'          => [
             'property_id' => 'id'

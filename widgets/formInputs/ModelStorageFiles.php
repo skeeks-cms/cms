@@ -50,12 +50,12 @@ class ModelStorageFiles extends InputWidget
         {
             if (!$this->hasModel())
             {
-                throw new Exception(\Yii::t('app',"Current widget works only in form with model"));
+                throw new Exception(\Yii::t('skeeks/cms',"Current widget works only in form with model"));
             }
 
             if ($this->model->isNewRecord)
             {
-                throw new Exception(\Yii::t('app',"Images can be downloaded after you save the form data"));
+                throw new Exception(\Yii::t('skeeks/cms',"Images can be downloaded after you save the form data"));
             }
 
 

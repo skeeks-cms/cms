@@ -28,10 +28,10 @@ class PropertyTypeList extends PropertyType
     static public function fieldElements()
     {
         return [
-            self::FIELD_ELEMENT_SELECT          => \Yii::t('app','Combobox').' (select)',
-            self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('app','Combobox').' (select multiple)',
-            self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('app','Radio Buttons (selecting one value)'),
-            self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('app','Checkbox List'),
+            self::FIELD_ELEMENT_SELECT          => \Yii::t('skeeks/cms','Combobox').' (select)',
+            self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('skeeks/cms','Combobox').' (select multiple)',
+            self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('skeeks/cms','Radio Buttons (selecting one value)'),
+            self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('skeeks/cms','Checkbox List'),
         ];
     }
 
@@ -43,7 +43,7 @@ class PropertyTypeList extends PropertyType
 
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','List');
+            $this->name = \Yii::t('skeeks/cms','List');
         }
     }
 
@@ -51,7 +51,7 @@ class PropertyTypeList extends PropertyType
     {
         return array_merge(parent::attributeLabels(),
         [
-            'fieldElement'  => \Yii::t('app','Element form'),
+            'fieldElement'  => \Yii::t('skeeks/cms','Element form'),
         ]);
     }
 

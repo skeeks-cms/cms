@@ -54,16 +54,16 @@ class CmsDashboard extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'cms_user_id' => Yii::t('app', 'Cms User ID'),
-            'priority' => Yii::t('app', 'Priority'),
-            'columns' => Yii::t('app', 'Number of columns'),
-            'columns_settings' => Yii::t('app', 'Columns Settings'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'name' => Yii::t('skeeks/cms', 'Name'),
+            'cms_user_id' => Yii::t('skeeks/cms', 'Cms User ID'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
+            'columns' => Yii::t('skeeks/cms', 'Number of columns'),
+            'columns_settings' => Yii::t('skeeks/cms', 'Columns Settings'),
         ];
     }
 

@@ -72,12 +72,12 @@ JS
 ]); ?>
 
 <? if ($model) : ?>
-    <?= $form->fieldSet(\Yii::t('app','Files attached to records')); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Files attached to records')); ?>
 
         <? \yii\bootstrap\Alert::begin(['options' => [
           'class' => 'alert-info',
         ]]); ?>
-            <?=\Yii::t('app','At this tab displays all the files and images that are tied to the current element.')?>
+            <?=\Yii::t('skeeks/cms','At this tab displays all the files and images that are tied to the current element.')?>
         <? \yii\bootstrap\Alert::end(); ?>
 
 
@@ -208,7 +208,7 @@ CSS
     <?= $form->fieldSetEnd(); ?>
 <? endif; ?>
 
-<?= $form->fieldSet(\Yii::t('app','File manager')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','File manager')); ?>
     <?
         echo \mihaildev\elfinder\ElFinder::widget([
             'controller'       => 'cms/elfinder-full', // вставляем название контроллера, по умолчанию равен elfinder
@@ -223,7 +223,7 @@ CSS
     ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','File storage')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','File storage')); ?>
 
 
         <?
@@ -269,7 +269,7 @@ JS
                     'class'     => \yii\grid\DataColumn::className(),
                     'value'     => function(\skeeks\cms\models\StorageFile $model)
                     {
-                        return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose file'), $model->src, [
+                        return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms','Choose file'), $model->src, [
                             'class' => 'btn btn-primary',
                             'onclick' => 'sx.SelectFile.submit("' . $model->src . '"); return false;',
                             'data-pjax' => 0
@@ -292,7 +292,7 @@ JS
                         {
 
                             $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
-                            return "<a href='" . $model->src . "' data-pjax='0' class='sx-fancybox' title='".\Yii::t('app','Increase')."'>
+                            return "<a href='" . $model->src . "' data-pjax='0' class='sx-fancybox' title='".\Yii::t('skeeks/cms','Increase')."'>
                                     <img src='" . $smallImage . "' />
                                 </a>";
                         }
@@ -361,10 +361,10 @@ JS
 <hr />
 <?= \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#", [
     'class' => 'btn btn-default',
-    'onclick' => "sx.dialog({'title' : '".\Yii::t('app','Help')."', 'content' : '#sx-help'}); return false;"
+    'onclick' => "sx.dialog({'title' : '".\Yii::t('skeeks/cms','Help')."', 'content' : '#sx-help'}); return false;"
 ]);?>
 <div style="display: none;" id="sx-help">
-    <?\Yii::t('app','Help in the process of writing ...')?>
+    <?\Yii::t('skeeks/cms','Help in the process of writing ...')?>
 </div>
 
 <? ActiveForm::end(); ?>

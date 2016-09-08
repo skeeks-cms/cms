@@ -149,7 +149,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             if ($model->save() && $relatedModel->save())
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -167,7 +167,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
             }
         }
 
@@ -203,7 +203,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             if ($model->save() && $relatedModel->save())
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -229,7 +229,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     }
                 }
 
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save') . $errors);
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save') . $errors);
             }
         }
 
@@ -567,7 +567,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 },
                 'format' => 'raw',
-                'label' => \Yii::t('app','Additional sections'),
+                'label' => \Yii::t('skeeks/cms','Additional sections'),
                 'visible' => false
             ],
 
@@ -584,7 +584,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
                         'target' => '_blank',
-                        'title' => \Yii::t('app','Watch to site (opens new window)'),
+                        'title' => \Yii::t('skeeks/cms','Watch to site (opens new window)'),
                         'data-pjax' => '0',
                         'class' => 'btn btn-default btn-sm'
                     ]);

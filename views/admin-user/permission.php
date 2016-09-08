@@ -8,7 +8,7 @@ use yii\helpers\Html;
 ?>
 <div class="assignment-index">
     <div class="col-lg-5">
-        <?= Yii::t('app', 'Avaliable') ?>:
+        <?= Yii::t('skeeks/cms', 'Avaliable') ?>:
         <?php
         echo Html::textInput('search_av', '', ['class' => 'role-search', 'data-target' => 'avaliable']) . '<br>';
         echo Html::listBox('roles', '', $avaliable, [
@@ -26,7 +26,7 @@ use yii\helpers\Html;
         ?>
     </div>
     <div class="col-lg-5">
-        <?= Yii::t('app', 'Assigned') ?>:
+        <?= Yii::t('skeeks/cms', 'Assigned') ?>:
         <?php
         echo Html::textInput('search_asgn', '', ['class' => 'role-search', 'data-target' => 'assigned']) . '<br>';
         echo Html::listBox('roles', '', $assigned, [

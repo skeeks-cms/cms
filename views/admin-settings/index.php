@@ -16,7 +16,7 @@
     'id' => 'widget-select-component'
 ]) */?>
 <form id="selector-component" action="" method="get" data-pjax>
-    <label><?=\Yii::t('app','Component settings')?></label>
+    <label><?=\Yii::t('skeeks/cms','Component settings')?></label>
     <?=
     \skeeks\widget\chosen\Chosen::widget([
         'name' => 'component',

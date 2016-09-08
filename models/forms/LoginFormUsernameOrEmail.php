@@ -47,9 +47,9 @@ class LoginFormUsernameOrEmail extends Model
     public function attributeLabels()
     {
         return [
-            'identifier'    => \Yii::t('app','Username or Email'),
-            'password'      => \Yii::t('app','Password'),
-            'rememberMe'    => \Yii::t('app','Remember me'),
+            'identifier'    => \Yii::t('skeeks/cms','Username or Email'),
+            'password'      => \Yii::t('skeeks/cms','Password'),
+            'rememberMe'    => \Yii::t('skeeks/cms','Remember me'),
         ];
     }
     /**
@@ -66,7 +66,7 @@ class LoginFormUsernameOrEmail extends Model
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password))
             {
-                $this->addError($attribute, \Yii::t('app','Incorrect username or password.'));
+                $this->addError($attribute, \Yii::t('skeeks/cms','Incorrect username or password.'));
             }
         }
     }

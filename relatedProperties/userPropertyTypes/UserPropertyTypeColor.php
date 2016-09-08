@@ -37,7 +37,7 @@ class UserPropertyTypeColor extends PropertyType
 
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','Choice of color');
+            $this->name = \Yii::t('skeeks/cms','Choice of color');
         }
     }
 
@@ -45,12 +45,12 @@ class UserPropertyTypeColor extends PropertyType
     {
         return array_merge(parent::attributeLabels(),
         [
-            'showDefaultPalette'    => \Yii::t('app','Show extended palette of colors'),
-            'saveValueAs'           => \Yii::t('app','Format conservation values'),
-            'useNative'             => \Yii::t('app','Use the native color selection'),
-            'showAlpha'             => \Yii::t('app','Management transparency'),
-            'showInput'             => \Yii::t('app','Show input field values'),
-            'showPalette'           => \Yii::t('app','Generally show the palette'),
+            'showDefaultPalette'    => \Yii::t('skeeks/cms','Show extended palette of colors'),
+            'saveValueAs'           => \Yii::t('skeeks/cms','Format conservation values'),
+            'useNative'             => \Yii::t('skeeks/cms','Use the native color selection'),
+            'showAlpha'             => \Yii::t('skeeks/cms','Management transparency'),
+            'showInput'             => \Yii::t('skeeks/cms','Show input field values'),
+            'showPalette'           => \Yii::t('skeeks/cms','Generally show the palette'),
         ]);
     }
 
@@ -101,7 +101,7 @@ class UserPropertyTypeColor extends PropertyType
     {
         echo $activeForm->fieldRadioListBoolean($this, 'showDefaultPalette');
         echo $activeForm->fieldRadioListBoolean($this, 'useNative');
-        echo $activeForm->fieldRadioListBoolean($this, 'showInput')->hint(\Yii::t('app','This INPUT to opened the palette'));
+        echo $activeForm->fieldRadioListBoolean($this, 'showInput')->hint(\Yii::t('skeeks/cms','This INPUT to opened the palette'));
         echo $activeForm->fieldRadioListBoolean($this, 'showAlpha');
         echo $activeForm->fieldRadioListBoolean($this, 'showPalette');
         echo $activeForm->field($this, 'saveValueAs')->radioList(\skeeks\cms\widgets\ColorInput::$possibleSaveAs);

@@ -28,7 +28,7 @@ class WidgetRenderable extends Widget
     {
         return array_merge(parent::attributeLabels(),
         [
-            'viewFile'  => \Yii::t('app','File-template'),
+            'viewFile'  => \Yii::t('skeeks/cms','File-template'),
         ]);
     }
 
@@ -49,7 +49,7 @@ class WidgetRenderable extends Widget
             ]);
         } else
         {
-            return \Yii::t('app',"Template not found");
+            return \Yii::t('skeeks/cms',"Template not found");
         }
     }
 }

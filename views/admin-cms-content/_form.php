@@ -11,10 +11,10 @@ use common\models\User;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Main')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('app', 'Main')
+        'content' => \Yii::t('skeeks/cms', 'Main')
     ]); ?>
 
     <? if ($content_type = \Yii::$app->request->get('content_type')) : ?>
@@ -27,10 +27,10 @@ use common\models\User;
 
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput()
-        ->hint(\Yii::t('app', 'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
+        ->hint(\Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
 
     <?= $form->field($model, 'viewFile')->textInput()
-        ->hint(\Yii::t('app', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
+        ->hint(\Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
@@ -38,7 +38,7 @@ use common\models\User;
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('app', 'Link to section')
+        'content' => \Yii::t('skeeks/cms', 'Link to section')
     ]); ?>
 
     <div class="row">
@@ -55,10 +55,10 @@ use common\models\User;
 
     <?= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
         'allowDeselect' => true
-    ])->hint(\Yii::t('app', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
+    ])->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('app', 'Relationship to other content')
+        'content' => \Yii::t('skeeks/cms', 'Relationship to other content')
     ]); ?>
 
     <div class="row">
@@ -86,7 +86,7 @@ use common\models\User;
 
 
     <? if ($model->childrenContents) : ?>
-        <p><b><?= \Yii::t('app', 'Children content')?></b></p>
+        <p><b><?= \Yii::t('skeeks/cms', 'Children content')?></b></p>
         <? foreach ($model->childrenContents as $contentChildren) : ?>
             <p><?= Html::a($contentChildren->name, \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-cms-content/update', 'pk' => $contentChildren->id])->enableAdmin()->toString())?></p>
         <? endforeach;  ?>
@@ -98,10 +98,10 @@ use common\models\User;
 
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet(\Yii::t('app','Properties')) ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Properties')) ?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-            'label'             => \Yii::t('app',"Element properties"),
-            'hint'              => \Yii::t('app',"Every content on the site has its own set of properties, its sets here"),
+            'label'             => \Yii::t('skeeks/cms',"Element properties"),
+            'hint'              => \Yii::t('skeeks/cms',"Every content on the site has its own set of properties, its sets here"),
             'parentModel'       => $model,
             'relation'          => [
                 'content_id' => 'id'
@@ -138,7 +138,7 @@ use common\models\User;
         ]); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\Yii::t('app','Access')); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Access')); ?>
         <? \yii\bootstrap\Alert::begin([
             'options' => [
               'class' => 'alert-warning',
@@ -156,7 +156,7 @@ use common\models\User;
 
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\Yii::t('app','Seo')); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Seo')); ?>
         <?= $form->field($model, 'meta_title_template')->textarea()->hint("Используйте конструкции вида {=model.name}"); ?>
         <?= $form->field($model, 'meta_description_template')->textarea(); ?>
         <?= $form->field($model, 'meta_keywords_template')->textarea(); ?>
@@ -165,20 +165,20 @@ use common\models\User;
 <? endif; ?>
 
 
-<?= $form->fieldSet(\Yii::t('app','Captions')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Captions')); ?>
     <?= $form->field($model, 'name_one')->textInput(); ?>
     <?= $form->field($model, 'name_meny')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('app', 'Access')
+        'content' => \Yii::t('skeeks/cms', 'Access')
     ]); ?>
     <?= $form->fieldRadioListBoolean($model, 'access_check_element'); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('app', 'Additionally')
+        'content' => \Yii::t('skeeks/cms', 'Additionally')
     ]); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
     <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>

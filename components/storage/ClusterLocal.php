@@ -26,7 +26,7 @@ class ClusterLocal extends Cluster
     {
         if (!$this->name)
         {
-            $this->name = \Yii::t('app',"Local storage");
+            $this->name = \Yii::t('skeeks/cms',"Local storage");
         }
         if (!$this->publicBaseUrl)
         {

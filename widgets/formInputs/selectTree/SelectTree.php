@@ -53,7 +53,7 @@ class SelectTree extends InputWidget
     {
         if (!$this->hasModel())
         {
-            throw new Exception(\Yii::t('app',"This file is intended only for forms model"));
+            throw new Exception(\Yii::t('skeeks/cms',"This file is intended only for forms model"));
         }
     }
 

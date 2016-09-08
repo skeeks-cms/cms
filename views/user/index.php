@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = \Yii::t('app',"User List");
+$this->title = \Yii::t('skeeks/cms',"User List");
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

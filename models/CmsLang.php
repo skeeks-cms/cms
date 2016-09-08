@@ -90,18 +90,18 @@ class CmsLang extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'active' => Yii::t('app', 'Active'),
-            'def' => Yii::t('app', 'Default'),
-            'priority' => Yii::t('app', 'Priority'),
-            'code' => Yii::t('app', 'Code'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'image_id' => Yii::t('app', 'Image'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'active' => Yii::t('skeeks/cms', 'Active'),
+            'def' => Yii::t('skeeks/cms', 'Default'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
+            'code' => Yii::t('skeeks/cms', 'Code'),
+            'name' => Yii::t('skeeks/cms', 'Name'),
+            'description' => Yii::t('skeeks/cms', 'Description'),
+            'image_id' => Yii::t('skeeks/cms', 'Image'),
         ]);
     }
 

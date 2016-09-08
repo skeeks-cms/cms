@@ -48,13 +48,13 @@ class CmsSiteDomain extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'site_code' => Yii::t('app', 'Site'),
-            'domain' => Yii::t('app', 'Domain'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'site_code' => Yii::t('skeeks/cms', 'Site'),
+            'domain' => Yii::t('skeeks/cms', 'Domain'),
         ]);
     }
 
@@ -69,7 +69,7 @@ class CmsSiteDomain extends Core
             [['site_code', 'domain'], 'required'],
             [['site_code'], 'string', 'max' => 15],
             [['domain'], 'string', 'max' => 255],
-            [['domain', 'site_code'], 'unique', 'targetAttribute' => ['domain', 'site_code'], 'message' => \Yii::t('app','The combination of Site Code and Domain has already been taken.')]
+            [['domain', 'site_code'], 'unique', 'targetAttribute' => ['domain', 'site_code'], 'message' => \Yii::t('skeeks/cms','The combination of Site Code and Domain has already been taken.')]
         ]);
     }
 

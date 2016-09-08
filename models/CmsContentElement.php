@@ -182,35 +182,35 @@ class CmsContentElement extends RelatedElementModel
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'published_at' => Yii::t('app', 'Published At'),
-            'published_to' => Yii::t('app', 'Published To'),
-            'priority' => Yii::t('app', 'Priority'),
-            'active' => Yii::t('app', 'Active'),
-            'name' => Yii::t('app', 'Name'),
-            'code' => Yii::t('app', 'Code'),
-            'description_short' => Yii::t('app', 'Description Short'),
-            'description_full' => Yii::t('app', 'Description Full'),
-            'content_id' => Yii::t('app', 'Content'),
-            'tree_id' => Yii::t('app', 'The main section'),
-            'show_counter' => Yii::t('app', 'Show Counter'),
-            'show_counter_start' => Yii::t('app', 'Show Counter Start'),
-            'meta_title' => Yii::t('app', 'Meta Title'),
-            'meta_keywords' => Yii::t('app', 'Meta Keywords'),
-            'meta_description' => Yii::t('app', 'Meta Description'),
-            'description_short_type' => Yii::t('app', 'Description Short Type'),
-            'description_full_type' => Yii::t('app', 'Description Full Type'),
-            'image_id' => Yii::t('app', 'Main Image (announcement)'),
-            'image_full_id' => Yii::t('app', 'Main Image'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'published_at' => Yii::t('skeeks/cms', 'Published At'),
+            'published_to' => Yii::t('skeeks/cms', 'Published To'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
+            'active' => Yii::t('skeeks/cms', 'Active'),
+            'name' => Yii::t('skeeks/cms', 'Name'),
+            'code' => Yii::t('skeeks/cms', 'Code'),
+            'description_short' => Yii::t('skeeks/cms', 'Description Short'),
+            'description_full' => Yii::t('skeeks/cms', 'Description Full'),
+            'content_id' => Yii::t('skeeks/cms', 'Content'),
+            'tree_id' => Yii::t('skeeks/cms', 'The main section'),
+            'show_counter' => Yii::t('skeeks/cms', 'Show Counter'),
+            'show_counter_start' => Yii::t('skeeks/cms', 'Show Counter Start'),
+            'meta_title' => Yii::t('skeeks/cms', 'Meta Title'),
+            'meta_keywords' => Yii::t('skeeks/cms', 'Meta Keywords'),
+            'meta_description' => Yii::t('skeeks/cms', 'Meta Description'),
+            'description_short_type' => Yii::t('skeeks/cms', 'Description Short Type'),
+            'description_full_type' => Yii::t('skeeks/cms', 'Description Full Type'),
+            'image_id' => Yii::t('skeeks/cms', 'Main Image (announcement)'),
+            'image_full_id' => Yii::t('skeeks/cms', 'Main Image'),
 
-            'images' => Yii::t('app', 'Images'),
-            'files' => Yii::t('app', 'Files'),
-            'treeIds' => Yii::t('app', 'Sections'),
-            'parent_content_element_id' => Yii::t('app', 'Parent element'),
+            'images' => Yii::t('skeeks/cms', 'Images'),
+            'files' => Yii::t('skeeks/cms', 'Files'),
+            'treeIds' => Yii::t('skeeks/cms', 'Sections'),
+            'parent_content_element_id' => Yii::t('skeeks/cms', 'Parent element'),
         ]);
     }
 
@@ -225,8 +225,8 @@ class CmsContentElement extends RelatedElementModel
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
-            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('app','For the content of this code is already in use.')],
-            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => \Yii::t('app','For this section of the code is already in use.')],
+            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
+            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => \Yii::t('skeeks/cms','For this section of the code is already in use.')],
             [['treeIds'], 'safe'],
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
@@ -300,7 +300,7 @@ class CmsContentElement extends RelatedElementModel
             $contentElement = static::findOne($this->$attribute);
             if ($contentElement->cmsContent->id != $this->cmsContent->parentContent->id)
             {
-                $this->addError($attribute, \Yii::t('app', 'The parent must be a content element: «{contentName}».',['contentName' => $this->cmsContent->parentContent->name]));
+                $this->addError($attribute, \Yii::t('skeeks/cms', 'The parent must be a content element: «{contentName}».',['contentName' => $this->cmsContent->parentContent->name]));
             }
         }
     }

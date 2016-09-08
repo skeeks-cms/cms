@@ -32,7 +32,7 @@ class PasswordResetRequestForm extends Model
             ['email', 'exist',
                 'targetClass' => $identityClassName,
                 'filter' => ['status' => $identityClassName::STATUS_ACTIVE],
-                'message' => \Yii::t('app','There is no user with such email.')
+                'message' => \Yii::t('skeeks/cms','There is no user with such email.')
             ],
         ];
     }
@@ -69,7 +69,7 @@ class PasswordResetRequestForm extends Model
                 return \Yii::$app->mailer->compose('@app/mail/password-reset-token', ['user' => $user])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
                     ->setTo($this->email)
-                    ->setSubject(\Yii::t('app','Password reset for ') . \Yii::$app->cms->appName)
+                    ->setSubject(\Yii::t('skeeks/cms','Password reset for ') . \Yii::$app->cms->appName)
                     ->send();
             }
         }

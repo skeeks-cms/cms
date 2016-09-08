@@ -34,9 +34,9 @@ class I18N extends \yii\i18n\I18N
     {
         \Yii::info("@MISSING: {$event->category}.{$event->message} FOR LANGUAGE {$event->language} @", self::className());
 
-        if ($event->category != 'app')
+        if ($event->category != 'skeeks/cms')
         {
-            $event->translatedMessage = \Yii::t('app', $event->message);
+            $event->translatedMessage = \Yii::t('skeeks/cms', $event->message);
         }
     }
 }

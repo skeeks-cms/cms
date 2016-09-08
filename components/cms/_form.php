@@ -13,10 +13,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 ?>
 
-<?= $form->fieldSet(\Yii::t('app', 'Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('app', 'Main')
+        'content' => \Yii::t('skeeks/cms', 'Main')
     ])?>
     <?= $form->field($model, 'appName')->textInput()->hint(''); ?>
 

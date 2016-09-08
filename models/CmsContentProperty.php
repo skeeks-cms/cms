@@ -60,7 +60,7 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'content_id' => Yii::t('app', 'Linked to content'),
+            'content_id' => Yii::t('skeeks/cms', 'Linked to content'),
         ]);
     }
 
@@ -72,7 +72,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         $rules = ArrayHelper::merge(parent::rules(), [
             [['content_id'], 'integer'],
-            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('app','For the content of this code is already in use.')],
+            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
         ]);
 
         return $rules;

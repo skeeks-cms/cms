@@ -55,7 +55,7 @@ class ViewFileEditModel extends Model
     public function attributeLabels()
     {
         return [
-            'source'      => \Yii::t('app','Code'),
+            'source'      => \Yii::t('skeeks/cms','Code'),
         ];
     }
 

@@ -18,10 +18,10 @@ class StatusVendorsCheck extends CheckComponent
     {
         $vendorDir              = VENDOR_DIR;
 
-        $this->name             = \Yii::t('app',"Checking kernel and libraries modification");
-        $txt1 = \Yii::t('app','Checks, changes kernel {cms} and third-party libraries (Folder {folder}). Folder location and the name given by the global constant VENDOR_DIR. For the current project:',['cms' => 'cms', 'folder' => '/vendor']);
-        $txt2 = \Yii::t('app','We strongly not recommend to modify the core of the project, as it can bring to the update failed, or your modifications will be removed during the upgrade process. That in turn may result in errors of work the project.');
-        $txt3 = \Yii::t('app','To solve the problem, you can run the command in the console');
+        $this->name             = \Yii::t('skeeks/cms',"Checking kernel and libraries modification");
+        $txt1 = \Yii::t('skeeks/cms','Checks, changes kernel {cms} and third-party libraries (Folder {folder}). Folder location and the name given by the global constant VENDOR_DIR. For the current project:',['cms' => 'cms', 'folder' => '/vendor']);
+        $txt2 = \Yii::t('skeeks/cms','We strongly not recommend to modify the core of the project, as it can bring to the update failed, or your modifications will be removed during the upgrade process. That in turn may result in errors of work the project.');
+        $txt3 = \Yii::t('skeeks/cms','To solve the problem, you can run the command in the console');
         $this->description      = <<<HTML
 <p>
 {$txt1}
@@ -35,8 +35,8 @@ class StatusVendorsCheck extends CheckComponent
 <p>{$txt3}:</p>
 HTML;
 ;
-        $this->errorText    = \Yii::t('app',"Found modified kernel");
-        $this->successText  = \Yii::t('app',"The kernel has not been modified");
+        $this->errorText    = \Yii::t('skeeks/cms',"Found modified kernel");
+        $this->successText  = \Yii::t('skeeks/cms',"The kernel has not been modified");
 
         parent::init();
     }
@@ -48,7 +48,7 @@ HTML;
 
         if ($result)
         {
-            $this->addError(\Yii::t('app','Found modified kernel').': ' . <<<HTML
+            $this->addError(\Yii::t('skeeks/cms','Found modified kernel').': ' . <<<HTML
 <pre><code>$result</code></pre>
 HTML
 );

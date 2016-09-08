@@ -20,6 +20,6 @@ $model = new \skeeks\cms\models\CmsContentElement();
         'class' => 'alert-warning',
     ],
 ])?>
-    <p><?=\Yii::t('app','Attention! For checked items will be given a new primary section.')?></p>
-    <p><?=\Yii::t('app','This will alter the page record, and it will cease to be available at the old address.')?></p>
+    <p><?=\Yii::t('skeeks/cms','Attention! For checked items will be given a new primary section.')?></p>
+    <p><?=\Yii::t('skeeks/cms','This will alter the page record, and it will cease to be available at the old address.')?></p>
 <? \yii\bootstrap\Alert::end(); ?>

@@ -52,9 +52,9 @@ JS
 
         <? if (in_array('image', $widget->searchModelAttributes)) : ?>
             <?= $form->fieldSelect($widget->searchModel, "image", [
-                '' => \skeeks\cms\shop\Module::t('app', 'Does not matter'),
-                'Y' => \skeeks\cms\shop\Module::t('app', 'With photo'),
-                'N' => \skeeks\cms\shop\Module::t('app', 'Without photo'),
+                '' => \skeeks\cms\shop\Module::t('skeeks/cms', 'Does not matter'),
+                'Y' => \skeeks\cms\shop\Module::t('skeeks/cms', 'With photo'),
+                'N' => \skeeks\cms\shop\Module::t('skeeks/cms', 'Without photo'),
             ]); ?>
         <? endif; ?>
 
@@ -123,6 +123,6 @@ JS
 
 
 
-    <button class="btn btn-primary"><?= \Yii::t('app', 'Apply');?></button>
+    <button class="btn btn-primary"><?= \Yii::t('skeeks/cms', 'Apply');?></button>
 
 <? \skeeks\cms\base\widgets\ActiveForm::end(); ?>

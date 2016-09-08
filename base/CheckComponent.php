@@ -51,23 +51,23 @@ abstract class CheckComponent extends \yii\base\Component
     {
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','Checking the necessary modules');
+            $this->name = \Yii::t('skeeks/cms','Checking the necessary modules');
         }
         if(!$this->description)
         {
-            $this->description = \Yii::t('app','Checking the availability of the required extensions for maximality work product. If an error occurs, show a list of modules that are unavailable.');
+            $this->description = \Yii::t('skeeks/cms','Checking the availability of the required extensions for maximality work product. If an error occurs, show a list of modules that are unavailable.');
         }
         if(!$this->successText)
         {
-            $this->successText = \Yii::t('app','All necessary modules are installed');
+            $this->successText = \Yii::t('skeeks/cms','All necessary modules are installed');
         }
         if(!$this->errorText)
         {
-            $this->errorText = \Yii::t('app','Not all modules are installed');
+            $this->errorText = \Yii::t('skeeks/cms','Not all modules are installed');
         }
         if(!$this->warningText)
         {
-            $this->warningText = \Yii::t('app','Some non-critical remark');
+            $this->warningText = \Yii::t('skeeks/cms','Some non-critical remark');
         }
 
         parent::init();

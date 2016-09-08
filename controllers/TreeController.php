@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
+ * @copyright 2010 SkeekS (пїЅпїЅпїЅпїЅпїЅ)
  * @date 14.04.2016
  */
 namespace skeeks\cms\controllers;
@@ -74,7 +74,7 @@ class TreeController extends Controller
     {
         if (!$this->model)
         {
-            throw new NotFoundHttpException(\Yii::t('app', 'Page not found'));
+            throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Page not found'));
         }
 
         \Yii::$app->cms->setCurrentTree($this->model);
@@ -86,10 +86,10 @@ class TreeController extends Controller
         }
 
         $viewFile = $this->action->id;
-        //Пробуем рендерить view для текущего типа страницы
+        //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ view пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if ($this->model)
         {
-            //Если у раздела указан персональный шаблон, рендерим его, иначе шаблон типа страницы
+            //пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if ($this->model->view_file)
             {
                 $viewFile = $this->model->view_file;
@@ -115,9 +115,9 @@ class TreeController extends Controller
 
     /**
      *
-     * TODO: Вынести в seo компонент
+     * TODO: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ seo пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
      *
-     * Установка метаданных страницы
+     * пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
      * @return $this
      */
     protected function _initStandartMetaData()

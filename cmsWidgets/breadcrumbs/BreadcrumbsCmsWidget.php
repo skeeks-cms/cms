@@ -24,7 +24,7 @@ class BreadcrumbsCmsWidget extends WidgetRenderable
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('app','Breadcrumbs')
+            'name' => \Yii::t('skeeks/cms','Breadcrumbs')
         ]);
     }
 }

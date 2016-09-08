@@ -16,14 +16,14 @@ class ConfigCheck extends CheckComponent
 {
     public function init()
     {
-        $this->name             = \Yii::t('app','Checking the basic configuration of the project');
-        $txt = \Yii::t('app','Checking the configuration of the project. Global variables, mode of development, database query cache, the cache structure of the database tables.');
+        $this->name             = \Yii::t('skeeks/cms','Checking the basic configuration of the project');
+        $txt = \Yii::t('skeeks/cms','Checking the configuration of the project. Global variables, mode of development, database query cache, the cache structure of the database tables.');
         $this->description      = <<<HTML
 <p>{$txt}</p>
 HTML;
 ;
-        $this->errorText    = \Yii::t('app','There are mistakes');
-        $this->successText  = \Yii::t('app',"Optimally");
+        $this->errorText    = \Yii::t('skeeks/cms','There are mistakes');
+        $this->successText  = \Yii::t('skeeks/cms',"Optimally");
 
         parent::init();
     }
@@ -33,15 +33,15 @@ HTML;
     {
 		if (!\Yii::$app->db->enableSchemaCache)
         {
-            $this->addError(\Yii::t('app','Cache structure of the database tables is disabled'));
+            $this->addError(\Yii::t('skeeks/cms','Cache structure of the database tables is disabled'));
         } else
         {
-            $this->addSuccess(\Yii::t('app','Cache structure of the database tables is enabled'));
+            $this->addSuccess(\Yii::t('skeeks/cms','Cache structure of the database tables is enabled'));
         }
 
         if (!\Yii::$app->db->enableQueryCache)
         {
-            $this->addError(\Yii::t('app','Sql query cache is disabled'));
+            $this->addError(\Yii::t('skeeks/cms','Sql query cache is disabled'));
         }else
         {
             $this->addSuccess('Sql query cache is enabled');
@@ -50,18 +50,18 @@ HTML;
 
         if (YII_DEBUG)
         {
-            $this->addError(\Yii::t('app','Enable debug mode'));
+            $this->addError(\Yii::t('skeeks/cms','Enable debug mode'));
         }else
         {
-            $this->addSuccess(\Yii::t('app','Debug mode is enabled'));
+            $this->addSuccess(\Yii::t('skeeks/cms','Debug mode is enabled'));
         }
 
         if (YII_ENV == 'prod')
         {
-            $this->addSuccess(\Yii::t('app','Setting corresponds to the working site {prod}',['prod' => 'prod']));
+            $this->addSuccess(\Yii::t('skeeks/cms','Setting corresponds to the working site {prod}',['prod' => 'prod']));
         }else
         {
-            $this->addError(\Yii::t('app','Setting does not correspond to the working site now').': ' . YII_ENV . ', '.\Yii::t('app','preferably').': prod');
+            $this->addError(\Yii::t('skeeks/cms','Setting does not correspond to the working site now').': ' . YII_ENV . ', '.\Yii::t('skeeks/cms','preferably').': prod');
         }
     }
 

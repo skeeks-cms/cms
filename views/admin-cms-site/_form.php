@@ -12,7 +12,7 @@ use skeeks\cms\models\Tree;
 <?php $form = ActiveForm::begin(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('app',"Main")); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms',"Main")); ?>
 
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -22,8 +22,8 @@ use skeeks\cms\models\Tree;
 
 
     <? if ($model->def === \skeeks\cms\components\Cms::BOOL_Y): ?>
-        <?= $form->field($model, 'active')->hiddenInput()->hint(\Yii::t('app','Site selected by default always active')); ?>
-        <?= $form->field($model, 'def')->hiddenInput()->hint(\Yii::t('app','This site is the site selected by default. If you want to change it, you need to choose a different site, the default site.')); ?>
+        <?= $form->field($model, 'active')->hiddenInput()->hint(\Yii::t('skeeks/cms','Site selected by default always active')); ?>
+        <?= $form->field($model, 'def')->hiddenInput()->hint(\Yii::t('skeeks/cms','This site is the site selected by default. If you want to change it, you need to choose a different site, the default site.')); ?>
     <? else : ?>
         <?= $form->fieldRadioListBoolean($model, 'active'); ?>
         <?= $form->fieldRadioListBoolean($model, 'def'); ?>
@@ -40,7 +40,7 @@ use skeeks\cms\models\Tree;
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet(\Yii::t('app',"Domains")); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms',"Domains")); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => "",

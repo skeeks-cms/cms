@@ -102,7 +102,7 @@
 
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->getProfileUrl(), [
                         'target' => '_blank',
-                        'title' => \Yii::t('app','Watch to site (opens new window)'),
+                        'title' => \Yii::t('skeeks/cms','Watch to site (opens new window)'),
                         'data-pjax' => '0',
                         'class' => 'btn btn-default btn-sm'
                     ]);
