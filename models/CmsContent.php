@@ -74,9 +74,9 @@ class CmsContent extends Core
     static public function getOnDeleteOptions()
     {
         return [
-            self::CASCADE => "CASCADE (" . \Yii::t('app', 'Remove all items of that content') .  ")",
-            self::RESTRICT => "RESTRICT (" . \Yii::t('app', 'Deny delete parent is not removed, these elements') .  ")",
-            self::SET_NULL => "SET NULL (" . \Yii::t('app', 'Remove the connection to a remote parent') .  ")",
+            self::CASCADE => "CASCADE (" . \Yii::t('skeeks/cms', 'Remove all items of that content') .  ")",
+            self::RESTRICT => "RESTRICT (" . \Yii::t('skeeks/cms', 'Deny delete parent is not removed, these elements') .  ")",
+            self::SET_NULL => "SET NULL (" . \Yii::t('skeeks/cms', 'Remove the connection to a remote parent') .  ")",
         ];
     }
     /**
@@ -93,38 +93,38 @@ class CmsContent extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'code' => Yii::t('app', 'Code'),
-            'active' => Yii::t('app', 'Active'),
-            'priority' => Yii::t('app', 'Priority'),
-            'description' => Yii::t('app', 'Description'),
-            'content_type' => Yii::t('app', 'Content Type'),
-            'index_for_search' => Yii::t('app', 'To index for search module'),
-            'tree_chooser' => Yii::t('app', 'The Interface Binding Element to Sections'),
-            'list_mode' => Yii::t('app', 'View Mode Sections And Elements'),
-            'name_meny' => Yii::t('app', 'The Name Of The Elements (Plural)'),
-            'name_one' => Yii::t('app', 'The Name One Element'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'name' => Yii::t('skeeks/cms', 'Name'),
+            'code' => Yii::t('skeeks/cms', 'Code'),
+            'active' => Yii::t('skeeks/cms', 'Active'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
+            'description' => Yii::t('skeeks/cms', 'Description'),
+            'content_type' => Yii::t('skeeks/cms', 'Content Type'),
+            'index_for_search' => Yii::t('skeeks/cms', 'To index for search module'),
+            'tree_chooser' => Yii::t('skeeks/cms', 'The Interface Binding Element to Sections'),
+            'list_mode' => Yii::t('skeeks/cms', 'View Mode Sections And Elements'),
+            'name_meny' => Yii::t('skeeks/cms', 'The Name Of The Elements (Plural)'),
+            'name_one' => Yii::t('skeeks/cms', 'The Name One Element'),
 
-            'default_tree_id' => Yii::t('app', 'Default Section'),
-            'is_allow_change_tree' => Yii::t('app', 'Is Allow Change Default Section'),
-            'root_tree_id' => Yii::t('app', 'Root Section'),
-            'viewFile' => Yii::t('app', 'Template'),
+            'default_tree_id' => Yii::t('skeeks/cms', 'Default Section'),
+            'is_allow_change_tree' => Yii::t('skeeks/cms', 'Is Allow Change Default Section'),
+            'root_tree_id' => Yii::t('skeeks/cms', 'Root Section'),
+            'viewFile' => Yii::t('skeeks/cms', 'Template'),
 
-            'meta_title_template' => Yii::t('app', 'Шаблон META TITLE'),
-            'meta_description_template' => Yii::t('app', 'Шаблон META KEYWORDS'),
-            'meta_keywords_template' => Yii::t('app', 'Шаблон META DESCRIPTION'),
+            'meta_title_template' => Yii::t('skeeks/cms', 'Шаблон META TITLE'),
+            'meta_description_template' => Yii::t('skeeks/cms', 'Шаблон META KEYWORDS'),
+            'meta_keywords_template' => Yii::t('skeeks/cms', 'Шаблон META DESCRIPTION'),
 
-            'access_check_element'  => Yii::t('app', 'Включить управление доступом к элементам'),
-            'parent_content_id'     => Yii::t('app', 'Parent content'),
+            'access_check_element'  => Yii::t('skeeks/cms', 'Включить управление доступом к элементам'),
+            'parent_content_id'     => Yii::t('skeeks/cms', 'Parent content'),
 
-            'visible'                       => Yii::t('app', 'Show in menu'),
-            'parent_content_on_delete'      => Yii::t('app', 'At the time of removal of the parent element'),
-            'parent_content_is_required'    => Yii::t('app', 'Parent element is required to be filled'),
+            'visible'                       => Yii::t('skeeks/cms', 'Show in menu'),
+            'parent_content_on_delete'      => Yii::t('skeeks/cms', 'At the time of removal of the parent element'),
+            'parent_content_is_required'    => Yii::t('skeeks/cms', 'Parent element is required to be filled'),
         ]);
     }
 
@@ -152,8 +152,8 @@ class CmsContent extends Core
             ['active', 'default', 'value'           => Cms::BOOL_Y],
             ['is_allow_change_tree', 'default', 'value'           => Cms::BOOL_Y],
             ['access_check_element', 'default', 'value'           => Cms::BOOL_N],
-            ['name_meny', 'default', 'value'    => Yii::t('app', 'Elements')],
-            ['name_one', 'default', 'value'     => Yii::t('app', 'Element')],
+            ['name_meny', 'default', 'value'    => Yii::t('skeeks/cms', 'Elements')],
+            ['name_one', 'default', 'value'     => Yii::t('skeeks/cms', 'Element')],
 
 
             ['visible', 'default', 'value'                              => Cms::BOOL_Y],

@@ -112,13 +112,13 @@ class CmsUserEmail extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'user_id' => Yii::t('skeeks/cms', 'User'),
             'value' => "Email",
-            'approved' => \Yii::t('app',"Approved"),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'def' => Yii::t('app', 'Default'),
+            'approved' => \Yii::t('skeeks/cms',"Approved"),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'def' => Yii::t('skeeks/cms', 'Default'),
         ];
     }
 

@@ -42,7 +42,7 @@ class SearchProductsModel extends Model
     public function attributeLabels()
     {
         return [
-            'image' =>  \Yii::t('app', 'With photo'),
+            'image' =>  \Yii::t('skeeks/cms', 'With photo'),
         ];
     }
 

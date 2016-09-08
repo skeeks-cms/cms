@@ -3,6 +3,7 @@ CHANGELOG
 
 3.0.3.pre
 -----------------
+ * Translation updates
  * Fixed https://github.com/skeeks-cms/cms-admin/issues/2
 
 3.0.2

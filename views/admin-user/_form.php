@@ -19,14 +19,14 @@ if ($model->isNewRecord)
 <?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet(\Yii::t('app','General information'))?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','General information'))?>
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
     <?= $form->field($model, 'gender')->radioList([
-        'men'   => \Yii::t('app','Male'),
-        'women' => \Yii::t('app','Female'),
+        'men'   => \Yii::t('skeeks/cms','Male'),
+        'women' => \Yii::t('skeeks/cms','Female'),
     ]); ?>
 
     <?= $form->field($model, 'image_id')->widget(
@@ -35,7 +35,7 @@ if ($model->isNewRecord)
 
     <div class="row">
         <div class="col-md-5">
-            <?= $form->field($model, 'username')->textInput(['maxlength' => 25])->hint(\Yii::t('app','The unique username. Used for authorization and to form links to personal cabinet.')); ?>
+            <?= $form->field($model, 'username')->textInput(['maxlength' => 25])->hint(\Yii::t('skeeks/cms','The unique username. Used for authorization and to form links to personal cabinet.')); ?>
         </div>
         <div class="col-md-5">
             <?= $form->field($model, 'name')->textInput(); ?>
@@ -73,7 +73,7 @@ JS
 
     <? if ($model->relatedProperties) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('app', 'Additional properties')
+            'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
         <? if ($properties = $model->relatedProperties) : ?>
             <? foreach ($properties as $property) : ?>
@@ -82,14 +82,14 @@ JS
         <? endif; ?>
 
     <? else : ?>
-        <?/*= \Yii::t('app','Additional properties are not set')*/?>
+        <?/*= \Yii::t('skeeks/cms','Additional properties are not set')*/?>
     <? endif; ?>
 
 
 <?= $form->fieldSetEnd(); ?>
 
 <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
-    <?= $form->fieldSet(\Yii::t('app','Groups'))?>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Groups'))?>
 
         <? $this->registerCss(<<<CSS
     .sx-checkbox label
@@ -107,14 +107,14 @@ CSS
     <?= $form->fieldSetEnd(); ?>
 <? endif; ?>
 
-<?= $form->fieldSet(\Yii::t('app','Password')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Password')); ?>
 
     <?= $form->field($passwordChange, 'new_password')->passwordInput() ?>
     <?= $form->field($passwordChange, 'new_password_confirm')->passwordInput() ?>
 
 <?= $form->fieldSetEnd(); ?>
 
-<?/*= $form->fieldSet(\Yii::t('app','Additionally'))*/?><!--
+<?/*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally'))*/?><!--
     <?/*= $form->field($model, 'city')->textInput(); */?>
     <?/*= $form->field($model, 'address')->textInput(); */?>
     <?/*= $form->field($model, 'info')->textarea(); */?>

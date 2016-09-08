@@ -80,7 +80,7 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     {
         return array_merge(parent::attributeLabels(),
         [
-            'multiple'  => \Yii::t('app','Multiple choice'),
+            'multiple'  => \Yii::t('skeeks/cms','Multiple choice'),
         ]);
     }
 

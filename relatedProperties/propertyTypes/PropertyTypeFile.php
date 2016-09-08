@@ -22,7 +22,7 @@ class PropertyTypeFile extends PropertyType
 
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','File');
+            $this->name = \Yii::t('skeeks/cms','File');
         }
     }
 }

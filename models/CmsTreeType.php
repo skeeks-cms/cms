@@ -51,21 +51,21 @@ class CmsTreeType extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'code' => Yii::t('app', 'Code'),
-            'active' => Yii::t('app', 'Active'),
-            'priority' => Yii::t('app', 'Priority'),
-            'description' => Yii::t('app', 'Description'),
-            'index_for_search' => Yii::t('app', 'To index for search module'),
-            'name_meny' => Yii::t('app', 'Name Meny'),
-            'name_one' => Yii::t('app', 'Name One'),
-            'viewFile' => Yii::t('app', 'Template'),
-            'default_children_tree_type' => Yii::t('app', 'Type of child partitions by default'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'name' => Yii::t('skeeks/cms', 'Name'),
+            'code' => Yii::t('skeeks/cms', 'Code'),
+            'active' => Yii::t('skeeks/cms', 'Active'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
+            'description' => Yii::t('skeeks/cms', 'Description'),
+            'index_for_search' => Yii::t('skeeks/cms', 'To index for search module'),
+            'name_meny' => Yii::t('skeeks/cms', 'Name Meny'),
+            'name_one' => Yii::t('skeeks/cms', 'Name One'),
+            'viewFile' => Yii::t('skeeks/cms', 'Template'),
+            'default_children_tree_type' => Yii::t('skeeks/cms', 'Type of child partitions by default'),
         ]);
     }
 
@@ -86,8 +86,8 @@ class CmsTreeType extends Core
             [['code'], 'validateCode'],
             ['priority', 'default', 'value'         => 500],
             ['active', 'default', 'value'           => "Y"],
-            ['name_meny', 'default', 'value'        => \Yii::t('app','Sections')],
-            ['name_one', 'default', 'value'         => \Yii::t('app','Section')],
+            ['name_meny', 'default', 'value'        => \Yii::t('skeeks/cms','Sections')],
+            ['name_one', 'default', 'value'         => \Yii::t('skeeks/cms','Section')],
         ]);
     }
 

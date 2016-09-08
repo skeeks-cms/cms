@@ -12,7 +12,7 @@ use yii\helpers\Html;
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 use \skeeks\cms\helpers\UrlHelper;
 
-$this->title = \Yii::t('app','Authorization');
+$this->title = \Yii::t('skeeks/cms','Authorization');
 \Yii::$app->breadcrumbs->createBase()->append($this->title);
 ?>
 <div class="row">
@@ -31,12 +31,12 @@ $this->title = \Yii::t('app','Authorization');
                         <?= $form->field($model, 'rememberMe')->checkbox() ?>
 
                         <div class="form-group">
-                            <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> ".\Yii::t('app','Log in'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                            <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> ".\Yii::t('skeeks/cms','Log in'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                         </div>
 
                     <?php ActiveForm::end(); ?>
-                    <?= Html::a(\Yii::t('app','Forgot your password?'), UrlHelper::constructCurrent()->setRoute('cms/auth/forget')->toString()) ?> |
-                    <?= Html::a(\Yii::t('app','Registration'), UrlHelper::constructCurrent()->setRoute('cms/auth/register')->toString()) ?>
+                    <?= Html::a(\Yii::t('skeeks/cms','Forgot your password?'), UrlHelper::constructCurrent()->setRoute('cms/auth/forget')->toString()) ?> |
+                    <?= Html::a(\Yii::t('skeeks/cms','Registration'), UrlHelper::constructCurrent()->setRoute('cms/auth/register')->toString()) ?>
                 </div>
 
                 <div class="col-lg-3">

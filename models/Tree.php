@@ -263,37 +263,37 @@ class Tree extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'published_at' => Yii::t('app', 'Published At'),
-            'published_to' => Yii::t('app', 'Published To'),
-            'priority' => Yii::t('app', 'Priority'),
-            'active' => Yii::t('app', 'Active'),
-            'name' => Yii::t('app', 'Name'),
-            'tree_type_id'              => Yii::t('app', 'Type'),
-            'redirect'          => Yii::t('app', 'Redirect'),
-            'tree_menu_ids'     => Yii::t('app', 'Menu Positions'),
-            'priority'          => Yii::t('app', 'Priority'),
-            'code'              => Yii::t('app', 'Code'),
-            'active'              => Yii::t('app', 'Active'),
-            'meta_title'        => Yii::t('app', 'Meta Title'),
-            'meta_keywords'         => Yii::t('app', 'Meta Keywords'),
-            'meta_description'  => Yii::t('app', 'Meta Description'),
-            'description_short' => Yii::t('app', 'Description Short'),
-            'description_full' => Yii::t('app', 'Description Full'),
-            'description_short_type' => Yii::t('app', 'Description Short Type'),
-            'description_full_type' => Yii::t('app', 'Description Full Type'),
-            'image_id' => Yii::t('app', 'Main Image (announcement)'),
-            'image_full_id' => Yii::t('app', 'Main Image'),
-            'images' => Yii::t('app', 'Images'),
-            'files' => Yii::t('app', 'Files'),
-            'redirect_tree_id' => Yii::t('app', 'Redirect Section'),
-            'redirect_code' => Yii::t('app', 'Redirect Code'),
-            'name_hidden' => Yii::t('app', 'Hidden Name'),
-            'view_file' => Yii::t('app', 'Template'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'published_at' => Yii::t('skeeks/cms', 'Published At'),
+            'published_to' => Yii::t('skeeks/cms', 'Published To'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
+            'active' => Yii::t('skeeks/cms', 'Active'),
+            'name' => Yii::t('skeeks/cms', 'Name'),
+            'tree_type_id'              => Yii::t('skeeks/cms', 'Type'),
+            'redirect'          => Yii::t('skeeks/cms', 'Redirect'),
+            'tree_menu_ids'     => Yii::t('skeeks/cms', 'Menu Positions'),
+            'priority'          => Yii::t('skeeks/cms', 'Priority'),
+            'code'              => Yii::t('skeeks/cms', 'Code'),
+            'active'              => Yii::t('skeeks/cms', 'Active'),
+            'meta_title'        => Yii::t('skeeks/cms', 'Meta Title'),
+            'meta_keywords'         => Yii::t('skeeks/cms', 'Meta Keywords'),
+            'meta_description'  => Yii::t('skeeks/cms', 'Meta Description'),
+            'description_short' => Yii::t('skeeks/cms', 'Description Short'),
+            'description_full' => Yii::t('skeeks/cms', 'Description Full'),
+            'description_short_type' => Yii::t('skeeks/cms', 'Description Short Type'),
+            'description_full_type' => Yii::t('skeeks/cms', 'Description Full Type'),
+            'image_id' => Yii::t('skeeks/cms', 'Main Image (announcement)'),
+            'image_full_id' => Yii::t('skeeks/cms', 'Main Image'),
+            'images' => Yii::t('skeeks/cms', 'Images'),
+            'files' => Yii::t('skeeks/cms', 'Files'),
+            'redirect_tree_id' => Yii::t('skeeks/cms', 'Redirect Section'),
+            'redirect_code' => Yii::t('skeeks/cms', 'Redirect Code'),
+            'name_hidden' => Yii::t('skeeks/cms', 'Hidden Name'),
+            'view_file' => Yii::t('skeeks/cms', 'Template'),
         ]);
     }
 
@@ -317,8 +317,8 @@ class Tree extends Core
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
             [['site_code'], 'string', 'max' => 15],
-            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => \Yii::t('app','For this subsection of the code is already in use.')],
-            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => \Yii::t('app','The combination of Code and Pid has already been taken.')],
+            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => \Yii::t('skeeks/cms','For this subsection of the code is already in use.')],
+            [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => \Yii::t('skeeks/cms','The combination of Code and Pid has already been taken.')],
 
             ['description_short_type', 'string'],
             ['description_full_type', 'string'],
@@ -855,7 +855,7 @@ class Tree extends Core
         $target->setAttributesForFutureParent($this);
         if (!$target->save(false))
         {
-            throw new Exception(\Yii::t('app',"Failed to create the child element:  ") . Json::encode($target->attributes));
+            throw new Exception(\Yii::t('skeeks/cms',"Failed to create the child element:  ") . Json::encode($target->attributes));
         }
 
         $this->save(false);
@@ -897,7 +897,7 @@ class Tree extends Core
             $target->setAttributesForFutureParent($this);
             if (!$target->save(false))
             {
-                throw new Exception(\Yii::t('app',"Unable to move: ") . Json::encode($target->attributes));
+                throw new Exception(\Yii::t('skeeks/cms',"Unable to move: ") . Json::encode($target->attributes));
             }
 
             $this->processNormalize();

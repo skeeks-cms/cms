@@ -87,7 +87,7 @@ JS
             'class'     => \yii\grid\DataColumn::className(),
             'value'     => function(\skeeks\cms\models\User $model)
             {
-                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app','Choose'), '#', [
+                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms','Choose'), '#', [
                     'class' => 'btn btn-primary sx-row-action',
                     'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($model->toArray([], ['displayName'])) . '); return false;',
                     'data-pjax' => 0
@@ -131,7 +131,7 @@ JS
                 return implode(', ', $result);
             },
             'format'    => 'html',
-            'label'     => \Yii::t('app','Roles'),
+            'label'     => \Yii::t('skeeks/cms','Roles'),
         ],
 
         [

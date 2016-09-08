@@ -31,7 +31,7 @@ abstract class Widget extends Component implements ViewContextInterface
 
     public function init()
     {
-        $this->_token = \Yii::t('app','Widget').': ' . $this->id;
+        $this->_token = \Yii::t('skeeks/cms','Widget').': ' . $this->id;
 
         $this->defaultAttributes = $this->attributes;
 
@@ -74,7 +74,7 @@ abstract class Widget extends Component implements ViewContextInterface
             }
             catch (\Exception $e)
             {
-                $content = \Yii::t('app','Error widget {class}',['class' => $this->className()]). " (" . $this->descriptor->name . "): " . $e->getMessage();
+                $content = \Yii::t('skeeks/cms','Error widget {class}',['class' => $this->className()]). " (" . $this->descriptor->name . "): " . $e->getMessage();
             }
         } else
         {
@@ -102,7 +102,7 @@ JS
             [
                 'class'     => 'skeeks-cms-toolbar-edit-view-block',
                 'id'        => $id,
-                'title'     => \Yii::t('app',"Double-click on the block will open the settings manager"),
+                'title'     => \Yii::t('skeeks/cms',"Double-click on the block will open the settings manager"),
                 'data'      =>
                 [
                     'id' => $this->id,

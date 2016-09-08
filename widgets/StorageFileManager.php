@@ -68,12 +68,12 @@ JS
 
     public function run()
     {
-        $str_upload = \Yii::t('app','Upload');
-        $str_togg_drop = \Yii::t('app','Toggle Dropdow');
-        $str_upl_from_comp = \Yii::t('app','Upload from your computer');
-        $str_remote_upl = \Yii::t('app','Upload by link {http}',['http' => 'http://']);
-        $str_up_f = \Yii::t('app','The upload file');
-        $str_up_fs = \Yii::t('app','The upload files');
+        $str_upload = \Yii::t('skeeks/cms','Upload');
+        $str_togg_drop = \Yii::t('skeeks/cms','Toggle Dropdow');
+        $str_upl_from_comp = \Yii::t('skeeks/cms','Upload from your computer');
+        $str_remote_upl = \Yii::t('skeeks/cms','Upload by link {http}',['http' => 'http://']);
+        $str_up_f = \Yii::t('skeeks/cms','The upload file');
+        $str_up_fs = \Yii::t('skeeks/cms','The upload files');
     return <<<HTML
     <div id="sx-file-manager-{$this->id}">
 

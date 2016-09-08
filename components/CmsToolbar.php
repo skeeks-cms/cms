@@ -102,7 +102,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
     public function renderConfigForm(ActiveForm $form)
     {
-        echo $form->fieldSet(\Yii::t('app', 'Main'));
+        echo $form->fieldSet(\Yii::t('skeeks/cms', 'Main'));
 
             echo $form->field($this, 'enabled')->checkbox();
             echo $form->fieldCheckboxBoolean($this, 'isOpen');
@@ -122,7 +122,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
         echo $form->fieldSetEnd();
 
-        echo $form->fieldSet(\Yii::t('app', 'Access'));
+        echo $form->fieldSet(\Yii::t('skeeks/cms', 'Access'));
 
             echo \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
                 'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,

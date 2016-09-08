@@ -122,7 +122,7 @@ class AdminProfileController extends AdminModelEditorController
 
             if ($model->save() && $relatedModel->save())
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
                 if ($passwordChange->new_password)
                 {
@@ -156,7 +156,7 @@ class AdminProfileController extends AdminModelEditorController
                     }
                 }
 
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save') . ". " . implode($errors));
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save') . ". " . implode($errors));
             }
         }
 

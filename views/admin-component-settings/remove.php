@@ -16,14 +16,14 @@
 
 
     <div class="sx-box sx-mb-10 sx-p-10">
-        <p><?= \Yii::t('app','Erase all the settings from the database for this component.')?></p>
+        <p><?= \Yii::t('skeeks/cms','Erase all the settings from the database for this component.')?></p>
         <? if ($settingsAllCount = \skeeks\cms\models\CmsComponentSettings::baseQuery($component)->count()) : ?>
-            <p><b><?=\Yii::t('app','Total found')?>:</b> <?= $settingsAllCount; ?></p>
+            <p><b><?=\Yii::t('skeeks/cms','Total found')?>:</b> <?= $settingsAllCount; ?></p>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeAll(); return false;">
-                <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('app','reset all settings')?>
+                <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('skeeks/cms','reset all settings')?>
             </button>
         <? else: ?>
-            <small><?= \Yii::t('app','The database no settings for this component.')?></small>
+            <small><?= \Yii::t('skeeks/cms','The database no settings for this component.')?></small>
         <? endif; ?>
     </div>
 

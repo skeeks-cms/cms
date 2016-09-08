@@ -7,11 +7,11 @@
  */
 /* @var $this yii\web\View */
 ?>
-<?= $form->fieldSet(\Yii::t('app','Showing')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Showing')); ?>
     <?= $form->field($model, 'viewFile')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Pagination')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Pagination')); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledPaging', \Yii::$app->cms->booleanFormat()); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledPjaxPagination', \Yii::$app->cms->booleanFormat()); ?>
     <?= $form->fieldInputInt($model, 'pageSize'); ?>
@@ -21,12 +21,12 @@
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Filtering')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Filtering')); ?>
     <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat(), [
         'allowDeselect' => true
     ]); ?>
 
-    <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint(\Yii::t('app',"Will be considered time of beginning and end of the publication")); ?>
+    <?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint(\Yii::t('skeeks/cms',"Will be considered time of beginning and end of the publication")); ?>
 
     <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\User::find()->active()->all(),
@@ -52,16 +52,16 @@
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Sorting and quantity')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Sorting and quantity')); ?>
     <?= $form->fieldInputInt($model, 'limit'); ?>
     <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\CmsContentElement())->attributeLabels()); ?>
     <?= $form->fieldSelect($model, 'order', [
-        SORT_ASC    => "ASC (".\Yii::t('app','from smaller to larger').")",
-        SORT_DESC   => "DESC (".\Yii::t('app','from highest to lowest').")",
+        SORT_ASC    => "ASC (".\Yii::t('skeeks/cms','from smaller to larger').")",
+        SORT_DESC   => "DESC (".\Yii::t('skeeks/cms','from highest to lowest').")",
     ]); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')); ?>
     <?= $form->field($model, 'label')->textInput(); ?>
 
 <?= $form->fieldSetEnd(); ?>

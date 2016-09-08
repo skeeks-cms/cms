@@ -37,9 +37,9 @@ class SignupForm extends Model
     public function attributeLabels()
     {
         return [
-            'username'      => \Yii::t('app','Login'),
-            'email'         => \Yii::t('app','Email'),
-            'password'      => \Yii::t('app','Password'),
+            'username'      => \Yii::t('skeeks/cms','Login'),
+            'email'         => \Yii::t('skeeks/cms','Email'),
+            'password'      => \Yii::t('skeeks/cms','Password'),
         ];
     }
 
@@ -66,13 +66,13 @@ class SignupForm extends Model
         return [
             ['username', 'filter', 'filter' => 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('app','This login is already in use by another user.')],
+            ['username', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('skeeks/cms','This login is already in use by another user.')],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('app', 'This Email is already in use by another user')],
+            ['email', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('skeeks/cms', 'This Email is already in use by another user')],
 
             //[['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value'],
 
@@ -131,7 +131,7 @@ class SignupForm extends Model
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                         ->setTo($user->email)
-                        ->setSubject(\Yii::t('app','Sign up at site') . \Yii::$app->cms->appName)
+                        ->setSubject(\Yii::t('skeeks/cms','Sign up at site') . \Yii::$app->cms->appName)
                         ->send();
 
                     return $user;
@@ -175,7 +175,7 @@ class SignupForm extends Model
                 return \Yii::$app->mailer->compose('@app/mail/password-reset-token', ['user' => $user])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
                     ->setTo($this->email)
-                    ->setSubject(\Yii::t('app','Password reset for ') . \Yii::$app->cms->appName)
+                    ->setSubject(\Yii::t('skeeks/cms','Password reset for ') . \Yii::$app->cms->appName)
                     ->send();
             }
         }

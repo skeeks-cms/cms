@@ -35,7 +35,7 @@ class PropertyTypeNumber extends PropertyType
 
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','Number');
+            $this->name = \Yii::t('skeeks/cms','Number');
         }
 
     }

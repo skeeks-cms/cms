@@ -16,11 +16,11 @@ class MysqlBugVersionCheck extends CheckComponent
 
     public function init()
     {
-        $this->name             = \Yii::t('app',"Version MySQL server");
-        $txt1 = \Yii::t('app','Known versions of MySQL with errors that prevent normal operation of the site:');
-        $txt2 = \Yii::t('app','incorrect method works {ex}, search does not work properly');
-        $txt3 = \Yii::t('app','Step auto_increment default is 2, requires 1');
-        $txt4 = \Yii::t('app','Update MySQL, if you have one of these versions.');
+        $this->name             = \Yii::t('skeeks/cms',"Version MySQL server");
+        $txt1 = \Yii::t('skeeks/cms','Known versions of MySQL with errors that prevent normal operation of the site:');
+        $txt2 = \Yii::t('skeeks/cms','incorrect method works {ex}, search does not work properly');
+        $txt3 = \Yii::t('skeeks/cms','Step auto_increment default is 2, requires 1');
+        $txt4 = \Yii::t('skeeks/cms','Update MySQL, if you have one of these versions.');
         $this->description      = <<<HTML
 <p>
 {$txt1}
@@ -32,8 +32,8 @@ class MysqlBugVersionCheck extends CheckComponent
 </p>
 HTML;
 ;
-        $this->errorText    = \Yii::t('app',"Error");
-        $this->successText  = \Yii::t('app',"Successfully");
+        $this->errorText    = \Yii::t('skeeks/cms',"Error");
+        $this->successText  = \Yii::t('skeeks/cms',"Successfully");
 
         parent::init();
     }
@@ -52,7 +52,7 @@ HTML;
 
 		if (version_compare($version, $MySql_vercheck_min,'<'))
         {
-            $this->addError(\Yii::t('app','MySQL installed version {cur}, {req} is required',['cur' => $version,'req' => $MySql_vercheck_min]));
+            $this->addError(\Yii::t('skeeks/cms','MySQL installed version {cur}, {req} is required',['cur' => $version,'req' => $MySql_vercheck_min]));
         }
 
 		if ($version == '4.1.21' // sorting
@@ -61,12 +61,12 @@ HTML;
 //			|| $ver == '5.1.66' // forum page navigation
 			)
         {
-            $this->addError(\Yii::t('app','Problem version of the database').": " . trim($founded["r"]));
+            $this->addError(\Yii::t('skeeks/cms','Problem version of the database').": " . trim($founded["r"]));
         }
 
         if (!$this->errorMessages)
         {
-            $this->addSuccess(\Yii::t('app','The current version of the database').": " . trim($founded["r"]));
+            $this->addSuccess(\Yii::t('skeeks/cms','The current version of the database').": " . trim($founded["r"]));
         }
 
 		return true;

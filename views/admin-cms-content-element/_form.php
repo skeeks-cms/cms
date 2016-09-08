@@ -41,7 +41,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
 <? endif; ?>
 
-<?= $form->fieldSet(\Yii::t('app','Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Main')); ?>
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
@@ -60,7 +60,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         </div>
     </div>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('app',"This parameter affects the address of the page")); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms',"This parameter affects the address of the page")); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <? if ($contentModel->parent_content_id) : ?>
@@ -72,7 +72,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
     <? if ($model->relatedProperties) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('app', 'Additional properties')
+            'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
         <? if ($properties = $model->relatedProperties) : ?>
             <? foreach ($properties as $property) : ?>
@@ -81,7 +81,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         <? endif; ?>
 
     <? else : ?>
-        <?/*= \Yii::t('app','Additional properties are not set')*/?>
+        <?/*= \Yii::t('skeeks/cms','Additional properties are not set')*/?>
     <? endif; ?>
 <?= $form->fieldSetEnd()?>
 
@@ -89,7 +89,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
-<?= $form->fieldSet(\Yii::t('app','Announcement')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Announcement')); ?>
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
     ); ?>
@@ -103,7 +103,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet(\Yii::t('app','In detal')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -118,7 +118,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet(\Yii::t('app','Sections')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Sections')); ?>
 
 
     <? if ($contentModel->root_tree_id) : ?>
@@ -142,12 +142,12 @@ use skeeks\cms\modules\admin\widgets\Pjax;
                 $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI;
             }
         ?>
-        <?= $form->field($model, 'treeIds')->label(\Yii::t('app','Sections of the site'))->widget(
+        <?= $form->field($model, 'treeIds')->label(\Yii::t('skeeks/cms','Sections of the site'))->widget(
             \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
             [
                 "attributeMulti" => "treeIds",
                 "mode" => $mode
-            ])->hint(\Yii::t('app','Specify sections of the site, which would like to see this publication'));
+            ])->hint(\Yii::t('skeeks/cms','Specify sections of the site, which would like to see this publication'));
         ?>
     <? endif; ?>
 
@@ -157,14 +157,14 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
-<?= $form->fieldSet(\Yii::t('app','SEO')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','SEO')); ?>
     <?= $form->field($model, 'meta_title')->textarea(); ?>
     <?= $form->field($model, 'meta_description')->textarea(); ?>
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
 
-<?= $form->fieldSet(\Yii::t('app','Images/Files')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Images/Files')); ?>
 
     <?= $form->field($model, 'images')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -178,14 +178,14 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 <? if (!$model->isNewRecord) : ?>
-    <?/*= $form->fieldSet(\Yii::t('app','Additionally')); */?><!--
+    <?/*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')); */?><!--
         <?/*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */?>
         <?/*= $form->fieldInputInt($model, 'priority'); */?>
 
     --><?/*= $form->fieldSetEnd() */?>
 
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
-        <?= $form->fieldSet(\Yii::t('app','Access')); ?>
+        <?= $form->fieldSet(\Yii::t('skeeks/cms','Access')); ?>
             <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
                 'permissionName'                => $model->permissionName,
                 'permissionDescription'         => 'Доступ к этому элементу: ' . $model->name,
@@ -213,7 +213,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
                     [
                         'class' => 'alert-warning'
                     ],
-                    'body' => \Yii::t('app', 'Management will be available after saving')
+                    'body' => \Yii::t('skeeks/cms', 'Management will be available after saving')
                 ]); ?>
             <? else:  ?>
                 <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([

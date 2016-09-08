@@ -18,7 +18,7 @@ class MailBigCheck extends MailCheck
     public function init()
     {
         parent::init();
-        $this->name             = \Yii::t('app',"Sending e-mail messages larger than 64 KB (function {mail})",['mail' => 'mail']);
+        $this->name             = \Yii::t('skeeks/cms',"Sending e-mail messages larger than 64 KB (function {mail})",['mail' => 'mail']);
 
     }
 
@@ -28,7 +28,7 @@ class MailBigCheck extends MailCheck
 		$str = file_get_contents(__FILE__);
         if (!$str)
         {
-            $this->addError(\Yii::t('app','Unable to retrieve the contents of the file').": " . __FILE__);
+            $this->addError(\Yii::t('skeeks/cms','Unable to retrieve the contents of the file').": " . __FILE__);
         }
 
         $body = str_repeat($str, 10);
@@ -41,15 +41,15 @@ class MailBigCheck extends MailCheck
 		{
 			if ($time > 1)
             {
-                $this->addError(\Yii::t('app','Sent. Dispatch time: {s} sec.',['s' => $time]));
+                $this->addError(\Yii::t('skeeks/cms','Sent. Dispatch time: {s} sec.',['s' => $time]));
             } else
             {
-                $this->addSuccess(\Yii::t('app','Sent. Dispatch time: {s} sec.',['s' => $time]));
+                $this->addSuccess(\Yii::t('skeeks/cms','Sent. Dispatch time: {s} sec.',['s' => $time]));
             }
 		}
 		else
         {
-            $this->addError(\Yii::t('app',"The letter has not been sent."));
+            $this->addError(\Yii::t('skeeks/cms',"The letter has not been sent."));
         }
 
 		return true;

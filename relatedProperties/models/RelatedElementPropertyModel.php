@@ -39,17 +39,17 @@ abstract class RelatedElementPropertyModel extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'property_id' => Yii::t('app', 'Property ID'),
-            'element_id' => Yii::t('app', 'Element ID'),
-            'value' => Yii::t('app', 'Value'),
-            'value_enum' => Yii::t('app', 'Value Enum'),
-            'value_num' => Yii::t('app', 'Value Num'),
-            'description' => Yii::t('app', 'Description'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'property_id' => Yii::t('skeeks/cms', 'Property ID'),
+            'element_id' => Yii::t('skeeks/cms', 'Element ID'),
+            'value' => Yii::t('skeeks/cms', 'Value'),
+            'value_enum' => Yii::t('skeeks/cms', 'Value Enum'),
+            'value_num' => Yii::t('skeeks/cms', 'Value Num'),
+            'description' => Yii::t('skeeks/cms', 'Description'),
         ]);
     }
 

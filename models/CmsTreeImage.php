@@ -37,7 +37,7 @@ class CmsTreeImage extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'storage_file_id', 'tree_id', 'priority'], 'integer'],
             [['storage_file_id', 'tree_id'], 'required'],
-            [['storage_file_id', 'tree_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'tree_id'], 'message' => \Yii::t('app','The combination of Storage File ID and Tree ID has already been taken.')]
+            [['storage_file_id', 'tree_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'tree_id'], 'message' => \Yii::t('skeeks/cms','The combination of Storage File ID and Tree ID has already been taken.')]
         ];
     }
 
@@ -47,14 +47,14 @@ class CmsTreeImage extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'storage_file_id' => Yii::t('app', 'Storage File ID'),
-            'tree_id' => Yii::t('app', 'Tree ID'),
-            'priority' => Yii::t('app', 'Priority'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'storage_file_id' => Yii::t('skeeks/cms', 'Storage File ID'),
+            'tree_id' => Yii::t('skeeks/cms', 'Tree ID'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
         ];
     }
 

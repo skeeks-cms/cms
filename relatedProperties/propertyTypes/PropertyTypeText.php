@@ -31,9 +31,9 @@ class PropertyTypeText extends PropertyType
     static public function fieldElements()
     {
         return [
-            'textarea'      => \Yii::t('app','Text field').' (textarea)',
-            'textInput'     => \Yii::t('app','Text string').' (input)',
-            'hiddenInput'   => \Yii::t('app','Скрытое поле').' (hiddenInput)',
+            'textarea'      => \Yii::t('skeeks/cms','Text field').' (textarea)',
+            'textInput'     => \Yii::t('skeeks/cms','Text string').' (input)',
+            'hiddenInput'   => \Yii::t('skeeks/cms','Скрытое поле').' (hiddenInput)',
         ];
     }
 
@@ -43,7 +43,7 @@ class PropertyTypeText extends PropertyType
 
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','Text');
+            $this->name = \Yii::t('skeeks/cms','Text');
         }
     }
 
@@ -51,8 +51,8 @@ class PropertyTypeText extends PropertyType
     {
         return array_merge(parent::attributeLabels(),
         [
-            'fieldElement'  => \Yii::t('app','Element form'),
-            'rows'          => \Yii::t('app','The number of lines of the text field')
+            'fieldElement'  => \Yii::t('skeeks/cms','Element form'),
+            'rows'          => \Yii::t('skeeks/cms','The number of lines of the text field')
         ]);
     }
 

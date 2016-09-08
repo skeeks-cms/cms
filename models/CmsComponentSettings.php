@@ -73,14 +73,14 @@ class CmsComponentSettings extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'            => Yii::t('app', 'ID'),
-            'value'         => Yii::t('app', 'Value'),
-            'component'     => Yii::t('app', 'Component'),
+            'id'            => Yii::t('skeeks/cms', 'ID'),
+            'value'         => Yii::t('skeeks/cms', 'Value'),
+            'component'     => Yii::t('skeeks/cms', 'Component'),
 
-            'site_code' => Yii::t('app', 'Site Code'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'lang_code' => Yii::t('app', 'Lang Code'),
-            'namespace' => Yii::t('app', 'Namespace'),
+            'site_code' => Yii::t('skeeks/cms', 'Site Code'),
+            'user_id' => Yii::t('skeeks/cms', 'User ID'),
+            'lang_code' => Yii::t('skeeks/cms', 'Lang Code'),
+            'namespace' => Yii::t('skeeks/cms', 'Namespace'),
         ]);
     }
 

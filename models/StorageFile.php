@@ -68,7 +68,7 @@ class StorageFile extends Core
             [['cluster_file', 'original_name', 'name'], 'string', 'max' => 255],
             [['cluster_id', 'mime_type', 'extension'], 'string', 'max' => 16],
             [['name_to_save'], 'string', 'max' => 32],
-            [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => Yii::t('app','The combination of Cluster ID and Cluster Src has already been taken.')],
+            [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => Yii::t('skeeks/cms','The combination of Cluster ID and Cluster Src has already been taken.')],
         ]);
     }
 
@@ -78,23 +78,23 @@ class StorageFile extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'cluster_id' => Yii::t('app', 'Storage'),
-            'cluster_file' => Yii::t('app', 'Cluster File'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'size' => Yii::t('app', 'File Size'),
-            'mime_type' => Yii::t('app', 'File Type'),
-            'extension' => Yii::t('app', 'Extension'),
-            'original_name' => Yii::t('app', 'Original FileName'),
-            'name_to_save' => Yii::t('app', 'Name To Save'),
-            'name' => Yii::t('app', 'Name'),
-            'description_short' => Yii::t('app', 'Description Short'),
-            'description_full' => Yii::t('app', 'Description Full'),
-            'image_height' => Yii::t('app', 'Image Height'),
-            'image_width' => Yii::t('app', 'Image Width'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'cluster_id' => Yii::t('skeeks/cms', 'Storage'),
+            'cluster_file' => Yii::t('skeeks/cms', 'Cluster File'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'size' => Yii::t('skeeks/cms', 'File Size'),
+            'mime_type' => Yii::t('skeeks/cms', 'File Type'),
+            'extension' => Yii::t('skeeks/cms', 'Extension'),
+            'original_name' => Yii::t('skeeks/cms', 'Original FileName'),
+            'name_to_save' => Yii::t('skeeks/cms', 'Name To Save'),
+            'name' => Yii::t('skeeks/cms', 'Name'),
+            'description_short' => Yii::t('skeeks/cms', 'Description Short'),
+            'description_full' => Yii::t('skeeks/cms', 'Description Full'),
+            'image_height' => Yii::t('skeeks/cms', 'Image Height'),
+            'image_width' => Yii::t('skeeks/cms', 'Image Width'),
         ]);
     }
 

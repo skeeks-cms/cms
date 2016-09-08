@@ -56,7 +56,7 @@ class AdminCmsTreeTypeController extends AdminModelEditorController
 
                         [
                             'class'         => DataColumn::className(),
-                            'label'         => \Yii::t('app', 'Number of sections'),
+                            'label'         => \Yii::t('skeeks/cms', 'Number of sections'),
                             'value'     => function(CmsTreeType $cmsTreeType)
                             {
                                 return $cmsTreeType->getCmsTrees()->count();

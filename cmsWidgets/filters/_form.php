@@ -10,21 +10,21 @@
 /* @var $model \skeeks\cms\shop\cmsWidgets\filters\ShopProductFiltersWidget */
 
 ?>
-<?= $form->fieldSet(\Yii::t('app', 'Showing')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Showing')); ?>
     <?= $form->field($model, 'viewFile')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('app', 'Data source')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Data source')); ?>
     <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
 
     <?/*= $form->fieldSelectMulti($model, 'searchModelAttributes', [
-        'image' => \Yii::t('app', 'Filter by photo'),
-        'hasQuantity' => \Yii::t('app', 'Filter by availability')
+        'image' => \Yii::t('skeeks/cms', 'Filter by photo'),
+        'hasQuantity' => \Yii::t('skeeks/cms', 'Filter by availability')
     ]); */?>
 
     <?/*= $form->field($model, 'searchModelAttributes')->dropDownList([
-        'image' => \Yii::t('app', 'Filter by photo'),
-        'hasQuantity' => \Yii::t('app', 'Filter by availability')
+        'image' => \Yii::t('skeeks/cms', 'Filter by photo'),
+        'hasQuantity' => \Yii::t('skeeks/cms', 'Filter by availability')
     ], [
 'multiple' => true,
 'size' => 4

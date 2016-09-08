@@ -58,7 +58,7 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'tree_type_id' => Yii::t('app', "Linked To Section's Type"),
+            'tree_type_id' => Yii::t('skeeks/cms', "Linked To Section's Type"),
         ]);
     }
 
@@ -71,7 +71,7 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
         return array_merge(parent::rules(), [
             [['tree_type_id'], 'integer'],
             //[['code'], 'unique'],
-            [['code', 'tree_type_id'], 'unique', 'targetAttribute' => ['tree_type_id', 'code'], 'message' => \Yii::t('app',"For this section's type of the code is already in use.")],
+            [['code', 'tree_type_id'], 'unique', 'targetAttribute' => ['tree_type_id', 'code'], 'message' => \Yii::t('skeeks/cms',"For this section's type of the code is already in use.")],
         ]);
     }
 }

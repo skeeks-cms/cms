@@ -103,9 +103,9 @@ class ContentElementFiltersWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
         [
-            'content_id'                => \Yii::t('app', 'Content'),
-            'searchModelAttributes'     => \Yii::t('app', 'Fields'),
-            'realatedProperties'        => \Yii::t('app', 'Properties'),
+            'content_id'                => \Yii::t('skeeks/cms', 'Content'),
+            'searchModelAttributes'     => \Yii::t('skeeks/cms', 'Fields'),
+            'realatedProperties'        => \Yii::t('skeeks/cms', 'Properties'),
         ]);
     }
 

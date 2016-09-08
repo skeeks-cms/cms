@@ -12,7 +12,7 @@ use yii\helpers\Html;
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit as ActiveForm;
 use \skeeks\cms\helpers\UrlHelper;
 
-$this->title = \Yii::t('app','Request for password recovery');
+$this->title = \Yii::t('skeeks/cms','Request for password recovery');
 \Yii::$app->breadcrumbs->createBase()->append($this->title);
 ?>
 <div class="row">
@@ -29,12 +29,12 @@ $this->title = \Yii::t('app','Request for password recovery');
                         <?= $form->field($model, 'identifier') ?>
 
                         <div class="form-group">
-                            <?= Html::submitButton(\Yii::t('app',"Send"), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                            <?= Html::submitButton(\Yii::t('skeeks/cms',"Send"), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                         </div>
 
                     <?php ActiveForm::end(); ?>
-                    <?= Html::a(\Yii::t('app','Authorization'), UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?> |
-                    <?= Html::a(\Yii::t('app','Registration'), UrlHelper::constructCurrent()->setRoute('cms/auth/register')->toString()) ?>
+                    <?= Html::a(\Yii::t('skeeks/cms','Authorization'), UrlHelper::constructCurrent()->setRoute('cms/auth/login')->toString()) ?> |
+                    <?= Html::a(\Yii::t('skeeks/cms','Registration'), UrlHelper::constructCurrent()->setRoute('cms/auth/register')->toString()) ?>
                 </div>
 
                 <div class="col-lg-3">

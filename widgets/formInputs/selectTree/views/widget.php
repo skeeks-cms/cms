@@ -19,10 +19,10 @@ $idSmartFrame = $id . "-smart-frame";
     <p>
         <? if ($widget->mode == SelectTree::MOD_COMBO) : ?>
 
-        <small><?=\Yii::t('app','Circle — the main section (you can choose one section, it will affect the construction of bread crumbs)')?></small><br />
-        <small><?=\Yii::t('app','The square - an additional section (you can mark several additional sections)')?></small>
+        <small><?=\Yii::t('skeeks/cms','Circle — the main section (you can choose one section, it will affect the construction of bread crumbs)')?></small><br />
+        <small><?=\Yii::t('skeeks/cms','The square - an additional section (you can mark several additional sections)')?></small>
         <? elseif($widget->mode == SelectTree::MOD_MULTI) : ?>
-            <small><?=\Yii::t('app','The square - an additional section (you can mark several additional sections)')?></small>
+            <small><?=\Yii::t('skeeks/cms','The square - an additional section (you can mark several additional sections)')?></small>
         <? endif; ?>
     </p>
     <iframe data-src="<?= $src; ?>" width="100%;" height="200px;" id="sx-test"></iframe>

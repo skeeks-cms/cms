@@ -35,7 +35,7 @@ class UserPropertyTypeDate extends PropertyType
 
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','Datetime');
+            $this->name = \Yii::t('skeeks/cms','Datetime');
         }
 
     }
@@ -43,8 +43,8 @@ class UserPropertyTypeDate extends PropertyType
     public static function types()
     {
         return [
-            \kartik\datecontrol\DateControl::FORMAT_DATETIME => \Yii::t('app','Datetime'),
-            \kartik\datecontrol\DateControl::FORMAT_DATE => \Yii::t('app','Only date'),
+            \kartik\datecontrol\DateControl::FORMAT_DATETIME => \Yii::t('skeeks/cms','Datetime'),
+            \kartik\datecontrol\DateControl::FORMAT_DATE => \Yii::t('skeeks/cms','Only date'),
             //\kartik\datecontrol\DateControl::FORMAT_TIME => 'Только время',
         ];
     }

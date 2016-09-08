@@ -40,13 +40,13 @@ class CmsContentElementTree extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'element_id' => Yii::t('app', 'Element ID'),
-            'tree_id' => Yii::t('app', 'Tree ID'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'element_id' => Yii::t('skeeks/cms', 'Element ID'),
+            'tree_id' => Yii::t('skeeks/cms', 'Tree ID'),
         ]);
     }
 
@@ -58,7 +58,7 @@ class CmsContentElementTree extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'element_id', 'tree_id'], 'integer'],
             [['element_id', 'tree_id'], 'required'],
-            [['element_id', 'tree_id'], 'unique', 'targetAttribute' => ['element_id', 'tree_id'], 'message' => \Yii::t('app','The combination of Element ID and Tree ID has already been taken.')]
+            [['element_id', 'tree_id'], 'unique', 'targetAttribute' => ['element_id', 'tree_id'], 'message' => \Yii::t('skeeks/cms','The combination of Element ID and Tree ID has already been taken.')]
         ]);
     }
 

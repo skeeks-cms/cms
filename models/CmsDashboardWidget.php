@@ -74,16 +74,16 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'cms_dashboard_id' => Yii::t('app', 'Cms Dashboard ID'),
-            'priority' => Yii::t('app', 'Priority'),
-            'component' => Yii::t('app', 'Component'),
-            'component_settings' => Yii::t('app', 'Component Settings'),
-            'cms_dashboard_column' => Yii::t('app', 'cms_dashboard_column'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'created_by' => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
+            'cms_dashboard_id' => Yii::t('skeeks/cms', 'Cms Dashboard ID'),
+            'priority' => Yii::t('skeeks/cms', 'Priority'),
+            'component' => Yii::t('skeeks/cms', 'Component'),
+            'component_settings' => Yii::t('skeeks/cms', 'Component Settings'),
+            'cms_dashboard_column' => Yii::t('skeeks/cms', 'cms_dashboard_column'),
         ];
     }
 

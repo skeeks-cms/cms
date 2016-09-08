@@ -154,12 +154,12 @@ class User
     {
         if (in_array($this->username, static::getProtectedUsernames()))
         {
-            throw new Exception(\Yii::t('app','This user can not be removed'));
+            throw new Exception(\Yii::t('skeeks/cms','This user can not be removed'));
         }
 
         if ($this->id == \Yii::$app->user->identity->id)
         {
-            throw new Exception(\Yii::t('app','You can not delete yourself'));
+            throw new Exception(\Yii::t('skeeks/cms','You can not delete yourself'));
         }
     }
 
@@ -258,25 +258,25 @@ class User
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'username' => Yii::t('app', 'Login'),
-            'auth_key' => Yii::t('app', 'Auth Key'),
-            'password_hash' => Yii::t('app', 'Password Hash'),
-            'password_reset_token' => Yii::t('app', 'Password Reset Token'),
-            'email' => Yii::t('app', 'Email'),
-            'phone' => Yii::t('app', 'Phone'),
-            'active' => Yii::t('app', 'Active'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'username' => Yii::t('skeeks/cms', 'Login'),
+            'auth_key' => Yii::t('skeeks/cms', 'Auth Key'),
+            'password_hash' => Yii::t('skeeks/cms', 'Password Hash'),
+            'password_reset_token' => Yii::t('skeeks/cms', 'Password Reset Token'),
+            'email' => Yii::t('skeeks/cms', 'Email'),
+            'phone' => Yii::t('skeeks/cms', 'Phone'),
+            'active' => Yii::t('skeeks/cms', 'Active'),
+            'created_at' => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
             'name' => \Yii::t('skeeks/cms/user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
-            'gender' => Yii::t('app', 'Gender'),
-            'logged_at' => Yii::t('app', 'Logged At'),
-            'last_activity_at' => Yii::t('app', 'Last Activity At'),
-            'last_admin_activity_at' => Yii::t('app', 'Last Activity In The Admin At'),
-            'image_id' => Yii::t('app', 'Image'),
-            'roleNames' => Yii::t('app', 'Группы'),
-            'email_is_approved' => Yii::t('app', 'Email is approved'),
-            'phone_is_approved' => Yii::t('app', 'Phone is approved'),
+            'gender' => Yii::t('skeeks/cms', 'Gender'),
+            'logged_at' => Yii::t('skeeks/cms', 'Logged At'),
+            'last_activity_at' => Yii::t('skeeks/cms', 'Last Activity At'),
+            'last_admin_activity_at' => Yii::t('skeeks/cms', 'Last Activity In The Admin At'),
+            'image_id' => Yii::t('skeeks/cms', 'Image'),
+            'roleNames' => Yii::t('skeeks/cms', 'Группы'),
+            'email_is_approved' => Yii::t('skeeks/cms', 'Email is approved'),
+            'phone_is_approved' => Yii::t('skeeks/cms', 'Phone is approved'),
         ];
     }
 
@@ -435,7 +435,7 @@ class User
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException(\Yii::t('app','"findIdentityByAccessToken" is not implemented.'));
+        throw new NotSupportedException(\Yii::t('skeeks/cms','"findIdentityByAccessToken" is not implemented.'));
     }
 
     /**

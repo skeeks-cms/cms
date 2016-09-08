@@ -42,7 +42,7 @@ class ComponentSettingsWidget extends InputWidget
 
         if(!$this->buttonText)
         {
-            $this->buttonText = \Yii::t('app','Setting property');
+            $this->buttonText = \Yii::t('skeeks/cms','Setting property');
         }
     }
 

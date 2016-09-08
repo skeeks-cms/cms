@@ -21,7 +21,7 @@ CSS
 <div class="sx-image-controll">
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\Yii::t('app','Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Main')); ?>
     <? if ($model->isImage()) : ?>
         <div class="sx-image">
             <img src="<?= $model->src; ?>" />
@@ -30,15 +30,15 @@ CSS
     <div class="">
 
     </div>
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255])->hint(\Yii::t('app','This name is usually needed for SEO, so that the file was found in the search engines')) ?>
-    <?= $form->field($model, 'name_to_save')->textInput(['maxlength' => 255])->hint(\Yii::t('app','Filename, when someone will be download it.')) ?>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms','This name is usually needed for SEO, so that the file was found in the search engines')) ?>
+    <?= $form->field($model, 'name_to_save')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms','Filename, when someone will be download it.')) ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 
 
 
-<?= $form->fieldSet(\Yii::t('app','Description')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Description')); ?>
 
     <?= $form->field($model, 'description_full')->widget(
         \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
@@ -62,12 +62,12 @@ CSS
 
 
 
-<?= $form->fieldSet(\Yii::t('app','Additional Information')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Additional Information')); ?>
 
     <?= $form->field($model, 'original_name')->textInput([
         'maxlength' => 255,
         'disabled' => 'disabled'
-    ])->hint(\Yii::t('app','Filename at upload time to the site')) ?>
+    ])->hint(\Yii::t('skeeks/cms','Filename at upload time to the site')) ?>
 
 
     <div class="form-group field-storagefile-mime_type">
@@ -86,7 +86,7 @@ CSS
     <?= $form->field($model, 'mime_type')->textInput([
         'maxlength' => 255,
         'disabled' => 'disabled'
-    ])->hint('Internet Media Types — ' . \Yii::t('app','types of data which can be transmitted via the Internet using standard MIME.')); ?>
+    ])->hint('Internet Media Types — ' . \Yii::t('skeeks/cms','types of data which can be transmitted via the Internet using standard MIME.')); ?>
 
     <?= $form->field($model, 'extension')->textInput([
         'maxlength' => 255,
@@ -120,12 +120,12 @@ CSS
 
 
 <? if ($model->isImage()) : ?>
-    <?= $form->fieldSet(\Yii::t('app','Thumbnails')); ?>
-        <p><?=\Yii::t('app','This is an image in different places of the site displayed in different sizes.')?></p>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Thumbnails')); ?>
+        <p><?=\Yii::t('skeeks/cms','This is an image in different places of the site displayed in different sizes.')?></p>
 
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\Yii::t('app','Image editor')); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Image editor')); ?>
 
     <?= $form->fieldSetEnd(); ?>
 <? endif; ?>

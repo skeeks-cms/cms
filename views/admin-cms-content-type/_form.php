@@ -13,16 +13,16 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet(\Yii::t('app','General information'))?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','General information'))?>
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput(); ?>
     <?= $form->fieldInputInt($model, 'priority')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('app','Content'))?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Content'))?>
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => \Yii::t('app',"Content"),
+        'label'             => \Yii::t('skeeks/cms',"Content"),
         'hint'              => "",
         'parentModel'       => $model,
         'relation'          => [

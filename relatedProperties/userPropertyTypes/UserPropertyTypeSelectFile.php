@@ -26,7 +26,7 @@ class UserPropertyTypeSelectFile extends PropertyType
 
         if(!$this->name)
         {
-            $this->name = \Yii::t('app','Standard file selection');
+            $this->name = \Yii::t('skeeks/cms','Standard file selection');
         }
     }
 
@@ -34,7 +34,7 @@ class UserPropertyTypeSelectFile extends PropertyType
     {
         return array_merge(parent::attributeLabels(),
         [
-            'type'  => \Yii::t('app','Type'),
+            'type'  => \Yii::t('skeeks/cms','Type'),
         ]);
     }
 

@@ -230,7 +230,7 @@ class RelatedPropertiesModel extends DynamicModel
             $this->$name = $value;
         } else
         {
-            throw new InvalidParamException(get_class($this) . ' '.\Yii::t('app','has no attribute named "{name}".',['name' => $name]));
+            throw new InvalidParamException(get_class($this) . ' '.\Yii::t('skeeks/cms','has no attribute named "{name}".',['name' => $name]));
         }
     }
 
