@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.0.2.pre
+3.0.2
 -----------------
  * UrlManager configuration for the console application
  * i18n logs
