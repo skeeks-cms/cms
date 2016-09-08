@@ -74,11 +74,6 @@ class AdminTreeController extends AdminModelEditorController
 
         unset($actions['create']);
 
-        if (isset($actions['related-properties']))
-        {
-            unset($actions['related-properties']);
-        }
-
         return $actions;
     }
 

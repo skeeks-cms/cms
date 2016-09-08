@@ -107,11 +107,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ]
         );
 
-        if (isset($actions['related-properties']))
-        {
-            unset($actions['related-properties']);
-        }
-
         return $actions;
     }
 

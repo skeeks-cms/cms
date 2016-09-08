@@ -235,31 +235,4 @@ abstract class RelatedPropertyModel extends Core
 
         return $this;
     }
-    /**
-     * @return array
-     */
-    /*public function rulesForActiveForm()
-    {
-        $result = [];
-
-        $rules = [];
-
-        if ($this->is_required == Cms::BOOL_Y)
-        {
-            $rules = ['required'];
-        }
-
-        if ((array) $rules)
-        {
-            foreach ((array) $rules as $ruleCode)
-            {
-                $result[] = [[$this->code], $ruleCode];
-            }
-        } else
-        {
-            $result[] = [[$this->code], 'safe'];
-        }
-
-        return $result;
-    }*/
 }

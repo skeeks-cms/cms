@@ -80,12 +80,6 @@ class AdminProfileController extends AdminModelEditorController
         unset($actions['delete']);
         unset($actions['create']);
         unset($actions['index']);
-        if (isset($actions['related-properties']))
-        {
-            unset($actions['related-properties']);
-        }
-
-
         return $actions;
     }
 
