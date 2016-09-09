@@ -53,8 +53,6 @@ use yii\widgets\ActiveForm;
  */
 abstract class RelatedPropertyModel extends Core
 {
-    const SCENARIO_UPDATE_CONFIG = "updateConfig";
-
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
@@ -70,41 +68,19 @@ abstract class RelatedPropertyModel extends Core
     {
         parent::init();
 
-        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT,    [$this, "processBeforeSave"]);
-        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE,    [$this, "processBeforeSave"]);
-    }
-
-    public function scenarios()
-    {
-        $scenarios                                  = parent::scenarios();
-        $scenarios[static::SCENARIO_UPDATE_CONFIG]  = $scenarios[static::SCENARIO_DEFAULT];
-
-        return $scenarios;
+        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "processBeforeSave"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "processBeforeSave"]);
     }
 
     public function processBeforeSave()
     {
-        if ($this->component)
+        if ($handler = $this->handler)
         {
-            if ($this->scenario == static::SCENARIO_UPDATE_CONFIG)
-            {
-                $this->component_settings = unserialize(StringHelper::base64DecodeUrl($this->component_settings));
-
-                /**
-                 * @var $propertyType PropertyType
-                 */
-                $propertyTypeClassName      = $this->component;
-                $propertyType               = new $propertyTypeClassName();
-                $propertyType->attributes   = $this->component_settings;
-                $propertyType->initInstance();
-
-                $this->property_type    = $propertyType->code;
-                $this->multiple         = $propertyType->multiple;
-
-                $this->component_settings = serialize($this->component_settings);
-            }
+            $this->property_type    = $handler->code;
+            $this->multiple         = $handler->multiple;
         }
     }
+
 
     /**
      * @inheritdoc
@@ -185,12 +161,18 @@ abstract class RelatedPropertyModel extends Core
      */
     public function renderActiveForm(ActiveForm $activeForm, $model)
     {
-        if (!$propertyType = $this->createPropertyType($activeForm, $model))
+        $handler = $this->handler;
+
+        if ($handler)
+        {
+            $handler->model = $model;
+            $handler->activeForm = $activeForm;
+        } else
         {
             return false;
         }
 
-        return $propertyType->renderForActiveForm();
+        return $handler->renderForActiveForm();
     }
 
     /**
@@ -221,21 +203,6 @@ abstract class RelatedPropertyModel extends Core
         return null;
     }
 
-    /**
-     * TODO: > is @deprecated 3.0.2
-     * @return PropertyType
-     */
-    public function createPropertyType(ActiveForm $activeForm = null, $model = null)
-    {
-        $handler = $this->handler;
-        if ($handler)
-        {
-            $handler->model = $model;
-            $handler->activeForm = $activeForm;
-        }
-
-        return $handler;
-    }
 
 
     /**
@@ -245,6 +212,11 @@ abstract class RelatedPropertyModel extends Core
      */
     public function addRulesToDynamicModel(DynamicModel $dynamicModel)
     {
+        if ($this->is_required == Cms::BOOL_Y)
+        {
+            $dynamicModel->addRule($this->code, 'required');
+        }
+
         if ($this->is_required == Cms::BOOL_Y)
         {
             $dynamicModel->addRule($this->code, 'required');

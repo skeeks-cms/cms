@@ -47,7 +47,6 @@ class RelatedPropertiesModel extends DynamicModel
         {
             foreach ($this->relatedElementModel->relatedProperties as $property)
             {
-                //TODO: default value
                 $this->defineAttribute($property->code, $property->multiple == "Y" ? [] : null );
                 $property->addRulesToDynamicModel($this);
                 $this->_properties[$property->code] = $property;
@@ -164,6 +163,55 @@ class RelatedPropertiesModel extends DynamicModel
         }
 
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function attributeHints()
+    {
+        $result = [];
+
+        foreach ($this->relatedElementModel->relatedProperties as $property)
+        {
+            $result[$property->code] = $property->hint;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Loads default values from database table schema
+     *
+     * You may call this method to load default values after creating a new instance:
+     *
+     * ```php
+     * // class Customer extends \yii\db\ActiveRecord
+     * $customer = new Customer();
+     * $customer->loadDefaultValues();
+     * ```
+     *
+     * @param boolean $skipIfSet whether existing value should be preserved.
+     * This will only set defaults for attributes that are `null`.
+     * @return $this the model instance itself.
+     */
+    public function loadDefaultValues($skipIfSet = true)
+    {
+        foreach ($this->relatedElementModel->relatedProperties as $property)
+        {
+            if ((!$skipIfSet || $this->{$column->name} === null)) {
+                //$this->{$column->name} = $column->defaultValue;
+            }
+        }
+
+        return $this;
+
+        /*foreach (static::getTableSchema()->columns as $column) {
+            if ($column->defaultValue !== null && (!$skipIfSet || $this->{$column->name} === null)) {
+                $this->{$column->name} = $column->defaultValue;
+            }
+        }
+        return $this;*/
     }
 
     /**

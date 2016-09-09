@@ -411,7 +411,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                     if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
                     {
-                        $propertyType = $property->createPropertyType();
+                        $propertyType = $property->handler;
                             $options = \skeeks\cms\models\CmsContentElement::find()->active()->andWhere([
                                 'content_id' => $propertyType->content_id
                             ])->all();

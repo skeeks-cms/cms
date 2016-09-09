@@ -173,7 +173,7 @@ class ContentElementFiltersWidget extends WidgetRenderable
 
         if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
         {
-            $propertyType = $property->createPropertyType();
+            $propertyType = $property->handler;
 
             if ($this->elementIds)
             {
