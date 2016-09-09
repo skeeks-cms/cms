@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
@@ -38,6 +39,7 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
 use Yii;
 use yii\base\Component;
 use yii\base\Event;
+use yii\base\InvalidParamException;
 use yii\base\Theme;
 use yii\console\Application;
 use yii\db\Exception;
@@ -58,6 +60,8 @@ use yii\widgets\ActiveForm;
  * @property \skeeks\cms\modules\admin\Module   $moduleAdmin
  * @property \skeeks\cms\Module                 $moduleCms
  * @property CmsLang                            $cmsLanguage
+ * @property PropertyType[]                     $relatedHandlers
+ * @property array                              $relatedHandlersDataForSelect
  *
  * @package skeeks\cms\components
  */
@@ -98,12 +102,6 @@ class Cms extends \skeeks\cms\base\Component
      * @var string Это изображение показывается в тех случаях, когда не найдено основное.
      */
     public $noImageUrl;
-
-    /**
-     * @var array
-     */
-    public $relatedProperies       = [];
-
 
     //После регистрации пользователю будут присвоены эти роли
     public $registerRoles                   = [
@@ -191,6 +189,52 @@ class Cms extends \skeeks\cms\base\Component
 
         } else
         {
+            $this->relatedHandlers = ArrayHelper::merge([
+                PropertyTypeText::className() =>
+                [
+                    'class' => PropertyTypeText::className()
+                ],
+                PropertyTypeNumber::className() =>
+                [
+                    'class' => PropertyTypeNumber::className()
+                ],
+                PropertyTypeList::className() =>
+                [
+                    'class' => PropertyTypeList::className()
+                ],
+                PropertyTypeFile::className() =>
+                [
+                    'class' => PropertyTypeFile::className()
+                ],
+                PropertyTypeTree::className() =>
+                [
+                    'class' => PropertyTypeTree::className()
+                ],
+                PropertyTypeElement::className() =>
+                [
+                    'class' => PropertyTypeElement::className()
+                ],
+
+
+                UserPropertyTypeDate::className() =>
+                [
+                    'class' => UserPropertyTypeDate::className()
+                ],
+                UserPropertyTypeComboText::className() =>
+                [
+                    'class' => UserPropertyTypeComboText::className()
+                ],
+                UserPropertyTypeColor::className() =>
+                [
+                    'class' => UserPropertyTypeColor::className()
+                ],
+                UserPropertyTypeSelectFile::className() =>
+                [
+                    'class' => UserPropertyTypeSelectFile::className()
+                ],
+
+            ], $this->relatedHandlers);
+
             //web init
             if (!$this->noImageUrl)
             {
@@ -393,55 +437,7 @@ class Cms extends \skeeks\cms\base\Component
     }
 
 
-    /**
-     * Базовые типы свойств
-     * @return array
-     */
-    public function basePropertyTypes()
-    {
-        return [
-            PropertyTypeText::className()           => (new PropertyTypeText)->name,
-            PropertyTypeNumber::className()         => (new PropertyTypeNumber)->name,
-            PropertyTypeList::className()           => (new PropertyTypeList)->name,
-            PropertyTypeFile::className()           => (new PropertyTypeFile)->name,
-            PropertyTypeTree::className()           => (new PropertyTypeTree)->name,
-            PropertyTypeElement::className()        => (new PropertyTypeElement)->name,
-        ];
-    }
 
-    /**
-     * Пользовательские типы свойств.
-     * @return array
-     */
-    public function userPropertyTypes()
-    {
-        $fromConfig = [];
-
-        if ((array) $this->relatedProperies)
-        {
-            foreach ((array) $this->relatedProperies as $userPropertyClass)
-            {
-                //TODO: добавить проверки
-                $fromConfig[$userPropertyClass] = (new $userPropertyClass)->name;
-            }
-        }
-
-        return (array) ArrayHelper::merge([
-            UserPropertyTypeDate::className() => (new UserPropertyTypeDate())->name,
-            UserPropertyTypeComboText::className() => (new UserPropertyTypeComboText())->name,
-            UserPropertyTypeColor::className() => (new UserPropertyTypeColor())->name,
-            UserPropertyTypeSelectFile::className() => (new UserPropertyTypeSelectFile())->name
-        ], (array) $fromConfig);
-    }
-
-    /**
-     * Все типы свойств
-     * @return array
-     */
-    public function allPropertyTypes()
-    {
-        return array_merge($this->basePropertyTypes(), $this->userPropertyTypes());
-    }
 
     /**
      * @return array|null|CmsLang
@@ -449,5 +445,97 @@ class Cms extends \skeeks\cms\base\Component
     public function getCmsLanguage()
     {
         return CmsLang::find()->where(['code' => \Yii::$app->language])->one();
+    }
+
+    /**
+     * @return array
+     */
+    public function getRelatedHandlersDataForSelect()
+    {
+        $baseTypes = [];
+        $userTypes = [];
+        if ($this->relatedHandlers)
+        {
+            foreach ($this->relatedHandlers as $id => $handler)
+            {
+                if ($handler instanceof PropertyTypeText || $handler instanceof PropertyTypeNumber || $handler instanceof PropertyTypeList
+                    || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement)
+                {
+                    $baseTypes[$handler->id] = $handler->name;
+                } else
+                {
+                    $userTypes[$handler->id] = $handler->name;
+                }
+            }
+        }
+
+        return [
+            \Yii::t('skeeks/cms', 'Base types')          => $baseTypes,
+            \Yii::t('skeeks/cms', 'Custom types')        => $userTypes,
+        ];
+    }
+
+
+    private $_relatedHandlers = [];
+
+    /**
+     * @param array $handlers list of handlers
+     */
+    public function setRelatedHandlers(array $handlers)
+    {
+        $this->_relatedHandlers = $handlers;
+    }
+
+    /**
+     * @return PropertyType[] list of handlers.
+     */
+    public function getRelatedHandlers()
+    {
+        $handlers = [];
+        foreach ($this->_relatedHandlers as $id => $handler) {
+            $handlers[$id] = $this->getRelatedHandler($id);
+        }
+
+        return $handlers;
+    }
+
+    /**
+     * @param string $id service id.
+     * @return PropertyType auth client instance.
+     * @throws InvalidParamException on non existing client request.
+     */
+    public function getRelatedHandler($id)
+    {
+        if (!array_key_exists($id, $this->_relatedHandlers)) {
+            throw new InvalidParamException("Unknown auth property type '{$id}'.");
+        }
+        if (!is_object($this->_relatedHandlers[$id])) {
+            $this->_relatedHandlers[$id] = $this->createRelatedHandler($id, $this->_relatedHandlers[$id]);
+        }
+
+        return $this->_relatedHandlers[$id];
+    }
+
+    /**
+     * Checks if client exists in the hub.
+     * @param string $id client id.
+     * @return boolean whether client exist.
+     */
+    public function hasRelatedHandler($id)
+    {
+        return array_key_exists($id, $this->_relatedHandlers);
+    }
+
+    /**
+     * Creates auth client instance from its array configuration.
+     * @param string $id auth client id.
+     * @param array $config auth client instance configuration.
+     * @return PropertyType auth client instance.
+     */
+    protected function createRelatedHandler($id, $config)
+    {
+        $config['id'] = $id;
+
+        return \Yii::createObject($config);
     }
 }

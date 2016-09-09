@@ -7,16 +7,82 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
+/* @var $handler \skeeks\cms\relatedProperties\PropertyType */
 
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
+
+<?php $form = ActiveForm::begin([
+    'id'                                            => 'sx-dynamic-form',
+    'enableAjaxValidation'                          => false,
+]); ?>
+
+<? $this->registerJs(<<<JS
+
+(function(sx, $, _)
+{
+    sx.classes.DynamicForm = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            $("[data-form-reload=true]").on('change', function()
+            {
+                self.update();
+            });
+        },
+
+        update: function()
+        {
+            _.delay(function()
+            {
+                var jForm = $("#sx-dynamic-form");
+                jForm.append($('<input>', {'type': 'hidden', 'name' : 'sx-not-submit', 'value': 'true'}));
+                jForm.submit();
+            }, 200);
+        }
+    });
+
+    sx.DynamicForm = new sx.classes.DynamicForm();
+})(sx, sx.$, sx._);
+
+
+JS
+); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Basic settings')) ?>
 
     <?= $form->field($model, 'active')->radioList(\Yii::$app->cms->booleanFormat()) ?>
     <?= $form->field($model, 'is_required')->radioList(\Yii::$app->cms->booleanFormat()) ?>
 
+
+    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'code')->textInput() ?>
+
+
+    <?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect), [
+            'size' => 1,
+            'data-form-reload' => 'true'
+        ])
+        ->label(\Yii::t('skeeks/cms',"Property type"))
+        ;
+    ?>
+
+    <? if ($handler) : ?>
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
+            <?= $handler->renderConfigForm($form); ?>
+    <? endif; ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) ?>
+    <?= $form->field($model, 'hint')->textInput() ?>
+    <?= $form->fieldInputInt($model, 'priority') ?>
+
+    <?= $form->field($model, 'searchable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
+    <?= $form->field($model, 'filtrable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
+    <?= $form->field($model, 'with_description')->radioList(\Yii::$app->cms->booleanFormat()) ?>
 
 <? if ($content_id = \Yii::$app->request->get('content_id')) : ?>
 
@@ -37,32 +103,6 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <? endif; ?>
 
-    <?= $form->fieldSelect($model, 'component', [
-        \Yii::t('skeeks/cms','Base types')          => \Yii::$app->cms->basePropertyTypes(),
-        \Yii::t('skeeks/cms','Custom types') => \Yii::$app->cms->userPropertyTypes(),
-    ])
-        ->label(\Yii::t('skeeks/cms',"Property type"))
-        ;
-    ?>
-    <?= $form->field($model, 'component_settings')->label(false)->widget(
-        \skeeks\cms\widgets\formInputs\componentSettings\ComponentSettingsWidget::className(),
-        [
-            'componentSelectId' => Html::getInputId($model, "component")
-        ]
-    ); ?>
-
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput() ?>
-
-<?= $form->fieldSetEnd(); ?>
-
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) ?>
-    <?= $form->field($model, 'hint')->textInput() ?>
-    <?= $form->fieldInputInt($model, 'priority') ?>
-
-    <?= $form->field($model, 'searchable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
-    <?= $form->field($model, 'filtrable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
-    <?= $form->field($model, 'with_description')->radioList(\Yii::$app->cms->booleanFormat()) ?>
 <?= $form->fieldSetEnd(); ?>
 
 

@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.0.3.pre
+3.1.0.pre
 -----------------
+ * Changing the mechanism of additional properties \Yii::$app->cms->relatedHandlers
  * The custom properties changes
  * Translation updates
  * Fixed https://github.com/skeeks-cms/cms-admin/issues/2
