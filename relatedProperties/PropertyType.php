@@ -40,6 +40,7 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     const CODE_TREE     = 'T';
     const CODE_ELEMENT  = 'E';
 
+    public $id;
     /**
      * @var код типа свойства (логика приложения)
      */

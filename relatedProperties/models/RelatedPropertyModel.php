@@ -48,6 +48,8 @@ use yii\widgets\ActiveForm;
  *
  * @property RelatedElementPropertyModel[]      $elementProperties
  * @property RelatedPropertyEnumModel[]         $enums
+ *
+ * @property PropertyType         $handler
  */
 abstract class RelatedPropertyModel extends Core
 {
@@ -193,28 +195,46 @@ abstract class RelatedPropertyModel extends Core
 
     /**
      * @return PropertyType
+     * @throws \skeeks\cms\import\InvalidParamException
+     */
+    public function getHandler()
+    {
+        if ($this->component)
+        {
+            try
+            {
+                /**
+                 * @var $component PropertyType
+                 */
+                $component = \Yii::$app->cms->getRelatedHandler($this->component);
+                $component->property = $this;
+                $component->load($this->component_settings, "");
+
+                return $component;
+            } catch (\Exception $e)
+            {
+                return false;
+            }
+
+        }
+
+        return null;
+    }
+
+    /**
+     * TODO: > is @deprecated 3.0.2
+     * @return PropertyType
      */
     public function createPropertyType(ActiveForm $activeForm = null, $model = null)
     {
-        $elementClass   = $this->component;
-
-        if (!class_exists($elementClass))
+        $handler = $this->handler;
+        if ($handler)
         {
-            return false;
+            $handler->model = $model;
+            $handler->activeForm = $activeForm;
         }
 
-        /**
-         * @var $propertyType PropertyType
-         */
-        $propertyType = new $elementClass([
-            'model'         => $model,
-            'property'      => $this,
-            'activeForm'    => $activeForm,
-        ]);
-
-        $propertyType->attributes = $this->component_settings;
-
-        return $propertyType;
+        return $handler;
     }
 
 

@@ -7,6 +7,8 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\models\CmsUserUniversalProperty;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
@@ -19,9 +21,11 @@ use yii\helpers\ArrayHelper;
  */
 class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
 {
+    public $notSubmitParam = 'sx-not-submit';
+
     public function init()
     {
-        $this->name                   = "Управление свойствами пользователя";
+        $this->name                   = \Yii::t('skeeks/cms', 'User control properties');
         $this->modelShowAttribute      = "name";
         $this->modelClassName          = CmsUserUniversalProperty::className();
 
@@ -36,32 +40,130 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
+
+                'create' =>
                 [
-                    'columns' =>
-                    [
-                        'name',
-                        'code',
-                        [
-                            'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                            'falseValue' => \skeeks\cms\components\Cms::BOOL_N,
-                            'trueValue' => \skeeks\cms\components\Cms::BOOL_Y,
-                            'attribute' => 'active'
-                        ],
-                    ],
+                    'callback'         => [$this, 'create'],
                 ],
 
-                "update" =>
+                'update' =>
                 [
-                    "modelScenario" => RelatedPropertyModel::SCENARIO_UPDATE_CONFIG,
-                ],
-
-                "create" =>
-                [
-                    "modelScenario" => RelatedPropertyModel::SCENARIO_UPDATE_CONFIG,
+                    'callback'         => [$this, 'update'],
                 ],
             ]
         );
     }
 
+
+
+    public function create()
+    {
+        $rr = new RequestResponse();
+
+        $modelClass = $this->modelClassName;
+        $model = new $modelClass();
+        $model->loadDefaultValues();
+
+        if ($post = \Yii::$app->request->post())
+        {
+            $model->load($post);
+        }
+
+        $handler = $model->handler;
+        if ($handler)
+        {
+            if ($post = \Yii::$app->request->post())
+            {
+                $handler->load($post);
+            }
+        }
+
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
+            {
+                $model->component_settings = $handler->toArray();
+                if ($model->load(\Yii::$app->request->post()) && $handler->load(\Yii::$app->request->post())
+                    && $model->validate() && $handler->validate())
+                {
+                    $model->save();
+
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+
+                    return $this->redirect(
+                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
+                            ->toString()
+                    );
+                } else
+                {
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                }
+            }
+        }
+
+        return $this->render('_form', [
+            'model'     => $model,
+            'handler'   => $handler,
+        ]);
+    }
+
+
+    public function update()
+    {
+        $rr = new RequestResponse();
+
+        $model = $this->model;
+
+        if ($post = \Yii::$app->request->post())
+        {
+            $model->load($post);
+        }
+
+        $handler = $model->handler;
+        if ($handler)
+        {
+            if ($post = \Yii::$app->request->post())
+            {
+                $handler->load($post);
+            }
+        }
+
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
+            {
+                if ($rr->isRequestPjaxPost())
+                {
+                    $model->component_settings = $handler->toArray();
+
+                    if ($model->load(\Yii::$app->request->post()) && $handler->load(\Yii::$app->request->post())
+                        && $model->validate() && $handler->validate())
+                    {
+                        $model->save();
+
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+
+                        if (\Yii::$app->request->post('submit-btn') == 'apply')
+                        {
+
+                        } else
+                        {
+                            return $this->redirect(
+                                $this->indexUrl
+                            );
+                        }
+
+                        $model->refresh();
+
+                    }
+                }
+            }
+        }
+
+        return $this->render('_form', [
+            'model'     => $model,
+            'handler'   => $handler,
+        ]);
+    }
 }

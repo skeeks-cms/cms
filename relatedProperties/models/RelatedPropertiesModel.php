@@ -28,7 +28,6 @@ use yii\helpers\BaseHtml;
 class RelatedPropertiesModel extends DynamicModel
 {
     /**
-     * TODO: use protected
      * @var RelatedElementModel
      */
     public $relatedElementModel = null;
@@ -37,6 +36,7 @@ class RelatedPropertiesModel extends DynamicModel
      * @var RelatedPropertyModel[]
      */
     private $_properties = [];
+
     private $_propertiesMap = [];
 
     public function init()
