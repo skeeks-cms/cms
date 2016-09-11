@@ -62,34 +62,6 @@ class HasRelatedProperties extends Behavior
     }
 
     /**
-     * @param $property_ids
-     * @return ActiveQuery
-     */
-    public function findRelatedElementProperties($property_ids)
-    {
-        return $this->getRelatedElementProperties()->where(['property_id' => $property_ids]);
-    }
-
-    /**
-     * @return string
-     */
-    public function renderRelatedPropertiesForm($viewFile = '@skeeks/cms/views/blank-form')
-    {
-        try
-        {
-            return \Yii::$app->view->render($viewFile, [
-                'modelHasRelatedProperties'     => $this->owner,
-            ]);
-
-        } catch (\Exception $e)
-        {
-            ob_end_clean();
-            ErrorHandler::convertExceptionToError($e);
-            return 'Ошибка рендеринга формы: ' . $e->getMessage();
-        }
-    }
-
-    /**
      * @return RelatedPropertiesModel
      */
     public function createRelatedPropertiesModel()
@@ -117,17 +89,6 @@ class HasRelatedProperties extends Behavior
         return $this->_relatedPropertiesModel;
     }
 
-
-
-    /**
-     * @param RelatedPropertyModel $property
-     * @return array|mixed|null
-     */
-    public function getRelatedPropertyValue($property)
-    {
-        return $this->owner->relatedPropertiesModel->getAttribute($property->code);
-    }
-
     /**
      * @param RelatedPropertyModel $property
      * @param $value
@@ -143,7 +104,8 @@ class HasRelatedProperties extends Behavior
 
         if ($property->multiple == "Y")
         {
-            $propertyValues = $this->findRelatedElementProperties($property->id)->all();
+            /*$propertyValues = $this->findRelatedElementProperties($property->id)->all();*/
+            $propertyValues = $this->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
             if ($propertyValues)
             {
                 foreach ($propertyValues as $pv)
@@ -176,7 +138,8 @@ class HasRelatedProperties extends Behavior
 
         } else
         {
-            if ($productPropertyValue = $this->findRelatedElementProperties($property->id)->one())
+            /*if ($productPropertyValue = $this->findRelatedElementProperties($property->id)->one())*/
+            if ($productPropertyValue = $this->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
             {
                 $productPropertyValue->value        = (string) $value;
                 $productPropertyValue->value_enum   = (int) $value;

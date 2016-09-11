@@ -8,6 +8,7 @@
 namespace skeeks\cms\relatedProperties\userPropertyTypes;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\ColorInput;
 use yii\helpers\ArrayHelper;
@@ -105,5 +106,18 @@ class UserPropertyTypeColor extends PropertyType
         echo $activeForm->fieldRadioListBoolean($this, 'showAlpha');
         echo $activeForm->fieldRadioListBoolean($this, 'showPalette');
         echo $activeForm->field($this, 'saveValueAs')->radioList(\skeeks\cms\widgets\ColorInput::$possibleSaveAs);
+    }
+
+    /**
+     * @varsion > 3.0.2
+     * @param RelatedPropertiesModel $relatedPropertiesModel
+     *
+     * @return $this
+     */
+    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    {
+        $relatedPropertiesModel->addRule($this->property->code, 'string');
+
+        return $this;
     }
 }

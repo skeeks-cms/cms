@@ -13,8 +13,10 @@ use skeeks\cms\base\Component;
 use skeeks\cms\base\ConfigFormInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
+use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -143,6 +145,19 @@ abstract class PropertyType extends Model implements ConfigFormInterface
      */
     public function initInstance()
     {
+        return $this;
+    }
+
+
+    /**
+     * @varsion > 3.0.2
+     * @param RelatedPropertiesModel $relatedPropertiesModel
+     *
+     * @return $this
+     */
+    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    {
+        $relatedPropertiesModel->addRule($this->property->code, 'safe');
         return $this;
     }
 }

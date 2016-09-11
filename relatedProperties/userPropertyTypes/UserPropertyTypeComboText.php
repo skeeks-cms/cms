@@ -8,6 +8,7 @@
 namespace skeeks\cms\relatedProperties\userPropertyTypes;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 
@@ -66,5 +67,18 @@ class UserPropertyTypeComboText extends PropertyType
     {
         $class = new \ReflectionClass($this->className());
         return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formUserPropertyTypeComboText.php';
+    }
+
+    /**
+     * @varsion > 3.0.2
+     * @param RelatedPropertiesModel $relatedPropertiesModel
+     *
+     * @return $this
+     */
+    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    {
+        $relatedPropertiesModel->addRule($this->property->code, 'string');
+
+        return $this;
     }
 }

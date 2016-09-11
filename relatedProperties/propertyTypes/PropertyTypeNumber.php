@@ -6,6 +6,7 @@
  * @date 30.04.2015
  */
 namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 
 /**
@@ -37,6 +38,18 @@ class PropertyTypeNumber extends PropertyType
         {
             $this->name = \Yii::t('skeeks/cms','Number');
         }
+    }
 
+    /**
+     * @varsion > 3.0.2
+     * @param RelatedPropertiesModel $relatedPropertiesModel
+     *
+     * @return $this
+     */
+    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    {
+        $relatedPropertiesModel->addRule($this->property->code, 'number');
+
+        return $this;
     }
 }

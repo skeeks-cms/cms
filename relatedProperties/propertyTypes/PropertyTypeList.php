@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\components\Cms;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -124,6 +125,25 @@ class PropertyTypeList extends PropertyType
         if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
         {
             $this->multiple = Cms::BOOL_Y;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @varsion > 3.0.2
+     * @param RelatedPropertiesModel $relatedPropertiesModel
+     *
+     * @return $this
+     */
+    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    {
+        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        {
+            $relatedPropertiesModel->addRule($this->property->code, 'safe');
+        } else
+        {
+            $relatedPropertiesModel->addRule($this->property->code, 'integer');
         }
 
         return $this;

@@ -48,7 +48,7 @@ class RelatedPropertiesModel extends DynamicModel
             foreach ($this->relatedElementModel->relatedProperties as $property)
             {
                 $this->defineAttribute($property->code, $property->multiple == "Y" ? [] : null );
-                $property->addRulesToDynamicModel($this);
+                $property->addRulesToRelatedPropertiesModel($this);
                 $this->_properties[$property->code] = $property;
             }
         }
@@ -233,9 +233,6 @@ class RelatedPropertiesModel extends DynamicModel
     }
 
 
-
-
-
     /**
      * Returns a value indicating whether the model has an attribute with the specified name.
      * @param string $name the name of the attribute
@@ -281,8 +278,6 @@ class RelatedPropertiesModel extends DynamicModel
             throw new InvalidParamException(get_class($this) . ' '.\Yii::t('skeeks/cms','has no attribute named "{name}".',['name' => $name]));
         }
     }
-
-
 
     /**
      * @param $name

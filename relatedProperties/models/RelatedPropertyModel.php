@@ -204,27 +204,27 @@ abstract class RelatedPropertyModel extends Core
     }
 
 
-
     /**
-     * @varsion > 2.4.9.1
-     * @param DynamicModel $dynamicModel
+     * @varsion > 3.0.2
+     * @param RelatedPropertiesModel $relatedPropertiesModel
+     *
      * @return $this
      */
-    public function addRulesToDynamicModel(DynamicModel $dynamicModel)
+    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
     {
         if ($this->is_required == Cms::BOOL_Y)
         {
-            $dynamicModel->addRule($this->code, 'required');
+            $relatedPropertiesModel->addRule($this->code, 'required');
         }
 
-        if ($this->is_required == Cms::BOOL_Y)
-        {
-            $dynamicModel->addRule($this->code, 'required');
-        } else
-        {
-            $dynamicModel->addRule($this->code, 'safe');
-        }
+        $this->handler->addRulesToRelatedPropertiesModel($relatedPropertiesModel);
 
         return $this;
+    }
+
+
+    public function loadDefaultValue()
+    {
+
     }
 }

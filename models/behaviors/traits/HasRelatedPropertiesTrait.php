@@ -15,10 +15,7 @@ use yii\db\ActiveRecord;
 /**
  * @method ActiveQuery getRelatedElementProperties()
  * @method ActiveQuery getRelatedProperties()
- * @method string renderRelatedPropertiesForm()
- * @method ActiveQuery findRelatedElementProperties($property_ids)
  * @method RelatedPropertiesModel getRelatedPropertiesModel()
- * @method mixed getRelatedPropertyValue(RelatedPropertyModel $model)
  * @method mixed saveRelatedPropertyValue(RelatedPropertyModel $model)
  *
  * @property RelatedElementPropertyModel[]    relatedElementProperties

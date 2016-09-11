@@ -60,6 +60,9 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
         $rr = new RequestResponse();
 
         $modelClass = $this->modelClassName;
+        /**
+         * @var CmsContentProperty $model
+         */
         $model = new $modelClass();
         $model->loadDefaultValues();
 
@@ -82,7 +85,9 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
             if (!\Yii::$app->request->post($this->notSubmitParam))
             {
                 $model->component_settings = $handler->toArray();
-                if ($model->load(\Yii::$app->request->post()) && $handler->load(\Yii::$app->request->post())
+                $handler->load(\Yii::$app->request->post());
+
+                if ($model->load(\Yii::$app->request->post())
                     && $model->validate() && $handler->validate())
                 {
                     $model->save();
@@ -135,8 +140,9 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
                 if ($rr->isRequestPjaxPost())
                 {
                     $model->component_settings = $handler->toArray();
+                    $handler->load(\Yii::$app->request->post());
 
-                    if ($model->load(\Yii::$app->request->post()) && $handler->load(\Yii::$app->request->post())
+                    if ($model->load(\Yii::$app->request->post())
                         && $model->validate() && $handler->validate())
                     {
                         $model->save();
