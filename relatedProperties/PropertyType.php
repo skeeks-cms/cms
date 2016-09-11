@@ -56,13 +56,6 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     public $name;
 
     /**
-     * Это модель со свойствами
-     * Для полей формы используется $this->model->relatedPropertiesModel
-     *
-     * @var \skeeks\cms\relatedProperties\models\RelatedElementModel
-     */
-    public $model;
-    /**
      * @var RelatedPropertyModel
      */
     public $property;
@@ -94,7 +87,7 @@ abstract class PropertyType extends Model implements ConfigFormInterface
      */
     public function renderForActiveForm()
     {
-        $field = $this->activeForm->field($this->model->relatedPropertiesModel, $this->property->code);
+        $field = $this->activeForm->field($this->property->relatedPropertiesModel, $this->property->code);
 
         if (!$field)
         {

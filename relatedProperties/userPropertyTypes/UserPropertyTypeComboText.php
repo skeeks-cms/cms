@@ -50,7 +50,7 @@ class UserPropertyTypeComboText extends PropertyType
         [
             'ckeditorOptions' =>
             [
-                'relatedModel' => $this->model
+                'relatedModel' => $this->property->relatedPropertiesModel->relatedElementModel
             ]
         ]);
 

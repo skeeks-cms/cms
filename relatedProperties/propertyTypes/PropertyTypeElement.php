@@ -98,7 +98,7 @@ class PropertyTypeElement extends PropertyType
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT)
         {
             $field = $this->activeForm->fieldSelect(
-                $this->model->relatedPropertiesModel,
+                $this->property->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($find->all(), 'id', 'name'),
                 []
@@ -106,7 +106,7 @@ class PropertyTypeElement extends PropertyType
         } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI)
         {
             $field = $this->activeForm->fieldSelectMulti(
-                $this->model->relatedPropertiesModel,
+                $this->property->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($find->all(), 'id', 'name'),
                 []

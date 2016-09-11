@@ -55,7 +55,7 @@ class UserPropertyTypeSelectFile extends PropertyType
 
         $field->widget(\skeeks\cms\modules\admin\widgets\formInputs\OneImage::className(),
         [
-            'filesModel' => $this->model
+            'filesModel' => $this->property->relatedPropertiesModel->relatedElementModel
         ]);
 
         return $field;

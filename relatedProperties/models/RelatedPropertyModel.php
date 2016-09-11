@@ -160,16 +160,15 @@ abstract class RelatedPropertyModel extends Core
 
     /**
      * @param ActiveForm $activeForm
-     * @param \skeeks\cms\relatedProperties\models\RelatedElementModel $model
+     * @param \skeeks\cms\relatedProperties\models\RelatedElementModel $model TODO: is depricated @version > 3.0.2
      * @return mixed
      */
-    public function renderActiveForm(ActiveForm $activeForm, $model)
+    public function renderActiveForm(ActiveForm $activeForm, $model = null)
     {
         $handler = $this->handler;
 
         if ($handler)
         {
-            $handler->model = $model;
             $handler->activeForm = $activeForm;
         } else
         {
