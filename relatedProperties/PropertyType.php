@@ -15,20 +15,19 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
+ * @property bool $isMultiple
+ *
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
  */
 abstract class PropertyType extends Model implements ConfigFormInterface
 {
-    use HasComponentDescriptorTrait;
-
     /**
      * @param ActiveForm $form
      */
@@ -51,10 +50,6 @@ abstract class PropertyType extends Model implements ConfigFormInterface
      * @var Название свойства
      */
     public $name;
-    /**
-     * @var string множественный выбор
-     */
-    public $multiple    = Cms::BOOL_N;
 
     /**
      * Это модель со свойствами
@@ -73,29 +68,22 @@ abstract class PropertyType extends Model implements ConfigFormInterface
      */
     public $activeForm;
 
-
-    public function init()
+    /**
+     * @return bool
+     */
+    public function getIsMultiple()
     {
-        //Не загружаем настройки по умолчанию (В родительском классе идет загрузка настроек из базы, тут этого не надо)
+        return false;
     }
 
-    public function attributeLabels()
+    /**
+     * TODO: is depricated @varsion > 3.0.2
+     * @return string
+     */
+    public function getMultiple()
     {
-        return array_merge(parent::attributeLabels(),
-        [
-            'multiple'  => \Yii::t('skeeks/cms','Multiple choice'),
-        ]);
+        return $this->isMultiple ? Cms::BOOL_Y : Cms::BOOL_N;
     }
-
-    public function rules()
-    {
-        return ArrayHelper::merge(parent::rules(),
-        [
-            ['multiple', 'string'],
-            ['multiple', 'in', 'range' => array_keys(\Yii::$app->cms->booleanFormat())],
-        ]);
-    }
-
 
     /**
      * @return \yii\widgets\ActiveField
@@ -138,16 +126,6 @@ abstract class PropertyType extends Model implements ConfigFormInterface
 
         return $field;
     }
-
-    /**
-     * Установка свойства перед сохранением
-     * @return $this
-     */
-    public function initInstance()
-    {
-        return $this;
-    }
-
 
     /**
      * @varsion > 3.0.2

@@ -130,9 +130,9 @@ class RelatedPropertiesModel extends DynamicModel
 
         try
         {
-            foreach ($this->relatedElementModel->relatedProperties as $property)
+            foreach ($this->_properties as $property)
             {
-                $this->relatedElementModel->saveRelatedPropertyValue($property, $this->getAttribute($property->code));
+                $this->_saveRelatedPropertyValue($property);
             }
 
         } catch (\Exception $e)
@@ -147,6 +147,84 @@ class RelatedPropertiesModel extends DynamicModel
         }
 
         return true;
+    }
+
+    /**
+     * @param RelatedPropertyModel $property
+     * @param $value
+     * @return $this
+     * @throws \Exception
+     */
+    protected function _saveRelatedPropertyValue($property)
+    {
+        $value      = $this->getAttribute($property->code);
+        $element    = $this->relatedElementModel;
+
+        if ($element->isNewRecord)
+        {
+            throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
+        }
+
+        if ($property->multiple == "Y")
+        {
+            $propertyValues = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
+            if ($propertyValues)
+            {
+                foreach ($propertyValues as $pv)
+                {
+                    $pv->delete();
+                }
+            }
+
+            $values = (array) $value;
+
+            if ($values)
+            {
+                foreach ($values as $key => $value)
+                {
+                    $className = $element->relatedElementPropertyClassName;
+                    $productPropertyValue = new $className([
+                        'element_id'    => $element->id,
+                        'property_id'   => $property->id,
+                        'value'         => (string) $value,
+                        'value_enum'    => (int) $value,
+                        'value_num'     => (float) $value,
+                    ]);
+
+                    if (!$productPropertyValue->save())
+                    {
+                        throw new Exception("{$property->code} not save");
+                    }
+                }
+            }
+
+        } else
+        {
+            if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
+            {
+                $productPropertyValue->value        = (string) $value;
+                $productPropertyValue->value_enum   = (int) $value;
+                $productPropertyValue->value_num    = (float) $value;
+            } else
+            {
+                $className = $element->relatedElementPropertyClassName;
+
+                $productPropertyValue = new $className([
+                    'element_id'    => $element->id,
+                    'property_id'   => $property->id,
+                    'value'         => (string) $value,
+                    'value_enum'    => (int) $value,
+                    'value_num'     => (float) $value,
+                ]);
+            }
+
+            if (!$productPropertyValue->save())
+            {
+                throw new Exception("{$property->code} not save");
+            }
+        }
+
+        return $this;
     }
 
 
@@ -197,9 +275,9 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function loadDefaultValues($skipIfSet = true)
     {
-        foreach ($this->relatedElementModel->relatedProperties as $property)
+        foreach ($this->_properties as $property)
         {
-            if ((!$skipIfSet || $this->{$column->name} === null)) {
+            if ((!$skipIfSet || $this->{$property->code} === null)) {
                 //$this->{$column->name} = $column->defaultValue;
             }
         }

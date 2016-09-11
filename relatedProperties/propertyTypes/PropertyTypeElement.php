@@ -50,6 +50,19 @@ class PropertyTypeElement extends PropertyType
         }
     }
 
+    /**
+     * @return bool
+     */
+    public function getIsMultiple()
+    {
+        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
@@ -129,23 +142,6 @@ class PropertyTypeElement extends PropertyType
         echo $activeForm->fieldSelect($this, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect());
     }
 
-
-
-    /**
-     * @return $this
-     */
-    public function initInstance()
-    {
-        parent::initInstance();
-
-        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
-        {
-            $this->multiple = Cms::BOOL_Y;
-        }
-
-        return $this;
-    }
-
     /**
      * @varsion > 3.0.2
      * @param RelatedPropertiesModel $relatedPropertiesModel
@@ -154,7 +150,7 @@ class PropertyTypeElement extends PropertyType
      */
     public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        if ($this->isMultiple)
         {
             $relatedPropertiesModel->addRule($this->property->code, 'safe');
         } else

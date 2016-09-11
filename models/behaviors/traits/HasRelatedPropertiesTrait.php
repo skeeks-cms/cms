@@ -16,7 +16,6 @@ use yii\db\ActiveRecord;
  * @method ActiveQuery getRelatedElementProperties()
  * @method ActiveQuery getRelatedProperties()
  * @method RelatedPropertiesModel getRelatedPropertiesModel()
- * @method mixed saveRelatedPropertyValue(RelatedPropertyModel $model)
  *
  * @property RelatedElementPropertyModel[]    relatedElementProperties
  * @property RelatedPropertyModel[]           relatedProperties

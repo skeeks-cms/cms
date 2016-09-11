@@ -72,15 +72,14 @@ abstract class RelatedPropertyModel extends Core
         $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "processBeforeSave"]);
     }
 
-    public function processBeforeSave()
+    public function processBeforeSave($e)
     {
         if ($handler = $this->handler)
         {
             $this->property_type    = $handler->code;
-            $this->multiple         = $handler->multiple;
+            $this->multiple         = $handler->isMultiple ? Cms::BOOL_Y : Cms::BOOL_N;
         }
     }
-
 
     /**
      * @inheritdoc
@@ -112,7 +111,6 @@ abstract class RelatedPropertyModel extends Core
             'smart_filtrable' => Yii::t('skeeks/cms', 'Smart Filtrable'),
         ]);
     }
-
 
     /**
      * @inheritdoc

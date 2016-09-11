@@ -30,6 +30,7 @@ use yii\base\ActionEvent;
 use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * Class AdminCmsContentTypeController
@@ -116,6 +117,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $modelClassName = $this->modelClassName;
         $model          = new $modelClassName();
 
+        $model->loadDefaultValues();
+
         if ($content_id = \Yii::$app->request->get("content_id"))
         {
             $contentModel       = \skeeks\cms\models\CmsContent::findOne($content_id);
@@ -123,6 +126,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
         $relatedModel = $model->relatedPropertiesModel;
+        $relatedModel->loadDefaultValues();
 
         $rr = new RequestResponse();
 
@@ -214,17 +218,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             } else
             {
-                $errors = [];
-
-                if ($model->getErrors())
+                $errors = $model->errors;
+                if (!$errors)
                 {
-                    foreach ($model->getErrors() as $error)
-                    {
-                        $errors[] = implode(', ', $error);
-                    }
+                    $errors = $relatedModel->errors;
                 }
-
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save') . $errors);
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save') . Json::encode($errors));
             }
         }
 

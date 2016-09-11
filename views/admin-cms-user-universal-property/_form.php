@@ -72,6 +72,9 @@ JS
 
     <? if ($handler) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
+            <? if($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
+                <? $handler->enumRoute = 'cms/admin-cms-user-universal-property-enum'; ?>
+            <? endif; ?>
             <?= $handler->renderConfigForm($form); ?>
     <? endif; ?>
 
@@ -89,54 +92,7 @@ JS
     <?= $form->fieldRadioListBoolean($model, 'with_description') ?>
 <?= $form->fieldSetEnd(); ?>
 
-
-<? if (!$model->isNewRecord) : ?>
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Values for list')) ?>
-
-    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => \Yii::t('skeeks/cms',"Values for list"),
-        'hint'              => \Yii::t('skeeks/cms',"You can snap to the element number of properties, and set the value to them"),
-        'parentModel'       => $model,
-        'relation'          => [
-            'property_id' => 'id'
-        ],
-        'controllerRoute'   => 'cms/admin-cms-user-universal-property-enum',
-        'gridViewOptions'   => [
-            'sortable' => true,
-            'columns' => [
-                [
-                    'attribute'     => 'id',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'code',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'value',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'priority',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                    'attribute'     => 'def',
-                    'enableSorting' => false
-                ],
-            ],
-        ],
-    ]); ?>
-
-<?= $form->fieldSetEnd(); ?>
-<? endif; ?>
-
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 
 <?php ActiveForm::end(); ?>
 

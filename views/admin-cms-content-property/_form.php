@@ -105,55 +105,7 @@ JS
 
 <?= $form->fieldSetEnd(); ?>
 
-
-<? if (!$model->isNewRecord) : ?>
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Values for list')) ?>
-
-    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => \Yii::t('skeeks/cms',"Values for list"),
-        'hint'              => \Yii::t('skeeks/cms',"You can snap to the element number of properties, and set the value to them"),
-        'parentModel'       => $model,
-        'relation'          => [
-            'property_id' => 'id'
-        ],
-
-        'controllerRoute'   => 'cms/admin-cms-content-property-enum',
-        'gridViewOptions'   => [
-            'sortable' => true,
-            'columns' => [
-                [
-                    'attribute'     => 'id',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'code',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'value',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'priority',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                    'attribute'     => 'def',
-                    'enableSorting' => false
-                ],
-            ],
-        ],
-    ]); ?>
-
-<?= $form->fieldSetEnd(); ?>
-<? endif; ?>
-
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 
 <?php ActiveForm::end(); ?>
 

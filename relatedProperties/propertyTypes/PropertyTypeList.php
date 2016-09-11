@@ -18,6 +18,8 @@ use yii\widgets\ActiveForm;
  */
 class PropertyTypeList extends PropertyType
 {
+    public $enumRoute               = 'cms/admin-cms-content-property-enum';
+
     public $code                 = self::CODE_LIST;
     public $name                 = "";
 
@@ -48,6 +50,19 @@ class PropertyTypeList extends PropertyType
         }
     }
 
+    /**
+     * @return bool
+     */
+    public function getIsMultiple()
+    {
+        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
@@ -71,6 +86,47 @@ class PropertyTypeList extends PropertyType
     public function renderConfigForm(ActiveForm $activeForm)
     {
         echo $activeForm->fieldSelect($this, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements());
+
+        echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+            'label'             => \Yii::t('skeeks/cms',"Values for list"),
+            'hint'              => \Yii::t('skeeks/cms',"You can snap to the element number of properties, and set the value to them"),
+            'parentModel'       => $this->property,
+            'relation'          => [
+                'property_id' => 'id'
+            ],
+
+            'controllerRoute'   => $this->enumRoute,
+            'gridViewOptions'   => [
+                'sortable' => true,
+                'columns' => [
+                    [
+                        'attribute'     => 'id',
+                        'enableSorting' => false
+                    ],
+
+                    [
+                        'attribute'     => 'code',
+                        'enableSorting' => false
+                    ],
+
+                    [
+                        'attribute'     => 'value',
+                        'enableSorting' => false
+                    ],
+
+                    [
+                        'attribute'     => 'priority',
+                        'enableSorting' => false
+                    ],
+
+                    [
+                        'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                        'attribute'     => 'def',
+                        'enableSorting' => false
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**
@@ -116,21 +172,6 @@ class PropertyTypeList extends PropertyType
     }
 
     /**
-     * @return $this
-     */
-    public function initInstance()
-    {
-        parent::initInstance();
-
-        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
-        {
-            $this->multiple = Cms::BOOL_Y;
-        }
-
-        return $this;
-    }
-
-    /**
      * @varsion > 3.0.2
      * @param RelatedPropertiesModel $relatedPropertiesModel
      *
@@ -138,7 +179,7 @@ class PropertyTypeList extends PropertyType
      */
     public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        if ($this->isMultiple)
         {
             $relatedPropertiesModel->addRule($this->property->code, 'safe');
         } else
