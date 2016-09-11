@@ -80,6 +80,7 @@ return
 
     "Rule"                  => "Правило",
     "Component"             => "Компонент",
+    "Editing view files"    => "Редактирование шаблонов",
 
     "The Name One Element"  => "Название одного элемента",
     "The Name Of The Elements (Plural)" => "Название элементов (множественное число)",
