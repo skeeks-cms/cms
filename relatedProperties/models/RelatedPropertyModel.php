@@ -50,9 +50,15 @@ use yii\widgets\ActiveForm;
  * @property RelatedPropertyEnumModel[]         $enums
  *
  * @property PropertyType         $handler
+ * @property mixed         $defaultValue
  */
 abstract class RelatedPropertyModel extends Core
 {
+    /**
+     * @var RelatedPropertiesModel
+     */
+    public $relatedPropertiesModel = null;
+
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
@@ -204,25 +210,26 @@ abstract class RelatedPropertyModel extends Core
 
     /**
      * @varsion > 3.0.2
-     * @param RelatedPropertiesModel $relatedPropertiesModel
      *
      * @return $this
      */
-    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    public function addRules()
     {
         if ($this->is_required == Cms::BOOL_Y)
         {
-            $relatedPropertiesModel->addRule($this->code, 'required');
+            $this->relatedPropertiesModel->addRule($this->code, 'required');
         }
 
-        $this->handler->addRulesToRelatedPropertiesModel($relatedPropertiesModel);
+        $this->handler->addRules();
 
         return $this;
     }
 
-
-    public function loadDefaultValue()
+    /**
+     * @return mixed
+     */
+    public function getDefaultValue()
     {
-
+        return $this->handler->defaultValue;
     }
 }

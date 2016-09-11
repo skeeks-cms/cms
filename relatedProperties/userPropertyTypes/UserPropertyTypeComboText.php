@@ -71,13 +71,12 @@ class UserPropertyTypeComboText extends PropertyType
 
     /**
      * @varsion > 3.0.2
-     * @param RelatedPropertiesModel $relatedPropertiesModel
      *
      * @return $this
      */
-    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    public function addRules()
     {
-        $relatedPropertiesModel->addRule($this->property->code, 'string');
+        $this->property->relatedPropertiesModel->addRule($this->property->code, 'string');
 
         return $this;
     }

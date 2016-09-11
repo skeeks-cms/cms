@@ -21,7 +21,8 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * @property bool $isMultiple
+ * @property bool           $isMultiple
+ * @property mixed          $defaultValue
  *
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
@@ -42,10 +43,13 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     const CODE_ELEMENT  = 'E';
 
     public $id;
+
     /**
+     * TODO: ?
      * @var код типа свойства (логика приложения)
      */
     public $code;
+
     /**
      * @var Название свойства
      */
@@ -129,13 +133,22 @@ abstract class PropertyType extends Model implements ConfigFormInterface
 
     /**
      * @varsion > 3.0.2
-     * @param RelatedPropertiesModel $relatedPropertiesModel
      *
      * @return $this
      */
-    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    public function addRules()
     {
-        $relatedPropertiesModel->addRule($this->property->code, 'safe');
+        $this->property->relatedPropertiesModel->addRule($this->property->code, 'safe');
         return $this;
+    }
+
+    /**
+     * @varsion > 3.0.2
+     *
+     * @return null
+     */
+    public function getDefaultValue()
+    {
+        return null;
     }
 }

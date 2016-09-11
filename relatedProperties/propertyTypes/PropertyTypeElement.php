@@ -144,18 +144,17 @@ class PropertyTypeElement extends PropertyType
 
     /**
      * @varsion > 3.0.2
-     * @param RelatedPropertiesModel $relatedPropertiesModel
      *
      * @return $this
      */
-    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    public function addRules()
     {
         if ($this->isMultiple)
         {
-            $relatedPropertiesModel->addRule($this->property->code, 'safe');
+            $this->property->relatedPropertiesModel->addRule($this->property->code, 'safe');
         } else
         {
-            $relatedPropertiesModel->addRule($this->property->code, 'integer');
+            $this->property->relatedPropertiesModel->addRule($this->property->code, 'integer');
         }
 
         return $this;

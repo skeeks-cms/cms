@@ -20,6 +20,8 @@ class PropertyTypeText extends PropertyType
     public $code             = self::CODE_STRING;
     public $name             = "";
 
+    public $default_value        = null;
+
     /*static public $fieldElements    =
     [
         'textarea'  => 'Текстовое поле (textarea)',
@@ -35,6 +37,7 @@ class PropertyTypeText extends PropertyType
             'textarea'      => \Yii::t('skeeks/cms','Text field').' (textarea)',
             'textInput'     => \Yii::t('skeeks/cms','Text string').' (input)',
             'hiddenInput'   => \Yii::t('skeeks/cms','Скрытое поле').' (hiddenInput)',
+            'default_value'  => \Yii::t('skeeks/cms','Default Value'),
         ];
     }
 
@@ -53,7 +56,8 @@ class PropertyTypeText extends PropertyType
         return array_merge(parent::attributeLabels(),
         [
             'fieldElement'  => \Yii::t('skeeks/cms','Element form'),
-            'rows'          => \Yii::t('skeeks/cms','The number of lines of the text field')
+            'rows'          => \Yii::t('skeeks/cms','The number of lines of the text field'),
+            'default_value'  => \Yii::t('skeeks/cms','Default Value'),
         ]);
     }
 
@@ -63,6 +67,7 @@ class PropertyTypeText extends PropertyType
         [
             ['fieldElement', 'string'],
             ['rows', 'integer', 'min' => 1, 'max' => 50],
+            ['default_value', 'string'],
         ]);
     }
 
@@ -73,6 +78,7 @@ class PropertyTypeText extends PropertyType
     {
         echo $activeForm->fieldSelect($this, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText::fieldElements());
         echo $activeForm->fieldInputInt($this, 'rows');
+        echo $activeForm->field($this, 'default_value');
     }
 
     /**
@@ -103,15 +109,28 @@ class PropertyTypeText extends PropertyType
 
     /**
      * @varsion > 3.0.2
-     * @param RelatedPropertiesModel $relatedPropertiesModel
      *
      * @return $this
      */
-    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    public function addRules()
     {
-        $relatedPropertiesModel->addRule($this->property->code, 'string');
+        $this->property->relatedPropertiesModel->addRule($this->property->code, 'string');
 
         return $this;
+    }
+
+    /**
+     * @varsion > 3.0.2
+     *
+     * @return null
+     */
+    public function getDefaultValue()
+    {
+        if ($this->default_value !== null)
+        {
+            return $this->default_value;
+        }
+        return;
     }
 
 }

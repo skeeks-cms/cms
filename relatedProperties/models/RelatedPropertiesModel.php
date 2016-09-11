@@ -37,7 +37,10 @@ class RelatedPropertiesModel extends DynamicModel
      */
     private $_properties = [];
 
-    private $_propertiesMap = [];
+    /**
+     * @var array
+     */
+    private $_propertyValues = [];
 
     public function init()
     {
@@ -47,8 +50,11 @@ class RelatedPropertiesModel extends DynamicModel
         {
             foreach ($this->relatedElementModel->relatedProperties as $property)
             {
-                $this->defineAttribute($property->code, $property->multiple == "Y" ? [] : null );
-                $property->addRulesToRelatedPropertiesModel($this);
+                $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null );
+
+                $property->relatedPropertiesModel = $this;
+                $property->addRules();
+
                 $this->_properties[$property->code] = $property;
             }
         }
@@ -57,7 +63,7 @@ class RelatedPropertiesModel extends DynamicModel
         {
             foreach ($this->_properties as $code => $property)
             {
-                if ($property->multiple == "Y")
+                if ($property->handler->isMultiple)
                 {
                     $values = [];
                     $valuesModels = [];
@@ -72,7 +78,7 @@ class RelatedPropertiesModel extends DynamicModel
                     }
 
                     $this->setAttribute($code, $values);
-                    $this->_propertiesMap[$code] = $valuesModels;
+                    $this->_propertyValues[$code] = $valuesModels;
                 } else
                 {
                     $value = null;
@@ -89,7 +95,7 @@ class RelatedPropertiesModel extends DynamicModel
                     }
 
                     $this->setAttribute($code, $value);
-                    $this->_propertiesMap[$code] = $valueModel;
+                    $this->_propertyValues[$code] = $valueModel;
                 }
             }
         }
@@ -165,7 +171,7 @@ class RelatedPropertiesModel extends DynamicModel
             throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
         }
 
-        if ($property->multiple == "Y")
+        if ($property->handler->isMultiple)
         {
             $propertyValues = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
             if ($propertyValues)
@@ -278,7 +284,7 @@ class RelatedPropertiesModel extends DynamicModel
         foreach ($this->_properties as $property)
         {
             if ((!$skipIfSet || $this->{$property->code} === null)) {
-                //$this->{$column->name} = $column->defaultValue;
+                $this->{$property->code} = $property->defaultValue;
             }
         }
 
@@ -307,7 +313,7 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getRelatedElementProperties($name)
     {
-        return ArrayHelper::getValue($this->_propertiesMap, $name);
+        return ArrayHelper::getValue($this->_propertyValues, $name);
     }
 
 
@@ -377,7 +383,7 @@ class RelatedPropertiesModel extends DynamicModel
 
         if ($property->property_type == PropertyType::CODE_LIST)
         {
-            if ($property->multiple == Cms::BOOL_Y)
+            if ($property->handler->isMultiple)
             {
                 if ($property->enums)
                 {
@@ -415,7 +421,7 @@ class RelatedPropertiesModel extends DynamicModel
             }
         } else if ($property->property_type == PropertyType::CODE_ELEMENT)
         {
-            if ($property->multiple == Cms::BOOL_Y)
+            if ($property->handler->isMultiple)
             {
                 return ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
             } else
@@ -443,7 +449,7 @@ class RelatedPropertiesModel extends DynamicModel
 
         if ($property->property_type == PropertyType::CODE_LIST)
         {
-            if ($property->multiple == Cms::BOOL_Y)
+            if ($property->handler->isMultiple)
             {
                 if ($property->enums)
                 {

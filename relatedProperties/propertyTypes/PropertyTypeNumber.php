@@ -8,6 +8,8 @@
 namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
+use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class PropertyTypeNumber
@@ -17,6 +19,43 @@ class PropertyTypeNumber extends PropertyType
 {
     public $code                 = self::CODE_NUMBER;
     public $name                 = "";
+
+    public $default_value        = null;
+
+    public function init()
+    {
+        parent::init();
+
+        if(!$this->name)
+        {
+            $this->name = \Yii::t('skeeks/cms','Number');
+        }
+    }
+
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(),
+        [
+            'default_value'  => \Yii::t('skeeks/cms','Default Value'),
+        ]);
+    }
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(),
+        [
+            ['default_value', 'number'],
+        ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function renderConfigForm(ActiveForm $activeForm)
+    {
+        echo $activeForm->field($this, 'default_value');
+    }
+
 
     /**
      * @return \yii\widgets\ActiveField
@@ -30,26 +69,30 @@ class PropertyTypeNumber extends PropertyType
         return $field;
     }
 
-    public function init()
-    {
-        parent::init();
 
-        if(!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms','Number');
-        }
+    /**
+     * @varsion > 3.0.2
+     *
+     * @return $this
+     */
+    public function addRules()
+    {
+        $this->property->relatedPropertiesModel->addRule($this->property->code, 'number');
+
+        return $this;
     }
 
     /**
      * @varsion > 3.0.2
-     * @param RelatedPropertiesModel $relatedPropertiesModel
      *
-     * @return $this
+     * @return null
      */
-    public function addRulesToRelatedPropertiesModel(RelatedPropertiesModel $relatedPropertiesModel)
+    public function getDefaultValue()
     {
-        $relatedPropertiesModel->addRule($this->property->code, 'number');
-
-        return $this;
+        if ($this->default_value !== null)
+        {
+            return $this->default_value;
+        }
+        return;
     }
 }
