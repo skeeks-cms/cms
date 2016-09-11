@@ -297,6 +297,11 @@ class RelatedPropertiesModel extends DynamicModel
         $property       = $this->getRelatedProperty($name);
         $propertyValue  = $this->getRelatedElementProperties($name);
 
+        if (!$property)
+        {
+            return '';
+        }
+
         if ($property->property_type == PropertyType::CODE_LIST)
         {
             if ($property->multiple == Cms::BOOL_Y)
