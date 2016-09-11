@@ -83,12 +83,14 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
             if (!\Yii::$app->request->post($this->notSubmitParam))
             {
                 $model->component_settings = $handler->toArray();
-                if ($model->load(\Yii::$app->request->post()) && $handler->load(\Yii::$app->request->post())
+                $handler->load(\Yii::$app->request->post());
+
+                if ($model->load(\Yii::$app->request->post())
                     && $model->validate() && $handler->validate())
                 {
                     $model->save();
 
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
                     return $this->redirect(
                         UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
@@ -97,7 +99,7 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
                     );
                 } else
                 {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
                 }
             }
         }
@@ -136,13 +138,14 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
                 if ($rr->isRequestPjaxPost())
                 {
                     $model->component_settings = $handler->toArray();
+                    $handler->load(\Yii::$app->request->post());
 
-                    if ($model->load(\Yii::$app->request->post()) && $handler->load(\Yii::$app->request->post())
+                    if ($model->load(\Yii::$app->request->post())
                         && $model->validate() && $handler->validate())
                     {
                         $model->save();
 
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
                         if (\Yii::$app->request->post('submit-btn') == 'apply')
                         {

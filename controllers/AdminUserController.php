@@ -115,8 +115,10 @@ class AdminUserController extends AdminModelEditorController
     {
         $modelClassName = $this->modelClassName;
         $model          = new $modelClassName();
+        $model->loadDefaultValues();
 
         $relatedModel = $model->relatedPropertiesModel;
+        $relatedModel->loadDefaultValues();
 
         $passwordChange = new PasswordChangeForm([
             'user' => $model

@@ -8,11 +8,6 @@ use common\models\User;
 /* @var $model \skeeks\cms\models\CmsUser */
 /* @var $console \skeeks\cms\controllers\AdminUserController */
 
-if ($model->isNewRecord)
-{
-    $model->loadDefaultValues();
-}
-
 ?>
 
 

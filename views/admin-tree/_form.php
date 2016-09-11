@@ -118,8 +118,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
         <? if ($properties = $model->relatedProperties) : ?>
+            <? if ($model->relatedPropertiesModel) : ?>
+            <? endif; ?>
             <? foreach ($properties as $property) : ?>
-                <?= $property->renderActiveForm($form, $model)?>
+                <?= $property->renderActiveForm($form); ?>
             <? endforeach; ?>
         <? endif; ?>
 

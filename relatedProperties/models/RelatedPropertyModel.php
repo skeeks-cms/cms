@@ -175,6 +175,11 @@ abstract class RelatedPropertyModel extends Core
             return false;
         }
 
+        if ($model && !$this->relatedPropertiesModel)
+        {
+            $this->relatedPropertiesModel = $model->relatedPropertiesModel;
+        }
+
         return $handler->renderForActiveForm();
     }
 

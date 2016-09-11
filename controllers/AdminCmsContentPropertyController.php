@@ -72,6 +72,7 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
         }
 
         $handler = $model->handler;
+
         if ($handler)
         {
             if ($post = \Yii::$app->request->post())
@@ -92,7 +93,7 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
                 {
                     $model->save();
 
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
                     return $this->redirect(
                         UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
@@ -101,7 +102,7 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
                     );
                 } else
                 {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
                 }
             }
         }
