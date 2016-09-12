@@ -128,7 +128,15 @@ abstract class RelatedPropertyModel extends Core
             [['name', 'component'], 'required'],
             [['component_settings'], 'safe'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
-            [['code'], 'string', 'max' => 64],
+            //[['code'], 'string', 'max' => 64],
+            [['code'], function($attribute)
+            {
+                if(!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9]{1,255}$/', $this->$attribute))
+                //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
+                {
+                    $this->addError($attribute, \Yii::t('skeeks/cms','Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',['code' => 'code1']));
+                }
+            }],
 
             [['active', 'property_type', 'list_type', 'multiple', 'with_description', 'searchable', 'filtrable', 'is_required', 'smart_filtrable'], 'string', 'max' => 1],
             ['code', 'default', 'value' => function($model, $attribute)
