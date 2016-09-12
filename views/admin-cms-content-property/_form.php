@@ -82,7 +82,7 @@ JS
 
     <?= $form->field($model, 'searchable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
     <?= $form->field($model, 'filtrable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
-    <?= $form->field($model, 'with_description')->radioList(\Yii::$app->cms->booleanFormat()) ?>
+    <?/*= $form->field($model, 'with_description')->radioList(\Yii::$app->cms->booleanFormat()) */?>
 
 <? if ($content_id = \Yii::$app->request->get('content_id')) : ?>
 

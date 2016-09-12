@@ -100,6 +100,13 @@ class RelatedPropertiesModel extends DynamicModel
             }
         }
 
+        if ($this->_properties)
+        {
+            foreach ($this->_properties as $code => $property)
+            {
+                $property->handler->initValue();
+            }
+        }
     }
 
 
@@ -156,6 +163,27 @@ class RelatedPropertiesModel extends DynamicModel
     }
 
     /**
+     * @return bool
+     */
+    public function delete()
+    {
+        try
+        {
+            foreach ($this->_properties as $property)
+            {
+                $this->_deleteRelatedPropertyValue($property);
+            }
+
+        } catch (\Exception $e)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
      * @param RelatedPropertyModel $property
      * @param $value
      * @return $this
@@ -182,7 +210,8 @@ class RelatedPropertiesModel extends DynamicModel
                 }
             }
 
-            $values = (array) $value;
+            $property->handler->beforeSaveValue();
+            $values  = (array) $this->getAttribute($property->code);
 
             if ($values)
             {
@@ -193,8 +222,8 @@ class RelatedPropertiesModel extends DynamicModel
                         'element_id'    => $element->id,
                         'property_id'   => $property->id,
                         'value'         => (string) $value,
-                        'value_enum'    => (int) $value,
-                        'value_num'     => (float) $value,
+                        'value_enum'    => (int)    $value,
+                        'value_num'     => (float)  $value,
                     ]);
 
                     if (!$productPropertyValue->save())
@@ -206,11 +235,14 @@ class RelatedPropertiesModel extends DynamicModel
 
         } else
         {
+            $property->handler->beforeSaveValue();
+            $value  = $this->getAttribute($property->code);
+
             if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
             {
-                $productPropertyValue->value        = (string) $value;
-                $productPropertyValue->value_enum   = (int) $value;
-                $productPropertyValue->value_num    = (float) $value;
+                $productPropertyValue->value        = (string)  $value;
+                $productPropertyValue->value_enum   = (int)     $value;
+                $productPropertyValue->value_num    = (float)   $value;
             } else
             {
                 $className = $element->relatedElementPropertyClassName;
@@ -219,8 +251,8 @@ class RelatedPropertiesModel extends DynamicModel
                     'element_id'    => $element->id,
                     'property_id'   => $property->id,
                     'value'         => (string) $value,
-                    'value_enum'    => (int) $value,
-                    'value_num'     => (float) $value,
+                    'value_enum'    => (int)    $value,
+                    'value_num'     => (float)  $value,
                 ]);
             }
 
@@ -233,6 +265,52 @@ class RelatedPropertiesModel extends DynamicModel
         return $this;
     }
 
+
+    /**
+     * @param RelatedPropertyModel $property
+     * @param $value
+     * @return $this
+     * @throws \Exception
+     */
+    protected function _deleteRelatedPropertyValue($property)
+    {
+        $element    = $this->relatedElementModel;
+
+        if ($element->isNewRecord)
+        {
+            throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
+        }
+
+
+        if ($property->handler->isMultiple)
+        {
+            $property->handler->beforeDeleteValue();
+
+            $propertyValues = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
+            if ($propertyValues)
+            {
+                foreach ($propertyValues as $pv)
+                {
+                    $pv->delete();
+                }
+            }
+
+        } else
+        {
+            $property->handler->beforeDeleteValue();
+
+            $propertyValues = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
+            if ($propertyValues)
+            {
+                foreach ($propertyValues as $pv)
+                {
+                    $pv->delete();
+                }
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * @inheritdoc

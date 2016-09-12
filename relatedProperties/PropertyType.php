@@ -30,42 +30,37 @@ use yii\widgets\ActiveForm;
 abstract class PropertyType extends Model implements ConfigFormInterface
 {
     /**
-     * @param ActiveForm $form
+     * @var string
      */
-    public function renderConfigForm(ActiveForm $form)
-    {}
-
-    const CODE_STRING   = 'S';
-    const CODE_NUMBER   = 'N';
-    const CODE_LIST     = 'L';
-    const CODE_FILE     = 'F';
-    const CODE_TREE     = 'T';
-    const CODE_ELEMENT  = 'E';
-
     public $id;
 
     /**
-     * TODO: ?
-     * @var код типа свойства (логика приложения)
-     */
-    public $code;
-
-    /**
-     * @var Название свойства
+     * The name of the handler
+     * @var string
      */
     public $name;
 
     /**
+     * Object properties is bound to the current handler
      * @var RelatedPropertyModel
      */
     public $property;
 
     /**
+     * Object form which will be completed item
      * @var ActiveForm
      */
     public $activeForm;
 
     /**
+     * The configuration form for the current state of the component settings
+     * @param ActiveForm $form
+     */
+    public function renderConfigForm(ActiveForm $form)
+    {}
+
+    /**
+     * From the result of this function will depend on how the property values are stored in the database
      * @return bool
      */
     public function getIsMultiple()
@@ -74,15 +69,7 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     }
 
     /**
-     * TODO: is depricated @varsion > 3.0.2
-     * @return string
-     */
-    public function getMultiple()
-    {
-        return $this->isMultiple ? Cms::BOOL_Y : Cms::BOOL_N;
-    }
-
-    /**
+     * Drawing form element
      * @return \yii\widgets\ActiveField
      */
     public function renderForActiveForm()
@@ -94,37 +81,12 @@ abstract class PropertyType extends Model implements ConfigFormInterface
             return '';
         }
 
-        $this->postFieldRender($field);
         return $field;
     }
 
     /**
+     * Adding validation rules to the object RelatedPropertiesModel
      *
-     * Стандартная обработка поля формы.
-     *
-     * @param \yii\widgets\ActiveField $field
-     * @return \yii\widgets\ActiveField
-     */
-    public function postFieldRender(\yii\widgets\ActiveField $field)
-    {
-        if ($this->property->hint)
-        {
-            $field->hint((string) $this->property->hint);
-        }
-
-        if ($this->property->name)
-        {
-            $label = $this->property->name;
-            $field->label($label);
-        } else
-        {
-            $field->label(false);
-        }
-
-        return $field;
-    }
-
-    /**
      * @varsion > 3.0.2
      *
      * @return $this
@@ -136,6 +98,8 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     }
 
     /**
+     * The default value for this property
+     *
      * @varsion > 3.0.2
      *
      * @return null
@@ -144,4 +108,82 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     {
         return null;
     }
+
+    /**
+     * Conversion property value received from the database
+     *
+     * @return $this
+     * @throws models\InvalidParamException
+     */
+    public function initValue()
+    {
+        /*$valueFromDb    = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value          = unserialize($valueFromDb);
+        $this->property->relatedPropertiesModel->setAttribute($this->property->code, $value);*/
+
+        return $this;
+    }
+
+    /**
+     * Converting the property value before saving to database
+     *
+     * @return $this
+     */
+    public function beforeSaveValue()
+    {
+        /*$value        = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $valueToDb      = serialize($value);
+        $this->property->relatedPropertiesModel->setAttribute($this->property->code, $valueToDb);*/
+        return $this;
+    }
+
+    /**
+     * Fires before the removal of the property value of the element base
+     *
+     * @return $this
+     */
+    public function beforeDeleteValue()
+    {
+        /*$value        = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $valueToDb      = serialize($value);
+        $this->property->relatedPropertiesModel->setAttribute($this->property->code, $valueToDb);*/
+        return $this;
+    }
+
+
+
+
+
+
+
+        /**
+         * TODO: It may be deprecated
+         */
+
+
+    /**
+     * TODO: It may be deprecated @version > 3.0.2
+     */
+    const CODE_STRING   = 'S';
+    const CODE_NUMBER   = 'N';
+    const CODE_LIST     = 'L';
+    const CODE_FILE     = 'F';
+    const CODE_TREE     = 'T';
+    const CODE_ELEMENT  = 'E';
+
+    /**
+     * TODO: It may be deprecated @version > 3.0.2
+     * @var код типа свойства (логика приложения)
+     */
+    public $code;
+
+    /**
+     * TODO: is deprecated @version > 3.0.2
+     * @return string
+     */
+    public function getMultiple()
+    {
+        return $this->isMultiple ? Cms::BOOL_Y : Cms::BOOL_N;
+    }
+
 }

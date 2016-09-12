@@ -167,7 +167,6 @@ class PropertyTypeList extends PropertyType
             return '';
         }
 
-        $this->postFieldRender($field);
         return $field;
     }
 

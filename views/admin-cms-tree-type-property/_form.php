@@ -85,7 +85,7 @@ JS
     <?= $form->fieldRadioListBoolean($model, 'searchable') ?>
     <?/*= $form->fieldRadioListBoolean($model, 'filtrable') */?><!--
     --><?/*= $form->fieldRadioListBoolean($model, 'smart_filtrable') */?>
-    <?= $form->fieldRadioListBoolean($model, 'with_description') ?>
+    <?/*= $form->fieldRadioListBoolean($model, 'with_description') */?>
 
 
     <? if ($content_id = \Yii::$app->request->get('tree_type_id')) : ?>

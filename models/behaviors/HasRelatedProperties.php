@@ -14,6 +14,7 @@ use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Behavior;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
+use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\ErrorHandler;
 
@@ -42,6 +43,25 @@ class HasRelatedProperties extends Behavior
     public function getRelatedElementProperties()
     {
         return $this->owner->hasMany($this->relatedElementPropertyClassName, ['element_id' => 'id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function events()
+    {
+        return [
+            BaseActiveRecord::EVENT_BEFORE_DELETE      => "_deleteRelatedProperties",
+        ];
+    }
+
+    /**
+     * before removal of the model you want to delete related properties
+     */
+    public function _deleteRelatedProperties()
+    {
+        $rpm = $this->owner->relatedPropertiesModel;
+        $rpm->delete();
     }
 
     /**

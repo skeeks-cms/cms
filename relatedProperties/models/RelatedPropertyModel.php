@@ -74,17 +74,23 @@ abstract class RelatedPropertyModel extends Core
     {
         parent::init();
 
-        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "processBeforeSave"]);
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "processBeforeSave"]);
+        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "_processBeforeSave"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_processBeforeSave"]);
+        $this->on(self::EVENT_BEFORE_DELETE,    [$this, "_processBeforeDelete"]);
     }
 
-    public function processBeforeSave($e)
+    public function _processBeforeSave($e)
     {
         if ($handler = $this->handler)
         {
             $this->property_type    = $handler->code;
             $this->multiple         = $handler->isMultiple ? Cms::BOOL_Y : Cms::BOOL_N;
         }
+    }
+
+    public function _processBeforeDelete($e)
+    {
+        //TODO:: find all the elements associated with this feature and to remove them
     }
 
     /**
