@@ -14,6 +14,7 @@ use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
 use Yii;
 use yii\base\DynamicModel;
 use yii\base\Model;
@@ -197,12 +198,19 @@ abstract class RelatedPropertyModel extends Core
         return $handler->renderForActiveForm();
     }
 
+    protected $_handler = null;
+
     /**
      * @return PropertyType
      * @throws \skeeks\cms\import\InvalidParamException
      */
     public function getHandler()
     {
+        if ($this->_handler !== null)
+        {
+            return $this->_handler;
+        }
+
         if ($this->component)
         {
             try
@@ -214,10 +222,16 @@ abstract class RelatedPropertyModel extends Core
                 $component->property = $this;
                 $component->load($this->component_settings, "");
 
-                return $component;
+                $this->_handler = $component;
+                return $this->_handler;
             } catch (\Exception $e)
             {
-                return false;
+                \Yii::error("Related property handler not found '{$this->component}'", self::className());
+                $component = new PropertyTypeText();
+                $component->property = $this;
+
+                $this->_handler = $component;
+                return $this->_handler;
             }
 
         }
