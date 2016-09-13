@@ -34,7 +34,7 @@
         "skeeks/yii2-sx": "*",
         "skeeks/yii2-ckeditor": "*",
         "skeeks/yii2-widget-simpleajaxuploader": "*",
-        "skeeks/yii2-widget-chosen": "dev-master",
+        "skeeks/yii2-widget-chosen": "*",
         "skeeks/yii2-widget-highcharts": "*",
         "skeeks/yii2-widget-codemirror": "*",
         "kartik-v/yii2-datecontrol": "*",
