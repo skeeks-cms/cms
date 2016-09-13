@@ -25,16 +25,21 @@ class PropertyTypeList extends PropertyType
 
     const FIELD_ELEMENT_SELECT              = "select";
     const FIELD_ELEMENT_SELECT_MULTI        = "selectMulti";
+    const FIELD_ELEMENT_LISTBOX             = "listbox";
+    const FIELD_ELEMENT_LISTBOX_MULTI       = "listboxmulti";
+
     const FIELD_ELEMENT_RADIO_LIST          = "radioList";
     const FIELD_ELEMENT_CHECKBOX_LIST       = "checkbox";
 
     static public function fieldElements()
     {
         return [
-            self::FIELD_ELEMENT_SELECT          => \Yii::t('skeeks/cms','Combobox').' (select)',
-            self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('skeeks/cms','Combobox').' (select multiple)',
-            self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('skeeks/cms','Radio Buttons (selecting one value)'),
-            self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('skeeks/cms','Checkbox List'),
+            self::FIELD_ELEMENT_SELECT          => \Yii::t('skeeks/cms', 'Combobox').' (select)',
+            self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('skeeks/cms', 'Combobox').' (select multiple)',
+            self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('skeeks/cms', 'Radio Buttons (selecting one value)'),
+            self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('skeeks/cms', 'Checkbox List'),
+            self::FIELD_ELEMENT_LISTBOX         => \Yii::t('skeeks/cms', 'ListBox'),
+            self::FIELD_ELEMENT_LISTBOX_MULTI   => \Yii::t('skeeks/cms', 'ListBox Multi'),
         ];
     }
 
@@ -55,7 +60,7 @@ class PropertyTypeList extends PropertyType
      */
     public function getIsMultiple()
     {
-        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST, self::FIELD_ELEMENT_LISTBOX_MULTI]))
         {
             return true;
         }
@@ -159,6 +164,20 @@ class PropertyTypeList extends PropertyType
         {
             $field = parent::renderForActiveForm();
             $field->checkboxList(ArrayHelper::map($this->property->enums, 'id', 'value'));
+
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX_MULTI)
+        {
+            $field = parent::renderForActiveForm();
+            $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
+                'size' => 5,
+                'multiple' => 'multiple'
+            ]);
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX)
+        {
+            $field = parent::renderForActiveForm();
+            $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
+                'size' => 1,
+            ]);
         }
 
 
