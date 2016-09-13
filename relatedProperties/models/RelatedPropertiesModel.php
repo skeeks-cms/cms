@@ -439,78 +439,18 @@ class RelatedPropertiesModel extends DynamicModel
 
     /**
      * @param $name
-     * @return array|mixed|string
+     * @return string
      */
     public function getSmartAttribute($name)
     {
-        /**
-         * @var $property RelatedPropertyModel
-         */
-        $value          = $this->getAttribute($name);
         $property       = $this->getRelatedProperty($name);
-        $propertyValue  = $this->getRelatedElementProperties($name);
 
         if (!$property)
         {
             return '';
         }
 
-        if ($property->property_type == PropertyType::CODE_LIST)
-        {
-            if ($property->handler->isMultiple)
-            {
-                if ($property->enums)
-                {
-                    $result = [];
-
-                    foreach ($property->enums as $enum)
-                    {
-                        if (in_array($enum->id, $value))
-                        {
-                            $result[$enum->code] = $enum->value;
-                        }
-
-                    }
-
-                    return $result;
-                }
-            } else
-            {
-                if ($property->enums)
-                {
-                    //TODO:: it is necessary to verify in the future
-                    $enums = (array) $property->enums;
-                    $enum = array_shift($enums);
-
-                    foreach ($enums as $enum)
-                    {
-                        if ($enum->id == $value)
-                        {
-                            return $enum->value;;
-                        }
-                    }
-                }
-
-                return "";
-            }
-        } else if ($property->property_type == PropertyType::CODE_ELEMENT)
-        {
-            if ($property->handler->isMultiple)
-            {
-                return ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
-            } else
-            {
-                if ($element = CmsContentElement::find()->where(['id' => $value])->one())
-                {
-                    return $element->name;
-                }
-
-                return "";
-            }
-        } else
-        {
-            return $value;
-        }
+        return $property->handler->stringValue;
     }
 
     public function getEnumByAttribute($name)

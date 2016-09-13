@@ -18,11 +18,13 @@ use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
  * @property bool           $isMultiple
  * @property mixed          $defaultValue
+ * @property string         $stringValue
  *
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
@@ -107,6 +109,22 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     public function getDefaultValue()
     {
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStringValue()
+    {
+        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+
+        if (is_array($value))
+        {
+            return Json::encode($value);
+        } else
+        {
+            return (string) $value;
+        }
     }
 
     /**

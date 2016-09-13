@@ -119,9 +119,11 @@ class SelectTree extends InputWidget
                 'select'            => $select,
                 'src'               => $src,
                 'valueSingle'       => $valueSingle,
+                'idSmartFrame'      => $id . "-smart-frame",
                 'singleInput'       => $singleInput,
                 'clientOptions'     => Json::encode(
                     [
+                        'idSmartFrame'       => $id . "-smart-frame",
                         'src'       => $src,
                         'name'      => $id,
                         'id'        => $id,

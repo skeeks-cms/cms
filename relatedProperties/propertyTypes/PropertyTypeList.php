@@ -187,4 +187,50 @@ class PropertyTypeList extends PropertyType
 
         return $this;
     }
+
+
+    /**
+     * @return string
+     */
+    public function getStringValue()
+    {
+        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+
+        if ($property->isMultiple)
+        {
+            if ($this->property->enums)
+            {
+                $result = [];
+
+                foreach ($this->property->enums as $enum)
+                {
+                    if (in_array($enum->id, $value))
+                    {
+                        $result[$enum->code] = $enum->value;
+                    }
+
+                }
+
+                return implode(", ", $result);
+            }
+        } else
+        {
+            if ($this->property->enums)
+            {
+                //TODO:: it is necessary to verify in the future
+                $enums = (array) $this->property->enums;
+                $enum = array_shift($enums);
+
+                foreach ($enums as $enum)
+                {
+                    if ($enum->id == $value)
+                    {
+                        return $enum->value;
+                    }
+                }
+            }
+
+            return "";
+        }
+    }
 }

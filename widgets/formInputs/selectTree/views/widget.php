@@ -12,7 +12,6 @@ use \skeeks\cms\widgets\formInputs\selectTree\SelectTree;
 /**
  * @var \skeeks\cms\widgets\formInputs\selectTree\SelectTree $widget
  */
-$idSmartFrame = $id . "-smart-frame";
 ?>
 
 <div id="<?= $id; ?>">
@@ -25,7 +24,7 @@ $idSmartFrame = $id . "-smart-frame";
             <small><?=\Yii::t('skeeks/cms','The square - an additional section (you can mark several additional sections)')?></small>
         <? endif; ?>
     </p>
-    <iframe data-src="<?= $src; ?>" width="100%;" height="200px;" id="sx-test"></iframe>
+    <iframe data-src="<?= $src; ?>" width="100%;" height="200px;" id="<?= $idSmartFrame; ?>"></iframe>
     <div class="sx-selected">
         <?= $select; ?>
         <?= $singleInput; ?>
@@ -45,7 +44,7 @@ $idSmartFrame = $id . "-smart-frame";
 
             var self = this;
 
-            this.Iframe = new sx.classes.Iframe('sx-test', {
+            this.Iframe = new sx.classes.Iframe(this.get('idSmartFrame'), {
                 'autoHeight'        : true,
                 'heightSelector'    : '.sx-panel-content'
             });
@@ -97,7 +96,7 @@ $idSmartFrame = $id . "-smart-frame";
 
             _.delay(function()
             {
-                $('#sx-test').attr('src', $('#sx-test').data('src'));
+                $('#' + self.get('idSmartFrame')).attr('src', $('#' + self.get('idSmartFrame')).data('src'));
             }, 200);
 
         },
