@@ -50,8 +50,9 @@ use yii\widgets\ActiveForm;
  * @property RelatedElementPropertyModel[]      $elementProperties
  * @property RelatedPropertyEnumModel[]         $enums
  *
- * @property PropertyType         $handler
- * @property mixed         $defaultValue
+ * @property PropertyType           $handler
+ * @property mixed                  $defaultValue
+ * @property bool                   $isRequired
  */
 abstract class RelatedPropertyModel extends Core
 {
@@ -218,7 +219,10 @@ abstract class RelatedPropertyModel extends Core
                 /**
                  * @var $component PropertyType
                  */
-                $component = \Yii::$app->cms->getRelatedHandler($this->component);
+                $foundComponent = \Yii::$app->cms->getRelatedHandler($this->component);
+                //TODO:: Подумать! Нужно чтобы создавался новый экземляр класса потому что в него передается property объект. В то же время хотелось бы чтобы объект handler собирался согласно настройкам конфига.
+                $component = clone $foundComponent;
+                //$component = \Yii::$app->cms->createRelatedHandler($this->component);
                 $component->property = $this;
                 $component->load($this->component_settings, "");
 
@@ -237,6 +241,14 @@ abstract class RelatedPropertyModel extends Core
         }
 
         return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsRequired()
+    {
+        return (bool) $this->is_required == Cms::BOOL_Y;
     }
 
 

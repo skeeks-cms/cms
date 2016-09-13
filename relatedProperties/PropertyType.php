@@ -112,29 +112,32 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     /**
      * Conversion property value received from the database
      *
-     * @return $this
-     * @throws models\InvalidParamException
+     * @param mixed $valueFromDb
+     *
+     * @return mixed
      */
-    public function initValue()
+    public function initValue($valueFromDb)
     {
-        /*$valueFromDb    = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
-        $value          = unserialize($valueFromDb);
-        $this->property->relatedPropertiesModel->setAttribute($this->property->code, $value);*/
+        /*
+            $valueFromDb          = unserialize($valueFromDb);
+        */
 
-        return $this;
+        return $valueFromDb;
     }
 
     /**
      * Converting the property value before saving to database
      *
-     * @return $this
+     * @param mixed $value
+     *
+     * @return mixed
      */
-    public function beforeSaveValue()
+    public function beforeSaveValue($value)
     {
-        /*$value        = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
-        $valueToDb      = serialize($value);
-        $this->property->relatedPropertiesModel->setAttribute($this->property->code, $valueToDb);*/
-        return $this;
+        /*
+            $value      = serialize($value);
+        */
+        return $value;
     }
 
     /**

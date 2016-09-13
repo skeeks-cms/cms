@@ -77,6 +77,8 @@ class RelatedPropertiesModel extends DynamicModel
                         }
                     }
 
+                    $values = $property->handler->initValue($values);
+
                     $this->setAttribute($code, $values);
                     $this->_propertyValues[$code] = $valuesModels;
                 } else
@@ -94,17 +96,11 @@ class RelatedPropertiesModel extends DynamicModel
                         }
                     }
 
+                    $value = $property->handler->initValue($value);
+
                     $this->setAttribute($code, $value);
                     $this->_propertyValues[$code] = $valueModel;
                 }
-            }
-        }
-
-        if ($this->_properties)
-        {
-            foreach ($this->_properties as $code => $property)
-            {
-                $property->handler->initValue();
             }
         }
     }
@@ -210,8 +206,8 @@ class RelatedPropertiesModel extends DynamicModel
                 }
             }
 
-            $property->handler->beforeSaveValue();
             $values  = (array) $this->getAttribute($property->code);
+            $values = $property->handler->beforeSaveValue($values);
 
             if ($values)
             {
@@ -235,8 +231,8 @@ class RelatedPropertiesModel extends DynamicModel
 
         } else
         {
-            $property->handler->beforeSaveValue();
-            $value  = $this->getAttribute($property->code);
+            $value      = $this->getAttribute($property->code);
+            $value      = $property->handler->beforeSaveValue($value);
 
             if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
             {
