@@ -215,7 +215,7 @@ class PropertyTypeList extends PropertyType
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
 
-        if ($property->isMultiple)
+        if ($this->isMultiple)
         {
             if ($this->property->enums)
             {
