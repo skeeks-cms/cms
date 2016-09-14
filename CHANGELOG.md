@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.1.0.pre
+3.1.0
 -----------------
  * Fixed https://github.com/skeeks-cms/cms/issues/31
  * Changing the mechanism of additional properties \Yii::$app->cms->relatedHandlers
