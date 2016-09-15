@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.1.0.1
+-----------------
+ * Fixed bugs
+
 3.1.0
 -----------------
  * Fixed https://github.com/skeeks-cms/cms/issues/31

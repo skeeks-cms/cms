@@ -113,17 +113,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-    <? if ($model->relatedProperties) : ?>
+    <? if ($model->relatedPropertiesModel->properties) : ?>
+
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
-        <? if ($properties = $model->relatedProperties) : ?>
-            <? if ($model->relatedPropertiesModel) : ?>
-            <? endif; ?>
-            <? foreach ($properties as $property) : ?>
-                <?= $property->renderActiveForm($form); ?>
-            <? endforeach; ?>
-        <? endif; ?>
+
+        <? foreach ($model->relatedPropertiesModel->properties as $property) : ?>
+            <?= $property->renderActiveForm($form); ?>
+        <? endforeach; ?>
 
     <? else : ?>
         <?/*= \Yii::t('skeeks/cms','Additional properties are not set')*/?>

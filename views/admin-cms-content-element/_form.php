@@ -68,15 +68,13 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         )->label($contentModel->parentContent->name_one) ?>
     <? endif; ?>
 
-    <? if ($model->relatedProperties) : ?>
+    <? if ($model->relatedPropertiesModel->properties) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
-        <? if ($properties = $model->relatedProperties) : ?>
-            <? foreach ($properties as $property) : ?>
-                <?= $property->renderActiveForm($form, $model)?>
-            <? endforeach; ?>
-        <? endif; ?>
+        <? foreach ($model->relatedPropertiesModel->properties as $property) : ?>
+            <?= $property->renderActiveForm($form)?>
+        <? endforeach; ?>
 
     <? else : ?>
         <?/*= \Yii::t('skeeks/cms','Additional properties are not set')*/?>

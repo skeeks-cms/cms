@@ -22,6 +22,8 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\BaseHtml;
 
 /**
+ * @property RelatedPropertyModel[] $properties
+ *
  * Class RelatedPropertiesModel
  * @package skeeks\cms\relatedProperties\models
  */
@@ -156,6 +158,14 @@ class RelatedPropertiesModel extends DynamicModel
         }
 
         return true;
+    }
+
+    /**
+     * @return RelatedPropertyModel[]
+     */
+    public function getProperties()
+    {
+        return $this->_properties;
     }
 
     /**
