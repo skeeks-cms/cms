@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.1.0.2.pre
+-----------------
+* Fixed #32 (Solving problems for value_enum and value_num on save additional properties.)
+
 3.1.0.1
 -----------------
  * Fixed bugs
