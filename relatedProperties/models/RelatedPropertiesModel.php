@@ -227,9 +227,9 @@ class RelatedPropertiesModel extends DynamicModel
                     $productPropertyValue = new $className([
                         'element_id'    => $element->id,
                         'property_id'   => $property->id,
-                        'value'         => (string) $value,
-                        'value_enum'    => (int)    $value,
-                        'value_num'     => (float)  $value,
+                        'value'         => $value,
+                        'value_enum'    => $value,
+                        'value_num'     => $value,
                     ]);
 
                     if (!$productPropertyValue->save())
@@ -246,9 +246,9 @@ class RelatedPropertiesModel extends DynamicModel
 
             if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
             {
-                $productPropertyValue->value        = (string)  $value;
-                $productPropertyValue->value_enum   = (int)     $value;
-                $productPropertyValue->value_num    = (float)   $value;
+                $productPropertyValue->value        = $value;
+                $productPropertyValue->value_enum   = $value;
+                $productPropertyValue->value_num    = $value;
             } else
             {
                 $className = $element->relatedElementPropertyClassName;
@@ -256,9 +256,9 @@ class RelatedPropertiesModel extends DynamicModel
                 $productPropertyValue = new $className([
                     'element_id'    => $element->id,
                     'property_id'   => $property->id,
-                    'value'         => (string) $value,
-                    'value_enum'    => (int)    $value,
-                    'value_num'     => (float)  $value,
+                    'value'         => $value,
+                    'value_enum'    => $value,
+                    'value_num'     => $value,
                 ]);
             }
 
