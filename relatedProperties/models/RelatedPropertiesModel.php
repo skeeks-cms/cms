@@ -197,6 +197,29 @@ class RelatedPropertiesModel extends DynamicModel
      */
     protected function _saveRelatedPropertyValue($property)
     {
+        $filter_int = function($value) {
+            $value = (int) $value;
+            $filter_options = [
+                'options' => [
+                    'default' => 0,
+                    'min_range' => -2147483648,
+                    'max_range' => 2147483647
+                ]
+            ];
+            return filter_var($value, FILTER_VALIDATE_INT, $filter_options);
+        };
+
+        $filter_decimal = function($value) {
+            $new_value = (float) $value;
+            $min_range = -1.0E+14;
+            $max_range = 1.0E+14;
+            if($new_value<=$min_range || $new_value>=$max_range )
+            {
+                return 0.0;
+            }
+            return filter_var($value, FILTER_VALIDATE_FLOAT, ['options'=>['default' => 0.0]]);
+        };
+
         $value      = $this->getAttribute($property->code);
         $element    = $this->relatedElementModel;
 
@@ -228,8 +251,8 @@ class RelatedPropertiesModel extends DynamicModel
                         'element_id'    => $element->id,
                         'property_id'   => $property->id,
                         'value'         => (string) $value,
-                        'value_enum'    => (int)    $value,
-                        'value_num'     => (float)  $value,
+                        'value_enum'    => $filter_int($value),
+                        'value_num'     => $filter_decimal($value),
                     ]);
 
                     if (!$productPropertyValue->save())
@@ -247,8 +270,8 @@ class RelatedPropertiesModel extends DynamicModel
             if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
             {
                 $productPropertyValue->value        = (string)  $value;
-                $productPropertyValue->value_enum   = (int)     $value;
-                $productPropertyValue->value_num    = (float)   $value;
+                $productPropertyValue->value_enum   = $filter_int($value);
+                $productPropertyValue->value_num    = $filter_decimal($value);
             } else
             {
                 $className = $element->relatedElementPropertyClassName;
@@ -257,8 +280,8 @@ class RelatedPropertiesModel extends DynamicModel
                     'element_id'    => $element->id,
                     'property_id'   => $property->id,
                     'value'         => (string) $value,
-                    'value_enum'    => (int)    $value,
-                    'value_num'     => (float)  $value,
+                    'value_enum'    => $filter_int($value),
+                    'value_num'     => $filter_decimal($value),
                 ]);
             }
 
