@@ -59,11 +59,35 @@ abstract class RelatedElementPropertyModel extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'element_id', 'value_enum'], 'integer'],
-            /*[['value'], 'required'],*/
-            [['value_num'], 'number'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'element_id'], 'integer'],
             [['description'], 'string', 'max' => 255],
-            [['value'], 'string']
+            [['value'], 'string'],
+
+            ['value_enum', 'filter', 'filter' => function ($value) {
+                $value = (int) $value;
+                $filter_options = [
+                    'options' => [
+                        'default' => 0,
+                        'min_range' => -2147483648,
+                        'max_range' => 2147483647
+                    ]
+                ];
+                return filter_var($value, FILTER_VALIDATE_INT, $filter_options);
+            }],
+            ['value_enum', 'integer'],
+
+            ['value_num', 'filter', 'filter' => function ($value) {
+                $new_value = (float) $value;
+                $min_range = -1.0E+14;
+                $max_range = 1.0E+14;
+                if($new_value<=$min_range || $new_value>=$max_range )
+                {
+                    return 0.0;
+                }
+                return filter_var($value, FILTER_VALIDATE_FLOAT, ['options'=>['default' => 0.0]]);
+            }],
+            ['value_num', 'number'],
+
         ]);
     }
 
