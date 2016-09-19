@@ -77,14 +77,14 @@ abstract class RelatedElementPropertyModel extends Core
             ['value_enum', 'integer'],
 
             ['value_num', 'filter', 'filter' => function ($value) {
-                $new_value = (float) $value;
+                $value = (float) $value;
                 $min_range = -1.0E+14;
                 $max_range = 1.0E+14;
-                if($new_value<=$min_range || $new_value>=$max_range )
+                if($value <= $min_range || $value >= $max_range )
                 {
                     return 0.0;
                 }
-                return filter_var($value, FILTER_VALIDATE_FLOAT, ['options'=>['default' => 0.0]]);
+                return $value;
             }],
             ['value_num', 'number'],
 
