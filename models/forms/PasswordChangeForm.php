@@ -14,6 +14,7 @@ namespace skeeks\cms\models\forms;
 use skeeks\cms\models\User;
 use Yii;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * Login form
@@ -24,11 +25,27 @@ class PasswordChangeForm extends Model
      * @var User
      */
     public $user;
+
     /**
      * @var string
      */
     public $new_password;
+
+    /**
+     * @var
+     */
     public $new_password_confirm;
+
+    const SCENARION_NOT_REQUIRED = 'notRequired';
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        return ArrayHelper::merge(parent::scenarios(), [
+            self::SCENARION_NOT_REQUIRED => $scenarios[self::SCENARIO_DEFAULT],
+        ]);
+    }
 
     /**
      * @inheritdoc
@@ -37,7 +54,11 @@ class PasswordChangeForm extends Model
     {
         return [
             // password is validated by validatePassword()
-            [['new_password_confirm', 'new_password'], 'required'],
+            /*[['new_password_confirm', 'new_password'], 'required'/*, 'when' => function(self $model)
+            {
+                return $model->scenario != self::SCENARION_NOT_REQUIRED;
+            }],*/
+            /*],*/
             [['new_password_confirm', 'new_password'], 'string', 'min' => 6],
             [['new_password_confirm'], 'validateNewPassword'],
         ];
@@ -63,13 +84,10 @@ class PasswordChangeForm extends Model
      */
     public function validateNewPassword($attribute, $params)
     {
-        //if (!$this->hasErrors())
-        //{
-            if ($this->new_password_confirm != $this->new_password)
-            {
-                $this->addError($attribute, \Yii::t('skeeks/cms','New passwords do not match'));
-            }
-        //}
+        if ($this->new_password_confirm != $this->new_password)
+        {
+            $this->addError($attribute, \Yii::t('skeeks/cms','New passwords do not match'));
+        }
     }
 
     /**
@@ -79,7 +97,7 @@ class PasswordChangeForm extends Model
      */
     public function changePassword()
     {
-        if ($this->validate() && $this->new_password == $this->new_password_confirm)
+        if ($this->validate() && $this->new_password == $this->new_password_confirm && $this->new_password)
         {
             $this->user->setPassword($this->new_password);
             return $this->user->save(false);

@@ -94,6 +94,7 @@ class AdminProfileController extends AdminModelEditorController
         $passwordChange = new PasswordChangeForm([
             'user' => $model
         ]);
+        $passwordChange->scenario = PasswordChangeForm::SCENARION_NOT_REQUIRED;
 
         $rr = new RequestResponse();
 
