@@ -14,29 +14,38 @@
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$dataProvider->sort->defaultOrder = [
-    'created_at' => SORT_DESC
-];
 ?>
 
+
+<? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+
+<? $pjaxId = $pjax->id; ?>
 <?= \skeeks\cms\widgets\StorageFileManager::widget([
     'clientOptions' =>
     [
         'completeUploadFile' => new \yii\web\JsExpression(<<<JS
         function(data)
         {
-            $.pjax.reload('#sx-storage-files', {});
+            $.pjax.reload('#{$pjaxId}', {});
         }
 JS
 )
     ],
 ]); ?>
 <p></p>
+
+    <?php echo $this->render('_search', [
+        'searchModel'   => $searchModel,
+        'dataProvider'  => $dataProvider
+    ]); ?>
+
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
 
     'dataProvider'      => $dataProvider,
     'filterModel'       => $searchModel,
     'adminController'   => $controller,
+
+    'pjax'              => $pjax,
 
     'pjaxOptions' => [
         'id' => 'sx-storage-files'
@@ -113,3 +122,5 @@ JS
     ],
 
 ]); ?>
+
+<? $pjax::end(); ?>

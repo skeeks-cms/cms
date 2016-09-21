@@ -39,38 +39,6 @@ class AdminCmsTreeTypeController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns" => [
-                        'name',
-                        'code',
-
-                        [
-                            'class'         => DataColumn::className(),
-                            'label'         => \Yii::t('skeeks/cms', 'Number of sections'),
-                            'value'     => function(CmsTreeType $cmsTreeType)
-                            {
-                                return $cmsTreeType->getCmsTrees()->count();
-                            }
-                        ],
-
-                        [
-                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => 'active'
-                        ],
-                        'priority',
-                    ],
-                ],
-
                 "activate-multi" =>
                 [
                     'class' => AdminMultiModelEditAction::className(),

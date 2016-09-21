@@ -27,45 +27,4 @@ class AdminCmsContentTypeController extends AdminModelEditorController
 
         parent::init();
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns" => [
-                        'name',
-                        'code',
-
-                        [
-                            'value'     => function(\skeeks\cms\models\CmsContentType $model)
-                            {
-                                $contents = \yii\helpers\ArrayHelper::map($model->cmsContents, 'id', 'name');
-                                return implode(', ', $contents);
-                            },
-
-                            'label' => 'Контент',
-                        ],
-
-                        'priority',
-                    ],
-                ],
-            ]
-        );
-    }
-
 }
