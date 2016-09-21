@@ -3,6 +3,7 @@ CHANGELOG
 
 3.1.0.2.pre
 -----------------
+* Fixed #37 (A bug in the password change)
 * Fixed #32 (Solving problems for value_enum and value_num on save additional properties.)
 
 3.1.0.1
