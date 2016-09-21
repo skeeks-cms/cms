@@ -463,6 +463,11 @@ class RelatedPropertiesModel extends DynamicModel
         return $property->handler->stringValue;
     }
 
+    /**
+     * @param $name
+     *
+     * @return RelatedPropertyEnumModel|RelatedPropertyEnumModel[]|null
+     */
     public function getEnumByAttribute($name)
     {
         /**
@@ -494,13 +499,13 @@ class RelatedPropertiesModel extends DynamicModel
             {
                 if ($property->enums)
                 {
-                    $enum = array_shift($property->enums);
+                    $enums = (array) $property->enums;
 
-                    foreach ($property->enums as $enum)
+                    foreach ($enums as $enum)
                     {
                         if ($enum->id == $value)
                         {
-                            return $enum;;
+                            return $enum;
                         }
                     }
                 }

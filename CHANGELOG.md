@@ -3,6 +3,7 @@ CHANGELOG
 
 3.1.0.2.pre
 -----------------
+* Fixed #38 [https://github.com/skeeks-cms/cms/issues/38] (Additional properties of content items)
 * Fixed #35 [https://github.com/skeeks-cms/cms/issues/35] (Errors in JavaScript code in the behavior of the widget in the admin table)
 * Fixed #37 [https://github.com/skeeks-cms/cms/issues/37] (A bug in the password change)
 * Fixed #32 [https://github.com/skeeks-cms/cms/issues/32] (Solving problems for value_enum and value_num on save additional properties.)
