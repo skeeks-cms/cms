@@ -82,6 +82,8 @@ return
     "Component"             => "Компонент",
     "Editing view files"    => "Редактирование шаблонов",
 
+    "Phone number does not seem to be a valid phone number"    => "Некорректный формат номера телефона",
+
     "The Name One Element"  => "Название одного элемента",
     "The Name Of The Elements (Plural)" => "Название элементов (множественное число)",
     "View Mode Sections And Elements" => "Режим просмотра разделов и элементов",

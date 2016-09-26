@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.1.0.2.pre
+3.1.1.pre
 -----------------
+* Phone validator translate message
 * Fixed bug admin edit settings form
 * Fixed #38 [https://github.com/skeeks-cms/cms/issues/38] (Additional properties of content items)
 * Fixed #35 [https://github.com/skeeks-cms/cms/issues/35] (Errors in JavaScript code in the behavior of the widget in the admin table)
