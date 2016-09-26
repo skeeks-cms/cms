@@ -42,7 +42,7 @@
 
             [
                 'class'     => \yii\grid\DataColumn::className(),
-                'value'     => function(\skeeks\cms\models\CmsSite $model, $key, $index, $this)
+                'value'     => function(\skeeks\cms\models\CmsSite $model, $key, $index)
                 {
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-cog"></i>',
                     \skeeks\cms\helpers\UrlHelper::constructCurrent()->setRoute('cms/admin-component-settings/site')->set('site_id', $model->id)->toString(),
