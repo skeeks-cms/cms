@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.1.1.pre
+3.1.1
 -----------------
 * Phone validator translate message
 * Fixed bug admin edit settings form
