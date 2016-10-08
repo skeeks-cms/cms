@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.1.1.1.pre
+-----------------
+* CmsContentElementWidget add options
+
 3.1.1
 -----------------
 * Phone validator translate message

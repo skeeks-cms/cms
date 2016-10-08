@@ -75,6 +75,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
      */
     public $with = ['image', 'cmsTree'];
 
+    public $options = [];
 
     /*public function init()
     {
