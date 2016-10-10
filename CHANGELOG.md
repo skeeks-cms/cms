@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.1.1.1.pre
+3.1.1.1
 -----------------
 * Change related properties saver
 * CmsContentElementWidget add options
