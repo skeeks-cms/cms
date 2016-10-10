@@ -20,6 +20,7 @@ use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
@@ -230,7 +231,7 @@ abstract class RelatedPropertyModel extends Core
                 return $this->_handler;
             } catch (\Exception $e)
             {
-                \Yii::error("Related property handler not found '{$this->component}'", self::className());
+                \Yii::error("Related property handler not found '{$this->component}' " . $e->getMessage(), self::className());
                 $component = new PropertyTypeText();
                 $component->property = $this;
 

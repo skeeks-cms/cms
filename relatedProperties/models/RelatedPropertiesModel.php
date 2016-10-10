@@ -20,6 +20,7 @@ use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseHtml;
+use yii\helpers\Json;
 
 /**
  * @property RelatedPropertyModel[] $properties
@@ -227,7 +228,7 @@ class RelatedPropertiesModel extends DynamicModel
                     $productPropertyValue = new $className([
                         'element_id'    => $element->id,
                         'property_id'   => $property->id,
-                        'value'         => $value,
+                        'value'         => (string) $value,
                         'value_enum'    => $value,
                         'value_num'     => $value,
                     ]);
@@ -246,7 +247,7 @@ class RelatedPropertiesModel extends DynamicModel
 
             if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
             {
-                $productPropertyValue->value        = $value;
+                $productPropertyValue->value        = (string) $value;
                 $productPropertyValue->value_enum   = $value;
                 $productPropertyValue->value_num    = $value;
             } else
@@ -256,7 +257,7 @@ class RelatedPropertiesModel extends DynamicModel
                 $productPropertyValue = new $className([
                     'element_id'    => $element->id,
                     'property_id'   => $property->id,
-                    'value'         => $value,
+                    'value'         => (string) $value,
                     'value_enum'    => $value,
                     'value_num'     => $value,
                 ]);
@@ -264,7 +265,7 @@ class RelatedPropertiesModel extends DynamicModel
 
             if (!$productPropertyValue->save())
             {
-                throw new Exception("{$property->code} not save");
+                throw new Exception("{$property->code} not save. " . Json::encode($productPropertyValue->errors));
             }
         }
 
