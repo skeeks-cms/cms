@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.1.1.2.pre
+-----------------
+* Change log level
+
 3.1.1.1
 -----------------
 * Change related properties saver
