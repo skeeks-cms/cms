@@ -231,7 +231,7 @@ abstract class RelatedPropertyModel extends Core
                 return $this->_handler;
             } catch (\Exception $e)
             {
-                \Yii::warning("Related property handler not found '{$this->component}' or load with errors: " . $e->getMessage(), self::className());
+                //\Yii::warning("Related property handler not found '{$this->component}' or load with errors: " . $e->getMessage(), self::className());
                 $component = new PropertyTypeText();
                 $component->property = $this;
 
