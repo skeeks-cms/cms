@@ -1,23 +1,27 @@
 CHANGELOG
 ==============
 
+3.1.1.3.pre
+-----------------
+ * Search for additional user properties
+
 3.1.1.2
 -----------------
-* Change log level
+ * Change log level
 
 3.1.1.1
 -----------------
-* Change related properties saver
-* CmsContentElementWidget add options
+ * Change related properties saver
+ * CmsContentElementWidget add options
 
 3.1.1
 -----------------
-* Phone validator translate message
-* Fixed bug admin edit settings form
-* Fixed #38 [https://github.com/skeeks-cms/cms/issues/38] (Additional properties of content items)
-* Fixed #35 [https://github.com/skeeks-cms/cms/issues/35] (Errors in JavaScript code in the behavior of the widget in the admin table)
-* Fixed #37 [https://github.com/skeeks-cms/cms/issues/37] (A bug in the password change)
-* Fixed #32 [https://github.com/skeeks-cms/cms/issues/32] (Solving problems for value_enum and value_num on save additional properties.)
+ * Phone validator translate message
+ * Fixed bug admin edit settings form
+ * Fixed #38 [https://github.com/skeeks-cms/cms/issues/38] (Additional properties of content items)
+ * Fixed #35 [https://github.com/skeeks-cms/cms/issues/35] (Errors in JavaScript code in the behavior of the widget in the admin table)
+ * Fixed #37 [https://github.com/skeeks-cms/cms/issues/37] (A bug in the password change)
+ * Fixed #32 [https://github.com/skeeks-cms/cms/issues/32] (Solving problems for value_enum and value_num on save additional properties.)
 
 3.1.0.1
 -----------------

@@ -13,9 +13,27 @@
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+
+
 ?>
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
+    <?
+        $user = new \skeeks\cms\models\CmsUser();
+        $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
+        $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\models\CmsUserProperty::className();
+        $searchRelatedPropertiesModel->initProperties( $user->relatedProperties );
+        $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+        if ($dataProvider)
+        {
+            $searchRelatedPropertiesModel->search($dataProvider, $user->tableName());
+        }
+
+        if ($user->relatedPropertiesModel)
+        {
+            $autoColumns = \skeeks\cms\modules\admin\widgets\GridViewStandart::getColumnsByRelatedPropertiesModel($user->relatedPropertiesModel, $searchRelatedPropertiesModel);
+        }
+    ?>
     <?php echo $this->render('_search', [
         'searchModel' => $searchModel,
         'dataProvider' => $dataProvider
@@ -26,7 +44,7 @@
         'filterModel'   => $searchModel,
         'adminController'   => $controller,
         'pjax'              => $pjax,
-        'columns' => [
+        'columns' => \yii\helpers\ArrayHelper::merge([
 
             [
                 'class'             => \skeeks\cms\grid\ImageColumn2::className(),
@@ -117,9 +135,7 @@
                 'attribute' => 'last_activity_at',
                 'visible' => false,
             ],
-
-
-        ],
+        ], $autoColumns),
     ]); ?>
 
 <? $pjax::end(); ?>
