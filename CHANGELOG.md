@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.1.1.3.pre
+3.1.1.3
 -----------------
  * Search for additional user properties
 
