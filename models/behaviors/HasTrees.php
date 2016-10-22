@@ -33,6 +33,16 @@ class HasTrees extends Behavior
     public $elementTreesClassName;
 
     /**
+     * @var string
+     */
+    public $attributeElementName = 'element_id';
+
+    /**
+     * @var string
+     */
+    public $attributeTreeName = 'tree_id';
+
+    /**
      * @return array
      */
     public function events()
@@ -54,7 +64,7 @@ class HasTrees extends Behavior
         }
 
         //Старые атрибуты
-        $oldIds = (array) ArrayHelper::map($this->owner->elementTrees, "tree_id", "tree_id");
+        $oldIds = (array) ArrayHelper::map($this->owner->elementTrees, $this->attributeTreeName, $this->attributeTreeName);
         $newIds = (array) $this->owner->treeIds; //Новые
 
 
@@ -98,7 +108,7 @@ class HasTrees extends Behavior
         if ($deleteIds)
         {
             $elementTrees  = $this->owner->getElementTrees()->andWhere([
-                'tree_id' => $deleteIds
+                $this->attributeTreeName => $deleteIds
             ])->limit(count($deleteIds))->all();
 
             foreach ($elementTrees as $elementTree)
@@ -117,8 +127,8 @@ class HasTrees extends Behavior
                 if ($treeId)
                 {
                     $elementTree = new $className([
-                        'element_id'    => $this->owner->id,
-                        'tree_id'       => $treeId,
+                        $this->attributeElementName    => $this->owner->id,
+                        $this->attributeTreeName       => $treeId,
                     ]);
 
                     $elementTree->save(false);
@@ -139,7 +149,7 @@ class HasTrees extends Behavior
 
             if ($this->owner->elementTrees)
             {
-                $this->_tree_ids = (array) ArrayHelper::map($this->owner->elementTrees, "tree_id", "tree_id");
+                $this->_tree_ids = (array) ArrayHelper::map($this->owner->elementTrees, $this->attributeTreeName, $this->attributeTreeName);
             }
 
             return $this->_tree_ids;
@@ -164,6 +174,6 @@ class HasTrees extends Behavior
     public function getElementTrees()
     {
         $className = $this->elementTreesClassName;
-        return $this->owner->hasMany($className::className(), ['element_id' => 'id']);
+        return $this->owner->hasMany($className::className(), [$this->attributeElementName => 'id']);
     }
 }
