@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.1.1.4.pre
+3.1.2
 -----------------
  * Fixed a bug when editing widgets with big data.
  * Updated HasTree behavior
