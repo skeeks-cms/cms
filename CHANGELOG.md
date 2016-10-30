@@ -3,6 +3,7 @@ CHANGELOG
 
 3.1.1.4.pre
 -----------------
+ * Fixed a bug when editing widgets with big data.
  * Updated HasTree behavior
 
 3.1.1.3

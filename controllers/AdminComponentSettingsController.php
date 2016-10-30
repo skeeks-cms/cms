@@ -21,6 +21,8 @@ use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 /**
+ * @property array $callableData;
+ *
  * Class AdminComponentSettingsController
  * @package skeeks\cms\controllers
  */
@@ -40,11 +42,15 @@ class AdminComponentSettingsController extends AdminController
         parent::init();
     }
 
-
     /**
      * @var Component
      */
     protected $_component = null;
+
+    /**
+     * @var array
+     */
+    protected $_callableData = [];
 
     /**
      * @inheritdoc
@@ -54,8 +60,8 @@ class AdminComponentSettingsController extends AdminController
         if (parent::beforeAction($action)) {
 
             $componentClassName         = \Yii::$app->request->get('componentClassName');
-
             $namespace                  = \Yii::$app->request->get('componentNamespace');
+
             if ($namespace)
             {
                 $component                  = new $componentClassName([
@@ -66,18 +72,13 @@ class AdminComponentSettingsController extends AdminController
                 $component                  = new $componentClassName();
             }
 
-
             if (!$component || !$component instanceof Component)
             {
                 throw new UserException("Указан некорректный компонент");
             }
 
-            /*if (!$component->existsConfigFormFile())
-            {
-                throw new UserException("У компонента не задана форма для управления настройками");
-            }*/
-
-            $this->_component = $component;
+            $this->_component       = $component;
+            $this->_callableData    = $this->_getCallableData($component);
 
             //TODO: Добавить возможность настройки
             \Yii::$app->view->theme = new Theme([
@@ -98,14 +99,73 @@ class AdminComponentSettingsController extends AdminController
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getCallableData()
+    {
+        return $this->_callableData;
+    }
 
-    public function actionIndex()
+    /**
+     * Сохранение значений компонента с которыми он был вызван в коде.
+     * И далее отправка на страницу редактирования. Где эти значения предзагрузятся в форму.
+     *
+     * @return string
+     */
+    public function actionCallEdit()
     {
         $component = $this->_component;
 
         if (\Yii::$app->request->get('attributes') && !$settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentDefault($component))
         {
             $attributes                 = \Yii::$app->request->get('attributes');
+            $component->attributes      = $attributes;
+        } else
+        {
+            $component->loadDefaultSettings();
+        }
+
+        if (!\Yii::$app->request->get('callableId'))
+        {
+            return $this->redirect(\yii\helpers\Url::to('index') . "?" . http_build_query(\Yii::$app->request->get()));
+        }
+
+
+        return $this->render($this->action->id, [
+            'component'         => $component,
+            'callableId'         => \Yii::$app->request->get('callableId'),
+        ]);
+    }
+
+    public function actionSaveCallable()
+    {
+        $rr = new RequestResponse();
+
+        //Callable дата (с этими настройками разработчик вызвал этот компонент в коде + еще какие то настройки окружения)
+        if ($data = \Yii::$app->request->post('data'))
+        {
+            $component = $this->_component;
+            $this->_saveCallableData($component, unserialize(base64_decode($data)));
+        }
+
+        return $rr;
+    }
+
+    public function actionIndex()
+    {
+        $component = $this->_component;
+
+        $attibutes = (array) \Yii::$app->request->get('attributes');
+
+        if ($attributesCallable = ArrayHelper::getValue($this->_callableData, 'attributes'))
+        {
+            $attibutes = ArrayHelper::merge($attibutes, $attributesCallable);
+        }
+
+        if ($attibutes && !\skeeks\cms\models\CmsComponentSettings::fetchByComponentDefault($component))
+        {
+            $attributes                 = $attibutes;
             $component->attributes      = $attributes;
         } else
         {
@@ -241,7 +301,6 @@ class AdminComponentSettingsController extends AdminController
         ]);
     }
 
-
     public function actionUsers()
     {
         $component = $this->_component;
@@ -251,7 +310,6 @@ class AdminComponentSettingsController extends AdminController
         ]);
     }
 
-
     public function actionSites()
     {
         $component = $this->_component;
@@ -260,7 +318,6 @@ class AdminComponentSettingsController extends AdminController
             'component'         => $component
         ]);
     }
-
 
     public function actionCache()
     {
@@ -402,5 +459,30 @@ class AdminComponentSettingsController extends AdminController
         return $this->render($this->action->id, [
             'component'         => $component
         ]);
+    }
+
+
+
+
+
+    /**
+     * @param Component $component
+     * @param array $data
+     */
+    protected function _saveCallableData($component, $data = [])
+    {
+        //TODO: переписать без использования кэша, вдруг он вообще отключен, переполнен или еще чего
+        $key = md5($component::className() . $component->namespace);
+        \Yii::$app->cache->set($key, $data);
+    }
+
+    /**
+     * @param Component $component
+     * @param array $data
+     */
+    protected function _getCallableData($component)
+    {
+        $key = md5($component::className() . $component->namespace);
+        return (array) \Yii::$app->cache->get($key);
     }
 }

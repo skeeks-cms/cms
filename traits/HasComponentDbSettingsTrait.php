@@ -288,7 +288,88 @@ trait HasComponentDbSettingsTrait
             'attributes'                        => $attributes,
             'componentNamespace'                => $this->namespace,
         ])
-        ->enableAdmin()
-        ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+            ->enableAdmin()
+            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+    }
+
+    /**
+     * @return UrlHelper
+     */
+    public function getCallableEditUrl()
+    {
+        return UrlHelper::construct('/cms/admin-component-settings/call-edit', [
+            'componentClassName'                => $this->className(),
+            'componentNamespace'                => $this->namespace,
+            'callableId'                        => $this->callableId,
+        ])
+            ->enableAdmin()
+            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getCallableData()
+    {
+        $attributes = [];
+
+        foreach ($this->defaultAttributes as $key => $value)
+        {
+            if (!is_object($value))
+            {
+                $attributes[$key] = $value;
+            }
+        }
+
+        return [
+            'attributes'                        => $attributes,
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getCallableId()
+    {
+        return $this->settingsId . '-callable';
+    }
+
+
+
+    /**
+     * @var integer a counter used to generate [[id]] for widgets.
+     * @internal
+     */
+    public static $counterSettings = 0;
+    /**
+     * @var string the prefix to the automatically generated widget IDs.
+     * @see getId()
+     */
+    public static $autoSettingsIdPrefix = 'skeeksSettings';
+
+    private $_settingsId;
+
+    /**
+     * Returns the ID of the widget.
+     * @param boolean $autoGenerate whether to generate an ID if it is not set previously
+     * @return string ID of the widget.
+     */
+    public function getSettingsId($autoGenerate = true)
+    {
+        if ($autoGenerate && $this->_settingsId === null) {
+            $this->_settingsId = static::$autoSettingsIdPrefix . static::$counterSettings++;
+        }
+
+        return $this->_settingsId;
+    }
+
+    /**
+     * Sets the ID of the widget.
+     * @param string $value id of the widget.
+     */
+    public function setSettingsId($value)
+    {
+        $this->_settingsId = $value;
     }
 }

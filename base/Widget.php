@@ -98,7 +98,14 @@ abstract class Widget extends Component implements ViewContextInterface
 new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
 JS
 );
-            return Html::tag('div', $pre . (string) $content,
+            $callableData = $this->callableData;
+
+            $callableDataInput = Html::textarea('callableData', base64_encode(serialize($callableData)), [
+                'id'    => $this->callableId,
+                'style' => 'display: none;'
+            ]);
+
+            return Html::tag('div', $pre . $callableDataInput . (string) $content,
             [
                 'class'     => 'skeeks-cms-toolbar-edit-view-block',
                 'id'        => $id,
@@ -106,7 +113,8 @@ JS
                 'data'      =>
                 [
                     'id' => $this->id,
-                    'config-url' => $this->getEditUrl()
+                    //'config-url' => $this->getEditUrl(),
+                    'config-url' => $this->getCallableEditUrl()
                 ]
             ]);
         }

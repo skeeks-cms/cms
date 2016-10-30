@@ -23,6 +23,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use skeeks\imagine\Image;
+
 
 /**
  * Class ImagingController
@@ -147,9 +149,15 @@ class ImagingController extends Controller
                 }
             }
 
-            return \Yii::$app->response->redirect(\Yii::$app->request->getUrl() . ($params ?
+            $url = \Yii::$app->request->getUrl() . ($params ?
                     ""//"?" . http_build_query($params) . '&sx-refresh'
-                    : '?sx-refresh'), 302);
+                    : '?sx-refresh');
+
+            /*Header("HTTP/1.0 200 OK");
+            Image::getImagine()->open($newFileRootDefault)->show('png');
+            return '';*/
+
+            return \Yii::$app->response->redirect($url, 302);
 
         } catch(\Exception $e)
         {
