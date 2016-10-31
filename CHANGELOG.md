@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.1.3
+-----------------
+ * Batch control properties
+
 3.1.2
 -----------------
  * Fixed a bug when editing widgets with big data.

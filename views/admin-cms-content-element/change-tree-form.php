@@ -18,6 +18,7 @@ $model = new \skeeks\cms\models\CmsContentElement();
 <? \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-warning',
+        'style' => 'margin-top: 20px;',
     ],
 ])?>
     <p><?=\Yii::t('skeeks/cms','Attention! For checked items will be given a new primary section.')?></p>

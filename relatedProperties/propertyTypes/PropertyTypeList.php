@@ -236,9 +236,7 @@ class PropertyTypeList extends PropertyType
         {
             if ($this->property->enums)
             {
-                //TODO:: it is necessary to verify in the future
                 $enums = (array) $this->property->enums;
-                $enum = array_shift($enums);
 
                 foreach ($enums as $enum)
                 {

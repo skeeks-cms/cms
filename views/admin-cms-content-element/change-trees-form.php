@@ -20,6 +20,7 @@ $model = new \skeeks\cms\models\CmsContentElement();
 <? \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-info',
+        'style' => 'margin-top: 20px;',
     ],
 ])?>
     <p><?=\Yii::t('skeeks/cms','You can specify some additional sections that will show your records.')?></p>

@@ -33,6 +33,8 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 /**
+ * @property CmsContent|static $content
+ *
  * Class AdminCmsContentTypeController
  * @package skeeks\cms\controllers
  */
@@ -93,7 +95,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-tree-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => "Основной раздел",
+                    "name"              => \Yii::t('skeeks/shop/app', 'The main section'),
                     "viewDialog"        => "change-tree-form",
                     "eachCallback"      => [$this, 'eachMultiChangeTree'],
                 ],
@@ -101,9 +103,17 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-trees-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => "Дополнительные разделы",
+                    "name"              => \Yii::t('skeeks/shop/app', 'Related topics'),
                     "viewDialog"        => "change-trees-form",
                     "eachCallback"      => [$this, 'eachMultiChangeTrees'],
+                ],
+
+                "rp" =>
+                [
+                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    "name"              => \Yii::t('skeeks/shop/app', 'Properties'),
+                    "viewDialog"        => "multi-rp",
+                    "eachCallback"      => [$this, 'eachRelatedProperties'],
                 ],
             ]
         );
@@ -259,6 +269,62 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
     }
 
+    public function eachRelatedProperties($model, $action)
+    {
+        try
+        {
+            $formData = [];
+            parse_str(\Yii::$app->request->post('formData'), $formData);
+
+            if (!$formData)
+            {
+                return false;
+            }
+
+            if (!$content_id = ArrayHelper::getValue($formData, 'content_id'))
+            {
+                return false;
+            }
+
+            if (!$fields = ArrayHelper::getValue($formData, 'fields'))
+            {
+                return false;
+            }
+
+
+            /**
+             * @var CmsContent $content
+             */
+            $content = CmsContent::findOne($content_id);
+            if (!$content)
+            {
+                return false;
+            }
+
+
+            $element            = $content->createElement();
+            $relatedProperties  = $element->relatedPropertiesModel;
+            $relatedProperties->load($formData);
+            /**
+             * @var $model CmsContentElement
+             */
+            $rpForSave = $model->relatedPropertiesModel;
+
+            foreach ((array) ArrayHelper::getValue($formData, 'fields') as $code)
+            {
+                if ($rpForSave->hasAttribute($code))
+                {
+                    $rpForSave->setAttribute($code, ArrayHelper::getValue($formData, 'RelatedPropertiesModel.' . $code));
+                }
+            }
+
+            return $rpForSave->save(false);
+        } catch (\Exception $e)
+        {
+            return false;
+        }
+    }
+
     /**
      * @param CmsContentElement $model
      * @param $action
@@ -294,7 +360,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     /**
      * @var CmsContent
      */
-    public $content;
+    protected $_content = null;
 
     /**
      * @return string
@@ -309,13 +375,36 @@ class AdminCmsContentElementController extends AdminModelEditorController
         return parent::getPermissionName();
     }
 
-    public function beforeAction($action)
+    /**
+     * @return CmsContent|static
+     */
+    public function getContent()
     {
-        if ($content_id = \Yii::$app->request->get('content_id'))
+        if ($this->_content !== null)
         {
-            $this->content = CmsContent::findOne($content_id);
+            return $this->_content;
         }
 
+        if ($content_id = \Yii::$app->request->get('content_id'))
+        {
+            $this->_content = CmsContent::findOne($content_id);
+        }
+
+        return $this->_content;
+    }
+
+    /**
+     * @param $content
+     * @return $this
+     */
+    public function setContent($content)
+    {
+        $this->_content = $content;
+        return $this;
+    }
+
+    public function beforeAction($action)
+    {
         if ($this->content)
         {
             if ($this->content->name_meny)

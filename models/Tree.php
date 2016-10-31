@@ -551,9 +551,14 @@ class Tree extends Core
     {
         $tableName = $this->tableName();
         $id = $this->getParentsIds();
-        $id = $id[0];
+        if ($id && is_array($id))
+        {
+            $id = $id[0];
+        }
+
         $query = $this->find()
             ->andWhere(["{$tableName}.[[" . $this->primaryKey()[0] . "]]" => $id]);
+
         $query->multiple = false;
         return $query;
     }

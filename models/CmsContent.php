@@ -276,4 +276,14 @@ class CmsContent extends Core
     {
         return $this->hasMany(CmsContent::className(), ['parent_content_id' => 'id']);
     }
+
+    /**
+     * @return CmsContentElement
+     */
+    public function createElement()
+    {
+        return new CmsContentElement([
+            'content_id' => $this->id
+        ]);
+    }
 }
