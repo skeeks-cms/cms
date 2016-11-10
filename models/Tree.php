@@ -230,7 +230,7 @@ class Tree extends Core
 
         if (!$this->tree_type_id)
         {
-            if ($this->parent)
+            if ($this->parent && $this->parent->treeType)
             {
                 if ($this->parent->treeType->defaultChildrenTreeType)
                 {
@@ -352,7 +352,7 @@ class Tree extends Core
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl($scheme = false)
     {
         if ($this->redirect)
         {
@@ -367,7 +367,19 @@ class Tree extends Core
             }
         }
 
-        return ($this->site ? $this->site->url : "") . Url::to(['/cms/tree/view', 'model' => $this]);
+        if ($this->site)
+        {
+            if (!$this->site->server_name)
+            {
+                return Url::to(['/cms/tree/view', 'model' => $this], $scheme);
+            } else
+            {
+                //TODO::update this is
+                return $this->site->url . Url::to(['/cms/tree/view', 'model' => $this], false);
+            }
+        }
+
+        return Url::to(['/cms/tree/view', 'model' => $this]);
     }
 
 
@@ -870,7 +882,8 @@ class Tree extends Core
 
 
     /**
-     * Процесс вставки ноды одна в другую. Можно вставлять как уже сохраненную модель с дочерними элементами, так и еще не сохраненную.
+     * Процесс вставки ноды одна в другую.
+     * Можно вставлять как уже сохраненную модель с дочерними элементами, так и еще не сохраненную.
      *
      * @param Tree $target
      * @return $this
