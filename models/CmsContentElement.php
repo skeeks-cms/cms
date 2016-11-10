@@ -365,19 +365,11 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getUrl($scheme = false)
     {
-        return Url::to(['/cms/content-element/view', 'model' => $this], $scheme);
-    }
-
-    /**
-     * @return string
-     */
-    public function getAbsoluteUrl($scheme = false)
-    {
         if ($this->cmsTree)
         {
             if (!$this->cmsTree->site->server_name)
             {
-                return $this->getUrl($scheme);
+                return Url::to(['/cms/content-element/view', 'model' => $this], $scheme);
             } else
             {
                 //TODO::update this is
@@ -387,7 +379,15 @@ class CmsContentElement extends RelatedElementModel
             }
         }
 
-        return $this->getUrl($scheme);
+        return Url::to(['/cms/content-element/view', 'model' => $this], $scheme);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAbsoluteUrl($scheme = false)
+    {
+        return $this->getUrl(true);
     }
 
 

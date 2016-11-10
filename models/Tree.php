@@ -363,7 +363,7 @@ class Tree extends Core
         {
             if ($this->redirectTree->id != $this->id)
             {
-                return $this->redirectTree->url;
+                return $this->redirectTree->getUrl($scheme);
             }
         }
 
@@ -381,7 +381,7 @@ class Tree extends Core
             }
         }
 
-        return Url::to(['/cms/tree/view', 'model' => $this]);
+        return Url::to(['/cms/tree/view', 'model' => $this], $scheme);
     }
 
 
@@ -390,7 +390,7 @@ class Tree extends Core
      */
     public function getAbsoluteUrl()
     {
-        return $this->url;
+        return $this->getUrl(true);
     }
 
     /**
