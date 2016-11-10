@@ -375,7 +375,9 @@ class Tree extends Core
             } else
             {
                 //TODO::update this is
-                return $this->site->url . Url::to(['/cms/tree/view', 'model' => $this], false);
+                $standartUrl = Url::to(['/cms/tree/view', 'model' => $this], false);
+                $standartUrl = str_replace(\Yii::$app->urlManager->baseUrl, '', $standartUrl);
+                return $this->site->url . $standartUrl;
             }
         }
 
