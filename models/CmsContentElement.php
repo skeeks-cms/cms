@@ -363,26 +363,31 @@ class CmsContentElement extends RelatedElementModel
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl($scheme = false)
     {
-        return Url::to(['/cms/content-element/view', 'model' => $this]);
-        /*return UrlHelper::construct('cms/content-element/view', [
-            'id'    => $this->id,
-            'code'  => $this->code,
-        ])->toString();*/
+        return Url::to(['/cms/content-element/view', 'model' => $this], $scheme);
     }
 
     /**
      * @return string
      */
-    public function getAbsoluteUrl()
+    public function getAbsoluteUrl($scheme = false)
     {
         if ($this->cmsTree)
         {
-            return $this->cmsTree->site->url . $this->url;
+            if (!$this->cmsTree->site->server_name)
+            {
+                return $this->getUrl($scheme);
+            } else
+            {
+                //TODO::update this is
+                $standartUrl = Url::to(['/cms/tree/view', 'model' => $this], false);
+                $standartUrl = str_replace(\Yii::$app->urlManager->baseUrl, '', $standartUrl);
+                return $this->cmsTree->site->url . $standartUrl;
+            }
         }
 
-        return $this->url;
+        return $this->getUrl($scheme);
     }
 
 
