@@ -135,6 +135,8 @@ class HasTrees extends Behavior
                 }
             }
         }
+
+        $this->owner->_tree_ids = null;
     }
 
 

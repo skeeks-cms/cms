@@ -3,6 +3,7 @@ CHANGELOG
 
 3.1.4.pre
 -----------------
+ * Update HasTrees
  * Tree url update
 
 3.1.3
