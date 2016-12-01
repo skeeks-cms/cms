@@ -9,7 +9,11 @@
 /* @var $widget     \skeeks\cms\widgets\formInputs\ModelStorageFiles */
 /* @var $this       yii\web\View */
 /* @var $model      \yii\db\ActiveRecord */
-$controller = \Yii::$app->createController('cms/admin-storage-files')[0];
+
+if (!$widget->viewItemTemplate)
+{
+    $controller = \Yii::$app->createController('cms/admin-storage-files')[0];
+}
 ?>
 <?
     $this->registerCss(<<<CSS
@@ -101,17 +105,23 @@ JS
 
                                 <div class="sx-controlls">
                                     <?
-                                    $controllerTmp = clone $controller;
-                                    $controllerTmp->setModel($imageFile);
+                                        try
+                                        {
+                                            $controllerTmp = clone $controller;
+                                            $controllerTmp->setModel($imageFile);
 
-                                    echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
-                                        "controller"            => $controllerTmp,
-                                        "isOpenNewWindow"       => true,
-                                        "clientOptions"         =>
-                                        [
-                                            'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
-                                        ],
-                                    ]);
+                                            echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
+                                                "controller"            => $controllerTmp,
+                                                "isOpenNewWindow"       => true,
+                                                "clientOptions"         =>
+                                                [
+                                                    'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
+                                                ],
+                                            ]);
+                                        } catch (\Exception $e)
+                                        {
+                                            echo $e->getMessage();
+                                        }
                                     ?>
                                 </div>
                             <? else : ?>
@@ -127,7 +137,7 @@ JS
     <? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
 
     <div class="sx-controlls">
-        <?= \skeeks\cms\widgets\StorageFileManager::widget([
+        <?= \skeeks\cms\widgets\StorageFileManager::widget(\yii\helpers\ArrayHelper::merge([
             'clientOptions'     =>
             [
                 'simpleUpload' =>
@@ -157,7 +167,7 @@ JS
 JS
 )
             ],
-        ]); ?>
+        ], $widget->controllWidgetOptions)); ?>
     </div>
 </div>
 

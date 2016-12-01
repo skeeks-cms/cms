@@ -16,6 +16,22 @@ use yii\helpers\Json;
 use yii\widgets\InputWidget;
 
 /**
+ *
+ *
+ *
+ * <?= $form->field($model, 'images')->widget(
+    \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
+    [
+        'backendUrl' => \yii\helpers\Url::to(['/cms/storage-files/link-to-models']),
+        'viewItemTemplate' => '',
+        'controllWidgetOptions' => [
+            'backendSimpleUploadUrl' => \yii\helpers\Url::to(['/cms/storage-files/upload']),
+            'backendRemoteUploadUrl' => \yii\helpers\Url::to(['/cms/storage-files/remote-upload']),
+        ],
+    ]
+); ?>
+ *
+ *
  * @property StorageFile[] $files
  * Class StorageImages
  * @package skeeks\cms\widgets\formInputs
@@ -27,9 +43,32 @@ class ModelStorageFiles extends InputWidget
      */
     public $clientOptions = [];
 
-
+    /**
+     * @var null
+     */
     public $viewItemTemplate = null;
 
+    /**
+     * @var string url to communicate with the model pictures
+     * cms/storage-files/link-to-models
+     * cms/admin-storage-files/link-to-models
+     */
+    public $backendUrl = null;
+
+    /**
+     * @var array
+     */
+    public $controllWidgetOptions = [];
+
+    public function init()
+    {
+        parent::init();
+
+        if ($this->backendUrl === null)
+        {
+            $this->backendUrl = UrlHelper::construct('cms/admin-storage-files/link-to-models')->enableAdmin()->toString();
+        }
+    }
     /**
      * @param $cmsStorageFile
      * @return string
@@ -91,7 +130,7 @@ class ModelStorageFiles extends InputWidget
     public function getJsonString()
     {
         return Json::encode([
-            'backendUrl'        => UrlHelper::construct('cms/admin-storage-files/link-to-models')->enableAdmin()->toString(),
+            'backendUrl'        => $this->backendUrl,
             'modelId'           => $this->model->id,
             'modelClassName'    => $this->model->className(),
             'modelRelation'     => $this->attribute,

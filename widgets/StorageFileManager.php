@@ -10,18 +10,27 @@ namespace skeeks\cms\widgets;
 use skeeks\cms\helpers\UrlHelper;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
+ * @property array $defaultClientOptions read-only
+ *
  * Class ControllerActions
  * @package skeeks\cms\modules\admin\widgets
  */
 class StorageFileManager extends Widget
 {
+    const SOURCE_SIMPLE_UPLOAD = 'simpleUpload';
+    const SOURCE_REMOTE_UPLOAD = 'remoteUpload';
+
     public $model;
-    public $fileGroup;
 
     /** @var array $targets */
     public $clientOptions = [];
+
+    public $backendSimpleUploadUrl = '';
+    public $backendRemoteUploadUrl = '';
+
 
     public $simpleUploadButtons = '';
     public $remoteUploadButtonSelector = '';
@@ -30,13 +39,18 @@ class StorageFileManager extends Widget
     {
         parent::init();
 
-        $clientOptions = ArrayHelper::merge($this->defaultClientOptions(), $this->clientOptions);
+        if (!$this->backendSimpleUploadUrl)
+        {
+            $this->backendSimpleUploadUrl = Url::to(['/cms/admin-storage-files/upload']);
+        }
+        if (!$this->backendRemoteUploadUrl)
+        {
+            $this->backendRemoteUploadUrl = Url::to(['/cms/admin-storage-files/remote-upload']);
+        }
+
+        $clientOptions = ArrayHelper::merge($this->defaultClientOptions, $this->clientOptions);
 
         $options = [
-            'commonData' => [
-                'group' => $this->fileGroup
-            ],
-
             'simpleUploadButtons' => [
                 'source-simpleUpload-' . $this->id,
                 'source-simpleUpload-2-' . $this->id,
@@ -116,24 +130,20 @@ JS
 HTML;
     }
 
-    public function defaultClientOptions($group = '')
+    public function getDefaultClientOptions()
     {
-        $urlData = [
-            "cms/admin-storage-files/upload",
-        ];
+        $result['simpleUpload']['options']  = $this->_getSourceSimpleUploadOptions();
+        $result['remoteUpload']             = $this->_getSourceRemoteUploadOptions();
 
+        return $result;
+    }
 
-        if ($this->fileGroup)
-        {
-            $urlData["group"] = $this->fileGroup;
-        }
-
-        $backendSimpleUpload = UrlHelper::construct($urlData)->enableAdmin()->toString();
-
+    protected function _getSourceSimpleUploadOptions()
+    {
         //Опции которые перетирать нельзя
-        $mainOptions =
+        $options =
         [
-            "url"               => $backendSimpleUpload,
+            "url"               => $this->backendSimpleUploadUrl,
             "name"              => "imgfile", //TODO: хардкод
             "hoverClass"        => 'btn-hover',
             "focusClass"        => 'active',
@@ -142,38 +152,23 @@ HTML;
             "multiple"          => true,
         ];
 
-        $result['simpleUpload']['options'] = $mainOptions;
-
-        $result['remoteUpload'] = $this->_getSourceRemoteUploadOptions();
-
-        return $result;
+        return $options;
     }
 
-    private function _getSourceRemoteUploadOptions()
+    protected function _getSourceRemoteUploadOptions()
     {
-        $urlData = [
-            "cms/admin-storage-files/remote-upload",
+        $options=
+        [
+            "url"               => $this->backendRemoteUploadUrl,
+            "name"              => "imgfile", //TODO: хардкод
+            "hoverClass"        => 'btn-hover',
+            "focusClass"        => 'active',
+            "disabledClass"     => 'disabled',
+            "responseType"      => 'json',
+            "multiple"          => true,
         ];
 
-        if ($this->fileGroup)
-        {
-            $urlData["group"] = $this->fileGroup;
-        }
-        $backendRemoteUpload = \Yii::$app->urlManager->createUrl($urlData);
-        $mainOptions =
-            [
-                "url"               => $backendRemoteUpload,
-                "name"              => "imgfile", //TODO: хардкод
-                "hoverClass"        => 'btn-hover',
-                "focusClass"        => 'active',
-                "disabledClass"     => 'disabled',
-                "responseType"      => 'json',
-                "multiple"          => true,
-
-            ];
-
-        $fromBehaviorOptions = [];
-        return array_merge($fromBehaviorOptions, $mainOptions);
+        return $options;
     }
 
 }
