@@ -31,6 +31,7 @@ class SeoPageName extends AttributeBehavior
     public $generatedAttribute  = 'code';
     public $fromAttribute       = 'name';
     public $uniqeue             = true;
+    public $maxLenth            = 64;
 
     /**
      * @var
@@ -63,6 +64,8 @@ class SeoPageName extends AttributeBehavior
         if (!$this->value)
         {
             $filter = new FilterSeoPageName();
+            $filter->maxLenth = $this->maxLenth;
+
             if ($this->owner->{$this->generatedAttribute})
             {
                 $seoPageName = $filter->filter($this->owner->{$this->generatedAttribute});
