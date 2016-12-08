@@ -363,17 +363,32 @@ class CmsContentElement extends RelatedElementModel
     /**
      * @return string
      */
-    public function getUrl($scheme = false)
+    public function getUrl($scheme = false, $params = [])
     {
         if ($this->cmsTree)
         {
             if (!$this->cmsTree->site->server_name)
             {
-                return Url::to(['/cms/content-element/view', 'model' => $this], $scheme);
+                if ($params)
+                {
+                    $params = ArrayHelper::merge(['/cms/content-element/view', 'model' => $this], $params);
+                } else
+                {
+                    $params = ['/cms/content-element/view', 'model' => $this];
+                }
+
+                return Url::to($params, $scheme);
             } else
             {
-                //TODO::update this is
-                $standartUrl = Url::to(['/cms/tree/view', 'model' => $this], false);
+                if ($params)
+                {
+                    $params = ArrayHelper::merge(['/cms/content-element/view', 'model' => $this], $params);
+                } else
+                {
+                    $params = ['/cms/content-element/view', 'model' => $this];
+                }
+
+                $standartUrl = Url::to($params, false);
                 $standartUrl = str_replace(\Yii::$app->urlManager->baseUrl, '', $standartUrl);
                 return $this->cmsTree->site->url . $standartUrl;
             }
@@ -385,9 +400,9 @@ class CmsContentElement extends RelatedElementModel
     /**
      * @return string
      */
-    public function getAbsoluteUrl($scheme = false)
+    public function getAbsoluteUrl($scheme = false, $params = [])
     {
-        return $this->getUrl(true);
+        return $this->getUrl(true, $params);
     }
 
 

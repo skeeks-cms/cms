@@ -74,9 +74,17 @@ class UrlRuleContentElement
 
             $url = '';
 
-            if ($contentElement->cmsTree)
+            $cmsTree                = ArrayHelper::getValue($params, 'cmsTree');
+
+            //We need to build on what that particular section of the settings
+            if (!$cmsTree)
             {
-                $url = $contentElement->cmsTree->dir . "/";
+                $cmsTree = $contentElement->cmsTree;
+            }
+
+            if ($cmsTree)
+            {
+                $url = $cmsTree->dir . "/";
             }
 
             //$url .= $contentElement->id . '-' . $contentElement->code . ((bool) \Yii::$app->seo->useLastDelimetrContentElements ? DIRECTORY_SEPARATOR : "");
