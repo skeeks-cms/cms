@@ -171,6 +171,7 @@ class CmsContentElement extends RelatedElementModel
             [
                 'class'                             => SeoPageName::className(),
                 'generatedAttribute'                => 'code',
+                'maxLength'                         => \Yii::$app->cms->element_max_code_length,
             ]
         ]);
     }

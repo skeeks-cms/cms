@@ -701,6 +701,8 @@ class Tree extends Core
         } else
         {
             $filter         = new FilterSeoPageName();
+            $filter->maxLength = \Yii::$app->cms->tree_max_code_length;
+
             $this->code     = $filter->filter($this->name);
 
             $matches = [];

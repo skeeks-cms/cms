@@ -48,6 +48,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd(); ?>
 
+<?= $form->fieldSet('Разделы'); ?>
+    <?= $form->field($model, 'tree_max_code_length'); ?>
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Элементы'); ?>
+    <?= $form->field($model, 'element_max_code_length'); ?>
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->fieldSet('Доступ'); ?>
 
      <? \yii\bootstrap\Alert::begin([

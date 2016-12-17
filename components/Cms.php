@@ -119,6 +119,16 @@ class Cms extends \skeeks\cms\base\Component
     public $passwordResetTokenExpire        = 3600;
 
     /**
+     * @var int
+     */
+    public $tree_max_code_length            = 64;
+
+    /**
+     * @var int
+     */
+    public $element_max_code_length            = 128;
+
+    /**
      * Схема временных папок
      * Чистятся в момент нажатия на кнопку чистки временных файлов
      *
@@ -290,6 +300,8 @@ class Cms extends \skeeks\cms\base\Component
             [['adminEmail'], 'email'],
             [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['registerRoles'], 'safe'],
+            [['tree_max_code_length'], 'integer'],
+            [['element_max_code_length'], 'integer'],
         ]);
     }
 
@@ -302,6 +314,8 @@ class Cms extends \skeeks\cms\base\Component
             'languageCode'              => 'Язык по умолчанию',
             'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'registerRoles'             => 'При регистрации добавлять в группу',
+            'tree_max_code_length'      => 'Максимальная длинна кода (url) разделов',
+            'element_max_code_length'   => 'Максимальная длинна кода (url) элементов',
         ]);
     }
 
