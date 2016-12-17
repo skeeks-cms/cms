@@ -64,7 +64,7 @@ class SeoPageName extends AttributeBehavior
         if (!$this->value)
         {
             $filter = new FilterSeoPageName();
-            $filter->Length = $this->Length;
+            $filter->maxLength = $this->maxLength;
 
             if ($this->owner->{$this->generatedAttribute})
             {
