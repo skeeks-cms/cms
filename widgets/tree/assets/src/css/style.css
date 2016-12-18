@@ -1,0 +1,164 @@
+.sx-tree ul li.sx-tree-node .row .sx-label-node.level-0
+{
+    background: url("../images/icon.domik.png") no-repeat 2px 2px !important;
+}
+
+.sx-tree ul li.sx-tree-node .row .sx-label-node
+{
+    background: url("../images/ico-folder-blue.png") no-repeat 2px 3px;
+    padding-top: 0px;
+}
+
+.sx-tree ul li.sx-tree-node.open > .row > .sx-label-node
+{
+    background: url("../images/ico-folder-open-blue.png") no-repeat 2px 3px;
+}
+
+.sx-tree ul li.sx-tree-node .row
+{
+    height: 24px;
+    /*cursor: move;*/
+}
+
+
+.sx-tree ul li.sx-tree-node .row:hover
+{
+    background: rgba(192, 192, 192, 0.17);
+}
+
+.sx-tree ul li.sx-tree-node .row .sx-controll-node
+{
+    display: none;
+    float: left;
+}
+
+.sx-tree ul li.sx-tree-node .row .sx-controll-node .sx-btn-caret-action
+{
+    width: 21px;
+    height: 22px;
+}
+.sx-tree ul li.sx-tree-node .row .sx-controll-node .btn
+{
+    height: 22px;
+}
+
+
+.sx-tree ul li.sx-tree-node .row:hover .sx-controll-node
+{
+    display: block;
+}
+
+
+
+
+
+.sx-tree
+{
+    margin-left: 15px;
+}
+.sx-tree ul
+{
+    padding-left: 0px;
+}
+
+
+    .sx-tree ul li.sx-tree-node
+    {
+        list-style-type: none;
+        padding-left: 15px;
+        margin: 2px 0px;
+        /*overflow: hidden;*/
+    }
+
+        .sx-tree ul li .sx-tree-type
+        {
+            display: none;
+            padding-top: 5px;
+            padding-left: 20px;
+            font-size: 11px;
+        }
+
+            .sx-tree ul li:hover>.row .sx-tree-type
+            {
+                display: block;
+            }
+
+        .sx-tree ul li.sx-tree-node .sx-controll-act
+        {
+            margin-left: 5px;
+        }
+
+    .sx-tree ul li.sx-tree-node.open
+    {}
+
+    .sx-tree ul li.sx-tree-node.active
+    {}
+
+        .sx-tree ul li.sx-tree-node .row
+        {
+            /*margin: 0 !important;*/
+        }
+
+
+
+    .sx-tree ul li.sx-tree-node .sx-node-open-close
+    {
+        float: left;
+        width: 23px;
+        margin-left: -23px;
+    }
+
+        .sx-tree ul li.sx-tree-node .sx-node-open-close > a
+        {
+            font-size: 6px;
+            color: #000000;
+            background: white;
+            padding: 2px 4px;
+            margin-top: 2px;
+        }
+
+.btn-tree-node-controll
+{
+    font-size: 8px;
+}
+
+    .sx-tree ul li.sx-tree-node .sx-controll-node
+    {
+        width: auto;
+        float: left;
+        margin-left: 10px;
+        padding-top: 0px;
+    }
+
+        .sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button
+        {
+            font-size: 6px;
+            color: #000000;
+            background: white;
+            padding: 2px 4px;
+        }
+
+
+
+    .sx-tree ul li.sx-tree-node .sx-label-node
+    {
+        float: left;
+        padding-left: 23px;
+    }
+
+        .sx-tree ul li.sx-tree-node .sx-label-node > a
+        {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > a
+        {
+            color: silver;
+        }
+
+.sx-tree-move
+{
+    cursor: move;
+}

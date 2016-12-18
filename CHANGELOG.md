@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.1.4.pre
+3.2.0.pre
 -----------------
+ * Complete rebuilding of sections of the tree widget
  * Correction of translations
  * Update urls
  * Updated seo filter behavior

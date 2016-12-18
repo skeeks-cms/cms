@@ -79,7 +79,7 @@ class SelectTree extends InputWidget
                 $valueArray         = Html::getAttributeValue($this->model, $this->attribute);
                 $select = Html::activeListBox($this->model, $this->attribute, ['16' => "16"], [
                     'multiple' => true,
-                    'class' => 'sx-controll-element',
+                    'class' => 'sx-controll-element sx-multi',
                     'style' => 'display: none;'
                 ]);
                 $trees          = Tree::find()->where(['id' => $valueArray])->all();
@@ -98,7 +98,7 @@ class SelectTree extends InputWidget
 
             $src = UrlHelper::construct('/cms/admin-tree')
                             ->set('mode', $this->mode)
-                            ->set('s', $valueArray)
+                            //->set('s', $valueArray)
                             ->setSystemParam(Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                             ->setSystemParam(Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                             ->enableAdmin()->toString();

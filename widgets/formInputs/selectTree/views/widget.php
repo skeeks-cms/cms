@@ -79,6 +79,7 @@ use \skeeks\cms\widgets\formInputs\selectTree\SelectTree;
             var self = this;
 
             this.JsingleInput           = $('input.sx-single',              this.getWrapper());
+            this.JmultiInput           = $('select.sx-multi',              this.getWrapper());
 
             if (this.get('selected'))
             {
@@ -89,8 +90,8 @@ use \skeeks\cms\widgets\formInputs\selectTree\SelectTree;
             {
                 if (self.Iframe.sx.Tree)
                 {
-                    console.log(self.JsingleInput.val());
                     self.Iframe.sx.Tree.setSingle(self.JsingleInput.val());
+                    self.Iframe.sx.Tree.setSelect(self.JmultiInput.val());
                 }
             });
 

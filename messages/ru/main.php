@@ -777,4 +777,6 @@ return
     "User control properties"             => "Управление свойствами пользователя",
     'Related topics'                      => 'Дополнительные разделы',
     'Component settings'                  => 'Настройки компонентов',
+    'Deactivate'                                                => 'Деактивировать',
+    'Activate'                                                  => 'Активировать',
 ];
