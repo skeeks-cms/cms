@@ -3,6 +3,7 @@ CHANGELOG
 
 3.1.4.pre
 -----------------
+ * Correction of translations
  * Update urls
  * Updated seo filter behavior
  * Completion widgets upload files

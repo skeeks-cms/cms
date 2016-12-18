@@ -44,7 +44,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Элементы";
+        $this->name                     = \Yii::t('skeeks/cms', 'Elements');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = CmsContentElement::className();
 
@@ -79,7 +79,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "activate-multi" =>
                 [
                     'class' => AdminMultiModelEditAction::className(),
-                    "name" => "Активировать",
+                    "name" => \Yii::t('skeeks/cms', 'Activate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiActivate'],
                 ],
@@ -87,7 +87,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "inActivate-multi" =>
                 [
                     'class' => AdminMultiModelEditAction::className(),
-                    "name" => "Деактивировать",
+                    "name" => \Yii::t('skeeks/cms', 'Deactivate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
                 ],
@@ -95,7 +95,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-tree-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => \Yii::t('skeeks/shop/app', 'The main section'),
+                    "name"              => \Yii::t('skeeks/cms', 'The main section'),
                     "viewDialog"        => "change-tree-form",
                     "eachCallback"      => [$this, 'eachMultiChangeTree'],
                 ],
@@ -103,7 +103,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-trees-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => \Yii::t('skeeks/shop/app', 'Related topics'),
+                    "name"              => \Yii::t('skeeks/cms', 'Related topics'),
                     "viewDialog"        => "change-trees-form",
                     "eachCallback"      => [$this, 'eachMultiChangeTrees'],
                 ],
@@ -111,7 +111,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "rp" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => \Yii::t('skeeks/shop/app', 'Properties'),
+                    "name"              => \Yii::t('skeeks/cms', 'Properties'),
                     "viewDialog"        => "multi-rp",
                     "eachCallback"      => [$this, 'eachRelatedProperties'],
                 ],
