@@ -57,6 +57,11 @@ class SelectTreeInputWidget extends InputWidget
      */
     public $multiple      = false;
 
+    /**
+     * @var null|callable
+     */
+    public $isAllowNodeSelectCallback = null;
+
     public function init()
     {
         $this->treeWidgetOptions = ArrayHelper::merge([
@@ -161,11 +166,22 @@ class SelectTreeInputWidget extends InputWidget
      */
     public function renderNodeControll($model)
     {
+        $disabled = false;
+        if ($this->isAllowNodeSelectCallback && is_callable($this->isAllowNodeSelectCallback))
+        {
+            $function = $this->isAllowNodeSelectCallback;
+            if (!$function($model))
+            {
+                $disabled = "disabled";
+            }
+        }
+
         if ($this->multiple)
         {
             $controllElement = Html::checkbox($this->id . '-checkbox', false, [
                 'value'     => $model->id,
                 'class'     => 'sx-checkbox',
+                'disabled'  => $disabled,
                 'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
             ]);
         } else
@@ -173,6 +189,7 @@ class SelectTreeInputWidget extends InputWidget
             $controllElement = Html::radio($this->id . '-radio', false, [
                 'value'     => $model->id,
                 'class'     => 'sx-radio',
+                'disabled'  => $disabled,
                 'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
             ]);
         }
