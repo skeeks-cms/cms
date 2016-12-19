@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.0.pre
 -----------------
+ * Completion form controls
  * Created skeeks\cms\widgets\Pjax Widget
  * Complete rebuilding of sections of the tree widget
  * Correction of translations

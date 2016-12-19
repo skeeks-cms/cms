@@ -188,6 +188,7 @@ return
 
     "The name of the controller" => "Название контроллера",
 
+    "Are you sure you want to delete this item?" => "Вы уверены, что хотите удалить этот элемент?",
     "Are you sure you want to permanently delete the selected items?" => "Вы действительно хотите безвозвратно удалить выбранные элементы?",
     "For {modelname} must specify the model class" => "Для {modelname} необходимо указать класс модели",
     "the class is not found, you must specify the existing class model" => "класс не нейден, необходимо указать существующий класс модели",
