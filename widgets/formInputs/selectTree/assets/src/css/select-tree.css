@@ -1,0 +1,33 @@
+.sx-widget-element
+{
+    display: none;
+}
+
+.sx-selected
+{
+    margin-bottom: 10px;
+}
+
+.sx-selected .sx-close-btn
+{
+    display: none;
+    color: red;
+}
+
+.sx-selected li
+{
+    padding: 5px;
+    font-size: 14px;
+    font-weight: bold;
+
+}
+
+.sx-selected li:hover
+{
+    background: rgba(192, 192, 192, 0.14);
+}
+
+.sx-selected li:hover .sx-close-btn
+{
+    display: block;
+}

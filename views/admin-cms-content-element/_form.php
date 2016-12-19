@@ -115,39 +115,47 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd() ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Sections')); ?>
-
-
     <? if ($contentModel->root_tree_id) : ?>
-
-        <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
-            <?= $form->fieldSelect($model, 'tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions($contentModel->root_tree_id), [
-                    'allowDeselect' => true
-                ]
-            );
-            ?>
-        <? endif; ?>
-
-        <?= $form->fieldSelectMulti($model, 'treeIds', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions($contentModel->root_tree_id) );
-        ?>
-
+        <? $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
     <? else : ?>
-        <?
-            $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_COMBO;
-            if ($contentModel->is_allow_change_tree != \skeeks\cms\components\Cms::BOOL_Y)
-            {
-                $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI;
-            }
-        ?>
-        <?= $form->field($model, 'treeIds')->label(\Yii::t('skeeks/cms','Sections of the site'))->widget(
-            \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-            [
-                "attributeMulti" => "treeIds",
-                "mode" => $mode
-            ])->hint(\Yii::t('skeeks/cms','Specify sections of the site, which would like to see this publication'));
-        ?>
+        <? $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all(); ?>
     <? endif; ?>
 
+    <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
+        <? if ($rootTreeModels) : ?>
+            <div class="row">
+                <div class="col-lg-8 col-md-12 col-sm-12">
+                    <?= $form->field($model, 'tree_id')->widget(
+                        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+                        [
+                            'multiple' => false,
+                            'treeWidgetOptions' =>
+                            [
+                                'models' => $rootTreeModels
+                            ]
+                        ]
+                    ); ?>
+                </div>
+            </div>
+        <? endif; ?>
+    <? endif; ?>
 
+    <? if ($rootTreeModels) : ?>
+        <div class="row">
+            <div class="col-lg-8 col-md-12 col-sm-12">
+                <?= $form->field($model, 'treeIds')->widget(
+                    \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+                    [
+                        'multiple' => true,
+                        'treeWidgetOptions' =>
+                        [
+                            'models' => $rootTreeModels
+                        ]
+                    ]
+                ); ?>
+            </div>
+        </div>
+    <? endif; ?>
 
 <?= $form->fieldSetEnd()?>
 

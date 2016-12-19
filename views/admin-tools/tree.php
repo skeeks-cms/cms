@@ -72,8 +72,6 @@ CSS
     ]
 ]); ?>
     <?
-        \yii\jui\Sortable::widget();
-
         $options    = \yii\helpers\Json::encode([
             'id'                => $widget->id,
             'pjaxid'            => $widget->pjax->id,

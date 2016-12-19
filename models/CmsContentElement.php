@@ -177,6 +177,7 @@ class CmsContentElement extends RelatedElementModel
     }
 
 
+
     /**
      * @inheritdoc
      */
@@ -210,8 +211,18 @@ class CmsContentElement extends RelatedElementModel
 
             'images' => Yii::t('skeeks/cms', 'Images'),
             'files' => Yii::t('skeeks/cms', 'Files'),
-            'treeIds' => Yii::t('skeeks/cms', 'Sections'),
+            'treeIds' => Yii::t('skeeks/cms', 'Additional sections'),
             'parent_content_element_id' => Yii::t('skeeks/cms', 'Parent element'),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'treeIds' => Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.'),
         ]);
     }
 

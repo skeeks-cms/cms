@@ -61,11 +61,18 @@ class CmsTreeWidget extends Widget
     public $viewNodeContentFile         = '_node-content';
 
     /**
+     * @var array Additional information in the context of a call widget
+     */
+    public $contextData                     = [];
+
+    /**
      * @var \yii\widgets\Pjax
      */
     public $pjax                        = null;
-    public $pjaxClass                   = 'yii\widgets\Pjax';
-    public $pjaxOptions                 = [];
+    public $pjaxClass                   = 'skeeks\cms\widgets\Pjax';
+    public $pjaxOptions                 = [
+        'isBlock' => true
+    ];
 
 
     protected $_pjaxIsStart = false;
@@ -229,9 +236,9 @@ class CmsTreeWidget extends Widget
     {
         $isOpen = false;
 
-        if ($this->openedIds)
+        if ($openedIds = (array) $this->openedIds)
         {
-            if (in_array($model->id, $this->openedIds))
+            if (in_array($model->id, $openedIds))
             {
                 $isOpen = true;
             }

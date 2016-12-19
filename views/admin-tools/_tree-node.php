@@ -44,11 +44,6 @@ $controllElement = \Yii::$app->controller->renderNodeControll($model);
 
 <!-- Possible actions -->
 <div class="sx-controll-node row">
-    <?
-        $controller = \Yii::$app->cms->moduleCms->createControllerByID("admin-tree");
-        $controller->setModel($model);
-    ?>
-
     <div class="pull-left sx-controll-act">
         <a href="<?= $model->absoluteUrl; ?>" target="_blank" class="btn-tree-node-controll btn btn-default btn-sm show-at-site" title="<?= \Yii::t('skeeks/cms',"Show at site"); ?>">
             <span class="glyphicon glyphicon-eye-open"></span>
