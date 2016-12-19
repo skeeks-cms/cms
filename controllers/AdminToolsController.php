@@ -12,15 +12,20 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\forms\ViewFileEditModel;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\filters\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\UserLastActivityWidget;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\widgets\formInputs\selectTree\SelectTree;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\Controller;
+use yii\web\JsExpression;
 use yii\web\Response;
 
 /**
@@ -192,5 +197,91 @@ class AdminToolsController extends AdminController
 
 
         return $rr;
+    }
+
+
+
+    /**
+     * @return string
+     */
+    protected function _getMode()
+    {
+        if ($mode = \Yii::$app->request->getQueryParam('mode'))
+        {
+            return (string) $mode;
+        }
+
+        return '';
+    }
+
+    /**
+     * @param $model
+     *
+     * @return string
+     */
+    public function renderNodeControll($model)
+    {
+        if ($this->_getMode() == SelectTree::MOD_MULTI)
+        {
+            $controllElement = Html::checkbox('tree_id', false, [
+                'value'     => $model->id,
+                'class'     => 'sx-checkbox',
+                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'onclick'   => new JsExpression(<<<JS
+    sx.Tree.select("{$model->id}");
+JS
+)
+            ]);
+
+
+        } else if ($this->_getMode() == SelectTree::MOD_SINGLE)
+        {
+
+            $controllElement = Html::radio('tree_id', false, [
+                'value'     => $model->id,
+                'class'     => 'sx-readio',
+                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'onclick'   => new JsExpression(<<<JS
+    sx.Tree.selectSingle("{$model->id}");
+JS
+)
+            ]);
+
+        }  else if ($this->_getMode() == SelectTree::MOD_COMBO)
+        {
+
+            $controllElement = Html::radio('tree_id', false, [
+                                'value'     => $model->id,
+                                'class'     => 'sx-readio',
+                                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                                'onclick'   => new JsExpression(<<<JS
+                    sx.Tree.selectSingle("{$model->id}");
+JS
+            )
+                ]);
+
+            $controllElement .= Html::checkbox('tree_id', false, [
+                'value'     => $model->id,
+                'class'     => 'sx-checkbox',
+                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'onclick'   => new JsExpression(<<<JS
+    sx.Tree.select("{$model->id}");
+JS
+)
+            ]);
+
+        } else
+        {
+            $controllElement = '';
+        }
+
+        return $controllElement;
+    }
+
+    public function actionTree()
+    {
+        return $this->render($this->action->id, [
+            'models' => CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all()
+        ]);
     }
 }

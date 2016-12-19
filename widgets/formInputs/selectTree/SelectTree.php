@@ -96,9 +96,8 @@ class SelectTree extends InputWidget
 
 
 
-            $src = UrlHelper::construct('/cms/admin-tree')
+            $src = UrlHelper::construct('/cms/admin-tools/tree')
                             ->set('mode', $this->mode)
-                            //->set('s', $valueArray)
                             ->setSystemParam(Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
                             ->setSystemParam(Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
                             ->enableAdmin()->toString();
