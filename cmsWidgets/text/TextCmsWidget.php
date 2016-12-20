@@ -55,9 +55,9 @@ class TextCmsWidget extends Widget
         );
     }
 
-    public function init()
+    static public function begin($config = [])
     {
-        parent::init();
+        parent::begin($config);
 
         ob_start();
         ob_implicit_flush(false);
@@ -65,10 +65,13 @@ class TextCmsWidget extends Widget
 
     public function run()
     {
-        $this->_obContent = ob_get_clean();
-        if (!$this->text)
+        if ($this->_isBegin)
         {
-            $this->text = $this->_obContent;
+            $this->_obContent = ob_get_clean();
+            if (!$this->text)
+            {
+                $this->text = $this->_obContent;
+            }
         }
 
         return parent::run();

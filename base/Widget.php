@@ -10,8 +10,10 @@ namespace skeeks\cms\base;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\traits\WidgetTrait;
+use yii\base\InvalidCallException;
 use yii\base\ViewContextInterface;
 use yii\db\Exception;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 
@@ -29,23 +31,43 @@ abstract class Widget extends Component implements ViewContextInterface
      */
     protected $_token;
 
+    /**
+     * Признак срабатывания функции static self::begin()
+     * @var bool
+     */
+    protected $_isBegin = false;
+
     public function init()
     {
-        $this->_token = \Yii::t('skeeks/cms','Widget').': ' . $this->id;
+        $this->_token = \Yii::t('skeeks/cms', 'Widget').': ' . $this->id;
 
         $this->defaultAttributes = $this->attributes;
 
         \Yii::beginProfile("Init: " . $this->_token);
             $this->initSettings();
         \Yii::endProfile("Init: " . $this->_token);
+    }
 
+
+    /**
+     * Если включена дебаг мод, будет напечатан первый тег
+     * @return string
+     */
+    public function _begin()
+    {
+        //Запускается 1 раз
+        if ($this->_isBegin === true)
+        {
+            return "";
+        }
+        $this->_isBegin = true;
 
         \Yii::$app->cmsToolbar->initEnabled();
         if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
         {
             $id = 'sx-infoblock-' . $this->id;
 
-            echo Html::beginTag('div',
+            return Html::beginTag('div',
             [
                 'class'     => 'skeeks-cms-toolbar-edit-view-block',
                 'id'        => $id,
@@ -56,6 +78,92 @@ abstract class Widget extends Component implements ViewContextInterface
                     'config-url' => $this->getCallableEditUrl()
                 ]
             ]);
+        }
+
+        return "";
+    }
+
+    /**
+     * В режиме редактирования, будет добавлен закрывающий тег + зарегистрированные данные для js
+     * @return string
+     */
+    public function _end()
+    {
+        $result = "";
+
+        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
+        {
+            $id = 'sx-infoblock-' . $this->id;
+
+            $this->view->registerJs(<<<JS
+new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
+JS
+);
+            $callableData = $this->callableData;
+
+            $callableDataInput = Html::textarea('callableData', base64_encode(serialize($callableData)), [
+                'id'    => $this->callableId,
+                'style' => 'display: none;'
+            ]);
+
+            $result = $callableDataInput;
+            $result .= Html::endTag('div');
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string    $namespace  Unique code, which is attached to the settings in the database
+     * @param array     $config     Standard widget settings
+     *
+     * @return Widget
+     */
+    static public function beginWidget($namespace, $config = [])
+    {
+        $config = ArrayHelper::merge(['namespace' => $namespace], $config);
+        return static::begin($config);
+    }
+
+    /**
+     * Begins a widget.
+     * This method creates an instance of the calling class. It will apply the configuration
+     * to the created instance. A matching [[end()]] call should be called later.
+     * @param array $config name-value pairs that will be used to initialize the object properties
+     * @return static the newly created widget instance
+     */
+    public static function begin($config = [])
+    {
+        $config['class'] = get_called_class();
+        /* @var $widget Widget */
+        $widget = \Yii::createObject($config);
+        static::$stack[] = $widget;
+        //Если включена дебаг мод, будет напечатан первый тег
+        echo $widget->_begin();
+
+        return $widget;
+    }
+
+    /**
+     * Ends a widget.
+     * Note that the rendering result of the widget is directly echoed out.
+     * @return static the widget instance that is ended.
+     * @throws InvalidCallException if [[begin()]] and [[end()]] calls are not properly nested
+     */
+    public static function end()
+    {
+        if (!empty(static::$stack)) {
+            $widget = array_pop(static::$stack);
+            if (get_class($widget) === get_called_class()) {
+                echo $widget->run();
+                //В режиме редактирования, будет добавлен закрывающий тег + зарегистрированные данные для js
+                echo $widget->_end();
+                return $widget;
+            } else {
+                throw new InvalidCallException(\Yii::t('skeeks/cms','"Expecting end() of {widget}, found {class}',['widget' => get_class($widget) , 'class' => get_called_class()]));
+            }
+        } else {
+            throw new InvalidCallException(\Yii::t('skeeks/cms',"Unexpected {class}::end() call. A matching begin() is not found.",['class' => get_called_class()]));
         }
     }
 
@@ -83,26 +191,17 @@ abstract class Widget extends Component implements ViewContextInterface
             \Yii::endProfile("Run: " . $this->_token);
         }
 
-        echo $content;
-
-        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
+        if ($this->_isBegin)
         {
-            $id = 'sx-infoblock-' . $this->id;
-
-            $this->view->registerJs(<<<JS
-new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
-JS
-);
-            $callableData = $this->callableData;
-
-            $callableDataInput = Html::textarea('callableData', base64_encode(serialize($callableData)), [
-                'id'    => $this->callableId,
-                'style' => 'display: none;'
-            ]);
-
-            echo $callableDataInput;
-            echo Html::endTag('div');
+            $result = $content;
+        } else
+        {
+            $result = $this->_begin();
+            $result .= $content;
+            $result .= $this->_end();
         }
+
+        return $result;
     }
 
     /**
