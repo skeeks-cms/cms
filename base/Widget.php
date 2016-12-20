@@ -38,26 +38,26 @@ abstract class Widget extends Component implements ViewContextInterface
         \Yii::beginProfile("Init: " . $this->_token);
             $this->initSettings();
         \Yii::endProfile("Init: " . $this->_token);
-    }
 
 
-    /**
-     * В ключ добавляется зависимость, какой режим используется
-     * @return string
-     */
-    /*public function getCacheKey()
-    {
         \Yii::$app->cmsToolbar->initEnabled();
-        if (\Yii::$app->cmsToolbar->isEditMode() && \Yii::$app->cmsToolbar->enabled)
+        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
         {
-            return implode([
-                "edit-mode-true"
-            ]) . parent::getCacheKey();
-        } else
-        {
-            parent::getCacheKey();
+            $id = 'sx-infoblock-' . $this->id;
+
+            echo Html::beginTag('div',
+            [
+                'class'     => 'skeeks-cms-toolbar-edit-view-block',
+                'id'        => $id,
+                'title'     => \Yii::t('skeeks/cms',"Double-click on the block will open the settings manager"),
+                'data'      =>
+                [
+                    'id' => $this->id,
+                    'config-url' => $this->getCallableEditUrl()
+                ]
+            ]);
         }
-    }*/
+    }
 
     /**
      * @return string
@@ -83,18 +83,13 @@ abstract class Widget extends Component implements ViewContextInterface
             \Yii::endProfile("Run: " . $this->_token);
         }
 
+        echo $content;
 
-        \Yii::$app->cmsToolbar->initEnabled();
         if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
         {
-            $pre = "";
-            /*$pre = Html::tag('pre', Json::encode($this->attributes), [
-                'style' => 'display: none;'
-            ]);*/
-
             $id = 'sx-infoblock-' . $this->id;
 
-            $this->getView()->registerJs(<<<JS
+            $this->view->registerJs(<<<JS
 new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
 JS
 );
@@ -105,21 +100,9 @@ JS
                 'style' => 'display: none;'
             ]);
 
-            return Html::tag('div', $pre . $callableDataInput . (string) $content,
-            [
-                'class'     => 'skeeks-cms-toolbar-edit-view-block',
-                'id'        => $id,
-                'title'     => \Yii::t('skeeks/cms',"Double-click on the block will open the settings manager"),
-                'data'      =>
-                [
-                    'id' => $this->id,
-                    //'config-url' => $this->getEditUrl(),
-                    'config-url' => $this->getCallableEditUrl()
-                ]
-            ]);
+            echo $callableDataInput;
+            echo Html::endTag('div');
         }
-
-        return $content;
     }
 
     /**

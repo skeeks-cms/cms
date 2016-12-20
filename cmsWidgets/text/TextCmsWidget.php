@@ -30,6 +30,8 @@ class TextCmsWidget extends Widget
 
     public $text = '';
 
+    protected $_obContent = '';
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
@@ -51,6 +53,38 @@ class TextCmsWidget extends Widget
         echo $form->field($this, 'text')->widget(
             \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className()
         );
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        ob_start();
+        ob_implicit_flush(false);
+    }
+
+    public function run()
+    {
+        $this->_obContent = ob_get_clean();
+        if (!$this->text)
+        {
+            $this->text = $this->_obContent;
+        }
+
+        return parent::run();
+    }
+
+    /**
+     * @return array
+     */
+    public function getCallableData()
+    {
+        $attributes = parent::getCallableData();
+        if (!$attributes['attributes']['text'])
+        {
+            $attributes['attributes']['text'] = $this->_obContent;
+        }
+        return $attributes;
     }
 
     protected function _run()
