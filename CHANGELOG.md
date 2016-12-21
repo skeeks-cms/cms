@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.2.0.pre
+3.2.0
 -----------------
+ * Delete _all dir
  * Updated cluster local
  * Good improvement widgets allows you to use begin() end() design
  * Completion form controls
