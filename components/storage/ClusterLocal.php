@@ -128,7 +128,7 @@ class ClusterLocal extends Cluster
             return $this->getPublicSrc($clusterFileUniqSrc);
         } else
         {
-            return \Yii::$app->request->hostInfo . $this->getPublicSrc($clusterFileUniqSrc);
+            return \Yii::$app->urlManager->hostInfo . $this->getPublicSrc($clusterFileUniqSrc);
         }
     }
 

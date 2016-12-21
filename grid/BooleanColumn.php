@@ -75,10 +75,10 @@ class BooleanColumn extends DataColumn
     public function init()
     {
         if (empty($this->trueLabel)) {
-            $this->trueLabel = \Yii::t('skeeks/cms', 'да');
+            $this->trueLabel = \Yii::t('yii', 'Yes');
         }
         if (empty($this->falseLabel)) {
-            $this->falseLabel = \Yii::t('skeeks/cms', 'нет');
+            $this->falseLabel = \Yii::t('yii', 'No');
         }
         if (!$this->filter)
         {

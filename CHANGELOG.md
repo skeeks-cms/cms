@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.0.pre
 -----------------
+ * Updated cluster local
  * Good improvement widgets allows you to use begin() end() design
  * Completion form controls
  * Created skeeks\cms\widgets\Pjax Widget

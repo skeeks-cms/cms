@@ -8,6 +8,7 @@
 namespace skeeks\cms\helpers;
 
 use yii\base\Model;
+use yii\helpers\Json;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
@@ -97,5 +98,10 @@ class RequestResponse extends Model
     {
         $model->load(\Yii::$app->request->post());
         return ActiveForm::validate($model);
+    }
+
+    public function __toString()
+    {
+        return Json::encode($this->toArray());
     }
 }
