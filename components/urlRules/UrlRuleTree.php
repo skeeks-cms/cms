@@ -6,6 +6,7 @@
  * @date 24.05.2015
  */
 namespace skeeks\cms\components\urlRules;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
@@ -41,44 +42,39 @@ class UrlRuleTree
         if ($route == 'cms/tree/view')
         {
             $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
+            $defaultParams      = $params;
 
-            $id          = (int) ArrayHelper::getValue($params, 'id');
-            $treeModel   = ArrayHelper::getValue($params, 'model');
-
-            if (!$id && !$treeModel)
-            {
-                return false;
-            }
-
-            if ($treeModel && $treeModel instanceof Tree)
-            {
-                $tree = $treeModel;
-                self::$models[$treeModel->id] = $treeModel;
-            } else
-            {
-                if (!$tree = ArrayHelper::getValue(self::$models, $id))
-                {
-                    $tree = Tree::findOne(['id' => $id]);
-                    self::$models[$id] = $tree;
-                }
-            }
-
+            $tree = $this->_getCreateUrlTree($params);
             if (!$tree)
             {
                 return false;
             }
 
+            //Для раздела задан редиррект
+            if ($tree->redirect)
+            {
+                return $tree->redirect;
+            }
+
+            /**
+             * Указан редиррект на другой раздел
+             */
+            if ($tree->redirect_tree_id)
+            {
+                if ($tree->redirectTree->id != $tree->id)
+                {
+                    $paramsNew = ArrayHelper::merge(['/cms/tree/view'], $defaultParams, ['model' => $tree->redirectTree]);
+                    return Url::toRoute($paramsNew);
+                }
+            }
+
             if ($tree->dir)
             {
-                //$url = $tree->dir . ((bool) \Yii::$app->seo->useLastDelimetrTree ? DIRECTORY_SEPARATOR : "") . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
                 $url = $tree->dir . $suffix;
             } else
             {
                 $url = "";
             }
-
-            ArrayHelper::remove($params, 'id');
-            ArrayHelper::remove($params, 'model');
 
             if (!empty($params) && ($query = http_build_query($params)) !== '') {
                 $url .= '?' . $query;
@@ -88,6 +84,68 @@ class UrlRuleTree
         }
 
         return false;
+    }
+
+    protected function _getCreateUrlTree(&$params)
+    {
+        $id             = (int) ArrayHelper::getValue($params, 'id');
+        $treeModel      = ArrayHelper::getValue($params, 'model');
+
+        $dir            = ArrayHelper::getValue($params, 'dir');
+        $site_code      = ArrayHelper::getValue($params, 'site_code');
+
+        ArrayHelper::remove($params, 'id');
+        ArrayHelper::remove($params, 'model');
+
+        ArrayHelper::remove($params, 'dir');
+        ArrayHelper::remove($params, 'site_code');
+
+
+        if ($treeModel && $treeModel instanceof Tree)
+        {
+            $tree = $treeModel;
+            self::$models[$treeModel->id] = $treeModel;
+
+            return $tree;
+        }
+
+        if ($id)
+        {
+            $tree = ArrayHelper::getValue(self::$models, $id);
+
+            if ($tree)
+            {
+                return $tree;
+            } else
+            {
+                $tree = CmsTree::findOne(['id' => $id]);
+                self::$models[$id] = $tree;
+                return $tree;
+            }
+        }
+
+
+        if ($dir)
+        {
+            if (!$site_code && \Yii::$app->cms && \Yii::$app->cms->site)
+            {
+                $site_code = \Yii::$app->cms->site->code;
+            }
+
+            $tree = CmsTree::findOne([
+                'dir'       => $dir,
+                'site_code' => $site_code
+            ]);
+
+            if ($tree)
+            {
+                self::$models[$id] = $tree;
+                return $tree;
+            }
+        }
+
+
+        return null;
     }
 
     /**
