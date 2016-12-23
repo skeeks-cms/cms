@@ -85,7 +85,7 @@ class UrlRuleContentElement
             }
 
             //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
-            if ($cmsTree->site)
+            if ($cmsTree && $cmsTree->site)
             {
                 //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
                 if ($cmsTree->site->server_name)
