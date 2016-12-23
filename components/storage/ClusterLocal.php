@@ -30,7 +30,7 @@ class ClusterLocal extends Cluster
         }
         if (!$this->publicBaseUrl)
         {
-            $this->publicBaseUrl = "/uploads/all";
+            $this->publicBaseUrl = \Yii::getAlias("@web/uploads/all");
         }
         if (!$this->rootBasePath)
         {
