@@ -40,6 +40,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property string $url
  *
+ * @property CmsTree $rootCmsTree
  * @property CmsLang $cmsLang
  * @property CmsSiteDomain[] $cmsSiteDomains
  * @property CmsTree[] $cmsTrees
@@ -241,6 +242,14 @@ class CmsSite extends Core
         }
 
         return \Yii::$app->request->hostInfo;
+    }
+
+    /**
+     * @return CmsTree
+     */
+    public function getRootCmsTree()
+    {
+        return $this->getCmsTrees()->andWhere(['level' => 0])->limit(1)->one();
     }
 
     /**

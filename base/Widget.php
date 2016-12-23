@@ -117,7 +117,7 @@ JS
      * @param string    $namespace  Unique code, which is attached to the settings in the database
      * @param array     $config     Standard widget settings
      *
-     * @return Widget
+     * @return static
      */
     static public function beginWidget($namespace, $config = [])
     {

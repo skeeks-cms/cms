@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.2.1
+-----------------
+ * CmsSite added property rootCmsTree
+
 3.2.0
 -----------------
  * Delete _all dir
