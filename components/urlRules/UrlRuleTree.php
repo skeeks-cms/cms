@@ -6,6 +6,7 @@
  * @date 24.05.2015
  */
 namespace skeeks\cms\components\urlRules;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
@@ -40,54 +41,164 @@ class UrlRuleTree
     {
         if ($route == 'cms/tree/view')
         {
-            $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
+            $defaultParams      = $params;
 
-            $id          = (int) ArrayHelper::getValue($params, 'id');
-            $treeModel   = ArrayHelper::getValue($params, 'model');
-
-            if (!$id && !$treeModel)
-            {
-                return false;
-            }
-
-            if ($treeModel && $treeModel instanceof Tree)
-            {
-                $tree = $treeModel;
-                self::$models[$treeModel->id] = $treeModel;
-            } else
-            {
-                if (!$tree = ArrayHelper::getValue(self::$models, $id))
-                {
-                    $tree = Tree::findOne(['id' => $id]);
-                    self::$models[$id] = $tree;
-                }
-            }
-
+            //Из параметров получаем модель дерева, если модель не найдена просто остановка
+            $tree = $this->_getCreateUrlTree($params);
             if (!$tree)
             {
                 return false;
             }
 
+            //Для раздела задан редиррект
+            if ($tree->redirect)
+            {
+                if (strpos($tree->redirect, '://') !== false)
+                {
+                    return $tree->redirect;
+                } else
+                {
+                    $url = trim($tree->redirect, '/');
+
+                    if ($tree->site)
+                    {
+                        if ($tree->site->server_name)
+                        {
+                            return $tree->site->url . '/' . $url;
+                        } else
+                        {
+                            return $url;
+                        }
+                    } else
+                    {
+                        return $url;
+                    }
+                }
+            }
+
+            //Указан редиррект на другой раздел
+            if ($tree->redirect_tree_id)
+            {
+                if ($tree->redirectTree->id != $tree->id)
+                {
+                    $paramsNew = ArrayHelper::merge($defaultParams, ['model' => $tree->redirectTree]);
+                    $url = $this->createUrl($manager, $route, $paramsNew);
+                    return $url;
+                }
+            }
+
+            //Стандартно берем dir раздела
             if ($tree->dir)
             {
-                //$url = $tree->dir . ((bool) \Yii::$app->seo->useLastDelimetrTree ? DIRECTORY_SEPARATOR : "") . (\Yii::$app->urlManager->suffix ? \Yii::$app->urlManager->suffix : '');
-                $url = $tree->dir . $suffix;
+                $url = $tree->dir;
             } else
             {
                 $url = "";
             }
 
-            ArrayHelper::remove($params, 'id');
-            ArrayHelper::remove($params, 'model');
+            if (strpos($url, '//') !== false) {
 
+                $url = preg_replace('#/+#', '/', $url);
+            }
+
+
+            /**
+             * @see parent::createUrl()
+             */
+            if ($url !== '') {
+                $url .= ($this->suffix === null ? $manager->suffix : $this->suffix);
+            }
+
+            /**
+             * @see parent::createUrl()
+             */
             if (!empty($params) && ($query = http_build_query($params)) !== '') {
                 $url .= '?' . $query;
+            }
+
+
+            //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
+            if ($tree->site)
+            {
+                //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
+                if ($tree->site->server_name)
+                {
+                    return $tree->site->url . '/' . $url;
+                }
             }
 
             return $url;
         }
 
         return false;
+    }
+
+    /**
+     * Поиск раздела по параметрам + удаление лишних
+     *
+     * @param $params
+     * @return null|Tree
+     */
+    protected function _getCreateUrlTree(&$params)
+    {
+        $id             = (int) ArrayHelper::getValue($params, 'id');
+        $treeModel      = ArrayHelper::getValue($params, 'model');
+
+        $dir            = ArrayHelper::getValue($params, 'dir');
+        $site_code      = ArrayHelper::getValue($params, 'site_code');
+
+        ArrayHelper::remove($params, 'id');
+        ArrayHelper::remove($params, 'model');
+
+        ArrayHelper::remove($params, 'dir');
+        ArrayHelper::remove($params, 'site_code');
+
+
+        if ($treeModel && $treeModel instanceof Tree)
+        {
+            $tree = $treeModel;
+            self::$models[$treeModel->id] = $treeModel;
+
+            return $tree;
+        }
+
+        if ($id)
+        {
+            $tree = ArrayHelper::getValue(self::$models, $id);
+
+            if ($tree)
+            {
+                return $tree;
+            } else
+            {
+                $tree = CmsTree::findOne(['id' => $id]);
+                self::$models[$id] = $tree;
+                return $tree;
+            }
+        }
+
+
+        if ($dir)
+        {
+            if (!$site_code && \Yii::$app->cms && \Yii::$app->cms->site)
+            {
+                $site_code = \Yii::$app->cms->site->code;
+            }
+
+            $tree = CmsTree::findOne([
+                'dir'       => $dir,
+                'site_code' => $site_code
+            ]);
+
+            if ($tree)
+            {
+                self::$models[$id] = $tree;
+                return $tree;
+            }
+        }
+
+
+        return null;
     }
 
     /**

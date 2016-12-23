@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.2.1
+3.2.1.pre
 -----------------
+ * Url Rewrites
  * CmsSite added property rootCmsTree
 
 3.2.0

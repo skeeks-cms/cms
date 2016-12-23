@@ -352,45 +352,25 @@ class Tree extends Core
     /**
      * @return string
      */
-    public function getUrl($scheme = false)
+    public function getUrl($scheme = false, $params = [])
     {
-        if ($this->redirect)
+        if ($params)
         {
-            return $this->redirect;
-        }
-
-        if ($this->redirect_tree_id)
+            $params = ArrayHelper::merge(['/cms/tree/view', 'model' => $this], $params);
+        } else
         {
-            if ($this->redirectTree->id != $this->id)
-            {
-                return $this->redirectTree->getUrl($scheme);
-            }
-        }
-
-        if ($this->site)
-        {
-            if (!$this->site->server_name)
-            {
-                return Url::to(['/cms/tree/view', 'model' => $this], $scheme);
-            } else
-            {
-                //TODO::update this is
-                $standartUrl = Url::to(['/cms/tree/view', 'model' => $this], false);
-                $standartUrl = str_replace(\Yii::$app->urlManager->baseUrl, '', $standartUrl);
-                return $this->site->url . $standartUrl;
-            }
+            $params = ['/cms/tree/view', 'model' => $this];
         }
 
         return Url::to(['/cms/tree/view', 'model' => $this], $scheme);
     }
 
-
     /**
      * @return string
      */
-    public function getAbsoluteUrl()
+    public function getAbsoluteUrl($params = [])
     {
-        return $this->getUrl(true);
+        return $this->getUrl(true, $params);
     }
 
     /**

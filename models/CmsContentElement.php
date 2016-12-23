@@ -377,36 +377,15 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getUrl($scheme = false, $params = [])
     {
-        if ($this->cmsTree)
+        if ($params)
         {
-            if (!$this->cmsTree->site->server_name)
-            {
-                if ($params)
-                {
-                    $params = ArrayHelper::merge(['/cms/content-element/view', 'model' => $this], $params);
-                } else
-                {
-                    $params = ['/cms/content-element/view', 'model' => $this];
-                }
-
-                return Url::to($params, $scheme);
-            } else
-            {
-                if ($params)
-                {
-                    $params = ArrayHelper::merge(['/cms/content-element/view', 'model' => $this], $params);
-                } else
-                {
-                    $params = ['/cms/content-element/view', 'model' => $this];
-                }
-
-                $standartUrl = Url::to($params, false);
-                $standartUrl = str_replace(\Yii::$app->urlManager->baseUrl, '', $standartUrl);
-                return $this->cmsTree->site->url . $standartUrl;
-            }
+            $params = ArrayHelper::merge(['/cms/content-element/view', 'model' => $this], $params);
+        } else
+        {
+            $params = ['/cms/content-element/view', 'model' => $this];
         }
 
-        return Url::to(['/cms/content-element/view', 'model' => $this], $scheme);
+        return Url::to($params, $scheme);
     }
 
     /**
