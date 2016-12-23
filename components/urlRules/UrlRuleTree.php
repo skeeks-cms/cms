@@ -41,9 +41,9 @@ class UrlRuleTree
     {
         if ($route == 'cms/tree/view')
         {
-            $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
             $defaultParams      = $params;
 
+            //Из параметров получаем модель дерева, если модель не найдена просто остановка
             $tree = $this->_getCreateUrlTree($params);
             if (!$tree)
             {
@@ -53,31 +53,78 @@ class UrlRuleTree
             //Для раздела задан редиррект
             if ($tree->redirect)
             {
-                return $tree->redirect;
+                if (strpos($tree->redirect, '://') !== false)
+                {
+                    return $tree->redirect;
+                } else
+                {
+                    $url = trim($tree->redirect, '/');
+
+                    if ($tree->site)
+                    {
+                        if ($tree->site->server_name)
+                        {
+                            return $tree->site->url . '/' . $url;
+                        } else
+                        {
+                            return $url;
+                        }
+                    } else
+                    {
+                        return $url;
+                    }
+                }
             }
 
-            /**
-             * Указан редиррект на другой раздел
-             */
+            //Указан редиррект на другой раздел
             if ($tree->redirect_tree_id)
             {
                 if ($tree->redirectTree->id != $tree->id)
                 {
-                    $paramsNew = ArrayHelper::merge(['/cms/tree/view'], $defaultParams, ['model' => $tree->redirectTree]);
-                    return Url::toRoute($paramsNew);
+                    $paramsNew = ArrayHelper::merge($defaultParams, ['model' => $tree->redirectTree]);
+                    $url = $this->createUrl($manager, $route, $paramsNew);
+                    return $url;
                 }
             }
 
+            //Стандартно берем dir раздела
             if ($tree->dir)
             {
-                $url = $tree->dir . $suffix;
+                $url = $tree->dir;
             } else
             {
                 $url = "";
             }
 
+            if (strpos($url, '//') !== false) {
+
+                $url = preg_replace('#/+#', '/', $url);
+            }
+
+
+            /**
+             * @see parent::createUrl()
+             */
+            if ($url !== '') {
+                $url .= ($this->suffix === null ? $manager->suffix : $this->suffix);
+            }
+
+            /**
+             * @see parent::createUrl()
+             */
             if (!empty($params) && ($query = http_build_query($params)) !== '') {
                 $url .= '?' . $query;
+            }
+
+
+            //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
+            if ($tree->site)
+            {
+                //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
+                if ($tree->site->server_name)
+                {
+                    return $tree->site->url . '/' . $url;
+                }
             }
 
             return $url;
@@ -86,6 +133,12 @@ class UrlRuleTree
         return false;
     }
 
+    /**
+     * Поиск раздела по параметрам + удаление лишних
+     *
+     * @param $params
+     * @return null|Tree
+     */
     protected function _getCreateUrlTree(&$params)
     {
         $id             = (int) ArrayHelper::getValue($params, 'id');

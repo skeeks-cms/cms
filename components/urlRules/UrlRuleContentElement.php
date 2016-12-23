@@ -40,32 +40,7 @@ class UrlRuleContentElement
     {
         if ($route == 'cms/content-element/view')
         {
-            $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
-
-            $id                     = (int) ArrayHelper::getValue($params, 'id');
-            $contentElement         = ArrayHelper::getValue($params, 'model');
-
-            if (!$id && !$contentElement)
-            {
-                return false;
-            }
-
-            if ($contentElement && $contentElement instanceof CmsContentElement)
-            {
-                self::$models[$contentElement->id] = $contentElement;
-            } else
-            {
-                /**
-                 * @var $contentElement CmsContentElement
-                 */
-                if (!$contentElement = ArrayHelper::getValue(self::$models, $id))
-                {
-                    $contentElement     = CmsContentElement::findOne(['id' => $id]);
-                    self::$models[$id]  = $contentElement;
-                }
-            }
-
-
+            $contentElement = $this->_getElement($params);
 
             if (!$contentElement)
             {
@@ -75,7 +50,7 @@ class UrlRuleContentElement
             $url = '';
 
             $cmsTree                = ArrayHelper::getValue($params, 'cmsTree');
-
+            ArrayHelper::remove($params, 'cmsTree');
             //We need to build on what that particular section of the settings
             if (!$cmsTree)
             {
@@ -87,16 +62,36 @@ class UrlRuleContentElement
                 $url = $cmsTree->dir . "/";
             }
 
-            //$url .= $contentElement->id . '-' . $contentElement->code . ((bool) \Yii::$app->seo->useLastDelimetrContentElements ? DIRECTORY_SEPARATOR : "");
-            $url .= $contentElement->id . '-' . $contentElement->code . $suffix;
+            $url .= $contentElement->id . '-' . $contentElement->code;
 
-            ArrayHelper::remove($params, 'id');
-            ArrayHelper::remove($params, 'code');
-            ArrayHelper::remove($params, 'model');
 
-            if (!empty($params) && ($query = http_build_query($params)) !== '')
-            {
+            if (strpos($url, '//') !== false) {
+
+                $url = preg_replace('#/+#', '/', $url);
+            }
+
+            /**
+             * @see parent::createUrl()
+             */
+            if ($url !== '') {
+                $url .= ($this->suffix === null ? $manager->suffix : $this->suffix);
+            }
+
+            /**
+             * @see parent::createUrl()
+             */
+            if (!empty($params) && ($query = http_build_query($params)) !== '') {
                 $url .= '?' . $query;
+            }
+
+            //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
+            if ($cmsTree->site)
+            {
+                //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
+                if ($cmsTree->site->server_name)
+                {
+                    return $cmsTree->site->url . '/' . $url;
+                }
             }
 
             return $url;
@@ -106,13 +101,49 @@ class UrlRuleContentElement
     }
 
     /**
+     *
+     * @param $params
+     * @return bool|CmsContentElement
+     */
+    protected function _getElement(&$params)
+    {
+        $id                     = (int) ArrayHelper::getValue($params, 'id');
+        $contentElement         = ArrayHelper::getValue($params, 'model');
+
+        if (!$id && !$contentElement)
+        {
+            return false;
+        }
+
+        if ($contentElement && $contentElement instanceof CmsContentElement)
+        {
+            self::$models[$contentElement->id] = $contentElement;
+        } else
+        {
+            /**
+             * @var $contentElement CmsContentElement
+             */
+            if (!$contentElement = ArrayHelper::getValue(self::$models, $id))
+            {
+                $contentElement     = CmsContentElement::findOne(['id' => $id]);
+                self::$models[$id]  = $contentElement;
+            }
+        }
+
+        ArrayHelper::remove($params, 'id');
+        ArrayHelper::remove($params, 'code');
+        ArrayHelper::remove($params, 'model');
+
+        return $contentElement;
+    }
+
+    /**
      * @param \yii\web\UrlManager $manager
      * @param \yii\web\Request $request
      * @return array|bool
      */
     public function parseRequest($manager, $request)
     {
-
         if ($this->mode === self::CREATION_ONLY) {
             return false;
         }

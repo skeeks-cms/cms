@@ -241,7 +241,7 @@ class CmsSite extends Core
             return 'http://' . $this->server_name;
         }
 
-        return \Yii::$app->request->hostInfo;
+        return \Yii::$app->urlManager->hostInfo;
     }
 
     /**
