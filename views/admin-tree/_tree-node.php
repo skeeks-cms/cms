@@ -51,7 +51,7 @@ if ($additionalName)
         "containerClass"        => "dropdown pull-left",
         'clientOptions'         =>
         [
-            'pjax-id' => 'sx-pjax-tree'
+            'pjax-id' => $widget->pjax->id
         ]
     ]); ?>
     <div class="pull-left sx-controll-act">

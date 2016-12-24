@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.1.pre
 -----------------
+ * Fixed admin tree
  * Fixed image urls
  * Url Rewrites
  * CmsSite added property rootCmsTree
