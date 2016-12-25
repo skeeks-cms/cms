@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.1.pre
 -----------------
+ * Showing links in the tree
  * Fixed admin tree
  * Fixed image urls
  * Url Rewrites

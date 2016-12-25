@@ -37,7 +37,38 @@ if ($additionalName)
     <a href="<?= $widget->getOpenCloseLink($model); ?>">
         <?= $result; ?>
     </a>
+    <? if ($model->redirect || $model->redirect_tree_id) : ?>
+        →
+    <? endif; ?>
+    <? if ($model->redirect) : ?>
+        <?= $model->redirect; ?>
+    <? endif; ?>
+    <? if ($model->redirectTree) : ?>
+        <? if ($parents = $model->redirectTree->parents) : ?>
+            <?
+                $root = $parents[0];
+                unset($parents[0]);
+            /**
+             * @var \skeeks\cms\models\CmsTree $root
+             */
+                $names[] = $root->site->name;
+                if ($parents)
+                {
+                    $names = \yii\helpers\ArrayHelper::merge($names, \yii\helpers\ArrayHelper::map($parents, 'name', 'name'));
+                }
+                $names[] = $model->redirectTree->name;
+                echo implode(" / ", $names);
+            ?>
+        <? else : ?>
+            <?
+                $names[] = $model->redirectTree->site->name;
+                echo implode(" / ", $names);
+            ?>
+        <? endif; ?>
+
+    <? endif; ?>
 </div>
+
 
 <!-- Possible actions -->
 <div class="sx-controll-node row">
@@ -45,6 +76,9 @@ if ($additionalName)
         $controller = \Yii::$app->cms->moduleCms->createControllerByID("admin-tree");
         $controller->setModel($model);
     ?>
+
+
+
     <?= \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
         "controller"            => $controller,
         "renderFirstAction"     => true,
