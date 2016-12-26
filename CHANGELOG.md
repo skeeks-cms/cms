@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.1.pre
 -----------------
+ * Updated CmsContentElementWidget
  * Updated TreeMenuCmsWidget
  * Showing links in the tree
  * Fixed admin tree

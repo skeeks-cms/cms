@@ -77,14 +77,13 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
     public $options = [];
 
-    /*public function init()
+    public function init()
     {
-        print_r($this->attributes);
-        $className = $this->contentElementClass;
+        parent::init();
 
-        echo $className;
-        //die;
-    }*/
+        $this->initActiveQuery();
+    }
+
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
@@ -164,8 +163,6 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
     protected function _run()
     {
-        $className = $this->contentElementClass;
-
         $cacheKey = $this->getCacheKey() . 'run';
 
         $dependency = new TagDependency([
@@ -179,126 +176,6 @@ class ContentElementsCmsWidget extends WidgetRenderable
         $result = \Yii::$app->cache->get($cacheKey);
         if ($result === false || $this->enabledRunCache == Cms::BOOL_N)
         {
-            $this->initDataProvider();
-
-            if ($this->createdBy)
-            {
-                $this->dataProvider->query->andWhere([$className::tableName() . '.created_by' => $this->createdBy]);
-            }
-
-            if ($this->active)
-            {
-                $this->dataProvider->query->andWhere([$className::tableName() . '.active' => $this->active]);
-            }
-
-            if ($this->content_ids)
-            {
-                $this->dataProvider->query->andWhere([$className::tableName() . '.content_id' => $this->content_ids]);
-            }
-
-            if ($this->limit)
-            {
-                $this->dataProvider->query->limit($this->limit);
-            }
-
-
-            $treeIds = (array) $this->tree_ids;
-
-            if ($this->enabledCurrentTree == Cms::BOOL_Y)
-            {
-                $tree = \Yii::$app->cms->currentTree;
-                if ($tree)
-                {
-                    if ($this->enabledCurrentTreeChild == Cms::BOOL_Y)
-                    {
-                        if ($this->enabledCurrentTreeChildAll == Cms::BOOL_Y)
-                        {
-                            $treeIds = $tree->getDescendants()->select(['id'])->indexBy('id')->asArray()->all();
-                            $treeIds = array_keys($treeIds);
-                        } else
-                        {
-                            if ($childrens = $tree->children)
-                            {
-                                foreach ($childrens as $chidren)
-                                {
-                                    $treeIds[] = $chidren->id;
-                                }
-                            }
-                        }
-                    }
-
-                    $treeIds[] = $tree->id;
-
-                }
-            }
-
-            if ($treeIds)
-            {
-                foreach ($treeIds as $key => $treeId)
-                {
-                    if (!$treeId)
-                    {
-                        unset($treeIds[$key]);
-                    }
-                }
-
-                if ($treeIds)
-                {
-                    /**
-                     * @var $query ActiveQuery
-                     */
-                    $query = $this->dataProvider->query;
-
-                    $query->joinWith('cmsContentElementTrees');
-                    $query->andWhere(
-                        [
-                            'or',
-                            [$className::tableName() . '.tree_id' => $treeIds],
-                            [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
-                        ]
-                    );
-                }
-
-            }
-
-
-            if ($this->enabledActiveTime == Cms::BOOL_Y)
-            {
-                $this->dataProvider->query->andWhere(
-                    ["<=", $className::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
-                );
-
-                $this->dataProvider->query->andWhere(
-                    [
-                        'or',
-                        [">=", $className::tableName() . '.published_to', \Yii::$app->formatter->asTimestamp(time())],
-                        [CmsContentElement::tableName() . '.published_to' => null],
-                    ]
-                );
-            }
-
-            /**
-             *
-             */
-            if ($this->with)
-            {
-                $this->dataProvider->query->with($this->with);
-            }
-
-            $this->dataProvider->query->groupBy([$className::tableName() . '.id']);
-
-            if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
-            {
-                $callback = $this->activeQueryCallback;
-                $callback($this->dataProvider->query);
-            }
-
-            if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
-            {
-                $callback = $this->dataProviderCallback;
-                $callback($this->dataProvider);
-            }
-
             $result = parent::_run();
 
             \Yii::$app->cache->set($cacheKey, $result, (int) $this->runCacheDuration, $dependency);
@@ -345,6 +222,135 @@ class ContentElementsCmsWidget extends WidgetRenderable
      * @var Search
      */
     public $search          = null;
+
+    /**
+     * @return $this
+     */
+    public function initActiveQuery()
+    {
+        $className = $this->contentElementClass;
+        $this->initDataProvider();
+
+        if ($this->createdBy)
+        {
+            $this->dataProvider->query->andWhere([$className::tableName() . '.created_by' => $this->createdBy]);
+        }
+
+        if ($this->active)
+        {
+            $this->dataProvider->query->andWhere([$className::tableName() . '.active' => $this->active]);
+        }
+
+        if ($this->content_ids)
+        {
+            $this->dataProvider->query->andWhere([$className::tableName() . '.content_id' => $this->content_ids]);
+        }
+
+        if ($this->limit)
+        {
+            $this->dataProvider->query->limit($this->limit);
+        }
+
+
+        $treeIds = (array) $this->tree_ids;
+
+        if ($this->enabledCurrentTree == Cms::BOOL_Y)
+        {
+            $tree = \Yii::$app->cms->currentTree;
+            if ($tree)
+            {
+                if ($this->enabledCurrentTreeChild == Cms::BOOL_Y)
+                {
+                    if ($this->enabledCurrentTreeChildAll == Cms::BOOL_Y)
+                    {
+                        $treeIds = $tree->getDescendants()->select(['id'])->indexBy('id')->asArray()->all();
+                        $treeIds = array_keys($treeIds);
+                    } else
+                    {
+                        if ($childrens = $tree->children)
+                        {
+                            foreach ($childrens as $chidren)
+                            {
+                                $treeIds[] = $chidren->id;
+                            }
+                        }
+                    }
+                }
+
+                $treeIds[] = $tree->id;
+
+            }
+        }
+
+        if ($treeIds)
+        {
+            foreach ($treeIds as $key => $treeId)
+            {
+                if (!$treeId)
+                {
+                    unset($treeIds[$key]);
+                }
+            }
+
+            if ($treeIds)
+            {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $this->dataProvider->query;
+
+                $query->joinWith('cmsContentElementTrees');
+                $query->andWhere(
+                    [
+                        'or',
+                        [$className::tableName() . '.tree_id' => $treeIds],
+                        [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
+                    ]
+                );
+            }
+
+        }
+
+
+        if ($this->enabledActiveTime == Cms::BOOL_Y)
+        {
+            $this->dataProvider->query->andWhere(
+                ["<=", $className::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
+            );
+
+            $this->dataProvider->query->andWhere(
+                [
+                    'or',
+                    [">=", $className::tableName() . '.published_to', \Yii::$app->formatter->asTimestamp(time())],
+                    [CmsContentElement::tableName() . '.published_to' => null],
+                ]
+            );
+        }
+
+        /**
+         *
+         */
+        if ($this->with)
+        {
+            $this->dataProvider->query->with($this->with);
+        }
+
+        $this->dataProvider->query->groupBy([$className::tableName() . '.id']);
+
+        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
+        {
+            $callback = $this->activeQueryCallback;
+            $callback($this->dataProvider->query);
+        }
+
+        if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
+        {
+            $callback = $this->dataProviderCallback;
+            $callback($this->dataProvider);
+        }
+
+        return $this;
+    }
 
     public function initDataProvider()
     {
