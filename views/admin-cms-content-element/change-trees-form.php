@@ -9,7 +9,12 @@ $model = new \skeeks\cms\models\CmsContentElement();
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
-    <?= $form->fieldSelectMulti($model, 'treeIds', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions())->label(\Yii::t('skeeks/cms','Additional sections'));?>
+    <?= $form->field($model, 'treeIds')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+        [
+            'multiple' => true
+        ]
+    ); ?>
 
     <?= \yii\helpers\Html::checkbox('removeCurrent', false); ?> <label><?=\Yii::t('skeeks/cms','Get rid of the already linked (in this case, the selected records bind only to the selected section)')?></label>
     <?= $form->buttonsStandart($model, ['save']);?>

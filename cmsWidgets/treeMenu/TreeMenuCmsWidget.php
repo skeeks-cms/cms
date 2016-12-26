@@ -22,26 +22,71 @@ use yii\widgets\ActiveForm;
 
 /**
  * Class TreeMenuCmsWidget
+ *
  * @package skeeks\cms\cmsWidgets\treeMenu
  */
 class TreeMenuCmsWidget extends WidgetRenderable
 {
+    /**
+     * Родительский раздел дерева
+     * @var null
+     */
     public $treePid                     = null;
+
+    /**
+     * Выбор только активных пунктов
+     * @var string
+     */
     public $active                      = Cms::BOOL_Y;
+
+    /**
+     * Добавить условие уровня раздела
+     * @var null
+     */
     public $level                       = null;
+
+    /**
+     * Название
+     * @var null
+     */
     public $label                       = null;
+
+    /**
+     * Условие выборки по сайтам
+     * @var array
+     */
     public $site_codes                  = [];
 
+    /**
+     * Сортировка по умолчанию
+     * @var string
+     */
     public $orderBy                     = "priority";
     public $order                       = SORT_ASC;
 
+    /**
+     * Добавить условие выборки разделов, только текущего сайта
+     * @var string
+     */
     public $enabledCurrentSite          = Cms::BOOL_Y;
 
+    /**
+     * Включить выключить кэш
+     * @var string
+     */
     public $enabledRunCache             = Cms::BOOL_Y;
     public $runCacheDuration            = 0;
 
+    /**
+     * Типы разделов
+     * @var array
+     */
     public $tree_type_ids               = [];
 
+    /**
+     * Дополнительный activeQueryCallback
+     * @var
+     */
     public $activeQueryCallback;
 
     /**
@@ -69,17 +114,26 @@ class TreeMenuCmsWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
         [
-            'treePid'               => 'Родительский раздел',
-            'active'                => 'Активность',
-            'level'                 => 'Уровень вложенности',
-            'label'                 => 'Заголовок',
-            'site_codes'            => 'Разделы привязанные к сайтам',
-            'orderBy'               => 'По какому параметру сортировать',
-            'order'                 => 'Направление сортировки',
-            'enabledCurrentSite'    => 'Учитывать текущий сайт',
-            'enabledRunCache'       => 'Включить кэширование',
-            'runCacheDuration'      => 'Время жизни кэша',
-            'tree_type_ids'         => 'Типы страниц',
+            'treePid'               => \Yii::t('skeeks/cms', 'The parent section'),
+            'active'                => \Yii::t('skeeks/cms', 'Activity'),
+            'level'                 => \Yii::t('skeeks/cms', 'The nesting level'),
+            'label'                 => \Yii::t('skeeks/cms', 'Header'),
+            'site_codes'            => \Yii::t('skeeks/cms', 'Linking to sites'),
+            'orderBy'               => \Yii::t('skeeks/cms', 'Sorting'),
+            'order'                 => \Yii::t('skeeks/cms', 'Sorting direction'),
+            'enabledCurrentSite'    => \Yii::t('skeeks/cms', 'Consider the current site'),
+            'enabledRunCache'       => \Yii::t('skeeks/cms', 'Enable caching'),
+            'runCacheDuration'      => \Yii::t('skeeks/cms', 'Cache lifetime'),
+            'tree_type_ids'         => \Yii::t('skeeks/cms', 'Section types'),
+        ]);
+    }
+
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(),
+        [
+            'enabledCurrentSite'   => \Yii::t('skeeks/cms', 'If you select "yes", then the sample section, add the filter condition, sections of the site, which is called the widget'),
+            'level'                => \Yii::t('skeeks/cms', 'Adds the sample sections, the condition of nesting choice. 0 - will not use this condition at all.'),
         ]);
     }
 
@@ -104,6 +158,60 @@ class TreeMenuCmsWidget extends WidgetRenderable
         ], $this);
     }
 
+    public function init()
+    {
+        parent::init();
+
+        $this->activeQuery = Tree::find();
+
+        if ($this->treePid)
+        {
+            $this->activeQuery->andWhere(['pid' => $this->treePid]);
+        }
+
+        if ($this->level)
+        {
+            $this->activeQuery->andWhere(['level' => $this->level]);
+        }
+
+        if ($this->active)
+        {
+            $this->activeQuery->andWhere(['active' => $this->active]);
+        }
+
+        if ($this->site_codes)
+        {
+            $this->activeQuery->andWhere(['site_code' => $this->site_codes]);
+        }
+
+        if ($this->enabledCurrentSite == Cms::BOOL_Y && \Yii::$app->cms->site)
+        {
+            $this->activeQuery->andWhere(['site_code' => \Yii::$app->cms->site->code]);
+        }
+
+        if ($this->orderBy)
+        {
+            $this->activeQuery->orderBy([$this->orderBy => (int) $this->order]);
+        }
+
+        if ($this->tree_type_ids)
+        {
+            $this->activeQuery->andWhere(['tree_type_id' => $this->tree_type_ids]);
+        }
+
+
+        if ($this->with)
+        {
+            $this->activeQuery->with($this->with);
+        }
+
+        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
+        {
+            $callback = $this->activeQueryCallback;
+            $callback($this->activeQuery);
+        }
+    }
+
     protected function _run()
     {
         $key = $this->getCacheKey() . 'run';
@@ -119,59 +227,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
         $result = \Yii::$app->cache->get($key);
         if ($result === false || $this->enabledRunCache == Cms::BOOL_N)
         {
-            $this->activeQuery = Tree::find();
-
-            if ($this->treePid)
-            {
-                $this->activeQuery->andWhere(['pid' => $this->treePid]);
-            }
-
-            if ($this->level)
-            {
-                $this->activeQuery->andWhere(['level' => $this->level]);
-            }
-
-            if ($this->active)
-            {
-                $this->activeQuery->andWhere(['active' => $this->active]);
-            }
-
-            if ($this->site_codes)
-            {
-                $this->activeQuery->andWhere(['site_code' => $this->site_codes]);
-            }
-
-            if ($this->enabledCurrentSite == Cms::BOOL_Y && $currentSite = \Yii::$app->cms->site)
-            {
-                $this->activeQuery->andWhere(['site_code' => $currentSite->code]);
-            }
-
-            if ($this->orderBy)
-            {
-                $this->activeQuery->orderBy([$this->orderBy => (int) $this->order]);
-            }
-
-            if ($this->tree_type_ids)
-            {
-                $this->activeQuery->andWhere(['tree_type_id' => $this->tree_type_ids]);
-            }
-
-            /**
-             *
-             */
-            if ($this->with)
-            {
-                $this->activeQuery->with($this->with);
-            }
-
-            if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
-            {
-                $callback = $this->activeQueryCallback;
-                $callback($this->activeQuery);
-            }
-
             $result = parent::_run();
-
             \Yii::$app->cache->set($key, $result, (int) $this->runCacheDuration, $dependency);
         }
 

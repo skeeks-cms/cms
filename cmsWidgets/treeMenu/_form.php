@@ -7,47 +7,42 @@
  */
 /* @var $this yii\web\View */
 ?>
-<?= $form->fieldSet('Отображение'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Template')); ?>
     <?= $form->field($model, 'viewFile')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Фильтрация'); ?>
-    <?= $form->fieldRadioListBoolean($model, 'enabledCurrentSite', \Yii::$app->cms->booleanFormat())
-        ->hint('Если будет выбрано "да", то в выборку разделов добавиться условие фильтрации, разделов сайта, где вызван компонент'); ?>
-    <?= $form->fieldSelect($model, 'active', \Yii::$app->cms->booleanFormat()); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Filtration')); ?>
+    <?= $form->field($model, 'enabledCurrentSite')->listBox(\yii\helpers\ArrayHelper::merge([null => "-"], \Yii::$app->cms->booleanFormat()), ['size' => 1]); ?>
+    <?= $form->field($model, 'active')->listBox(\yii\helpers\ArrayHelper::merge([null => "-"], \Yii::$app->cms->booleanFormat()), ['size' => 1]); ?>
 
     <?= $form->fieldSelectMulti($model, 'tree_type_ids', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
     )); ?>
 
-    <?= $form->fieldInputInt($model, 'level')->hint('Добавляет в выборку разделов, условие выбора вложенности. 0 — не будет использовать это условие вовсе.'); ?>
+    <?= $form->fieldInputInt($model, 'level'); ?>
     <?= $form->fieldSelectMulti($model, 'site_codes', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsSite::find()->active()->all(),
         'code',
         'name'
     )); ?>
     <?= $form->field($model, 'treePid')->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-        [
-            'mode' => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_SINGLE,
-            'attributeSingle' => 'treePid'
-        ]
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
     ); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Сортировка'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Sorting')); ?>
     <?= $form->fieldSelect($model, 'orderBy', (new \skeeks\cms\models\Tree())->attributeLabels()); ?>
     <?= $form->fieldSelect($model, 'order', [
-        SORT_ASC    => "ASC (от меньшего к большему)",
-        SORT_DESC   => "DESC (от большего к меньшему)",
+        SORT_ASC    => \Yii::t('skeeks/cms', 'ASC (from lowest to highest)'),
+        SORT_DESC   => \Yii::t('skeeks/cms', 'DESC (from highest to lowest)'),
     ]); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Дополнительно'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
     <?= $form->field($model, 'label')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Настройки кэширования'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Cache settings')); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledRunCache', \Yii::$app->cms->booleanFormat()); ?>
     <?= $form->fieldInputInt($model, 'runCacheDuration'); ?>
 <?= $form->fieldSetEnd(); ?>

@@ -10,6 +10,7 @@ namespace skeeks\cms\widgets\tree;
 
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\widgets\tree\assets\CmsTreeWidgetAsset;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
@@ -83,6 +84,14 @@ class CmsTreeWidget extends Widget
 
         $this->options['id'] = $this->id;
         Html::addCssClass($this->options, 'sx-tree');
+
+        //Automatic filling models
+        if ($this->models !== false && is_array($this->models) && count($this->models) == 0)
+        {
+            $this->models = CmsTree::findRoots()
+                ->joinWith('cmsSiteRelation')
+                ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
+        }
 
         $this->_beginPjax();
     }

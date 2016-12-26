@@ -693,6 +693,9 @@ return
     "preferably"            => "желательно",
     "Successfully"          => "Успешно",
     "Error"                 => "Ошибка",
+    "Cache settings"        => "Настройки кэширования",
+    "Filtration"            => "Фильтрация",
+    "Sorting"               => "Сортировка",
 
 
 
@@ -780,4 +783,22 @@ return
     'Component settings'                  => 'Настройки компонентов',
     'Deactivate'                                                => 'Деактивировать',
     'Activate'                                                  => 'Активировать',
+    'Activity'                                                  => 'Активность',
+
+
+
+    //TreeMenuWidget
+    'The parent section'                    => 'Родительский раздел',
+    'The nesting level'                     => 'Уровень вложенности',
+    'Header'                                => 'Заголовок',
+    'Linking to sites'                      => 'Привязка к сайтам',
+    'Sorting direction'                     => 'Направление сортировки',
+    'Consider the current site'             => 'Учитывать текущий сайт',
+    'Enable caching'                        => 'Включить кэширование',
+    'Cache lifetime'                        => 'Время жизни кэша',
+    'Section types'                         => 'Типы разделов',
+    'ASC (from lowest to highest)'          => 'ASC (от меньшего к большему)',
+    'DESC (from highest to lowest)'          => 'DESC (от большего к меньшему)',
+    'If you select "yes", then the sample section, add the filter condition, sections of the site, which is called the widget'                         => 'Если будет выбрано "да", то в выборку разделов добавиться условие фильтрации, разделов сайта, где вызван данный виджет',
+    'Adds the sample sections, the condition of nesting choice. 0 - will not use this condition at all.'                         => 'Добавляет в выборку разделов, условие выбора вложенности. 0 — не будет использовать это условие вовсе.',
 ];

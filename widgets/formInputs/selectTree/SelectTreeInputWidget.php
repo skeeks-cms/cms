@@ -25,6 +25,16 @@ use yii\widgets\InputWidget;
 use Yii;
 
 /**
+ *
+ *
+ *  <?= $form->field($model, 'treeIds')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+        [
+            'multiple' => true
+        ]
+    ); ?>
+ *
+ *
  * @property CmsTree[] $sections
  *
  * Class SelectTreeInputWidget

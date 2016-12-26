@@ -28,7 +28,7 @@ class WidgetRenderable extends Widget
     {
         return array_merge(parent::attributeLabels(),
         [
-            'viewFile'  => \Yii::t('skeeks/cms','File-template'),
+            'viewFile'  => \Yii::t('skeeks/cms', 'File-template'),
         ]);
     }
 
