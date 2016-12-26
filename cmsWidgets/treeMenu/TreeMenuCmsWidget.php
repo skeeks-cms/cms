@@ -162,6 +162,15 @@ class TreeMenuCmsWidget extends WidgetRenderable
     {
         parent::init();
 
+        $this->initActiveQuery();
+    }
+
+    /**
+     * Инициализация acitveQuery
+     * @return $this
+     */
+    public function initActiveQuery()
+    {
         $this->activeQuery = Tree::find();
 
         if ($this->treePid)
@@ -210,6 +219,8 @@ class TreeMenuCmsWidget extends WidgetRenderable
             $callback = $this->activeQueryCallback;
             $callback($this->activeQuery);
         }
+
+        return $this;
     }
 
     protected function _run()
