@@ -70,6 +70,13 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $dataProviderCallback;
 
     /**
+     * Additionaly, any data
+     *
+     * @var array
+     */
+    public $data = [];
+
+    /**
      * @see (new ActiveQuery)->with
      * @var array
      */
@@ -87,7 +94,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => 'Элементы контента'
+            'name' => \Yii::t('skeeks/cms','Content elements')
         ]);
     }
 

@@ -61,12 +61,12 @@
     ]); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
     <?= $form->field($model, 'label')->textInput(); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Настройки кэширования'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Cache settings')); ?>
     <?= $form->fieldRadioListBoolean($model, 'enabledRunCache', \Yii::$app->cms->booleanFormat()); ?>
     <?= $form->fieldInputInt($model, 'runCacheDuration'); ?>
 <?= $form->fieldSetEnd(); ?>
