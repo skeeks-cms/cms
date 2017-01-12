@@ -164,7 +164,6 @@ class CmsContentElement extends RelatedElementModel
             HasTrees::className() =>
             [
                 'class'                             => HasTrees::className(),
-                'elementTreesClassName'             => CmsContentElementTree::className(),
             ],
 
             SeoPageName::className() =>

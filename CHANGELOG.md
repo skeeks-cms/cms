@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.2.1.1.pre
+-----------------
+ * CmsContentElement added ->cmsTrees
+
 3.2.1
 -----------------
  * Updated CmsContentElementWidget

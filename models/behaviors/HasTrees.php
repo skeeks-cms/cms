@@ -30,7 +30,12 @@ class HasTrees extends Behavior
     /**
      * @var string названием модели таблицы через которую связаны элементы и разделы.
      */
-    public $elementTreesClassName;
+    public $elementTreesClassName = '\skeeks\cms\models\CmsContentElementTree';
+
+    /**
+     * @var string класс разделов
+     */
+    public $treesClassName = '\skeeks\cms\models\CmsTree';
 
     /**
      * @var string
@@ -170,6 +175,7 @@ class HasTrees extends Behavior
         return $this;
     }
 
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -177,5 +183,17 @@ class HasTrees extends Behavior
     {
         $className = $this->elementTreesClassName;
         return $this->owner->hasMany($className::className(), [$this->attributeElementName => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTrees()
+    {
+        $className      = $this->elementTreesClassName;
+        $treesClassName = $this->treesClassName;
+
+        return $this->owner->hasMany($treesClassName::className(), ['id' => 'tree_id'])
+                ->via('elementTrees');
     }
 }
