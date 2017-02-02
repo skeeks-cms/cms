@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.1.1.pre
 -----------------
+ * go to https
  * CmsContentElement added ->cmsTrees
 
 3.2.1

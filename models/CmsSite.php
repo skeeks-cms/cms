@@ -231,14 +231,13 @@ class CmsSite extends Core
 
 
     /**
-     * TODO: добавить настройку схемы в будущем.
      * @return string
      */
     public function getUrl()
     {
         if ($this->server_name)
         {
-            return 'http://' . $this->server_name;
+            return '//' . $this->server_name;
         }
 
         return \Yii::$app->urlManager->hostInfo;
