@@ -46,11 +46,11 @@ ___
 
 ##Install
 
-[https://cms.skeeks.com/docs/install/installation-on-linux](https://cms.skeeks.com/docs/install/installation-on-linux)
+[https://cms.skeeks.com/docs/installation](https://cms.skeeks.com/docs/installation)
 
 ___
 
 > [![skeeks!](https://gravatar.com/userimage/74431132/13d04d83218593564422770b616e5622.jpg)](https://skeeks.com)  
 <i>SkeekS CMS (Yii2) — quickly, easily and effectively!</i>  
-[skeeks.com](https://skeeks.com) | [en.cms.skeeks.com](https://en.cms.skeeks.com) | [cms.skeeks.com](https://cms.skeeks.com) | [marketplace.cms.skeeks.com](https://cms.skeeks.com/marketplace)
+[skeeks.com](https://skeeks.com) | [cms.skeeks.com/en](https://cms.skeeks.com/en) | [cms.skeeks.com](https://cms.skeeks.com) | [cms.skeeks.com/marketplace](https://cms.skeeks.com/marketplace)
 
