@@ -81,7 +81,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <? if (!$model->isNewRecord) : ?>
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/cms','Access')); ?>
-            <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+            <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
                 'permissionName'                => $model->permissionName,
                 'permissionDescription'         => 'Доступ к этому элементу: ' . $model->name,
                 'label'                         => 'Доступ к этому элементу',

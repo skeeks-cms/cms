@@ -147,7 +147,7 @@ use common\models\User;
         <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
         <? \yii\bootstrap\Alert::end()?>
 
-        <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
             'permissionName'        => $model->adminPermissionName,
             'label'                 => 'Доступ в административной части',
         ]); ?>

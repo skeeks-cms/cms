@@ -124,7 +124,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
         echo $form->fieldSet(\Yii::t('skeeks/cms', 'Access'));
 
-            echo \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+            echo \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
                 'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
                 'label'                 => 'Доступ к панеле разрешен',
             ]);

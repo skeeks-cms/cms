@@ -9,6 +9,29 @@ namespace skeeks\cms\base\widgets;
 use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
 
 /**
+ *
+ *
+ * 'afterValidateCallback'     => new \yii\web\JsExpression(<<<JS
+    function(jForm, AjaxQuery)
+    {
+        var Handler = new sx.classes.AjaxHandlerStandartRespose(AjaxQuery);
+        var Blocker = new sx.classes.AjaxHandlerBlocker(AjaxQuery, {
+            'wrapper' : jForm.closest('.modal-content')
+        });
+
+        Handler.bind('success', function()
+        {
+            _.delay(function()
+            {
+                window.location.reload();
+            }, 1000);
+        });
+    }
+JS
+        )
+JS
+)
+ *
  * Class ActiveFormAjaxSubmit
  * @package skeeks\cms\base\widgets
  */

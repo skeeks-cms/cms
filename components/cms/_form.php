@@ -70,18 +70,18 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         'content' => "Файлы"
     ])?>
 
-    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+    <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
         'label'                 => 'Доступ к личным файлам',
     ]); ?>
 
-    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+    <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
         'label'                 => 'Доступ к общим файлам',
     ]); ?>
 
 
-    <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+    <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
         'permissionName'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
         'label'                 => 'Доступ ко всем файлам',
     ]); ?>

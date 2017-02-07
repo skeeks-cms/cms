@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.2.1.1.pre
+3.2.2.pre
 -----------------
+ * Removed \skeeks\cms\widgets\rbac\PermissionForRoles
  * go to https
  * CmsContentElement added ->cmsTrees
 
