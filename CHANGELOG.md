@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.2.2.pre
+3.2.2
 -----------------
  * Removed \skeeks\cms\widgets\rbac\PermissionForRoles
  * Go to https
