@@ -13,7 +13,7 @@ $this->title = 'Система управления сайтом: SkeekS CMS (Yi
     <p>Система управления сайтом: <?= \yii\helpers\Html::a("SkeekS CMS (Yii2)", \Yii::$app->cms->descriptor->homepage, [
         'target' => '_blank'
     ]); ?></p>
-    <p>@author <?= \yii\helpers\Html::a("SkeekS", "http://skeeks.com", [
+    <p>@author <?= \yii\helpers\Html::a("SkeekS", "https://skeeks.com", [
         'target' => '_blank'
     ]); ?></p>
 </div>

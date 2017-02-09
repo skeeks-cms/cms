@@ -39,14 +39,14 @@ trait HasComponentDescriptorTrait
             "description"           => "",
             "keywords"              => "skeeks, cms",
 
-            "homepage"              => "http://cms.skeeks.com/",
+            "homepage"              => "https://cms.skeeks.com/",
             "license"               => "BSD-3-Clause",
 
             "support"               =>
             [
-                "issues"    =>  "http://www.skeeks.com/",
-                "wiki"      =>  "http://cms.skeeks.com/wiki/",
-                "source"    =>  "http://git.skeeks.com/skeeks/yii2-app"
+                "issues"    =>  "https://www.skeeks.com/",
+                "wiki"      =>  "https://cms.skeeks.com/docs/",
+                "source"    =>  "https://github.com/skeeks-cms/cms"
             ],
 
             "companies"   =>

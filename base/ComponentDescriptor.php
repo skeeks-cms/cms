@@ -23,7 +23,7 @@ class ComponentDescriptor
     public $name            = "SkeekS CMS";
     public $description     = "";
     public $keywords        = [];
-    public $homepage        = "http://cms.skeeks.com/";
+    public $homepage        = "https://cms.skeeks.com/";
     public $license         = "BSD-3-Clause";
 
     public $support         =
