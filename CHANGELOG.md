@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.2.2.1.pre
+-----------------
+ * Fixed admin urls
+
 3.2.2
 -----------------
  * Removed \skeeks\cms\widgets\rbac\PermissionForRoles

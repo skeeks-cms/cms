@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\widgets;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\modules\admin\components\UrlRule;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -41,11 +42,11 @@ class StorageFileManager extends Widget
 
         if (!$this->backendSimpleUploadUrl)
         {
-            $this->backendSimpleUploadUrl = Url::to(['/cms/admin-storage-files/upload']);
+            $this->backendSimpleUploadUrl = Url::to(['/cms/admin-storage-files/upload', UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE]);
         }
         if (!$this->backendRemoteUploadUrl)
         {
-            $this->backendRemoteUploadUrl = Url::to(['/cms/admin-storage-files/remote-upload']);
+            $this->backendRemoteUploadUrl = Url::to(['/cms/admin-storage-files/remote-upload', UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE]);
         }
 
         $clientOptions = ArrayHelper::merge($this->defaultClientOptions, $this->clientOptions);
