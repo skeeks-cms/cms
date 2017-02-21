@@ -30,14 +30,14 @@ $this->registerJs(<<<JS
             {
                 if (window.opener)
                 {
-                    this.callableData = window.opener.$("#" + this.get('callableId')).val();
+                    this.callableData = window.opener.sx.$("#" + this.get('callableId')).val();
                 }
             } else if (window.parent)
             {
 
                 if (window.parent)
                 {
-                    this.callableData = window.parent.$("#" + this.get('callableId')).val();
+                    this.callableData = window.parent.sx.$("#" + this.get('callableId')).val();
                 }
             }
 
