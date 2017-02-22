@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.2.1.pre
 -----------------
+ * Add docs
  * Fixed admin js
  * Fixed admin urls
 
