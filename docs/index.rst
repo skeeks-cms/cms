@@ -1,20 +1,33 @@
-.. SkeekS CMS documentation master file, created by
-   sphinx-quickstart on Wed Feb 22 23:46:55 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to SkeekS CMS's documentation!
 ======================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: User Documentation
 
 
+   getting_started
+   versions
+   builds
+   features
+   support
+   faq
+   yaml-config
+   guides/index
+   api
+   embed
 
-Indices and tables
-==================
+.. _about-docs:
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+   :caption: About Read the Docs
+
+   contribute
+   team
+   ethical-advertising
+   sponsors
+   open-source-philosophy
+   story
+   talks
+   dmca/index
