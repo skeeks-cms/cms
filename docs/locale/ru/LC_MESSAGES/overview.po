@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-23 12:13+0300\n"
+"POT-Creation-Date: 2017-02-23 13:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,69 +113,147 @@ msgstr ""
 msgid "short_open_tag on"
 msgstr ""
 
-#: ../../overview.rst:39
-msgid "Не забудте"
-msgstr ""
-
-#: ../../overview.rst:45
+#: ../../overview.rst:40
 msgid "Installation"
 msgstr ""
 
-#: ../../overview.rst:47
+#: ../../overview.rst:43
+msgid "1. Installation composer"
+msgstr ""
+
+#: ../../overview.rst:45
 msgid ""
-"The recommended way to install Guzzle is with `Composer "
+"The recommended way to install SkeekS CMS is with `Composer "
 "<http://getcomposer.org>`_. Composer is a dependency management tool for "
 "PHP that allows you to declare the dependencies your project needs and "
 "installs them into your project."
 msgstr ""
 
 #: ../../overview.rst:57
-msgid "You can add Guzzle as a dependency using the composer.phar CLI:"
+msgid "2. Installation files"
 msgstr ""
 
-#: ../../overview.rst:63
+#: ../../overview.rst:87
+msgid "3. Configuring the database"
+msgstr ""
+
+#: ../../overview.rst:90
 msgid ""
-"Alternatively, you can specify Guzzle as a dependency in your project's "
-"existing composer.json file:"
-msgstr ""
-
-#: ../../overview.rst:74
-msgid "After installing, you need to require Composer's autoloader:"
-msgstr ""
-
-#: ../../overview.rst:80
-msgid ""
-"You can find out more on how to install Composer, configure autoloading, "
-"and other best-practices for defining dependencies at `getcomposer.org "
-"<http://getcomposer.org>`_."
+"Edit the file to access the database, it is located at "
+"**common/config/db.php**"
 msgstr ""
 
 #: ../../overview.rst:93
+msgid "4. Installation of migrations"
+msgstr ""
+
+#: ../../overview.rst:102
+msgid "5. Configuring the server"
+msgstr ""
+
+#: ../../overview.rst:104
+msgid "By default, your site opens at **//example.com/frontend/web/**"
+msgstr ""
+
+#: ../../overview.rst:106
+msgid "On hostings are configured by default under the usual sites."
+msgstr ""
+
+#: ../../overview.rst:108
+msgid ""
+"But it can be reconfigured (and even necessary) in detail about this "
+"here: Server Configuration (web-server)"
+msgstr ""
+
+#: ../../overview.rst:112
+msgid "6. Authorization system"
+msgstr ""
+
+#: ../../overview.rst:113
+msgid ""
+"Default management system is available at the following address (if "
+"desired, it can be reconfigured)"
+msgstr ""
+
+#: ../../overview.rst:115
+msgid "**//example.com/~sx/admin/auth/** **root** (login) **skeeks** (password)"
+msgstr ""
+
+#: ../../overview.rst:120
+msgid "7. Check the working environment"
+msgstr ""
+
+#: ../../overview.rst:122
+msgid ""
+"If the installation process has been completed, but there are still not "
+"clear to you the error, it is likely that something is wrong is "
+"configured on the server. To do so, download to /frontend/web/ and run "
+"the file to test https://github.com/skeeks-"
+"cms/cms/blob/master/requirements.php environment. "
+"//example.com/frontend/web/requirements.php or "
+"//example.com/requirements.php (depends on item 4)."
+msgstr ""
+
+#: ../../overview.rst:128
+msgid ""
+"It is important to remember to check the setting of php: **short_open_tag"
+" on**"
+msgstr ""
+
+#: ../../overview.rst:132
 msgid "Update"
 msgstr ""
 
-#: ../../overview.rst:97
+#: ../../overview.rst:136
 msgid "Reporting a security vulnerability"
 msgstr ""
 
-#: ../../overview.rst:98
+#: ../../overview.rst:137
 msgid ""
 "Publicly disclosing a vulnerability can put the entire community at risk."
 " If you've discovered a security concern, please email us at "
 "support@skeeks.com."
 msgstr ""
 
-#: ../../overview.rst:102
+#: ../../overview.rst:141
 msgid ""
 "After a security vulnerability has been corrected, a security hotfix "
 "release will be deployed as soon as possible."
 msgstr ""
 
 #~ msgid ""
-#~ "During your development, you can keep"
-#~ " up with the latest changes on "
-#~ "the master branch by setting the "
-#~ "version requirement for Guzzle to "
-#~ "``~6.0@dev``."
+#~ msgstr ""
+
+#~ msgid "Не забудте"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The recommended way to install Guzzle"
+#~ " is with `Composer <http://getcomposer.org>`_."
+#~ " Composer is a dependency management "
+#~ "tool for PHP that allows you to"
+#~ " declare the dependencies your project "
+#~ "needs and installs them into your "
+#~ "project."
+#~ msgstr ""
+
+#~ msgid "You can add Guzzle as a dependency using the composer.phar CLI:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Alternatively, you can specify Guzzle as"
+#~ " a dependency in your project's "
+#~ "existing composer.json file:"
+#~ msgstr ""
+
+#~ msgid "After installing, you need to require Composer's autoloader:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You can find out more on how "
+#~ "to install Composer, configure autoloading,"
+#~ " and other best-practices for "
+#~ "defining dependencies at `getcomposer.org "
+#~ "<http://getcomposer.org>`_."
 #~ msgstr ""
 
