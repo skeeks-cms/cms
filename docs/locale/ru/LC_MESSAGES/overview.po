@@ -107,7 +107,7 @@ msgstr ""
 
 #: ../../overview.rst:33
 msgid "Php settings"
-msgstr ""
+msgstr "Настройки php"
 
 #: ../../overview.rst:34
 msgid "short_open_tag on"
@@ -250,7 +250,7 @@ msgstr ""
 
 #: ../../overview.rst:187
 msgid "Custom update"
-msgstr ""
+msgstr "Обновление с настройками"
 
 #: ../../overview.rst:189
 msgid "Or mount it in your settings file composer.json"
