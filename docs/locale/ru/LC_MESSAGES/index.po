@@ -26,6 +26,8 @@ msgid ""
 "SkeekS CMS - modern generic content management system based on yii2 php "
 "framework."
 msgstr ""
+"SkeekS CMS - современная система общего управления контентом на основе yii2 php "
+"framework."
 
 #: ../../index.rst:14
 msgid "Links"
@@ -33,11 +35,11 @@ msgstr "Ссылки"
 
 #: ../../index.rst:15
 msgid "`Web site <https://cms.skeeks.com>`_"
-msgstr ""
+msgstr "`Сайт <https://cms.skeeks.com>`_"
 
 #: ../../index.rst:16
 msgid "`Author <https://skeeks.com>`_"
-msgstr ""
+msgstr "`Автор <https://skeeks.com>`_"
 
 #: ../../index.rst:17
 msgid "`ChangeLog <https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md>`_"

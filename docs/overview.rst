@@ -311,10 +311,16 @@ Work with documents
 
 .. code-block:: bash
 
+    apt-get install python-pip
+    pip install Sphinx
+    pip install sphinx-intl
+    pip install sphinx_rtd_theme
+
+
     make gettext
     make html
     sphinx-intl update -p _build/gettext -l ru
-    make -e SPHINXOPTS="-D language='ru'" html
+    #make -e SPHINXOPTS="-D language='ru'" html
 
     sphinx-build -D language='ru' ./ build/ru
     sphinx-build ./ build/en
