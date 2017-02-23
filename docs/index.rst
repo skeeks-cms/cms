@@ -38,5 +38,6 @@ Just have https://cms.skeeks.com/marketplace marketpleys the CMS for this, which
    :maxdepth: 3
 
    overview
+   structure
 
 

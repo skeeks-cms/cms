@@ -1,0 +1,260 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, SkeekS
+# This file is distributed under the same license as the SkeekS CMS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SkeekS CMS 3.2.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-23 23:43+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ../../structure.rst:3
+msgid "Structure"
+msgstr "Структура"
+
+#: ../../structure.rst:6
+msgid "Directories"
+msgstr "Директории"
+
+#: ../../structure.rst:40
+msgid "The root directory contains the following subdirectories:"
+msgstr ""
+
+#: ../../structure.rst:42
+msgid "**common** - files common to all applications."
+msgstr ""
+
+#: ../../structure.rst:43
+msgid "**console** - console application."
+msgstr ""
+
+#: ../../structure.rst:44
+msgid "**frontend** - frontend web application."
+msgstr ""
+
+#: ../../structure.rst:46
+msgid "Root directory contains a set of files."
+msgstr ""
+
+#: ../../structure.rst:48
+msgid ""
+"**.gitignore** contains a list of directories ignored by git version "
+"system. If you need something never get to your source code repository, "
+"add it there."
+msgstr ""
+
+#: ../../structure.rst:50
+msgid "**composer.json** - Composer config described in Configuring Composer."
+msgstr ""
+
+#: ../../structure.rst:51
+msgid ""
+"**LICENSE.md** - license info. Put your project license there. Especially"
+" when opensourcing."
+msgstr ""
+
+#: ../../structure.rst:52
+msgid ""
+"**README.md** - basic info about installing template. Consider replacing "
+"it with information about your project and its installation."
+msgstr ""
+
+#: ../../structure.rst:54
+msgid "**yii** - console application bootstrap."
+msgstr ""
+
+#: ../../structure.rst:55
+msgid "**yii.bat** - same for Windows."
+msgstr ""
+
+#: ../../structure.rst:59
+msgid "Predefined path aliases"
+msgstr ""
+
+#: ../../structure.rst:61
+msgid "`@yii` - framework directory."
+msgstr ""
+
+#: ../../structure.rst:62
+msgid "`@app` - base path of currently running application."
+msgstr ""
+
+#: ../../structure.rst:63
+msgid "`@common` - common directory."
+msgstr ""
+
+#: ../../structure.rst:64
+msgid "`@frontend` - frontend web application directory."
+msgstr ""
+
+#: ../../structure.rst:65
+msgid "`@console` - console directory."
+msgstr ""
+
+#: ../../structure.rst:66
+msgid "`@runtime` - runtime directory of currently running web application."
+msgstr ""
+
+#: ../../structure.rst:67
+msgid "`@vendor` - Composer vendor directory."
+msgstr ""
+
+#: ../../structure.rst:68
+msgid ""
+"`@bower` - vendor directory that contains the `bower packages "
+"<http://bower.io/>`_."
+msgstr ""
+
+#: ../../structure.rst:69
+msgid ""
+"`@npm` - vendor directory that contains `npm packages "
+"<https://www.npmjs.org/>`_."
+msgstr ""
+
+#: ../../structure.rst:70
+msgid "`@web` - base URL of currently running web application."
+msgstr ""
+
+#: ../../structure.rst:71
+msgid "`@webroot` - web root directory of currently running web application."
+msgstr ""
+
+#: ../../structure.rst:73
+msgid ""
+"The aliases specific to the directory structure of the advanced "
+"application (`@common`,  `@frontend` and `@console`) are defined in "
+"`common/config/bootstrap.php`."
+msgstr ""
+
+#: ../../structure.rst:78
+msgid "Applications"
+msgstr "Приложения"
+
+#: ../../structure.rst:79
+msgid ""
+"There are two applications in advanced template: frontend and console. "
+"Frontend is typically what is presented to end user, the project itself. "
+"Console is typically used for cron jobs and low-level server management. "
+"Also it's used during application deployment and handles migrations and "
+"assets."
+msgstr ""
+
+#: ../../structure.rst:81
+msgid ""
+"There's also a common directory that contains files used by more than one"
+" application. For example, User model."
+msgstr ""
+
+#: ../../structure.rst:83
+msgid ""
+"Frontend and backend are both web applications and both contain the web "
+"directory. That's the webroot you should point your web server to."
+msgstr ""
+
+#: ../../structure.rst:85
+msgid ""
+"Each application has its own namespace and alias corresponding to its "
+"name. Same applies to the common directory."
+msgstr ""
+
+#: ../../structure.rst:89
+msgid "Configuration and environments"
+msgstr "Конфигурация и окружение"
+
+#: ../../structure.rst:90
+msgid "There are multiple problems with a typical approach to configuration:"
+msgstr ""
+
+#: ../../structure.rst:92
+msgid ""
+"Each team member has its own configuration options. Committing such "
+"config will affect other team members."
+msgstr ""
+
+#: ../../structure.rst:93
+msgid ""
+"Production database password and API keys should not end up in the "
+"repository."
+msgstr ""
+
+#: ../../structure.rst:94
+msgid ""
+"There are multiple server environments: development, testing, production."
+" Each should have its own configuration."
+msgstr ""
+
+#: ../../structure.rst:95
+msgid ""
+"Defining all configuration options for each case is very repetitive and "
+"takes too much time to maintain."
+msgstr ""
+
+#: ../../structure.rst:97
+msgid ""
+"In order to solve these issues Yii introduces a simple environments "
+"concept. Each environment is represented by a set of files under the "
+"environments directory."
+msgstr ""
+
+#: ../../structure.rst:99
+msgid ""
+"By default there are two environments: dev and prod. First is for "
+"development. It has all the developer tools and debug turned on. Second "
+"is for server deployments. It has debug and developer tools turned off."
+msgstr ""
+
+#: ../../structure.rst:101
+msgid ""
+"In order to avoid duplication configurations are overriding each other. "
+"For example, the frontend reads configuration in the following order:"
+msgstr ""
+
+#: ../../structure.rst:103
+msgid "``common/config/main.php``"
+msgstr ""
+
+#: ../../structure.rst:104
+msgid "``common/config/env/{your-env}/main.php``"
+msgstr ""
+
+#: ../../structure.rst:105
+msgid "``frontend/config/main.php``"
+msgstr ""
+
+#: ../../structure.rst:106
+msgid "``frontend/config/env/{your-env}/main.php``"
+msgstr ""
+
+#: ../../structure.rst:108
+msgid "Parameters are read in the following order:"
+msgstr ""
+
+#: ../../structure.rst:110
+msgid "``common/config/params.php``"
+msgstr ""
+
+#: ../../structure.rst:111
+msgid "``common/config/env/{your-env}/params.php``"
+msgstr ""
+
+#: ../../structure.rst:112
+msgid "``frontend/config/params.php``"
+msgstr ""
+
+#: ../../structure.rst:113
+msgid "``frontend/config/env/{your-env}/params.php``"
+msgstr ""
+
+#: ../../structure.rst:115
+msgid "The later config file overrides the former."
+msgstr ""
+
