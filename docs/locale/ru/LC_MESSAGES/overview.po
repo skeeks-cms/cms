@@ -1,0 +1,181 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, SkeekS
+# This file is distributed under the same license as the SkeekS CMS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SkeekS CMS 3.2.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-23 12:13+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ../../overview.rst:3
+msgid "Overview"
+msgstr ""
+
+#: ../../overview.rst:6
+msgid "Requirements"
+msgstr ""
+
+#: ../../overview.rst:9
+msgid "Software"
+msgstr ""
+
+#: ../../overview.rst:10
+msgid "apache"
+msgstr ""
+
+#: ../../overview.rst:11
+msgid "mod_rewrite apache module"
+msgstr ""
+
+#: ../../overview.rst:12
+msgid "php >= 5.5"
+msgstr ""
+
+#: ../../overview.rst:13
+msgid "DB mysql ~ 5.5"
+msgstr ""
+
+#: ../../overview.rst:14
+msgid "SSH access"
+msgstr ""
+
+#: ../../overview.rst:17
+msgid "Php modules"
+msgstr ""
+
+#: ../../overview.rst:18
+msgid "mbstring"
+msgstr ""
+
+#: ../../overview.rst:19
+msgid "xml"
+msgstr ""
+
+#: ../../overview.rst:20
+msgid "pdo"
+msgstr ""
+
+#: ../../overview.rst:21
+msgid "pdo_mysql"
+msgstr ""
+
+#: ../../overview.rst:22
+msgid "json"
+msgstr ""
+
+#: ../../overview.rst:23
+msgid "phar"
+msgstr ""
+
+#: ../../overview.rst:24
+msgid "simplexml"
+msgstr ""
+
+#: ../../overview.rst:25
+msgid "timezonedb"
+msgstr ""
+
+#: ../../overview.rst:26
+msgid "gd или imagik"
+msgstr ""
+
+#: ../../overview.rst:27
+msgid "intl"
+msgstr ""
+
+#: ../../overview.rst:28
+msgid "mcrypt"
+msgstr ""
+
+#: ../../overview.rst:29
+msgid "fileinfo"
+msgstr ""
+
+#: ../../overview.rst:30
+msgid "curl"
+msgstr ""
+
+#: ../../overview.rst:33
+msgid "Php settings"
+msgstr ""
+
+#: ../../overview.rst:34
+msgid "short_open_tag on"
+msgstr ""
+
+#: ../../overview.rst:39
+msgid "Не забудте"
+msgstr ""
+
+#: ../../overview.rst:45
+msgid "Installation"
+msgstr ""
+
+#: ../../overview.rst:47
+msgid ""
+"The recommended way to install Guzzle is with `Composer "
+"<http://getcomposer.org>`_. Composer is a dependency management tool for "
+"PHP that allows you to declare the dependencies your project needs and "
+"installs them into your project."
+msgstr ""
+
+#: ../../overview.rst:57
+msgid "You can add Guzzle as a dependency using the composer.phar CLI:"
+msgstr ""
+
+#: ../../overview.rst:63
+msgid ""
+"Alternatively, you can specify Guzzle as a dependency in your project's "
+"existing composer.json file:"
+msgstr ""
+
+#: ../../overview.rst:74
+msgid "After installing, you need to require Composer's autoloader:"
+msgstr ""
+
+#: ../../overview.rst:80
+msgid ""
+"You can find out more on how to install Composer, configure autoloading, "
+"and other best-practices for defining dependencies at `getcomposer.org "
+"<http://getcomposer.org>`_."
+msgstr ""
+
+#: ../../overview.rst:93
+msgid "Update"
+msgstr ""
+
+#: ../../overview.rst:97
+msgid "Reporting a security vulnerability"
+msgstr ""
+
+#: ../../overview.rst:98
+msgid ""
+"Publicly disclosing a vulnerability can put the entire community at risk."
+" If you've discovered a security concern, please email us at "
+"support@skeeks.com."
+msgstr ""
+
+#: ../../overview.rst:102
+msgid ""
+"After a security vulnerability has been corrected, a security hotfix "
+"release will be deployed as soon as possible."
+msgstr ""
+
+#~ msgid ""
+#~ "During your development, you can keep"
+#~ " up with the latest changes on "
+#~ "the master branch by setting the "
+#~ "version requirement for Guzzle to "
+#~ "``~6.0@dev``."
+#~ msgstr ""
+

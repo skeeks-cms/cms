@@ -1,0 +1,100 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, SkeekS
+# This file is distributed under the same license as the SkeekS CMS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SkeekS CMS 3.2.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-23 11:57+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ../../index.rst:4
+msgid "Welcome to SkeekS CMS's documentation!"
+msgstr "Добро пожаловать в SkeekS CMS документацию!"
+
+#: ../../index.rst:11
+msgid ""
+"SkeekS CMS - modern generic content management system based on yii2 php "
+"framework."
+msgstr ""
+
+#: ../../index.rst:14
+msgid "Links"
+msgstr "Ссылки"
+
+#: ../../index.rst:15
+msgid "`Web site <https://cms.skeeks.com>`_"
+msgstr ""
+
+#: ../../index.rst:16
+msgid "`Author <https://skeeks.com>`_"
+msgstr ""
+
+#: ../../index.rst:17
+msgid "`ChangeLog <https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md>`_"
+msgstr ""
+
+#: ../../index.rst:20
+msgid "Info"
+msgstr ""
+
+#: ../../index.rst:21
+msgid ""
+"It provides capabilities to manage site structure and content elements "
+"(news, publications, products, etc.)."
+msgstr ""
+
+#: ../../index.rst:23
+msgid ""
+"Opportunities for management and dynamic creation of additional "
+"properties of the content sections and elements through the "
+"administration system."
+msgstr ""
+
+#: ../../index.rst:25
+msgid "Opportunities to manage users, privileges, roles and their purpose."
+msgstr ""
+
+#: ../../index.rst:27
+msgid ""
+"Supports single query entry point (one index.php), for backend and "
+"frontend parts of the project. By then, it is more convenient to "
+"configure nginx and apache."
+msgstr ""
+
+#: ../../index.rst:29
+msgid ""
+"Almost every page of the site - content item or section. Each of these "
+"models has some povdeniem availability of additional properties. "
+"Therefore, any product publkatsii, news, etc. It has a set of common "
+"properties, which are described in the model, and a set of dynamically "
+"created properties, through the administration system."
+msgstr ""
+
+#: ../../index.rst:31
+msgid ""
+"This versatility allows you to easily create any site, without writing "
+"and design of additional models and migration. What idelalno for quickly "
+"writing conventional nevysokonagruzhennyh projects (this does not mean "
+"that you can not write highly loaded projects)."
+msgstr ""
+
+#: ../../index.rst:33
+msgid ""
+"Just have https://cms.skeeks.com/marketplace marketpleys the CMS for "
+"this, which is constantly updated with useful solutions."
+msgstr ""
+
+#: ../../index.rst:36
+msgid "Documentation for developers"
+msgstr "Документация для разработчиков"
+
