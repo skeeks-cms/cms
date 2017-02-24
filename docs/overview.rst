@@ -52,7 +52,7 @@ If you do not have Composer, follow the instructions in the `Installing Yii <htt
 .. code-block:: bash
 
     # Install Composer
-    curl -sS https://getcomposer.org/installer | php
+    curl -sS https://getcomposer.org/installer | COMPOSER_HOME=.composer php
 
 
 .. note::
@@ -83,14 +83,14 @@ Navigate to the folder where are your projects (such as **/var/www/sites/**).
 .. code-block:: bash
 
     # Download latest version of composer
-    curl -sS https://getcomposer.org/installer | php
+    curl -sS https://getcomposer.org/installer | COMPOSER_HOME=.composer php
 
     # Installing the base project SkeekS CMS
     COMPOSER_HOME=.composer php composer.phar create-project --no-install --prefer-dist skeeks/app-basic example.com
     # Going into the project folder
     cd demo.ru
     # Download latest version of composer in project
-    curl -sS https://getcomposer.org/installer | php
+    curl -sS https://getcomposer.org/installer | COMPOSER_HOME=.composer php
 
     # Extra plug-ins
     COMPOSER_HOME=.composer php composer.phar global require fxp/composer-asset-plugin --no-plugins
