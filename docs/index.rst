@@ -35,9 +35,10 @@ Just have https://cms.skeeks.com/marketplace marketpleys the CMS for this, which
 
 .. toctree::
    :caption: Documentation for developers
-   :maxdepth: 3
+   :maxdepth: 4
 
    overview
    structure
+   quickstart
 
 
