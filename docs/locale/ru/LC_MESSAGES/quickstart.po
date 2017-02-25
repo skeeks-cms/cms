@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-24 21:24+0300\n"
+"POT-Creation-Date: 2017-02-26 01:40+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,16 +22,92 @@ msgid "Quick start"
 msgstr "Быстрый старт"
 
 #: ../../quickstart.rst:6
+msgid "Авторизация / Регистрация"
+msgstr ""
+
+#: ../../quickstart.rst:9
+msgid "Стандартная авторизация/регистрация"
+msgstr ""
+
+#: ../../quickstart.rst:11
+msgid ""
+"В **SkeekS CMS** уже реализован процесс авторизации, регистрации и "
+"восстановления пароля (через email). Реализация находится в ``cms/auth`` "
+"контроллере."
+msgstr ""
+
+#: ../../quickstart.rst:14
+msgid "Методы реализающие эти процессы:"
+msgstr ""
+
+#: ../../quickstart.rst:16
+msgid "``login`` — процесс авторизации"
+msgstr ""
+
+#: ../../quickstart.rst:17
+msgid "``register`` — процесс регистрации"
+msgstr ""
+
+#: ../../quickstart.rst:18
+msgid "``register-by-email`` — регистрация через email (только ajax)"
+msgstr ""
+
+#: ../../quickstart.rst:19
+msgid "``forget`` — запроса начала процедуры восстановления пароля"
+msgstr ""
+
+#: ../../quickstart.rst:20
+msgid "``reset-password`` — действие подтверждения смены пароля"
+msgstr ""
+
+#: ../../quickstart.rst:24
+msgid "Проверка текущего пользователя"
+msgstr ""
+
+#: ../../quickstart.rst:26
+msgid ""
+"Для проверки авторизации текущего пользователя на сайте, используется "
+"стандартная конструкция yii2."
+msgstr ""
+
+#: ../../quickstart.rst:40
+msgid "Ссылки на авторизацию"
+msgstr ""
+
+#: ../../quickstart.rst:42
+msgid "Как получить ссылку на действия связанные с авторизацией"
+msgstr ""
+
+#: ../../quickstart.rst:50
+msgid "Еще один вариант через хелпер SkeekS CMS"
+msgstr ""
+
+#: ../../quickstart.rst:58
+msgid "Форма авторизации"
+msgstr ""
+
+#: ../../quickstart.rst:60
+msgid "Эту форму можно вставить в любое место на сайте, работает через ajax."
+msgstr ""
+
+#: ../../quickstart.rst:82
+msgid "Форма регистрации"
+msgstr ""
+
+#: ../../quickstart.rst:119
+msgid "Форма восстановления пароля"
+msgstr ""
+
+#: ../../quickstart.rst:138
 msgid "Examples"
 msgstr ""
 
-#: ../../quickstart.rst:8
+#: ../../quickstart.rst:140
 msgid ""
 "Тут временно публикуются различные полезные примеры, которые можно "
 "использовать на своих сайтах."
 msgstr ""
 
-#: ../../quickstart.rst:11
-msgid "Форма авторизации на сайте"
-msgstr ""
+#~ msgid "Форма авторизации на сайте"
+#~ msgstr ""
 
