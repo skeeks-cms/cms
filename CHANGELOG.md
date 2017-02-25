@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.2.2.1.pre
+3.2.2.1
 -----------------
  * Add docs
  * Fixed admin js
