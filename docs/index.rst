@@ -41,5 +41,6 @@ Just have https://cms.skeeks.com/marketplace marketpleys the CMS for this, which
    structure
    quickstart
    extensions
+   faq
 
 
