@@ -2,6 +2,80 @@
 Quick start
 ===========
 
+Работа с URL
+============
+
+Везде в своих проектах правильно формируйте url, на любое действие на любой раздел, на любой элемент и т.д. Это позволит избежать кучи проблем с ростом проекта. Особенно с добавлением мультиязычности на сайт.
+
+И так, в yii2 на эту тему есть множество примеров, с ними можно ознакомиться, например тут: https://github.com/yiisoft/yii2/blob/master/docs/guide/helper-url.md
+
+Здесь же, мы рассмотрим конкретные примеры всего что связано с базовым модулем cms
+
+Ссылки на разделы
+-----------------
+
+Ссылки на разделы сайта, по их id параметру
+
+.. code-block:: php
+
+    \yii\helpers\Url::to(['/cms/tree/view', 'id' => 10])
+
+Ссылки на разделы сайта, по их объекту модели model
+
+.. code-block:: php
+
+    $model = \skeeks\cms\models\CmsTree::findOne(10);
+    \yii\helpers\Url::to(['/cms/tree/view', 'model' => $model])
+
+Ссылки на разделы сайта, по их dir параметру
+
+.. code-block:: php
+
+    //Ссылка в раздел about
+    \yii\helpers\Url::to(['/cms/tree/view', 'dir' => 'about'])
+
+Прочие примеры с параметрами
+
+.. code-block:: php
+
+    //Ссылка в раздел about с параметрами
+    \yii\helpers\Url::to(['/cms/tree/view', 'dir' => 'about', 'param1' => 'test1', '#' => 'test1'])
+
+    //Абсолютная ссылка на раздел about
+    \yii\helpers\Url::to(['/cms/tree/view', 'dir' => 'about'], true)
+
+    //Абсолютная https ссылка на раздел about
+    \yii\helpers\Url::to(['/cms/tree/view', 'dir' => 'about'], 'https')
+
+    //Ссылка на вложенный раздел
+    \yii\helpers\Url::to(['/cms/tree/view', 'dir' => 'about/level-2/level-3'])
+
+Но cms поддерживает концепцию многосайтовости. Поэтому можно в параметрах указать код желаемого сайта:
+
+.. code-block:: php
+
+    \yii\helpers\Url::to(['/cms/tree/view', 'dir' => 'about/level-2/level-3', 'site_code' => 's2'])
+
+
+Ссылки в консольном приложении
+------------------------------
+
+Об этом стоит сказать особенно. Частый случай, что в yii2 сыпятся ошибки при запуске каких либо консольных утилит. Для корректной работы ссылок, необходимо сконфигурировать компонент UrlManager в конскольном приложении.
+
+.. code-block:: php
+
+    'urlManager' => [
+        'baseUrl'   => '',
+        'hostInfo' => 'http://your-site.com'
+    ]
+
+А так же в bootstrap определить пару алиасов:
+
+.. code-block:: php
+
+    \Yii::setAlias('webroot', dirname(dirname(__DIR__)) . '/frontend/web');
+    \Yii::setAlias('web', '');
+
 Авторизация / Регистрация
 =========================
 

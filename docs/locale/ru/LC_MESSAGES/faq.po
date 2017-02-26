@@ -1,0 +1,49 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, SkeekS
+# This file is distributed under the same license as the SkeekS CMS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SkeekS CMS 3.2.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-26 11:38+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ../../faq.rst:3
+msgid "FAQ"
+msgstr ""
+
+#: ../../faq.rst:6
+msgid "Examples"
+msgstr ""
+
+#: ../../faq.rst:8
+msgid ""
+"Тут временно публикуются различные полезные примеры, которые можно "
+"использовать на своих сайтах. Куча разных несвязных примеров, которые "
+"могут быть полезны. Позже это будет структурированно и разнесено"
+msgstr ""
+
+#: ../../faq.rst:12
+msgid "Отметка обязательных полей формы ``*``"
+msgstr ""
+
+#: ../../faq.rst:14
+msgid ""
+"Для того чтобы добавить во все формы генерируемые стандартными средствами"
+" yii2, звездочки ``*`` обязтельных полей. Глобально на стринце можно "
+"подключить js и css."
+msgstr ""
+
+#: ../../faq.rst:36
+msgid "Изменить timeout pjax по умолчанию глобально"
+msgstr ""
+

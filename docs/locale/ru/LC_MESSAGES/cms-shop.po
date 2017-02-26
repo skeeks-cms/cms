@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-26 01:40+0300\n"
+"POT-Creation-Date: 2017-02-26 11:38+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,10 +18,84 @@ msgstr ""
 "Generated-By: Babel 2.3.4\n"
 
 #: ../../cms-shop.rst:3
-msgid "Shop"
+msgid "Shop (skeeks/cms-shop)"
 msgstr ""
 
 #: ../../cms-shop.rst:5
-msgid "Магазин"
+msgid "Полноценный интернет магазин."
 msgstr ""
+
+#: ../../cms-shop.rst:8
+msgid "Виджеты"
+msgstr ""
+
+#: ../../cms-shop.rst:11
+msgid "Этапы оформления заказа"
+msgstr ""
+
+#: ../../cms-shop.rst:13
+msgid "Потребуется установка ``skeeks/cms-shop-cart-steps-widget``"
+msgstr ""
+
+#: ../../cms-shop.rst:21
+msgid "Товары в корзине"
+msgstr ""
+
+#: ../../cms-shop.rst:23
+msgid "Потребуется установка ``skeeks/cms-shop-cart-items-widget``"
+msgstr ""
+
+#: ../../cms-shop.rst:42
+msgid "Оформление заказа"
+msgstr ""
+
+#: ../../cms-shop.rst:44
+msgid "Потребуется установка ``skeeks/cms-shop-checkout-widget``"
+msgstr ""
+
+#: ../../cms-shop.rst:53
+msgid "Скидочные купоны"
+msgstr ""
+
+#: ../../cms-shop.rst:55
+msgid "Потребуется установка ``skeeks/cms-shop-discount-coupon-widget``"
+msgstr ""
+
+#: ../../cms-shop.rst:64
+msgid "Примеры"
+msgstr ""
+
+#: ../../cms-shop.rst:67
+msgid "Страница полной корзины"
+msgstr ""
+
+#: ../../cms-shop.rst:69
+msgid "Шаблон находится по адресу ``default\\modules\\shop\\cart\\cart.php``"
+msgstr ""
+
+#: ../../cms-shop.rst:140
+msgid "Страница оформления заказа"
+msgstr ""
+
+#: ../../cms-shop.rst:142
+msgid "Шаблон находится по адресу ``default\\modules\\shop\\cart\\checkout.php``"
+msgstr ""
+
+#: ../../cms-shop.rst:248
+msgid "Финальная страница заказа"
+msgstr ""
+
+#: ../../cms-shop.rst:250
+msgid "Шаблон находится по адресу ``default\\modules\\shop\\order\\finish.php``"
+msgstr ""
+
+#: ../../cms-shop.rst:416
+msgid "Содержимое шаблона ``default\\modules\\shop\\cart\\_result.php``"
+msgstr ""
+
+#~ msgid "Shop"
+#~ msgstr ""
+
+#~ msgid "Магазин"
+#~ msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-26 01:40+0300\n"
+"POT-Creation-Date: 2017-02-26 11:56+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,92 +22,154 @@ msgid "Quick start"
 msgstr "Быстрый старт"
 
 #: ../../quickstart.rst:6
+msgid "Работа с URL"
+msgstr ""
+
+#: ../../quickstart.rst:8
+msgid ""
+"Везде в своих проектах правильно формируйте url, на любое действие на "
+"любой раздел, на любой элемент и т.д. Это позволит избежать кучи проблем "
+"с ростом проекта. Особенно с добавлением мультиязычности на сайт."
+msgstr ""
+
+#: ../../quickstart.rst:10
+msgid ""
+"И так, в yii2 на эту тему есть множество примеров, с ними можно "
+"ознакомиться, например тут: "
+"https://github.com/yiisoft/yii2/blob/master/docs/guide/helper-url.md"
+msgstr ""
+
+#: ../../quickstart.rst:12
+msgid ""
+"Здесь же, мы рассмотрим конкретные примеры всего что связано с базовым "
+"модулем cms"
+msgstr ""
+
+#: ../../quickstart.rst:15
+msgid "Ссылки на разделы"
+msgstr ""
+
+#: ../../quickstart.rst:17
+msgid "Ссылки на разделы сайта, по их id параметру"
+msgstr ""
+
+#: ../../quickstart.rst:23
+msgid "Ссылки на разделы сайта, по их объекту модели model"
+msgstr ""
+
+#: ../../quickstart.rst:30
+msgid "Ссылки на разделы сайта, по их dir параметру"
+msgstr ""
+
+#: ../../quickstart.rst:37
+msgid "Прочие примеры с параметрами"
+msgstr ""
+
+#: ../../quickstart.rst:53
+msgid ""
+"Но cms поддерживает концепцию многосайтовости. Поэтому можно в параметрах"
+" указать код желаемого сайта:"
+msgstr ""
+
+#: ../../quickstart.rst:61
+msgid "Ссылки в консольном приложении"
+msgstr ""
+
+#: ../../quickstart.rst:63
+msgid ""
+"Об этом стоит сказать особенно. Частый случай, что в yii2 сыпятся ошибки "
+"при запуске каких либо консольных утилит. Для корректной работы ссылок, "
+"необходимо сконфигурировать компонент UrlManager в конскольном "
+"приложении."
+msgstr ""
+
+#: ../../quickstart.rst:72
+msgid "А так же в bootstrap определить пару алиасов:"
+msgstr ""
+
+#: ../../quickstart.rst:80
 msgid "Авторизация / Регистрация"
 msgstr ""
 
-#: ../../quickstart.rst:9
+#: ../../quickstart.rst:83
 msgid "Стандартная авторизация/регистрация"
 msgstr ""
 
-#: ../../quickstart.rst:11
+#: ../../quickstart.rst:85
 msgid ""
 "В **SkeekS CMS** уже реализован процесс авторизации, регистрации и "
 "восстановления пароля (через email). Реализация находится в ``cms/auth`` "
 "контроллере."
 msgstr ""
 
-#: ../../quickstart.rst:14
+#: ../../quickstart.rst:88
 msgid "Методы реализающие эти процессы:"
 msgstr ""
 
-#: ../../quickstart.rst:16
+#: ../../quickstart.rst:90
 msgid "``login`` — процесс авторизации"
 msgstr ""
 
-#: ../../quickstart.rst:17
+#: ../../quickstart.rst:91
 msgid "``register`` — процесс регистрации"
 msgstr ""
 
-#: ../../quickstart.rst:18
+#: ../../quickstart.rst:92
 msgid "``register-by-email`` — регистрация через email (только ajax)"
 msgstr ""
 
-#: ../../quickstart.rst:19
+#: ../../quickstart.rst:93
 msgid "``forget`` — запроса начала процедуры восстановления пароля"
 msgstr ""
 
-#: ../../quickstart.rst:20
+#: ../../quickstart.rst:94
 msgid "``reset-password`` — действие подтверждения смены пароля"
 msgstr ""
 
-#: ../../quickstart.rst:24
+#: ../../quickstart.rst:98
 msgid "Проверка текущего пользователя"
 msgstr ""
 
-#: ../../quickstart.rst:26
+#: ../../quickstart.rst:100
 msgid ""
 "Для проверки авторизации текущего пользователя на сайте, используется "
 "стандартная конструкция yii2."
 msgstr ""
 
-#: ../../quickstart.rst:40
+#: ../../quickstart.rst:114
 msgid "Ссылки на авторизацию"
 msgstr ""
 
-#: ../../quickstart.rst:42
+#: ../../quickstart.rst:116
 msgid "Как получить ссылку на действия связанные с авторизацией"
 msgstr ""
 
-#: ../../quickstart.rst:50
+#: ../../quickstart.rst:124
 msgid "Еще один вариант через хелпер SkeekS CMS"
 msgstr ""
 
-#: ../../quickstart.rst:58
+#: ../../quickstart.rst:132
 msgid "Форма авторизации"
 msgstr ""
 
-#: ../../quickstart.rst:60
+#: ../../quickstart.rst:134
 msgid "Эту форму можно вставить в любое место на сайте, работает через ajax."
 msgstr ""
 
-#: ../../quickstart.rst:82
+#: ../../quickstart.rst:156
 msgid "Форма регистрации"
 msgstr ""
 
-#: ../../quickstart.rst:119
+#: ../../quickstart.rst:193
 msgid "Форма восстановления пароля"
 msgstr ""
 
-#: ../../quickstart.rst:138
-msgid "Examples"
-msgstr ""
-
-#: ../../quickstart.rst:140
-msgid ""
-"Тут временно публикуются различные полезные примеры, которые можно "
-"использовать на своих сайтах."
-msgstr ""
-
 #~ msgid "Форма авторизации на сайте"
+#~ msgstr ""
+
+#~ msgid "Examples"
+#~ msgstr ""
+
+#~ msgid ""
 #~ msgstr ""
 

@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.2.2.2.pre
+-----------------
+ * Documentation about working with the url
+
 3.2.2.1
 -----------------
  * Add docs
