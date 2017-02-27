@@ -11,13 +11,13 @@ Welcome to SkeekS CMS's documentation!
 SkeekS CMS - modern generic content management system based on yii2 php framework.
 
 Links
-~~~~~~~~~~~~~~~~~~
+~~~~~
 * `Web site <https://cms.skeeks.com>`_
 * `Author <https://skeeks.com>`_
 * `ChangeLog <https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md>`_
 
 Info
-~~~~~~~~~~~~~~~~~~
+~~~~
 It provides capabilities to manage site structure and content elements (news, publications, products, etc.).
 
 Opportunities for management and dynamic creation of additional properties of the content sections and elements through the administration system.
@@ -40,6 +40,7 @@ Just have https://cms.skeeks.com/marketplace marketpleys the CMS for this, which
    overview
    structure
    quickstart
+   admin
    extensions
    faq
 

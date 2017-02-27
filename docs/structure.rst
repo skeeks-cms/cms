@@ -100,6 +100,8 @@ By default there are two environments: dev and prod. First is for development. I
 
 In order to avoid duplication configurations are overriding each other. For example, the frontend reads configuration in the following order:
 
+* ``@skeeks/cms/config/main.php``
+* Все компонент подключенные компоненты yii2 у которых есть ``config/main.php``
 * ``common/config/main.php``
 * ``common/config/env/{your-env}/main.php``
 * ``frontend/config/main.php``

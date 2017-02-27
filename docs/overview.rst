@@ -6,7 +6,7 @@ Requirements
 ============
 
 Software
-~~~~~~~~~~~
+~~~~~~~~
 * apache
 * mod_rewrite apache module
 * php >= 5.5
@@ -14,7 +14,7 @@ Software
 * SSH access
 
 Php modules
-~~~~~~~~~~~~~
+~~~~~~~~~~~
 * mbstring
 * xml
 * pdo
@@ -30,7 +30,7 @@ Php modules
 * curl
 
 Php settings
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 * short_open_tag on
 
 .. _installation:
@@ -40,7 +40,7 @@ Installation
 ============
 
 1. Installation composer
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The recommended way to install SkeekS CMS is with
 `Composer <http://getcomposer.org>`_. Composer is a dependency management tool
@@ -74,7 +74,7 @@ If you do not have Composer, follow the instructions in the `Installing Yii <htt
 
 
 2. Installation files
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 Establish **example.com** site in example.com folder
 
@@ -102,13 +102,13 @@ Navigate to the folder where are your projects (such as **/var/www/sites/**).
 
 
 3. Configuring the database
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Edit the file to access the database, it is located at **common/config/db.php**
 
 4. Installation of migrations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
@@ -117,7 +117,7 @@ Edit the file to access the database, it is located at **common/config/db.php**
 
 
 5. Configuring the server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, your site opens at **//example.com/frontend/web/**
 
@@ -127,7 +127,7 @@ But it can be reconfigured (and even necessary) in detail about this here: Serve
 
 
 6. Authorization system
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 Default management system is available at the following address (if desired, it can be reconfigured)
 
 **//example.com/~sx/admin/auth/**
@@ -152,7 +152,7 @@ Update
 ============
 
 Standart update
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
@@ -184,7 +184,7 @@ Or all of these commands in one line
 
 
 Custom update
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 Or mount it in your settings file composer.json
 
@@ -217,7 +217,7 @@ The application installed according to the above instructions should work out of
 On a production server, you may want to configure your Web server so that the application can be accessed via the URL **//www.example.com/index.php** instead of **//www.example.com/frontend/web/index.php**. Such configuration requires pointing the document root of your Web server to the basic/web folder. You may also want to hide index.php from the URL, as described in the Routing and URL Creation section. In this subsection, you'll learn how to configure your Apache or Nginx server to achieve these goals.
 
 Recommended Apache Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use the following configuration in Apache's httpd.conf file or within a virtual host configuration. Note that you should replace path/to/basic/web with the actual path for basic/web.
 
