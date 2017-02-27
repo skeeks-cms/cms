@@ -261,5 +261,160 @@ Quick start
 
 
 
+
 Виджеты CMS
 ===========
+
+Виджеты cms наследуются от базвого виджета: ``skeeks\cms\base\Widget``
+
+Преимущество их работы, состоит в том, что их можно редактировать в "**Панеле быстрого управления сайтом**".
+
+skeeks\\cms\\cmsWidgets\\text\\TextCmsWidget
+--------------------------------------------
+
+Предназначен для редактирования блоков текста или html кода
+
+Пример использования:
+
+.. code-block:: php
+
+    <? echo \skeeks\cms\cmsWidgets\text\TextCmsWidget::widget([
+        'namespace' => 'unique-settings-code',
+        'text' => 'Edited text'
+    ]); ?>
+
+.. code-block:: php
+
+    <? echo \skeeks\cms\cmsWidgets\text\TextCmsWidget::widget([
+        'namespace' => 'unique-settings-code',
+        'text' => <<<HTML
+    <p class="cl-gray ">
+        Edited text
+    </p>
+    HTML
+    ]); ?>
+
+.. code-block:: php
+
+    <? \skeeks\cms\cmsWidgets\text\TextCmsWidget::begin([
+        'namespace' => 'unique-settings-code',
+    ]); ?>
+    <p class="cl-gray ">
+        Edited text
+    </p>
+    <? \skeeks\cms\cmsWidgets\text\TextCmsWidget::end(); ?>
+
+
+.. code-block:: php
+
+    <? \skeeks\cms\cmsWidgets\text\TextCmsWidget::beginWidget('unique-settings-code'); ?>
+    <p class="cl-gray ">
+        Edited text
+    </p>
+    <? \skeeks\cms\cmsWidgets\text\TextCmsWidget::end(); ?>
+
+
+skeeks\\cms\\cmsWidgets\\treeMenu\\TreeMenuCmsWidget
+----------------------------------------------------
+
+Данный виджет, чаще всего предназначен для построения меню на сайте. При чем как главного меню, так и второстепенного. Добиться этого можно путем манипулации с его параметрами и способом вызова. Так же, виджет может подойти для вывода подразделов определенного раздела сайта (например основные разделы услуг, на главную страницу сайта).
+
+Пример использования
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    <?= \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget::widget([
+        'namespace' => 'top-site-menu',
+        'viewFile' => '@app/views/widgets/TreeMenuCmsWidget/top-site-menu',
+        'label' => 'Title menu',
+        'level' => '1',
+        'enabledRunCache' => \skeeks\cms\components\Cms::BOOL_N,
+    ]); ?>
+
+Пример содержимого файла: ``@app/views/widgets/TreeMenuCmsWidget/top-site-menu``
+
+.. code-block:: php
+
+    <?php
+    /* @var $this   yii\web\View */
+    /* @var $widget \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget */
+    /* @var $trees  \skeeks\cms\models\Tree[] */
+    ?>
+    <ul class="menu">
+        <? if ($trees = $widget->activeQuery->all()) : ?>
+            <? foreach ($trees as $tree) : ?>
+                <?= $this->render("menu-top-item", [
+                    "widget" => $widget,
+                    "model" => $tree,
+                ]); ?>
+            <? endforeach; ?>
+        <? endif; ?>
+    </ul>
+
+Пример содержимого файла: ``@app/views/widgets/TreeMenuCmsWidget/menu-top-item​``
+
+.. code-block:: php
+
+    <?php
+    /* @var $this   yii\web\View */
+    /* @var $widget \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget */
+    /* @var $model   \skeeks\cms\models\Tree */
+    $dir = $model->dir;
+    if ($model->redirect_tree_id) {
+        $dir = $model->redirectTree->dir;
+    };
+    $activeClass = '';
+    if (strpos(\Yii::$app->request->pathInfo, $dir) !== false) {
+        $activeClass = ' active';
+    }
+    ?>
+    <li>
+        <a href="<?= $model->url; ?>" title="<?= $model->name; ?>" class="<?= $activeClass; ?>">
+            <?= $model->name; ?>
+        </a>
+    </li>
+
+
+Пример с переопределением настроек
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    <? $widget = \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget::beginWidget('menu-top-1', [
+      'viewFile' => '@app/views/widgets/TreeMenuCmsWidget/menu-top',
+      'label' => 'Верхнее меню',
+      'level' => '1',
+      'enabledRunCache' => \skeeks\cms\components\Cms::BOOL_N,
+    ]); ?>
+        <?
+        //Переопределение шаблона, то есть не важно что укажут в настройках виджета, шаблон все равно будет использоваться этот!
+        $widget->viewFile = '@app/views/widgets/TreeMenuCmsWidget/menu-top-2';
+        //Изменение запроса
+        $widget->activeQuery->andWhere(['code' => 'dostavka']);
+        ?>
+    <? \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget::end(); ?>
+
+Второстепенное меню каталога
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Например, при хождении по каталогу, необходимо чтобы подразделы каталога, отображались всегда слева. Для этого можно опереться на параметр текущего раздела сайта, и передать его в один из параметров виджета в качестве ``treePid``. В этом случае, в выборке нужных разделов будет всегда участвовать условие родительского раздела. И при этом это условие будет перекрывать настройки указанные администратором через админку, а значит администратор не сможет сломать виджет, но при этом сможет поменять некоторые параметры.
+
+.. code-block:: php
+
+    <? $widget = \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget::beginWidget('menu-top-1', [
+      'viewFile' => '@app/views/widgets/TreeMenuCmsWidget/menu-top',
+      'label' => 'Вложенное меню',
+      'enabledRunCache' => \skeeks\cms\components\Cms::BOOL_N,
+    ]); ?>
+        <?
+        //Если задан текущий раздел, и у него есть достаточная вложенность
+        if (\Yii::$app->cms->currentTree && \Yii::$app->cms->currentTree->parent && isset(\Yii::$app->cms->currentTree->parents[1]))
+        {
+            $currentParentTree = \Yii::$app->cms->currentTree->parents[1];
+            $widget->treePid    = $currentParentTree->id; //Пере определние параметра родительского раздела
+
+            $widget->initActiveQuery(); //Применение новых настроек виджета
+        }
+        ?>
+    <? \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget::end(); ?>
