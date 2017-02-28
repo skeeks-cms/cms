@@ -13,7 +13,7 @@ CMS Admin
 Пример конфигурирования
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-В файле конфига проекта ``frontend/config/main.php`` отредактировать секцию ``components``
+В файле конфига проекта ``common/config/main.php`` отредактировать секцию ``components``
 
 .. code-block:: php
 
