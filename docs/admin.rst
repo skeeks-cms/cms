@@ -13,7 +13,7 @@ CMS Admin
 Пример конфигурирования
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-В файле конфига проекта ``common/config/main.php`` отредактировать секцию ``components``
+В файле конфига проекта ``frontend/config/main.php`` отредактировать секцию ``components``
 
 .. code-block:: php
 
@@ -61,7 +61,7 @@ allowedIPs
 * ``@skeeks/cms/config/admin/menu.php``
 * ``@skeeks/cms-admin/config/admin/menu.php``
 * ``@all-other-extensions/config/admin/menu.php``
-* ``@app/config/admin/menu.php``
+* ``@common/config/admin/menu.php``
 
 
 Формат
