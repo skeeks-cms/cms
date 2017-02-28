@@ -105,6 +105,99 @@ allowedIPs
 Создание контроллера
 --------------------
 
+В проекте
+~~~~~~~~~
+
+Ссылка на контроллер: ``Url::to(['/admin-competition'])``
+
+Создать файл контроллера: ``frontend/controllers/AdminCompetitionController.php``
+
+.. code-block:: php
+
+    namespace frontend\controllers;
+    use frontend\modules\competition\models\Competition;
+
+    class AdminCompetitionController extends \skeeks\cms\modules\admin\controllers\AdminModelEditorController
+    {
+        public function init()
+        {
+            $this->name                     = \Yii::t('app', 'Конкурсы');
+            $this->modelShowAttribute       = "name";
+            $this->modelClassName           = Competition::className();
+
+            parent::init();
+        }
+    }
+
+Создать файл шаблона: ``frontend/views/admin-competition/index.php``
+
+
+.. code-block:: php
+
+    <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+
+    <?php echo $this->render('_search', [
+        'searchModel'   => $searchModel,
+        'dataProvider'  => $dataProvider
+    ]); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+        'dataProvider'  => $dataProvider,
+        'filterModel'   => $searchModel,
+        'adminController'   => $controller,
+        'pjax'              => $pjax,
+        'columns' => [
+            'name',
+
+        ],
+    ]); ?>
+
+    <? $pjax::end(); ?>
+
+Создать файл для фильтров и поиска: ``frontend/views/admin-competition/_search.php``
+
+
+.. code-block:: php
+
+    <?
+        $filter = new \yii\base\DynamicModel([
+            'id',
+        ]);
+        $filter->addRule('id', 'integer');
+
+        $filter->load(\Yii::$app->request->get());
+
+        if ($filter->id)
+        {
+            $dataProvider->query->andWhere(['id' => $filter->id]);
+        }
+    ?>
+    <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+            'action' => '/' . \Yii::$app->request->pathInfo,
+        ]); ?>
+
+        <?= $form->field($searchModel, 'name')->setVisible(); ?>
+
+    <? $form::end(); ?>
+
+Создать файл для редактирования элементов: ``frontend/views/admin-competition/_form.php``
+
+
+.. code-block:: php
+
+    <?php $form = ActiveForm::begin(); ?>
+    <?php  ?>
+
+    <?= $form->fieldSet( \Yii::t('skeeks/form2/app', 'General information'))?>
+        <?= $form->field($model, 'name')->textInput(); ?>
+        <?= $form->field($model, 'description')->textInput(); ?>
+        <?= $form->field($model, 'is_active')->checkbox(); ?>
+    <?= $form->fieldSetEnd(); ?>
+
+    <?= $form->buttonsCreateOrUpdate($model); ?>
+    <?php ActiveForm::end(); ?>
+
+
 Создание контроллера
 ~~~~~~~~~~~~~~~~~~~~
 
