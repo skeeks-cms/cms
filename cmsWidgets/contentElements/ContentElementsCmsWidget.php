@@ -82,6 +82,13 @@ class ContentElementsCmsWidget extends WidgetRenderable
      */
     public $with = ['image', 'cmsTree'];
 
+    /**
+     * When a sample of elements does a search and table of multiple links. Slowly on large databases!
+     * При выборке элементов делает поиск и по таблице множественных связей. Медленно на больших базах данных!
+     * @var bool
+     */
+    public $isJoinTreeMap = true;
+
     public $options = [];
 
     public function init()
@@ -306,14 +313,21 @@ class ContentElementsCmsWidget extends WidgetRenderable
                  */
                 $query = $this->dataProvider->query;
 
-                $query->joinWith('cmsContentElementTrees');
-                $query->andWhere(
-                    [
-                        'or',
-                        [$className::tableName() . '.tree_id' => $treeIds],
-                        [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
-                    ]
-                );
+                if ($this->isJoinTreeMap === true)
+                {
+                    $query->joinWith('cmsContentElementTrees');
+                    $query->andWhere(
+                        [
+                            'or',
+                            [$className::tableName() . '.tree_id' => $treeIds],
+                            [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
+                        ]
+                    );
+                } else
+                {
+                    $query->andWhere([$className::tableName() . '.tree_id' => $treeIds]);
+                }
+
             }
 
         }

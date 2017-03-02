@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.2.2.pre
 -----------------
+ * ContentElementsCmsWidget new setting isJoinTreeMap
  * allowDeselect PropertyTypeElement
  * Documentation about working with the url
 
