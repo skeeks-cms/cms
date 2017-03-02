@@ -95,13 +95,23 @@ class PropertyTypeElement extends PropertyType
             $find->andWhere(['content_id' => $this->content_id]);
         }
 
+
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT)
         {
+            $config = [];
+            if ($this->property->is_required == Cms::BOOL_Y)
+            {
+                $config['allowDeselect'] = false;
+            } else
+            {
+                $config['allowDeselect'] = true;
+            }
+
             $field = $this->activeForm->fieldSelect(
                 $this->property->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($find->all(), 'id', 'name'),
-                []
+                $config
             );
         } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI)
         {
