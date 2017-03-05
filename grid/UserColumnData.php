@@ -59,7 +59,7 @@ class UserColumnData extends DataColumn
         {
             if (!$srcImage = $user->getAvatarSrc())
             {
-                $srcImage = \Yii::$app->cms->moduleAdmin->noImage;
+                $srcImage = \Yii::$app->cms->noImageUrl;
             }
 
             $this->grid->view->registerCss(<<<CSS

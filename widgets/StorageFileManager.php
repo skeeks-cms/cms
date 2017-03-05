@@ -42,11 +42,11 @@ class StorageFileManager extends Widget
 
         if (!$this->backendSimpleUploadUrl)
         {
-            $this->backendSimpleUploadUrl = Url::to(['/cms/admin-storage-files/upload', UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE]);
+            $this->backendSimpleUploadUrl = Url::to(['/cms/admin-storage-files/upload']);
         }
         if (!$this->backendRemoteUploadUrl)
         {
-            $this->backendRemoteUploadUrl = Url::to(['/cms/admin-storage-files/remote-upload', UrlRule::ADMIN_PARAM_NAME => UrlRule::ADMIN_PARAM_VALUE]);
+            $this->backendRemoteUploadUrl = Url::to(['/cms/admin-storage-files/remote-upload']);
         }
 
         $clientOptions = ArrayHelper::merge($this->defaultClientOptions, $this->clientOptions);

@@ -264,7 +264,7 @@ return
         [
             [
                 "label"     => \Yii::t('skeeks/cms','Sites'),
-                "url"       => ["cms/admin-cms-site"],
+                "url"       => ["/cms/admin-cms-site"],
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/www.png']
             ],
 
