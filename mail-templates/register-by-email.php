@@ -21,7 +21,7 @@ use skeeks\cms\mail\helpers\Html;
     <b>Пароль: </b><?= $password; ?><br>
     <?= Html::a("Ссылка на авторизацию", \skeeks\cms\helpers\UrlHelper::construct('cms/auth/login')
         ->setRef(
-            \skeeks\cms\helpers\UrlHelper::construct('cms/user/profile')->enableAbsolute()->toString()
+            \skeeks\cms\helpers\UrlHelper::construct('/cms/profile')->enableAbsolute()->toString()
         )
         ->enableAbsolute()
         ->toString()

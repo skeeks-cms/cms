@@ -3,6 +3,7 @@ CHANGELOG
 
 3.3.0.pre
 -----------------
+ * Fixed login url
  * Url changes
  * ContentElementsCmsWidget new setting isJoinTreeMap
  * allowDeselect PropertyTypeElement

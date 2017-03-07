@@ -20,7 +20,7 @@ $clientOptionsJson = \yii\helpers\Json::encode($clientOptions);
 
     <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS)) : ?>
         <div class="skeeks-cms-toolbar-block">
-            <a href="<?= UrlHelper::construct('')->enableAdmin()->toString(); ?>" title="<?=\Yii::t('skeeks/cms','Go to the administration panel',[],\Yii::$app->admin->languageCode)?>"><span class="label label-info"><?=\Yii::t('skeeks/cms','Administration',[],\Yii::$app->admin->languageCode)?></span></a>
+            <a href="<?= \yii\helpers\Url::to(['/admin/index']); ?>" title="<?=\Yii::t('skeeks/cms','Go to the administration panel',[],\Yii::$app->admin->languageCode)?>"><span class="label label-info"><?=\Yii::t('skeeks/cms','Administration',[],\Yii::$app->admin->languageCode)?></span></a>
         </div>
     <? endif; ?>
 

@@ -88,7 +88,7 @@ class UserController extends Controller
      */
     public function getIsOwner()
     {
-        return (bool) ($this->user->id == \Yii::$app->user->id);
+        return (bool) ($this->user && $this->user->id == \Yii::$app->user->id);
     }
 
     /**
@@ -116,6 +116,7 @@ class UserController extends Controller
 
         return $this->_user;
     }
+
 
     /**
      * @return string
