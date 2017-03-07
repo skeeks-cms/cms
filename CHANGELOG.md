@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-3.2.2.3
+3.2.2.2
 -----------------
  * Fixed fancybox
  * ContentElementsCmsWidget new setting isJoinTreeMap
