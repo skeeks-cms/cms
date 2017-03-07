@@ -2,9 +2,13 @@ CHANGELOG
 ==============
 
 3.3.0.pre
------------------
+---------------
  * Fixed login url
  * Url changes
+ 
+3.2.2.3
+-----------------
+ * Fixed fancybox
  * ContentElementsCmsWidget new setting isJoinTreeMap
  * allowDeselect PropertyTypeElement
  * Documentation about working with the url
