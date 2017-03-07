@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-3.2.2.2.pre
+3.2.2.3
 -----------------
+ * Fixed fancybox
  * ContentElementsCmsWidget new setting isJoinTreeMap
  * allowDeselect PropertyTypeElement
  * Documentation about working with the url
