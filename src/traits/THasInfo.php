@@ -12,10 +12,10 @@ namespace skeeks\cms\traits;
  * @property $icon;
  * @property $image;
  *
- * Class InfoTrait
- * @package skeeks\cms
+ * Class THasInfo
+ * @package skeeks\cms\traits
  */
-trait InfoTrait
+trait THasInfo
 {
     /**
      * @var string
