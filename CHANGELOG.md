@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.0.pre
 ---------------
+ * Removed skeeks\cms\Config
  * Change code folder /src
  * Fixed login url
  * Url changes
