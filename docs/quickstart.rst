@@ -49,6 +49,23 @@ Quick start
     <?= \Yii::$app->views->render("@app/views/header", []); ?>
 
 
+Шаблоны для писем
+-----------------
+
+Шаблоны для отправки писем из расширений лежат непосредственно в расширении в папке \mail-templates
+При отправке письма идет проверка
+
+.. code-block:: php
+    \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
+        '@app/mail' =>
+        [
+            '@skeeks/cms/mail-templates'
+        ]
+    ]);
+
+@app - это папка текущего приложения.
+Чтобы подложить для отправки свой шаблон, создайте папку mail в папке своего приложения. Положите туда свои шаблоны.
+
 
 Работа с URL
 ============
