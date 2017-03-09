@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.3.0.pre
 -----------------
+ * Fixed login url
  * Uploads files for new not saved models (change \skeeks\cms\models\behaviors\HasStorageFile)
 
 3.2.2.2

@@ -69,7 +69,10 @@ class HasStorageFile extends Behavior
              */
             if ($this->owner->isAttributeChanged($fieldCode))
             {
-                $this->_removeFiles[] = $this->owner->getOldAttribute($fieldCode);
+                if ($this->owner->getOldAttribute($fieldCode) && $this->owner->getOldAttribute($fieldCode) != $this->owner->{$fieldCode})
+                {
+                    $this->_removeFiles[] = $this->owner->getOldAttribute($fieldCode);
+                }
             }
 
             if ($this->owner->{$fieldCode} && is_string($this->owner->{$fieldCode}) && ((string) (int) $this->owner->{$fieldCode} != (string) $this->owner->{$fieldCode}))
