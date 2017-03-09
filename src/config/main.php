@@ -81,9 +81,9 @@ $config =
         ],
 
         'urlManager' => [
-            'class' => 'yii\web\UrlManager',
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
+            'class'             => 'yii\web\UrlManager',
+            'enablePrettyUrl'   => true,
+            'showScriptName'    => false,
             'suffix' => '',
             'rules' => [
                 'u'                           => 'cms/user/index',
