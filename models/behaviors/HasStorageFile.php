@@ -36,7 +36,39 @@ class HasStorageFile extends Behavior
     {
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_INSERT      => "saveStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE      => "saveStorgaFile",
         ];
+    }
+
+    /**
+     * Загрузка файлов в хранилище и их сохранение со связанной сущьностью
+     *
+     * @param $e
+     */
+    public function saveStorgaFile($e)
+    {
+        foreach ($this->fields as $fieldValue)
+        {
+            if ($this->owner->{$fieldValue} && is_string($this->owner->{$fieldValue}) && ((string) (int) $this->owner->{$fieldValue} != (string) $this->owner->{$fieldValue}))
+            {
+                try
+                {
+                    $file = \Yii::$app->storage->upload($this->owner->{$fieldValue});
+                    if ($file)
+                    {
+                        $this->owner->{$fieldValue} = $file->id;
+                    } else
+                    {
+                        $this->owner->{$fieldValue} = null;
+                    }
+
+                } catch (\Exception $e)
+                {
+                    $this->owner->{$fieldValue} = null;
+                }
+            }
+        }
     }
 
     /**

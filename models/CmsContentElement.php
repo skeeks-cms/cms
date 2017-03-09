@@ -231,7 +231,7 @@ class CmsContentElement extends RelatedElementModel
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'published_at', 'published_to', 'priority', 'content_id', 'tree_id', 'show_counter', 'show_counter_start', 'image_id', 'image_full_id'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'published_at', 'published_to', 'priority', 'content_id', 'tree_id', 'show_counter', 'show_counter_start'], 'integer'],
             [['name'], 'required'],
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
@@ -255,6 +255,8 @@ class CmsContentElement extends RelatedElementModel
                     return $this->cmsContent->defaultTree->id;
                 }
             }],
+
+            ['image_id', 'image_full_id', 'safe'],
 
             ['parent_content_element_id', 'integer'],
             ['parent_content_element_id', 'validateParentContentElement'],
