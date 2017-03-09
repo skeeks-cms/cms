@@ -7,7 +7,6 @@ CHANGELOG
  * Removed skeeks\cms\traits\ValidateRulesTrait
  * Removed skeeks\cms\Config
  * Change code folder /src
- * Fixed login url
  * Url changes
  
 3.2.3.0.pre
