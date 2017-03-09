@@ -199,8 +199,9 @@ class User
             ['gender', 'default', 'value' => 'men'],
             ['gender', 'in', 'range' => ['men', 'women']],
 
-            [['created_at', 'updated_at', 'image_id', 'email_is_approved', 'phone_is_approved'], 'integer'],
+            [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved'], 'integer'],
 
+            [['image_id'], 'safe'],
             [['gender'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
