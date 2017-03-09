@@ -256,7 +256,7 @@ class CmsContentElement extends RelatedElementModel
                 }
             }],
 
-            ['image_id', 'image_full_id', 'safe'],
+            [['image_id', 'image_full_id'], 'safe'],
 
             ['parent_content_element_id', 'integer'],
             ['parent_content_element_id', 'validateParentContentElement'],

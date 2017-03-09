@@ -9,11 +9,16 @@
  * @since 1.0.0
  */
 namespace skeeks\cms\models\behaviors;
+use common\models\User;
 use skeeks\cms\models\CmsStorageFile;
+use skeeks\cms\models\StorageFile;
 use yii\base\Behavior;
+use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 
 /**
+ * @property ActiveRecord|User $owner
+ *
  * Class HasStorageFile
  * @package skeeks\cms\models\behaviors
  */
@@ -32,12 +37,21 @@ class HasStorageFile extends Behavior
      */
     public $onDeleteCascade = true;
 
+    /**
+     * @var array
+     */
+    protected $_removeFiles = [];
+
     public function events()
     {
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteStorgaFile",
+
             BaseActiveRecord::EVENT_BEFORE_INSERT      => "saveStorgaFile",
             BaseActiveRecord::EVENT_BEFORE_UPDATE      => "saveStorgaFile",
+
+            BaseActiveRecord::EVENT_AFTER_INSERT      => "afterSaveStorgaFile",
+            BaseActiveRecord::EVENT_AFTER_UPDATE      => "afterSaveStorgaFile",
         ];
     }
 
@@ -48,24 +62,50 @@ class HasStorageFile extends Behavior
      */
     public function saveStorgaFile($e)
     {
-        foreach ($this->fields as $fieldValue)
+        foreach ($this->fields as $fieldCode)
         {
-            if ($this->owner->{$fieldValue} && is_string($this->owner->{$fieldValue}) && ((string) (int) $this->owner->{$fieldValue} != (string) $this->owner->{$fieldValue}))
+            /**
+             * Удалить старые файлы
+             */
+            if ($this->owner->isAttributeChanged($fieldCode))
+            {
+                $this->_removeFiles[] = $this->owner->getOldAttribute($fieldCode);
+            }
+
+            if ($this->owner->{$fieldCode} && is_string($this->owner->{$fieldCode}) && ((string) (int) $this->owner->{$fieldCode} != (string) $this->owner->{$fieldCode}))
             {
                 try
                 {
-                    $file = \Yii::$app->storage->upload($this->owner->{$fieldValue});
+                    $file = \Yii::$app->storage->upload($this->owner->{$fieldCode});
                     if ($file)
                     {
-                        $this->owner->{$fieldValue} = $file->id;
+                        $this->owner->{$fieldCode} = $file->id;
                     } else
                     {
-                        $this->owner->{$fieldValue} = null;
+                        $this->owner->{$fieldCode} = null;
                     }
 
                 } catch (\Exception $e)
                 {
-                    $this->owner->{$fieldValue} = null;
+                    $this->owner->{$fieldCode} = null;
+                }
+            }
+        }
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function afterSaveStorgaFile()
+    {
+        if ($this->_removeFiles)
+        {
+            if ($files = StorageFile::find()->where(['id' => $this->_removeFiles])->all())
+            {
+                foreach ($files as $file)
+                {
+                    $file->delete();
                 }
             }
         }
