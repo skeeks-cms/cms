@@ -10,7 +10,6 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
-use skeeks\cms\traits\ValidateRulesTrait;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -62,8 +61,6 @@ use yii\helpers\ArrayHelper;
  */
 class CmsContent extends Core
 {
-    use ValidateRulesTrait;
-
     const CASCADE   = 'CASCADE';
     const RESTRICT  = 'RESTRICT';
     const SET_NULL  = 'SET_NULL';

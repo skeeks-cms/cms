@@ -9,7 +9,6 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasStorageFile;
-use skeeks\cms\traits\ValidateRulesTrait;
 use Yii;
 use yii\base\Event;
 use yii\db\BaseActiveRecord;
@@ -36,8 +35,6 @@ use yii\helpers\ArrayHelper;
  */
 class CmsLang extends Core
 {
-    use ValidateRulesTrait;
-
     /**
      * @inheritdoc
      */

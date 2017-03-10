@@ -7,7 +7,6 @@
  */
 namespace skeeks\cms\models;
 
-use skeeks\cms\traits\ValidateRulesTrait;
 use Yii;
 
 /**
@@ -35,8 +34,6 @@ use Yii;
  */
 class CmsTreeType extends Core
 {
-    use ValidateRulesTrait;
-
     /**
      * @inheritdoc
      */

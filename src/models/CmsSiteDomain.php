@@ -11,7 +11,6 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
-use skeeks\cms\traits\ValidateRulesTrait;
 use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\base\Event;
@@ -32,8 +31,6 @@ use yii\db\BaseActiveRecord;
  */
 class CmsSiteDomain extends Core
 {
-    use ValidateRulesTrait;
-
     /**
      * @inheritdoc
      */

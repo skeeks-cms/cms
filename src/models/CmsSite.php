@@ -13,7 +13,6 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\Tree;
-use skeeks\cms\traits\ValidateRulesTrait;
 use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\base\Event;
@@ -48,8 +47,6 @@ use yii\helpers\ArrayHelper;
  */
 class CmsSite extends Core
 {
-    use ValidateRulesTrait;
-
     /**
      * @inheritdoc
      */
