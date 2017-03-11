@@ -80,55 +80,34 @@ class ErrorAction extends \yii\web\ErrorAction
             return (array) $rr;
         } else
         {
-            /*if (\Yii::$app->admin->checkAccess() && \Yii::$app->admin->requestIsAdmin)
+            //All requests are to our backend
+            //TODO::Add image processing
+            $info = pathinfo(\Yii::$app->request->pathInfo);
+            if ($extension = ArrayHelper::getValue($info, 'extension'))
             {
-                if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
+                $extension = \skeeks\cms\helpers\StringHelper::strtolower($extension);
+                if (in_array($extension, ['js', 'css']))
                 {
-                    $this->controller->layout = \Yii::$app->cms->moduleAdmin->layout;
-                    return $this->controller->render('@skeeks/cms/modules/admin/views/error/error', [
-                        'message' => nl2br(Html::encode($message))
-                    ]);
-                } else
-                {
-                    $this->controller->layout = '@skeeks/cms/modules/admin/views/layouts/unauthorized';
-
-                    return $this->controller->render('@skeeks/cms/modules/admin/views/error/unauthorized-403', [
-                        'message' => nl2br(Html::encode($message))
-                    ]);
-                }
-
-            } else
-            {*/
-                //All requests are to our backend
-                //TODO::Add image processing
-                $info = pathinfo(\Yii::$app->request->pathInfo);
-                if ($extension = ArrayHelper::getValue($info, 'extension'))
-                {
-                    $extension = \skeeks\cms\helpers\StringHelper::strtolower($extension);
-                    if (in_array($extension, ['js', 'css']))
+                    \Yii::$app->response->format = Response::FORMAT_RAW;
+                    if ($extension == 'js')
                     {
-                        \Yii::$app->response->format = Response::FORMAT_RAW;
-                        if ($extension == 'js')
-                        {
-                            \Yii::$app->response->headers->set('Content-Type', 'application/javascript');
-                        }
-                        if ($extension == 'css')
-                        {
-                            \Yii::$app->response->headers->set('Content-Type', 'text/css');
-                        }
-
-                        $url = \Yii::$app->request->absoluteUrl;
-                        return "/* File: '{$url}' not found */";
+                        \Yii::$app->response->headers->set('Content-Type', 'application/javascript');
                     }
+                    if ($extension == 'css')
+                    {
+                        \Yii::$app->response->headers->set('Content-Type', 'text/css');
+                    }
+
+                    $url = \Yii::$app->request->absoluteUrl;
+                    return "/* File: '{$url}' not found */";
                 }
+            }
 
-                return $this->controller->render($this->view ?: $this->id, [
-                    'name' => $name,
-                    'message' => $message,
-                    'exception' => $exception,
-                ]);
-            /*}*/
-
+            return $this->controller->render($this->view ?: $this->id, [
+                'name' => $name,
+                'message' => $message,
+                'exception' => $exception,
+            ]);
         }
     }
 }

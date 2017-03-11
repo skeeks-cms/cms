@@ -67,11 +67,6 @@ class UrlHelper
         $route[] = \Yii::$app->controller->action->id;
 
         $url = new static("/" . implode('/', $route), \Yii::$app->request->getQueryParams());
-        if (\Yii::$app->admin->requestIsAdmin)
-        {
-            $url->enableAdmin();
-        }
-
 
         return $url;
     }
