@@ -80,7 +80,7 @@ class ErrorAction extends \yii\web\ErrorAction
             return (array) $rr;
         } else
         {
-            if (\Yii::$app->admin->checkAccess() && \Yii::$app->admin->requestIsAdmin)
+            /*if (\Yii::$app->admin->checkAccess() && \Yii::$app->admin->requestIsAdmin)
             {
                 if (\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS))
                 {
@@ -98,7 +98,7 @@ class ErrorAction extends \yii\web\ErrorAction
                 }
 
             } else
-            {
+            {*/
                 //All requests are to our backend
                 //TODO::Add image processing
                 $info = pathinfo(\Yii::$app->request->pathInfo);
@@ -127,7 +127,7 @@ class ErrorAction extends \yii\web\ErrorAction
                     'message' => $message,
                     'exception' => $exception,
                 ]);
-            }
+            /*}*/
 
         }
     }
