@@ -363,9 +363,28 @@ class AdminCmsContentElementController extends AdminModelEditorController
     protected $_content = null;
 
     /**
-     * @return string
+     * @return array
      */
-    public function getPermissionName()
+    public function getPermissionNames()
+    {
+        $contentPermission = '';
+
+        if ($this->content)
+        {
+            $contentPermission = $this->content->adminPermissionName;
+        }
+
+        if ($contentPermission)
+        {
+            return ArrayHelper::merge(parent::getPermissionNames(), [
+                $contentPermission
+            ]);
+        }
+
+        return parent::getPermissionNames();
+
+    }
+    /*public function getPermissionName()
     {
         if ($this->content)
         {
@@ -373,7 +392,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
         return parent::getPermissionName();
-    }
+    }*/
 
     /**
      * @return CmsContent|static

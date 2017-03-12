@@ -18,6 +18,7 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminAjaxController
@@ -25,6 +26,11 @@ use skeeks\cms\models\searchs\User as UserSearch;
  */
 class AdminAjaxController extends AdminController
 {
+    public function getPermissionName()
+    {
+        return "";
+    }
+
     public function actionSetLang()
     {
         $rr = new RequestResponse();

@@ -81,16 +81,6 @@ class AdminComponentSettingsController extends AdminController
             $this->_callableData    = $this->_getCallableData($component);
 
             //TODO: Добавить возможность настройки
-            \Yii::$app->view->theme = new Theme([
-                'pathMap' =>
-                [
-                    '@app/views' =>
-                    [
-                        '@skeeks/cms/modules/admin/views',
-                    ]
-                ]
-            ]);
-
             \Yii::$app->language = \Yii::$app->admin->languageCode;
 
             return true;
