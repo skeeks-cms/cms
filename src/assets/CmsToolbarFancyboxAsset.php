@@ -18,11 +18,11 @@ class CmsToolbarFancyboxAsset extends CmsToolbarAsset
 
     public $js =
     [
-        'toolbar/classes/window-fancybox.js',
+        'classes/window-fancybox.js',
     ];
 
     public $depends = [
-        '\skeeks\cms\assets\FancyboxAssets',
-        '\skeeks\cms\assets\CmsToolbarAsset',
+        'skeeks\cms\assets\FancyboxAssets',
+        'skeeks\cms\assets\CmsToolbarAsset',
     ];
 }

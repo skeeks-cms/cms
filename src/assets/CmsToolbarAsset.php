@@ -14,18 +14,18 @@ use skeeks\cms\base\AssetBundle;
  */
 class CmsToolbarAsset extends AssetBundle
 {
-    public $sourcePath = '@skeeks/cms/assets';
+    public $sourcePath = '@skeeks/cms/assets/src/toolbar';
 
     public $css = [
-        'toolbar/toolbar.css',
+        'toolbar.css',
     ];
 
     public $js =
     [
-        'toolbar/classes/window.js',
-        'toolbar/classes/dialog.js',
-        'toolbar/classes/edit-view-block.js',
-        'toolbar/toolbar.js',
+        'classes/window.js',
+        'classes/dialog.js',
+        'classes/edit-view-block.js',
+        'toolbar.js',
     ];
 
     public $depends = [

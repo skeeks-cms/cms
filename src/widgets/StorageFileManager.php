@@ -7,6 +7,7 @@
  */
 
 namespace skeeks\cms\widgets;
+use skeeks\cms\admin\assets\ActionFilesAsset;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
 use yii\base\Widget;
@@ -65,7 +66,7 @@ class StorageFileManager extends Widget
         $clientOptions = ArrayHelper::merge($clientOptions, $options);
 
         $clientOptionsString = \yii\helpers\Json::encode($clientOptions);
-        \skeeks\cms\modules\admin\assets\ActionFilesAsset::register($this->getView());
+        ActionFilesAsset::register($this->getView());
 
         $fileManagerId = "sx-file-manager-{$this->id}";
 

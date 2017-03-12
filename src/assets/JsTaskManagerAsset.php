@@ -14,7 +14,7 @@ use skeeks\cms\base\AssetBundle;
  */
 class JsTaskManagerAsset extends AssetBundle
 {
-    public $sourcePath = '@skeeks/cms/assets';
+    public $sourcePath = '@skeeks/cms/assets/src';
 
     public $css = [
     ];

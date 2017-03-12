@@ -14,5 +14,5 @@ use skeeks\cms\base\AssetBundle;
  */
 class CmsAsset extends AssetBundle
 {
-    public $sourcePath = '@skeeks/cms/assets';
+    public $sourcePath = '@skeeks/cms/assets/src';
 }
