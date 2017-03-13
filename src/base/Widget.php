@@ -9,7 +9,7 @@ namespace skeeks\cms\base;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\traits\WidgetTrait;
+use skeeks\cms\traits\TWidget;
 use yii\base\InvalidCallException;
 use yii\base\ViewContextInterface;
 use yii\db\Exception;
@@ -24,7 +24,7 @@ use yii\helpers\Json;
 abstract class Widget extends Component implements ViewContextInterface
 {
     //Умеет все что умеет \yii\base\Widget
-    use WidgetTrait;
+    use TWidget;
 
     /**
      * @var string

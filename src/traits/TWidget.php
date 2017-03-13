@@ -17,7 +17,7 @@ use ReflectionClass;
  * Class WidgetTrait
  * @package skeeks\cms\traits
  */
-trait WidgetTrait
+trait TWidget
 {
     /**
      * @var integer a counter used to generate [[id]] for widgets.

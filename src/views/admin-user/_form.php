@@ -48,7 +48,7 @@ use common\models\User;
         </div>
         <div class="col-md-5">
             <?
-\skeeks\cms\modules\admin\assets\JqueryMaskInputAsset::register($this);
+\skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
 $id = \yii\helpers\Html::getInputId($model, 'phone');
 $this->registerJs(<<<JS
 $("#{$id}").mask("+7 999 999-99-99");
