@@ -1,8 +1,14 @@
 CHANGELOG
 ==============
 
-3.3.0.pre
+3.2.3.0.pre
 -----------------
+ * Fixed login url
+ * Uploads files for new not saved models (change \skeeks\cms\models\behaviors\HasStorageFile)
+
+3.2.2.2
+-----------------
+ * Fixed fancybox
  * Url changes
  * ContentElementsCmsWidget new setting isJoinTreeMap
  * allowDeselect PropertyTypeElement
