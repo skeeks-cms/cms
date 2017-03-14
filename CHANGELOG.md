@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.3
 -----------------
+ * Fixed admin url
  * Fixed fancybox
  * Fixed login url
  * Uploads files for new not saved models (change \skeeks\cms\models\behaviors\HasStorageFile)

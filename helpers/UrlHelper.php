@@ -304,23 +304,28 @@ class UrlHelper
 
 
 
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return (bool) $this->get(UrlRule::ADMIN_PARAM_NAME);
+    }
 
     /**
-     * TODO:: is deprecated
      * Это урл админки.
      * @return $this
      */
     public function enableAdmin()
     {
-        return $this;
+        return $this->set(UrlRule::ADMIN_PARAM_NAME, UrlRule::ADMIN_PARAM_VALUE);
     }
 
     /**
-     * TODO:: is deprecated
      * @return $this
      */
     public function disableAdmin()
     {
-        return $this;
+        return $this->offsetUnset(UrlRule::ADMIN_PARAM_NAME);
     }
 }
