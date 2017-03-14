@@ -3,6 +3,7 @@ CHANGELOG
 
 3.2.3
 -----------------
+ * Fancybox return v2.*
  * Fixed admin url
  * Fixed fancybox
  * Fixed login url
