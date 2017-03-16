@@ -39,4 +39,28 @@ trait THasPermissions
         return $this;
     }
 
+
+    /**
+     * @var string
+     */
+    protected $_permissionName = '';
+
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return (string) $this->_permissionName;
+    }
+
+    /**
+     * @param string $permissionNames
+     * @return $this
+     */
+    public function setPermissionName(string $permissionName = null)
+    {
+        $this->_permissionName = $permissionName;
+        return $this;
+    }
+
 }

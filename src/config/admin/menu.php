@@ -354,7 +354,7 @@ return
 
                     [
                         "label"     => \Yii::t('skeeks/cms',"Information"),
-                        "url"       => ["admin/info"],
+                        "url"       => ["cms/admin-info"],
                         "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.infoblock.png'],
                     ],
 
@@ -389,7 +389,7 @@ return
 
             [
                 "label"     => \Yii::t('skeeks/cms',"Clearing temporary data"),
-                "url"       => ["admin/clear"],
+                "url"       => ["cms/admin-clear"],
                 "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/clear.png'],
             ],
         ]
