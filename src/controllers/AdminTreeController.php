@@ -55,7 +55,7 @@ class AdminTreeController extends AdminModelEditorController
             [
                 'class'         => AdminAction::className(),
                 'name'          => 'Разделы',
-                'viewParams'    => $this->indexData()
+                'callback'      => [$this, 'indexAction']
             ],
 
             'create' =>
@@ -143,23 +143,12 @@ class AdminTreeController extends AdminModelEditorController
 
 
 
-    static public $indexData = [];
-
-    public function indexData()
+    public function indexAction()
     {
-        if (self::$indexData)
-        {
-            return self::$indexData;
-        }
+        $models = CmsTree::findRoots()->joinWith('cmsSiteRelation')
+            ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
 
-        $models = Tree::findRoots()->joinWith('cmsSiteRelation')->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
-
-        self::$indexData =
-        [
-            'models' => $models
-        ];
-
-        return self::$indexData;
+        return $this->render($this->action->id, ['models' => $models]);
     }
 
     public function actionNewChildren()
