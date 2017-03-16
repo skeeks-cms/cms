@@ -96,7 +96,7 @@ JS
                             $controllerTmp = clone $controller;
                             $controllerTmp->setModel($imageFile);
 
-                            echo \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
+                            echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
                                 "controller"            => $controllerTmp,
                                 "isOpenNewWindow"       => true,
                                 "clientOptions"         =>

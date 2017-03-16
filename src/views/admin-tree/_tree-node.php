@@ -79,10 +79,10 @@ if ($additionalName)
 
 
 
-    <?= \skeeks\cms\modules\admin\widgets\DropdownControllerActions::widget([
+    <?= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
         "controller"            => $controller,
         "renderFirstAction"     => true,
-        "containerClass"        => "dropdown pull-left",
+        "wrapperOptions"        => ['class' => "dropdown pull-left"],
         'clientOptions'         =>
         [
             'pjax-id' => $widget->pjax->id

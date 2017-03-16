@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\controllers;
 use skeeks\cms\admin\AdminController;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -41,16 +42,16 @@ class AdminInfoController extends AdminController
         [
             'index' =>
             [
-                'class'         => AdminAction::className(),
-                'name'          => \Yii::t('skeeks/cms','General information'),
-                'viewParams'    => $this->indexData(),
+                'class'         => BackendAction::className(),
+                'name'          => \Yii::t('skeeks/cms', 'General information'),
+                'callback'      => [$this, 'actionIndex'],
             ]
         ];
     }
 
-    public function indexData()
+    public function actionIndex()
     {
-        return
+        return $this->render($this->action->id,
         [
             'phpVersion' => PHP_VERSION,
             'yiiVersion' => \Yii::getVersion(),
@@ -70,7 +71,7 @@ class AdminInfoController extends AdminController
                 'gd' => extension_loaded('gd'),
             ],
             'extensions' => $this->getExtensions(),
-        ];
+        ]);
     }
 
 

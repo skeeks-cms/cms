@@ -10,6 +10,7 @@
  */
 namespace skeeks\cms\controllers;
 use skeeks\cms\admin\AdminController;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -38,14 +39,14 @@ class AdminClearController extends AdminController
         [
             "index" =>
             [
-                "class"        => AdminAction::className(),
+                "class"        => BackendAction::className(),
                 "name"         => \Yii::t('skeeks/cms',"Clearing temporary data"),
                 "callback"     => [$this, 'actionIndex'],
             ],
 
             "index2" =>
             [
-                "class"        => AdminAction::className(),
+                "class"        => BackendAction::className(),
                 "name"         => \Yii::t('skeeks/cms',"Clearing temporary data"),
                 "callback"     => [$this, 'actionIndex'],
             ],
