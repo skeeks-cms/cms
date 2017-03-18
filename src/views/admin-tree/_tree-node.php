@@ -80,7 +80,7 @@ if ($additionalName)
 
 
     <?= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-        "controller"            => $controller,
+        "actions"               => $controller->modelActions,
         "renderFirstAction"     => true,
         "wrapperOptions"        => ['class' => "dropdown pull-left"],
         'clientOptions'         =>

@@ -7,9 +7,10 @@
  */
 namespace skeeks\cms;
 use yii\base\Model;
+use yii\db\ActiveRecord;
 
 /**
- * @property Model $model;
+ * @property $model;
  *
  * Interface IHasModel
  * @package skeeks\cms
@@ -17,7 +18,14 @@ use yii\base\Model;
 interface IHasModel
 {
     /**
-     * @return Model
+     * @return Model|ActiveRecord
      */
     public function getModel();
+
+    /**
+     * @param Model|ActiveRecord $model
+     * @return mixed
+     */
+    public function setModel(Model $model);
+
 }

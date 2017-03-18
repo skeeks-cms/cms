@@ -111,7 +111,7 @@ JS
                                             $controllerTmp->setModel($imageFile);
 
                                             echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-                                                "controller"            => $controllerTmp,
+                                                "actions"               => $controllerTmp->modelActions,
                                                 "isOpenNewWindow"       => true,
                                                 "clientOptions"         =>
                                                 [

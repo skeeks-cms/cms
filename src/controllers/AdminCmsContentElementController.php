@@ -122,6 +122,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     }
 
 
+
     public function create(AdminAction $adminAction)
     {
         $modelClassName = $this->modelClassName;
@@ -170,7 +171,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 } else
                 {
                     return $this->redirect(
-                        $this->indexUrl
+                        $this->url
                     );
                 }
 
@@ -220,7 +221,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 } else
                 {
                     return $this->redirect(
-                        $this->indexUrl
+                        $this->url
                     );
                 }
 
@@ -442,11 +443,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
     /**
      * @return string
      */
-    public function getIndexUrl()
+    public function getUrl()
     {
         return UrlHelper::construct($this->id . '/' . $this->action->id, [
             'content_id' => \Yii::$app->request->get('content_id')
-        ])->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
+        ])->setRoute('index')->normalizeCurrentRoute()->toString();
     }
 
 

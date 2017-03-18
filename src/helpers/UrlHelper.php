@@ -22,7 +22,7 @@ use yii\web\Application;
  * @package skeeks\cms\helpers
  */
 class UrlHelper
-    extends BaseUrl
+    extends Url
 {
     use Entity;
 

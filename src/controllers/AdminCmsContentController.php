@@ -29,7 +29,7 @@ class AdminCmsContentController extends AdminModelEditorController
     /**
      * @return string
      */
-    public function getIndexUrl()
+    public function getUrl()
     {
         $contentTypePk = null;
 
