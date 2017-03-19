@@ -797,6 +797,7 @@ return
     'Enable caching'                        => 'Включить кэширование',
     'Cache lifetime'                        => 'Время жизни кэша',
     'Section types'                         => 'Типы разделов',
+    'Access to the administration system'   => 'Доступ к системе администрирования',
     'ASC (from lowest to highest)'          => 'ASC (от меньшего к большему)',
     'DESC (from highest to lowest)'          => 'DESC (от большего к меньшему)',
     'If you select "yes", then the sample section, add the filter condition, sections of the site, which is called the widget'                         => 'Если будет выбрано "да", то в выборку разделов добавиться условие фильтрации, разделов сайта, где вызван данный виджет',

@@ -6,11 +6,11 @@
  * @date 05.03.2017
  */
 namespace skeeks\cms\traits;
+use yii\helpers\Url;
 
 /**
- * @property $name;
- * @property $icon;
- * @property $image;
+ * @property string $url;
+ * @property string|array $urlData;
  *
  * Class THasUrl
  * @package skeeks\cms\traits
@@ -18,16 +18,21 @@ namespace skeeks\cms\traits;
 trait THasUrl
 {
     /**
-     * @var string
+     * @var string|array
      */
-    protected $_url = '';
+    protected $_url = null;
 
     /**
      * @return string
      */
     public function getUrl()
     {
-        return $this->_url;
+        if (is_array($this->_url))
+        {
+            return Url::to($this->_url);
+        }
+
+        return (string) $this->_url;
     }
 
     /**
@@ -38,5 +43,13 @@ trait THasUrl
     {
         $this->_url = $url;
         return $this;
+    }
+
+    /**
+     * @return array|string|null
+     */
+    public function getUrlData()
+    {
+        return $this->_url;
     }
 }

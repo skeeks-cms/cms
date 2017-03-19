@@ -7,8 +7,10 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\IBackendAction;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\IHasUrl;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
@@ -378,7 +380,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         if ($contentPermission)
         {
             return ArrayHelper::merge(parent::getPermissionNames(), [
-                $contentPermission
+                $contentPermission => $this->content->name
             ]);
         }
 
@@ -423,8 +425,43 @@ class AdminCmsContentElementController extends AdminModelEditorController
         return $this;
     }
 
+    public function getActions()
+    {
+        /**
+         * @var AdminAction $action
+         */
+        $actions = parent::getActions();
+        if ($actions)
+        {
+            foreach ($actions as $action)
+            {
+                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+            }
+        }
+
+        return $actions;
+    }
+    public function getModelActions()
+    {
+        /**
+         * @var AdminAction $action
+         */
+        $actions = parent::getModelActions();
+        if ($actions)
+        {
+            foreach ($actions as $action)
+            {
+                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+            }
+        }
+
+        return $actions;
+    }
+
+
     public function beforeAction($action)
     {
+
         if ($this->content)
         {
             if ($this->content->name_meny)
@@ -445,9 +482,14 @@ class AdminCmsContentElementController extends AdminModelEditorController
      */
     public function getUrl()
     {
-        return UrlHelper::construct($this->id . '/' . $this->action->id, [
-            'content_id' => \Yii::$app->request->get('content_id')
-        ])->setRoute('index')->normalizeCurrentRoute()->toString();
+        $actions = $this->getActions();
+        $index = ArrayHelper::getValue($actions, 'index');
+        if ($index && $index instanceof IHasUrl)
+        {
+            return $index->url;
+        }
+
+        return '';
     }
 
 

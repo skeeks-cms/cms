@@ -6,10 +6,12 @@
  * @date 05.03.2017
  */
 namespace skeeks\cms\traits;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\Model;
 
 /**
  * @property array $permissionNames;
+ * @property bool $isAllow;
  *
  * Class THasPermissions
  * @package skeeks\cms\traits
@@ -19,7 +21,7 @@ trait THasPermissions
     /**
      * @var string
      */
-    protected $_permissionNames = '';
+    protected $_permissionNames = null;
 
     /**
      * @return array
@@ -41,26 +43,39 @@ trait THasPermissions
 
 
     /**
-     * @var string
+     * @return bool
      */
-    protected $_permissionName = '';
-
-    /**
-     * @return string
-     */
-    public function getPermissionName()
+    public function getIsAllow()
     {
-        return (string) $this->_permissionName;
-    }
+        if ($this->permissionNames)
+        {
+            foreach ($this->permissionNames as $permissionName => $permissionLabel)
+            {
+                //Привилегия доступу к админке
+                if (!$permission = \Yii::$app->authManager->getPermission($permissionName))
+                {
+                    $permission = \Yii::$app->authManager->createPermission($permissionName);
+                    $permission->description = $permissionLabel;
+                    \Yii::$app->authManager->add($permission);
+                }
 
-    /**
-     * @param string $permissionNames
-     * @return $this
-     */
-    public function setPermissionName(string $permissionName = null)
-    {
-        $this->_permissionName = $permissionName;
-        return $this;
-    }
+                if ($roleRoot = \Yii::$app->authManager->getRole(CmsManager::ROLE_ROOT))
+                {
+                    if (!\Yii::$app->authManager->hasChild($roleRoot, $permission))
+                    {
+                        \Yii::$app->authManager->addChild($roleRoot, $permission);
+                    }
+                }
 
+                if (!\Yii::$app->user->can($permissionName))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -6,7 +6,9 @@
  * @date 05.03.2017
  */
 namespace skeeks\cms;
+use yii\base\Component;
 use yii\base\Model;
+use yii\base\Object;
 use yii\db\ActiveRecord;
 
 /**
@@ -23,9 +25,9 @@ interface IHasModel
     public function getModel();
 
     /**
-     * @param Model|ActiveRecord $model
+     * @param Model|ActiveRecord|Component|Object $model
      * @return mixed
      */
-    public function setModel(Model $model);
+    public function setModel(Object $model);
 
 }
