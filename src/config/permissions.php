@@ -45,10 +45,6 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
@@ -75,9 +71,6 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
                 ],
@@ -101,10 +94,6 @@ return [
                 [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
-
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
@@ -154,60 +143,6 @@ return [
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_EDIT_VIEW_FILES,
             'description'   => \Yii::t('skeeks/cms','The ability to edit view files')
-        ],
-
-        [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
-            'description'   => \Yii::t('skeeks/cms','Updating data records'),
-        ],
-
-        [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_OWN,
-            'description'   => \Yii::t('skeeks/cms','Updating data own records'),
-            'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
-            'child'         =>
-            [
-                'permissions' =>
-                [
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE,
-                ],
-            ]
-        ],
-
-        [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
-            'description'   => \Yii::t('skeeks/cms','Updating additional data records'),
-        ],
-
-        [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED_OWN,
-            'description'   => \Yii::t('skeeks/cms','Updating additional data own records'),
-            'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
-            'child'         =>
-            [
-                'permissions' =>
-                [
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_UPDATE_ADVANCED,
-                ],
-            ]
-        ],
-
-        [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
-            'description'   => \Yii::t('skeeks/cms','Deleting records'),
-        ],
-
-        [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE_OWN,
-            'description'   => \Yii::t('skeeks/cms','Deleting own records'),
-            'ruleName'      => (new \skeeks\cms\rbac\AuthorRule())->name,
-            'child'         =>
-            [
-                'permissions' =>
-                [
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_DELETE,
-                ],
-            ]
         ],
 
 
