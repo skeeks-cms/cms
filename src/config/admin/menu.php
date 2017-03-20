@@ -39,7 +39,7 @@ function contentMenu()
                         'url'   => ["cms/admin-cms-content-element", "content_id" => $content->id],
                         "activeCallback"       => function($adminMenuItem) use ($content)
                         {
-                            return (bool) ($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'cms/admin-cms-content-element');
+                            return (bool) ($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'cms/admin-cms-content-element__' . $content->id);
                         },
 
                         "accessCallback"       => function($adminMenuItem) use ($content)

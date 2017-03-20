@@ -48,7 +48,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $this->name                     = \Yii::t('skeeks/cms', 'Elements');
         $this->modelShowAttribute       = "name";
-        $this->modelClassName           = CmsContentElement::className();
+        $this->modelClassName           = CmsContentElement::class;
 
         parent::init();
     }
@@ -63,24 +63,24 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "index" =>
                 [
-                    'modelSearchClassName' => CmsContentElementSearch::className()
+                    'modelSearchClassName' => CmsContentElementSearch::class
                 ],
 
                 "create" =>
                 [
-                    'class'         => AdminModelEditorCreateAction::className(),
+                    'class'         => AdminModelEditorCreateAction::class,
                     "callback"      => [$this, 'create'],
                 ],
 
                 "update" =>
                 [
-                    'class'         => AdminOneModelEditAction::className(),
+                    'class'         => AdminOneModelEditAction::class,
                     "callback"      => [$this, 'update'],
                 ],
 
                 "activate-multi" =>
                 [
-                    'class' => AdminMultiModelEditAction::className(),
+                    'class' => AdminMultiModelEditAction::class,
                     "name" => \Yii::t('skeeks/cms', 'Activate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiActivate'],
@@ -88,7 +88,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "inActivate-multi" =>
                 [
-                    'class' => AdminMultiModelEditAction::className(),
+                    'class' => AdminMultiModelEditAction::class,
                     "name" => \Yii::t('skeeks/cms', 'Deactivate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
@@ -96,7 +96,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "change-tree-multi" =>
                 [
-                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    'class'             => AdminMultiDialogModelEditAction::class,
                     "name"              => \Yii::t('skeeks/cms', 'The main section'),
                     "viewDialog"        => "change-tree-form",
                     "eachCallback"      => [$this, 'eachMultiChangeTree'],
@@ -104,7 +104,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "change-trees-multi" =>
                 [
-                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    'class'             => AdminMultiDialogModelEditAction::class,
                     "name"              => \Yii::t('skeeks/cms', 'Related topics'),
                     "viewDialog"        => "change-trees-form",
                     "eachCallback"      => [$this, 'eachMultiChangeTrees'],
@@ -112,7 +112,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "rp" =>
                 [
-                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    'class'             => AdminMultiDialogModelEditAction::class,
                     "name"              => \Yii::t('skeeks/cms', 'Properties'),
                     "viewDialog"        => "multi-rp",
                     "eachCallback"      => [$this, 'eachRelatedProperties'],
@@ -125,10 +125,10 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
 
 
-    public function create(AdminAction $adminAction)
+    public function create($adminAction)
     {
         $modelClassName = $this->modelClassName;
-        $model          = new $modelClassName();
+        $model          = new $modelClassName;
 
         $model->loadDefaultValues();
 
@@ -189,7 +189,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         ]);
     }
 
-    public function update(AdminAction $adminAction)
+    public function update($adminAction)
     {
         /**
          * @var $model CmsContentElement
@@ -360,42 +360,28 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
     }
 
+
+
+    /**
+     * Returns the unique ID of the controller.
+     * @return string the controller ID that is prefixed with the module ID (if any).
+     */
+    public function getUniqueId()
+    {
+        $unique = parent::getUniqueId();
+
+        if ($this->content)
+        {
+            $unique = $unique . "__" . $this->content->id;
+        }
+
+        return $unique;
+    }
+
     /**
      * @var CmsContent
      */
     protected $_content = null;
-
-    /**
-     * @return array
-     */
-    public function getPermissionNames()
-    {
-        $contentPermission = '';
-
-        if ($this->content)
-        {
-            $contentPermission = $this->content->adminPermissionName;
-        }
-
-        if ($contentPermission)
-        {
-            return ArrayHelper::merge(parent::getPermissionNames(), [
-                $contentPermission => $this->content->name
-            ]);
-        }
-
-        return parent::getPermissionNames();
-
-    }
-    /*public function getPermissionName()
-    {
-        if ($this->content)
-        {
-            return $this->content->adminPermissionName;
-        }
-
-        return parent::getPermissionName();
-    }*/
 
     /**
      * @return CmsContent|static
@@ -526,7 +512,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'attribute' => $name,
                     'visible' => false,
                     'format' => 'raw',
-                    'class' => \yii\grid\DataColumn::className(),
+                    'class' => \yii\grid\DataColumn::class,
                     'value' => function($model, $key, $index) use ($name)
                     {
                         if (is_array($model->{$name}))
@@ -569,30 +555,30 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $columns = [
             [
-                'class' => \skeeks\cms\grid\ImageColumn2::className(),
+                'class' => \skeeks\cms\grid\ImageColumn2::class,
             ],
 
             'name',
-            ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+            ['class' => \skeeks\cms\grid\CreatedAtColumn::class],
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
                 'visible' => false
             ],
             [
-                'class' => \skeeks\cms\grid\PublishedAtColumn::className(),
+                'class' => \skeeks\cms\grid\PublishedAtColumn::class,
                 'visible' => false
             ],
             [
-                'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+                'class' => \skeeks\cms\grid\DateTimeColumnData::class,
                 'attribute' => "published_to",
                 'visible' => false
             ],
 
-            ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
-            //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+            ['class' => \skeeks\cms\grid\CreatedByColumn::class],
+            //['class' => \skeeks\cms\grid\UpdatedByColumn::class],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'value'     => function(\skeeks\cms\models\CmsContentElement $model)
                 {
                     if (!$model->cmsTree)
@@ -624,7 +610,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ],
 
             'additionalSections' => [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'value'     => function(\skeeks\cms\models\CmsContentElement $model)
                 {
                     $result = [];
@@ -650,11 +636,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             [
                 'attribute' => 'active',
-                'class' => \skeeks\cms\grid\BooleanColumn::className()
+                'class' => \skeeks\cms\grid\BooleanColumn::class
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'label'     => "Смотреть",
                 'value'     => function(\skeeks\cms\models\CmsContentElement $model)
                 {
