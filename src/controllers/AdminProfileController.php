@@ -10,6 +10,10 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendController;
+use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
@@ -32,7 +36,7 @@ use yii\web\Response;
  * Class AdminProfileController
  * @package skeeks\cms\controllers
  */
-class AdminProfileController extends AdminModelEditorController
+class AdminProfileController extends BackendModelController
 {
     /**
      * @return string
@@ -54,17 +58,9 @@ class AdminProfileController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(),
         [
-            /*'change-password' =>
-            [
-                "class"         => AdminOneModelEditAction::className(),
-                "name"          => "Изменение пароля",
-                "icon"          => "glyphicon glyphicon-cog",
-                "callback"      => [$this, 'actionChangePassword'],
-            ],*/
-
             'file-manager' =>
             [
-                "class"         => AdminOneModelEditAction::className(),
+                "class"         => BackendModelAction::class,
                 "name"          => "Личные файлы",
                 "icon"          => "glyphicon glyphicon-folder-open",
                 "callback"      => [$this, 'actionFileManager'],
@@ -72,7 +68,7 @@ class AdminProfileController extends AdminModelEditorController
 
             'update' =>
             [
-                'class'         => AdminOneModelEditAction::className(),
+                'class'         => BackendModelUpdateAction::class,
                 "callback"      => [$this, 'update'],
             ],
         ]);
@@ -84,7 +80,7 @@ class AdminProfileController extends AdminModelEditorController
     }
 
 
-    public function update(AdminAction $adminAction)
+    public function update($adminAction)
     {
         /**
          * @var $model CmsUser
