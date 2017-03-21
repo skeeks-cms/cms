@@ -17,6 +17,10 @@ return
     "List"                  => "Список",
     "Add"                   => "Добавить",
     "Edit"                  => "Редактировать",
+    "Content management"    => "Управление контентом",
+    "Property management"   => "Управление свойствами",
+    "Managing property values"   => "Управление значениями свойств",
+    "Management of languages"   => "Управление языковыми версиями",
 
 
     "Created By"            =>  "Автор",

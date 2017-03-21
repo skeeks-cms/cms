@@ -26,7 +26,7 @@ class AdminCmsSiteController extends AdminModelEditorController
     {
         $this->name                   = \Yii::t('skeeks/cms', "Site management");
         $this->modelShowAttribute      = "name";
-        $this->modelClassName          = CmsSite::className();
+        $this->modelClassName          = CmsSite::class;
 
         parent::init();
     }

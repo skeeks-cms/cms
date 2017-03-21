@@ -26,9 +26,9 @@ class AdminCmsContentPropertyController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                   = "Управление свойствами";
+        $this->name                   = \Yii::t('skeeks/cms', 'Property management');
         $this->modelShowAttribute      = "name";
-        $this->modelClassName          = CmsContentProperty::className();
+        $this->modelClassName          = CmsContentProperty::class;
 
         parent::init();
     }

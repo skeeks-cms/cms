@@ -1,16 +1,12 @@
 <?php
 /**
- * index
- *
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 08.11.2014
- * @since 1.0.0
+ * @link https://skeeks.com/
+ * @copyright (c) 2010 SkeekS
+ * @date 21.03.2017
  */
 /* @var $this yii\web\View */
-
-$url = \skeeks\cms\helpers\UrlHelper::construct('cms/admin-clear/index')->enableAdmin()->toString();
+$url = \yii\helpers\Url::to(['/cms/admin-clear/index']);
 $data = \yii\helpers\Json::encode([
     'backend' => $url
 ])

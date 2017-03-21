@@ -7,6 +7,8 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\BackendModelCreateAction;
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\IBackendAction;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -68,13 +70,13 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "create" =>
                 [
-                    'class'         => AdminModelEditorCreateAction::class,
+                    'class'         => BackendModelCreateAction::class,
                     "callback"      => [$this, 'create'],
                 ],
 
                 "update" =>
                 [
-                    'class'         => AdminOneModelEditAction::class,
+                    'class'         => BackendModelUpdateAction::class,
                     "callback"      => [$this, 'update'],
                 ],
 
@@ -165,11 +167,23 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
-                    return $this->redirect(
-                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                            ->toString()
-                    );
+                    $url = '';
+                    $this->model = $model;
+
+                    if ($this->modelActions)
+                    {
+                        if ($action = ArrayHelper::getValue($this->modelActions, $this->modelDefaultAction))
+                        {
+                            $url = $action->url;
+                        }
+                    }
+
+                    if (!$url)
+                    {
+                        $url = $this->url;
+                    }
+
+                    return $this->redirect($url);
                 } else
                 {
                     return $this->redirect(

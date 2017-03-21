@@ -19,9 +19,9 @@ class AdminCmsContentController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление контентом";
+        $this->name                     = \Yii::t('skeeks/cms', 'Content management');
         $this->modelShowAttribute      = "name";
-        $this->modelClassName          = CmsContent::className();
+        $this->modelClassName          = CmsContent::class;
 
         parent::init();
     }

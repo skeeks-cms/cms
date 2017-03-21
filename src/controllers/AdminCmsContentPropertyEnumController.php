@@ -19,12 +19,11 @@ class AdminCmsContentPropertyEnumController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление значениями свойств";
+        $this->name                   = \Yii::t('skeeks/cms', 'Managing property values');
         $this->modelShowAttribute      = "value";
-        $this->modelClassName          = CmsContentPropertyEnum::className();
+        $this->modelClassName          = CmsContentPropertyEnum::class;
 
         parent::init();
-
     }
 
 }

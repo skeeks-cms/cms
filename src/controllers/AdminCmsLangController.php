@@ -25,9 +25,9 @@ class AdminCmsLangController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                   = "Управление языками";
-        $this->modelShowAttribute      = "name";
-        $this->modelClassName          = CmsLang::className();
+        $this->name                     = \Yii::t('skeeks/cms', 'Management of languages');
+        $this->modelShowAttribute       = "name";
+        $this->modelClassName           = CmsLang::class;
 
         parent::init();
     }

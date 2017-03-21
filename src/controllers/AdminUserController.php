@@ -62,13 +62,11 @@ class AdminUserController extends AdminModelEditorController
 
             'create' =>
             [
-                'class'         => AdminModelEditorCreateAction::className(),
                 "callback"      => [$this, 'create'],
             ],
 
             'update' =>
             [
-                'class'         => AdminOneModelEditAction::className(),
                 "callback"      => [$this, 'update'],
             ],
 
@@ -111,7 +109,7 @@ class AdminUserController extends AdminModelEditorController
     }
 
 
-    public function create(AdminAction $adminAction)
+    public function create($adminAction)
     {
         $modelClassName = $this->modelClassName;
         $model          = new $modelClassName();
@@ -183,7 +181,7 @@ class AdminUserController extends AdminModelEditorController
     }
 
 
-    public function update(AdminAction $adminAction)
+    public function update($adminAction)
     {
         /**
          * @var $model CmsUser
