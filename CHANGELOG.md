@@ -1,16 +1,22 @@
 CHANGELOG
 ==============
 
-3.2.3
+4.0.0.pre
+---------------
+ * Removed skeeks\cms\base\CheckComponent
+ * Removed skeeks\cms\traits\ValidateRulesTrait
+ * Removed skeeks\cms\Config
+ * Change code folder /src
+ * Url changes
+ 
+3.2.3.0.pre
 -----------------
- * Fixed fancybox
  * Fixed login url
  * Uploads files for new not saved models (change \skeeks\cms\models\behaviors\HasStorageFile)
 
 3.2.2.2
 -----------------
  * Fixed fancybox
- * Url changes
  * ContentElementsCmsWidget new setting isJoinTreeMap
  * allowDeselect PropertyTypeElement
  * Documentation about working with the url
