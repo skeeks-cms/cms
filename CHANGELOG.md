@@ -1,6 +1,14 @@
 CHANGELOG
 ==============
 
+4.0.0.pre
+---------------
+ * Removed skeeks\cms\base\CheckComponent
+ * Removed skeeks\cms\traits\ValidateRulesTrait
+ * Removed skeeks\cms\Config
+ * Change code folder /src
+ * Url changes
+ 
 3.2.3.0.pre
 -----------------
  * Fixed login url

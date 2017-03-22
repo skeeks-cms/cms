@@ -27,6 +27,8 @@
         "yiisoft/yii2": "*",
         "yiisoft/yii2-jui": "*",
         "yiisoft/yii2-bootstrap": "*",
+        "skeeks/cms-backend": "*",
+        "skeeks/cms-backend-admin": "*",
         "skeeks/cms-admin": "*",
         "skeeks/cms-rbac": "*",
         "skeeks/cms-marketplace": "*",
@@ -47,7 +49,7 @@
     },
     "autoload": {
         "psr-4": {
-            "skeeks\\cms\\": ""
+            "skeeks\\cms\\":  "src/"
         }
     }
 }
