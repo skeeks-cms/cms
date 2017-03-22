@@ -79,7 +79,7 @@ class AdminTreeController extends AdminModelEditorController
 
 
 
-    public function update(AdminAction $adminAction)
+    public function update($adminAction)
     {
         /**
          * @var $model CmsTree
