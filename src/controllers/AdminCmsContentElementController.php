@@ -375,14 +375,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
     }
 
 
-
     /**
-     * Returns the unique ID of the controller.
-     * @return string the controller ID that is prefixed with the module ID (if any).
+     * @return string
      */
-    public function getUniqueId()
+    public function getPermissionName()
     {
-        $unique = parent::getUniqueId();
+        $unique = parent::getPermissionName();
 
         if ($this->content)
         {
@@ -391,6 +389,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return $unique;
     }
+
 
     /**
      * @var CmsContent
