@@ -10,6 +10,8 @@ use skeeks\cms\actions\ViewModelAction;
 use skeeks\cms\assets\CmsToolbarAsset;
 use skeeks\cms\assets\CmsToolbarAssets;
 use skeeks\cms\assets\CmsToolbarFancyboxAsset;
+use skeeks\cms\backend\BackendComponent;
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsContentElement;
@@ -142,7 +144,7 @@ class CmsToolbar extends \skeeks\cms\base\Component implements BootstrapInterfac
 
         \Yii::$app->view->on(View::EVENT_AFTER_RENDER, function(ViewEvent $e)
         {
-            if (\Yii::$app->controller instanceof AdminController)
+            if (\Yii::$app->controller instanceof BackendController)
             {
                 return false;
             }
@@ -286,7 +288,7 @@ JS
         //\Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS) version > 2.0.13
         if (\Yii::$app->user->can(CmsManager::PERMISSION_CONTROLL_PANEL))
         {
-            if (!\Yii::$app->admin->requestIsAdmin && (!\Yii::$app->controller instanceof AdminController) && !in_array(\Yii::$app->controller->module->id, ['debug', 'gii']))
+            if (!BackendComponent::getCurrent() && (!\Yii::$app->controller instanceof BackendController) && !in_array(\Yii::$app->controller->module->id, ['debug', 'gii']))
             {
                 return true;
             }

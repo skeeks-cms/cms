@@ -406,6 +406,15 @@ class AdminCmsContentElementController extends AdminModelEditorController
             return $this->_content;
         }
 
+        if ($this->model)
+        {
+            /**
+             * @var $model CmsContentElement
+             */
+            $model = $this->model;
+            $this->_content = $model->cmsContent;
+        }
+
         if ($content_id = \Yii::$app->request->get('content_id'))
         {
             $this->_content = CmsContent::findOne($content_id);
@@ -440,6 +449,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return $actions;
     }
+
     public function getModelActions()
     {
         /**
@@ -450,7 +460,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             foreach ($actions as $action)
             {
-                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content ? $this->content->id : ""]);
             }
         }
 
@@ -460,7 +470,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public function beforeAction($action)
     {
-
         if ($this->content)
         {
             if ($this->content->name_meny)
