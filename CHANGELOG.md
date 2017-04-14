@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+3.2.4.pre
+-----------------
+ * Filter rewrite sql
+ 
 3.2.3
 -----------------
  * Fancybox return v2.*
