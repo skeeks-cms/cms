@@ -1,12 +1,9 @@
 <?php
 /**
- * RequestHelper
- *
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 05.11.2014
- * @since 1.0.0
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 05.03.2017
  */
 namespace skeeks\cms\helpers;
 
@@ -19,7 +16,9 @@ use yii\helpers\Url;
 use yii\web\Application;
 
 /**
- * Class RequestOptions
+ * TODO::is deprecated
+ *
+ * Class UrlHelper
  * @package skeeks\cms\helpers
  */
 class UrlHelper
@@ -223,15 +222,6 @@ class UrlHelper
         return $this->getSystem("ref", "");
     }
 
-
-    /**
-     * @return bool
-     */
-    public function isAdmin()
-    {
-        return (bool) $this->get(UrlRule::ADMIN_PARAM_NAME);
-    }
-
     /**
      * Добавить параметры, указывающие что запрос на валидацию данных формы.
      * @return $this
@@ -239,23 +229,6 @@ class UrlHelper
     public function enableAjaxValidateForm()
     {
         return $this->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME);
-    }
-
-    /**
-     * Это урл админки.
-     * @return $this
-     */
-    public function enableAdmin()
-    {
-        return $this->set(UrlRule::ADMIN_PARAM_NAME, UrlRule::ADMIN_PARAM_VALUE);
-    }
-
-    /**
-     * @return $this
-     */
-    public function disableAdmin()
-    {
-        return $this->offsetUnset(UrlRule::ADMIN_PARAM_NAME);
     }
 
     /**
@@ -307,5 +280,42 @@ class UrlHelper
     public function toArray()
     {
         return array_merge([$this->_route], $this->_data);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * TODO:: is deprecated
+     * Это урл админки.
+     * @return $this
+     */
+    public function enableAdmin()
+    {
+        return $this;
+    }
+
+    /**
+     * TODO:: is deprecated
+     * @return $this
+     */
+    public function disableAdmin()
+    {
+        return $this;
     }
 }
