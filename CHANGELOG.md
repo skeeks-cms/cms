@@ -9,14 +9,22 @@ CHANGELOG
  * Change code folder /src
  * Url changes
  
-3.2.3.0.pre
+3.2.4.pre
 -----------------
+ * Filter rewrite sql
+ 
+3.2.3
+-----------------
+ * Fancybox return v2.*
+ * Fixed admin url
+ * Fixed fancybox
  * Fixed login url
  * Uploads files for new not saved models (change \skeeks\cms\models\behaviors\HasStorageFile)
 
 3.2.2.2
 -----------------
  * Fixed fancybox
+ * Url changes
  * ContentElementsCmsWidget new setting isJoinTreeMap
  * allowDeselect PropertyTypeElement
  * Documentation about working with the url
