@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.0.pre
 ---------------
+ * Using paulzi/yii2-auto-tree
  * Removed skeeks\cms\base\CheckComponent
  * Removed skeeks\cms\traits\ValidateRulesTrait
  * Removed skeeks\cms\Config

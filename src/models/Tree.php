@@ -11,6 +11,9 @@
 
 namespace skeeks\cms\models;
 
+use paulzi\adjacencyList\AdjacencyListBehavior;
+use paulzi\autotree\AutoTreeTrait;
+use paulzi\materializedPath\MaterializedPathBehavior;
 use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
@@ -50,12 +53,10 @@ use yii\helpers\Url;
  * @property string $pids
  * @property integer $level
  * @property string $dir
- * @property integer $has_children
  * @property integer $priority
  * @property string $tree_type_id
  * @property integer $published_at
  * @property string $redirect
- * @property string $tree_menu_ids
  * @property string $active
  * @property string $meta_title
  * @property string $meta_description
@@ -70,7 +71,7 @@ use yii\helpers\Url;
  * @property string $name_hidden
  *
  *
- * @property string $view_file //version > 2.4.8
+ * @property string $view_file
  *
  * @property string $absoluteUrl
  * @property string $url
@@ -92,17 +93,19 @@ use yii\helpers\Url;
  * @property CmsTreeType                $treeType
  * @property CmsTreeProperty[]          $cmsTreeProperties
  *
+ *
  * @property Tree                       $parent
  * @property Tree[]                     $parents
  * @property Tree[]                     $children
  * @property Tree                       $root
  * @property Tree                       $prev
  * @property Tree                       $next
- * @property Tree                       $descendants //@version > 2.6.0
+ * @property Tree                       $descendants
  */
 class Tree extends Core
 {
     use HasRelatedPropertiesTrait;
+    use AutoTreeTrait;
 
     /**
      * @inheritdoc
@@ -113,7 +116,7 @@ class Tree extends Core
     }
 
     const PRIORITY_STEP = 100; //Шаг приоритета
-    const PIDS_DELIMETR = "/"; //Шаг приоритета
+
 
 
     public function behaviors()
@@ -134,26 +137,31 @@ class Tree extends Core
                 'relations'     => ['images', 'files']
             ],
 
-            Implode::className() =>
-            [
-                'class' => Implode::className(),
-                "fields" =>  [
-                    "tree_menu_ids"
-                ]
-            ],
-
-            "implode_tree" =>
-            [
-                'class' => Implode::className(),
-                "fields" =>  ["pids"],
-                "delimetr" => self::PIDS_DELIMETR,
-            ],
-
             HasRelatedProperties::className() =>
             [
                 'class' => HasRelatedProperties::className(),
                 'relatedElementPropertyClassName'   => CmsTreeProperty::className(),
                 'relatedPropertyClassName'          => CmsTreeTypeProperty::className(),
+            ],
+
+            [
+                'class'              => AdjacencyListBehavior::className(),
+                'parentAttribute'  => 'pid',
+                'sortable'  => [
+                    'sortAttribute' => 'priority'
+                ],
+                /*'parentsJoinLevels'  => 0,
+                'childrenJoinLevels' => 0,
+                'sortable'           => false,*/
+            ],
+
+            [
+                'class' => MaterializedPathBehavior::className(),
+                'pathAttribute'     => 'pids',
+                'depthAttribute'    => 'level',
+                'sortable'  => [
+                    'sortAttribute' => 'priority'
+                ],
             ],
         ]);
     }
@@ -162,11 +170,11 @@ class Tree extends Core
     {
         parent::init();
 
-        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'beforeSaveTree']);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'beforeSaveTree']);
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, '_updateCode']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, '_updateCode']);
+
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'afterUpdateTree']);
         $this->on(self::EVENT_BEFORE_DELETE, [$this, 'beforeDeleteTree']);
-        $this->on(self::EVENT_AFTER_DELETE, [$this, 'afterDeleteTree']);
     }
 
 
@@ -177,25 +185,62 @@ class Tree extends Core
      */
     public function beforeDeleteTree(Event $event)
     {
-        if ($this->children)
+        if ($children = $this->getChildren()->all())
         {
-            foreach ($this->children as $childNode)
+            foreach ($children as $childNode)
             {
                 $childNode->delete();
             }
         }
     }
 
-    /**
-     * После удаления нужно родителя пересчитать
-     * @param Event $event
-     */
-    public function afterDeleteTree(Event $event)
+    public function _updateCode(Event $event)
     {
+        //У корневой ноды всегда нет кода
+        if ($this->isRoot())
+        {
+            $this->code = null;
+            $this->dir = null;
+        } else
+        {
+            if (!$this->code)
+            {
+                $this->_generateCode();
+            }
+
+            $this->dir = $this->code;
+
+            if ($this->level > 1)
+            {
+                $this->dir = $this->parent->dir . "/" . $this->code;
+            }
+        }
+
+
+        //site code
         if ($this->parent)
         {
-            $this->parent->processNormalize();
+            $this->site_code = $this->parent->site_code;
+        } else
+        {
+            if ($site = \Yii::$app->currentSite->site)
+            {
+                $this->site_code = $site->code;
+            }
         }
+
+        //tree type
+        if ($this->parent && $this->parent->treeType)
+        {
+            if ($this->parent->treeType->defaultChildrenTreeType)
+            {
+                $this->tree_type_id = $this->parent->treeType->defaultChildrenTreeType->id;
+            } else
+            {
+                $this->tree_type_id = $this->parent->tree_type_id;
+            }
+        }
+
     }
 
     /**
@@ -211,47 +256,6 @@ class Tree extends Core
             {
                 $event->sender->processNormalize();
             }
-        }
-    }
-
-    /**
-     * Проверки и дополнения перед сохранением раздела
-     * @param $event
-     */
-    public function beforeSaveTree($event)
-    {
-        if (!$this->site_code)
-        {
-            if ($this->parent)
-            {
-                $this->site_code = $this->parent->site_code;
-            }
-        }
-
-        if (!$this->tree_type_id)
-        {
-            if ($this->parent && $this->parent->treeType)
-            {
-                if ($this->parent->treeType->defaultChildrenTreeType)
-                {
-                    $this->tree_type_id = $this->parent->treeType->defaultChildrenTreeType->id;
-                } else
-                {
-                    $this->tree_type_id = $this->parent->tree_type_id;
-                }
-            }
-        }
-
-
-        //Если не заполнено название, нужно сгенерить
-        if (!$this->name)
-        {
-            $this->generateName();
-        }
-
-        if (!$this->code)
-        {
-            $this->generateCode();
         }
     }
 
@@ -275,7 +279,6 @@ class Tree extends Core
             'name' => Yii::t('skeeks/cms', 'Name'),
             'tree_type_id'              => Yii::t('skeeks/cms', 'Type'),
             'redirect'          => Yii::t('skeeks/cms', 'Redirect'),
-            'tree_menu_ids'     => Yii::t('skeeks/cms', 'Menu Positions'),
             'priority'          => Yii::t('skeeks/cms', 'Priority'),
             'code'              => Yii::t('skeeks/cms', 'Code'),
             'active'              => Yii::t('skeeks/cms', 'Active'),
@@ -311,7 +314,6 @@ class Tree extends Core
             [['redirect'], 'string'],
             [['name_hidden'], 'string'],
             [['priority', 'tree_type_id', 'image_id', 'image_full_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
-            [['tree_menu_ids'], 'safe'],
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
@@ -325,6 +327,18 @@ class Tree extends Core
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
             ['view_file', 'string', 'max' => 128],
+
+            [['name'], 'default', 'value' => function(self $model)
+            {
+                $lastTree = static::find()->orderBy(["id" => SORT_DESC])->one();
+                if ($lastTree)
+                {
+                    return "pk-" . $lastTree->primaryKey;
+                }
+
+                return 'root';
+            }],
+
         ]);
     }
 
@@ -424,17 +438,6 @@ class Tree extends Core
 
 
     /**
-     * @version > 2.4.9.1
-     * Все возможные свойства связанные с моделью
-     *
-     * @return array|\yii\db\ActiveRecord[]
-     */
-    /*public function getRelatedProperties()
-    {
-        return $this->treeType->cmsTreeTypeProperties;
-    }*/
-
-    /**
      *
      * @version > 2.4.9.1
      * Все возможные свойства связанные с моделью
@@ -514,192 +517,41 @@ class Tree extends Core
 
 
 
-        //Работа с деревом
 
-    /**
-     * @param null $depth
-     * @return array
-     */
-    public function getParentsIds($depth = null)
-    {
-        return (array) $this->pids;
-    }
+
+
 
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getParent()
-    {
-        return $this->hasOne(static::className(), ['id' => 'pid']);
-    }
-
-    /**
-     *
-     * To get root of a node:
-     *
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRoot()
-    {
-        $tableName = $this->tableName();
-        $id = $this->getParentsIds();
-        if ($id && is_array($id))
-        {
-            $id = $id[0];
-        }
-
-        $query = $this->find()
-            ->andWhere(["{$tableName}.[[" . $this->primaryKey()[0] . "]]" => $id]);
-
-        $query->multiple = false;
-        return $query;
-    }
-
-    /**
-     * @param int|null $depth
-     * @return \yii\db\ActiveQuery
-     * @throws Exception
-     */
-    public function getParents($depth = null)
-    {
-        $tableName = $this->tableName();
-        $ids = $this->getParentsIds($depth);
-        $query = $this->find()
-            ->andWhere(["{$tableName}.[[" . $this->primaryKey()[0] . "]]" => $ids]);
-        $query->multiple = true;
-        return $query;
-    }
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getChildren()
-    {
-        $result = $this->hasMany($this->className(), ["pid" => "id"]);
-        $result->orderBy(["priority" => SORT_ASC]);
-
-        return $result;
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDescendants()
-    {
-        $pidsAll = implode("/", $this->pids) . "/" . $this->id . "/%";
-
-        $expression = new Expression("`pids` LIKE '{$pidsAll}'");
-
-        $query = static::find()
-            ->andWhere([
-                'or',
-                $expression,
-                ['pid' => $this->id],
-            ])
-            ->orderBy([
-                "level"     => SORT_ASC,
-                "priority"  => SORT_ASC
-            ]);
-
-        //$query->primaryModel = $this;
-        $query->multiple = true;
-
-        return $query;
-    }
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     * @throws NotSupportedException
-     */
-    public function getPrev()
-    {
-        $tableName = $this->tableName();
-        $query = $this->find()
-            ->andWhere([
-                'and',
-                ["{$tableName}.[[pid]]" => $this->pid],
-                ['<', "{$tableName}.[[priority]]", $this->priority],
-            ])
-            ->orderBy(["{$tableName}.[[priority]]" => SORT_ASC])
-            ->limit(1);
-        $query->multiple = false;
-        return $query;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     * @throws NotSupportedException
-     */
-    public function getNext()
-    {
-        $tableName = $this->tableName();
-        $query = $this->find()
-            ->andWhere([
-                'and',
-                ["{$tableName}.[[pid]]" => $this->pid],
-                ['>', "{$tableName}.[[priority]]", $this->priority],
-            ])
-            ->orderBy(["{$tableName}.[[priority]]" => SORT_ASC])
-            ->limit(1);
-        $query->multiple = false;
-        return $query;
-    }
-
-
-
-
-
-
-
-        //Манипуляции с деревом
-
-
-    /**
-     * Автоматическая генерация названия раздела
      * @return $this
      */
-    public function generateName()
-    {
-        $lastTree = $this->find()->orderBy(["id" => SORT_DESC])->one();
-        $this->setAttribute("name", "pk-" . $lastTree->primaryKey);
-
-        return $this;
-    }
-
-    /**
-     * Автоматическая генерация code по названию
-     * @return $this
-     */
-    public function generateCode()
+    protected function _generateCode()
     {
         if ($this->isRoot())
         {
-            $this->setAttribute("code", null);
-        } else
+            $this->code = null;
+            return $this;
+        }
+
+        $filter         = new FilterSeoPageName();
+        $filter->maxLength = \Yii::$app->cms->tree_max_code_length;
+
+        $this->code     = $filter->filter($this->name);
+
+        $matches = [];
+        //Роутинг элементов нужно исключить
+        if (preg_match('/(?<id>\d+)\-(?<code>\S+)$/i', $this->code, $matches))
         {
-            $filter         = new FilterSeoPageName();
-            $filter->maxLength = \Yii::$app->cms->tree_max_code_length;
+            $this->code = "s" . $this->code;
+        }
 
-            $this->code     = $filter->filter($this->name);
+        if (!$this->_isValidCode())
+        {
+            $this->code    = $filter->filter($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
 
-            $matches = [];
-            //Роутинг элементов нужно исключить
-            if (preg_match('/(?<id>\d+)\-(?<code>\S+)$/i', $this->code, $matches))
+            if (!$this->_isValidCode())
             {
-                $this->code = "s" . $this->code;
-            }
-
-            if (!$this->isValidCode())
-            {
-                $this->code    = $filter->filter($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
-
-                if (!$this->isValidCode())
-                {
-                    $this->generateCode();
-                }
+                return $this->_generateCode();
             }
         }
 
@@ -709,15 +561,14 @@ class Tree extends Core
     /**
      * @return bool
      */
-    protected function isValidCode()
+    protected function _isValidCode()
     {
-        $parent = $this->parent;
-        if (!$parent)
+        if (!$this->parent)
         {
             return true;
         }
 
-        $find   = $parent->getChildren()
+        $find   = $this->parent->getChildren()
             ->where([
                 "code" => $this->code,
                 'pid' => $this->pid
@@ -738,6 +589,11 @@ class Tree extends Core
         return true;
     }
 
+
+
+
+
+
     /**
      *
      * Обновление всего дерева ниже, и самого элемента.
@@ -748,20 +604,20 @@ class Tree extends Core
      */
     public function processNormalize()
     {
-        //Если это новая несохраненная сущьность, ничего делать не надо
-        if ($this->isNewRecord)
-        {
-            return $this;
-        }
-
-        if (!$this->pid)
+        if ($this->isRoot())
         {
             $this->setAttribute("dir", null);
             $this->save(false);
         }
         else
         {
-            $this->setAttributesForFutureParent($this->parent);
+            $this->setAttribute('dir', $this->code);
+
+            if ($this->level > 1)
+            {
+                $this->setAttribute('dir', $this->parent->dir . "/" . $this->code);
+            }
+
             $this->save(false);
         }
 
@@ -769,8 +625,6 @@ class Tree extends Core
         //Берем детей на один уровень ниже
         if ($this->children)
         {
-            $this->save(false);
-
             foreach ($this->children as $childModel)
             {
                 $childModel->processNormalize();
@@ -781,160 +635,42 @@ class Tree extends Core
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
-     * Установка атрибутов если родителем этой ноды будет новый, читаем родителя, и обновляем необходимые данные у себя
-     *
-     * @param Tree $parent
+     * TODO: is deprecated
+     * @param Tree $target | Новая нода, будет вставлена в текущую
      * @return $this
-     */
-    public function setAttributesForFutureParent(Tree $parent)
-    {
-        //Родитель должен быть уже сохранен
-        if ($parent->isNewRecord)
-        {
-            throw new Exception('Родитель дольжен быть сохранен');
-        }
-
-        if ($this->id == $parent->id)
-        {
-            throw new Exception('Родитель не может быть вложен в родителя');
-        }
-
-        $newPids     = $parent->pids;
-        $newPids[]   = $parent->primaryKey;
-
-        $this->setAttribute("level",     ($parent->level + 1));
-        $this->setAttribute('pid',       $parent->primaryKey);
-        $this->setAttribute("pids",      $newPids);
-
-
-        if (!$this->name)
-        {
-            $this->generateName();
-        }
-
-        if (!$this->code)
-        {
-            //Просто генерируем pageName
-            $this->generateCode();
-        }
-
-        if ($parent->dir)
-        {
-            $this->setAttribute("dir",       $parent->dir . Tree::PIDS_DELIMETR . $this->code);
-        } else
-        {
-            $this->setAttribute("dir",       $this->code);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * Создание дочерней ноды
-     *
-     * @param Tree $target
-     * @return Tree
-     * @throws Exception
-     * @throws \skeeks\sx\validate\Exception
      */
     public function processCreateNode(Tree $target)
     {
-        //Текущая сущьность должна быть уже сохранена
-        if ($this->isNewRecord)
-        {
-            throw new Exception('Текущая сущьность должна быть уже сохранена');
-        }
-        //Новая сущьность должна быть еще не сохранена
-        if (!$target->isNewRecord)
-        {
-            throw new Exception('Новая сущьность должна быть еще не сохранена');
-        }
-
-        //Установка атрибутов будущему ребенку
-        $target->setAttributesForFutureParent($this);
-        if (!$target->save(false))
-        {
-            throw new Exception(\Yii::t('skeeks/cms',"Failed to create the child element:  ") . Json::encode($target->attributes));
-        }
-
-        $this->save(false);
-
-        return $target;
+        return $this->processAddNode($target);
     }
 
 
     /**
-     * Процесс вставки ноды одна в другую.
-     * Можно вставлять как уже сохраненную модель с дочерними элементами, так и еще не сохраненную.
+     * TODO: is deprecated
      *
-     * @param Tree $target
+     * @param Tree $target | Новая нода, будет вставлена в текущую
      * @return $this
-     * @throws Exception
-     * @throws \skeeks\sx\validate\Exception
      */
     public function processAddNode(Tree $target)
     {
-        //Текущая сущьность должна быть уже сохранена, и не равна $target
-        if ($this->isNewRecord)
-        {
-            throw new Exception('Для начала нужно сохранить');
-        }
-
-        if ($this->id == $target->id)
-        {
-            throw new Exception('Должны быть разными');
-        }
-
-
-        //Если раздел который мы пытаемся добавить новый, то у него нет детей и он
-        if ($target->isNewRecord)
-        {
-            $this->processCreateNode($target);
-            return $this;
-        }
-        else
-        {
-            $target->setAttributesForFutureParent($this);
-            if (!$target->save(false))
-            {
-                throw new Exception(\Yii::t('skeeks/cms',"Unable to move: ") . Json::encode($target->attributes));
-            }
-
-            $this->processNormalize();
-        }
-
+        $target->appendTo($this)->save();
         return $this;
     }
-
-
-
-
-
-
-    //TODO: is depricated 2.4
-    /**
-     * @return bool
-     */
-    public function isRoot()
-    {
-        return (bool) ($this->level == 0);
-    }
-
-    //TODO: is depricated 2.3.3
-    /**
-     * Найти непосредственных детей ноды
-     * @return ActiveQuery
-     */
-	/*public function findChildrensAll()
-	{
-        $pidString = implode('/', $this->pids) . "/" . $this->primaryKey;
-
-		return $this->find()
-            ->andWhere(['like', 'pids', $pidString . '%', false])
-            ->orderBy(["priority" => SORT_ASC]);
-	}*/
 
 }
 
