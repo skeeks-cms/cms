@@ -136,15 +136,9 @@ return [
         ],
 
         [
-            'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ALLOW_MODEL_CREATE,
-            'description'   => \Yii::t('skeeks/cms','The ability to create records')
-        ],
-
-        [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_EDIT_VIEW_FILES,
             'description'   => \Yii::t('skeeks/cms','The ability to edit view files')
         ],
-
 
         [
             'name' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,

@@ -9,6 +9,8 @@ namespace skeeks\cms;
 
 /**
  * @property $permissionNames;
+ * @property $permissionName;
+ * @property bool $isAllow;
  *
  * Interface IHasPermissions
  * @package skeeks\cms
@@ -16,7 +18,17 @@ namespace skeeks\cms;
 interface IHasPermissions
 {
     /**
+     * @return string
+     */
+    public function getPermissionName();
+
+    /**
      * @return array
      */
     public function getPermissionNames();
+
+    /**
+     * @return bool
+     */
+    public function getIsAllow();
 }

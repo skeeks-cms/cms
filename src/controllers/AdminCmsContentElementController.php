@@ -375,14 +375,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
     }
 
 
-
     /**
-     * Returns the unique ID of the controller.
-     * @return string the controller ID that is prefixed with the module ID (if any).
+     * @return string
      */
-    public function getUniqueId()
+    public function getPermissionName()
     {
-        $unique = parent::getUniqueId();
+        $unique = parent::getPermissionName();
 
         if ($this->content)
         {
@@ -391,6 +389,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return $unique;
     }
+
 
     /**
      * @var CmsContent
@@ -405,6 +404,15 @@ class AdminCmsContentElementController extends AdminModelEditorController
         if ($this->_content !== null)
         {
             return $this->_content;
+        }
+
+        if ($this->model)
+        {
+            /**
+             * @var $model CmsContentElement
+             */
+            $model = $this->model;
+            $this->_content = $model->cmsContent;
         }
 
         if ($content_id = \Yii::$app->request->get('content_id'))
@@ -441,6 +449,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return $actions;
     }
+
     public function getModelActions()
     {
         /**
@@ -451,7 +460,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             foreach ($actions as $action)
             {
-                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content ? $this->content->id : ""]);
             }
         }
 
@@ -461,7 +470,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public function beforeAction($action)
     {
-
         if ($this->content)
         {
             if ($this->content->name_meny)

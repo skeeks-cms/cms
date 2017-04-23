@@ -101,13 +101,21 @@ class CmsTreeWidget extends Widget
      */
     public function getOpenedIds()
     {
+        $opened = [];
+
         if ($fromRequest = (array) \Yii::$app->request->getQueryParam($this->openedRequestName))
         {
             $opened = array_unique($fromRequest);
-            \Yii::$app->getSession()->set($this->sessionName, $opened);
+            if ($this->sessionName)
+            {
+                \Yii::$app->getSession()->set($this->sessionName, $opened);
+            }
         } else
         {
-            $opened = array_unique(\Yii::$app->getSession()->get($this->sessionName, []));
+            if ($this->sessionName)
+            {
+                $opened = array_unique(\Yii::$app->getSession()->get($this->sessionName, []));
+            }
         }
 
         return $opened;

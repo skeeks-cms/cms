@@ -16,7 +16,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\forms\ViewFileEditModel;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\filters\AdminAccessControl;
+use skeeks\cms\admin\AdminAccessControl;
 use skeeks\cms\modules\admin\widgets\UserLastActivityWidget;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTree;

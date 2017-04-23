@@ -10,7 +10,8 @@ use skeeks\cms\rbac\CmsManager;
 use yii\base\Model;
 
 /**
- * @property array $permissionNames;
+ * @property string $permissionName;
+ * @property array  $permissionNames;
  * @property bool $isAllow;
  *
  * Class THasPermissions
@@ -19,7 +20,7 @@ use yii\base\Model;
 trait THasPermissions
 {
     /**
-     * @var string
+     * @var array
      */
     protected $_permissionNames = null;
 
@@ -38,6 +39,30 @@ trait THasPermissions
     public function setPermissionNames(array $permissionNames = null)
     {
         $this->_permissionNames = $permissionNames;
+        return $this;
+    }
+
+
+    /**
+     * @var string
+     */
+    protected $_permissionName = null;
+
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return $this->_permissionName;
+    }
+
+    /**
+     * @param string|null $permissionName
+     * @return $this
+     */
+    public function setPermissionName($permissionName = null)
+    {
+        $this->_permissionName = $permissionName;
         return $this;
     }
 

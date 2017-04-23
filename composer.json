@@ -44,8 +44,10 @@
         "kartik-v/yii2-widget-datetimepicker": "*",
         "kartik-v/yii2-widget-colorinput": "*",
         "mihaildev/yii2-elfinder": "1.1.3",
-        "bower-asset/fancybox": "*",
-        "giggsey/libphonenumber-for-php": "~7.0"
+        "bower-asset/fancybox": "~2.1",
+        "giggsey/libphonenumber-for-php": "~7.0",
+        "paulzi/yii2-auto-tree": "*",
+        "paulzi/yii2-materialized-path": "*"
     },
     "autoload": {
         "psr-4": {

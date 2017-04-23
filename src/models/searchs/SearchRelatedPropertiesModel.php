@@ -15,6 +15,7 @@ use yii\base\DynamicModel;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\ActiveQueryInterface;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -159,6 +160,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
         $activeQuery = $activeDataProvider->query;
         $elementIdsGlobal = [];
         $applyFilters = false;
+        $unionQueries = [];
 
         foreach ($this->toArray() as $propertyCode => $value)
         {
@@ -174,7 +176,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
                 {
                     $elementIds = [];
 
-                    $query = $classSearch::find()->select(['element_id'])->where([
+                    $query = $classSearch::find()->select(['element_id as id'])->where([
                         "property_id"   => $property->id
                     ])->indexBy('element_id');
 
@@ -198,7 +200,8 @@ class SearchRelatedPropertiesModel extends DynamicModel
                         continue;
                     }
 
-                    $elementIds = $query->all();
+                    $unionQueries[] = $query;
+                    //$elementIds = $query->all();
 
                 } else
                 {
@@ -211,28 +214,31 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
                     if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING)
                     {
-                        $elementIds = $classSearch::find()->select(['element_id'])
+                        $query = $classSearch::find()->select(['element_id as id'])
                             ->where([
                                 "property_id"   => $property->id
                             ])
                             ->andWhere([
                                 'like', 'value', $value
-                            ])
-                        ->indexBy('element_id')
-                        ->all();
+                            ]);
+
+                        /*->indexBy('element_id')
+                        ->all();*/
+                        $unionQueries[] = $query;
 
                     } else
                     {
-                        $elementIds = $classSearch::find()->select(['element_id'])->where([
+                        $query = $classSearch::find()->select(['element_id as id'])->where([
                             "value"         => $value,
                             "property_id"   => $property->id
-                        ])
-                        ->indexBy('element_id')
-                        ->all();
+                        ]);
+                        //print_r($query->createCommand()->rawSql);die;
+                        //$elementIds = $query->indexBy('element_id')->all();
+                        $unionQueries[] = $query;
                     }
                 }
 
-                $elementIds = array_keys($elementIds);
+                /*$elementIds = array_keys($elementIds);
 
                 \Yii::beginProfile('array_intersect');
 
@@ -249,7 +255,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
                     $elementIdsGlobal = $elementIds;
                 }
 
-                \Yii::endProfile('array_intersect');
+                \Yii::endProfile('array_intersect');*/
 
             }
         }
@@ -257,7 +263,49 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
         if ($applyFilters)
         {
-            $activeQuery->andWhere([$tableName . '.id' => $elementIdsGlobal]);
+            if ($unionQueries)
+            {
+                /**
+                 * @var $unionQuery ActiveQuery
+                 */
+                $lastQuery = null;
+                $unionQuery = null;
+                $unionQueriesStings = [];
+                foreach ($unionQueries as $query)
+                {
+                    if ($lastQuery)
+                    {
+                        $lastQuery->andWhere(['in', 'element_id', $query]);
+                        $lastQuery = $query;
+                        continue;
+                    }
+                    
+                    if ($unionQuery === null)
+                    {
+                        $unionQuery = $query;
+                    } else
+                    {
+                        $unionQuery->andWhere(['in', 'element_id', $query]);
+                        $lastQuery = $query;
+                    }
+
+                    //$unionQueriesStings[] = $query->createCommand()->rawSql;
+                }
+            }
+
+            //print_r($unionQuery->createCommand()->rawSql);die;
+
+            //$activeQuery->andWhere(['in', $tableName . '.id', $unionQuery]);
+            //$activeQuery->union()
+            /*if ($unionQueriesStings)
+            {
+                $unionQueryStings = implode(" MINUS ", $unionQueriesStings);
+            }*/
+            $activeQuery->andWhere(['in', $tableName . '.id', $unionQuery]);
+            //print_r($unionQuery->createCommand()->rawSql);die;
+            //$activeQuery->andWhere($tableName . '.id in (' . new Expression($unionQuery) . ')');
+            //print_r($activeQuery->createCommand()->rawSql);die;
+
         }
 
     }
