@@ -77,8 +77,8 @@ class CmsSite extends Core
         //Before delete site delete all tree
         foreach ($this->cmsTrees as $tree)
         {
-            $tree->delete();
-            /*if (!$tree->delete())
+            //$tree->delete();
+            /*if (!$tree->deleteWithChildren())
             {
                 throw new Exception('Not deleted tree');
             }*/
@@ -139,10 +139,12 @@ class CmsSite extends Core
     {
         $tree = new Tree([
             'name'      => 'Главная страница',
-            'site_code' => $this->code,
         ]);
 
-        if (!$tree->save(false))
+        $tree->makeRoot();
+        $tree->site_code = $this->code;
+
+        if (!$tree->save())
         {
             throw new Exception('Failed to create a section of the tree');
         }

@@ -221,7 +221,7 @@ class Tree extends Core
         if ($this->parent)
         {
             $this->site_code = $this->parent->site_code;
-        } else
+        } elseif (!$this->site_code)
         {
             if ($site = \Yii::$app->currentSite->site)
             {
@@ -238,6 +238,15 @@ class Tree extends Core
             } else
             {
                 $this->tree_type_id = $this->parent->tree_type_id;
+            }
+        } else
+        {
+            if (!$this->tree_type_id)
+            {
+                if ($treeType = CmsTreeType::find()->orderBy(['priority' => SORT_ASC])->one())
+                {
+                    $this->tree_type_id = $treeType->id;
+                }
             }
         }
 
