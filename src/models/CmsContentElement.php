@@ -151,7 +151,16 @@ class CmsContentElement extends RelatedElementModel
             HasStorageFileMulti::className() =>
             [
                 'class'     => HasStorageFileMulti::className(),
-                'relations'    => ['images', 'files']
+                'relations'    => [
+                    [
+                        'relation' => 'images',
+                        'property' => 'imageIds'
+                    ],
+                    [
+                        'relation' => 'files',
+                        'property' => 'fileIds'
+                    ],
+                ]
             ],
 
             HasRelatedProperties::className() =>
@@ -208,6 +217,8 @@ class CmsContentElement extends RelatedElementModel
             'image_id' => Yii::t('skeeks/cms', 'Main Image (announcement)'),
             'image_full_id' => Yii::t('skeeks/cms', 'Main Image'),
 
+            'imageIds' => Yii::t('skeeks/cms', 'Images'),
+            'fileIds' => Yii::t('skeeks/cms', 'Files'),
             'images' => Yii::t('skeeks/cms', 'Images'),
             'files' => Yii::t('skeeks/cms', 'Files'),
             'treeIds' => Yii::t('skeeks/cms', 'Additional sections'),
@@ -257,6 +268,7 @@ class CmsContentElement extends RelatedElementModel
             }],
 
             [['image_id', 'image_full_id'], 'safe'],
+            [['imageIds', 'fileIds'], 'safe'],
 
             ['parent_content_element_id', 'integer'],
             ['parent_content_element_id', 'validateParentContentElement'],
@@ -435,6 +447,65 @@ class CmsContentElement extends RelatedElementModel
 
 
 
+
+
+    protected $_image_ids = null;
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function setImageIds($ids)
+    {
+        $this->_image_ids = $ids;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getImageIds()
+    {
+        if ($this->_image_ids !== null)
+        {
+            return $this->_image_ids;
+        }
+
+        if ($this->images)
+        {
+            return ArrayHelper::map($this->images, 'id', 'id');
+        }
+
+        return [];
+    }
+
+    protected $_file_ids = null;
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function setFileIds($ids)
+    {
+        $this->_file_ids = $ids;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileIds()
+    {
+        if ($this->_file_ids !== null)
+        {
+            return $this->_file_ids;
+        }
+
+        if ($this->files)
+        {
+            return ArrayHelper::map($this->files, 'id', 'id');
+        }
+
+        return [];
+    }
 
 
     /**
