@@ -43,6 +43,7 @@ class HasStorageFileMulti extends Behavior
      * @var array
      */
     protected $_removeFiles = [];
+    protected $_linkFiles = [];
 
     
     public function events()
@@ -50,8 +51,8 @@ class HasStorageFileMulti extends Behavior
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteStorgaFile",
 
-            BaseActiveRecord::EVENT_BEFORE_INSERT      => "saveStorgaFile",
-            BaseActiveRecord::EVENT_BEFORE_UPDATE      => "saveStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_INSERT        => [$this, "saveStorgaFile"],
+            BaseActiveRecord::EVENT_BEFORE_UPDATE       => "saveStorgaFile",
 
             BaseActiveRecord::EVENT_AFTER_INSERT      => "afterSaveStorgaFile",
             BaseActiveRecord::EVENT_AFTER_UPDATE      => "afterSaveStorgaFile",
@@ -90,7 +91,13 @@ class HasStorageFileMulti extends Behavior
                             $file = \Yii::$app->storage->upload($fileId);
                             if ($file)
                             {
-                                $this->owner->link($relation, $file);
+                                if ($this->owner->isNewRecord)
+                                {
+                                    $this->_linkFiles[$relation][] = $file;
+                                } else
+                                {
+                                    $this->owner->link($relation, $file);
+                                }
                                 $files[] = $file->id;
                             }
 
@@ -124,6 +131,18 @@ class HasStorageFileMulti extends Behavior
      */
     public function afterSaveStorgaFile()
     {
+        if ($this->_linkFiles)
+        {
+            foreach ($this->_linkFiles as $relation => $files)
+            {
+                foreach ($files as $file)
+                {
+                    $this->owner->link($relation, $file);
+                }
+
+            }
+        }
+
         if ($this->_removeFiles)
         {
             if ($files = StorageFile::find()->where(['id' => $this->_removeFiles])->all())
@@ -161,18 +180,6 @@ class HasStorageFileMulti extends Behavior
                         $file->delete();
                     }
 
-                }
-            }
-        }
-
-        //TODO:: old
-        foreach ($this->relations as $relationNmae)
-        {
-            if ($files = $this->owner->{$relationNmae})
-            {
-                foreach ($files as $file)
-                {
-                    $file->delete();
                 }
             }
         }
