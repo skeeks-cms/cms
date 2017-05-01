@@ -77,7 +77,7 @@ use yii\helpers\Url;
  * @property string $url
  *
  * @property CmsStorageFile $image
- * @property CmsStorageFile $imageFull
+ * @property CmsStorageFile $fullImage
  *
  * @property CmsTreeFile[]  $cmsTreeFiles
  * @property CmsTreeImage[] $cmsTreeImages
@@ -133,8 +133,17 @@ class Tree extends Core
 
             HasStorageFileMulti::className() =>
             [
-                'class'         => HasStorageFileMulti::className(),
-                'relations'     => ['images', 'files']
+                'class'     => HasStorageFileMulti::className(),
+                'relations'    => [
+                    [
+                        'relation' => 'images',
+                        'property' => 'imageIds'
+                    ],
+                    [
+                        'relation' => 'files',
+                        'property' => 'fileIds'
+                    ],
+                ]
             ],
 
             HasRelatedProperties::className() =>
@@ -301,7 +310,9 @@ class Tree extends Core
             'image_id' => Yii::t('skeeks/cms', 'Main Image (announcement)'),
             'image_full_id' => Yii::t('skeeks/cms', 'Main Image'),
             'images' => Yii::t('skeeks/cms', 'Images'),
+            'imageIds' => Yii::t('skeeks/cms', 'Images'),
             'files' => Yii::t('skeeks/cms', 'Files'),
+            'fileIds' => Yii::t('skeeks/cms', 'Files'),
             'redirect_tree_id' => Yii::t('skeeks/cms', 'Redirect Section'),
             'redirect_code' => Yii::t('skeeks/cms', 'Redirect Code'),
             'name_hidden' => Yii::t('skeeks/cms', 'Hidden Name'),
@@ -322,7 +333,7 @@ class Tree extends Core
             [['redirect_code'], 'in', 'range' => [301, 302]],
             [['redirect'], 'string'],
             [['name_hidden'], 'string'],
-            [['priority', 'tree_type_id', 'image_id', 'image_full_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
+            [['priority', 'tree_type_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
@@ -336,6 +347,9 @@ class Tree extends Core
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
             ['view_file', 'string', 'max' => 128],
+
+            [['image_id', 'image_full_id'], 'safe'],
+            [['imageIds', 'fileIds'], 'safe'],
 
             [['name'], 'default', 'value' => function(self $model)
             {
@@ -475,6 +489,66 @@ class Tree extends Core
     public function getFullImage()
     {
         return $this->hasOne(StorageFile::className(), ['id' => 'image_full_id']);
+    }
+
+
+
+    protected $_image_ids = null;
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function setImageIds($ids)
+    {
+        $this->_image_ids = $ids;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getImageIds()
+    {
+        if ($this->_image_ids !== null)
+        {
+            return $this->_image_ids;
+        }
+
+        if ($this->images)
+        {
+            return ArrayHelper::map($this->images, 'id', 'id');
+        }
+
+        return [];
+    }
+
+    protected $_file_ids = null;
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function setFileIds($ids)
+    {
+        $this->_file_ids = $ids;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileIds()
+    {
+        if ($this->_file_ids !== null)
+        {
+            return $this->_file_ids;
+        }
+
+        if ($this->files)
+        {
+            return ArrayHelper::map($this->files, 'id', 'id');
+        }
+
+        return [];
     }
 
 

@@ -5,12 +5,19 @@
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Images/Files')); ?>
 
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    <?= $form->field($model, 'imageIds')->widget(
+        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        [
+            'accept' => 'image/*',
+            'multiple' => true
+        ]
     ); ?>
 
-    <?= $form->field($model, 'files')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    <?= $form->field($model, 'fileIds')->widget(
+        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        [
+            'multiple' => true
+        ]
     ); ?>
 
 <?= $form->fieldSetEnd()?>

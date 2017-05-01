@@ -42,6 +42,11 @@ class HasStorageFileMulti extends Behavior
     /**
      * @var array
      */
+    public $nameAttribute = 'name';
+
+    /**
+     * @var array
+     */
     protected $_removeFiles = [];
     protected $_linkFiles = [];
 
@@ -88,7 +93,18 @@ class HasStorageFileMulti extends Behavior
                     {
                         try
                         {
-                            $file = \Yii::$app->storage->upload($fileId);
+                            $data = [];
+
+                            if (isset($this->owner->{$this->nameAttribute}))
+                            {
+                                if ($name = $this->owner->{$this->nameAttribute})
+                                {
+                                    $data['name'] = $name;
+                                }
+                            }
+
+
+                            $file = \Yii::$app->storage->upload($fileId, $data);
                             if ($file)
                             {
                                 if ($this->owner->isNewRecord)

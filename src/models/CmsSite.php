@@ -144,10 +144,18 @@ class CmsSite extends Core
         $tree->makeRoot();
         $tree->site_code = $this->code;
 
-        if (!$tree->save())
+        try
         {
-            throw new Exception('Failed to create a section of the tree');
+            if (!$tree->save())
+            {
+                throw new Exception('Failed to create a section of the tree');
+            }
+        } catch (\Exception $e)
+        {
+            var_dump($e->getMessage());die;
+            throw $e;
         }
+
     }
 
 
@@ -192,7 +200,7 @@ class CmsSite extends Core
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             ['def', 'default', 'value' => Cms::BOOL_N],
-            [['image_id'], 'integer'],
+            [['image_id'], 'safe'],
         ]);
     }
 

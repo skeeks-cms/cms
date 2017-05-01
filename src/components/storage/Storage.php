@@ -61,10 +61,13 @@ class Storage extends Component
         $tmpdir         = Dir::runtimeTmp();
         $tmpfile        = $tmpdir->newFile();
 
+        $original_file_name = '';
+
         if ($file instanceof UploadedFile)
         {
             $extension  = File::object($file->name)->getExtension();
             $tmpfile->setExtension($extension);
+            $original_file_name = $file->getBaseName();
 
             if (!$file->saveAs($tmpfile->getPath()))
             {
@@ -73,6 +76,8 @@ class Storage extends Component
         } else if ($file instanceof File || (is_string($file) && BaseUrl::isRelative($file)))
         {
             $file       = File::object($file);
+            $original_file_name = $file->getBaseName();
+
             $tmpfile->setExtension($file->getExtension());
             $tmpfile    = $file->move($tmpfile);
         } else if (is_string($file) && !BaseUrl::isRelative($file))
@@ -167,6 +172,7 @@ class Storage extends Component
         $data["mime_type"]  = $tmpfile->getMimeType();
         $data["size"]       = $tmpfile->size()->getBytes();
         $data["extension"]  = $tmpfile->getExtension();
+        $data["original_name"]  = $original_file_name;
 
         //Елси это изображение
         if ($tmpfile->getType() == 'image')

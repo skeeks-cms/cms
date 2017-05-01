@@ -31,11 +31,17 @@ class HasStorageFile extends Behavior
     public $fields = ['image_id'];
 
     /**
+     * @var array
+     */
+    public $nameAttribute = 'name';
+
+    /**
      * При удалении сущьности удалять все привязанные файлы?
      *
      * @var string
      */
     public $onDeleteCascade = true;
+
 
     /**
      * @var array
@@ -79,7 +85,17 @@ class HasStorageFile extends Behavior
             {
                 try
                 {
-                    $file = \Yii::$app->storage->upload($this->owner->{$fieldCode});
+                    $data = [];
+
+                    if (isset($this->owner->{$this->nameAttribute}))
+                    {
+                        if ($name = $this->owner->{$this->nameAttribute})
+                        {
+                            $data['name'] = $name;
+                        }
+                    }
+
+                    $file = \Yii::$app->storage->upload($this->owner->{$fieldCode}, $data);
                     if ($file)
                     {
                         $this->owner->{$fieldCode} = $file->id;

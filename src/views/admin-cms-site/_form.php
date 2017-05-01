@@ -19,7 +19,11 @@ $action     = $controller->action;
     <?= $form->fieldSet(\Yii::t('skeeks/cms',"Main")); ?>
 
         <?= $form->field($model, 'image_id')->widget(
-            \skeeks\cms\widgets\formInputs\StorageImage::className()
+            \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+            [
+                'accept' => 'image/*',
+                'multiple' => false
+            ]
         ); ?>
 
         <?= $form->field($model, 'code')->textInput(); ?>
