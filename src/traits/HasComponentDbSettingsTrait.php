@@ -13,99 +13,70 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\User;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
+use yii\base\ModelEvent;
 use yii\caching\TagDependency;
 use yii\console\Application;
+use yii\db\AfterSaveEvent;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property UrlHelper editUrl
+ * @property array      settings
+ * @property UrlHelper  editUrl
  *
  * Class HasComponentDbSettingsTrait
  * @package skeeks\cms\traits
  */
 trait HasComponentDbSettingsTrait
 {
-    public $namespace = null;
-
-    /**
-     * Загрузка настроек по умолчанию
-     * @return $this
-     */
-    public function initSettings()
-    {
-        try
-        {
-            $settingsValues = $this->getSettings();
-
-            if ($settingsValues)
-            {
-                $this->setAttributes($settingsValues);
-            }
-
-
-        } catch (Exception $e)
-        {
-
-        } catch (\Exception $e)
-        {
-            \Yii::error(\Yii::t('skeeks/cms','{cms} component error load defaul settings',['cms' => 'Cms']).': ' . $e->getMessage());
-        }
-
-        return $this;
-    }
-
     public function getCacheKey()
     {
         return implode([
             \Yii::getAlias('@webroot'),
-            $this->className(),
+            static::class,
             $this->namespace,
-            \Yii::$app->currentSite->site->code,
-            \Yii::$app->user->id
+            $this->cmsUser ? (string) $this->cmsUser->id : '',
+            $this->cmsSite ? (string) $this->cmsSite->id : '',
         ]);
     }
 
     /**
      * @return array
      */
-    public function getSettings()
+    public function getSettings($useCache = true)
     {
-        if (\Yii::$app instanceof Application)
-        {
-            return $this->fetchDefaultSettings();
-        }
-
-
         $key = $this->getCacheKey();
 
         $dependency = new TagDependency([
             'tags'      =>
             [
-                $this->className(),
-                $this->className() . (string) $this->namespace
+                \Yii::getAlias('@webroot'),
+                static::class,
+                $this->namespace,
+                $this->cmsUser ? (string) $this->cmsUser->id : '',
+                $this->cmsSite ? (string) $this->cmsSite->id : '',
             ],
         ]);
 
         $settingsValues = \Yii::$app->cache->get($key);
-        if ($settingsValues === false) {
+
+        if ($settingsValues === false && $useCache === true) {
 
             $settingsValues = $this->fetchDefaultSettings();
 
             //Настройки для текущего сайта
-            if ($site = \Yii::$app->currentSite->site)
+            if ($site = $this->cmsSite)
             {
-
                 $settingsValues = ArrayHelper::merge($settingsValues,
                     $this->fetchDefaultSettingsBySiteCode($site->code)
                 );
             }
 
             //Настройки для текущего пользователя
-            if (!\Yii::$app->user->isGuest)
+            if ($this->cmsUser)
             {
                 $settingsValues = ArrayHelper::merge($settingsValues,
-                    $this->fetchDefaultSettingsByUserId(\Yii::$app->user->identity->id)
+                    $this->fetchDefaultSettingsByUserId($this->cmsUser->id)
                 );
             }
 
@@ -170,11 +141,16 @@ trait HasComponentDbSettingsTrait
     public function saveDefaultSettings()
     {
         $settings           = CmsComponentSettings::createByComponentDefault($this);
-        $settings->value    = $this->attributes;
-
         $this->invalidateCache();
 
-        return $settings->save();
+        $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
+        $settings->value    = $this->attributes;
+        $result = $settings->save();
+        $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
+            'changedAttributes' => $this->getDirtyAttributes(),
+        ]));
+
+        return $result;
     }
 
     /**
@@ -183,11 +159,17 @@ trait HasComponentDbSettingsTrait
     public function saveDefaultSettingsBySiteCode($site_code)
     {
         $settings           = CmsComponentSettings::createByComponentSiteCode($this, $site_code);
-        $settings->value    = $this->attributes;
 
         $this->invalidateCache();
 
-        return $settings->save();
+        $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
+        $settings->value    = $this->attributes;
+        $result = $settings->save();
+        $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
+            'changedAttributes' => $this->getDirtyAttributes(),
+        ]));
+
+        return $result;
     }
 
     /**
@@ -196,11 +178,17 @@ trait HasComponentDbSettingsTrait
     public function saveDefaultSettingsByUserId($user_id)
     {
         $settings           = CmsComponentSettings::createByComponentUserId($this, $user_id);
-        $settings->value    = $this->attributes;
 
         $this->invalidateCache();
 
-        return $settings->save();
+        $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
+        $settings->value    = $this->attributes;
+        $result = $settings->save();
+        $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
+            'changedAttributes' => $this->getDirtyAttributes(),
+        ]));
+
+        return $result;
     }
 
 
@@ -215,7 +203,6 @@ trait HasComponentDbSettingsTrait
 
         return $this;
     }
-
 
     /**
      *
