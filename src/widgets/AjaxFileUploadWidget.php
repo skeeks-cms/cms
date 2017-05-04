@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\widgets;
 use skeeks\cms\models\CmsStorageFile;
+use yii\helpers\Html;
 
 /**
  * @property CmsStorageFile $cmsFile
