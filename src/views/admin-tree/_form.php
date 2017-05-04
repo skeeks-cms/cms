@@ -134,7 +134,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Announcement')); ?>
 
     <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\widgets\formInputs\StorageImage::className()
+        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        [
+            'accept' => 'image/*',
+            'multiple' => false
+        ]
     ); ?>
 
     <div data-listen="isLink" data-show="0" class="sx-hide">
@@ -176,7 +180,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('skeeks/cms','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
-        \skeeks\cms\widgets\formInputs\StorageImage::className()
+        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        [
+            'accept' => 'image/*',
+            'multiple' => false
+        ]
     ); ?>
 
 <div data-listen="isLink" data-show="0" class="sx-hide">
@@ -200,8 +208,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Images')); ?>
 
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    <?= $form->field($model, 'imageIds')->widget(
+        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        [
+            'accept' => 'image/*',
+            'multiple' => true
+        ]
     ); ?>
 
 <?= $form->fieldSetEnd()?>
@@ -209,8 +221,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Files')); ?>
 
-    <?= $form->field($model, 'files')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    <?= $form->field($model, 'fileIds')->widget(
+        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        [
+            'multiple' => true
+        ]
     ); ?>
 
 <?= $form->fieldSetEnd()?>

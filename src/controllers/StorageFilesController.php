@@ -72,7 +72,6 @@ class StorageFilesController extends Controller
 
         $request = Yii::$app->getRequest();
 
-
         $dir = \skeeks\sx\Dir::runtimeTmp();
 
         $uploader = new \skeeks\widget\simpleajaxuploader\backend\FileUpload("imgfile");
@@ -118,7 +117,7 @@ class StorageFilesController extends Controller
 
 
     /**
-     * Прикрепить к моделе другой файл
+     * пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
      * @see skeeks\cms\widgets\formInputs\StorageImage
      * @return RequestResponse
      */
@@ -132,18 +131,18 @@ class StorageFilesController extends Controller
             {
                 if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelAttribute'))
                 {
-                    throw new \yii\base\Exception("Не достаточно входных данных");
+                    throw new \yii\base\Exception("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
                 if (!$file)
                 {
-                    throw new \yii\base\Exception("Возможно файл уже удален или не загрузился");
+                    throw new \yii\base\Exception("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
                 {
-                    throw new \yii\base\Exception("Невозможно привязать файл к этой моделе");
+                    throw new \yii\base\Exception("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 $className = \Yii::$app->request->post('modelClassName');
@@ -153,15 +152,15 @@ class StorageFilesController extends Controller
                 $model = $className::findOne(\Yii::$app->request->post('modelId'));
                 if (!$model)
                 {
-                    throw new \yii\base\Exception("Модель к которой необходимо привязать файл не найдена");
+                    throw new \yii\base\Exception("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 if (!$model->hasAttribute(\Yii::$app->request->post('modelAttribute')))
                 {
-                    throw new \yii\base\Exception("У модели не найден атрибут привязки файла: " . \Yii::$app->request->post('modelAttribute'));
+                    throw new \yii\base\Exception("пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: " . \Yii::$app->request->post('modelAttribute'));
                 }
 
-                //Удаление старого файла
+                //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                 if ($oldFileId = $model->{\Yii::$app->request->post('modelAttribute')})
                 {
                     /**
@@ -175,7 +174,7 @@ class StorageFilesController extends Controller
                 $model->{\Yii::$app->request->post('modelAttribute')} = $file->id;
                 if (!$model->save(false))
                 {
-                    throw new \yii\base\Exception("Не удалось сохранить модель");
+                    throw new \yii\base\Exception("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 $file->name = $model->name;
@@ -196,7 +195,7 @@ class StorageFilesController extends Controller
     }
 
     /**
-     * Прикрепить к моделе другой файл
+     * пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
      * @see skeeks\cms\widgets\formInputs\StorageImage
      * @return RequestResponse
      */
@@ -210,18 +209,18 @@ class StorageFilesController extends Controller
             {
                 if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelRelation'))
                 {
-                    throw new \yii\base\Exception("Не достаточно входных данных");
+                    throw new \yii\base\Exception("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
                 if (!$file)
                 {
-                    throw new \yii\base\Exception("Возможно файл уже удален или не загрузился");
+                    throw new \yii\base\Exception("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
                 {
-                    throw new \yii\base\Exception("Невозможно привязать файл к этой моделе");
+                    throw new \yii\base\Exception("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 $className = \Yii::$app->request->post('modelClassName');
@@ -231,12 +230,12 @@ class StorageFilesController extends Controller
                 $model = $className::findOne(\Yii::$app->request->post('modelId'));
                 if (!$model)
                 {
-                    throw new \yii\base\Exception("Модель к которой необходимо привязать файл не найдена");
+                    throw new \yii\base\Exception("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
                 }
 
                 if (!$model->hasProperty(\Yii::$app->request->post('modelRelation')))
                 {
-                    throw new \yii\base\Exception("У модели не найден атрибут привязки к файлам modelRelation: " . \Yii::$app->request->post('modelRelation'));
+                    throw new \yii\base\Exception("пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ modelRelation: " . \Yii::$app->request->post('modelRelation'));
                 }
 
                 try

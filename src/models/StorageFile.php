@@ -42,6 +42,7 @@ use yii\base\Event;
  * @property integer $image_height
  * @property integer $image_width
  *
+ * @property string $fileName
  * @property string $src
  * @property string $absoluteSrc
  *
@@ -220,6 +221,19 @@ class StorageFile extends Core
         return \Yii::$app->storage->getCluster($this->cluster_id);
     }
 
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        if ($this->original_name)
+        {
+            return $this->original_name;
+        } else
+        {
+            return $this->cluster_file;
+        }
+    }
 
     /**
      * TODO::is depricated version > 2.6.0

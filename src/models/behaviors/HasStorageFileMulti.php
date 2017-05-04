@@ -10,8 +10,10 @@
  */
 namespace skeeks\cms\models\behaviors;
 use skeeks\cms\models\CmsStorageFile;
+use skeeks\cms\models\StorageFile;
 use yii\base\Behavior;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class HasStorageFileMulti
@@ -23,7 +25,12 @@ class HasStorageFileMulti extends Behavior
      * Набор полей модели к которым будут привязываться id файлов
      * @var array
      */
-    public $relations = ['images'];
+    public $relations = [
+        [
+            'relation' => 'images',
+            'property' => 'imageIds'
+        ]
+    ];
 
     /**
      * При удалении сущьности удалять все привязанные файлы?
@@ -32,13 +39,138 @@ class HasStorageFileMulti extends Behavior
      */
     public $onDeleteCascade = true;
 
+    /**
+     * @var array
+     */
+    public $nameAttribute = 'name';
+
+    /**
+     * @var array
+     */
+    protected $_removeFiles = [];
+    protected $_linkFiles = [];
+
+    
     public function events()
     {
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteStorgaFile",
+
+            BaseActiveRecord::EVENT_BEFORE_INSERT        => [$this, "saveStorgaFile"],
+            BaseActiveRecord::EVENT_BEFORE_UPDATE       => "saveStorgaFile",
+
+            BaseActiveRecord::EVENT_AFTER_INSERT      => "afterSaveStorgaFile",
+            BaseActiveRecord::EVENT_AFTER_UPDATE      => "afterSaveStorgaFile",
         ];
     }
+    
+    /**
+     * Загрузка файлов в хранилище и их сохранение со связанной сущьностью
+     *
+     * @param $e
+     */
+    public function saveStorgaFile($e)
+    {
+        foreach ($this->relations as $data)
+        {
+            $fieldCode = ArrayHelper::getValue($data, 'property');
+            $relation = ArrayHelper::getValue($data, 'relation');
 
+            $oldFiles = $this->owner->{$relation};
+            $oldIds = [];
+
+            if ($oldFiles)
+            {
+                $oldIds = ArrayHelper::map($oldFiles, 'id', 'id');
+            }
+
+            $files = [];
+            if ($this->owner->{$fieldCode} && is_array($this->owner->{$fieldCode}))
+            {
+                foreach ($this->owner->{$fieldCode} as $fileId)
+                {
+                    if (is_string($fileId) && ((string) (int) $fileId != (string) $fileId))
+                    {
+                        try
+                        {
+                            $data = [];
+
+                            if (isset($this->owner->{$this->nameAttribute}))
+                            {
+                                if ($name = $this->owner->{$this->nameAttribute})
+                                {
+                                    $data['name'] = $name;
+                                }
+                            }
+
+
+                            $file = \Yii::$app->storage->upload($fileId, $data);
+                            if ($file)
+                            {
+                                if ($this->owner->isNewRecord)
+                                {
+                                    $this->_linkFiles[$relation][] = $file;
+                                } else
+                                {
+                                    $this->owner->link($relation, $file);
+                                }
+                                $files[] = $file->id;
+                            }
+
+                        } catch (\Exception $e)
+                        {}
+                    } else
+                    {
+                        $files[] = $fileId;
+                        ArrayHelper::remove($oldIds, $fileId);
+                    }
+                }
+
+                $this->owner->{$fieldCode} = $files;
+            }
+
+            /**
+             * Удалить старые файлы
+             */
+            if ($oldIds)
+            {
+                $this->_removeFiles = $oldIds;
+            }
+
+
+        }
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function afterSaveStorgaFile()
+    {
+        if ($this->_linkFiles)
+        {
+            foreach ($this->_linkFiles as $relation => $files)
+            {
+                foreach ($files as $file)
+                {
+                    $this->owner->link($relation, $file);
+                }
+
+            }
+        }
+
+        if ($this->_removeFiles)
+        {
+            if ($files = StorageFile::find()->where(['id' => $this->_removeFiles])->all())
+            {
+                foreach ($files as $file)
+                {
+                    $file->delete();
+                }
+            }
+        }
+    }
+    
     /**
      * До удаления сущьности, текущей необходим проверить все описанные модели, и сделать операции с ними (удалить, убрать привязку или ничего не делать кинуть Exception)
      * @throws Exception
@@ -50,13 +182,20 @@ class HasStorageFileMulti extends Behavior
             return $this;
         }
 
-        foreach ($this->relations as $relationNmae)
+
+        foreach ($this->relations as $data)
         {
-            if ($files = $this->owner->{$relationNmae})
+            $fieldName = ArrayHelper::getValue($data, 'property');
+
+            if ($fileIds = $this->owner->{$fieldName})
             {
-                foreach ($files as $file)
+                if ($storageFiles = CmsStorageFile::find()->where(['id' => $fileIds])->all())
                 {
-                    $file->delete();
+                    foreach ($storageFiles as $file)
+                    {
+                        $file->delete();
+                    }
+
                 }
             }
         }

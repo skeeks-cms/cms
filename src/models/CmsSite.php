@@ -77,8 +77,8 @@ class CmsSite extends Core
         //Before delete site delete all tree
         foreach ($this->cmsTrees as $tree)
         {
-            $tree->delete();
-            /*if (!$tree->delete())
+            //$tree->delete();
+            /*if (!$tree->deleteWithChildren())
             {
                 throw new Exception('Not deleted tree');
             }*/
@@ -139,13 +139,23 @@ class CmsSite extends Core
     {
         $tree = new Tree([
             'name'      => 'Главная страница',
-            'site_code' => $this->code,
         ]);
 
-        if (!$tree->save(false))
+        $tree->makeRoot();
+        $tree->site_code = $this->code;
+
+        try
         {
-            throw new Exception('Failed to create a section of the tree');
+            if (!$tree->save())
+            {
+                throw new Exception('Failed to create a section of the tree');
+            }
+        } catch (\Exception $e)
+        {
+            var_dump($e->getMessage());die;
+            throw $e;
         }
+
     }
 
 
@@ -190,7 +200,7 @@ class CmsSite extends Core
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             ['def', 'default', 'value' => Cms::BOOL_N],
-            [['image_id'], 'integer'],
+            [['image_id'], 'safe'],
         ]);
     }
 

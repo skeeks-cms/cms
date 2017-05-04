@@ -119,7 +119,7 @@ class CmsLang extends Core
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             ['def', 'default', 'value' => Cms::BOOL_N],
-            [['image_id'], 'integer'],
+            [['image_id'], 'safe'],
         ]);
     }
 

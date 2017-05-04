@@ -37,15 +37,14 @@ abstract class Widget extends Component implements ViewContextInterface
      */
     protected $_isBegin = false;
 
+
     public function init()
     {
         $this->_token = \Yii::t('skeeks/cms', 'Widget').': ' . $this->id;
 
-        $this->defaultAttributes = $this->attributes;
-
-        \Yii::beginProfile("Init: " . $this->_token);
-            $this->initSettings();
-        \Yii::endProfile("Init: " . $this->_token);
+        \Yii::beginProfile("Cms Widget: " . $this->_token);
+            parent::init();
+        \Yii::endProfile("Cms Widget: " . $this->_token);
     }
 
 

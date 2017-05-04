@@ -15,7 +15,11 @@ $action     = $controller->action;
 <?php $form = $action->beginActiveForm(); ?>
 
     <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\widgets\formInputs\StorageImage::className()
+        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        [
+            'accept' => 'image/*',
+            'multiple' => false
+        ]
     ); ?>
     <?= $form->field($model, 'code')->textInput(); ?>
     <?= $form->fieldRadioListBoolean($model, 'active')->hint(\Yii::t('skeeks/cms','On the site must be included at least one language')); ?>
