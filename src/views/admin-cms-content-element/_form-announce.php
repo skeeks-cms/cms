@@ -5,7 +5,7 @@
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Announcement')); ?>
     <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => false

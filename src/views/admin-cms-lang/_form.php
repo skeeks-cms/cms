@@ -15,7 +15,7 @@ $action     = $controller->action;
 <?php $form = $action->beginActiveForm(); ?>
 
     <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => false

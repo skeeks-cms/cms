@@ -19,6 +19,7 @@ use yii\helpers\Url;
  *
  * Class ControllerActions
  * @package skeeks\cms\modules\admin\widgets
+ * @deprecated 
  */
 class StorageFileManager extends Widget
 {

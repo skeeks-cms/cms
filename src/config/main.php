@@ -160,6 +160,10 @@ $config =
 
         'datecontrol' =>  [
             'class' => 'skeeks\cms\modules\datecontrol\Module',
+        ],
+
+        'ajaxfileupload' => [
+            'class'         => '\skeeks\yii2\ajaxfileupload\AjaxFileUploadModule',
         ]
     ],
 ];

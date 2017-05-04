@@ -6,7 +6,7 @@
 <?= $form->fieldSet(\Yii::t('skeeks/cms','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => false

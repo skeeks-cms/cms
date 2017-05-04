@@ -6,7 +6,7 @@
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Images/Files')); ?>
 
     <?= $form->field($model, 'imageIds')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => true
@@ -14,7 +14,7 @@
     ); ?>
 
     <?= $form->field($model, 'fileIds')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'multiple' => true
         ]

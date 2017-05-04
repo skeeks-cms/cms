@@ -134,7 +134,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Announcement')); ?>
 
     <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => false
@@ -180,7 +180,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('skeeks/cms','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => false
@@ -209,7 +209,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Images')); ?>
 
     <?= $form->field($model, 'imageIds')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => true
@@ -222,7 +222,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Files')); ?>
 
     <?= $form->field($model, 'fileIds')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'multiple' => true
         ]

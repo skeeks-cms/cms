@@ -25,7 +25,7 @@ use common\models\User;
     ]); ?>
 
     <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\fileupload\widgets\AjaxFileUploadWidget::class,
+        \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
             'accept' => 'image/*',
             'multiple' => false
