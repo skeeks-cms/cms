@@ -13,6 +13,7 @@ $controller = $this->context;
 $action     = $controller->action;
 ?>
 <?php $form = $action->beginActiveForm(); ?>
+    <?php echo $form->errorSummary($model); ?>
 
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\AjaxFileUploadWidget::class,
@@ -29,4 +30,5 @@ $action     = $controller->action;
 
     <?= $form->buttonsStandart($model) ?>
 
+    <?php echo $form->errorSummary($model); ?>
 <?php $action->endActiveForm(); ?>

@@ -5,9 +5,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\widgets\Pjax;
 
-/* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
+
+/* @var $this yii\web\View */
+/* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
+/* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
+/* @var $model \skeeks\cms\models\CmsLang */
+$controller = $this->context;
+$action     = $controller->action;
 
  if ($model->isNewRecord)
  {
@@ -23,7 +29,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
  }
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = $action->beginActiveForm(); ?>
+    <?php echo $form->errorSummary([$model, $relatedModel]); ?>
 
 <? if ($model->isNewRecord) : ?>
     <? if ($content_id = \Yii::$app->request->get("content_id")) : ?>
@@ -145,4 +152,5 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 <?= $form->buttonsStandart($model); ?>
+<?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <?php ActiveForm::end(); ?>

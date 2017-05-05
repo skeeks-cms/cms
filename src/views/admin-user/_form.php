@@ -8,11 +8,20 @@ use common\models\User;
 /* @var $model \skeeks\cms\models\CmsUser */
 /* @var $console \skeeks\cms\controllers\AdminUserController */
 
+/* @var $this yii\web\View */
+/* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
+/* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
+/* @var $model \skeeks\cms\models\CmsLang */
+$controller = $this->context;
+$action     = $controller->action;
+
 ?>
 
 
-<?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
-<?php  ?>
+
+<?php $form = $action->beginActiveForm(); ?>
+    <?php echo $form->errorSummary([$model, $relatedModel]); ?>
+
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms','General information'))?>
 
@@ -140,4 +149,5 @@ CSS
 <? endif; ?>
 
 <?= $form->buttonsStandart($model); ?>
+<?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <?php \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>

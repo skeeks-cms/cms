@@ -350,7 +350,28 @@ class Tree extends Core
             ['view_file', 'string', 'max' => 128],
 
             [['image_id', 'image_full_id'], 'safe'],
+            [['image_id', 'image_full_id'], \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty'   => false,
+                'extensions' => ['jpg', 'jpeg', 'gif','png'],
+                'maxFiles' => 1,
+                'maxSize'       => 1024*1024*10,
+                'minSize'       => 1024,
+            ],
             [['imageIds', 'fileIds'], 'safe'],
+            [['imageIds'], \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty'   => false,
+                'extensions'    => ['jpg', 'jpeg', 'gif','png'],
+                'maxFiles'      => 40,
+                'maxSize'       => 1024*1024*10,
+                'minSize'       => 1024,
+            ],
+            [['fileIds'], \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty'   => false,
+                //'extensions'    => [''],
+                'maxFiles'      => 40,
+                'maxSize'       => 1024*1024*50,
+                'minSize'       => 1024,
+            ],
 
             [['name'], 'default', 'value' => function(self $model)
             {

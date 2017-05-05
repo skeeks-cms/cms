@@ -46,7 +46,7 @@ class FileValidator extends \yii\validators\FileValidator
         if ($this->maxFiles != 1) {
             $files = $model->$attribute;
             if (!is_array($files)) {
-                $this->addError($model, $attribute, $this->uploadRequired);
+                //$this->addError($model, $attribute, $this->uploadRequired);
                 return;
             }
             if ($this->maxFiles && count($files) > $this->maxFiles) {

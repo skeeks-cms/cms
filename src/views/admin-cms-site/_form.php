@@ -15,6 +15,7 @@ $action     = $controller->action;
 
 
 <?php $form = $action->beginActiveForm(); ?>
+    <?php echo $form->errorSummary($model); ?>
 
     <?= $form->fieldSet(\Yii::t('skeeks/cms',"Main")); ?>
 
@@ -71,4 +72,5 @@ $action     = $controller->action;
     <? endif; ?>
     <?= $form->buttonsStandart($model) ?>
 
+    <?php echo $form->errorSummary($model); ?>
 <?php $action->endActiveForm(); ?>

@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsSite;
@@ -39,6 +40,8 @@ use yii\web\Cookie;
  */
 class AdminTreeController extends AdminModelEditorController
 {
+    public $notSubmitParam = 'sx-not-submit';
+
     public function init()
     {
         $this->name                   = "Дерево страниц";
@@ -65,7 +68,7 @@ class AdminTreeController extends AdminModelEditorController
 
             "update" =>
             [
-                'class'         => AdminOneModelEditAction::className(),
+                'class'         => BackendModelUpdateAction::className(),
                 "callback"      => [$this, 'update'],
             ],
 
@@ -85,6 +88,9 @@ class AdminTreeController extends AdminModelEditorController
          * @var $model CmsTree
          */
         $model = $this->model;
+        if ($post = \Yii::$app->request->post()) {
+            $model->load($post);
+        }
         $relatedModel = $model->relatedPropertiesModel;
 
         $rr = new RequestResponse();
@@ -98,41 +104,36 @@ class AdminTreeController extends AdminModelEditorController
             ]);
         }
 
+        if ($post = \Yii::$app->request->post())
+        {
+            $model->load($post);
+            $relatedModel->load($post);
+        }
+
         if ($rr->isRequestPjaxPost())
         {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-
-            if ($model->save() && $relatedModel->save())
+            if (!\Yii::$app->request->post($this->notSubmitParam))
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
 
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                if ($model->save() && $relatedModel->save())
                 {
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
-                } else
-                {
-                    return $this->redirect(
-                        $this->indexUrl
-                    );
-                }
-
-                $model->refresh();
-
-            } else
-            {
-                $errors = [];
-
-                if ($model->getErrors())
-                {
-                    foreach ($model->getErrors() as $error)
+                    if (\Yii::$app->request->post('submit-btn') == 'apply')
+                    {} else
                     {
-                        $errors[] = implode(', ', $error);
+                        return $this->redirect(
+                            $this->url
+                        );
                     }
-                }
 
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save') . $errors);
+                    $model->refresh();
+
+                }
             }
+
         }
 
         return $this->render('_form', [

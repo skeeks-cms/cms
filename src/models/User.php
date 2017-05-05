@@ -202,6 +202,14 @@ class User
             [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved'], 'integer'],
 
             [['image_id'], 'safe'],
+            [['image_id'], \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty'   => false,
+                'extensions'    => ['jpg', 'jpeg', 'gif','png'],
+                'maxFiles'      => 1,
+                'maxSize'       => 1024*1024*1,
+                'minSize'       => 1024,
+            ],
+
             [['gender'], 'string'],
             [['username', 'password_hash', 'password_reset_token', 'email', 'name'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],

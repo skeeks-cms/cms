@@ -6,6 +6,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
+/* @var $this yii\web\View */
+/* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
+/* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
+/* @var $model \skeeks\cms\models\CmsLang */
+$controller = $this->context;
+$action     = $controller->action;
+
 ?>
 
 <div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
@@ -34,8 +41,46 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     </div>
 </div>
 
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = $action->beginActiveForm([
+    'id'                                            => 'sx-dynamic-form',
+    'enableAjaxValidation'                          => false,
+    'enableClientValidation'                          => false,
+]); ?>
 
+<? $this->registerJs(<<<JS
+
+(function(sx, $, _)
+{
+    sx.classes.DynamicForm = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            $("[data-form-reload=true]").on('change', function()
+            {
+                self.update();
+            });
+        },
+
+        update: function()
+        {
+            _.delay(function()
+            {
+                var jForm = $("#sx-dynamic-form");
+                jForm.append($('<input>', {'type': 'hidden', 'name' : 'sx-not-submit', 'value': 'true'}));
+                jForm.submit();
+            }, 200);
+        }
+    });
+
+    sx.DynamicForm = new sx.classes.DynamicForm();
+})(sx, sx.$, sx._);
+
+
+JS
+); ?>
+    <?php echo $form->errorSummary([$model, $model->relatedPropertiesModel]); ?>
 
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Main')); ?>
@@ -70,11 +115,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <div data-listen="isLink" data-show="0" class="sx-hide">
         <?= $form->field($model, 'tree_type_id')->widget(
             \skeeks\widget\chosen\Chosen::className(), [
-                    'items' => \yii\helpers\ArrayHelper::map(
-                         \skeeks\cms\models\CmsTreeType::find()->active()->all(),
-                         "id",
-                         "name"
-                     ),
+                'items' => \yii\helpers\ArrayHelper::map(
+                     \skeeks\cms\models\CmsTreeType::find()->active()->all(),
+                     "id",
+                     "name"
+                 ),
+                'options' =>
+                [
+                    'data-form-reload' => 'true'
+                ]
             ])->label('Тип раздела')->hint(\Yii::t('skeeks/cms','On selected type of partition can depend how it will be displayed.'));
         ?>
 
@@ -113,13 +162,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-    <? if ($model->relatedPropertiesModel->properties) : ?>
+    <? if ($relatedModel->properties) : ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
 
-        <? foreach ($model->relatedPropertiesModel->properties as $property) : ?>
+        <? foreach ($relatedModel->properties as $property) : ?>
             <?= $property->renderActiveForm($form); ?>
         <? endforeach; ?>
 
@@ -345,4 +394,5 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 JS
 );
 ?>
+    <?php echo $form->errorSummary([$model, $model->relatedPropertiesModel]); ?>
 <?php ActiveForm::end(); ?>
