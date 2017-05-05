@@ -10,8 +10,6 @@ use skeeks\cms\models\CmsStorageFile;
 use yii\helpers\Html;
 
 /**
- * @property CmsStorageFile $cmsFile
- *
  * Class AjaxFileUploadWidget
  * @package skeeks\cms\widgets
  */
@@ -21,84 +19,66 @@ class AjaxFileUploadWidget extends \skeeks\yii2\ajaxfileupload\widgets\AjaxFileU
     {
         if ($this->multiple)
         {
-            if ($this->cmsFiles)
+            if (is_array($this->model->{$this->attribute}))
             {
-                foreach ($this->cmsFiles as $file)
+                foreach ($this->model->{$this->attribute} as $value)
                 {
-                    $fileData = [
-                        'name' => $file->fileName,
-                        'value' => $file->id,
-                        'state' => 'success',
-                        'size' => $file->size,
-                        'type' => $file->mime_type,
-                        'src' => $file->src,
-                    ];
-
-                    if ($file->isImage())
+                    if ($file = CmsStorageFile::findOne((int) $value))
                     {
-                        $fileData['image'] = [
-                            'height' => $file->image_height,
-                            'width' => $file->image_width,
-                        ];
-                        $fileData['preview'] = Html::img($file->src);
+                        $this->clientOptions['files'][] = $this->_getCmsFileData($file);
+                    } else
+                    {
+                        if ($this->_getClientFileData($value))
+                        {
+                            $this->clientOptions['files'][] = $this->_getClientFileData($value);
+                        }
                     }
-
-                    $this->clientOptions['files'][] = $fileData;
                 }
+
             }
 
         } else
         {
-            if ($this->cmsFile)
+            if ($value = $this->model->{$this->attribute})
             {
-                $fileData = [
-                    'name' => $this->cmsFile->fileName,
-                    'value' => $this->cmsFile->id,
-                    'state' => 'success',
-                    'size' => $this->cmsFile->size,
-                    'type' => $this->cmsFile->mime_type,
-                    'src' => $this->cmsFile->src,
-                ];
-                if ($this->cmsFile->isImage())
+                if ($file = CmsStorageFile::findOne((int) $value))
                 {
-                    $fileData['image'] = [
-                        'height' => $this->cmsFile->image_height,
-                        'width' => $this->cmsFile->image_width,
-                    ];
-
-                    $fileData['preview'] = Html::img($this->cmsFile->src);
+                    $this->clientOptions['files'][] = $this->_getCmsFileData($file);
+                } else
+                {
+                    return parent::_initClientFiles();
                 }
-                $this->clientOptions['files'][] = $fileData;
+            } else
+            {
+                return parent::_initClientFiles();
             }
-
         }
 
         return $this;
     }
 
-    /**
-     * @return null|CmsStorageFile
-     */
-    public function getCmsFile()
+    protected function _getCmsFileData(CmsStorageFile $file)
     {
-        if ($fileId = $this->model->{$this->attribute})
+        $fileData = [
+            'name' => $file->fileName,
+            'value' => $file->id,
+            'state' => 'success',
+            'size' => $file->size,
+            'type' => $file->mime_type,
+            'src' => $file->src,
+        ];
+
+        if ($file->isImage())
         {
-            return CmsStorageFile::findOne((int) $fileId);
+            $fileData['image'] = [
+                'height' => $file->image_height,
+                'width' => $file->image_width,
+            ];
+
+            $fileData['preview'] = Html::img($file->src);
         }
 
-        return null;
+        return $fileData;
     }
 
-    /**
-     * @return null|CmsStorageFile[]
-     */
-    public function getCmsFiles()
-    {
-        if ($fileId = $this->model->{$this->attribute})
-        {
-            return CmsStorageFile::find()->where(['id' => $fileId])->all();
-        }
-
-        return null;
-    }
 }

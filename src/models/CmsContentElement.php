@@ -25,6 +25,7 @@ use skeeks\cms\models\behaviors\traits\HasTreesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use skeeks\yii2\ajaxfileupload\validators\FileValidator;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -268,7 +269,9 @@ class CmsContentElement extends RelatedElementModel
             }],
 
             [['image_id', 'image_full_id'], 'safe'],
+            [['image_id', 'image_full_id'], \skeeks\cms\validators\FileValidator::class, 'skipOnEmpty' => false, 'extensions' => ['jpg', 'jpeg', 'gif','png'], 'maxFiles' => 1],
             [['imageIds', 'fileIds'], 'safe'],
+            [['imageIds', 'fileIds'], \skeeks\cms\validators\FileValidator::class, 'skipOnEmpty' => false, 'extensions' => ['jpg', 'jpeg', 'gif','png'], 'maxFiles' => 40],
 
             ['parent_content_element_id', 'integer'],
             ['parent_content_element_id', 'validateParentContentElement'],
