@@ -239,19 +239,20 @@ class Tree extends Core
         }
 
         //tree type
-        if ($this->parent && $this->parent->treeType)
+        if (!$this->tree_type_id)
         {
-            if ($this->parent->treeType->defaultChildrenTreeType)
+            if ($this->parent && $this->parent->treeType)
             {
-                $this->tree_type_id = $this->parent->treeType->defaultChildrenTreeType->id;
+                if ($this->parent->treeType->defaultChildrenTreeType)
+                {
+                    $this->tree_type_id = $this->parent->treeType->defaultChildrenTreeType->id;
+                } else
+                {
+                    $this->tree_type_id = $this->parent->tree_type_id;
+                }
             } else
             {
-                $this->tree_type_id = $this->parent->tree_type_id;
-            }
-        } else
-        {
-            if (!$this->tree_type_id)
-            {
+
                 if ($treeType = CmsTreeType::find()->orderBy(['priority' => SORT_ASC])->one())
                 {
                     $this->tree_type_id = $treeType->id;
