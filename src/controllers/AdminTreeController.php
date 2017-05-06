@@ -35,6 +35,8 @@ use yii\helpers\Url;
 use yii\web\Cookie;
 
 /**
+ * @property Tree $model
+ *
  * Class AdminUserController
  * @package skeeks\cms\controllers
  */

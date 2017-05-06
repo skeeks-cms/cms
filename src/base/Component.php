@@ -11,6 +11,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
+use yii\console\Application;
 use yii\db\BaseActiveRecord;
 use yii\widgets\ActiveForm;
 
@@ -70,14 +71,17 @@ abstract class Component extends Model implements ConfigFormInterface
 
         \Yii::beginProfile("Init: " . static::class);
 
-            if ($this->cmsSite === null && isset(\Yii::$app->currentSite) && \Yii::$app->currentSite->site)
+            if (!\Yii::$app instanceof Application)
             {
-                $this->cmsSite = \Yii::$app->currentSite->site;
-            }
+                if ($this->cmsSite === null && isset(\Yii::$app->currentSite) && \Yii::$app->currentSite->site)
+                {
+                    $this->cmsSite = \Yii::$app->currentSite->site;
+                }
 
-            if (isset(\Yii::$app->user) && \Yii::$app->user->identity && !\Yii::$app->user->isGuest && $this->cmsUser === null)
-            {
-                $this->cmsUser = \Yii::$app->user->identity;
+                if (isset(\Yii::$app->user) && $this->cmsUser === null && !\Yii::$app->user->isGuest)
+                {
+                    $this->cmsUser = \Yii::$app->user->identity;
+                }
             }
 
             $this->_initSettings();
