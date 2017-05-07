@@ -325,7 +325,7 @@ abstract class Component extends Model implements ConfigFormInterface
                 \Yii::getAlias('@webroot'),
                 static::class,
                 $this->namespace,
-                $this->overridePath,
+                implode('.', $this->overridePath),
                 $this->cmsUser ? (string) $this->cmsUser->id : '',
                 $this->cmsSite ? (string) $this->cmsSite->id : '',
             ],
@@ -501,7 +501,7 @@ abstract class Component extends Model implements ConfigFormInterface
     public function invalidateCache()
     {
         TagDependency::invalidate(\Yii::$app->cache, [
-            $this->className() . (string) $this->namespace
+            static::class
         ]);
 
         return $this;
