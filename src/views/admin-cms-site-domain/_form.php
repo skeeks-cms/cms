@@ -13,14 +13,14 @@ use skeeks\cms\models\Tree;
 
     <?= $form->fieldSet(\Yii::t('skeeks/cms',"Main")); ?>
 
-            <? if ($code = \Yii::$app->request->get('site_code')) : ?>
-                <?= $form->field($model, 'site_code')->hiddenInput(['value' => $code])->label(false); ?>
+            <? if ($code = \Yii::$app->request->get('cms_site_id')) : ?>
+                <?= $form->field($model, 'cms_site_id')->hiddenInput(['value' => $code])->label(false); ?>
             <? else: ?>
-                <?= $form->field($model, 'site_code')->widget(
+                <?= $form->field($model, 'cms_site_id')->widget(
                     \skeeks\widget\chosen\Chosen::className(), [
                         'items' => \yii\helpers\ArrayHelper::map(
                              \skeeks\cms\models\CmsSite::find()->all(),
-                             "code",
+                             "id",
                              "name"
                         ),
                 ]);

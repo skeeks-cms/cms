@@ -56,7 +56,7 @@ $action     = $controller->action;
                 'hint'              => "",
                 'parentModel'       => $model,
                 'relation'          => [
-                    'site_code' => 'code'
+                    'cms_site_id' => 'id'
                 ],
 
                 'controllerRoute'   => 'cms/admin-cms-site-domain',

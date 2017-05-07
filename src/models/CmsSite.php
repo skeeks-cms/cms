@@ -265,7 +265,7 @@ class CmsSite extends Core
      */
     public function getCmsSiteDomains()
     {
-        return $this->hasMany(CmsSiteDomain::className(), ['site_code' => 'code']);
+        return $this->hasMany(CmsSiteDomain::class, ['cms_site_id' => 'id']);
     }
 
     /**
@@ -273,7 +273,7 @@ class CmsSite extends Core
      */
     public function getCmsTrees()
     {
-        return $this->hasMany(CmsTree::className(), ['site_code' => 'code']);
+        return $this->hasMany(CmsTree::class, ['cms_site_id' => 'id']);
     }
 
 

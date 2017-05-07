@@ -24,7 +24,7 @@ use yii\db\BaseActiveRecord;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $site_code
+ * @property integer $cms_site_id
  * @property string $domain
  *
  *  @property CmsSite $cmsSite
@@ -50,7 +50,7 @@ class CmsSiteDomain extends Core
             'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
             'created_at' => Yii::t('skeeks/cms', 'Created At'),
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'site_code' => Yii::t('skeeks/cms', 'Site'),
+            'cms_site_id' => Yii::t('skeeks/cms', 'Site'),
             'domain' => Yii::t('skeeks/cms', 'Domain'),
         ]);
     }
@@ -63,10 +63,9 @@ class CmsSiteDomain extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-            [['site_code', 'domain'], 'required'],
-            [['site_code'], 'string', 'max' => 15],
+            [['cms_site_id', 'domain'], 'required'],
             [['domain'], 'string', 'max' => 255],
-            [['domain', 'site_code'], 'unique', 'targetAttribute' => ['domain', 'site_code'], 'message' => \Yii::t('skeeks/cms','The combination of Site Code and Domain has already been taken.')]
+            [['domain'], 'unique']
         ]);
     }
 
@@ -75,6 +74,6 @@ class CmsSiteDomain extends Core
      */
     public function getCmsSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
     }
 }
