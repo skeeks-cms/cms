@@ -142,7 +142,7 @@ class CmsSite extends Core
         ]);
 
         $tree->makeRoot();
-        $tree->site_code = $this->code;
+        $tree->cms_site_id = $this->id;
 
         try
         {
@@ -231,17 +231,33 @@ class CmsSite extends Core
     static public $sites = [];
 
     /**
-     * @param (string) $code
+     * @param (integer) $id
+     * @return static
+     */
+    static public function getById($id)
+    {
+        if (!array_key_exists($id, static::$sites))
+        {
+            static::$sites[$id] = static::find()->where(['id' => (integer) $id])->one();
+        }
+
+        return static::$sites[$id];
+    }
+
+    static public $sites_by_code = [];
+
+    /**
+     * @param (integer) $id
      * @return static
      */
     static public function getByCode($code)
     {
-        if (!array_key_exists($code, static::$sites))
+        if (!array_key_exists($code, static::$sites_by_code))
         {
-            static::$sites[$code] = static::find()->where(['code' => (string) $code])->active()->one();
+            static::$sites_by_code[$code] = static::find()->where(['code' => (string) $code])->one();
         }
 
-        return static::$sites[$code];
+        return static::$sites_by_code[$code];
     }
 
     /**

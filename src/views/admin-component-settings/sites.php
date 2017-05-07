@@ -18,7 +18,7 @@
     <div class="sx-box sx-mb-10 sx-p-10">
         <p><?= \Yii::t('skeeks/cms','This component may have personal preferences. And it works differently depending on which of the sites is displayed.')?></p>
         <p><?= \Yii::t('skeeks/cms','In that case, if the site not has personal settings will be used the default settings.')?></p>
-        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::baseQuerySites($component)->count()) : ?>
+        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere(['>', 'cms_site_id', 0])->count()) : ?>
             <p><b><?=\Yii::t('skeeks/cms','Number of customized sites')?>:</b> <?= $settings; ?></p>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeSites(); return false;">
                 <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('skeeks/cms','reset settings for all sites"')?>

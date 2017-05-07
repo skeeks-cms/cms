@@ -17,7 +17,7 @@
 
     <div class="sx-box sx-mb-10 sx-p-10">
         <p><?= \Yii::t('skeeks/cms','Erase all the settings from the database for this component.')?></p>
-        <? if ($settingsAllCount = \skeeks\cms\models\CmsComponentSettings::baseQuery($component)->count()) : ?>
+        <? if ($settingsAllCount = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->count()) : ?>
             <p><b><?=\Yii::t('skeeks/cms','Total found')?>:</b> <?= $settingsAllCount; ?></p>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeAll(); return false;">
                 <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('skeeks/cms','reset all settings')?>

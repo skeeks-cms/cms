@@ -85,7 +85,8 @@ class AdminSettingsController extends AdminController
             {
                 if ($component->load(\Yii::$app->request->post()))
                 {
-                    if ($component->saveDefaultSettings())
+                    $component->override = Component::OVERRIDE_DEFAULT;
+                    if ($component->save())
                     {
                         \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                     } else

@@ -18,7 +18,7 @@
 
     <h2><?=\Yii::t('skeeks/cms','User settings')?>: <?= $user->getDisplayName() ?></h2>
     <div class="sx-box sx-mb-10 sx-p-10">
-        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentUserId($component, $user->id)) : ?>
+        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentUser($component, $user)->one()) : ?>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeByUser('<?= $user->id; ?>'); return false;">
                 <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('skeeks/cms','Reset settings for this user')?>
             </button>

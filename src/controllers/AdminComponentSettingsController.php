@@ -107,13 +107,14 @@ class AdminComponentSettingsController extends AdminController
     {
         $component = $this->_component;
 
-        if (\Yii::$app->request->get('attributes') && !$settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentDefault($component))
+        if (\Yii::$app->request->get('attributes') && !$settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one())
         {
             $attributes                 = \Yii::$app->request->get('attributes');
             $component->attributes      = $attributes;
         } else
         {
-            $component->loadDefaultSettings();
+            $component->overridePath = [Component::OVERRIDE_DEFAULT];
+            $component->refresh();
         }
 
         if (!\Yii::$app->request->get('callableId'))
@@ -142,8 +143,14 @@ class AdminComponentSettingsController extends AdminController
         return $rr;
     }
 
+    /**
+     * @return array|string
+     */
     public function actionIndex()
     {
+        /**
+         * @var Component $component
+         */
         $component = $this->_component;
 
         $attibutes = (array) \Yii::$app->request->get('attributes');
@@ -153,13 +160,14 @@ class AdminComponentSettingsController extends AdminController
             $attibutes = ArrayHelper::merge($attibutes, $attributesCallable);
         }
 
-        if ($attibutes && !\skeeks\cms\models\CmsComponentSettings::fetchByComponentDefault($component))
+        if ($attibutes && !\skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one())
         {
             $attributes                 = $attibutes;
             $component->attributes      = $attributes;
         } else
         {
-            $component->loadDefaultSettings();
+            $component->overridePath = [Component::OVERRIDE_DEFAULT];
+            $component->refresh();
         }
 
 
@@ -173,7 +181,8 @@ class AdminComponentSettingsController extends AdminController
         {
             if ($component->load(\Yii::$app->request->post()) && $component->validate())
             {
-                if ($component->saveDefaultSettings())
+                $component->override = Component::OVERRIDE_DEFAULT;
+                if ($component->save())
                 {
                     \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 } else
@@ -194,6 +203,9 @@ class AdminComponentSettingsController extends AdminController
 
     public function actionSite()
     {
+        /**
+         * @var Component $component
+         */
         $component = $this->_component;
 
         $site_id = \Yii::$app->request->get('site_id');
@@ -208,7 +220,9 @@ class AdminComponentSettingsController extends AdminController
             throw new UserException("Не найден сайт");
         }
 
-        $component->loadSettingsBySite($site);
+        $component->overridePath = [Component::OVERRIDE_DEFAULT, Component::OVERRIDE_SITE];
+        $component->cmsSite = $site;
+        $component->refresh();
 
 
         $rr = new RequestResponse();
@@ -222,7 +236,9 @@ class AdminComponentSettingsController extends AdminController
         {
             if ($component->load(\Yii::$app->request->post()) && $component->validate())
             {
-                if ($component->saveDefaultSettingsBySiteCode($site->code))
+                $component->override = Component::OVERRIDE_SITE;
+                $component->cmsSite = $site;
+                if ($component->save())
                 {
                     \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 } else
@@ -259,7 +275,9 @@ class AdminComponentSettingsController extends AdminController
             throw new UserException("Не найден пользователь");
         }
 
-        $component->loadSettingsByUser($user);
+        $component->overridePath = [Component::OVERRIDE_DEFAULT, Component::OVERRIDE_USER];
+        $component->cmsUser = $user;
+        $component->refresh();
 
         $rr = new RequestResponse();
         if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax)
@@ -271,7 +289,9 @@ class AdminComponentSettingsController extends AdminController
         {
             if ($component->load(\Yii::$app->request->post()) && $component->validate())
             {
-                if ($component->saveDefaultSettingsByUserId($user->id))
+                $component->override = Component::OVERRIDE_USER;
+                $component->cmsUser = $user;
+                if ($component->save())
                 {
                     \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                 } else
@@ -338,7 +358,7 @@ class AdminComponentSettingsController extends AdminController
         {
             if (\Yii::$app->request->post('do') == 'all')
             {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::baseQuery($component)->all())
+                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->all())
                 {
                     /**
                      * @var $setting CmsComponentSettings
@@ -356,7 +376,7 @@ class AdminComponentSettingsController extends AdminController
                 };
             } else if (\Yii::$app->request->post('do') == 'default')
             {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentDefault($component))
+                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one())
                 {
                     $settings->delete();
                     $component->invalidateCache();
@@ -365,7 +385,7 @@ class AdminComponentSettingsController extends AdminController
                 };
             } else if (\Yii::$app->request->post('do') == 'sites')
             {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::baseQuerySites($component)->all())
+                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere(['>', 'cms_site_id', 0])->all())
                 {
                     /**
                      * @var $setting CmsComponentSettings
@@ -383,7 +403,7 @@ class AdminComponentSettingsController extends AdminController
                 };
             } else if (\Yii::$app->request->post('do') == 'users')
             {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::baseQueryUsers($component)->all())
+                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere(['>', 'user_id', 0])->all())
                 {
                     /**
                      * @var $setting CmsComponentSettings
@@ -408,10 +428,9 @@ class AdminComponentSettingsController extends AdminController
 
                 if ($site)
                 {
-                    if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentSite($component, $site))
+                    $component->setOverride(Component::OVERRIDE_SITE)->setCmsSite($site);
+                    if ($component->delete())
                     {
-                        $settings->delete();
-                        $component->invalidateCache();
                         $rr->message = 'Настройки успешно удалены';
                         $rr->success = true;
                     };
@@ -426,10 +445,9 @@ class AdminComponentSettingsController extends AdminController
 
                 if ($user)
                 {
-                    if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentUser($component, $user))
+                    $component->setOverride(Component::OVERRIDE_USER)->setCmsUser($user);
+                    if ($component->delete())
                     {
-                        $settings->delete();
-                        $component->invalidateCache();
                         $rr->message = 'Настройки успешно удалены';
                         $rr->success = true;
                     };

@@ -281,7 +281,7 @@ class CmsTreeWidget extends Widget
         $additionalName = '';
         if ($model->level == 0)
         {
-            $site = CmsSite::findOne(['code' => $model->site_code]);
+            $site = CmsSite::findOne(['id' => $model->cms_site_id]);
             if ($site)
             {
                 $additionalName = $site->name;

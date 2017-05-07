@@ -218,7 +218,7 @@ class SelectTreeInputWidget extends InputWidget
         $additionalName = '';
         if ($model->level == 0)
         {
-            $site = \skeeks\cms\models\CmsSite::findOne(['code' => $model->site_code]);
+            $site = \skeeks\cms\models\CmsSite::findOne(['id' => $model->cms_site_id]);
             if ($site)
             {
                 $additionalName = $site->name;

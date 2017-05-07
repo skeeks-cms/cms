@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\base\Component;
 use skeeks\cms\components\marketplace\models\PackageModel;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -47,18 +48,16 @@ class AdminAjaxController extends AdminController
 
         $rr->success = true;
 
+        $component = clone \Yii::$app->admin;
+        $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+        $component->languageCode = $cmsLang->code;
 
-        $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->admin, \Yii::$app->user->id);
-        $userSettings->setSettingValue('languageCode', $cmsLang->code);
-
-        if (!$userSettings->save())
+        if (!$component->save(true, ['languageCode']))
         {
-            $rr->message = 'Не удалось сохранить настройки';
+            $rr->message = 'Не удалось сохранить настройки: ';
             $rr->success = false;
             return $rr;
         }
-
-        \Yii::$app->admin->invalidateCache();
 
         return $rr;
     }

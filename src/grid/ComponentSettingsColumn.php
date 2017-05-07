@@ -40,12 +40,12 @@ class ComponentSettingsColumn extends BooleanColumn
 
         if ($model instanceof CmsSite)
         {
-            $settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentSiteCode($this->component, $model->code);
+            $settings = \skeeks\cms\models\CmsComponentSettings::findByComponentSite($this->component, $model)->one();
         }
 
         if ($model instanceof User)
         {
-            $settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentUserId($this->component, $model->id);
+            $settings = \skeeks\cms\models\CmsComponentSettings::findByComponentUser($this->component, $model)->one();
         }
 
         if ($settings)

@@ -18,7 +18,7 @@
 
     <h2><?=\Yii::t('skeeks/cms','Settings for the site')?>: <?= $site->name; ?> (<?= $site->code; ?>)</h2>
     <div class="sx-box sx-mb-10 sx-p-10">
-        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentSiteCode($component, $site->code)) : ?>
+        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentSite($component, $site)->one()) : ?>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeBySite('<?= $site->code; ?>'); return false;">
                 <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('skeeks/cms','reset settings for this site')?>
             </button>

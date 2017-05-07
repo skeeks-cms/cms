@@ -61,7 +61,7 @@ use yii\helpers\Url;
  * @property string $meta_title
  * @property string $meta_description
  * @property string $meta_keywords
- * @property string $site_code
+ * @property string $cms_site_id
  * @property string $description_short_type
  * @property string $description_full_type
  * @property integer $image_full_id
@@ -229,12 +229,12 @@ class Tree extends Core
         //site code
         if ($this->parent)
         {
-            $this->site_code = $this->parent->site_code;
-        } elseif (!$this->site_code)
+            $this->cms_site_id = $this->parent->cms_site_id;
+        } elseif (!$this->cms_site_id)
         {
             if ($site = \Yii::$app->currentSite->site)
             {
-                $this->site_code = $site->code;
+                $this->cms_site_id = $site->code;
             }
         }
 
@@ -339,7 +339,7 @@ class Tree extends Core
             [['name'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
-            [['site_code'], 'string', 'max' => 15],
+            [['cms_site_id'], 'integer'],
             [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => \Yii::t('skeeks/cms','For this subsection of the code is already in use.')],
             [['pid', 'code'], 'unique', 'targetAttribute' => ['pid', 'code'], 'message' => \Yii::t('skeeks/cms','The combination of Code and Pid has already been taken.')],
 
@@ -437,8 +437,8 @@ class Tree extends Core
      */
     public function getSite()
     {
-        //return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
-        return CmsSite::getByCode($this->site_code);
+        //return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
+        return CmsSite::getById($this->cms_site_id);
     }
 
     /**
@@ -446,7 +446,7 @@ class Tree extends Core
      */
     public function getCmsSiteRelation()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
     }
 
     /**
@@ -777,6 +777,15 @@ class Tree extends Core
         return $this;
     }
 
+
+    /**
+     * @return bool
+     * @deprecated > 4.0
+     */
+    public function gethas_children()
+    {
+        return (bool) $this->children;
+    }
 }
 
 

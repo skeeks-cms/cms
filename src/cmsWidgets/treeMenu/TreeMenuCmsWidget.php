@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\cmsWidgets\treeMenu;
 
+use common\modules\company\models\CmsSite;
 use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
@@ -190,12 +191,17 @@ class TreeMenuCmsWidget extends WidgetRenderable
 
         if ($this->site_codes)
         {
-            $this->activeQuery->andWhere(['site_code' => $this->site_codes]);
+            $cmsSites = CmsSite::find()->where(['code' => $this->site_codes])->all();
+            if ($cmsSites)
+            {
+                $ids = ArrayHelper::map($cmsSites, 'id', 'id');
+                $this->activeQuery->andWhere(['cms_site_id' => $ids]);
+            }
         }
 
         if ($this->enabledCurrentSite == Cms::BOOL_Y && \Yii::$app->cms->site)
         {
-            $this->activeQuery->andWhere(['site_code' => \Yii::$app->cms->site->code]);
+            $this->activeQuery->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
         }
 
         if ($this->orderBy)

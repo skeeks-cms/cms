@@ -6,12 +6,17 @@
  * @date 26.03.2015
  */
 namespace skeeks\cms\base;
+use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsComponentSettings;
 use \skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
+use yii\base\Exception;
 use yii\base\Model;
+use yii\caching\TagDependency;
 use yii\console\Application;
+use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
 use yii\widgets\ActiveForm;
 
@@ -25,10 +30,13 @@ use yii\base\InvalidCallException;
 use yii\helpers\ArrayHelper;
 /**
  * @property array          namespace
- * @property array          defaultAttributes
  * @property array          settings
  * @property CmsSite        cmsSite
  * @property CmsUser        cmsUser
+ *
+ * @property array          callAttributes
+ * @property string|null    override
+ * @property array          overridePath
  *
  * Class Component
  * @package skeeks\cms\base
@@ -37,23 +45,47 @@ abstract class Component extends Model implements ConfigFormInterface
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;
-    //Можно сохранять настройки в базу
-    use HasComponentDbSettingsTrait;
+
+
+    const OVERRIDE_DEFAULT  = 'default';
+    const OVERRIDE_SITE     = 'site';
+    const OVERRIDE_USER     = 'user';
 
     /**
-     * @var null
+     * @return array
      */
-    protected $_namespace = null;
+    static public function getOverrides()
+    {
+        return [
+            self::OVERRIDE_DEFAULT,
+            self::OVERRIDE_SITE,
+            self::OVERRIDE_USER,
+        ];
+    }
+
+    /**
+     * Путь переопределения настроек
+     * @var array
+     */
+    protected $_overridePath = ['default', 'site', 'user'];
+
+    /**
+     * Текущий путь для которого сохранять настройки
+     * @var string|null
+     */
+    protected $_override = null;
+
+
+    /**
+     * Callable attributes
+     * @var array
+     */
+    protected $_callAttributes = [];
 
     /**
      * @var array
      */
-    protected $_defaultAttributes = [];
-
-    /**
-     * @var
-     */
-    protected $_oldAttributes;
+    protected $_oldAttributes = [];
 
     /**
      * @var CmsSite|null
@@ -64,10 +96,15 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     protected $_cmsUser = null;
 
+    /**
+     * @var null
+     */
+    protected $_namespace = null;
+
 
     public function init()
     {
-        $this->_defaultAttributes = $this->attributes;
+        $this->_callAttributes = $this->attributes;
 
         \Yii::beginProfile("Init: " . static::class);
 
@@ -122,9 +159,6 @@ abstract class Component extends Model implements ConfigFormInterface
     }
 
 
-    /**
-     *
-     */
     public function afterRefresh()
     {
         $this->trigger(self::EVENT_AFTER_REFRESH);
@@ -168,13 +202,70 @@ abstract class Component extends Model implements ConfigFormInterface
         return $this;
     }
 
+
+
+    /**
+     * @return null|string
+     */
+    public function getOverride()
+    {
+        return $this->_override;
+    }
+
+    /**
+     * @param string $override
+     * @return $this
+     */
+    public function setOverride($override)
+    {
+        if (!in_array($override, static::getOverrides()))
+        {
+            throw new Exception('Invalid override name');
+        }
+
+        $this->_override = $override;
+        return $this;
+    }
+
+
     /**
      * @return array
      */
-    public function getDefaultAttributes()
+    public function getOverridePath()
     {
-        return $this->_defaultAttributes;
+        return (array) $this->_overridePath;
     }
+
+    /**
+     * @param array $overridePath
+     * @return $this
+     */
+    public function setOverridePath($overridePath)
+    {
+        foreach ((array) $overridePath as $override)
+        {
+            if (!in_array($override, static::getOverrides()))
+            {
+                throw new Exception('Invalid override name');
+            }
+        }
+
+        $this->_overridePath = (array) $overridePath;
+        return $this;
+    }
+
+
+
+
+
+    /**
+     * @return array
+     */
+    public function getCallAttributes()
+    {
+        return $this->_callAttributes;
+    }
+
 
     /**
      * @param CmsSite $cmsSite
@@ -218,6 +309,328 @@ abstract class Component extends Model implements ConfigFormInterface
 
 
 
+
+
+    /**
+     * Получение настроек согласно пути перекрытия настроек.
+     * @return array
+     */
+    public function getSettings($useCache = true)
+    {
+        $key = $this->getCacheKey();
+
+        $dependency = new TagDependency([
+            'tags'      =>
+            [
+                \Yii::getAlias('@webroot'),
+                static::class,
+                $this->namespace,
+                $this->overridePath,
+                $this->cmsUser ? (string) $this->cmsUser->id : '',
+                $this->cmsSite ? (string) $this->cmsSite->id : '',
+            ],
+        ]);
+
+        $settingsValues = \Yii::$app->cache->get($key);
+
+        if ($settingsValues === false && $useCache === true) {
+
+            $settingsValues = [];
+
+            if ($this->overridePath)
+            {
+                foreach ($this->overridePath as $overrideName)
+                {
+                    $settingsValues = ArrayHelper::merge($settingsValues,
+                        $this->fetchOverrideSettings($overrideName)
+                    );
+                }
+            }
+
+            \Yii::$app->cache->set($key, $settingsValues, 0, $dependency);
+        }
+
+        return $settingsValues;
+    }
+
+
+    /**
+     * @param $overrideName
+     * @return null|CmsComponentSettings
+     */
+    protected function _getOverrideSettingsModel($overrideName)
+    {
+        $settingsModel = null;
+
+        if ($overrideName == self::OVERRIDE_DEFAULT)
+        {
+            $settingsModel = CmsComponentSettings::findByComponentDefault($this)->one();
+
+        } else if ($overrideName == self::OVERRIDE_SITE)
+        {
+            if ($this->cmsSite)
+            {
+                $settingsModel = CmsComponentSettings::findByComponentSite($this, $this->cmsSite)->one();
+            }
+        } else if ($overrideName == self::OVERRIDE_USER)
+        {
+            if ($this->cmsUser)
+            {
+                $settingsModel = CmsComponentSettings::findByComponentUser($this, $this->cmsUser)->one();
+            }
+        }
+
+        return $settingsModel;
+    }
+
+    /**
+     * @param string $overrideName
+     * @return CmsComponentSettings
+     * @throws Exception
+     */
+    protected function _createOverrideSettingsModel($overrideName)
+    {
+        $overrideName = (string) $overrideName;
+
+        $settingsModel = new CmsComponentSettings([
+            'component' => static::class
+        ]);
+
+        if ($this->namespace)
+        {
+            $settingsModel->namespace = $this->namespace;
+        }
+
+        if ($overrideName == self::OVERRIDE_DEFAULT)
+        {}
+        else if ($overrideName == self::OVERRIDE_SITE)
+        {
+            if (!$this->cmsSite)
+            {
+                throw new Exception('Need set site');
+            }
+
+            $settingsModel->cms_site_id = $this->cmsSite->id;
+
+        } else if ($overrideName == self::OVERRIDE_USER)
+        {
+            if (!$this->cmsUser)
+            {
+                throw new Exception('Need set user');
+            }
+
+            $settingsModel->user_id = $this->cmsUser->id;
+        }
+
+        return $settingsModel;
+    }
+
+
+    /**
+     * @param $overrideName
+     * @return array
+     */
+    public function fetchOverrideSettings($overrideName)
+    {
+        $settingsModel = $this->_getOverrideSettingsModel($overrideName);
+
+        if ($settingsModel)
+        {
+            return (array) $settingsModel->value;
+        }
+
+        return [];
+    }
+
+    /**
+     * @param bool $runValidation
+     * @param null $attributeNames
+     * @return bool
+     * @throws Exception
+     */
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        if (!$this->override)
+        {
+            throw new Exception('Need set current override');
+        }
+
+        if ($runValidation && !$this->validate($attributeNames)) {
+            return false;
+        }
+
+        $modelSettings = $this->_getOverrideSettingsModel($this->override);
+        if (!$modelSettings)
+        {
+            $modelSettings = $this->_createOverrideSettingsModel($this->override);
+        }
+
+        $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
+
+        $modelSettings->value       = $this->attributes;
+        $result                     = $modelSettings->save();
+
+        $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
+            'changedAttributes' => $this->getDirtyAttributes(),
+        ]));
+
+        $this->invalidateCache();
+
+        return $result;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return implode([
+            \Yii::getAlias('@webroot'),
+            static::class,
+            $this->namespace,
+            $this->cmsUser ? (string) $this->cmsUser->id : '',
+            $this->cmsSite ? (string) $this->cmsSite->id : '',
+        ]);
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function invalidateCache()
+    {
+        TagDependency::invalidate(\Yii::$app->cache, [
+            $this->className() . (string) $this->namespace
+        ]);
+
+        return $this;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * TODO: Revrite and check
+     */
+
+
+
+
+    /**
+     * @return UrlHelper
+     */
+    public function getEditUrl()
+    {
+        $attributes = [];
+
+        foreach ($this->callAttributes as $key => $value)
+        {
+            if (!is_object($value))
+            {
+                $attributes[$key] = $value;
+            }
+        }
+
+        return UrlHelper::construct('/cms/admin-component-settings/index', [
+            'componentClassName'                => $this->className(),
+            'attributes'                        => $attributes,
+            'componentNamespace'                => $this->namespace,
+        ])
+            ->enableAdmin()
+            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+    }
+
+    /**
+     * @return UrlHelper
+     */
+    public function getCallableEditUrl()
+    {
+        return UrlHelper::construct('/cms/admin-component-settings/call-edit', [
+            'componentClassName'                => $this->className(),
+            'componentNamespace'                => $this->namespace,
+            'callableId'                        => $this->callableId,
+        ])
+            ->enableAdmin()
+            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getCallableData()
+    {
+        $attributes = [];
+
+        foreach ($this->callAttributes as $key => $value)
+        {
+            if (!is_object($value))
+            {
+                $attributes[$key] = $value;
+            }
+        }
+
+        return [
+            'attributes'                        => $attributes,
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getCallableId()
+    {
+        return $this->settingsId . '-callable';
+    }
+
+
+
+    /**
+     * @var integer a counter used to generate [[id]] for widgets.
+     * @internal
+     */
+    public static $counterSettings = 0;
+    /**
+     * @var string the prefix to the automatically generated widget IDs.
+     * @see getId()
+     */
+    public static $autoSettingsIdPrefix = 'skeeksSettings';
+
+    private $_settingsId;
+
+    /**
+     * Returns the ID of the widget.
+     * @param boolean $autoGenerate whether to generate an ID if it is not set previously
+     * @return string ID of the widget.
+     */
+    public function getSettingsId($autoGenerate = true)
+    {
+        if ($autoGenerate && $this->_settingsId === null) {
+            $this->_settingsId = static::$autoSettingsIdPrefix . static::$counterSettings++;
+        }
+
+        return $this->_settingsId;
+    }
+
+    /**
+     * Sets the ID of the widget.
+     * @param string $value id of the widget.
+     */
+    public function setSettingsId($value)
+    {
+        $this->_settingsId = $value;
+    }
 
 
 
@@ -465,96 +878,7 @@ abstract class Component extends Model implements ConfigFormInterface
         return $attributes;
     }
 
-    /**
-     * Saves the current record.
-     *
-     * This method will call [[insert()]] when [[isNewRecord]] is `true`, or [[update()]]
-     * when [[isNewRecord]] is `false`.
-     *
-     * For example, to save a customer record:
-     *
-     * ```php
-     * $customer = new Customer; // or $customer = Customer::findOne($id);
-     * $customer->name = $name;
-     * $customer->email = $email;
-     * $customer->save();
-     * ```
-     *
-     * @param bool $runValidation whether to perform validation (calling [[validate()]])
-     * before saving the record. Defaults to `true`. If the validation fails, the record
-     * will not be saved to the database and this method will return `false`.
-     * @param array $attributeNames list of attribute names that need to be saved. Defaults to null,
-     * meaning all attributes that are loaded from DB will be saved.
-     * @return bool whether the saving succeeded (i.e. no validation errors occurred).
-     */
-    public function save($runValidation = true, $attributeNames = null)
-    {
-        if ($this->getIsNewRecord()) {
-            return $this->insert($runValidation, $attributeNames);
-        } else {
-            return $this->update($runValidation, $attributeNames) !== false;
-        }
-    }
 
-    /**
-     * Saves the changes to this active record into the associated database table.
-     *
-     * This method performs the following steps in order:
-     *
-     * 1. call [[beforeValidate()]] when `$runValidation` is `true`. If [[beforeValidate()]]
-     *    returns `false`, the rest of the steps will be skipped;
-     * 2. call [[afterValidate()]] when `$runValidation` is `true`. If validation
-     *    failed, the rest of the steps will be skipped;
-     * 3. call [[beforeSave()]]. If [[beforeSave()]] returns `false`,
-     *    the rest of the steps will be skipped;
-     * 4. save the record into database. If this fails, it will skip the rest of the steps;
-     * 5. call [[afterSave()]];
-     *
-     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]],
-     * [[EVENT_AFTER_VALIDATE]], [[EVENT_BEFORE_UPDATE]], and [[EVENT_AFTER_UPDATE]]
-     * will be raised by the corresponding methods.
-     *
-     * Only the [[dirtyAttributes|changed attribute values]] will be saved into database.
-     *
-     * For example, to update a customer record:
-     *
-     * ```php
-     * $customer = Customer::findOne($id);
-     * $customer->name = $name;
-     * $customer->email = $email;
-     * $customer->update();
-     * ```
-     *
-     * Note that it is possible the update does not affect any row in the table.
-     * In this case, this method will return 0. For this reason, you should use the following
-     * code to check if update() is successful or not:
-     *
-     * ```php
-     * if ($customer->update() !== false) {
-     *     // update successful
-     * } else {
-     *     // update failed
-     * }
-     * ```
-     *
-     * @param bool $runValidation whether to perform validation (calling [[validate()]])
-     * before saving the record. Defaults to `true`. If the validation fails, the record
-     * will not be saved to the database and this method will return `false`.
-     * @param array $attributeNames list of attribute names that need to be saved. Defaults to null,
-     * meaning all attributes that are loaded from DB will be saved.
-     * @return int|false the number of rows affected, or `false` if validation fails
-     * or [[beforeSave()]] stops the updating process.
-     * @throws StaleObjectException if [[optimisticLock|optimistic locking]] is enabled and the data
-     * being updated is outdated.
-     * @throws Exception in case update failed.
-     */
-    public function update($runValidation = true, $attributeNames = null)
-    {
-        if ($runValidation && !$this->validate($attributeNames)) {
-            return false;
-        }
-        return $this->updateInternal($attributeNames);
-    }
 
     /**
      * Deletes the table row corresponding to this active record.
@@ -577,22 +901,26 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function delete()
     {
+        if (!$this->override)
+        {
+            throw new Exception('Set current override');
+        }
+
         $result = false;
         if ($this->beforeDelete()) {
             // we do not check the return value of deleteAll() because it's possible
             // the record is already deleted in the database and thus the method will return 0
-            $condition = $this->getOldPrimaryKey(true);
-            $lock = $this->optimisticLock();
-            if ($lock !== null) {
-                $condition[$lock] = $this->$lock;
+            if (!$model = $this->_getOverrideSettingsModel($this->override))
+            {
+                return false;
             }
-            $result = static::deleteAll($condition);
-            if ($lock !== null && !$result) {
-                throw new StaleObjectException('The object being deleted is outdated.');
-            }
+
+            $result = $model->delete();
             $this->_oldAttributes = null;
             $this->afterDelete();
         }
+
+        $this->invalidateCache();
 
         return $result;
     }

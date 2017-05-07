@@ -17,7 +17,7 @@
 
 
     <div class="sx-box sx-mb-10 sx-p-10">
-        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::fetchByComponentDefault($component)) : ?>
+        <? if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentDefault($component)->one()) : ?>
             <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Remove.removeDefault(); return false;">
                 <i class="glyphicon glyphicon-remove"></i> <?=\Yii::t('skeeks/cms','reset default settings')?>
             </button>

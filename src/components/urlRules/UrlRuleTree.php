@@ -6,6 +6,7 @@
  * @date 24.05.2015
  */
 namespace skeeks\cms\components\urlRules;
+use common\modules\company\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
@@ -185,9 +186,19 @@ class UrlRuleTree
                 $site_code = \Yii::$app->cms->site->code;
             }
 
+            if ($site_code)
+            {
+                $cmsSite = CmsSite::getByCode($site_code);
+            }
+
+            if (!$cmsSite)
+            {
+                return null;
+            }
+
             $tree = CmsTree::findOne([
                 'dir'       => $dir,
-                'site_code' => $site_code
+                'cms_site_id' => $cmsSite->id
             ]);
 
             if ($tree)
@@ -244,7 +255,7 @@ class UrlRuleTree
         {
             $treeNode = Tree::getDb()->cache(function ($db) {
                 return Tree::find()->where([
-                    "site_code"         => \Yii::$app->cms->site->code,
+                    "cms_site_id"         => \Yii::$app->cms->site->id,
                     "level"             => 0,
                 ])->one();
             }, null, $dependency);
@@ -254,7 +265,7 @@ class UrlRuleTree
 
             $treeNode = Tree::find()->where([
                 "dir"                           => $originalDir,
-                "site_code"                     => \Yii::$app->cms->site->code,
+                "cms_site_id"                     => \Yii::$app->cms->site->id,
             ])->one();
         }
 

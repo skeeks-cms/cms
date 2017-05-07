@@ -11,6 +11,7 @@
 namespace skeeks\cms\controllers;
 
 
+use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsComponentSettings;
@@ -43,31 +44,28 @@ class ToolbarController extends Controller
 
             if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y)
             {
-                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
-                $userSettings->setSettingValue('editWidgets', Cms::BOOL_N);
+                $component = clone \Yii::$app->cmsToolbar;
+                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->editWidgets = Cms::BOOL_N;
 
-                if (!$userSettings->save())
+                if (!$component->save(true, ['editWidgets']))
                 {
                     $rr->message = 'Не удалось сохранить настройки';
                     $rr->success = false;
                     return $rr;
                 }
-
-                \Yii::$app->cmsToolbar->invalidateCache();
-
             } else
             {
-                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
-                $userSettings->setSettingValue('editWidgets', Cms::BOOL_Y);
+                $component = clone \Yii::$app->cmsToolbar;
+                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->editWidgets = Cms::BOOL_Y;
 
-                if (!$userSettings->save())
+                if (!$component->save(true, ['editWidgets']))
                 {
                     $rr->message = 'Не удалось сохранить настройки';
                     $rr->success = false;
                     return $rr;
                 }
-
-                \Yii::$app->cmsToolbar->invalidateCache();
             }
 
             return $rr;
@@ -84,31 +82,28 @@ class ToolbarController extends Controller
 
             if (\Yii::$app->cmsToolbar->editViewFiles == Cms::BOOL_Y)
             {
-                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
-                $userSettings->setSettingValue('editViewFiles', Cms::BOOL_N);
+                $component = clone \Yii::$app->cmsToolbar;
+                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->editViewFiles = Cms::BOOL_N;
 
-                if (!$userSettings->save())
+                if (!$component->save(true, ['editViewFiles']))
                 {
                     $rr->message = 'Не удалось сохранить настройки';
                     $rr->success = false;
                     return $rr;
                 }
-
-                \Yii::$app->cmsToolbar->invalidateCache();
-
             } else
             {
-                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
-                $userSettings->setSettingValue('editViewFiles', Cms::BOOL_Y);
+                $component = clone \Yii::$app->cmsToolbar;
+                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->editViewFiles = Cms::BOOL_Y;
 
-                if (!$userSettings->save())
+                if (!$component->save(true, ['editViewFiles']))
                 {
                     $rr->message = 'Не удалось сохранить настройки';
                     $rr->success = false;
                     return $rr;
                 }
-
-                \Yii::$app->cmsToolbar->invalidateCache();
             }
 
             return $rr;
@@ -123,25 +118,26 @@ class ToolbarController extends Controller
 
             if (\Yii::$app->request->post('isOpen') == "true")
             {
-                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
-                $userSettings->setSettingValue('isOpen', Cms::BOOL_Y);
+                $component = clone \Yii::$app->cmsToolbar;
+                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->isOpen = Cms::BOOL_Y;
 
-                if (!$userSettings->save())
+                if (!$component->save(true, ['isOpen']))
                 {
                     $rr->message = 'Не удалось сохранить настройки';
                     $rr->success = false;
                     return $rr;
                 }
 
-                \Yii::$app->cmsToolbar->invalidateCache();
                 $rr->message = 'Сохранено';
                 $rr->success = true;
             } else
             {
-                $userSettings           = CmsComponentSettings::createByComponentUserId(\Yii::$app->cmsToolbar, \Yii::$app->user->id);
-                $userSettings->setSettingValue('isOpen', Cms::BOOL_N);
+                $component = clone \Yii::$app->cmsToolbar;
+                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->isOpen = Cms::BOOL_N;
 
-                if (!$userSettings->save())
+                if (!$component->save(true, ['isOpen']))
                 {
                     $rr->message = 'Не удалось сохранить настройки';
                     $rr->success = false;
