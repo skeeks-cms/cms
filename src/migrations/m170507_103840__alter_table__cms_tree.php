@@ -17,7 +17,7 @@ class m170507_103840__alter_table__cms_tree extends Migration
 
         $this->addForeignKey(
             'cms_tree__cms_site_id', "{{%cms_tree}}",
-            'cms_site_id', '{{%cms_site}}', 'id', 'SET NULL', 'SET NULL'
+            'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
         );
 
         $this->db->createCommand("UPDATE cms_tree JOIN cms_site ON cms_site.code = cms_tree.site_code SET cms_tree.cms_site_id = cms_site.id")->execute();

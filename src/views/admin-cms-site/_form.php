@@ -27,6 +27,7 @@ $action     = $controller->action;
             ]
         ); ?>
 
+        <?= $form->field($model, 'name'); ?>
         <?= $form->field($model, 'code')->textInput(); ?>
 
 
@@ -39,7 +40,6 @@ $action     = $controller->action;
         <? endif; ?>
 
 
-        <?= $form->field($model, 'name')->textarea(); ?>
 
 
         <?= $form->field($model, 'description')->textarea(); ?>
