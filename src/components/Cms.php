@@ -114,7 +114,7 @@ class Cms extends \skeeks\cms\base\Component
     public $languageCode                    = "";
 
     /**
-     * @var int сбрасывать токен пароля через час
+     * @var int Reset password token one hour later
      */
     public $passwordResetTokenExpire        = 3600;
 
@@ -298,7 +298,6 @@ class Cms extends \skeeks\cms\base\Component
             [['adminEmail', 'noImageUrl', 'appName', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
-            [['passwordResetTokenExpire'], 'integer', 'min' => 300],
             [['registerRoles'], 'safe'],
             [['tree_max_code_length'], 'integer'],
             [['element_max_code_length'], 'integer'],
@@ -312,7 +311,6 @@ class Cms extends \skeeks\cms\base\Component
             'noImageUrl'                => 'Изображение заглушка',
             'appName'                   => 'Название проекта',
             'languageCode'              => 'Язык по умолчанию',
-            'passwordResetTokenExpire'  => 'Инвалидировать токен пароля через час',
             'registerRoles'             => 'При регистрации добавлять в группу',
             'tree_max_code_length'      => 'Максимальная длинна кода (url) разделов',
             'element_max_code_length'   => 'Максимальная длинна кода (url) элементов',
