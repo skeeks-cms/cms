@@ -8,6 +8,7 @@
 namespace skeeks\cms\traits;
 use skeeks\cms\rbac\CmsManager;
 use yii\base\Model;
+use yii\web\Application;
 
 /**
  * @property string $permissionName;
@@ -92,7 +93,7 @@ trait THasPermissions
                     }
                 }
 
-                if (!\Yii::$app->user->can($permissionName))
+                if (\Yii::$app instanceof Application && !\Yii::$app->user->can($permissionName))
                 {
                     return false;
                 }
