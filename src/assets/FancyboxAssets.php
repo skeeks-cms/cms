@@ -14,7 +14,7 @@ use skeeks\cms\base\AssetBundle;
  */
 class FancyboxAssets extends AssetBundle
 {
-    public $sourcePath = '@bower/fancybox/source';
+    public $sourcePath = '@bower/fancybox/dist';
 
     public $js = [
         'jquery.fancybox.js',
