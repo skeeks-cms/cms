@@ -146,7 +146,10 @@ class ContentElementFiltersWidget extends WidgetRenderable
              * @var $query \yii\db\ActiveQuery
              */
             $query  = clone $activeDataProvider->query;
-            $ids    = $query->select(['cms_content_element.id as mainId'])->indexBy('mainId')->asArray()->all();
+
+            $query->with = [];
+            $query->select(['cms_content_element.id as mainId', 'cms_content_element.id as id'])->indexBy('mainId');
+            $ids    = $query->asArray()->all();
 
             $this->elementIds = array_keys($ids);
         }
