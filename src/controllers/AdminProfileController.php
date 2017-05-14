@@ -58,24 +58,27 @@ class AdminProfileController extends BackendModelController
     {
         $actions = ArrayHelper::merge(parent::actions(),
         [
-            'file-manager' =>
+            /*'file-manager' =>
             [
                 "class"         => BackendModelAction::class,
                 "name"          => "Личные файлы",
                 "icon"          => "glyphicon glyphicon-folder-open",
                 "callback"      => [$this, 'actionFileManager'],
-            ],
+            ],*/
 
             'update' =>
             [
                 'class'         => BackendModelUpdateAction::class,
                 "callback"      => [$this, 'update'],
+                "isVisible"      => false
             ],
         ]);
 
-        unset($actions['delete']);
-        unset($actions['create']);
-        unset($actions['index']);
+
+        ArrayHelper::remove($actions, 'delete');
+        ArrayHelper::remove($actions, 'create');
+        ArrayHelper::remove($actions, 'index');
+
         return $actions;
     }
 
@@ -179,7 +182,7 @@ class AdminProfileController extends BackendModelController
      * If update is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionFileManager()
+    /*public function actionFileManager()
     {
         $model = $this->model;
 
@@ -188,7 +191,7 @@ class AdminProfileController extends BackendModelController
             'model' => $model
         ]);
 
-    }
+    }*/
 
 
     /**

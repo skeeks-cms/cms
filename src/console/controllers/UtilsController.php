@@ -9,6 +9,9 @@ namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsContentProperty2content;
 use skeeks\cms\models\CmsSearchPhrase;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\StorageFile;
@@ -142,4 +145,50 @@ class UtilsController extends Controller
         }
     }
 
+
+
+    /**
+     * Tree normalization
+     */
+    public function actionNormalizeContent()
+    {
+        if (!CmsContent::find()->count())
+        {
+            $this->stdout("Content not found!\n", Console::BOLD);
+            return;
+        }
+
+        $this->stdout("1. Tree normalize content!\n", Console::FG_YELLOW);
+
+        /**
+         * @var CmsContentProperty $cmsContentProperty
+         */
+        foreach (CmsContentProperty::find()->orderBy(['id' => SORT_ASC])->each(10) as $cmsContentProperty)
+        {
+            $this->stdout("\t content property: {$cmsContentProperty->name}\n", Console::FG_YELLOW);
+
+            if (!$cmsContentProperty->content_id)
+            {
+                continue;
+            }
+
+            if (!CmsContentProperty2content::find()
+                ->where(['cms_content_id' => $cmsContentProperty->content_id])
+                ->andWhere(['cms_content_property_id' => $cmsContentProperty->id])
+                ->exists()
+            )
+            {
+                if ( (new CmsContentProperty2content([
+                    'cms_content_id' => $cmsContentProperty->content_id,
+                    'cms_content_property_id' => $cmsContentProperty->id
+                ]))->save() )
+                {
+                    $this->stdout("\t Created: {$cmsContentProperty->name}\n", Console::FG_GREEN);
+                } else
+                {
+                    $this->stdout("\t NOT Created: {$cmsContentProperty->name}\n", Console::FG_RED);
+                }
+            }
+        }
+    }
 }

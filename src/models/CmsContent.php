@@ -42,22 +42,23 @@ use yii\helpers\ArrayHelper;
  * @property string $meta_description_template
  * @property string $meta_keywords_template
  *
- * @property integer $parent_content_id             @version > 2.4.8
- * @property string $visible                        @version > 2.4.8
- * @property string $parent_content_on_delete       @version > 2.4.8
- * @property string $parent_content_is_required     @version > 2.4.8
+ * @property integer $parent_content_id
+ * @property string $visible
+ * @property string $parent_content_on_delete
+ * @property string $parent_content_is_required
+ *
+ * ***
  *
  * @property string $adminPermissionName
  *
- * @property CmsTree $rootTree
- * @property CmsTree $defaultTree
- * @property CmsContentType $contentType
- * @property CmsContentElement[] $cmsContentElements
- * @property CmsContentProperty[] $cmsContentProperties
+ * @property CmsTree                $rootTree
+ * @property CmsTree                $defaultTree
+ * @property CmsContentType         $contentType
+ * @property CmsContentElement[]    $cmsContentElements
+ * @property CmsContentProperty[]   $cmsContentProperties
  *
- * @version > 2.4.8
- * @property CmsContent $parentContent
- * @property CmsContent[] $childrenContents
+ * @property CmsContent             $parentContent
+ * @property CmsContent[]           $childrenContents
  */
 class CmsContent extends Core
 {
@@ -248,10 +249,32 @@ class CmsContent extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCmsContentProperties()
+    /*public function getCmsContentProperties()
     {
         return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }*/
+
+
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentProperty2contents()
+    {
+        return $this->hasMany(CmsContentProperty2content::className(), ['cms_content_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentProperties()
+    {
+        return $this->hasMany(CmsContentProperty::className(), ['id' => 'cms_content_property_id'])->viaTable('cms_content_property2content', ['cms_content_id' => 'id']);
+    }
+
+
 
     /**
      * @return string
@@ -264,7 +287,6 @@ class CmsContent extends Core
 
 
      /**
-      * version > 2.4.8
      * @return \yii\db\ActiveQuery
      */
     public function getParentContent()
@@ -273,7 +295,6 @@ class CmsContent extends Core
     }
 
     /**
-     * version > 2.4.8
      * @return \yii\db\ActiveQuery
      */
     public function getChildrenContents()
