@@ -16,10 +16,9 @@ use yii\helpers\Url;
 use yii\web\Application;
 
 /**
- * TODO::is deprecated
- *
  * Class UrlHelper
- * @package skeeks\cms\helpers
+ * @package         skeeks\cms\helpers
+ * @deprecated
  */
 class UrlHelper
     extends Url
