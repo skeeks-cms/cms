@@ -116,7 +116,7 @@ class AdminToolsController extends AdminController
      */
     public function actionSelectFile()
     {
-        $this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
+        //$this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
         \Yii::$app->cmsToolbar->enabled = 0;
 
         $model = null;
@@ -143,7 +143,7 @@ class AdminToolsController extends AdminController
      */
     public function actionSelectCmsElement()
     {
-        $this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
+        //$this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
         \Yii::$app->cmsToolbar->enabled = 0;
 
         return $this->render($this->action->id);
@@ -155,7 +155,7 @@ class AdminToolsController extends AdminController
      */
     public function actionSelectCmsUser()
     {
-        $this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
+        //$this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
         \Yii::$app->cmsToolbar->enabled = 0;
 
         return $this->render($this->action->id);
