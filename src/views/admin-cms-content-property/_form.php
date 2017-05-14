@@ -79,15 +79,8 @@ JS
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) ?>
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
-
-    <?= $form->field($model, 'searchable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
-    <?= $form->field($model, 'filtrable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
-    <?/*= $form->field($model, 'with_description')->radioList(\Yii::$app->cms->booleanFormat()) */?>
-
 <? if ($content_id = \Yii::$app->request->get('content_id')) : ?>
-
     <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
-
 <? else: ?>
 
     <?= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(

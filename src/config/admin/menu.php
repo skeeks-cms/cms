@@ -315,7 +315,12 @@ return
                 "url"       => ["cms/admin-cms-content-type"],
                 "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/content.png'],
 
-                'items'     => contentEditMenu()
+                'items'     => \yii\helpers\ArrayHelper::merge([
+                    'contentSettings' => [
+                        'url'       => ["/cms/admin-cms-content-property"],
+                        'label'     => \Yii::t('skeeks/cms', "Properties"),
+                    ]
+                ], contentEditMenu())
             ],
 
             [
@@ -346,44 +351,11 @@ return
 
                 'items' =>
                 [
-                    /*[
-                        "label"     => \Yii::t('skeeks/cms',"Checking system"),
-                        "url"       => ["admin/checker"],
-                        "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/tools.png'],
-                    ],*/
-
                     [
                         "label"     => \Yii::t('skeeks/cms',"Information"),
                         "url"       => ["cms/admin-info"],
                         "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.infoblock.png'],
                     ],
-
-/**
- * TODO:: make a separate module
-
-                    [
-                        "label"         => \Yii::t('skeeks/cms','Code generator'). " gii",
-                        "url"           => ["admin/gii"],
-                        "img"           => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ssh.png'],
-                        "accessCallback"=> function()
-                        {
-                            if ((bool) \Yii::$app->hasModule('gii'))
-                            {
-                                /**
-                                 * @var $gii yii\gii\Module
-                                $gii = \Yii::$app->getModule('gii');
-
-                                $ip = \Yii::$app->getRequest()->getUserIP();
-                                foreach ($gii->allowedIPs as $filter) {
-                                    if ($filter === '*' || $filter === $ip || (($pos = strpos($filter, '*')) !== false && !strncmp($ip, $filter, $pos))) {
-                                        return true;
-                                    }
-                                }
-                            }
-
-                            return false;
-                        },
-                    ],*/
                 ]
             ],
 
