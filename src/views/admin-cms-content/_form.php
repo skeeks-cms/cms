@@ -102,7 +102,42 @@ $action     = $controller->action;
     
     <? if (!$model->isNewRecord) : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/cms','Properties')) ?>
-            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+            <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                'dataProvider'      => new \yii\data\ActiveDataProvider([
+                    'query' => \skeeks\cms\models\CmsContentProperty::find()
+                ]),
+                //'filterModel'       => $searchModel,
+                'autoColumns'       => false,
+                //'pjax'              => $pjax,
+                'adminController'   => \Yii::$app->createController('cms/admin-cms-content-property')[0],
+                'columns' => [
+                    [
+                        'attribute'     => 'name',
+                        'enableSorting' => false
+                    ],
+
+                    [
+                        'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                        'attribute'     => 'active',
+                        'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
+                        'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,
+                        'enableSorting' => false
+                    ],
+
+                    [
+                        'attribute'     => 'code',
+                        'enableSorting' => false
+                    ],
+
+                    [
+                        'attribute'     => 'priority',
+                        'enableSorting' => false
+                    ],
+                ],
+            ]); ?>
+
+
+            <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => \Yii::t('skeeks/cms',"Element properties"),
                 'hint'              => \Yii::t('skeeks/cms',"Every content on the site has its own set of properties, its sets here"),
                 'parentModel'       => $model,
@@ -138,26 +173,26 @@ $action     = $controller->action;
                         ],
                     ],
                 ],
-            ]); ?>
+            ]); */?>
         <?= $form->fieldSetEnd(); ?>
     
-        <?= $form->fieldSet(\Yii::t('skeeks/cms','Access')); ?>
-            <? \yii\bootstrap\Alert::begin([
+        <?/*= $form->fieldSet(\Yii::t('skeeks/cms','Access')); */?><!--
+            <?/* \yii\bootstrap\Alert::begin([
                 'options' => [
                   'class' => 'alert-warning',
               ],
-            ]); ?>
+            ]); */?>
             <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
-            <? \yii\bootstrap\Alert::end()?>
+            <?/* \yii\bootstrap\Alert::end()*/?>
     
-            <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
+            <?/*= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
                 'permissionName'        => $model->adminPermissionName,
                 'label'                 => 'Доступ в административной части',
-            ]); ?>
+            ]); */?>
     
     
     
-        <?= $form->fieldSetEnd(); ?>
+        --><?/*= $form->fieldSetEnd(); */?>
     
         <?= $form->fieldSet(\Yii::t('skeeks/cms','Seo')); ?>
             <?= $form->field($model, 'meta_title_template')->textarea()->hint("Используйте конструкции вида {=model.name}"); ?>
@@ -184,7 +219,7 @@ $action     = $controller->action;
             'content' => \Yii::t('skeeks/cms', 'Additionally')
         ]); ?>
         <?= $form->fieldInputInt($model, 'priority'); ?>
-        <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
+        <?/*= $form->fieldRadioListBoolean($model, 'index_for_search'); */?>
     
     <?= $form->fieldSetEnd(); ?>
     

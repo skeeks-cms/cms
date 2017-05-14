@@ -80,10 +80,18 @@ JS
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
 <? if ($content_id = \Yii::$app->request->get('content_id')) : ?>
-    <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
-<? else: ?>
 
-    <?= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(
+
+    <div style="display: none;">
+        <?= $form->field($model, 'cmsContents')->checkboxList(\yii\helpers\ArrayHelper::map(
+            \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
+        ), ['value' => $content_id]); ?>
+    </div>
+
+    <?/*= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); */?>
+
+<? else: ?>
+    <?/*= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\CmsContent::find()->all(),
@@ -92,7 +100,10 @@ JS
              ),
             'controllerRoute' => 'cms/admin-cms-content',
         ]);
-    ?>
+    */?>
+    <?= $form->field($model, 'cmsContents')->checkboxList(\yii\helpers\ArrayHelper::map(
+        \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
+    )); ?>
 
 <? endif; ?>
 

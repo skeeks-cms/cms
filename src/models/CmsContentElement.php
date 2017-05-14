@@ -363,9 +363,9 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getRelatedProperties()
     {
-        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])
-                    ->via('cmsContent')->orderBy(['priority' => SORT_ASC]);
-        //return $this->cmsContent->cmsContentProperties;
+        /*return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])
+                    ->via('cmsContent')->orderBy(['priority' => SORT_ASC]);*/
+        return $this->cmsContent->getCmsContentProperties();
     }
 
     /**
