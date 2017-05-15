@@ -79,7 +79,8 @@ class CmsContentProperty extends RelatedPropertyModel
         $rules = ArrayHelper::merge(parent::rules(), [
             [['content_id'], 'integer'],
             [['cmsContents'], 'safe'],
-            [['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
+            [['code'], 'unique'],
+            //[['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
         ]);
 
         return $rules;
