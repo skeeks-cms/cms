@@ -112,7 +112,6 @@ abstract class RelatedPropertyModel extends Core
             'property_type' => Yii::t('skeeks/cms', 'Property Type'),
             'list_type' => Yii::t('skeeks/cms', 'List Type'),
             'multiple' => Yii::t('skeeks/cms', 'Multiple'),
-            'searchable' => Yii::t('skeeks/cms', 'Searchable'),
             'is_required' => Yii::t('skeeks/cms', 'Is Required'),
             'component' => Yii::t('skeeks/cms', 'Component'),
             'component_settings' => Yii::t('skeeks/cms', 'Component Settings'),
@@ -140,13 +139,13 @@ abstract class RelatedPropertyModel extends Core
                 }
             }],
 
-            [['active', 'property_type', 'list_type', 'multiple', 'searchable', 'is_required'], 'string', 'max' => 1],
+            [['active', 'property_type', 'list_type', 'multiple', 'is_required'], 'string', 'max' => 1],
             ['code', 'default', 'value' => function($model, $attribute)
             {
                 return "property" . StringHelper::ucfirst(md5(rand(1, 10) . time()));
             }],
             ['priority', 'default', 'value' => 500],
-            [['active', 'searchable'], 'default', 'value' => Cms::BOOL_Y],
+            [['active'], 'default', 'value' => Cms::BOOL_Y],
             [['is_required'], 'default', 'value' => Cms::BOOL_N],
         ]);
     }

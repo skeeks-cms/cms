@@ -306,8 +306,22 @@ return
 
             [
                 "label"     => \Yii::t('skeeks/cms',"Settings sections"),
-                "url"       => ["cms/admin-cms-tree-type"],
+                //"url"       => ["cms/admin-cms-tree-type"],
                 "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.tree.gif'],
+                "items" =>
+                [
+                    [
+                        "label"     => \Yii::t('skeeks/cms',"Properties"),
+                        "url"       => ["cms/admin-cms-tree-type-property"],
+                        //"img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.tree.gif'],
+                    ],
+
+                    [
+                        "label"     => \Yii::t('skeeks/cms',"Types"),
+                        "url"       => ["cms/admin-cms-tree-type"],
+                        "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.tree.gif'],
+                    ],
+                ]
             ],
 
             [

@@ -81,25 +81,27 @@ JS
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
 
-
-    <?= $form->fieldRadioListBoolean($model, 'searchable') ?>
-
     <? if ($content_id = \Yii::$app->request->get('tree_type_id')) : ?>
 
-        <?= $form->field($model, 'tree_type_id')->hiddenInput(['value' => $content_id])->label(false); ?>
+        <div style="display: none;">
+            <?= $form->field($model, 'cmsTreeTypes')->checkboxList(\yii\helpers\ArrayHelper::map(
+                \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
+            ), ['value' => $content_id]); ?>
+        </div>
+
+        <?/*= $form->field($model, 'tree_type_id')->hiddenInput(['value' => $content_id])->label(false); */?>
 
     <? else: ?>
 
-        <?= $form->field($model, 'tree_type_id')->label(\Yii::t('skeeks/cms','Section type'))->widget(
-            \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
+        <?= $form->field($model, 'cmsTreeTypes')->widget(
+            \skeeks\widget\chosen\Chosen::class,
+            [
+                'multiple' => true,
                 'items' => \yii\helpers\ArrayHelper::map(
-                     \skeeks\cms\models\CmsTreeType::find()->active()->all(),
-                     "id",
-                     "name"
-                 ),
-                'controllerRoute' => 'cms/admin-cms-tree-type',
-            ]);
-        ?>
+                    \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
+                )
+            ]
+        ); ?>
 
     <? endif; ?>
 <?= $form->fieldSetEnd(); ?>

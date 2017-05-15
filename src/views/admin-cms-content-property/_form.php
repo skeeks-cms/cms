@@ -101,9 +101,15 @@ JS
             'controllerRoute' => 'cms/admin-cms-content',
         ]);
     */?>
-    <?= $form->field($model, 'cmsContents')->checkboxList(\yii\helpers\ArrayHelper::map(
-        \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
-    )); ?>
+    <?= $form->field($model, 'cmsContents')->widget(
+        \skeeks\widget\chosen\Chosen::class,
+        [
+            'multiple' => true,
+            'items' => \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
+            )
+        ]
+    ); ?>
 
 <? endif; ?>
 

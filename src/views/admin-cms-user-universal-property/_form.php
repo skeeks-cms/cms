@@ -86,7 +86,6 @@ JS
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'searchable') ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsStandart($model); ?>

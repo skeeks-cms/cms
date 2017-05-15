@@ -407,6 +407,7 @@ return
     "Show input field values" => "Показывать поле для ввода значения",
     "Generally show the palette" => "Вообще показывать политру",
 
+    "Types"              => "Типы",
     "Datetime"              => "Дата и время",
     "Only date"             => "Только дата",
 
