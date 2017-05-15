@@ -27,6 +27,7 @@ use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\yii2\ajaxfileupload\validators\FileValidator;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\ErrorHandler;
@@ -356,16 +357,28 @@ class CmsContentElement extends RelatedElementModel
     }
 
     /**
-     *
      * Все возможные свойства связанные с моделью
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getRelatedProperties()
     {
-        /*return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])
-                    ->via('cmsContent')->orderBy(['priority' => SORT_ASC]);*/
         return $this->cmsContent->getCmsContentProperties();
+
+        /*$query = $this->cmsContent->getCmsContentProperties();
+        $query->joinWith('cmsContentProperty2trees as map2trees')
+            ->andWhere(['map2trees.cms_tree_id' => $this->treeIds])
+        ;
+
+        $query->groupBy(CmsContentProperty::tableName() . ".id");
+        return $query;
+
+        $query = CmsContentProperty::find()
+            ->from(CmsContentProperty::tableName() . ' AS property')
+            ->joinWith('cmsContentProperty2contents as map2contents')
+            ->joinWith('cmsContentProperty2trees as map2trees')
+            ->andWhere(['map2contents.cms_content_id' => $this->content_id])
+            ->all()
+        ;*/
     }
 
     /**

@@ -111,6 +111,13 @@ JS
         ]
     ); ?>
 
+    <?= $form->field($model, 'cmsTrees')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+        [
+            'multiple' => true,
+        ]
+    ); ?>
+
 <? endif; ?>
 
 <?= $form->fieldSetEnd(); ?>
