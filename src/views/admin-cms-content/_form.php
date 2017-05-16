@@ -102,40 +102,50 @@ $action     = $controller->action;
     
     <? if (!$model->isNewRecord) : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/cms','Properties')) ?>
-            <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-                'dataProvider'      => new \yii\data\ActiveDataProvider([
-                    'query' => \skeeks\cms\models\CmsContentProperty::find()
-                ]),
-                //'filterModel'       => $searchModel,
-                'autoColumns'       => false,
-                //'pjax'              => $pjax,
-                'adminController'   => \Yii::$app->createController('cms/admin-cms-content-property')[0],
-                'columns' => [
-                    [
-                        'attribute'     => 'name',
-                        'enableSorting' => false
-                    ],
 
+            <? $pjax = \yii\widgets\Pjax::begin(); ?>
+                <?
+                    $query = \skeeks\cms\models\CmsContentProperty::find()->orderBy(['priority' => SORT_ASC]);
+                    $query->joinWith('cmsContentProperty2contents map');
+                    $query->andWhere(['map.cms_content_id' => $model->id]);
+                ?>
+                <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                    'dataProvider'      => new \yii\data\ActiveDataProvider([
+                        'query' => $query
+                    ]),
+                    'settingsData' =>
                     [
-                        'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                        'attribute'     => 'active',
-                        'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
-                        'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,
-                        'enableSorting' => false
+                        'namespace' => \Yii::$app->controller->uniqueId . "__" . $model->id
                     ],
-
+                    //'filterModel'       => $searchModel,
+                    'autoColumns'       => false,
+                    'pjax'              => $pjax,
+                    'columns' =>
                     [
-                        'attribute'     => 'code',
-                        'enableSorting' => false
-                    ],
+                        [
+                            'class'                 => \skeeks\cms\modules\admin\grid\ActionColumn::class,
+                            'controller'            => \Yii::$app->createController('cms/admin-cms-content-property')[0],
+                            'isOpenNewWindow'       => true
+                        ],
+                        'name',
+                        'code',
+                        'priority',
+                        [
+                            'label' => \Yii::t('skeeks/cms', 'Content'),
+                            'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
+                            {
+                                $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsContents, 'id', 'name');
+                                return implode(', ', $contents);
+                            }
+                        ],
+                        [
+                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                            'attribute'     => "active"
+                        ],
+                    ]
+                ]); ?>
 
-                    [
-                        'attribute'     => 'priority',
-                        'enableSorting' => false
-                    ],
-                ],
-            ]); ?>
-
+            <? \yii\widgets\Pjax::end(); ?>
 
             <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => \Yii::t('skeeks/cms',"Element properties"),

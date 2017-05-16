@@ -29,7 +29,7 @@
             'code',
             'priority',
             [
-                'label' => \Yii::t('skeeks/cms', 'Content'),
+                'label' => \Yii::t('skeeks/cms', 'Sections'),
                 'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty)
                 {
                     $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTreeTypes, 'id', 'name');
