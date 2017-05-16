@@ -6,6 +6,7 @@ return
     "Meta Description"      =>  "Описание (Meta Description)",
 
     "Message"               =>  "Сообщение",
+    "Loading"               =>  "Загрузка",
     "Users"                 =>  "Пользователи",
 
     "Update"                =>  "Обновить",

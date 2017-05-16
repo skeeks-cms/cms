@@ -46,6 +46,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
 {
     use AdminModelEditorStandartControllerTrait;
 
+    public $notSubmitParam = 'sx-not-submit';
+
     public function init()
     {
         $this->name                     = \Yii::t('skeeks/cms', 'Elements');
@@ -155,42 +157,51 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ]);
         }
 
-
-        if ($rr->isRequestPjaxPost())
+        if ($post = \Yii::$app->request->post())
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
+        }
 
-            if ($model->save() && $relatedModel->save())
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
 
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                if ($model->save() && $relatedModel->save())
                 {
-                    $url = '';
-                    $this->model = $model;
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
-                    if ($this->modelActions)
+                    if (\Yii::$app->request->post('submit-btn') == 'apply')
                     {
-                        if ($action = ArrayHelper::getValue($this->modelActions, $this->modelDefaultAction))
+                        $url = '';
+                        $this->model = $model;
+
+                        if ($this->modelActions)
                         {
-                            $url = $action->url;
+                            if ($action = ArrayHelper::getValue($this->modelActions, $this->modelDefaultAction))
+                            {
+                                $url = $action->url;
+                            }
                         }
-                    }
 
-                    if (!$url)
+                        if (!$url)
+                        {
+                            $url = $this->url;
+                        }
+
+                        return $this->redirect($url);
+                    } else
                     {
-                        $url = $this->url;
+                        return $this->redirect(
+                            $this->url
+                        );
                     }
-
-                    return $this->redirect($url);
-                } else
-                {
-                    return $this->redirect(
-                        $this->url
-                    );
                 }
             }
+
         }
 
         return $this->render('_form', [
@@ -218,26 +229,36 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ]);
         }
 
-        if ($rr->isRequestPjaxPost())
+        if ($post = \Yii::$app->request->post())
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
+        }
 
-            if ($model->save() && $relatedModel->save())
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
 
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {} else
+                if ($model->save() && $relatedModel->save())
                 {
-                    return $this->redirect(
-                        $this->url
-                    );
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+
+                    if (\Yii::$app->request->post('submit-btn') == 'apply')
+                    {} else
+                    {
+                        return $this->redirect(
+                            $this->url
+                        );
+                    }
+
+                    $model->refresh();
+
                 }
-
-                $model->refresh();
-
             }
+
         }
 
         return $this->render('_form', [

@@ -264,7 +264,7 @@
 
             this.getJRadio().on('change', function()
             {
-                self.unSelectValue(self.getJElement().val());
+                self.unSelectValue(self.getJElement().val(), false);
 
                 if ($(this).is(":checked"))
                 {
@@ -289,7 +289,7 @@
             }
         },
 
-        unSelectValue: function(value)
+        unSelectValue: function(value, isTriggerChange = true)
         {
             var self = this;
             $("option[value='" + value + "']", self.getJElement()).remove();
@@ -302,7 +302,10 @@
                 Jelement.removeAttr("checked");
             };
 
-            self.getJElement().change();
+            if (isTriggerChange)
+            {
+                self.getJElement().change();
+            }
 
             return this;
         },
