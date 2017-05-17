@@ -93,6 +93,9 @@ use yii\helpers\Url;
  * @property CmsTreeType                $treeType
  * @property CmsTreeProperty[]          $cmsTreeProperties
  *
+ * @property CmsContentProperty2tree[]  $cmsContentProperty2trees
+ * @property CmsContentProperty[]       $cmsContentProperties
+ *
  *
  * @property Tree                       $parent
  * @property Tree[]                     $parents
@@ -608,6 +611,22 @@ class Tree extends Core
     }
 
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentProperty2trees()
+    {
+        return $this->hasMany(CmsContentProperty2tree::className(), ['cms_tree_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentProperties()
+    {
+        return $this->hasMany(CmsContentProperty::class, ['id' => 'cms_content_property_id'])->viaTable('cms_content_property2tree', ['cms_tree_id' => 'id'])
+            ->orderBy([CmsContentProperty::tableName() . ".priority" => SORT_ASC]);
+    }
 
 
 
