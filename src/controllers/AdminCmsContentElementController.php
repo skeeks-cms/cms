@@ -450,7 +450,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             foreach ($actions as $action)
             {
-                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->model->cmsContent->id]);
             }
         }
 
