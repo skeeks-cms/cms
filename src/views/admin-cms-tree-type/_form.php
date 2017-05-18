@@ -39,43 +39,55 @@ use common\models\User;
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet(\Yii::t('skeeks/cms','Element properties')) ?>
-        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-            'label'             => \Yii::t('skeeks/cms','Element properties'),
-            'hint'              => \Yii::t('skeeks/cms','Every content on the site has its own set of properties, its sets here'),
-            'parentModel'       => $model,
-            'relation'          => [
-                'tree_type_id' => 'id'
-            ],
-            'controllerRoute'   => 'cms/admin-cms-tree-type-property',
-            'gridViewOptions'   => [
-                'sortable' => true,
-                'columns' => [
+    <?= $form->fieldSet(\Yii::t('skeeks/cms','Properties')) ?>
+
+        <? $pjax = \yii\widgets\Pjax::begin(); ?>
+            <?
+                $query = \skeeks\cms\models\CmsTreeTypeProperty::find()->orderBy(['priority' => SORT_ASC]);
+                $query->joinWith('cmsTreeTypeProperty2types map');
+                $query->andWhere(['map.cms_tree_type_id' => $model->id]);
+            ?>
+            <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                'dataProvider'      => new \yii\data\ActiveDataProvider([
+                    'query' => $query
+                ]),
+                'settingsData' =>
+                [
+                    'namespace' => \Yii::$app->controller->uniqueId . "__" . $model->id
+                ],
+                //'filterModel'       => $searchModel,
+                'autoColumns'       => false,
+                'pjax'              => $pjax,
+                'columns' =>
+                [
                     [
-                        'attribute'     => 'name',
-                        'enableSorting' => false
+                        'class'                 => \skeeks\cms\modules\admin\grid\ActionColumn::class,
+                        'controller'            => \Yii::$app->createController('cms/admin-cms-tree-type-property')[0],
+                        'isOpenNewWindow'       => true
                     ],
 
+                    'name',
+                    'code',
+                    'priority',
+                    [
+                        'label' => \Yii::t('skeeks/cms', 'Sections'),
+                        'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty)
+                        {
+                            $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTreeTypes, 'id', 'name');
+                            return implode(', ', $contents);
+                        }
+                    ],
                     [
                         'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                        'attribute'     => 'active',
-                        'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
-                        'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,
-                        'enableSorting' => false
+                        'attribute'     => "active"
                     ],
+                ]
+            ]); ?>
 
-                    [
-                        'attribute'     => 'code',
-                        'enableSorting' => false
-                    ],
+        <? \yii\widgets\Pjax::end(); ?>
 
-                    [
-                        'attribute'     => 'priority',
-                        'enableSorting' => false
-                    ],
-                ],
-            ],
-        ]); ?>
+
+
     <?= $form->fieldSetEnd(); ?>
 <? endif; ?>
 <?= $form->buttonsCreateOrUpdate($model); ?>
