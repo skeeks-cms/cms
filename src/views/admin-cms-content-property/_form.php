@@ -79,18 +79,19 @@ JS
 <?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) ?>
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
-
-    <?= $form->field($model, 'searchable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
-    <?= $form->field($model, 'filtrable')->radioList(\Yii::$app->cms->booleanFormat()) ?>
-    <?/*= $form->field($model, 'with_description')->radioList(\Yii::$app->cms->booleanFormat()) */?>
-
 <? if ($content_id = \Yii::$app->request->get('content_id')) : ?>
 
-    <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
+
+    <div style="display: none;">
+        <?= $form->field($model, 'cmsContents')->checkboxList(\yii\helpers\ArrayHelper::map(
+            \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
+        ), ['value' => $content_id]); ?>
+    </div>
+
+    <?/*= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); */?>
 
 <? else: ?>
-
-    <?= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(
+    <?/*= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\CmsContent::find()->all(),
@@ -99,7 +100,23 @@ JS
              ),
             'controllerRoute' => 'cms/admin-cms-content',
         ]);
-    ?>
+    */?>
+    <?= $form->field($model, 'cmsContents')->widget(
+        \skeeks\widget\chosen\Chosen::class,
+        [
+            'multiple' => true,
+            'items' => \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
+            )
+        ]
+    ); ?>
+
+    <?= $form->field($model, 'cmsTrees')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+        [
+            'multiple' => true,
+        ]
+    ); ?>
 
 <? endif; ?>
 

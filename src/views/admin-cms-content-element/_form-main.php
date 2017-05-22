@@ -30,12 +30,39 @@
         )->label($contentModel->parentContent->name_one) ?>
     <? endif; ?>
 
-    <? if ($model->relatedPropertiesModel->properties) : ?>
+<?
+
+$properties = $model->getRelatedProperties()
+                ->joinWith('cmsContentProperty2trees as map2trees')
+                ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName() . ".id")
+;
+
+$treeIds = $model->treeIds;
+if ($model->tree_id)
+{
+    $treeIds[] = $model->tree_id;
+}
+if ($treeIds)
+{
+    $properties->andWhere([
+        'or',
+        ['map2trees.cms_tree_id' => $treeIds],
+        ['map2trees.cms_tree_id' => null],
+    ]);
+} else
+{
+    $properties->andWhere(['map2trees.cms_tree_id' => null]);
+}
+
+$properties = $properties->all();
+
+?>
+    <? if ($properties) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
-        <? foreach ($model->relatedPropertiesModel->properties as $property) : ?>
-            <?= $property->renderActiveForm($form)?>
+        <? foreach ($properties as $property) : ?>
+            <?= $property->renderActiveForm($form, $model)?>
         <? endforeach; ?>
 
     <? else : ?>

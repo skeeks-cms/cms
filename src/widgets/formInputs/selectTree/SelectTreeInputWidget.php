@@ -114,6 +114,24 @@ class SelectTreeInputWidget extends InputWidget
             $items = [];
         }
 
+        if (is_array($items))
+        {
+            $tmpItems = [];
+            foreach ($items as $key => $item)
+            {
+                if ($item instanceof CmsTree)
+                {
+                    $tmpItems[$item->id] = $item->id;
+                }
+            }
+
+            if ($tmpItems)
+            {
+                $items = $tmpItems;
+            }
+
+        }
+
         $this->options['multiple'] = $this->multiple;
         Html::addCssClass($this->options, 'sx-widget-element');
 
@@ -148,6 +166,25 @@ class SelectTreeInputWidget extends InputWidget
         {
             $model = $models[0];
             $rootLevel = $model->level;
+
+            /**
+             * @var \skeeks\cms\models\CmsTree $tree
+             */
+            $name = $tree->name;
+            if ($tree->parents)
+            {
+                $parents = $tree->getParents()->andWhere(['>=', 'level', $rootLevel])->all();
+                if ($parents)
+                {
+                    $name = implode(" / ", \yii\helpers\ArrayHelper::map($parents, 'id', 'name'));
+                    $name .= " / " . $tree->name;
+                }
+            }
+
+            return $name;
+        } else
+        {
+            $rootLevel = 0;
 
             /**
              * @var \skeeks\cms\models\CmsTree $tree
@@ -248,6 +285,24 @@ class SelectTreeInputWidget extends InputWidget
         if (is_string($value) || is_int($value))
         {
             $items = [$value => $value];
+        }
+
+        if (is_array($items))
+        {
+            $tmpItems = [];
+            foreach ($items as $key => $item)
+            {
+                if ($item instanceof CmsTree)
+                {
+                    $tmpItems[$item->id] = $item->id;
+                }
+            }
+
+            if ($tmpItems)
+            {
+                $items = $tmpItems;
+            }
+
         }
 
         return CmsTree::findAll(["id" => $items]);

@@ -101,64 +101,80 @@ $action     = $controller->action;
     
     
     <? if (!$model->isNewRecord) : ?>
-        <?= $form->fieldSet(\Yii::t('skeeks/cms','Properties')) ?>
-            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                'label'             => \Yii::t('skeeks/cms',"Element properties"),
-                'hint'              => \Yii::t('skeeks/cms',"Every content on the site has its own set of properties, its sets here"),
-                'parentModel'       => $model,
-                'relation'          => [
-                    'content_id' => 'id'
-                ],
-                'controllerRoute'   => 'cms/admin-cms-content-property',
-    
-                'gridViewOptions'   => [
-                    'sortable' => true,
-                    'columns' => [
-                        [
-                            'attribute'     => 'name',
-                            'enableSorting' => false
-                        ],
-    
-                        [
-                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => 'active',
-                            'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
-                            'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,
-                            'enableSorting' => false
-                        ],
-    
-                        [
-                            'attribute'     => 'code',
-                            'enableSorting' => false
-                        ],
-    
-                        [
-                            'attribute'     => 'priority',
-                            'enableSorting' => false
-                        ],
-                    ],
-                ],
-            ]); ?>
-        <?= $form->fieldSetEnd(); ?>
-    
-        <?= $form->fieldSet(\Yii::t('skeeks/cms','Access')); ?>
-            <? \yii\bootstrap\Alert::begin([
-                'options' => [
-                  'class' => 'alert-warning',
-              ],
-            ]); ?>
-            <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
-            <? \yii\bootstrap\Alert::end()?>
-    
-            <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                'permissionName'        => $model->adminPermissionName,
-                'label'                 => 'Доступ в административной части',
-            ]); ?>
-    
-    
-    
-        <?= $form->fieldSetEnd(); ?>
-    
+        <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : ?>
+            <?
+                /**
+                 * @var \skeeks\cms\backend\BackendAction $actionIndex
+                 */
+                $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+                $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
+            ?>
+
+            <? if ($actionIndex) : ?>
+                <?= $form->fieldSet(\Yii::t('skeeks/cms','Properties')) ?>
+
+                    <? $pjax = \yii\widgets\Pjax::begin(); ?>
+                        <?
+                            $query = \skeeks\cms\models\CmsContentProperty::find()->orderBy(['priority' => SORT_ASC]);
+                            $query->joinWith('cmsContentProperty2contents map');
+                            $query->andWhere(['map.cms_content_id' => $model->id]);
+                        ?>
+                        <?
+                        if ($actionCreate)
+                        {
+                            $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
+                                'content_id' => $model->id
+                            ]);
+
+                            echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                                'actions' => ['create' => $actionCreate],
+                                'isOpenNewWindow' => true
+                            ]);
+                        }
+                        ?>
+                        <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                            'dataProvider'      => new \yii\data\ActiveDataProvider([
+                                'query' => $query
+                            ]),
+                            'settingsData' =>
+                            [
+                                'namespace' => \Yii::$app->controller->uniqueId . "__" . $model->id
+                            ],
+                            'adminController' => $controllerProperty,
+                            'isOpenNewWindow'       => true,
+                            //'filterModel'       => $searchModel,
+                            'autoColumns'       => false,
+                            'pjax'              => $pjax,
+                            'columns' =>
+                            [
+                                'name',
+                                'code',
+                                'priority',
+                                [
+                                    'label' => \Yii::t('skeeks/cms', 'Content'),
+                                    'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
+                                    {
+                                        $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsContents, 'id', 'name');
+                                        return implode(', ', $contents);
+                                    }
+                                ],
+                                [
+                                    'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                                    'attribute'     => "active"
+                                ],
+                            ]
+                        ]); ?>
+
+                    <? \yii\widgets\Pjax::end(); ?>
+
+                <?= $form->fieldSetEnd(); ?>
+            <? endif; ?>
+        <? endif; ?>
+
+
+
+
+
         <?= $form->fieldSet(\Yii::t('skeeks/cms','Seo')); ?>
             <?= $form->field($model, 'meta_title_template')->textarea()->hint("Используйте конструкции вида {=model.name}"); ?>
             <?= $form->field($model, 'meta_description_template')->textarea(); ?>
@@ -184,7 +200,7 @@ $action     = $controller->action;
             'content' => \Yii::t('skeeks/cms', 'Additionally')
         ]); ?>
         <?= $form->fieldInputInt($model, 'priority'); ?>
-        <?= $form->fieldRadioListBoolean($model, 'index_for_search'); ?>
+        <?/*= $form->fieldRadioListBoolean($model, 'index_for_search'); */?>
     
     <?= $form->fieldSetEnd(); ?>
     

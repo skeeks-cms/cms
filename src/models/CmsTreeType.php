@@ -28,9 +28,14 @@ use Yii;
  * @property string $viewFile
  * @property integer $default_children_tree_type
  *
+ * ***
+ *
  * @property CmsTree[] $cmsTrees
- * @property CmsTreeTypeProperty[] $cmsTreeTypeProperties
  * @property CmsTreeType $defaultChildrenTreeType
+ *
+ * @property CmsTreeType[] $cmsTreeTypes
+ * @property CmsTreeTypeProperty2type[] $cmsTreeTypeProperty2types
+ * @property CmsTreeTypeProperty[] $cmsTreeTypeProperties
  */
 class CmsTreeType extends Core
 {
@@ -109,7 +114,9 @@ class CmsTreeType extends Core
      */
     public function getCmsTreeTypeProperties()
     {
-        return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);;
+        return $this->hasMany(CmsTreeTypeProperty::className(), ['id' => 'cms_tree_type_property_id'])->viaTable('cms_tree_type_property2type', ['cms_tree_type_id' => 'id']);
+        
+        //return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);;
     }
 
     /**
@@ -119,4 +126,21 @@ class CmsTreeType extends Core
     {
         return $this->hasOne(CmsTreeType::className(), ['id' => 'default_children_tree_type']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeTypes()
+    {
+        return $this->hasMany(CmsTreeType::className(), ['default_children_tree_type' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeTypeProperty2types()
+    {
+        return $this->hasMany(CmsTreeTypeProperty2type::className(), ['cms_tree_type_id' => 'id']);
+    }
+
 }

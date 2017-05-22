@@ -37,12 +37,10 @@ use yii\widgets\ActiveForm;
  * @property string $property_type
  * @property string $list_type
  * @property string $multiple
- * @property integer $multiple_cnt
  * @property string $with_description
  * @property string $searchable
  * @property string $filtrable
  * @property string $is_required
- * @property integer $version
  * @property string $component
  * @property string $component_settings
  * @property string $hint
@@ -114,16 +112,10 @@ abstract class RelatedPropertyModel extends Core
             'property_type' => Yii::t('skeeks/cms', 'Property Type'),
             'list_type' => Yii::t('skeeks/cms', 'List Type'),
             'multiple' => Yii::t('skeeks/cms', 'Multiple'),
-            'multiple_cnt' => Yii::t('skeeks/cms', 'Multiple Cnt'),
-            'with_description' => Yii::t('skeeks/cms', 'With Description'),
-            'searchable' => Yii::t('skeeks/cms', 'Searchable'),
-            'filtrable' => Yii::t('skeeks/cms', 'Filtrable'),
             'is_required' => Yii::t('skeeks/cms', 'Is Required'),
-            'version' => Yii::t('skeeks/cms', 'Version'),
             'component' => Yii::t('skeeks/cms', 'Component'),
             'component_settings' => Yii::t('skeeks/cms', 'Component Settings'),
             'hint' => Yii::t('skeeks/cms', 'Hint'),
-            'smart_filtrable' => Yii::t('skeeks/cms', 'Smart Filtrable'),
         ]);
     }
 
@@ -133,7 +125,7 @@ abstract class RelatedPropertyModel extends Core
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'multiple_cnt', 'version'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
             [['name', 'component'], 'required'],
             [['component_settings'], 'safe'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
@@ -147,14 +139,14 @@ abstract class RelatedPropertyModel extends Core
                 }
             }],
 
-            [['active', 'property_type', 'list_type', 'multiple', 'with_description', 'searchable', 'filtrable', 'is_required', 'smart_filtrable'], 'string', 'max' => 1],
+            [['active', 'property_type', 'list_type', 'multiple', 'is_required'], 'string', 'max' => 1],
             ['code', 'default', 'value' => function($model, $attribute)
             {
                 return "property" . StringHelper::ucfirst(md5(rand(1, 10) . time()));
             }],
             ['priority', 'default', 'value' => 500],
-            [['active', 'searchable'], 'default', 'value' => Cms::BOOL_Y],
-            [['is_required', 'smart_filtrable', 'filtrable', 'with_description'], 'default', 'value' => Cms::BOOL_N],
+            [['active'], 'default', 'value' => Cms::BOOL_Y],
+            [['is_required'], 'default', 'value' => Cms::BOOL_N],
         ]);
     }
 
@@ -177,8 +169,9 @@ abstract class RelatedPropertyModel extends Core
 
     /**
      * @param ActiveForm $activeForm
-     * @param \skeeks\cms\relatedProperties\models\RelatedElementModel $model TODO: is depricated @version > 3.0.2
+     * @param \skeeks\cms\relatedProperties\models\RelatedElementModel $model
      * @return mixed
+     * @deprecated
      */
     public function renderActiveForm(ActiveForm $activeForm, $model = null)
     {

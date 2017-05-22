@@ -6,6 +6,7 @@ return
     "Meta Description"      =>  "Описание (Meta Description)",
 
     "Message"               =>  "Сообщение",
+    "Loading"               =>  "Загрузка",
     "Users"                 =>  "Пользователи",
 
     "Update"                =>  "Обновить",
@@ -52,6 +53,7 @@ return
     "With Description"      =>  "Выводить поле для описания значения",
     "Searchable"            =>  "Значения свойства участвуют в поиске",
     "Filtrable"             =>  "Выводить на странице списка элементов поле для фильтрации по этому свойству",
+    "Linked to sections"    =>  "Привязка к разделам",
 
     "Value"                 =>  "Значение",
     "Server Name"           =>  "Имя сервера",
@@ -407,6 +409,7 @@ return
     "Show input field values" => "Показывать поле для ввода значения",
     "Generally show the palette" => "Вообще показывать политру",
 
+    "Types"              => "Типы",
     "Datetime"              => "Дата и время",
     "Only date"             => "Только дата",
 
