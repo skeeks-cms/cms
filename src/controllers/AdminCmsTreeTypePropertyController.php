@@ -148,7 +148,7 @@ class AdminCmsTreeTypePropertyController extends AdminModelEditorController
                         } else
                         {
                             return $this->redirect(
-                                $this->indexUrl
+                                $this->url
                             );
                         }
 

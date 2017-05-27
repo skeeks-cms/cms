@@ -153,7 +153,7 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
                         } else
                         {
                             return $this->redirect(
-                                $this->indexUrl
+                                $this->url
                             );
                         }
 

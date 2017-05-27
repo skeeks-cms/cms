@@ -132,7 +132,7 @@ class AdminProfileController extends BackendModelController
                 } else
                 {
                     return $this->redirect(
-                        $this->indexUrl
+                        $this->url
                     );
                 }
 
