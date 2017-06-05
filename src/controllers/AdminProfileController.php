@@ -68,9 +68,10 @@ class AdminProfileController extends BackendModelController
 
             'update' =>
             [
-                'class'         => BackendModelUpdateAction::class,
-                "callback"      => [$this, 'update'],
-                "isVisible"      => false
+                'class'                 => BackendModelUpdateAction::class,
+                "callback"              => [$this, 'update'],
+                "isVisible"             => false,
+                "accessCallback"        => false
             ],
         ]);
 
