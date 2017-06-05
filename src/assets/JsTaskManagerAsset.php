@@ -28,6 +28,6 @@ class JsTaskManagerAsset extends AssetBundle
     ];
 
     public $depends = [
-        '\skeeks\sx\assets\Core',
+        '\skeeks\sx\assets\Custom',
     ];
 }
