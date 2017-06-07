@@ -15,13 +15,13 @@ $autoEnvFile = '';
 if (file_exists(APP_ENV_GLOBAL_FILE))
 {
     $autoEnvFile = \Yii::t('skeeks/cms','Yes').' ';
-    $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/remove-env-global-file')->enableAdmin()->toString() . "'>".\Yii::t('skeeks/cms','Delete')."</a>  ";
+    $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('cms/admin-info/remove-env-global-file')->enableAdmin()->toString() . "'>".\Yii::t('skeeks/cms','Delete')."</a>  ";
 } else
 {
     $autoEnvFile = \Yii::t('skeeks/cms','No').' ';
 }
-$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'dev'])->enableAdmin()->toString() . "'>".\Yii::t('skeeks/cms', 'To record')." dev</a>  ";
-$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('admin/info/write-env-global-file', ['env' => 'prod'])->enableAdmin()->toString() . "'>".\Yii::t('skeeks/cms', 'To record')." prod</a>";
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('cms/admin-info/write-env-global-file', ['env' => 'dev'])->enableAdmin()->toString() . "'>".\Yii::t('skeeks/cms', 'To record')." dev</a>  ";
+$autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers\UrlHelper::construct('cms/admin-info/write-env-global-file', ['env' => 'prod'])->enableAdmin()->toString() . "'>".\Yii::t('skeeks/cms', 'To record')." prod</a>";
 
 ?>
 <? $form = ActiveForm::begin(); ?>
