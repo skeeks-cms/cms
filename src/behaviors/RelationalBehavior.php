@@ -26,6 +26,8 @@ class RelationalBehavior extends Behavior
      * @var ActiveRecord
      */
     public $owner;
+    public $relationNames = [];
+
     public function attach($owner)
     {
         if (!($owner instanceof ActiveRecord)) {
@@ -70,7 +72,14 @@ class RelationalBehavior extends Behavior
         /** @var ActiveRecord $model */
         $model = $event->sender;
         $relatedRecords = $model->getRelatedRecords();
+
         foreach ($relatedRecords as $relationName => $relationRecords) {
+
+            if ($this->relationNames && !in_array($relationName, $this->relationNames))
+            {
+                continue;
+            }
+
             $activeQuery = $model->getRelation($relationName);
             if (!empty($activeQuery->via)) { // works only for many-to-many relation
                 /* @var $viaQuery ActiveQuery */
@@ -107,5 +116,6 @@ class RelationalBehavior extends Behavior
                 });
             }
         }
+
     }
 }

@@ -52,7 +52,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $this->name                     = \Yii::t('skeeks/cms', 'Elements');
         $this->modelShowAttribute       = "name";
-        $this->modelClassName           = CmsContentElement::class;
+        $this->modelClassName           = \common\models\CmsContentElement::class;
 
         parent::init();
     }
