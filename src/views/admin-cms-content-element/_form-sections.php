@@ -39,7 +39,7 @@
                     \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                     [
                         'options' => [
-                            'data-form-reload' => 'true'
+                            //'data-form-reload' => 'true'
                         ],
                         'multiple' => true,
                         'treeWidgetOptions' =>
