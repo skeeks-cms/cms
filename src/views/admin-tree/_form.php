@@ -255,7 +255,7 @@ JS
 <?= $form->fieldSetEnd() ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Images')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms','Images/Files')); ?>
 
     <?= $form->field($model, 'imageIds')->widget(
         \skeeks\cms\widgets\AjaxFileUploadWidget::class,
@@ -265,11 +265,6 @@ JS
         ]
     ); ?>
 
-<?= $form->fieldSetEnd()?>
-
-
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Files')); ?>
-
     <?= $form->field($model, 'fileIds')->widget(
         \skeeks\cms\widgets\AjaxFileUploadWidget::class,
         [
@@ -278,6 +273,7 @@ JS
     ); ?>
 
 <?= $form->fieldSetEnd()?>
+
 
 <!--
 <?/*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) */?>

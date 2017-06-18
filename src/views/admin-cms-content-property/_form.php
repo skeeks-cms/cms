@@ -105,9 +105,7 @@ JS
         \skeeks\widget\chosen\Chosen::class,
         [
             'multiple' => true,
-            'items' => \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
-            )
+            'items' => \skeeks\cms\models\CmsContent::getDataForSelect()
         ]
     ); ?>
 

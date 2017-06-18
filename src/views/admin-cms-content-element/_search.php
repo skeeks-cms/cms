@@ -29,13 +29,12 @@
         'size' => 1
     ]); ?>
 
-    <?= $form->field($searchModel, 'section')->listBox(\yii\helpers\ArrayHelper::merge([
-        '' => ' - '
-    ], \skeeks\cms\helpers\TreeOptions::getAllMultiOptions()),
-    [
-        'unselect' => ' - ',
-        'size' => 1
-    ]); ?>
+    <?= $form->field($searchModel, 'section')->widget(
+        \skeeks\widget\chosen\Chosen::class,
+        [
+            'items' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions()
+        ]
+    ); ?>
 
 
     <?= $form->field($searchModel, 'has_image')->checkbox(\Yii::$app->formatter->booleanFormat, false); ?>

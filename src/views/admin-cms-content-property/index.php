@@ -26,8 +26,16 @@
         'columns' =>
         [
             'name',
-            'code',
-            'priority',
+
+            [
+                'label' => \Yii::t('skeeks/cms', 'Type'),
+                'format' => 'raw',
+                'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
+                {
+                    return $cmsContentProperty->handler->name;
+                }
+            ],
+
             [
                 'label' => \Yii::t('skeeks/cms', 'Content'),
                 'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
@@ -36,10 +44,52 @@
                     return implode(', ', $contents);
                 }
             ],
+
+            [
+                'label' => \Yii::t('skeeks/cms', 'Sections'),
+                'format' => 'raw',
+                'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
+                {
+                    if ($cmsContentProperty->cmsTrees)
+                    {
+                        $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTrees, 'id', function($cmsTree)
+                        {
+                            $path = [];
+
+                            if ($cmsTree->parents)
+                            {
+                                foreach ($cmsTree->parents as $parent)
+                                {
+                                    if ($parent->isRoot())
+                                    {
+                                        $path[] =  "[" . $parent->site->name . "] " . $parent->name;
+                                    } else
+                                    {
+                                        $path[] =  $parent->name;
+                                    }
+                                }
+                            }
+                            $path = implode(" / ", $path);
+                            return "<small><a href='{$cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$cmsTree->name}</a></small>";
+
+                        });
+
+
+                        return '<b>' . \Yii::t('skeeks/cms', 'Only shown in sections') . ':</b><br />' . implode('<br />', $contents);
+                    } else
+                    {
+                        return '<b>' . \Yii::t('skeeks/cms', 'Always shown') . '</b>';
+                    }
+                }
+            ],
+
             [
                 'class'         => \skeeks\cms\grid\BooleanColumn::className(),
                 'attribute'     => "active"
             ],
+
+            'code',
+            'priority',
         ]
     ]); ?>
 

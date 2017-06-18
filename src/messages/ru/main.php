@@ -23,6 +23,9 @@ return
     "Managing property values"   => "Управление значениями свойств",
     "Management of languages"   => "Управление языковыми версиями",
 
+    "Only shown in sections"=> "Показывается только в разделах",
+    "Always shown"          => "Показывается всегда",
+
 
     "Created By"            =>  "Автор",
     "Updated By"            =>  "Последний обновил",
