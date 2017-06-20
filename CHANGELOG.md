@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0.pre
+4.0.0-alpha
 ---------------
  * Using paulzi/yii2-auto-tree
  * Removed skeeks\cms\base\CheckComponent
