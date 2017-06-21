@@ -99,7 +99,7 @@ JS
                 <? foreach($behavior->relations as $relationName) : ?>
 
 
-                <?= $form->field($model, $relationName['property'])->widget(
+                <?= $form->field($model, $relationName['relation'])->widget(
                     \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
                     [
                         'viewItemTemplate' => '@skeeks/cms/views/admin-tools/one-file'
