@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha1
+---------------
+ * Fixed rp
+ 
 4.0.0-alpha
 ---------------
  * Using paulzi/yii2-auto-tree

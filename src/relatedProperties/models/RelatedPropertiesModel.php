@@ -477,7 +477,7 @@ class RelatedPropertiesModel extends DynamicModel
         $value      = $this->getAttribute($name);
         $property   = $this->getRelatedProperty($name);
 
-        if ($property->property_type == PropertyType::CODE_LIST)
+        if ($property && $property->property_type == PropertyType::CODE_LIST)
         {
             if ($property->handler->isMultiple)
             {
