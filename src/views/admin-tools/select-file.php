@@ -98,12 +98,13 @@ JS
             <? elseif ($behavior instanceof \skeeks\cms\models\behaviors\HasStorageFileMulti) : ?>
                 <? foreach($behavior->relations as $relationName) : ?>
 
-                    <?= $form->field($model, $relationName)->widget(
-                        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
-                        [
-                            'viewItemTemplate' => '@skeeks/cms/views/admin-tools/one-file'
-                        ]
-                    ); ?>
+
+                <?= $form->field($model, $relationName['property'])->widget(
+                    \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
+                    [
+                        'viewItemTemplate' => '@skeeks/cms/views/admin-tools/one-file'
+                    ]
+                ); ?>
 
                 <? endforeach; ?>
             <? endif; ?>
