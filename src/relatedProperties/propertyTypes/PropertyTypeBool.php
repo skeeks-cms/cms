@@ -29,7 +29,7 @@ class PropertyTypeBool extends PropertyType
     {
         return [
             'radioList'      => \Yii::t('skeeks/cms', 'Radio'),
-            'checkboxList'   => \Yii::t('skeeks/cms', 'Checkbox'),
+            'checkbox'   => \Yii::t('skeeks/cms', 'Checkbox'),
             'listBox'        => \Yii::t('skeeks/cms', 'listBox'),
         ];
     }
@@ -81,7 +81,14 @@ class PropertyTypeBool extends PropertyType
         if (in_array($this->fieldElement, array_keys(self::fieldElements())))
         {
             $fieldElement = $this->fieldElement;
-            $field->{$fieldElement}(\Yii::$app->formatter->booleanFormat);
+
+            if ($fieldElement == 'radioList' || $fieldElement == 'listbox')
+            {
+                $field->{$fieldElement}(\Yii::$app->formatter->booleanFormat);
+            } else
+            {
+                $field->{$fieldElement}();
+            }
 
         } else
         {
