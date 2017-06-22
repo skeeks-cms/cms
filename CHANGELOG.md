@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0-alpha1.pre
+4.0.0-alpha1
 ---------------
  * Fixed select file
  * Fixed rp
