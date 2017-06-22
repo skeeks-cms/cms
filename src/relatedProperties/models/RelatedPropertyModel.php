@@ -35,16 +35,11 @@ use yii\widgets\ActiveForm;
  * @property string $active
  * @property integer $priority
  * @property string $property_type
- * @property string $list_type
  * @property string $multiple
- * @property string $with_description
- * @property string $searchable
- * @property string $filtrable
  * @property string $is_required
  * @property string $component
  * @property string $component_settings
  * @property string $hint
- * @property string $smart_filtrable
  *
  * @property RelatedElementPropertyModel[]      $elementProperties
  * @property RelatedPropertyEnumModel[]         $enums
@@ -110,7 +105,6 @@ abstract class RelatedPropertyModel extends Core
             'active' => Yii::t('skeeks/cms', 'Active'),
             'priority' => Yii::t('skeeks/cms', 'Priority'),
             'property_type' => Yii::t('skeeks/cms', 'Property Type'),
-            'list_type' => Yii::t('skeeks/cms', 'List Type'),
             'multiple' => Yii::t('skeeks/cms', 'Multiple'),
             'is_required' => Yii::t('skeeks/cms', 'Is Required'),
             'component' => Yii::t('skeeks/cms', 'Component'),
@@ -139,7 +133,7 @@ abstract class RelatedPropertyModel extends Core
                 }
             }],
 
-            [['active', 'property_type', 'list_type', 'multiple', 'is_required'], 'string', 'max' => 1],
+            [['active', 'property_type', 'multiple', 'is_required'], 'string', 'max' => 1],
             ['code', 'default', 'value' => function($model, $attribute)
             {
                 return "property" . StringHelper::ucfirst(md5(rand(1, 10) . time()));

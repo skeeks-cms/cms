@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha2.pre
+---------------
+ * drop list_type
+ 
 4.0.0-alpha1
 ---------------
  * Fixed select file
