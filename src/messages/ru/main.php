@@ -25,6 +25,7 @@ return
 
     "Only shown in sections"=> "Показывается только в разделах",
     "Always shown"          => "Показывается всегда",
+    "Yes/No"                => "Да/Нет",
 
 
     "Created By"            =>  "Автор",

@@ -192,20 +192,9 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     const CODE_LIST     = 'L';
     const CODE_TREE     = 'T';
     const CODE_ELEMENT  = 'E';
+    const CODE_BOOL     = 'B';
 
 
-    const VALUE_TYPE_BOOL       = 'bool';
-    const VALUE_TYPE_INT        = 'int';
-    const VALUE_TYPE_NUM        = 'num';
-    const VALUE_TYPE_INT_RANGE  = 'int_range';
-    const VALUE_TYPE_NUM_RANGE  = 'num_range';
-    //const VALUE_TYPE_JSON     = 'json';
-    const VALUE_TYPE_STRING     = 'string';
-    const VALUE_TYPE_TEXT       = 'text';
-
-    const VALUE_TYPE_SOPTION    = 'soption';
-    const VALUE_TYPE_ELEMENT    = 'element';
-    const VALUE_TYPE_SECTION    = 'section';
 
     /**
      * TODO: It may be deprecated @version > 3.0.2

@@ -86,7 +86,14 @@ abstract class RelatedElementPropertyModel extends Core
                 }
                 return $value;
             }],
+
             ['value_num', 'number'],
+            ['value_bool', 'boolean'],
+
+            ['value_bool', 'filter', 'filter' => function ($value) {
+                $value = (bool) $value;
+                return $value;
+            }],
 
         ]);
     }

@@ -50,6 +50,20 @@ use yii\widgets\ActiveForm;
  */
 abstract class RelatedPropertyModel extends Core
 {
+    const VALUE_TYPE_BOOL       = 'bool';
+    const VALUE_TYPE_INT        = 'int';
+    const VALUE_TYPE_NUM        = 'num';
+    const VALUE_TYPE_INT_RANGE  = 'int_range';
+    const VALUE_TYPE_NUM_RANGE  = 'num_range';
+    //const VALUE_TYPE_JSON     = 'json';
+    const VALUE_TYPE_STRING     = 'string';
+    const VALUE_TYPE_TEXT       = 'text';
+
+    const VALUE_TYPE_SOPTION    = 'soption';
+    const VALUE_TYPE_ELEMENT    = 'element';
+    const VALUE_TYPE_SECTION    = 'section';
+
+
     /**
      * @var RelatedPropertiesModel
      */

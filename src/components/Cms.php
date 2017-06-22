@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeBool;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeFile;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
@@ -208,6 +209,10 @@ class Cms extends \skeeks\cms\base\Component
                 [
                     'class' => PropertyTypeNumber::className()
                 ],
+                PropertyTypeBool::className() =>
+                [
+                    'class' => PropertyTypeBool::className()
+                ],
                 PropertyTypeList::className() =>
                 [
                     'class' => PropertyTypeList::className()
@@ -224,6 +229,7 @@ class Cms extends \skeeks\cms\base\Component
                 [
                     'class' => PropertyTypeElement::className()
                 ],
+
 
 
                 UserPropertyTypeDate::className() =>
@@ -470,7 +476,7 @@ class Cms extends \skeeks\cms\base\Component
         {
             foreach ($this->relatedHandlers as $id => $handler)
             {
-                if ($handler instanceof PropertyTypeText || $handler instanceof PropertyTypeNumber || $handler instanceof PropertyTypeList
+                if ($handler instanceof PropertyTypeBool || $handler instanceof PropertyTypeText || $handler instanceof PropertyTypeNumber || $handler instanceof PropertyTypeList
                     || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement)
                 {
                     $baseTypes[$handler->id] = $handler->name;

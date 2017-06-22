@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.0-alpha2.pre
 ---------------
+ * new rp boolean value
  * drop list_type
  
 4.0.0-alpha1
