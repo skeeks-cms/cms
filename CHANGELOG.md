@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0-alpha2.pre
+4.0.0-alpha2
 ---------------
  * new rp boolean value
  * drop list_type
