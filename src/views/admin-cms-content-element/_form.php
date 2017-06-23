@@ -124,6 +124,12 @@ JS
         'model'             => $model,
     ]); ?>
 
+    <?= $this->render('_form-additionaly', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
+
 
 
 

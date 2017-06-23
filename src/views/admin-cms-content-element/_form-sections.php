@@ -10,11 +10,11 @@
         <? $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all(); ?>
     <? endif; ?>
 
-    <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
-        <? if ($rootTreeModels) : ?>
+    <?/* if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : */?><!--
+        <?/* if ($rootTreeModels) : */?>
             <div class="row">
                 <div class="col-lg-8 col-md-12 col-sm-12">
-                    <?= $form->field($model, 'tree_id')->widget(
+                    <?/*= $form->field($model, 'tree_id')->widget(
                         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                         [
                             'options' => [
@@ -26,11 +26,11 @@
                                 'models' => $rootTreeModels
                             ]
                         ]
-                    ); ?>
+                    ); */?>
                 </div>
             </div>
-        <? endif; ?>
-    <? endif; ?>
+        <?/* endif; */?>
+    --><?/* endif; */?>
 
     <? if ($rootTreeModels) : ?>
         <div class="row">

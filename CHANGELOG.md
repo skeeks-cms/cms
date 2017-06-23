@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha3.pre
+---------------
+ * Change the form of editing elements
+ 
 4.0.0-alpha2
 ---------------
  * new rp boolean value
