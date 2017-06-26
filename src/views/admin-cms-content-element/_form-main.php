@@ -61,7 +61,7 @@ if ($treeIds)
     $properties->andWhere(['map2trees.cms_tree_id' => null]);
 }
 
-$properties = $properties->all();
+$properties = $properties->orderBy(['priority' => SORT_ASC])->all();
 
 ?>
     <? if ($properties) : ?>
