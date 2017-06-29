@@ -333,6 +333,10 @@ return
                     'contentSettings' => [
                         'url'       => ["/cms/admin-cms-content-property"],
                         'label'     => \Yii::t('skeeks/cms', "Properties"),
+                    ],
+                    'contentSettingsEnum' => [
+                        'url'       => ["/cms/admin-cms-content-property-enum"],
+                        'label'     => \Yii::t('skeeks/cms', "Options"),
                     ]
                 ], contentEditMenu())
             ],

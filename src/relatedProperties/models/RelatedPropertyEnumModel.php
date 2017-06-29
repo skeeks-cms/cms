@@ -42,9 +42,9 @@ abstract class RelatedPropertyEnumModel extends Core
             'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
             'created_at' => Yii::t('skeeks/cms', 'Created At'),
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'property_id' => Yii::t('skeeks/cms', 'Property ID'),
+            'property_id' => Yii::t('skeeks/cms', 'Property'),
             'value' => Yii::t('skeeks/cms', 'Value'),
-            'def' => Yii::t('skeeks/cms', 'Def'),
+            'def' => Yii::t('skeeks/cms', 'Default'),
             'code' => Yii::t('skeeks/cms', 'Code'),
             'priority' => Yii::t('skeeks/cms', 'Priority'),
         ]);
@@ -57,7 +57,7 @@ abstract class RelatedPropertyEnumModel extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'priority'], 'integer'],
-            [['value'], 'required'],
+            [['value', 'property_id'], 'required'],
             [['value'], 'string', 'max' => 255],
             [['def'], 'string', 'max' => 1],
             [['code'], 'string', 'max' => 32],

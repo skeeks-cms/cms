@@ -105,6 +105,7 @@ $action     = $controller->action;
             <?
                 /**
                  * @var \skeeks\cms\backend\BackendAction $actionIndex
+                 * @var \skeeks\cms\backend\BackendAction $actionCreate
                  */
                 $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
                 $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
@@ -125,6 +126,8 @@ $action     = $controller->action;
                             $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
                                 'content_id' => $model->id
                             ]);
+
+                            $actionCreate->name = \Yii::t("skeeks/cms", "Create");
 
                             /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
                                 'actions' => ['create' => $actionCreate],

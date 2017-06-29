@@ -92,7 +92,87 @@ class PropertyTypeList extends PropertyType
     {
         echo $activeForm->fieldSelect($this, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements());
 
-        echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+        if ($controllerProperty = \Yii::$app->createController($this->enumRoute)[0])
+        {
+            /**
+             * @var \skeeks\cms\backend\BackendAction $actionIndex
+             * @var \skeeks\cms\backend\BackendAction $actionCreate
+             */
+            $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+            $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
+
+            if ($actionIndex)
+            {
+                $pjax = \yii\widgets\Pjax::begin();
+
+                if ($actionCreate)
+                {
+                    $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
+                        'property_id' => $this->property->id
+                    ]);
+
+                    echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                        'actions' => ['create' => $actionCreate],
+                        'clientOptions'     => ['pjax-id' => $pjax->id],
+                        'isOpenNewWindow'   => true,
+                        'tag'               => 'div',
+                        'itemWrapperTag'    => 'span',
+                        'itemTag'           => 'button',
+                        'itemOptions'       => ['class' => 'btn btn-default'],
+                        'options'           => ['class' => 'sx-controll-actions'],
+                    ]);
+                }
+
+                $query = \skeeks\cms\models\CmsContentPropertyEnum::find()->orderBy(['priority' => SORT_ASC]);
+                $query->andWhere(['property_id' => $this->property->id]);
+
+                echo \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                    'dataProvider'      => new \yii\data\ActiveDataProvider([
+                        'query' => $query
+                    ]),
+                    'settingsData' =>
+                    [
+                        'namespace' => \Yii::$app->controller->uniqueId . "__" . $this->property->id
+                    ],
+                    'adminController' => $controllerProperty,
+                    'isOpenNewWindow'       => true,
+                    //'filterModel'       => $searchModel,
+                    'autoColumns'       => false,
+                    'pjax'      => $pjax,
+                    'columns' => [
+                        [
+                            'attribute'     => 'id',
+                            'enableSorting' => false
+                        ],
+
+                        [
+                            'attribute'     => 'code',
+                            'enableSorting' => false
+                        ],
+
+                        [
+                            'attribute'     => 'value',
+                            'enableSorting' => false
+                        ],
+
+                        [
+                            'attribute'     => 'priority',
+                            'enableSorting' => false
+                        ],
+
+                        [
+                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                            'attribute'     => 'def',
+                            'enableSorting' => false
+                        ],
+                    ]
+                ]);
+
+                \yii\widgets\Pjax::end();
+            }
+        }
+
+        /*echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => \Yii::t('skeeks/cms',"Values for list"),
             'hint'              => \Yii::t('skeeks/cms',"You can snap to the element number of properties, and set the value to them"),
             'parentModel'       => $this->property,
@@ -131,7 +211,7 @@ class PropertyTypeList extends PropertyType
                     ],
                 ],
             ],
-        ]);
+        ]);*/
     }
 
     /**

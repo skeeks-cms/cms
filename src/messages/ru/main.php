@@ -22,10 +22,13 @@ return
     "Property management"   => "Управление свойствами",
     "Managing property values"   => "Управление значениями свойств",
     "Management of languages"   => "Управление языковыми версиями",
+    "Properties of elements"   => "Свойства элементов",
 
     "Only shown in sections"=> "Показывается только в разделах",
     "Always shown"          => "Показывается всегда",
     "Yes/No"                => "Да/Нет",
+    "Options"               => "Опции",
+    "Property"              => "Свойство",
 
 
     "Created By"            =>  "Автор",

@@ -275,6 +275,172 @@ JS
 <?= $form->fieldSetEnd()?>
 
 
+
+
+
+
+
+
+
+
+<? if (!$model->isNewRecord) : ?>
+        <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : ?>
+            <?
+                /**
+                 * @var \skeeks\cms\backend\BackendAction $actionIndex
+                 * @var \skeeks\cms\backend\BackendAction $actionCreate
+                 */
+                $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+                $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
+            ?>
+
+            <? if ($actionIndex) : ?>
+
+                <? if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : ?>
+
+                    <?= $form->fieldSet(\Yii::t('skeeks/cms','Properties of elements')) ?>
+
+
+                    <? foreach ($contents as $content) : ?>
+
+                        <h2><?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                            'content' => $content->name
+                        ]); ?></h2>
+                        <? $pjax = \yii\widgets\Pjax::begin(); ?>
+                            <?
+                                $query = \skeeks\cms\models\CmsContentProperty::find()->orderBy(['priority' => SORT_ASC]);
+                                $query->joinWith('cmsContentProperty2contents cmap');
+                                $query->joinWith('cmsContentProperty2trees tmap');
+                                $query->andWhere([
+                                    'cmap.cms_content_id' => $content->id,
+                                ]);
+                                $query->andWhere([
+                                    'or',
+                                    ['tmap.cms_tree_id' => $model->id],
+                                    ['tmap.cms_tree_id' => null],
+                                ]);
+                            ?>
+                            <?
+                            if ($actionCreate)
+                            {
+                                $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
+                                    'content_id' => $content->id,
+                                    'tree_id' => $model->id
+                                ]);
+
+                                $actionCreate->name = \Yii::t("skeeks/cms", "Create");
+
+                                echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                                    'actions' => ['create' => $actionCreate],
+                                    'clientOptions'     => ['pjax-id' => $pjax->id],
+                                    'isOpenNewWindow'   => true,
+                                    'tag'               => 'div',
+                                    'itemWrapperTag'    => 'span',
+                                    'itemTag'           => 'button',
+                                    'itemOptions'       => ['class' => 'btn btn-default'],
+                                    'options'           => ['class' => 'sx-controll-actions'],
+                                ]);
+                            }
+                            ?>
+                            <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                                'dataProvider'      => new \yii\data\ActiveDataProvider([
+                                    'query' => $query
+                                ]),
+                                'settingsData' =>
+                                [
+                                    'namespace' => \Yii::$app->controller->uniqueId . "__" . $model->id
+                                ],
+                                'adminController' => $controllerProperty,
+                                'isOpenNewWindow'       => true,
+                                //'filterModel'       => $searchModel,
+                                'autoColumns'       => false,
+                                'pjax'              => $pjax,
+                                'columns' =>
+                                [
+                                    'name',
+
+                                    [
+                                        'label' => \Yii::t('skeeks/cms', 'Type'),
+                                        'format' => 'raw',
+                                        'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
+                                        {
+                                            return $cmsContentProperty->handler->name;
+                                        }
+                                    ],
+
+                                    [
+                                        'label' => \Yii::t('skeeks/cms', 'Content'),
+                                        'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
+                                        {
+                                            $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsContents, 'id', 'name');
+                                            return implode(', ', $contents);
+                                        }
+                                    ],
+
+                                    [
+                                        'label' => \Yii::t('skeeks/cms', 'Sections'),
+                                        'format' => 'raw',
+                                        'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty)
+                                        {
+                                            if ($cmsContentProperty->cmsTrees)
+                                            {
+                                                $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTrees, 'id', function($cmsTree)
+                                                {
+                                                    $path = [];
+
+                                                    if ($cmsTree->parents)
+                                                    {
+                                                        foreach ($cmsTree->parents as $parent)
+                                                        {
+                                                            if ($parent->isRoot())
+                                                            {
+                                                                $path[] =  "[" . $parent->site->name . "] " . $parent->name;
+                                                            } else
+                                                            {
+                                                                $path[] =  $parent->name;
+                                                            }
+                                                        }
+                                                    }
+                                                    $path = implode(" / ", $path);
+                                                    return "<small><a href='{$cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$cmsTree->name}</a></small>";
+
+                                                });
+
+
+                                                return '<b>' . \Yii::t('skeeks/cms', 'Only shown in sections') . ':</b><br />' . implode('<br />', $contents);
+                                            } else
+                                            {
+                                                return '<b>' . \Yii::t('skeeks/cms', 'Always shown') . '</b>';
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                                        'attribute'     => "active"
+                                    ],
+                                    'code',
+                                    'priority',
+                                ]
+                            ]); ?>
+
+                        <? \yii\widgets\Pjax::end(); ?>
+
+                    <? endforeach; ?>
+
+
+
+
+                    <?= $form->fieldSetEnd(); ?>
+
+
+
+                <? endif; ?>
+
+
+            <? endif; ?>
+        <? endif; ?>
+<? endif; ?>
+
 <!--
 <?/*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) */?>
 

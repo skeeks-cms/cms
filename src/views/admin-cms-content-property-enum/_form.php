@@ -21,8 +21,9 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
     ?>
     <? endif; ?>
 
-    <?= $form->field($model, 'value')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 32]) ?>
+    <?= $form->field($model, 'value')->textInput(['maxlength' => 255]); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 32]); ?>
+    <?= $form->field($model, 'priority'); ?>
 
     <?= $form->buttonsCreateOrUpdate($model); ?>
 

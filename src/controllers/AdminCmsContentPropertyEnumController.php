@@ -7,9 +7,12 @@
  */
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminCmsContentPropertyEnumController
@@ -26,4 +29,18 @@ class AdminCmsContentPropertyEnumController extends AdminModelEditorController
         parent::init();
     }
 
+    /**
+     * @inheritdoc
+     */
+    /*public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+        [
+            'bind' =>
+            [
+                'class' => BackendAction::class,
+                'name' => 'Привязать'
+            ]
+        ]);
+    }*/
 }

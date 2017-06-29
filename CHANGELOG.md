@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.0-alpha3.pre
 ---------------
+ * Add Properties of elements in tree
  * Change the form of editing elements
  
 4.0.0-alpha2
