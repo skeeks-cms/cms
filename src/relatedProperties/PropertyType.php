@@ -194,6 +194,8 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     const CODE_ELEMENT  = 'E';
     const CODE_BOOL     = 'B';
 
+    const CODE_RANGE    = 'R';
+
 
 
     /**

@@ -232,6 +232,9 @@ class RelatedPropertiesModel extends DynamicModel
                         'value_enum'    => $value,
                         'value_num'     => $value,
                         'value_bool'    => (bool) $value,
+                        'value_num2'    => $value,
+                        'value_int2'    => $value,
+                        'value_string'  => (string) $value,
                     ]);
 
                     if (!$productPropertyValue->save())
@@ -262,6 +265,9 @@ class RelatedPropertiesModel extends DynamicModel
                     'value_enum'    => $value,
                     'value_num'     => $value,
                     'value_bool'    => (bool) $value,
+                    'value_num2'    => $value,
+                    'value_int2'    => $value,
+                    'value_string'  => (string) $value,
                 ]);
             }
 

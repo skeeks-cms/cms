@@ -61,9 +61,10 @@ abstract class RelatedElementPropertyModel extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'element_id'], 'integer'],
             [['description'], 'string', 'max' => 255],
-            [['value'], 'string'],
+            //[['value_string'], 'string', 'max' => 255],
+            [['value', 'value_string'], 'string'],
 
-            ['value_enum', 'filter', 'filter' => function ($value) {
+            [['value_enum', 'value_int2'], 'filter', 'filter' => function ($value) {
                 $value = (int) $value;
                 $filter_options = [
                     'options' => [
@@ -74,9 +75,10 @@ abstract class RelatedElementPropertyModel extends Core
                 ];
                 return filter_var($value, FILTER_VALIDATE_INT, $filter_options);
             }],
-            ['value_enum', 'integer'],
+            [['value_enum', 'value_int2'], 'integer'],
 
-            ['value_num', 'filter', 'filter' => function ($value) {
+
+            [['value_num', 'value_num2'], 'filter', 'filter' => function ($value) {
                 $value = (float) $value;
                 $min_range = -1.0E+14;
                 $max_range = 1.0E+14;
@@ -86,10 +88,10 @@ abstract class RelatedElementPropertyModel extends Core
                 }
                 return $value;
             }],
+            [['value_num', 'value_num2'], 'number'],
 
-            ['value_num', 'number'],
+
             ['value_bool', 'boolean'],
-
             ['value_bool', 'filter', 'filter' => function ($value) {
                 $value = (bool) $value;
                 return $value;
