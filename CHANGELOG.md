@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.0-alpha3.pre
 ---------------
+ * Deleted user restrict
  * Add Properties of elements in tree
  * Change the form of editing elements
  
