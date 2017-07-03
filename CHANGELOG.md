@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0-alpha3.pre
+4.0.0-alpha3
 ---------------
  * Range values
  * New related value types
