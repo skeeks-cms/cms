@@ -80,7 +80,7 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
 
 
 <?= $form->fieldSet('PHP info'); ?>
-    <iframe id="php-info" src='<?= \skeeks\cms\helpers\UrlHelper::construct('/admin/info/php')->enableAdmin()->toString(); ?>' width='100%' height='1000'></iframe>;
+    <iframe id="php-info" src='<?= \skeeks\cms\helpers\UrlHelper::construct('/cms/admin-info/php')->enableAdmin()->toString(); ?>' width='100%' height='1000'></iframe>;
 <?= $form->fieldSetEnd(); ?>
 
 <? ActiveForm::end(); ?>

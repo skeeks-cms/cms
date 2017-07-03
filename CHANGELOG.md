@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha4
+---------------
+ * Fixed admin php info url
+
 4.0.0-alpha3
 ---------------
  * Range values
