@@ -53,7 +53,7 @@ msgstr ""
 msgid ""
 "It provides capabilities to manage site structure and content elements "
 "(news, publications, products, etc.)."
-msgstr ""
+msgstr "Предоставляет возможности для управления структурой сайта и элементами контента (новостями, публикациями, продуктами и т.д.)."
 
 #: ../../index.rst:23
 msgid ""
