@@ -19,7 +19,7 @@ msgstr ""
 
 #: ../../extensions.rst:3
 msgid "Extensions"
-msgstr ""
+msgstr "Расширения"
 
 #: ../../extensions.rst:5
 msgid "Дополнительные решения, расширяющие стандартные возможности SkeekS CMS"
