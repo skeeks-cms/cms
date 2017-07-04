@@ -1,0 +1,181 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, SkeekS
+# This file is distributed under the same license as the SkeekS CMS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SkeekS CMS 3.2.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-28 10:50+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ../../admin.rst:3
+msgid "CMS Admin"
+msgstr ""
+
+#: ../../admin.rst:5
+msgid ""
+"Административная часть сайта реализована компонентом ``skeeks/cms-admin``"
+" По умолчанию CMS уже сдержит этот компонент."
+msgstr ""
+
+#: ../../admin.rst:9
+msgid "Настройка и конфигурирование"
+msgstr ""
+
+#: ../../admin.rst:11
+msgid ""
+"Компонент админки подключается и настраивается стандартным способом в "
+"проект."
+msgstr ""
+
+#: ../../admin.rst:14
+msgid "Пример конфигурирования"
+msgstr ""
+
+#: ../../admin.rst:16
+msgid ""
+"В файле конфига проекта ``common/config/main.php`` отредактировать секцию"
+" ``components``"
+msgstr ""
+
+#: ../../admin.rst:45
+msgid "Доступные настройки"
+msgstr ""
+
+#: ../../admin.rst:48
+msgid "languageCode"
+msgstr ""
+
+#: ../../admin.rst:49
+msgid "Язык интерфейса административной части, по умолчанию ``ru``"
+msgstr ""
+
+#: ../../admin.rst:52
+msgid "allowedIPs"
+msgstr ""
+
+#: ../../admin.rst:53
+msgid "Разрешенный массив ip адресов, по умолчанию ``['*']``"
+msgstr ""
+
+#: ../../admin.rst:57
+msgid "Меню"
+msgstr ""
+
+#: ../../admin.rst:59
+msgid ""
+"Административное меню формируется путем слияния конфигов всех "
+"установленных расширений и конфига проекта."
+msgstr ""
+
+#: ../../admin.rst:61
+msgid "``@skeeks/cms/config/admin/menu.php``"
+msgstr ""
+
+#: ../../admin.rst:62
+msgid "``@skeeks/cms-admin/config/admin/menu.php``"
+msgstr ""
+
+#: ../../admin.rst:63
+msgid "``@all-other-extensions/config/admin/menu.php``"
+msgstr ""
+
+#: ../../admin.rst:64
+msgid "``@app/config/admin/menu.php``"
+msgstr ""
+
+#: ../../admin.rst:68
+msgid "Формат"
+msgstr ""
+
+#: ../../admin.rst:70
+msgid ""
+"В конечном виде конфиг меню представляет собой один большой массив с "
+"элементами"
+msgstr ""
+
+#: ../../admin.rst:96
+msgid "Каждый элемент массива может содержать следующие опции:"
+msgstr ""
+
+#: ../../admin.rst:98
+msgid "**label** — Название пункта меню"
+msgstr ""
+
+#: ../../admin.rst:99
+msgid "**priority** — Порядок чем меньше тем выше пункт"
+msgstr ""
+
+#: ../../admin.rst:100
+msgid "**enabled** — Показывается или не показывается"
+msgstr ""
+
+#: ../../admin.rst:101
+msgid "**img** — Картинка (массив [Asset, 'путь к файлу'])"
+msgstr ""
+
+#: ../../admin.rst:102
+msgid "**url** — URL массив который будет передан в ``yii\\helpers\\Url::to()``;"
+msgstr ""
+
+#: ../../admin.rst:106 ../../admin.rst:202
+msgid "Создание контроллера"
+msgstr ""
+
+#: ../../admin.rst:109
+msgid "В проекте"
+msgstr ""
+
+#: ../../admin.rst:111
+msgid "Ссылка на контроллер: ``Url::to(['/admin-competition'])``"
+msgstr ""
+
+#: ../../admin.rst:113
+msgid ""
+"Создать файл контроллера: "
+"``frontend/controllers/AdminCompetitionController.php``"
+msgstr ""
+
+#: ../../admin.rst:132
+msgid "Создать файл шаблона: ``frontend/views/admin-competition/index.php``"
+msgstr ""
+
+#: ../../admin.rst:157
+msgid ""
+"Создать файл для фильтров и поиска: ``frontend/views/admin-"
+"competition/_search.php``"
+msgstr ""
+
+#: ../../admin.rst:183
+msgid ""
+"Создать файл для редактирования элементов: ``frontend/views/admin-"
+"competition/_form.php``"
+msgstr ""
+
+#~ msgid "Разрешенный массив ip адресов, по умолчанию ``["
+#~ msgstr ""
+
+#~ msgid "'*'"
+#~ msgstr ""
+
+#~ msgid "]``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ msgstr ""
+
+#~ msgid ""
+#~ "В файле конфига проекта "
+#~ "``frontend/config/main.php`` отредактировать секцию "
+#~ "``components``"
+#~ msgstr ""
+

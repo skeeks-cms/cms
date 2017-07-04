@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-26 11:56+0300\n"
+"POT-Creation-Date: 2017-07-05 01:13+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,60 +22,110 @@ msgid "Quick start"
 msgstr "Быстрый старт"
 
 #: ../../quickstart.rst:6
+msgid "Работа с шаблонами"
+msgstr ""
+
+#: ../../quickstart.rst:9
+msgid "Настройка"
+msgstr ""
+
+#: ../../quickstart.rst:11
+msgid ""
+"Стандартным для yii2 способом, для определения пути к теме/шаблону сайта,"
+" можно путем конфигурирования компонента view. В файле конфига проекта "
+"``frontend/config/main.php`` отредактировать секцию ``components``"
+msgstr ""
+
+#: ../../quickstart.rst:32
+msgid "Использование"
+msgstr ""
+
+#: ../../quickstart.rst:34
+msgid ""
+"Пути к шаблонам обычно собираюся оттакливаясь от алиаса ``@app/views`` - "
+"который выше сконфигурирован."
+msgstr ""
+
+#: ../../quickstart.rst:37
+msgid "Пример подключения шаблона в шаблоне"
+msgstr ""
+
+#: ../../quickstart.rst:45
+msgid "Пример глобального рендеринга шаблона"
+msgstr ""
+
+#: ../../quickstart.rst:53
+msgid "Шаблоны для писем"
+msgstr ""
+
+#: ../../quickstart.rst:55
+msgid ""
+"Шаблоны для отправки писем из расширений лежат непосредственно в "
+"расширении в папке \\mail-templates При отправке письма идет проверка"
+msgstr ""
+
+#: ../../quickstart.rst:67
+msgid ""
+"@app - это папка текущего приложения. Чтобы подложить для отправки свой "
+"шаблон, создайте папку mail в папке своего приложения. Положите туда свои"
+" шаблоны."
+msgstr ""
+
+#: ../../quickstart.rst:72
 msgid "Работа с URL"
 msgstr ""
 
-#: ../../quickstart.rst:8
+#: ../../quickstart.rst:74
 msgid ""
 "Везде в своих проектах правильно формируйте url, на любое действие на "
 "любой раздел, на любой элемент и т.д. Это позволит избежать кучи проблем "
 "с ростом проекта. Особенно с добавлением мультиязычности на сайт."
 msgstr ""
 
-#: ../../quickstart.rst:10
+#: ../../quickstart.rst:76
 msgid ""
 "И так, в yii2 на эту тему есть множество примеров, с ними можно "
 "ознакомиться, например тут: "
 "https://github.com/yiisoft/yii2/blob/master/docs/guide/helper-url.md"
 msgstr ""
 
-#: ../../quickstart.rst:12
+#: ../../quickstart.rst:78
 msgid ""
 "Здесь же, мы рассмотрим конкретные примеры всего что связано с базовым "
 "модулем cms"
 msgstr ""
 
-#: ../../quickstart.rst:15
+#: ../../quickstart.rst:81
 msgid "Ссылки на разделы"
 msgstr ""
 
-#: ../../quickstart.rst:17
+#: ../../quickstart.rst:83
 msgid "Ссылки на разделы сайта, по их id параметру"
 msgstr ""
 
-#: ../../quickstart.rst:23
+#: ../../quickstart.rst:89
 msgid "Ссылки на разделы сайта, по их объекту модели model"
 msgstr ""
 
-#: ../../quickstart.rst:30
+#: ../../quickstart.rst:96
 msgid "Ссылки на разделы сайта, по их dir параметру"
 msgstr ""
 
-#: ../../quickstart.rst:37
+#: ../../quickstart.rst:103
 msgid "Прочие примеры с параметрами"
 msgstr ""
 
-#: ../../quickstart.rst:53
+#: ../../quickstart.rst:119
 msgid ""
 "Но cms поддерживает концепцию многосайтовости. Поэтому можно в параметрах"
 " указать код желаемого сайта:"
 msgstr ""
 
-#: ../../quickstart.rst:61
+#: ../../quickstart.rst:127
 msgid "Ссылки в консольном приложении"
 msgstr ""
 
-#: ../../quickstart.rst:63
+#: ../../quickstart.rst:129
 msgid ""
 "Об этом стоит сказать особенно. Частый случай, что в yii2 сыпятся ошибки "
 "при запуске каких либо консольных утилит. Для корректной работы ссылок, "
@@ -83,85 +133,164 @@ msgid ""
 "приложении."
 msgstr ""
 
-#: ../../quickstart.rst:72
+#: ../../quickstart.rst:138
 msgid "А так же в bootstrap определить пару алиасов:"
 msgstr ""
 
-#: ../../quickstart.rst:80
+#: ../../quickstart.rst:146
 msgid "Авторизация / Регистрация"
 msgstr ""
 
-#: ../../quickstart.rst:83
+#: ../../quickstart.rst:149
 msgid "Стандартная авторизация/регистрация"
 msgstr ""
 
-#: ../../quickstart.rst:85
+#: ../../quickstart.rst:151
 msgid ""
 "В **SkeekS CMS** уже реализован процесс авторизации, регистрации и "
 "восстановления пароля (через email). Реализация находится в ``cms/auth`` "
 "контроллере."
 msgstr ""
 
-#: ../../quickstart.rst:88
+#: ../../quickstart.rst:154
 msgid "Методы реализающие эти процессы:"
 msgstr ""
 
-#: ../../quickstart.rst:90
+#: ../../quickstart.rst:156
 msgid "``login`` — процесс авторизации"
 msgstr ""
 
-#: ../../quickstart.rst:91
+#: ../../quickstart.rst:157
 msgid "``register`` — процесс регистрации"
 msgstr ""
 
-#: ../../quickstart.rst:92
+#: ../../quickstart.rst:158
 msgid "``register-by-email`` — регистрация через email (только ajax)"
 msgstr ""
 
-#: ../../quickstart.rst:93
+#: ../../quickstart.rst:159
 msgid "``forget`` — запроса начала процедуры восстановления пароля"
 msgstr ""
 
-#: ../../quickstart.rst:94
+#: ../../quickstart.rst:160
 msgid "``reset-password`` — действие подтверждения смены пароля"
 msgstr ""
 
-#: ../../quickstart.rst:98
+#: ../../quickstart.rst:164
 msgid "Проверка текущего пользователя"
 msgstr ""
 
-#: ../../quickstart.rst:100
+#: ../../quickstart.rst:166
 msgid ""
 "Для проверки авторизации текущего пользователя на сайте, используется "
 "стандартная конструкция yii2."
 msgstr ""
 
-#: ../../quickstart.rst:114
+#: ../../quickstart.rst:180
 msgid "Ссылки на авторизацию"
 msgstr ""
 
-#: ../../quickstart.rst:116
+#: ../../quickstart.rst:182
 msgid "Как получить ссылку на действия связанные с авторизацией"
 msgstr ""
 
-#: ../../quickstart.rst:124
+#: ../../quickstart.rst:190
 msgid "Еще один вариант через хелпер SkeekS CMS"
 msgstr ""
 
-#: ../../quickstart.rst:132
+#: ../../quickstart.rst:198
 msgid "Форма авторизации"
 msgstr ""
 
-#: ../../quickstart.rst:134
+#: ../../quickstart.rst:200
 msgid "Эту форму можно вставить в любое место на сайте, работает через ajax."
 msgstr ""
 
-#: ../../quickstart.rst:156
+#: ../../quickstart.rst:222
 msgid "Форма регистрации"
 msgstr ""
 
-#: ../../quickstart.rst:193
+#: ../../quickstart.rst:259
 msgid "Форма восстановления пароля"
+msgstr ""
+
+#: ../../quickstart.rst:278
+msgid "Компоненты CMS"
+msgstr ""
+
+#: ../../quickstart.rst:284
+msgid "Виджеты CMS"
+msgstr ""
+
+#: ../../quickstart.rst:286
+msgid "Виджеты cms наследуются от базвого виджета: ``skeeks\\cms\\base\\Widget``"
+msgstr ""
+
+#: ../../quickstart.rst:288
+msgid ""
+"Преимущество их работы, состоит в том, что их можно редактировать в "
+"\"**Панеле быстрого управления сайтом**\"."
+msgstr ""
+
+#: ../../quickstart.rst:291
+msgid "skeeks\\\\cms\\\\cmsWidgets\\\\text\\\\TextCmsWidget"
+msgstr ""
+
+#: ../../quickstart.rst:293
+msgid "Предназначен для редактирования блоков текста или html кода"
+msgstr ""
+
+#: ../../quickstart.rst:295
+msgid "Пример использования:"
+msgstr ""
+
+#: ../../quickstart.rst:336
+msgid "skeeks\\\\cms\\\\cmsWidgets\\\\treeMenu\\\\TreeMenuCmsWidget"
+msgstr ""
+
+#: ../../quickstart.rst:338
+msgid ""
+"Данный виджет, чаще всего предназначен для построения меню на сайте. При "
+"чем как главного меню, так и второстепенного. Добиться этого можно путем "
+"манипулации с его параметрами и способом вызова. Так же, виджет может "
+"подойти для вывода подразделов определенного раздела сайта (например "
+"основные разделы услуг, на главную страницу сайта)."
+msgstr ""
+
+#: ../../quickstart.rst:341
+msgid "Пример использования"
+msgstr ""
+
+#: ../../quickstart.rst:353
+msgid ""
+"Пример содержимого файла: ``@app/views/widgets/TreeMenuCmsWidget/top-"
+"site-menu``"
+msgstr ""
+
+#: ../../quickstart.rst:373
+msgid ""
+"Пример содержимого файла: ``@app/views/widgets/TreeMenuCmsWidget/menu-"
+"top-item​``"
+msgstr ""
+
+#: ../../quickstart.rst:398
+msgid "Пример с переопределением настроек"
+msgstr ""
+
+#: ../../quickstart.rst:417
+msgid "Второстепенное меню каталога"
+msgstr ""
+
+#: ../../quickstart.rst:419
+msgid ""
+"Например, при хождении по каталогу, необходимо чтобы подразделы каталога,"
+" отображались всегда слева. Для этого можно опереться на параметр "
+"текущего раздела сайта, и передать его в один из параметров виджета в "
+"качестве ``treePid``. В этом случае, в выборке нужных разделов будет "
+"всегда участвовать условие родительского раздела. И при этом это условие "
+"будет перекрывать настройки указанные администратором через админку, а "
+"значит администратор не сможет сломать виджет, но при этом сможет "
+"поменять некоторые параметры."
 msgstr ""
 
 #~ msgid "Форма авторизации на сайте"

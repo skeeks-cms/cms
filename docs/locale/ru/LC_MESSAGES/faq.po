@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-26 11:38+0300\n"
+"POT-Creation-Date: 2017-07-05 01:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,5 +45,49 @@ msgstr ""
 
 #: ../../faq.rst:36
 msgid "Изменить timeout pjax по умолчанию глобально"
+msgstr ""
+
+#: ../../faq.rst:48
+msgid "Перенос проекта на другой хостинг"
+msgstr ""
+
+#: ../../faq.rst:51
+msgid "Архивация"
+msgstr ""
+
+#: ../../faq.rst:53
+msgid "Создать актуальный архив базы данных"
+msgstr ""
+
+#: ../../faq.rst:59
+msgid "Создать архив вашего проекта"
+msgstr ""
+
+#: ../../faq.rst:64
+msgid "Восстановление"
+msgstr ""
+
+#: ../../faq.rst:67
+msgid "1. Скачать файлы проекта"
+msgstr ""
+
+#: ../../faq.rst:68
+msgid "Развернуть архив, или склонировать проект из git репозитория"
+msgstr ""
+
+#: ../../faq.rst:71
+msgid "2. Установка composer и зависимостей"
+msgstr ""
+
+#: ../../faq.rst:87
+msgid "3. Configuring the database"
+msgstr ""
+
+#: ../../faq.rst:88
+msgid "Прописать коннект к базе данных `common/config/db.php`"
+msgstr ""
+
+#: ../../faq.rst:91
+msgid "4. Installation of migrations"
 msgstr ""
 

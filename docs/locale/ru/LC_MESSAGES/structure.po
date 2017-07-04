@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-23 23:43+0300\n"
+"POT-Creation-Date: 2017-07-05 01:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,42 +219,52 @@ msgid ""
 msgstr ""
 
 #: ../../structure.rst:103
-msgid "``common/config/main.php``"
+msgid "``@skeeks/cms/config/main.php``"
 msgstr ""
 
 #: ../../structure.rst:104
-msgid "``common/config/env/{your-env}/main.php``"
+msgid ""
+"Все компонент подключенные компоненты yii2 у которых есть "
+"``config/main.php``"
 msgstr ""
 
 #: ../../structure.rst:105
-msgid "``frontend/config/main.php``"
+msgid "``common/config/main.php``"
 msgstr ""
 
 #: ../../structure.rst:106
-msgid "``frontend/config/env/{your-env}/main.php``"
+msgid "``common/config/env/{your-env}/main.php``"
+msgstr ""
+
+#: ../../structure.rst:107
+msgid "``frontend/config/main.php``"
 msgstr ""
 
 #: ../../structure.rst:108
-msgid "Parameters are read in the following order:"
+msgid "``frontend/config/env/{your-env}/main.php``"
 msgstr ""
 
 #: ../../structure.rst:110
-msgid "``common/config/params.php``"
-msgstr ""
-
-#: ../../structure.rst:111
-msgid "``common/config/env/{your-env}/params.php``"
+msgid "Parameters are read in the following order:"
 msgstr ""
 
 #: ../../structure.rst:112
-msgid "``frontend/config/params.php``"
+msgid "``common/config/params.php``"
 msgstr ""
 
 #: ../../structure.rst:113
-msgid "``frontend/config/env/{your-env}/params.php``"
+msgid "``common/config/env/{your-env}/params.php``"
+msgstr ""
+
+#: ../../structure.rst:114
+msgid "``frontend/config/params.php``"
 msgstr ""
 
 #: ../../structure.rst:115
+msgid "``frontend/config/env/{your-env}/params.php``"
+msgstr ""
+
+#: ../../structure.rst:117
 msgid "The later config file overrides the former."
 msgstr ""
 

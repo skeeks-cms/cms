@@ -56,6 +56,7 @@ Quick start
 При отправке письма идет проверка
 
 .. code-block:: php
+
     \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
         '@app/mail' =>
         [
