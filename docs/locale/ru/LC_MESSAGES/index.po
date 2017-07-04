@@ -60,18 +60,18 @@ msgid ""
 "Opportunities for management and dynamic creation of additional "
 "properties of the content sections and elements through the "
 "administration system."
-msgstr ""
+msgstr "Возможности управления и динамического создания дополнительных свойств разделов и элементов контента через систему администрирования."
 
 #: ../../index.rst:25
 msgid "Opportunities to manage users, privileges, roles and their purpose."
-msgstr ""
+msgstr "Возможности управления пользователями, привилегиями, ролями и их назначениями."
 
 #: ../../index.rst:27
 msgid ""
 "Supports single query entry point (one index.php), for backend and "
 "frontend parts of the project. By then, it is more convenient to "
 "configure nginx and apache."
-msgstr ""
+msgstr "Поддерживает точку входа для одного запроса (один index.php), для бэкэнд и фронтенд частей проекта. Удобно настраивать nginx и apache."
 
 #: ../../index.rst:29
 msgid ""
