@@ -307,8 +307,7 @@ be deployed as soon as possible.
 Work with documents
 ===================
 
-Этот раздел тут временно
-
+This section is here temporarily
 
 .. code-block:: bash
 

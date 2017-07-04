@@ -7,16 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SkeekS CMS 3.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-23 19:05+0300\n"
+"POT-Creation-Date: 2017-07-05 01:23+0300\n"
 "PO-Revision-Date: 2017-07-05 00:55+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: ru\n"
-"X-Generator: Poedit 2.0.2\n"
 
 #: ../../overview.rst:3
 msgid "Overview"
@@ -123,15 +121,25 @@ msgid "1. Installation composer"
 msgstr "1. Установка композера"
 
 #: ../../overview.rst:45
-msgid "The recommended way to install SkeekS CMS is with `Composer <http://getcomposer.org>`_. Composer is a dependency management tool for PHP that allows you to declare the dependencies your project needs and installs them into your project."
+msgid ""
+"The recommended way to install SkeekS CMS is with `Composer "
+"<http://getcomposer.org>`_. Composer is a dependency management tool for "
+"PHP that allows you to declare the dependencies your project needs and "
+"installs them into your project."
 msgstr ""
 
 #: ../../overview.rst:50
-msgid "If you do not have Composer, follow the instructions in the `Installing Yii <https://github.com/yiisoft/yii2/blob/master/docs/guide/start-installation.md#installing-via-composer>`_ section of the definitive guide to install it."
+msgid ""
+"If you do not have Composer, follow the instructions in the `Installing "
+"Yii <https://github.com/yiisoft/yii2/blob/master/docs/guide/start-"
+"installation.md#installing-via-composer>`_ section of the definitive "
+"guide to install it."
 msgstr ""
 
 #: ../../overview.rst:60
-msgid "Alternative commands, depending on the server configuration and your access rights:"
+msgid ""
+"Alternative commands, depending on the server configuration and your "
+"access rights:"
 msgstr ""
 
 #: ../../overview.rst:77
@@ -143,7 +151,9 @@ msgid "Establish **example.com** site in example.com folder"
 msgstr ""
 
 #: ../../overview.rst:81
-msgid "Navigate to the folder where are your projects (such as **/var/www/sites/**)."
+msgid ""
+"Navigate to the folder where are your projects (such as "
+"**/var/www/sites/**)."
 msgstr ""
 
 #: ../../overview.rst:105
@@ -151,7 +161,9 @@ msgid "3. Configuring the database"
 msgstr "3. Конфигурация базы данных"
 
 #: ../../overview.rst:108
-msgid "Edit the file to access the database, it is located at **common/config/db.php**"
+msgid ""
+"Edit the file to access the database, it is located at "
+"**common/config/db.php**"
 msgstr ""
 
 #: ../../overview.rst:111
@@ -171,7 +183,9 @@ msgid "On hostings are configured by default under the usual sites."
 msgstr ""
 
 #: ../../overview.rst:126
-msgid "But it can be reconfigured (and even necessary) in detail about this here: Server Configuration (web-server)"
+msgid ""
+"But it can be reconfigured (and even necessary) in detail about this "
+"here: Server Configuration (web-server)"
 msgstr ""
 
 #: ../../overview.rst:130
@@ -179,8 +193,12 @@ msgid "6. Authorization system"
 msgstr "6. Система авторизации"
 
 #: ../../overview.rst:131
-msgid "Default management system is available at the following address (if desired, it can be reconfigured)"
-msgstr "Система управления по умолчанию доступна по следующему адресу (при желании его можно переконфигурировать)"
+msgid ""
+"Default management system is available at the following address (if "
+"desired, it can be reconfigured)"
+msgstr ""
+"Система управления по умолчанию доступна по следующему адресу (при "
+"желании его можно переконфигурировать)"
 
 #: ../../overview.rst:133
 msgid "**//example.com/~sx/admin/auth/**"
@@ -199,11 +217,20 @@ msgid "7. Check the working environment"
 msgstr "7. Проверьте рабочее окружение"
 
 #: ../../overview.rst:142
-msgid "If the installation process has been completed, but there are still not clear to you the error, it is likely that something is wrong is configured on the server. To do so, download to /frontend/web/ and run the file to test https://github.com/skeeks-cms/cms/blob/master/requirements.php environment. //example.com/frontend/web/requirements.php or //example.com/requirements.php (depends on item 4)."
+msgid ""
+"If the installation process has been completed, but there are still not "
+"clear to you the error, it is likely that something is wrong is "
+"configured on the server. To do so, download to /frontend/web/ and run "
+"the file to test https://github.com/skeeks-"
+"cms/cms/blob/master/requirements.php environment. "
+"//example.com/frontend/web/requirements.php or "
+"//example.com/requirements.php (depends on item 4)."
 msgstr ""
 
 #: ../../overview.rst:148
-msgid "It is important to remember to check the setting of php: **short_open_tag on**"
+msgid ""
+"It is important to remember to check the setting of php: **short_open_tag"
+" on**"
 msgstr ""
 
 #: ../../overview.rst:152
@@ -239,15 +266,31 @@ msgid "Configuring Web Servers"
 msgstr "Настройка сервера"
 
 #: ../../overview.rst:213
-msgid "Info: You may skip this subsection for now if you are just test driving Yii with no intention of deploying it to a production server."
+msgid ""
+"Info: You may skip this subsection for now if you are just test driving "
+"Yii with no intention of deploying it to a production server."
 msgstr ""
 
 #: ../../overview.rst:215
-msgid "The application installed according to the above instructions should work out of box with either an Apache HTTP server or an Nginx HTTP server, on Windows, Mac OS X, or Linux running PHP 5.5 or higher. Yii 2.0 is also compatible with facebook's HHVM. However, there are some edge cases where HHVM behaves different than native PHP, so you have to take some extra care when using HHVM."
+msgid ""
+"The application installed according to the above instructions should work"
+" out of box with either an Apache HTTP server or an Nginx HTTP server, on"
+" Windows, Mac OS X, or Linux running PHP 5.5 or higher. Yii 2.0 is also "
+"compatible with facebook's HHVM. However, there are some edge cases where"
+" HHVM behaves different than native PHP, so you have to take some extra "
+"care when using HHVM."
 msgstr ""
 
 #: ../../overview.rst:217
-msgid "On a production server, you may want to configure your Web server so that the application can be accessed via the URL **//www.example.com/index.php** instead of **//www.example.com/frontend/web/index.php**. Such configuration requires pointing the document root of your Web server to the basic/web folder. You may also want to hide index.php from the URL, as described in the Routing and URL Creation section. In this subsection, you'll learn how to configure your Apache or Nginx server to achieve these goals."
+msgid ""
+"On a production server, you may want to configure your Web server so that"
+" the application can be accessed via the URL "
+"**//www.example.com/index.php** instead of "
+"**//www.example.com/frontend/web/index.php**. Such configuration requires"
+" pointing the document root of your Web server to the basic/web folder. "
+"You may also want to hide index.php from the URL, as described in the "
+"Routing and URL Creation section. In this subsection, you'll learn how to"
+" configure your Apache or Nginx server to achieve these goals."
 msgstr ""
 
 #: ../../overview.rst:220
@@ -255,7 +298,10 @@ msgid "Recommended Apache Configuration"
 msgstr ""
 
 #: ../../overview.rst:222
-msgid "Use the following configuration in Apache's httpd.conf file or within a virtual host configuration. Note that you should replace path/to/basic/web with the actual path for basic/web."
+msgid ""
+"Use the following configuration in Apache's httpd.conf file or within a "
+"virtual host configuration. Note that you should replace "
+"path/to/basic/web with the actual path for basic/web."
 msgstr ""
 
 #: ../../overview.rst:243
@@ -263,15 +309,24 @@ msgid "Recommended Nginx Configuration"
 msgstr ""
 
 #: ../../overview.rst:245
-msgid "To use Nginx, you should install PHP as an FPM SAPI. You may use the following Nginx configuration, replacing path/to/frontend/web with the actual path for frontend/web and mysite.local with the actual hostname to serve."
+msgid ""
+"To use Nginx, you should install PHP as an FPM SAPI. You may use the "
+"following Nginx configuration, replacing path/to/frontend/web with the "
+"actual path for frontend/web and mysite.local with the actual hostname to"
+" serve."
 msgstr ""
 
 #: ../../overview.rst:292
-msgid "When using this configuration, you should also set cgi.fix_pathinfo=0 in the php.ini file in order to avoid many unnecessary system stat() calls."
+msgid ""
+"When using this configuration, you should also set cgi.fix_pathinfo=0 in "
+"the php.ini file in order to avoid many unnecessary system stat() calls."
 msgstr ""
 
 #: ../../overview.rst:294
-msgid "Also note that when running an HTTPS server, you need to add fastcgi_param HTTPS on; so that Yii can properly detect if a connection is secure."
+msgid ""
+"Also note that when running an HTTPS server, you need to add "
+"fastcgi_param HTTPS on; so that Yii can properly detect if a connection "
+"is secure."
 msgstr ""
 
 #: ../../overview.rst:298
@@ -279,11 +334,16 @@ msgid "Reporting a security vulnerability"
 msgstr ""
 
 #: ../../overview.rst:299
-msgid "Publicly disclosing a vulnerability can put the entire community at risk. If you've discovered a security concern, please email us at support@skeeks.com."
+msgid ""
+"Publicly disclosing a vulnerability can put the entire community at risk."
+" If you've discovered a security concern, please email us at "
+"support@skeeks.com."
 msgstr ""
 
 #: ../../overview.rst:303
-msgid "After a security vulnerability has been corrected, a security hotfix release will be deployed as soon as possible."
+msgid ""
+"After a security vulnerability has been corrected, a security hotfix "
+"release will be deployed as soon as possible."
 msgstr ""
 
 #: ../../overview.rst:308
@@ -291,7 +351,7 @@ msgid "Work with documents"
 msgstr ""
 
 #: ../../overview.rst:310
-msgid "Этот раздел тут временно"
+msgid "This section is here temporarily"
 msgstr ""
 
 #~ msgid ""
@@ -309,7 +369,6 @@ msgstr ""
 #~ msgid "Обзор"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "**//example.com/~sx/admin/auth/** **root** (login) "
-#~ "**skeeks** (password)"
+#~ msgid "Этот раздел тут временно"
 #~ msgstr ""
+
