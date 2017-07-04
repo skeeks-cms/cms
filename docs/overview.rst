@@ -174,7 +174,7 @@ Standart update
     php yii cms/cache/flush-all
 
 Fast update
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 Or all of these commands in one line
 
