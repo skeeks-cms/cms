@@ -3,7 +3,7 @@
 Welcome to SkeekS CMS's documentation!
 ======================================
 
-.. figure:: _static/img/box-cms-en.svg
+.. figure:: _static/img/skeeks-box.png
        :width: 300 px
        :align: center
        :alt: SkeekS CMS
