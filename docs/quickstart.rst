@@ -293,6 +293,7 @@ skeeks\\cms\\cmsWidgets\\text\\TextCmsWidget
 Предназначен для редактирования блоков текста или html кода
 
 Пример использования:
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: php
 
