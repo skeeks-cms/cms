@@ -287,10 +287,10 @@ Quick start
 
 Преимущество их работы, состоит в том, что их можно редактировать в "**Панеле быстрого управления сайтом**".
 
-skeeks\\cms\\cmsWidgets\\text\\TextCmsWidget
---------------------------------------------
+Редактируемые блоки
+-------------------
 
-Предназначен для редактирования блоков текста или html кода
+``skeeks\\cms\\cmsWidgets\\text\\TextCmsWidget`` — Предназначен для редактирования блоков текста или html кода
 
 Пример использования:
 ~~~~~~~~~~~~~~~~~~~~~
@@ -333,10 +333,10 @@ skeeks\\cms\\cmsWidgets\\text\\TextCmsWidget
     <? \skeeks\cms\cmsWidgets\text\TextCmsWidget::end(); ?>
 
 
-skeeks\\cms\\cmsWidgets\\treeMenu\\TreeMenuCmsWidget
-----------------------------------------------------
+Меню
+----
 
-Данный виджет, чаще всего предназначен для построения меню на сайте. При чем как главного меню, так и второстепенного. Добиться этого можно путем манипулации с его параметрами и способом вызова. Так же, виджет может подойти для вывода подразделов определенного раздела сайта (например основные разделы услуг, на главную страницу сайта).
+``skeeks\\cms\\cmsWidgets\\treeMenu\\TreeMenuCmsWidget`` — Данный виджет, чаще всего предназначен для построения меню на сайте. При чем как главного меню, так и второстепенного. Добиться этого можно путем манипулации с его параметрами и способом вызова. Так же, виджет может подойти для вывода подразделов определенного раздела сайта (например основные разделы услуг, на главную страницу сайта).
 
 Пример использования
 ~~~~~~~~~~~~~~~~~~~~
@@ -437,3 +437,88 @@ skeeks\\cms\\cmsWidgets\\treeMenu\\TreeMenuCmsWidget
         }
         ?>
     <? \skeeks\cms\cmsWidgets\treeMenu\TreeMenuCmsWidget::end(); ?>
+
+
+Хлебные крошки
+--------------
+
+``\skeeks\cms\cmsWidgets\breadcrumbs\BreadcrumbsCmsWidget`` — виджет для построения хлебных крошек на сайте.
+
+Пример вызова
+~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    <?= \skeeks\cms\cmsWidgets\breadcrumbs\BreadcrumbsCmsWidget::widget([
+        'viewFile'       => '@app/views/widgets/BreadcrumbsCmsWidget/default',
+    ]); ?>
+
+Содержимое шаблона
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    <?php
+    /* @var $this   yii\web\View */
+    /* @var $widget \skeeks\cms\cmsWidgets\breadcrumbs\BreadcrumbsCmsWidget */
+    ?>
+    <? if (\Yii::$app->breadcrumbs->parts) : ?>
+        <? $count = count(\Yii::$app->breadcrumbs->parts); ?>
+        <? $counter = 0; ?>
+        <? if ($count > 1) : ?>
+            <ul class="breadcrumb">
+                <? foreach (\Yii::$app->breadcrumbs->parts as $data) : ?>
+                    <? $counter ++; ?>
+                    <? if ($counter == $count): ?>
+                        <li class="active"><?= $data['name']; ?></li>
+                    <? else : ?>
+                        <li><a href="<?= $data['url']; ?>" title="<?= $data['name']; ?>"><?= $data['name']; ?></a></li>
+                    <? endif;?>
+                <? endforeach; ?>
+            </ul>
+        <? endif;?>
+    <? endif;?>
+
+
+Элементы контента
+-----------------
+
+``\skeeks\cms\cmsWidgets\contentElements\ContentElementsCmsWidget`` — виджет для выборки и вывода элементов контента на сайт.
+
+Пример вызова
+~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    <?= \skeeks\cms\cmsWidgets\contentElements\ContentElementsCmsWidget::widget([
+        'namespace' => 'home-news',
+        'label'     => 'Новости компании',
+        'viewFile'  => '@app/views/widgets/ContentElementsCmsWidget/home-news',
+    ]); ?>
+
+Содержимое шаблона
+~~~~~~~~~~~~~~~~~~
+
+.. code-block:: php
+
+    <?php
+    /* @var $this   yii\web\View */
+    /* @var $widget \skeeks\cms\cmsWidgets\contentElements\ContentElementsCmsWidget */
+    /* @var $element \skeeks\cms\models\CmsContentElement */
+    ?>
+    <? if ($widget->dataProvider->query->count() > 1) : ?>
+        <h5><?= $widget->label; ?>:</h5>
+        <div class="news__posts">
+            <? foreach ($widget->dataProvider->query->all() as $element) : ?>
+                <div class="news__post">
+                    <span class="date"><?= \Yii::$app->formatter->asDate($element->published_at); ?></span>
+                    <span><a href="<?= $element->url ?>" title="<?= $element->name; ?>"><?= $element->name; ?></a></span>
+                </div>
+            <? endforeach; ?>
+        </div>
+        <? if($element->cmsTree) : ?>
+            <div class="more">
+                <a class="more" href="<?= $element->cmsTree->url; ?>">остальные новости</a>
+            </div>
+        <? endif; ?>
+    <? endif; ?>
