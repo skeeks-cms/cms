@@ -15,12 +15,12 @@ FAQ
 
 .. code-block:: php
 
-echo \Yii::$app->imaging->thumbnailUrlOnRequest($model->image ? $model->image->src : null,
-     new \skeeks\cms\components\imaging\filters\Thumbnail([
-         'w' => 0,
-         'h' => 200,
-     ]), $model->code
-);
+    echo \Yii::$app->imaging->thumbnailUrlOnRequest($model->image ? $model->image->src : null,
+         new \skeeks\cms\components\imaging\filters\Thumbnail([
+             'w' => 0,
+             'h' => 200,
+         ]), $model->code
+    );
 
 
 Как отметить обязательные поля в формах ``*``
@@ -58,6 +58,10 @@ echo \Yii::$app->imaging->thumbnailUrlOnRequest($model->image ? $model->image->s
     {
         $.pjax.defaults.timeout = 30000;
     });
+
+
+Как включить js, css и html оптимизацию?
+----------------------------------------
 
 
 
