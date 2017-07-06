@@ -65,10 +65,14 @@ FAQ
 
 Для этих целей существуют дополнительное расширение, которое обычно уже стоит в базовых проектах.
 
-[https://github.com/skeeks-cms/cms-assets-auto-compress](https://github.com/skeeks-cms/cms-assets-auto-compress)
+`https://github.com/skeeks-cms/cms-assets-auto-compress <https://github.com/skeeks-cms/cms-assets-auto-compress>`_
 
-Включение и настройка оптимизаций, проивзодится через систему управления сайтом
+Включение и настройка оптимизаций, проивзодится через систему управления сайтом:
 
+.. figure:: _static/screen/faq/js-css-compress.png
+       :width: 300 px
+       :align: center
+       :alt: SkeekS CMS
 
 
 Перенос проекта на другой хостинг
