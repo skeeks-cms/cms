@@ -307,7 +307,10 @@ be deployed as soon as possible.
 Work with documents
 ===================
 
-This section is here temporarily
+Для написания документации используется генератор документации `Sphinx <http://sphinx-ru.readthedocs.io/ru/latest/>`_
+`Стандартный синтаксис разметки reStructuredText <http://sphinx-ru.readthedocs.io/ru/latest/rst-markup.html>`_
+
+Полезные команды для генерации:
 
 .. code-block:: bash
 
@@ -315,7 +318,6 @@ This section is here temporarily
     pip install Sphinx
     pip install sphinx-intl
     pip install sphinx_rtd_theme
-
 
     make gettext
     make html
