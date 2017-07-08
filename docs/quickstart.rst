@@ -277,7 +277,14 @@ Quick start
 Компоненты CMS
 ==============
 
+.. code-block:: php
 
+    $model = \Yii::$app->companySiteSettings;
+    $model->setCmsSite(\Yii::$app->project->company->site);
+    $model->refresh();
+
+    $model->load(\Yii::$app->request->post());
+    $model->setOverride(Component::OVERRIDE_SITE)->save();
 
 
 Виджеты CMS
