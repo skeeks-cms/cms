@@ -23,6 +23,23 @@ FAQ
     );
 
 
+Как можно загрузить файл в хранилище?
+-------------------------------------
+
+Скачать с удаленного сервер и загрузить в хранилище
+
+.. code-block:: php
+
+    $imageUrl = 'http://test.ru/test.jpg';
+    $element = \skeeks\cms\models\CmsContentElement::find(10);
+
+    $file = \Yii::$app->storage->upload($imageUrl, [
+        'name' => $element->name
+    ]);
+
+    $element->link('image', $file);
+
+
 Как отметить обязательные поля в формах ``*``
 ---------------------------------------------
 

@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha5.pre
+---------------
+ * Fixed
+ 
 4.0.0-alpha4
 ---------------
  * Fixed admin php info url
