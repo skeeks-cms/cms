@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha6
+---------------
+ * Fixed TreeMenuCmsWidget
+ 
 4.0.0-alpha5
 ---------------
  * Fixed

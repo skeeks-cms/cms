@@ -8,7 +8,7 @@
 
 namespace skeeks\cms\cmsWidgets\treeMenu;
 
-use common\modules\company\models\CmsSite;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
