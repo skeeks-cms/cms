@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0-alpha5.pre
+4.0.0-alpha5
 ---------------
  * Fixed
  
