@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha7
+---------------
+ * Enabled url normalizer by default
+ 
 4.0.0-alpha6
 ---------------
  * Fixed TreeMenuCmsWidget

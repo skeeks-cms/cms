@@ -85,6 +85,12 @@ $config =
             'enablePrettyUrl'   => true,
             'showScriptName'    => false,
             'suffix' => '',
+            'normalizer' => [
+                'class' => 'yii\web\UrlNormalizer',
+                'collapseSlashes' => true,
+                'normalizeTrailingSlash' => true,
+                'action' => \yii\web\UrlNormalizer::ACTION_REDIRECT_PERMANENT,
+            ],
             'rules' => [
                 'u'                           => 'cms/user/index',
                 'u/<username>'                => 'cms/user/view',

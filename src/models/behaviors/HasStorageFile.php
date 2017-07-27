@@ -106,6 +106,7 @@ class HasStorageFile extends Behavior
 
                 } catch (\Exception $e)
                 {
+                    \Yii::error($e->getMessage());
                     $this->owner->{$fieldCode} = null;
                 }
             }

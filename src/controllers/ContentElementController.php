@@ -113,6 +113,13 @@ class ContentElementController extends Controller
         $contentElement     = $this->model;
         $tree               = $contentElement->cmsTree;
 
+
+        if ($contentElement->url != "/" . \Yii::$app->request->pathInfo)
+        {
+            $url = $contentElement->url;
+            \Yii::$app->response->redirect($url, 301);
+        }
+
         if ($tree)
         {
             \Yii::$app->cms->setCurrentTree($tree);

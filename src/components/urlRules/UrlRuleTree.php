@@ -227,21 +227,37 @@ class UrlRuleTree
             return false;
         }
 
+        $suffix = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
         $pathInfo           = $request->getPathInfo();
+        $normalized = false;
+        if ($this->hasNormalizer($manager)) {
+            $pathInfo = $this->getNormalizer($manager)->normalizePathInfo($pathInfo, $suffix, $normalized);
+        }
+        if ($suffix !== '' && $pathInfo !== '') {
+            $n = strlen($suffix);
+            if (substr_compare($pathInfo, $suffix, -$n, $n) === 0) {
+                $pathInfo = substr($pathInfo, 0, -$n);
+                if ($pathInfo === '') {
+                    // suffix alone is not allowed
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
         if ($this->host !== null) {
             $pathInfo = strtolower($request->getHostInfo()) . ($pathInfo === '' ? '' : '/' . $pathInfo);
         }
 
-
         $params             = $request->getQueryParams();
-        $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
         $treeNode           = null;
 
         $originalDir = $pathInfo;
-        if ($suffix)
+        /*if ($suffix)
         {
             $originalDir = substr($pathInfo, 0, (strlen($pathInfo) - strlen($suffix)));
-        }
+        }*/
 
         $dependency = new TagDependency([
             'tags'      =>
@@ -275,7 +291,14 @@ class UrlRuleTree
             \Yii::$app->cms->setCurrentTree($treeNode);
 
             $params['id']        = $treeNode->id;
-            return ['cms/tree/view', $params];
+
+            if ($normalized) {
+                // pathInfo was changed by normalizer - we need also normalize route
+                return $this->getNormalizer($manager)->normalizeRoute(['cms/tree/view', $params]);
+            } else {
+                return ['cms/tree/view', $params];
+            }
+
         } else
         {
             return false;
