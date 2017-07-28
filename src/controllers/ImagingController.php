@@ -66,7 +66,7 @@ class ImagingController extends Controller
         $strposFilter                   = strpos($newFileSrc, "/" . Imaging::THUMBNAIL_PREFIX);
         if (!$strposFilter)
         {
-            throw new \ErrorException("This is not a filter thumbnail: ". $newFileSrc);
+            throw new NotFoundHttpException("This is not a filter thumbnail: ". $newFileSrc);
         }
 
         $originalFileSrc                = substr($newFileSrc, 0, $strposFilter) . "." . $newFile->getExtension();
@@ -81,7 +81,7 @@ class ImagingController extends Controller
 
         if (!$originalFile->isExist())
         {
-            throw new \ErrorException("The original file is not found: " . $newFileSrc);
+            throw new NotFoundHttpException("The original file is not found: " . $newFileSrc);
         }
 
         //Проверено наличие оригинального файла, есть пути к оригиналу, и результирующему файлу.
@@ -121,7 +121,7 @@ class ImagingController extends Controller
         $filter = new $filterClass((array) $params);
         if (!is_subclass_of($filter, Filter::className()))
         {
-            throw new \ErrorException("No child filter class: " . $newFileSrc);
+            throw new NotFoundHttpException("No child filter class: " . $newFileSrc);
         }
 
         try

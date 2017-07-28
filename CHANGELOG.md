@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha8
+---------------
+ * Image not found http exception
+ 
 4.0.0-alpha7
 ---------------
  * Enabled url normalizer by default
