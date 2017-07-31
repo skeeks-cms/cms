@@ -288,11 +288,13 @@ class UrlRuleTree
 
         if ($treeNode)
         {
+
             \Yii::$app->cms->setCurrentTree($treeNode);
 
             $params['id']        = $treeNode->id;
 
             if ($normalized) {
+
                 // pathInfo was changed by normalizer - we need also normalize route
                 return $this->getNormalizer($manager)->normalizeRoute(['cms/tree/view', $params]);
             } else {
