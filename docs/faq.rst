@@ -40,6 +40,43 @@ FAQ
     $element->link('image', $file);
 
 
+Как правильно поймать событие отправки формы в конструкторе
+-----------------------------------------------------------
+
+Чаще всего, возниает необходимость отлавливать события успешной отправки формы, и сообщать о них в yandex или google метрику.
+Для этого предлагается использовать следующий код:
+
+.. code-block:: php
+
+    <?
+    \yii\bootstrap\Modal::begin([
+          'header' => 'Обратная связь',
+          'id' => 'sx-feedback',
+          'toggleButton' => false,
+          'size' => \yii\bootstrap\Modal::SIZE_DEFAULT
+      ]);
+    ?>
+        <?= \skeeks\modules\cms\form2\cmsWidgets\form2\FormWidget::widget([
+            'form_code' => 'feedback',
+            'namespace' => 'FormWidget-feedback',
+            'viewFile' => 'with-messages',
+            'successJs' => new \yii\web\JsExpression(<<<JS
+            console.log('successJs');
+            //yaCounter17836507.reachGoal('btn-send');
+    JS
+        ),
+        'errorJs' => new \yii\web\JsExpression(<<<JS
+            console.log('errorJs');
+    JS
+        ),
+            //'viewFile' => '@app/views/widgets/FormWidget/fiz-connect'
+        ]); ?>
+    <?
+        \yii\bootstrap\Modal::end();
+    ?>
+
+
+
 Как отметить обязательные поля в формах ``*``
 ---------------------------------------------
 
