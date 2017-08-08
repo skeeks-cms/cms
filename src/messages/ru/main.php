@@ -41,6 +41,7 @@ return
     "Description Short"     =>  "Короткое описание",
     "Description Full"      =>  "Подробное описание",
     "Description"           =>  "Описание",
+    "Unexpected Phone Number Format"           =>  "Неожиданный формат номера телефона",
 
     "Descending"            => "По убыванию",
     "Ascending"             => "По возрастанию",
