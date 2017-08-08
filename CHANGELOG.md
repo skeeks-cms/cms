@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha9.pre
+---------------
+ * Translate
+ 
 4.0.0-alpha8
 ---------------
  * Image not found http exception
