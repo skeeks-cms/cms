@@ -2,13 +2,14 @@
 
 namespace skeeks\cms\composer;
 
+use Composer\Installer\LibraryInstaller;
 use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\FileHelper;
 use yii\helpers\ArrayHelper;
 
-class Installer
+class Installer extends LibraryInstaller
 {
     public static function postInstall(Event $event)
     {
