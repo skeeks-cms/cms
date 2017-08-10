@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0-alpha9.pre
+4.0.0-alpha9
 ---------------
  * Composer installer update
  * Translate
