@@ -64,8 +64,8 @@ class CmsTreeType extends Core
             'priority' => Yii::t('skeeks/cms', 'Priority'),
             'description' => Yii::t('skeeks/cms', 'Description'),
             'index_for_search' => Yii::t('skeeks/cms', 'To index for search module'),
-            'name_meny' => Yii::t('skeeks/cms', 'Name Meny'),
-            'name_one' => Yii::t('skeeks/cms', 'Name One'),
+            'name_meny' => Yii::t('skeeks/cms', 'Name of many sections'),
+            'name_one' => Yii::t('skeeks/cms', 'Name of one section'),
             'viewFile' => Yii::t('skeeks/cms', 'Template'),
             'default_children_tree_type' => Yii::t('skeeks/cms', 'Type of child partitions by default'),
         ]);

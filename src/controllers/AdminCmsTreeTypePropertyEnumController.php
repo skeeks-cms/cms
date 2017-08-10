@@ -18,7 +18,7 @@ class AdminCmsTreeTypePropertyEnumController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление значениями свойств раздела";
+        $this->name                   = \Yii::t('skeeks/cms', 'Managing partition property values');
         $this->modelShowAttribute      = "value";
         $this->modelClassName          = CmsTreeTypePropertyEnum::className();
 

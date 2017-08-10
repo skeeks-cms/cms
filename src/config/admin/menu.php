@@ -317,6 +317,12 @@ return
                     ],
 
                     [
+                        "label"     => \Yii::t('skeeks/cms',"Options"),
+                        "url"       => ["cms/admin-cms-tree-type-property-enum"],
+                        //"img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.tree.gif'],
+                    ],
+
+                    [
                         "label"     => \Yii::t('skeeks/cms',"Types"),
                         "url"       => ["cms/admin-cms-tree-type"],
                         "img"       => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.tree.gif'],

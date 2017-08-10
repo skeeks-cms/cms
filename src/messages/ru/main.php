@@ -98,12 +98,16 @@ return
 
     "Phone number does not seem to be a valid phone number"    => "Некорректный формат номера телефона",
 
+    "Name of many sections"  => "Название многих разделов",
+    "Name of one section"  => "Название одного раздела",
     "The Name One Element"  => "Название одного элемента",
     "The Name Of The Elements (Plural)" => "Название элементов (множественное число)",
     "View Mode Sections And Elements" => "Режим просмотра разделов и элементов",
     "The Interface Binding Element to Sections" => "Интерфейс привязки элемента к разделам",
     "To index for search module" => "Индексировать для модуля поиска",
 
+    "To start setting up options, save this property."              => "Для начала заведения опций, сохраните это свойство.",
+    "Managing partition property values"              => "Управление значениями свойств разделов",
     "The main section"              => "Основной раздел",
     "Main Image (announcement)"     => "Главное изображение (для анонса)",
     "Main Image"                    => "Главное изображение",

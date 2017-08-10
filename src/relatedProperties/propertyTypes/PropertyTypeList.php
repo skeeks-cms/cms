@@ -9,6 +9,7 @@ namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
+use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -101,75 +102,87 @@ class PropertyTypeList extends PropertyType
             $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
             $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
 
-            if ($actionIndex)
+            if ($this->property->isNewRecord)
             {
-                $pjax = \yii\widgets\Pjax::begin();
-
-                if ($actionCreate)
-                {
-                    $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                        'property_id' => $this->property->id
-                    ]);
-
-                    echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                        'actions' => ['create' => $actionCreate],
-                        'clientOptions'     => ['pjax-id' => $pjax->id],
-                        'isOpenNewWindow'   => true,
-                        'tag'               => 'div',
-                        'itemWrapperTag'    => 'span',
-                        'itemTag'           => 'button',
-                        'itemOptions'       => ['class' => 'btn btn-default'],
-                        'options'           => ['class' => 'sx-controll-actions'],
-                    ]);
-                }
-
-                $query = \skeeks\cms\models\CmsContentPropertyEnum::find()->orderBy(['priority' => SORT_ASC]);
-                $query->andWhere(['property_id' => $this->property->id]);
-
-                echo \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-                    'dataProvider'      => new \yii\data\ActiveDataProvider([
-                        'query' => $query
-                    ]),
-                    'settingsData' =>
-                    [
-                        'namespace' => \Yii::$app->controller->uniqueId . "__" . $this->property->id
+                echo Alert::widget([
+                    'options' => [
+                        'class' => 'alert-info'
                     ],
-                    'adminController' => $controllerProperty,
-                    'isOpenNewWindow'       => true,
-                    //'filterModel'       => $searchModel,
-                    'autoColumns'       => false,
-                    'pjax'      => $pjax,
-                    'columns' => [
-                        [
-                            'attribute'     => 'id',
-                            'enableSorting' => false
-                        ],
-
-                        [
-                            'attribute'     => 'code',
-                            'enableSorting' => false
-                        ],
-
-                        [
-                            'attribute'     => 'value',
-                            'enableSorting' => false
-                        ],
-
-                        [
-                            'attribute'     => 'priority',
-                            'enableSorting' => false
-                        ],
-
-                        [
-                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => 'def',
-                            'enableSorting' => false
-                        ],
-                    ]
+                    'body' => \Yii::t('skeeks/cms', 'To start setting up options, save this property.')
                 ]);
+            } else
+            {
+                if ($actionIndex)
+                {
+                    $pjax = \yii\widgets\Pjax::begin();
 
-                \yii\widgets\Pjax::end();
+                    if ($actionCreate)
+                    {
+                        $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
+                            'property_id' => $this->property->id
+                        ]);
+
+                        echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                            'actions' => ['create' => $actionCreate],
+                            'clientOptions'     => ['pjax-id' => $pjax->id],
+                            'isOpenNewWindow'   => true,
+                            'tag'               => 'div',
+                            'itemWrapperTag'    => 'span',
+                            'itemTag'           => 'button',
+                            'itemOptions'       => ['class' => 'btn btn-default'],
+                            'options'           => ['class' => 'sx-controll-actions'],
+                        ]);
+                    }
+
+                    $query = \skeeks\cms\models\CmsContentPropertyEnum::find()->orderBy(['priority' => SORT_ASC]);
+                    $query->andWhere(['property_id' => $this->property->id]);
+
+                    echo \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                        'dataProvider'      => new \yii\data\ActiveDataProvider([
+                            'query' => $query
+                        ]),
+                        'settingsData' =>
+                        [
+                            'namespace' => \Yii::$app->controller->uniqueId . "__" . $this->property->id
+                        ],
+                        'adminController' => $controllerProperty,
+                        'isOpenNewWindow'       => true,
+                        //'filterModel'       => $searchModel,
+                        'autoColumns'       => false,
+                        'pjax'      => $pjax,
+                        'columns' => [
+                            [
+                                'attribute'     => 'id',
+                                'enableSorting' => false
+                            ],
+
+                            [
+                                'attribute'     => 'code',
+                                'enableSorting' => false
+                            ],
+
+                            [
+                                'attribute'     => 'value',
+                                'enableSorting' => false
+                            ],
+
+                            [
+                                'attribute'     => 'priority',
+                                'enableSorting' => false
+                            ],
+
+                            [
+                                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                                'attribute'     => 'def',
+                                'enableSorting' => false
+                            ],
+                        ]
+                    ]);
+
+                    \yii\widgets\Pjax::end();
+                }
             }
+
         }
 
         /*echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([

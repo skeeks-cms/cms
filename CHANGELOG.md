@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha11
+---------------
+ * Fixed bugs
+
 4.0.0-alpha10
 ---------------
  * Composer installer update
