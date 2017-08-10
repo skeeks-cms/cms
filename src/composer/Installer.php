@@ -1,13 +1,13 @@
 <?php
 
-namespace skeeks\cms\console;
+namespace skeeks\cms\composer;
 
 use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\FileHelper;
 
-class Composer
+class Installer
 {
     public static function postInstall(Event $event)
     {
