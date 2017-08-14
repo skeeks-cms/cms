@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.0-alpha12.pre
 ---------------
+ * @bower
  * Removed todos
  
 4.0.0-alpha11

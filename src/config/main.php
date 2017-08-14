@@ -17,6 +17,11 @@ $config =
     'language'      => 'ru',
     'bootstrap'     => ['cms', 'cmsToolbar'],
 
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm'   => '@vendor/npm-asset',
+    ],
+
     'components' => [
 
         'db' => [
