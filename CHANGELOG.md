@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha12.pre
+---------------
+ * Removed todos
+ 
 4.0.0-alpha11
 ---------------
  * Fixed bugs

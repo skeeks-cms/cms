@@ -55,7 +55,6 @@ trait ActiveFormAjaxSubmitTrait
 
                         var callback = $afterValidateCallback;
 
-                        //TODO: добавить проверки
                         callback(Jform, ajax);
 
                         ajax.execute();
