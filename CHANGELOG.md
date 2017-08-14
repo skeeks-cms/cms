@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha13.pre
+---------------
+ * mysq 5.7 migrate update
+ 
 4.0.0-alpha12
 ---------------
  * @bower

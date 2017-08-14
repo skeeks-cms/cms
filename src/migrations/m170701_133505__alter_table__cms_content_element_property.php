@@ -18,8 +18,21 @@ class m170701_133505__alter_table__cms_content_element_property extends Migratio
             ['property_id' => null],
         ]);
 
+        $this->dropForeignKey('cms_content_element_property_element_id', '{{%cms_content_element_property}}');
+        $this->dropForeignKey('cms_content_element_property_property_id', '{{%cms_content_element_property}}');
+
         $this->alterColumn("{{%cms_content_element_property}}", 'element_id', $this->integer()->notNull());
         $this->alterColumn("{{%cms_content_element_property}}", 'property_id', $this->integer()->notNull());
+
+        $this->addForeignKey(
+            'cms_content_element_property_element_id', "{{%cms_content_element_property}}",
+            'element_id', '{{%cms_content_element}}', 'id', 'CASCADE', 'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'cms_content_element_property_property_id', "{{%cms_content_element_property}}",
+            'property_id', '{{%cms_content_property}}', 'id', 'CASCADE', 'CASCADE'
+        );
     }
 
     public function safeDown()

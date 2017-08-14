@@ -18,8 +18,22 @@ class m170701_133515__alter_table__cms_user_property extends Migration
             ['property_id' => null],
         ]);
 
+
+        $this->dropForeignKey('cms_user_property_element_id', '{{%cms_user_property}}');
+        $this->dropForeignKey('cms_user_property_property_id', '{{%cms_user_property}}');
+
         $this->alterColumn("{{%cms_user_property}}", 'element_id', $this->integer()->notNull());
         $this->alterColumn("{{%cms_user_property}}", 'property_id', $this->integer()->notNull());
+
+        $this->addForeignKey(
+            'cms_user_property_element_id', "{{%cms_user_property}}",
+            'element_id', '{{%cms_user}}', 'id', 'CASCADE', 'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'cms_user_property_property_id', "{{%cms_user_property}}",
+            'property_id', '{{%cms_user_universal_property}}', 'id', 'CASCADE', 'CASCADE'
+        );
     }
 
     public function safeDown()

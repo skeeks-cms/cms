@@ -15,7 +15,14 @@ class m170508_023840__alter_table__cms_site_domain extends Migration
         $this->dropForeignKey("cms_site_domain_site_code", "{{%cms_site_domain}}");
         $this->dropColumn("{{%cms_site_domain}}", "site_code");
 
+        $this->dropForeignKey("cms_site_domain__cms_site_id", "{{%cms_site_domain}}");
+
         $this->alterColumn("{{%cms_site_domain}}", "cms_site_id", $this->integer()->notNull());
+
+        $this->addForeignKey(
+            'cms_site_domain__cms_site_id', "{{%cms_site_domain}}",
+            'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
+        );
     }
 
     public function safeDown()
