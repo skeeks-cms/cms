@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-alpha14
+---------------
+ * Dialog select elements
+ 
 4.0.0-alpha13
 ---------------
  * mysq 5.7 migrate update

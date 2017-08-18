@@ -66,15 +66,17 @@ class EditedSelect extends Chosen
         echo "<div class='col-md-6'>";
 
 
-        $createUrl = (string) \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->createAction, $this->additionalData)
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
-                ->enableAdmin()->toString();
+        $createUrl = (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([$this->controllerRoute . '/' . $this->createAction])
+                                    ->merge($this->additionalData)
+                                    ->enableEmptyLayout()
+                                    ->enableNoActions()
+                                    ->url;
 
-        $updateUrl =  (string) \skeeks\cms\helpers\UrlHelper::construct($this->controllerRoute . '/' . $this->updateAction, $this->additionalData)
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                //->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
-                ->enableAdmin()->toString();
+        $updateUrl =  (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([$this->controllerRoute . '/' . $this->updateAction])
+                                    ->merge($this->additionalData)
+                                    ->enableEmptyLayout()
+                                    ->url;
+
 
             $create_w = \Yii::t('skeeks/cms','Create');
             $edit_w = \Yii::t('skeeks/cms','Edit');

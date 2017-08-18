@@ -32,10 +32,14 @@ class TreeController extends Controller
         if ($this->model && \Yii::$app->cmsToolbar)
         {
             $controller = \Yii::$app->createController('cms/admin-tree')[0];
-            $adminControllerRoute = ['cms/admin-tree/update', $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}];
+            $adminControllerRoute = ['/cms/admin-tree/update', $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}];
 
-            $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();
+            $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
+                                    ->enableEmptyLayout()
+                                    ->url;
+            /*$urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();*/
+
 
             \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
         }

@@ -26,7 +26,7 @@
     ])
     ?>
     <? if (\Yii::$app->admin->isEmptyLayout()) : ?>
-        <input type="hidden" name="<?= \skeeks\cms\helpers\UrlHelper::SYSTEM_CMS_NAME; ?>[<?= \skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT?>]" value="true" />
+        <input type="hidden" name="<?= \skeeks\cms\backend\helpers\BackendUrlHelper::BACKEND_PARAM_NAME; ?>[<?= \skeeks\cms\backend\helpers\BackendUrlHelper::BACKEND_PARAM_NAME_EMPTY_LAYOUT; ?>]" value="true" />
     <? endif; ?>
 </form>
 <hr />

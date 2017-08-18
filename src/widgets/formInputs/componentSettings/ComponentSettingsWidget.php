@@ -80,10 +80,10 @@ class ComponentSettingsWidget extends InputWidget
         $this->clientOptions['componentSelectId']       = $this->componentSelectId;
         $this->clientOptions['componentSettingsId']     = Html::getInputId($this->model, $this->attribute);
         $this->clientOptions['id']                      = $this->id;
-        $this->clientOptions['backend']                 = UrlHelper::construct('/cms/admin-universal-component-settings/index')
-                                                            ->setSystemParam(Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                                                            ->enableAdmin()
-                                                            ->toString();
+
+        $this->clientOptions['backend']                 = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-universal-component-settings/index'])
+                                                            ->enableEmptyLayout()
+                                                            ->url;
 
         return $this->render('element', [
             'widget'    => $this,

@@ -542,27 +542,29 @@ abstract class Component extends Model implements ConfigFormInterface
             }
         }
 
-        return UrlHelper::construct('/cms/admin-component-settings/index', [
-            'componentClassName'                => $this->className(),
-            'attributes'                        => $attributes,
-            'componentNamespace'                => $this->namespace,
-        ])
-            ->enableAdmin()
-            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+        return \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/index'])
+                    ->merge([
+                        'componentClassName'                => $this->className(),
+                        'attributes'                        => $attributes,
+                        'componentNamespace'                => $this->namespace,
+                    ])
+                    ->enableEmptyLayout()
+                    ->url;
     }
 
     /**
-     * @return UrlHelper
+     * @return string
      */
     public function getCallableEditUrl()
     {
-        return UrlHelper::construct('/cms/admin-component-settings/call-edit', [
-            'componentClassName'                => $this->className(),
-            'componentNamespace'                => $this->namespace,
-            'callableId'                        => $this->callableId,
-        ])
-            ->enableAdmin()
-            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+        return \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/call-edit'])
+                    ->merge([
+                        'componentClassName'                => $this->className(),
+                        'componentNamespace'                => $this->namespace,
+                        'callableId'                        => $this->callableId,
+                    ])
+                    ->enableEmptyLayout()
+                    ->url;
     }
 
 

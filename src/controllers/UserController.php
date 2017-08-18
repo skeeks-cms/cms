@@ -46,10 +46,11 @@ class UserController extends Controller
         } else if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && \Yii::$app->cmsToolbar)
         {
             $controller = \Yii::$app->createController('cms/admin-user')[0];
-            $adminControllerRoute = ['cms/admin-user/update', $controller->requestPkParamName => $this->user->{$controller->modelPkAttribute}];
+            $adminControllerRoute = ['/cms/admin-user/update', $controller->requestPkParamName => $this->user->{$controller->modelPkAttribute}];
 
-            $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();
+            $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
+                                    ->enableEmptyLayout()
+                                    ->url;
 
             \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
         }

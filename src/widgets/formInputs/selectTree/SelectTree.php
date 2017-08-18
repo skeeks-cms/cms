@@ -96,11 +96,13 @@ class SelectTree extends InputWidget
 
 
 
-            $src = UrlHelper::construct('/cms/admin-tools/tree')
-                            ->set('mode', $this->mode)
-                            ->setSystemParam(Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                            ->setSystemParam(Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
-                            ->enableAdmin()->toString();
+            $src = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-tools/tree'])
+                            ->merge([
+                                'mode' => $this->mode
+                            ])
+                            ->enableEmptyLayout()
+                            ->enableNoActions()
+                            ->url;
 
             $id = "sx-id-" . md5(serialize([
                     $this->clientOptions, $this->mode, $this->attributeMulti, $this->attributeSingle

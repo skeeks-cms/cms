@@ -30,9 +30,9 @@
     ]); ?>
 
     <?= $form->field($searchModel, 'section')->widget(
-        \skeeks\widget\chosen\Chosen::class,
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
         [
-            'items' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions()
+            'multiple' => false,
         ]
     ); ?>
 

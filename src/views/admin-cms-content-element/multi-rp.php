@@ -80,7 +80,19 @@ JS
 
                 <? foreach ($element->relatedPropertiesModel->properties as $property) : ?>
                     <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
-                        <?= $property->renderActiveForm($form); ?>
+                        <? if($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT
+                            && $property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
+                            <?
+                            echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
+                                \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogContentElementInput::class,
+                                [
+                                    'content_id' => $property->handler->content_id
+                                ]
+                            );
+                            ?>
+                        <? else : ?>
+                            <?= $property->renderActiveForm($form); ?>
+                        <? endif; ?>
                     </div>
                 <? endforeach; ?>
                 <?= $form->buttonsStandart($model, ['save']);?>

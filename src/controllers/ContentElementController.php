@@ -35,10 +35,11 @@ class ContentElementController extends Controller
         if ($this->model && \Yii::$app->cmsToolbar)
         {
             $controller = \Yii::$app->createController('cms/admin-cms-content-element')[0];
-            $adminControllerRoute = ['cms/admin-cms-content-element/update', $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}];
+            $adminControllerRoute = ['/cms/admin-cms-content-element/update', $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}];
 
-            $urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();
+            $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
+                                    ->enableEmptyLayout()
+                                    ->url;
 
             \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
         }

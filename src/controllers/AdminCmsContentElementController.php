@@ -639,7 +639,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
                 },
                 'format'    => 'raw',
-                'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
+                'filter' => false,
+                //'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
                 'attribute' => 'tree_id'
             ],
 

@@ -171,9 +171,12 @@ JS
                     'data'      =>
                     [
                         'id'            => $id,
-                        'config-url'    => UrlHelper::construct(['/cms/admin-tools/view-file-edit', "root-file" => $e->viewFile])->enableAdmin()
-                            ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                            ->toString()
+                        'config-url'    => \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-tools/view-file-edit'])
+                                            ->merge([
+                                                "root-file" => $e->viewFile
+                                            ])
+                                            ->enableEmptyLayout()
+                                            ->url
                     ]
                 ]);
             }
@@ -243,7 +246,10 @@ JS
             return;
         }
 
-        $urlUserEdit = UrlHelper::construct('cms/admin-profile/update')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true');
+        $urlUserEdit = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-profile/update'])
+                        ->enableEmptyLayout()
+                        ->url;
+
 
         $clientOptions = [
             'infoblockSettings'             => [
@@ -275,7 +281,9 @@ JS
             'clientOptions'     => $clientOptions,
             'editUrl'           => $this->editUrl,
             'urlUserEdit'       => $urlUserEdit,
-            'urlSettings'       => UrlHelper::construct('cms/admin-settings')->enableAdmin()->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+            'urlSettings'       => \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-settings'])
+                                    ->enableEmptyLayout()
+                                    ->url
         ]);
     }
 
