@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -115,11 +116,25 @@ class ContentElementController extends Controller
         $tree               = $contentElement->cmsTree;
 
 
-        if ($contentElement->url != "/" . \Yii::$app->request->pathInfo)
+        if (Url::isRelative($contentElement->url))
         {
-            $url = $contentElement->url;
-            \Yii::$app->response->redirect($url, 301);
+            if ($contentElement->url != "/" . \Yii::$app->request->pathInfo)
+            {
+                $url = $contentElement->url;
+                \Yii::$app->response->redirect($url, 301);
+            }
+        } else
+        {
+            if ($urlData = parse_url($contentElement->url))
+            {
+                if (ArrayHelper::getValue($urlData, 'path') != "/" . \Yii::$app->request->pathInfo)
+                {
+                    $url = $contentElement->url;
+                    \Yii::$app->response->redirect($url, 301);
+                }
+            }
         }
+
 
         if ($tree)
         {
