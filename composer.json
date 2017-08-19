@@ -28,7 +28,7 @@
         "yiisoft/yii2-jui": "^2.0",
         "yiisoft/yii2-bootstrap": "^2.0",
         "skeeks/cms-backend": "dev-master",
-        "skeeks/cms-backend-admin": "^1",
+        "skeeks/cms-backend-admin": "dev-master",
         "skeeks/cms-admin": "dev-master",
         "skeeks/cms-rbac": "^2",
         "skeeks/cms-marketplace": "^1",
