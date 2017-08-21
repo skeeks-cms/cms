@@ -114,6 +114,24 @@ FAQ
     });
 
 
+Оптимальный robots.txt
+----------------------
+
+.. code-block:: bash
+
+    User-agent: *
+    Disallow: /~*
+    Disallow: /search*
+    Disallow: *&SearchProductsModel*
+    Disallow: *?SearchProductsModel*
+    Disallow: *&SearchRelatedPropertiesModel*
+    Disallow: *?SearchRelatedPropertiesModel*
+    Disallow: *&ProductFilters*
+    Disallow: *?ProductFilters*
+    Clean-Param: _openstat&utm_source&utm_medium&utm_campaign&utm_content&utm_term&pm_source&pm_block&pm_position&clid&yclid&ymclid&frommarket&text
+    Host: https://your-site.com
+    Sitemap: https://your-site.com/sitemap.xml
+
 Как включить js, css и html оптимизацию?
 ----------------------------------------
 
