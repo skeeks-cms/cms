@@ -530,7 +530,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
             return [];
         }
 
-        $model = CmsContentElement::find()->where(['content_id' => $cmsContent->id])->one();
+        $model = null;
+        //$model = CmsContentElement::find()->where(['content_id' => $cmsContent->id])->one();
 
         if (!$model)
         {
