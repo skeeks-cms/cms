@@ -84,7 +84,7 @@ JS
                             && $property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
                             <?
                             echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
-                                \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogContentElementInput::class,
+                                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
                                 [
                                     'content_id' => $property->handler->content_id
                                 ]

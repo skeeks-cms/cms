@@ -41,8 +41,12 @@
     <?= $form->field($searchModel, 'has_full_image')->checkbox(\Yii::$app->formatter->booleanFormat, false); ?>
 
 
-    <?= $form->field($searchModel, 'created_by')->widget(\skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()); ?>
-    <?= $form->field($searchModel, 'updated_by')->widget(\skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()); ?>
+    <?= $form->field($searchModel, 'created_by')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
+    ); ?>
+    <?= $form->field($searchModel, 'updated_by')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
+    ); ?>
 
 
     <?= $form->field($searchModel, 'created_at_from')->widget(
