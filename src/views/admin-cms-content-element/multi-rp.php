@@ -80,16 +80,28 @@ JS
 
                 <? foreach ($element->relatedPropertiesModel->properties as $property) : ?>
                     <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
-                        <? if($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT
-                            && $property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
-                            <?
-                            echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
-                                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                                [
-                                    'content_id' => $property->handler->content_id
-                                ]
-                            );
-                            ?>
+                        <? if($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
+
+                            <? if($property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
+                                <?
+                                    echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
+                                        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+                                        [
+                                            'content_id' => $property->handler->content_id
+                                        ]
+                                    );
+                                ?>
+                            <? else : ?>
+                                <?
+                                    echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
+                                        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+                                        [
+                                            'content_id' => $property->handler->content_id,
+                                            'multiple' => true
+                                        ]
+                                    );
+                                ?>
+                            <? endif; ?>
                         <? else : ?>
                             <?= $property->renderActiveForm($form); ?>
                         <? endif; ?>
