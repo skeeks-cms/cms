@@ -49,7 +49,7 @@ class Ckeditor extends CKEditorWidget
             ];
         }
 
-        $this->clientOptions['filebrowserImageBrowseUrl'] = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['cms/admin-tools/select-file'])
+        $this->clientOptions['filebrowserImageBrowseUrl'] = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-tools/select-file'])
                                     ->merge($additionalData)
                                     ->enableEmptyLayout()
                                     ->url;
