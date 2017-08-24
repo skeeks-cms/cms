@@ -805,6 +805,8 @@ return
     'Activity'                                                  => 'Активность',
 
 
+    'Selection widget in the dialog box'                    => 'Виджет выбора в диалоговом окне',
+    'Selection widget in the dialog box (multiple choice)'                    => 'Виджет выбора в диалоговом окне (множественный выбор)',
 
     //TreeMenuWidget
     'The parent section'                    => 'Родительский раздел',

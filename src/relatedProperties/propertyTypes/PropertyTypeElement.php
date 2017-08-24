@@ -6,6 +6,7 @@
  * @date 30.04.2015
  */
 namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
@@ -22,10 +23,12 @@ class PropertyTypeElement extends PropertyType
     public $code = self::CODE_ELEMENT;
     public $name = "";
 
-    const FIELD_ELEMENT_SELECT              = "select";
-    const FIELD_ELEMENT_SELECT_MULTI        = "selectMulti";
-    const FIELD_ELEMENT_RADIO_LIST          = "radioList";
-    const FIELD_ELEMENT_CHECKBOX_LIST       = "checkbox";
+    const FIELD_ELEMENT_SELECT                  = "select";
+    const FIELD_ELEMENT_SELECT_MULTI            = "selectMulti";
+    const FIELD_ELEMENT_RADIO_LIST              = "radioList";
+    const FIELD_ELEMENT_CHECKBOX_LIST           = "checkbox";
+    const FIELD_ELEMENT_SELECT_DIALOG           = "selectDialog";
+    const FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE  = "selectDialogMulti";
 
     public $fieldElement            = self::FIELD_ELEMENT_SELECT;
     public $content_id;
@@ -37,6 +40,8 @@ class PropertyTypeElement extends PropertyType
             self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('skeeks/cms','Combobox').' (select multiple)',
             self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('skeeks/cms','Radio Buttons (selecting one value)'),
             self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('skeeks/cms','Checkbox List'),
+            self::FIELD_ELEMENT_SELECT_DIALOG   => \Yii::t('skeeks/cms','Selection widget in the dialog box'),
+            self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE   => \Yii::t('skeeks/cms','Selection widget in the dialog box (multiple choice)'),
         ];
     }
 
@@ -55,7 +60,11 @@ class PropertyTypeElement extends PropertyType
      */
     public function getIsMultiple()
     {
-        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST]))
+        if (in_array($this->fieldElement, [
+            self::FIELD_ELEMENT_SELECT_MULTI
+            , self::FIELD_ELEMENT_CHECKBOX_LIST
+            , self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE
+        ]))
         {
             return true;
         }
@@ -130,6 +139,25 @@ class PropertyTypeElement extends PropertyType
         {
             $field = parent::renderForActiveForm();
             $field->checkboxList(ArrayHelper::map($find->all(), 'id', 'name'));
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG)
+        {
+            $field = parent::renderForActiveForm();
+            $field->widget(
+                SelectModelDialogContentElementWidget::class,
+                [
+                    'content_id' => $this->content_id
+                ]
+            );
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE)
+        {
+            $field = parent::renderForActiveForm();
+            $field->widget(
+                SelectModelDialogContentElementWidget::class,
+                [
+                    'content_id' => $this->content_id,
+                    'multiple' => true
+                ]
+            );
         }
 
 
