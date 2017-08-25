@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0-alpha14.pre
+4.0.0-beta
 ---------------
  * Dialog select elements
  
