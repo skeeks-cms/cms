@@ -33,7 +33,11 @@ if ($additionalName)
 }
 
 ?>
+
 <div class="sx-label-node level-<?= $model->level; ?> status-<?= $model->active; ?>">
+
+
+
     <a href="<?= $widget->getOpenCloseLink($model); ?>">
         <?= $result; ?>
     </a>
@@ -103,6 +107,68 @@ if ($additionalName)
             </a>
         </div>
     <? endif; ?>
+
+    <? if ($callbackEventName = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) : ?>
+
+
+        <?
+
+        $this->registerJs(<<<JS
+(function(sx, $, _)
+{
+    sx.classes.SelectCmsElement = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            $('table tr').on('dblclick', function()
+            {
+                $(".sx-row-action", $(this)).click();
+            });
+        },
+
+        submit: function(data)
+        {
+            if (window.opener)
+            {
+                if (window.opener.sx)
+                {
+                    window.opener.sx.EventManager.trigger('{$callbackEventName}', data);
+                    return this;
+                }
+            } else if (window.parent)
+            {
+                if (window.parent.sx)
+                {
+                    window.parent.sx.EventManager.trigger('{$callbackEventName}', data);
+                    return this;
+                }
+            }
+
+            return this;
+        }
+    });
+
+    sx.SelectCmsElement = new sx.classes.SelectCmsElement();
+
+})(sx, sx.$, sx._);
+JS
+);
+
+            $data = \yii\helpers\ArrayHelper::merge($model->toArray(), [
+                'url' => $model->url,
+                'image' => $model->image ? $model->image->src : '',
+                'fullName' => $model->fullName
+            ]);
+
+            echo \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms', 'Choose'), '#', [
+                'class' => 'btn btn-primary btn-xs sx-controll-act',
+                'style' => 'float: left;',
+                'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($data) . '); return false;',
+                'data-pjax' => 0
+            ]);
+        ?>
+    <? endif; ?>
+
 </div>
 
 <? if ($model->treeType) : ?>

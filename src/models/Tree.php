@@ -69,9 +69,11 @@ use yii\helpers\Url;
  * @property integer $redirect_tree_id
  * @property integer $redirect_code
  * @property string $name_hidden
- *
- *
  * @property string $view_file
+ *
+ * ***
+ *
+ * @property string $fullName
  *
  * @property string $absoluteUrl
  * @property string $url
@@ -787,6 +789,7 @@ class Tree extends Core
      *
      * @param Tree $target | Новая нода, будет вставлена в текущую
      * @return $this
+     * @deprecated
      */
     public function processAddNode(Tree $target)
     {
@@ -797,11 +800,39 @@ class Tree extends Core
 
     /**
      * @return bool
-     * @deprecated > 4.0
+     * @deprecated
      */
     public function gethas_children()
     {
         return (bool) $this->children;
+    }
+
+    /**
+     * @param string $glue
+     *
+     * @return string
+     */
+    public function getfullName($glue = " / ")
+    {
+        $paths = [];
+
+        if ($this->parents)
+        {
+            foreach ($this->parents as $parent)
+            {
+                if ($parent->isRoot())
+                {
+                    $paths[] =  "[" . $parent->site->name . "] " . $parent->name;
+                } else
+                {
+                    $paths[] =  $parent->name;
+                }
+            }
+        }
+
+        $paths[] = $this->name;
+
+        return implode($glue, $paths);
     }
 }
 

@@ -9,8 +9,12 @@ $model = new \skeeks\cms\models\CmsContentElement();
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'tree_id')->widget(
+    <?/*= $form->field($model, 'tree_id')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
+    ); */?>
+
+    <?= $form->field($model, 'tree_id')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
     ); ?>
 
     <?/*= $form->fieldSelect($model, 'tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions());*/?>

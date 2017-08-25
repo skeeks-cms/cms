@@ -9,12 +9,20 @@ $model = new \skeeks\cms\models\CmsContentElement();
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'treeIds')->widget(
+    <?/*= $form->field($model, 'treeIds')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
         [
             'multiple' => true
         ]
+    ); */?>
+
+    <?= $form->field($model, 'treeIds')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class,
+        [
+            'multiple' => true
+        ]
     ); ?>
+
 
     <?= \yii\helpers\Html::checkbox('removeCurrent', false); ?> <label><?=\Yii::t('skeeks/cms','Get rid of the already linked (in this case, the selected records bind only to the selected section)')?></label>
     <?= $form->buttonsStandart($model, ['save']);?>
