@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-beta2
+---------------
+ * Fixed composer.json
+ 
 4.0.0-beta
 ---------------
  * Dialog select elements
