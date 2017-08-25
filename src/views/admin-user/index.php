@@ -44,6 +44,14 @@
         'filterModel'   => $searchModel,
         'adminController'   => $controller,
         'pjax'              => $pjax,
+        'chooseCallback'   => function($model)
+        {
+            return \yii\helpers\ArrayHelper::merge($model->toArray(), [
+                //'url' => $model->url,
+                'image' => $model->image ? $model->image->src : "",
+                'displayName' => $model->displayName
+            ]);
+        },
         'columns' => \yii\helpers\ArrayHelper::merge([
 
             [
