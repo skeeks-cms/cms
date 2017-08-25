@@ -137,29 +137,7 @@ class AdminToolsController extends AdminController
         ]);
     }
 
-    /**
-     * Выбор элемента контента
-     * @return string
-     */
-    public function actionSelectCmsElement()
-    {
-        //$this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
-        \Yii::$app->cmsToolbar->enabled = 0;
 
-        return $this->render($this->action->id);
-    }
-
-    /**
-     * Выбор элемента контента
-     * @return string
-     */
-    public function actionSelectCmsUser()
-    {
-        //$this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
-        \Yii::$app->cmsToolbar->enabled = 0;
-
-        return $this->render($this->action->id);
-    }
 
     /**
      * Данные о текущем пользователе
