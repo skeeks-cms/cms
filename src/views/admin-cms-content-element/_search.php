@@ -7,7 +7,7 @@
  */
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-    'action' => '/' . \Yii::$app->request->pathInfo,
+    //'action' => '/' . \Yii::$app->request->pathInfo,
     'namespace' => \Yii::$app->controller->uniqueId . "_" . $content_id
 ]); ?>
 
