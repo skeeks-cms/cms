@@ -130,43 +130,47 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                         <?= $property->renderActiveForm($form, $model)?>
                         </div>
                         <div class="col-md-4">
+                            <? if (!in_array($property->handler->fieldElement, [
+                                \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG,
+                                \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE
+                            ])) : ?>
+                                <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
+                                    <label>&nbsp;</label>
+                                    <?
+                                        /**
+                                         * @var \skeeks\cms\backend\BackendAction $actionIndex
+                                         * @var \skeeks\cms\backend\BackendAction $actionCreate
+                                         */
+                                        $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+                                    ?>
 
-                            <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
-                                <label>&nbsp;</label>
-                                <?
-                                    /**
-                                     * @var \skeeks\cms\backend\BackendAction $actionIndex
-                                     * @var \skeeks\cms\backend\BackendAction $actionCreate
-                                     */
-                                    $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
-                                ?>
+                                    <?
+                                        if ($actionCreate)
+                                        {
+                                            $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
+                                                'content_id' => $property->handler->content_id
+                                            ]);
 
-                                <?
-                                    if ($actionCreate)
-                                    {
-                                        $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                                            'content_id' => $property->handler->content_id
-                                        ]);
+                                            $actionCreate->name = \Yii::t("skeeks/cms", "Create");
 
-                                        $actionCreate->name = \Yii::t("skeeks/cms", "Create");
+                                            /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                                                'actions' => ['create' => $actionCreate],
+                                                'isOpenNewWindow' => true
+                                            ]);*/
 
-                                        /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-                                            'actions' => ['create' => $actionCreate],
-                                            'isOpenNewWindow' => true
-                                        ]);*/
-
-                                        echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                                            'actions' => ['create' => $actionCreate],
-                                            'clientOptions'     => ['pjax-id' => $pjax->id],
-                                            'isOpenNewWindow'   => true,
-                                            'tag'               => 'div',
-                                            'itemWrapperTag'    => 'span',
-                                            'itemTag'           => 'button',
-                                            'itemOptions'       => ['class' => 'btn btn-default'],
-                                            'options'           => ['class' => 'sx-controll-actions'],
-                                        ]);
-                                    }
-                                ?>
+                                            echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                                                'actions' => ['create' => $actionCreate],
+                                                'clientOptions'     => ['pjax-id' => $pjax->id],
+                                                'isOpenNewWindow'   => true,
+                                                'tag'               => 'div',
+                                                'itemWrapperTag'    => 'span',
+                                                'itemTag'           => 'button',
+                                                'itemOptions'       => ['class' => 'btn btn-default'],
+                                                'options'           => ['class' => 'sx-controll-actions'],
+                                            ]);
+                                        }
+                                    ?>
+                                <? endif; ?>
                             <? endif; ?>
                             <!--<a href="#" style="border-bottom: 1px dashed">Добавить</a>-->
                         </div>
