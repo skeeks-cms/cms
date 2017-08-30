@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.0-beta3.pre
+---------------
+ * Fixed errors
+ 
 4.0.0-beta2
 ---------------
  * Fixed composer.json

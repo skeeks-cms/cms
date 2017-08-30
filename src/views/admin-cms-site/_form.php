@@ -27,12 +27,7 @@ $action     = $controller->action;
             ]
         ); ?>
 
-        <?= $form->field($model, 'name')->widget(
-            \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-            [
-                'content_id' => 6
-            ]
-        ); ?>
+        <?= $form->field($model, 'name'); ?>
         <?= $form->field($model, 'code')->textInput(); ?>
 
 
