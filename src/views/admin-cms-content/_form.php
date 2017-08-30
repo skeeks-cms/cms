@@ -46,19 +46,27 @@ $action     = $controller->action;
     
         <div class="row">
             <div class="col-md-6">
-                <?= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+
+                <?= $form->field($model, 'default_tree_id')->widget(
+                    \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+                ); ?>
+                <?/*= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
                     'allowDeselect' => true
-                ]); ?>
+                ]); */?>
             </div>
             <div class="col-md-6">
                 <?= $form->fieldRadioListBoolean($model, 'is_allow_change_tree'); ?>
             </div>
         </div>
     
-    
-        <?= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+
+        <?= $form->field($model, 'root_tree_id')->widget(
+            \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+        )->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
+
+        <?/*= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
             'allowDeselect' => true
-        ])->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
+        ])->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); */?>
     
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => \Yii::t('skeeks/cms', 'Relationship to other content')

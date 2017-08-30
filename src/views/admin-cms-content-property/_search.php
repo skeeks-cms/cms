@@ -49,13 +49,17 @@ if ($filter->tree_ids)
         ]
     ); ?>
 
-    <?= $form->field($filter, 'tree_ids')->label(\Yii::t('skeeks/cms', 'Sections'))->setVisible(true)->widget(
+    <?= $form->field($filter, 'tree_ids')->label(\Yii::t('skeeks/cms', 'Sections'))->setVisible(true)
+    ->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+    )
+    /*->widget(
         \skeeks\widget\chosen\Chosen::class,
         [
             'multiple' => true,
             'items' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions()
         ]
-    ); ?>
+    )*/; ?>
 
     <?= $form->field($searchModel, 'id') ?>
 
