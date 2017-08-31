@@ -1,16 +1,48 @@
 SkeekS CMS (Yii2)
 ================
+<p align="center">
+    <a href="https://cms.skeeks.com/" target="_blank">
+        <img src="https://cms.skeeks.com/uploads/all/35/fd/33/35fd33aa306823dbaf53a0142d43b3fa.png" width="400" alt="Yii Framework" />
+    </a>
+</p>
 
-[![skeeks!](https://cms.skeeks.com/uploads/all/35/fd/33/35fd33aa306823dbaf53a0142d43b3fa.png)](https://cms.skeeks.com)  
+SkeekS CMS - modern generic content management system based on yii2 php framework.
+
+[![Latest Stable Version](https://poser.pugx.org/skeeks/cms/v/stable.png)](https://packagist.org/packages/skeeks/cms)
+[![Total Downloads](https://poser.pugx.org/skeeks/cms/downloads.png)](https://packagist.org/packages/skeeks/cms)
+[![Reference Status](https://www.versioneye.com/php/skeeks:cms/reference_badge.svg)](https://www.versioneye.com/php/skeeks:cms/references)
+[![Dependency Status](https://www.versioneye.com/php/skeeks:cms/dev-master/badge.png)](https://www.versioneye.com/php/skeeks:cms/dev-master)
 
 
+Links
+-----
 
-##Links
 * [Web site](https://cms.skeeks.com)
 * [Author](https://skeeks.com)
 * [ChangeLog](https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md)
+* [Youtube](https://www.youtube.com/channel/UC26fcOT8EK0Rr80WSM44mEA)
+* [Facebook](https://www.facebook.com/skeekscom)
+* [Vk](https://vk.com/skeeks_com)
 
-## Info
+Installation
+------------
+
+- The minimum required PHP version of Yii is PHP 5.5.
+- It works best with PHP 7.
+- [Follow the Definitive Guide](https://docs.cms.skeeks.com/en/latest/overview.html#installation)
+in order to get step by step instructions.
+
+
+Documentation
+-------------
+
+- [Web version](https://docs.cms.skeeks.com/en/latest/).
+- [Pdf version](https://media.readthedocs.org/pdf/skeeks-cms/latest/skeeks-cms.pdf).
+- [Веб-версия на русскомя зыке](https://docs.cms.skeeks.com/ru/latest/).
+- [Pdf-версия на русскомя зыке](https://media.readthedocs.org/pdf/skeeks-cms-ru/latest/skeeks-cms-ru.pdf).
+
+Info
+----
 
 SkeekS CMS - modern generic content management system based on yii2 php framework.
 
@@ -28,9 +60,6 @@ This versatility allows you to easily create any site, without writing and desig
 
 Just have https://cms.skeeks.com/marketplace marketpleys the CMS for this, which is constantly updated with useful solutions.
 
-##Last video
-[![Video on youtube](https://img.youtube.com/vi/u9JRc27WVYY/0.jpg)](https://www.youtube.com/watch?v=u9JRc27WVYY)
-
 
 ##Screenshot
 [![SkeekS CMS admin panel](https://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)](https://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)
@@ -42,11 +71,6 @@ ___
 ___
 [![SkeekS CMS admin panel](https://cms.skeeks.com/uploads/all/35/b4/b6/35b4b6e7c1edf46b320002d61ffad411.png)](https://cms.skeeks.com/uploads/all/35/b4/b6/35b4b6e7c1edf46b320002d61ffad411.png)
 
-
-
-##Install
-
-[https://cms.skeeks.com/docs/installation](https://cms.skeeks.com/docs/installation)
 
 ___
 
