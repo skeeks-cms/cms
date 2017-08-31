@@ -86,19 +86,9 @@ Navigate to the folder where are your projects (such as **/var/www/sites/**).
     curl -sS https://getcomposer.org/installer | COMPOSER_HOME=.composer php
 
     # Installing the base project SkeekS CMS
-    COMPOSER_HOME=.composer php composer.phar create-project --no-install --prefer-dist skeeks/app-basic example.com
+    COMPOSER_HOME=.composer php composer.phar create-project --prefer-dist --stability=dev skeeks/app-basic demo.ru
     # Going into the project folder
     cd demo.ru
-    # Download latest version of composer in project
-    curl -sS https://getcomposer.org/installer | COMPOSER_HOME=.composer php
-
-    # Extra plug-ins
-    COMPOSER_HOME=.composer php composer.phar global require fxp/composer-asset-plugin --no-plugins
-    # Enter your github api key in composer.json
-    # Download dependency
-    COMPOSER_HOME=.composer php composer.phar install -o
-    # Run the command to initialize the project, the installer executable file and the necessary rights to the directory
-    php yii cms/init
 
 
 3. Configuring the database
@@ -157,55 +147,7 @@ Standart update
 .. code-block:: bash
 
     # Composer update to the latest stable version
-    COMPOSER_HOME=.composer php composer.phar self-update
-    # Extra plug-ins
-    COMPOSER_HOME=.composer php composer.phar global require fxp/composer-asset-plugin --no-plugins
-    # Download dependency
-    COMPOSER_HOME=.composer php composer.phar update -o
-    # Clear all caches (Just in case)
-    php yii cms/cache/flush-all
-    # Installation of migration
-    php yii cms/migrate --interactive=0
-    # Init privilages. If the component is installed skeeks/cms-rbac (optionality)
-    php yii rbac/init
-    # Init agents. If the component is installed skeeks/cms-agent (optionality)
-    php yii cmsAgent/init
-    # Clear all caches (Just in case)
-    php yii cms/cache/flush-all
-
-Fast update
-~~~~~~~~~~~
-
-Or all of these commands in one line
-
-.. code-block:: bash
-
-    COMPOSER_HOME=.composer php composer.phar self-update && COMPOSER_HOME=.composer php composer.phar global require fxp/composer-asset-plugin --no-plugins && COMPOSER_HOME=.composer php composer.phar update -o -n && php yii cms/cache/flush-all && php yii cms/migrate --interactive=0 && php yii rbac/init && php yii cmsAgent/init && php yii cms/cache/flush-all
-
-
-Custom update
-~~~~~~~~~~~~~
-
-Or mount it in your settings file composer.json
-
-.. code-block:: bash
-
-    "scripts": {
-        "post-install-cmd": [
-            "skeeks\\cms\\console\\Composer::postInstall"
-        ],
-        "post-update-cmd": [
-            "skeeks\\cms\\console\\Composer::postUpdate",
-            "php yii cms/cache/flush-all",
-            "php yii cms/migrate --interactive=0",
-            "php yii rbac/init",
-            "php yii cmsAgent/init",
-            "php yii cms/cache/flush-all"
-        ]
-    },
-
-Exemple: https://github.com/skeeks-cms/app-basic/blob/master/composer.json
-
+    COMPOSER_HOME=.composer php composer.phar self-update && COMPOSER_HOME=.composer php composer.phar update -o
 
 Configuring Web Servers
 =======================
