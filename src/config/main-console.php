@@ -114,6 +114,12 @@ $config =
             'class' => 'skeeks\cms\Module',
             'controllerNamespace' => 'skeeks\cms\console\controllers'
         ],
+        
+        'ajaxfileupload' => [
+            'class'                 => 'skeeks\yii2\ajaxfileupload\AjaxFileUploadModule',
+            'controllerNamespace'   => 'skeeks\yii2\ajaxfileupload\console\controllers',
+            'private_tmp_dir'       => '@frontend/runtime/ajaxfileupload'
+        ]
     ],
 ];
 
