@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.0-beta3.pre
+4.0.0-beta3
 ---------------
  * Fixed errors
  
