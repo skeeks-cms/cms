@@ -59,7 +59,7 @@ $action     = $controller->action;
                     'cms_site_id' => 'id'
                 ],
 
-                'controllerRoute'   => 'cms/admin-cms-site-domain',
+                'controllerRoute'   => '/cms/admin-cms-site-domain',
                 'gridViewOptions'   => [
                     'columns' => [
                         //['class' => 'yii\grid\SerialColumn'],
