@@ -195,6 +195,10 @@ class PropertyTypeElement extends PropertyType
             $this->property->relatedPropertiesModel->addRule($this->property->code, 'integer');
         }
 
+        if ($this->property->isRequired) {
+            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required');
+        }
+
         return $this;
     }
 

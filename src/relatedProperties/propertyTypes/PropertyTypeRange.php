@@ -90,6 +90,10 @@ class PropertyTypeRange extends PropertyType
     {
         $this->property->relatedPropertiesModel->addRule($this->property->code, 'boolean');
 
+        if ($this->property->isRequired) {
+            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required');
+        }
+
         return $this;
     }
 

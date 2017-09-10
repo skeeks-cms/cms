@@ -84,7 +84,7 @@ class PropertyTypeBool extends PropertyType
 
             if ($fieldElement == 'radioList' || $fieldElement == 'listbox')
             {
-                $field->{$fieldElement}(\Yii::$app->formatter->booleanFormat);
+                $field->{$fieldElement}();
             } else
             {
                 $field->{$fieldElement}();
@@ -105,7 +105,19 @@ class PropertyTypeBool extends PropertyType
      */
     public function addRules()
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'boolean');
+
+
+        if ($this->property->isRequired) {
+            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required', [
+                'requiredValue' => '1',
+                'message' => \Yii::t('yii', '{attribute} cannot be blank.'),
+            ]);
+        } else {
+            $this->property->relatedPropertiesModel->addRule($this->property->code, 'boolean', [
+                'trueValue' => '1',
+                'falseValue' => '0'
+            ]);
+        }
 
         return $this;
     }

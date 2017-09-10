@@ -261,13 +261,7 @@ abstract class RelatedPropertyModel extends Core
      */
     public function addRules()
     {
-        if ($this->is_required == Cms::BOOL_Y)
-        {
-            $this->relatedPropertiesModel->addRule($this->code, 'required');
-        }
-
         $this->handler->addRules();
-
         return $this;
     }
 

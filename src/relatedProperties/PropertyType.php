@@ -96,6 +96,11 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     public function addRules()
     {
         $this->property->relatedPropertiesModel->addRule($this->property->code, 'safe');
+
+        if ($this->property->isRequired) {
+            $this->property->relatedPropertiesModel->addRule($this->code, 'required');
+        }
+
         return $this;
     }
 
