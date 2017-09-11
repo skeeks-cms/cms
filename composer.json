@@ -29,7 +29,7 @@
         "yiisoft/yii2-bootstrap": "^2.0",
         "skeeks/cms-backend": "^1",
         "skeeks/cms-backend-admin": "^1",
-        "skeeks/cms-admin": "dev-master",
+        "skeeks/cms-admin": "^2",
         "skeeks/cms-rbac": "^2",
         "skeeks/cms-marketplace": "^1",
         "skeeks/yii2-ajax-file-upload": "^1",
