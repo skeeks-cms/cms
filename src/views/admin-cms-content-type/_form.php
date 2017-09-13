@@ -28,7 +28,7 @@ use common\models\User;
         'relation'          => [
             'content_type' => 'code'
         ],
-        'controllerRoute'   => 'cms/admin-cms-content',
+        'controllerRoute'   => '/cms/admin-cms-content',
         'gridViewOptions'   => [
             'sortable' => true,
             'columns' => [
