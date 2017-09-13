@@ -271,7 +271,7 @@
                     self.selectValue($(this).val(), $(this));
                 } else
                 {
-                    self.unSelectValue($(this).val());
+                    self.unSelectValue($(this).val(), true);
                 }
 
                 self.trigger("change", {
@@ -289,7 +289,7 @@
             }
         },
 
-        unSelectValue: function(value, isTriggerChange = true)
+        unSelectValue: function(value, isTriggerChange)
         {
             var self = this;
             $("option[value='" + value + "']", self.getJElement()).remove();
@@ -302,7 +302,7 @@
                 Jelement.removeAttr("checked");
             };
 
-            if (isTriggerChange)
+            if (isTriggerChange !== false)
             {
                 self.getJElement().change();
             }
