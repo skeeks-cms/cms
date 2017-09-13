@@ -250,7 +250,7 @@ abstract class RelatedPropertyModel extends Core
      */
     public function getIsRequired()
     {
-        return (bool) $this->is_required == Cms::BOOL_Y;
+        return (bool) ($this->is_required == Cms::BOOL_Y);
     }
 
 
