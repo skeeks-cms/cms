@@ -17,6 +17,7 @@ Links
 * [Web site](https://cms.skeeks.com)
 * [Author](https://skeeks.com)
 * [ChangeLog](https://github.com/skeeks-cms/cms/blob/master/CHANGELOG.md)
+* [Issues](https://github.com/skeeks-cms/cms/issues)
 * [Youtube](https://www.youtube.com/channel/UC26fcOT8EK0Rr80WSM44mEA)
 * [Facebook](https://www.facebook.com/skeekscom)
 * [Vk](https://vk.com/skeeks_com)
@@ -58,7 +59,9 @@ This versatility allows you to easily create any site, without writing and desig
 Just have https://cms.skeeks.com/marketplace marketpleys the CMS for this, which is constantly updated with useful solutions.
 
 
-##Screenshot
+Screenshot
+------------
+
 [![SkeekS CMS admin panel](https://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)](https://cms.skeeks.com/uploads/all/7a/72/a6/7a72a6bad8c89b27c09231a90b41f75e.png)
 ___
 [![SkeekS CMS admin panel](https://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)](https://cms.skeeks.com/uploads/all/4d/d7/38/4dd7380094d34a062a66d81c65c90be2.png)
