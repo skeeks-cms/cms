@@ -17,36 +17,25 @@ CMS Admin
 
 .. code-block:: php
 
-   'admin' =>
-   [
-      'class' => '\skeeks\cms\modules\admin\components\settings\AdminSettings',
-
-      'languageCode' => 'ru',
-
-      'allowedIPs' => [
-          '91.219.167.252',
-          '93.186.50.*'
-      ]
-   ],
-
-   'urlManager' =>
-   [
-      'rules' =>
-      [
-         'cms-admin' => [
-             "class" => 'skeeks\cms\modules\admin\components\UrlRule',
-             'adminPrefix' => '~sx' //Префикс админки, то есть путь к админке сайта может быть любой
-         ],
-      ]
-   ]
+    'backendAdmin' =>
+    [
+        'class'             => '\skeeks\cms\admin\AdminComponent',
+        'controllerPrefix'  => 'admin',
+        'urlRule'           => [
+            'urlPrefix' => '~sx' //Префикс админки, то есть путь к админке сайта может быть любой
+        ],
+        'allowedIPs' => [
+            '91.219.167.252',
+              '93.186.50.*'
+        ],
+        'on beforeRun' => function($event) {
+            \Yii::$app->httpBasicAuth->verify();
+        }
+    ],
 
 
 Доступные настройки
 ~~~~~~~~~~~~~~~~~~~
-
-languageCode
-""""""""""""
-Язык интерфейса административной части, по умолчанию ``ru``
 
 allowedIPs
 """"""""""
