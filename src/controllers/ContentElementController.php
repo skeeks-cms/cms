@@ -9,6 +9,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\filters\CmsAccessControl;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsTree;
@@ -118,16 +119,21 @@ class ContentElementController extends Controller
 
         if (Url::isRelative($contentElement->url))
         {
-            if ($contentElement->url != "/" . \Yii::$app->request->pathInfo)
+            if ($contentElement->url != \Yii::$app->request->url)
             {
                 $url = $contentElement->url;
                 \Yii::$app->response->redirect($url, 301);
             }
         } else
         {
+
             if ($urlData = parse_url($contentElement->url))
             {
-                if (ArrayHelper::getValue($urlData, 'path') != "/" . \Yii::$app->request->pathInfo)
+                $contentUrl = \Yii::$app->request->url;
+                /*if (\Yii::$app->homeUrl != '/') {
+                    $contentUrl = "/" . StringHelper::substr(\Yii::$app->request->url, StringHelper::strlen(\Yii::$app->homeUrl), StringHelper::strlen(\Yii::$app->request->url));
+                }*/
+                if (ArrayHelper::getValue($urlData, 'path') != $contentUrl)
                 {
                     $url = $contentElement->url;
                     \Yii::$app->response->redirect($url, 301);
