@@ -37,6 +37,13 @@
                 }
             ],
             [
+                'label' => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
+                'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty)
+                {
+                    return $cmsContentProperty->getElementProperties()->andWhere(['!=', 'value', ''])->count();
+                }
+            ],
+            [
                 'class'         => \skeeks\cms\grid\BooleanColumn::className(),
                 'attribute'     => "active"
             ],

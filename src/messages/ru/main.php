@@ -23,12 +23,15 @@ return
     "Managing property values"   => "Управление значениями свойств",
     "Management of languages"   => "Управление языковыми версиями",
     "Properties of elements"   => "Свойства элементов",
+    "Number of partitions where the property is filled"   => "Количество разделов, где заполнено свойство",
 
     "Only shown in sections"=> "Показывается только в разделах",
     "Always shown"          => "Показывается всегда",
     "Yes/No"                => "Да/Нет",
     "Options"               => "Опции",
     "Property"              => "Свойство",
+    "Communication with sections"              => "Связь с разделами",
+    "Show properties that are filled by someone"              => "Показывать свойства, которые заполнены у кого-либо",
 
 
     "Created By"            =>  "Автор",
