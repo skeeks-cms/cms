@@ -32,6 +32,7 @@ return
     "Property"              => "Свойство",
     "Communication with sections"              => "Связь с разделами",
     "Show properties that are filled by someone"              => "Показывать свойства, которые заполнены у кого-либо",
+    "Tree"              => "Дерево",
 
 
     "Created By"            =>  "Автор",
