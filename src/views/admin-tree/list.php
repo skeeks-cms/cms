@@ -8,7 +8,7 @@
 /* @var $this yii\web\View */
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-/* @var $model \skeeks\cms\models\CmsContentElement */
+/* @var $model \skeeks\cms\models\CmsTree */
 ?>
 <? $pjax = \yii\widgets\Pjax::begin(); ?>
 
@@ -27,8 +27,9 @@
         [
             'name',
             'code',
-            'priority',
-            [
+            'treeType.name',
+            'level',
+            /*[
                 'label' => \Yii::t('skeeks/cms', 'Sections'),
                 'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty)
                 {
@@ -38,22 +39,15 @@
             ],
             [
                 'label' => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
-                'format' => 'raw',
                 'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty)
                 {
-                    return \yii\helpers\Html::a($cmsContentProperty->getElementProperties()->andWhere(['!=', 'value', ''])->count(),
-                        ['/cms/admin-tree/list', 'DynamicModel' => [
-                            'fill' => $cmsContentProperty->id
-                        ]], [
-                            'data-pjax' => '0',
-                            'target' => '_blank'
-                        ]);
+                    return $cmsContentProperty->getElementProperties()->andWhere(['!=', 'value', ''])->count();
                 }
             ],
             [
                 'class'         => \skeeks\cms\grid\BooleanColumn::className(),
                 'attribute'     => "active"
-            ],
+            ],*/
         ]
     ]); ?>
 

@@ -20,6 +20,7 @@ use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
@@ -59,8 +60,16 @@ class AdminTreeController extends AdminModelEditorController
             'index' =>
             [
                 'class'         => AdminAction::className(),
-                'name'          => 'Разделы',
+                'name'          => \Yii::t('skeeks/cms', 'Tree'),
                 'callback'      => [$this, 'indexAction']
+            ],
+
+            'list' =>
+            [
+                'class'         => ModelEditorGridAction::className(),
+                'name'          => \Yii::t('skeeks/cms', 'List'),
+                "icon"          => "glyphicon glyphicon-th-list",
+                "priority"      => 10,
             ],
 
             'create' =>
@@ -73,6 +82,8 @@ class AdminTreeController extends AdminModelEditorController
                 'class'         => BackendModelUpdateAction::className(),
                 "callback"      => [$this, 'update'],
             ],
+
+
 
         ]);
 
