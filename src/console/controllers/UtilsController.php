@@ -10,6 +10,7 @@ namespace skeeks\cms\console\controllers;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentProperty2content;
 use skeeks\cms\models\CmsSearchPhrase;
@@ -188,6 +189,43 @@ class UtilsController extends Controller
                 {
                     $this->stdout("\t NOT Created: {$cmsContentProperty->name}\n", Console::FG_RED);
                 }
+            }
+        }
+    }
+
+    /**
+     * Deleting content items
+     *
+     * @param null $contentId content id
+     */
+    public function actionRemoveContentElements($contentId = null)
+    {
+        $query = CmsContentElement::find();
+        if ($contentId) {
+            $query->andWhere(['content_id' => $contentId]);
+        }
+
+        if (!$count = $query->count())
+        {
+            $this->stdout("Content elements not found!\n", Console::BOLD);
+            return;
+        }
+
+        $this->stdout("1. Found elements: {$count}!\n", Console::FG_YELLOW);
+
+        foreach ($query->orderBy([
+            'content_id' => SORT_ASC,
+            'id' => SORT_ASC
+        ])->each(10) as $cmsContentElement)
+        {
+            $this->stdout("\t Content element {$cmsContentElement->id}: {$cmsContentElement->name}\n", Console::FG_YELLOW);
+
+            if ($cmsContentElement->delete())
+            {
+                $this->stdout("\t\t Deleted: {$cmsContentElement->name}\n", Console::FG_GREEN);
+            } else
+            {
+                $this->stdout("\t\t NOT deleted: {$cmsContentElement->name}\n", Console::FG_RED);
             }
         }
     }
