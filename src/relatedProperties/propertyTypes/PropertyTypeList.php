@@ -81,6 +81,7 @@ class PropertyTypeList extends PropertyType
     {
         return ArrayHelper::merge(parent::rules(),
         [
+            ['fieldElement', 'required'],
             ['fieldElement', 'string'],
             ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
         ]);
@@ -232,6 +233,8 @@ class PropertyTypeList extends PropertyType
      */
     public function renderForActiveForm()
     {
+        $field = '';
+
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT)
         {
             $field = $this->activeForm->fieldSelect(
@@ -271,12 +274,14 @@ class PropertyTypeList extends PropertyType
             $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
                 'size' => 1,
             ]);
-        }
-
-
-        if (!$field)
+        } else
         {
-            return '';
+            $field = $this->activeForm->fieldSelect(
+                $this->property->relatedPropertiesModel,
+                $this->property->code,
+                ArrayHelper::map($this->property->enums, 'id', 'value'),
+                []
+            );
         }
 
         return $field;

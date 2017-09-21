@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.1.pre
 ---------------
+ * Fixed admin
  * New console cmd for delete content elements
  * Admin tree list controller
  
