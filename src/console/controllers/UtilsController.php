@@ -217,21 +217,21 @@ class UtilsController extends Controller
             return;
         }
 
-        $this->stdout("1. Found elements: {$count}!\n", Console::FG_YELLOW);
+        $this->stdout("1. Found elements: {$count}!\n", Console::BOLD);
 
         foreach ($query->orderBy([
             'content_id' => SORT_ASC,
             'id' => SORT_ASC
         ])->each(10) as $cmsContentElement)
         {
-            $this->stdout("\t Content element {$cmsContentElement->id}: {$cmsContentElement->name}\n", Console::FG_YELLOW);
+            $this->stdout("\t{$cmsContentElement->id}: {$cmsContentElement->name}");
 
             if ($cmsContentElement->delete())
             {
-                $this->stdout("\t\t Deleted: {$cmsContentElement->name}\n", Console::FG_GREEN);
+                $this->stdout(" - deleted\n", Console::FG_GREEN);
             } else
             {
-                $this->stdout("\t\t NOT deleted: {$cmsContentElement->name}\n", Console::FG_RED);
+                $this->stdout(" - NOT deleted\n", Console::FG_RED);
             }
         }
     }
