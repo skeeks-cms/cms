@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.1.pre
 ---------------
+ * Update console cms/utils/clear-all-thumbnails
  * Fixed admin
  * New console cmd for delete content elements
  * Admin tree list controller

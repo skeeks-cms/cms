@@ -69,11 +69,17 @@ class UtilsController extends Controller
         /**
          * @var $files StorageFile[]
          */
-        if ($files = StorageFile::find()->all())
+        if ($files = StorageFile::find()->count())
         {
-            foreach ($files as $file)
+            foreach (StorageFile::find()->orderBy(['id' => SORT_ASC])->each(10) as $file)
             {
-                $file->deleteTmpDir();
+                $this->stdout("{$file->id}");
+                if ($file->deleteTmpDir()) {
+                    $this->stdout(" - true\n", Console::FG_GREEN);
+                } else
+                {
+                    $this->stdout(" - false\n", Console::FG_RED);
+                }
             }
         }
     }
