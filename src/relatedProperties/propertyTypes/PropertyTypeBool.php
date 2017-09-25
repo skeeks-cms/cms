@@ -82,9 +82,9 @@ class PropertyTypeBool extends PropertyType
         {
             $fieldElement = $this->fieldElement;
 
-            if ($fieldElement == 'radioList' || $fieldElement == 'listbox')
+            if ($fieldElement == 'radioList' || $fieldElement == 'listBox')
             {
-                $field->{$fieldElement}();
+                $field->{$fieldElement}(\Yii::$app->formatter->booleanFormat);
             } else
             {
                 $field->{$fieldElement}();
