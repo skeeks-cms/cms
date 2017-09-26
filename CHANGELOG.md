@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.1.pre
 ---------------
+ * Tree property update
  * Filter by property
  * Create index m170922_023840__alter_table__cms_content_element_property
  * Update console cms/utils/clear-all-thumbnails

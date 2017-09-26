@@ -24,6 +24,10 @@ return
     "Management of languages"   => "Управление языковыми версиями",
     "Properties of elements"   => "Свойства элементов",
     "Number of partitions where the property is filled"   => "Количество разделов, где заполнено свойство",
+    "Standard selection element"   => "Стандартный элемент выбора",
+    "Selection in the dialog box"   => "Выбор в диалоговом окне",
+    "Form element type"   => "Тип элемента формы",
+    "Root partition"   => "Корневой раздел",
 
     "Only shown in sections"=> "Показывается только в разделах",
     "Always shown"          => "Показывается всегда",

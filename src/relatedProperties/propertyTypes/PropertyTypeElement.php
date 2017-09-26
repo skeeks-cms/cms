@@ -77,6 +77,7 @@ class PropertyTypeElement extends PropertyType
         return array_merge(parent::attributeLabels(),
         [
             'content_id'  => \Yii::t('skeeks/cms','Content'),
+            'fieldElement'  => \Yii::t('skeeks/cms','Form element type'),
         ]);
     }
 

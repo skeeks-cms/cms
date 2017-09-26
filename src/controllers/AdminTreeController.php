@@ -159,8 +159,17 @@ class AdminTreeController extends AdminModelEditorController
 
     public function indexAction()
     {
-        $models = CmsTree::findRoots()->joinWith('cmsSiteRelation')
-            ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
+        if ($root_id = \Yii::$app->request->get('root_id')) {
+            $query = CmsTree::find()->where([CmsTree::tableName() . '.id' => $root_id]);
+        } else {
+            $query = CmsTree::findRoots();
+        }
+
+        $models = $query
+            ->joinWith('cmsSiteRelation')
+            ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])
+            ->all()
+        ;
 
         return $this->render($this->action->id, ['models' => $models]);
     }
