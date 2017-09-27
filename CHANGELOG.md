@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.1.pre
+4.0.0.1
 ---------------
  * Tree property update
  * Filter by property
