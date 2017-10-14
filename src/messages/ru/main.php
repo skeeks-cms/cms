@@ -9,6 +9,9 @@ return
     "Loading"               =>  "Загрузка",
     "Users"                 =>  "Пользователи",
 
+    "First name"            =>  "Имя",
+    "Last name"             =>  "Фамилия",
+    "Patronymic"            =>  "Отчество",
     "Update"                =>  "Обновить",
     "Save"                  =>  "Сохранить",
     "Create"                =>  "Создать",

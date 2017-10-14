@@ -41,16 +41,11 @@ $action     = $controller->action;
         ]
     ); ?>
 
-    <div class="row">
-        <div class="col-md-5">
-            <?= $form->field($model, 'username')->textInput(['maxlength' => 25])->hint(\Yii::t('skeeks/cms','The unique username. Used for authorization and to form links to personal cabinet.')); ?>
-        </div>
-        <div class="col-md-5">
-            <?= $form->field($model, 'name')->textInput(); ?>
-        </div>
-    </div>
+    <?= $form->field($model, 'username')->textInput(['maxlength' => 25])->hint(\Yii::t('skeeks/cms','The unique username. Used for authorization and to form links to personal cabinet.')); ?>
 
-
+    <?= $form->field($model, 'first_name')->textInput(); ?>
+    <?= $form->field($model, 'last_name')->textInput(); ?>
+    <?= $form->field($model, 'patronymic')->textInput(); ?>
 
     <div class="row">
         <div class="col-md-5">

@@ -283,6 +283,9 @@ class User
             'created_at' => Yii::t('skeeks/cms', 'Created At'),
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
             'name' => \Yii::t('skeeks/cms/user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
+            'first_name' => \Yii::t('skeeks/cms', 'First name'),
+            'last_name' => \Yii::t('skeeks/cms', 'Last name'),
+            'patronymic' => \Yii::t('skeeks/cms', 'Patronymic'),
             'gender' => Yii::t('skeeks/cms', 'Gender'),
             'logged_at' => Yii::t('skeeks/cms', 'Logged At'),
             'last_activity_at' => Yii::t('skeeks/cms', 'Last Activity At'),
@@ -434,6 +437,7 @@ class User
 
     /**
      * @return string
+     * @deprecated
      */
     public function getName()
     {
