@@ -45,8 +45,10 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property string $password_reset_token
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $name
  * @property integer $image_id
+ * @property integer $first_name
+ * @property integer $last_name
+ * @property integer $patronymic
  *
  * @property string $gender
  * @property string $active
@@ -60,6 +62,9 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property integer $email_is_approved
  * @property integer $phone_is_approved
  *
+ * ***
+ *
+ * @property string $name
  * @property string $lastActivityAgo
  * @property string $lastAdminActivityAgo
  *
@@ -211,7 +216,7 @@ class User
             ],
 
             [['gender'], 'string'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'name'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'first_name', 'last_name', 'patronymic'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
 
             [['phone'], 'string', 'max' => 64],
@@ -427,6 +432,13 @@ class User
         return \Yii::$app->urlManager->createUrl($params);
     }
 
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->first_name . " " . $this->last_name . " " . $this->patronymic;
+    }
 
 
 
