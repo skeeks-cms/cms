@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.1.pre
 ---------------
+ * Pjax backend errors hide by default
  * Change user name to first and last names
  
 4.0.0.1

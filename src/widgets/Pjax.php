@@ -20,6 +20,11 @@ class Pjax extends \yii\widgets\Pjax
     public $isBlock     = true;
 
     /**
+     * @var bool
+     */
+    public $isShowError     = false;
+
+    /**
      * Block other container
      * @var string
      */
@@ -40,6 +45,11 @@ class Pjax extends \yii\widgets\Pjax
 
         $errorMessage = \Yii::t('skeeks/admin', 'An unexpected error occurred. Refer to the developers.');
 
+        $errorNotify = '';
+        if ($this->isShowError) {
+            $errorNotify = "sx.notify.error('{$errorMessage}');";
+        }
+
         if ($this->isBlock === true)
         {
             $this->getView()->registerJs(<<<JS
@@ -58,7 +68,7 @@ class Pjax extends \yii\widgets\Pjax
                     });
 
                     $(document).on('pjax:error', function(e, data) {
-                        sx.notify.error('{$errorMessage}');
+                        {$errorNotify}
                         blockerPanel.unblock();
                     });
 
@@ -85,7 +95,7 @@ JS
                     });
 
                     $(document).on('pjax:error', function(e, data) {
-                        sx.notify.error('{$errorMessage}');
+                        {$errorNotify}
                         blockerPanel.unblock();
                     });
 
