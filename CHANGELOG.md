@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+4.0.1.1.pre
+---------------
+ * Fixed css toolbar
+ 
 4.0.1
 ---------------
  * Pjax backend errors hide by default

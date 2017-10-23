@@ -30,6 +30,10 @@
     font-size: 12px !important;
 }
 
+.skeeks-cms-toolbar-top input[type="checkbox"]{
+    display: inline;
+}
+
 .skeeks-cms-toolbar-bottom {
     position: fixed;
     left: 0;
