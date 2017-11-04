@@ -662,6 +662,7 @@ class Tree extends Core
 
         $this->code     = $filter->filter($this->name);
 
+
         $matches = [];
         //Роутинг элементов нужно исключить
         if (preg_match('/(?<id>\d+)\-(?<code>\S+)$/i', $this->code, $matches))
