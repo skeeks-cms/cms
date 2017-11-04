@@ -142,3 +142,7 @@ CHANGELOG
  * Change code folder /src
  * Url changes
 
+
+### https://github.com/skeeks-cms/cms/blob/master/changelogs/CHANGELOG-V1.md
+### https://github.com/skeeks-cms/cms/blob/master/changelogs/CHANGELOG-V2.md
+### https://github.com/skeeks-cms/cms/blob/master/changelogs/CHANGELOG-V3.md

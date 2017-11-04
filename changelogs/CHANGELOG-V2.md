@@ -880,4 +880,4 @@
   * Возможность задания callback функции при построении меню админки
 
 
-### https://github.com/skeeks-cms/cms/blob/master/CHANGELOG-V1.md
+### https://github.com/skeeks-cms/cms/blob/master/changelogs/CHANGELOG-V1.md

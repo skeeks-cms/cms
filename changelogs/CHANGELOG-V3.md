@@ -241,3 +241,7 @@
  * Removed seo. In a separate package skeeks/cms-seo
  * Removed some settings in seo component
  * Rewritten classes urlRules
+ 
+ 
+### https://github.com/skeeks-cms/cms/blob/master/changelogs/CHANGELOG-V1.md
+### https://github.com/skeeks-cms/cms/blob/master/changelogs/CHANGELOG-V2.md
