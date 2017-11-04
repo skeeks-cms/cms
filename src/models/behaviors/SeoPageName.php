@@ -11,8 +11,8 @@
 
 namespace skeeks\cms\models\behaviors;
 
+use Cocur\Slugify\Slugify;
 use skeeks\modules\cms\catalog\models\Product;
-use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
 
 use yii\db\BaseActiveRecord;
 use yii\behaviors\AttributeBehavior;
@@ -63,22 +63,28 @@ class SeoPageName extends AttributeBehavior
     {
         if (!$this->value)
         {
-            $filter = new FilterSeoPageName();
-            $filter->maxLength = $this->maxLength;
+            $slugify = new Slugify();
 
             if ($this->owner->{$this->generatedAttribute})
             {
-                $seoPageName = $filter->filter($this->owner->{$this->generatedAttribute});
+                $seoPageName = $slugify->slugify($this->owner->{$this->generatedAttribute});
             } else
             {
-                $seoPageName = $filter->filter($this->owner->{$this->fromAttribute});
+                $seoPageName = $slugify->slugify($this->owner->{$this->fromAttribute});
+            }
+
+            if (strlen($seoPageName) < 2) {
+                $seoPageName = $seoPageName . "-" . md5(microtime());
+            }
+
+            if (strlen($seoPageName) > $this->maxLength) {
+                $seoPageName = substr($seoPageName, 0, $this->maxLength);
             }
 
 
             //Нужно чтобы поле было уникальным
             if ($this->uniqeue)
             {
-
                 if (!$this->owner->isNewRecord)
                 {
                     //Значит неуникально
@@ -89,7 +95,7 @@ class SeoPageName extends AttributeBehavior
                         if ($last = $this->owner->find()->orderBy('id DESC')->one())
                         {
                             $seoPageName = $seoPageName . '-' . $last->id;
-                            return $filter->filter($seoPageName);
+                            return $slugify->slugify($seoPageName);
                         }
                     }
                 } else
@@ -102,7 +108,7 @@ class SeoPageName extends AttributeBehavior
                         if ($last = $this->owner->find()->orderBy('id DESC')->one())
                         {
                             $seoPageName = $seoPageName . '-' . $last->id;
-                            return $filter->filter($seoPageName);
+                            return $slugify->slugify($seoPageName);
                         }
                     }
                 }

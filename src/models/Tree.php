@@ -11,10 +11,10 @@
 
 namespace skeeks\cms\models;
 
+use Cocur\Slugify\Slugify;
 use paulzi\adjacencyList\AdjacencyListBehavior;
 use paulzi\autotree\AutoTreeTrait;
 use paulzi\materializedPath\MaterializedPathBehavior;
-use skeeks\sx\filters\string\SeoPageName as FilterSeoPageName;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
@@ -657,11 +657,16 @@ class Tree extends Core
             return $this;
         }
 
-        $filter         = new FilterSeoPageName();
-        $filter->maxLength = \Yii::$app->cms->tree_max_code_length;
+        $slugify = new Slugify();
+        $this->code = $slugify->slugify($this->name);
 
-        $this->code     = $filter->filter($this->name);
+        if (strlen($this->code) < 2) {
+            $this->code = $this->code . "-" . md5(microtime());
+        }
 
+        if (strlen($this->code) > \Yii::$app->cms->tree_max_code_length) {
+            $this->code = substr($this->code, 0, \Yii::$app->cms->tree_max_code_length);
+        }
 
         $matches = [];
         //Роутинг элементов нужно исключить
@@ -672,7 +677,7 @@ class Tree extends Core
 
         if (!$this->_isValidCode())
         {
-            $this->code    = $filter->filter($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
+            $this->code    = $slugify->slugify($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
 
             if (!$this->_isValidCode())
             {

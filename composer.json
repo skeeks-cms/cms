@@ -45,11 +45,13 @@
         "kartik-v/yii2-widget-datetimepicker": "^1",
         "kartik-v/yii2-widget-colorinput": "^1",
         "mihaildev/yii2-elfinder": "1.1.3",
-        "bower-asset/fancybox": "^3.1",
         "giggsey/libphonenumber-for-php": "^8.8",
         "paulzi/yii2-auto-tree": "^1.0",
         "paulzi/yii2-adjacency-list": "^2.0",
-        "paulzi/yii2-materialized-path": "^2.0"
+        "paulzi/yii2-materialized-path": "^2.0",
+        "skeeks/yii2-slug-behavior": "*",
+        "bower-asset/fancybox": "^3.1",
+        "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable",
     },
     "autoload": {
         "psr-4": {
