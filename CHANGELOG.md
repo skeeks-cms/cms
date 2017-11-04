@@ -1,9 +1,9 @@
 CHANGELOG
 ==============
 
-4.0.1.1.pre
+4.0.2.pre
 ---------------
- * Fixed css toolbar
+ * Update to yii 2.0.13
  
 4.0.1
 ---------------
