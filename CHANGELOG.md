@@ -3,6 +3,7 @@ CHANGELOG
 
 4.0.2.pre
 ---------------
+ * Removed SeoPageName Behavior. To use SlugBehavior.
  * Update to yii 2.0.13
  
 4.0.1

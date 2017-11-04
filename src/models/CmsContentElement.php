@@ -18,7 +18,6 @@ use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\HasTrees;
-use skeeks\cms\models\behaviors\SeoPageName;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasTreesTrait;
@@ -26,6 +25,7 @@ use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\yii2\ajaxfileupload\validators\FileValidator;
+use skeeks\yii2\slug\SlugBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
@@ -177,10 +177,11 @@ class CmsContentElement extends RelatedElementModel
                 'class'                             => HasTrees::className(),
             ],
 
-            SeoPageName::className() =>
+            SlugBehavior::className() =>
             [
-                'class'                             => SeoPageName::className(),
-                'generatedAttribute'                => 'code',
+                'class'                             => SlugBehavior::class,
+                'attribute'                         => 'name',
+                'slugAttribute'                     => 'code',
                 'maxLength'                         => \Yii::$app->cms->element_max_code_length,
             ]
         ]);
