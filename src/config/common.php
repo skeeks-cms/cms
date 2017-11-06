@@ -1,30 +1,30 @@
 <?php
 /**
- * Самый базовый конфиг приложения на базе skeeks cms
- * По умолчанию конфигурирование всех базовых используемых компонентов и админки
- *
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 31.10.2014
- * @since 1.0.0
+ * @link https://skeeks.com/
+ * @copyright (c) 2010 SkeekS
+ * @date 06.11.2017
  */
-$config =
-[
-    'id'            => 'skeeks-cms-app',
+return [
     "name"          => "SkeekS CMS",
-    'language'      => 'ru',
+    'id'            => 'skeeks-cms-app',
     'vendorPath'    => VENDOR_DIR,
+    'language'      => 'ru',
 
     'components' => [
-
         'db' => [
             'class' => 'yii\db\Connection',
             //'dsn' => 'mysql:host=mysql.skeeks.com;dbname=s2_vz1005_demo-cms',
             //'username' => 's2_vz1016',
             //'password' => 'dryagtepEjsiocakVenAvyeyb',
             'charset' => 'utf8',
-            'enableSchemaCache' => false,
+            'enableSchemaCache' => true,
+            'schemaCacheDuration' => 3600,
+        ],
+
+        'cms' =>
+        [
+            'class'                         => '\skeeks\cms\components\Cms',
         ],
 
         'storage' => [
@@ -34,18 +34,14 @@ $config =
                 'local' =>
                 [
                     'class'                 => 'skeeks\cms\components\storage\ClusterLocal',
+                    'priority'              => 100,
                 ]
             ],
         ],
 
         'currentSite' =>
         [
-            'class' => 'skeeks\cms\components\CurrentSite'
-        ],
-
-        'cms' =>
-        [
-            'class'                         => '\skeeks\cms\components\Cms',
+            'class' => '\skeeks\cms\components\CurrentSite',
         ],
 
         'imaging' =>
@@ -81,9 +77,9 @@ $config =
         ],
 
         'urlManager' => [
-            'class' => 'yii\web\UrlManager',
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
+            'class'             => 'yii\web\UrlManager',
+            'enablePrettyUrl'   => true,
+            'showScriptName'    => false,
             'suffix' => '',
             'normalizer' => [
                 'class' => 'yii\web\UrlNormalizer',
@@ -106,21 +102,15 @@ $config =
         ],
     ],
 
-
     'modules' => [
 
         'cms' =>
         [
-            'class' => 'skeeks\cms\Module',
-            'controllerNamespace' => 'skeeks\cms\console\controllers'
+            'class' => '\skeeks\cms\Module',
         ],
-        
+
         'ajaxfileupload' => [
-            'class'                 => 'skeeks\yii2\ajaxfileupload\AjaxFileUploadModule',
-            'controllerNamespace'   => 'skeeks\yii2\ajaxfileupload\console\controllers',
-            'private_tmp_dir'       => '@frontend/runtime/ajaxfileupload'
+            'class'         => '\skeeks\yii2\ajaxfileupload\AjaxFileUploadModule',
         ]
     ],
 ];
-
-return $config;
