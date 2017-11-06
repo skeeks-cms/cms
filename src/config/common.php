@@ -8,7 +8,7 @@
 return [
     "name"          => "SkeekS CMS",
     'id'            => 'skeeks-cms-app',
-    'vendorPath'    => VENDOR_DIR,
+    'vendorPath'    => '@vendor',
     'language'      => 'ru',
 
     'components' => [
