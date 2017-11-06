@@ -375,6 +375,7 @@ class Cms extends \skeeks\cms\base\Component
 
     /**
      * @return bool
+     * @deprecated
      */
     public function generateTmpConfig()
     {

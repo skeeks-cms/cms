@@ -50,6 +50,7 @@
         "paulzi/yii2-adjacency-list": "^2.0",
         "paulzi/yii2-materialized-path": "^2.0",
         "skeeks/yii2-slug-behavior": "^1",
+        "hiqdev/composer-config-plugin": "^0.2",
         "bower-asset/fancybox": "^3.1",
         "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
     },

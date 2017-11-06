@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+4.0.3.pre
+---------------
+ * Using hiqdev/composer-config-plugin
+ * GenerateTmpConfigs is deprecated
+
 4.0.2
 ---------------
  * Removed SeoPageName Behavior. Now used https://github.com/skeeks-semenov/yii2-slug-behavior.

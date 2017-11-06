@@ -43,6 +43,10 @@ class Installer extends LibraryInstaller
         }
     }
 
+    /**
+     * @param $vendorDir
+     * @deprecated
+     */
     static public function generateTmpConfigs($vendorDir)
     {
         require $vendorDir . '/autoload.php';
