@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.0.3.pre
+4.0.3
 ---------------
  * Using hiqdev/composer-config-plugin
  * GenerateTmpConfigs is deprecated
