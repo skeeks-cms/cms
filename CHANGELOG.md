@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+4.1.0.pre
+---------------
+ * Full transition to the use of the component hiqdev/composer-config-plugin
+ * Loss of compatibility with older components
+ 
 4.0.3
 ---------------
  * Using hiqdev/composer-config-plugin
