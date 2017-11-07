@@ -61,13 +61,12 @@
     },
     "extra": {
         "config-plugin": {
-            "common": "src/config/common.php",
             "web": [
-                "$common",
+                "src/config/common.php",
                 "src/config/web.php"
             ],
             "console": [
-                "$common",
+                "src/config/common.php",
                 "src/config/console.php"
             ]
         }
