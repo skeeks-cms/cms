@@ -183,6 +183,12 @@ class CmsContentElement extends RelatedElementModel
                 'attribute'                         => 'name',
                 'slugAttribute'                     => 'code',
                 'maxLength'                         => \Yii::$app->cms->element_max_code_length,
+                'slugifyOptions' => [
+                    'rulesets' => [
+                        skeeks\yii2\slug\SlugRuleProvider::YANDEX,
+                        'default'
+                    ]
+                ]
             ]
         ]);
     }

@@ -27,6 +27,7 @@ use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
+use skeeks\yii2\slug\SlugRuleProvider;
 use Yii;
 use yii\base\Event;
 use yii\base\Exception;
@@ -657,7 +658,9 @@ class Tree extends Core
             return $this;
         }
 
-        $slugify = new Slugify();
+        $slugify = new Slugify(['rulesets' => [
+            SlugRuleProvider::YANDEX, 'default'
+        ]], new SlugRuleProvider());
         $this->code = $slugify->slugify($this->name);
 
         if (strlen($this->code) < 2) {
