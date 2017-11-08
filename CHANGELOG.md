@@ -6,6 +6,10 @@ CHANGELOG
  * Full transition to the use of the component hiqdev/composer-config-plugin
  * Loss of compatibility with older components
  
+4.0.3.2.pre
+---------------
+ * The ability to filter content properties by type
+ 
 4.0.3.1
 ---------------
  * Fixed

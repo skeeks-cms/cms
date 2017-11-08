@@ -5,7 +5,6 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 26.05.2016
  */
-
 $filter = new \yii\base\DynamicModel([
     'id',
     'tree_ids',
@@ -40,6 +39,14 @@ if ($filter->tree_ids)
     <?= $form->field($searchModel, 'name')->setVisible(true)->textInput([
         'placeholder' => \Yii::t('skeeks/cms', 'Search by name')
     ]); ?>
+
+    <?= $form->field($searchModel, 'component')->setVisible(true)
+        ->widget(
+            \skeeks\widget\chosen\Chosen::class, [
+                'items' => \Yii::$app->cms->relatedHandlersDataForSelect
+            ]
+        );
+    ?>
 
     <?= $form->field($filter, 'content_ids')->label(\Yii::t('skeeks/cms', 'Content'))->setVisible(true)->widget(
         \skeeks\widget\chosen\Chosen::class,
