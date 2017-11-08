@@ -14,7 +14,7 @@ require(__DIR__ . '/bootstrap.php');
 \Yii::beginProfile('Load config app');
 //Result config
 $config = \yii\helpers\ArrayHelper::merge(
-    (array) require(__DIR__ . '/tmp-config-extensions.php'),
+    //(array) require(__DIR__ . '/tmp-config-extensions.php'),
     (array) require \hiqdev\composer\config\Builder::path('web'),
     (array) require(__DIR__ . '/app-config.php')
 );

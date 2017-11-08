@@ -19,7 +19,7 @@ require(__DIR__ . '/bootstrap.php');
 
 //Result config
 $config = \yii\helpers\ArrayHelper::merge(
-    (array) require(__DIR__ . '/tmp-config-console-extensions.php'),
+    //(array) require(__DIR__ . '/tmp-config-console-extensions.php'),
     (array) require \hiqdev\composer\config\Builder::path('console'),
     (array) require(__DIR__ . '/app-config.php')
 );
