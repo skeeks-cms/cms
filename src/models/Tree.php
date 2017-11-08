@@ -28,6 +28,7 @@ use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use skeeks\yii2\slug\SlugRuleProvider;
+use skeeks\yii2\yaslug\YaSlugHelper;
 use Yii;
 use yii\base\Event;
 use yii\base\Exception;
@@ -658,10 +659,7 @@ class Tree extends Core
             return $this;
         }
 
-        $slugify = new Slugify(['rulesets' => [
-            SlugRuleProvider::YANDEX, 'default'
-        ]], new SlugRuleProvider());
-        $this->code = $slugify->slugify($this->name);
+        $this->code = YaSlugHelper::slugify($this->name);
 
         if (strlen($this->code) < 2) {
             $this->code = $this->code . "-" . md5(microtime());
@@ -680,7 +678,7 @@ class Tree extends Core
 
         if (!$this->_isValidCode())
         {
-            $this->code    = $slugify->slugify($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
+            $this->code    = YaSlugHelper::slugify($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
 
             if (!$this->_isValidCode())
             {

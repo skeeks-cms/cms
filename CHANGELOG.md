@@ -6,8 +6,10 @@ CHANGELOG
  * Full transition to the use of the component hiqdev/composer-config-plugin
  * Loss of compatibility with older components
  
-4.0.3.2.pre
+4.0.4
 ---------------
+ * Used https://github.com/skeeks-semenov/yii2-ya-slug.
+ * Removed slug behavior https://github.com/skeeks-semenov/yii2-slug-behavior.
  * The ability to filter content properties by type
  
 4.0.3.1

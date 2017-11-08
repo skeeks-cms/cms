@@ -26,6 +26,7 @@ use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\yii2\ajaxfileupload\validators\FileValidator;
 use skeeks\yii2\slug\SlugBehavior;
+use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
@@ -177,18 +178,12 @@ class CmsContentElement extends RelatedElementModel
                 'class'                             => HasTrees::className(),
             ],
 
-            SlugBehavior::className() =>
+            YaSlugBehavior::class =>
             [
-                'class'                             => SlugBehavior::class,
+                'class'                             => YaSlugBehavior::class,
                 'attribute'                         => 'name',
                 'slugAttribute'                     => 'code',
                 'maxLength'                         => \Yii::$app->cms->element_max_code_length,
-                'slugifyOptions' => [
-                    'rulesets' => [
-                        skeeks\yii2\slug\SlugRuleProvider::YANDEX,
-                        'default'
-                    ]
-                ]
             ]
         ]);
     }
