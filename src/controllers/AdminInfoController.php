@@ -85,23 +85,6 @@ class AdminInfoController extends AdminController
      * Перегенерация файла модулей.
      * @return \yii\web\Response
      */
-    public function actionUpdateModulesFile()
-    {
-        if (\Yii::$app->cms->generateTmpConfig() && \Yii::$app->cms->generateTmpConsoleConfig())
-        {
-            \Yii::$app->session->setFlash('success', \Yii::t('skeeks/cms','File, automatic paths to the modules successfully updated'));
-        } else
-        {
-            \Yii::$app->session->setFlash('error', \Yii::t('skeeks/cms','File, automatic paths to the modules are not updated'));
-        }
-
-        return $this->redirect(\Yii::$app->request->getReferrer());
-    }
-
-    /**
-     * Перегенерация файла модулей.
-     * @return \yii\web\Response
-     */
     public function actionWriteEnvGlobalFile()
     {
         $env = (string) \Yii::$app->request->get('env');

@@ -409,41 +409,6 @@ class Cms extends \skeeks\cms\base\Component
     }
 
     /**
-     * @return bool
-     */
-    public function generateTmpConsoleConfig()
-    {
-        $configs = FileHelper::findExtensionsFiles(['/config/main-console.php']);
-        $configs = array_unique(array_merge(
-            [
-                \Yii::getAlias('@skeeks/cms/config/main-console.php')
-            ], $configs
-        ));
-
-        $result = [];
-        foreach ($configs as $filePath)
-        {
-            $fileData = (array) include $filePath;
-
-            $result = \yii\helpers\ArrayHelper::merge($result, $fileData);
-        }
-
-        if (!file_exists(dirname(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS))) {
-            mkdir(dirname(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS), 0777, true);
-        }
-
-        $string = var_export($result, true);
-        file_put_contents(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS, "<?php\n\nreturn $string;\n");
-
-        // invalidate opcache of extensions.php if exists
-        if (function_exists('opcache_invalidate')) {
-            opcache_invalidate(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS, true);
-        }
-
-        return file_exists(TMP_CONSOLE_CONFIG_FILE_EXTENSIONS);
-    }
-
-    /**
      * Да/нет
      * @return array
      */

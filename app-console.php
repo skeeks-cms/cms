@@ -1,28 +1,24 @@
 <?php
 /**
- * Запуск console приложения
- *
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 20.02.2015
- * @since 1.0.0
+ * @link https://skeeks.com/
+ * @copyright (c) 2010 SkeekS
+ * @date 10.11.2017
  */
 // fcgi doesn't have STDIN and STDOUT defined by default
 defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
-//Determination of uncertainty must be constants
-require(__DIR__ . '/global.php');
 //Standard loader
 require(__DIR__ . '/bootstrap.php');
 
-//Result config
-$config = \yii\helpers\ArrayHelper::merge(
-    //(array) require(__DIR__ . '/tmp-config-console-extensions.php'),
-    (array) require \hiqdev\composer\config\Builder::path('console'),
-    (array) require(__DIR__ . '/app-config.php')
-);
+$configFile = \hiqdev\composer\config\Builder::path('console-' . YII_ENV);
+if (!file_exists($configFile)) {
+    $configFile = \hiqdev\composer\config\Builder::path('console');
+}
+
+$config = (array) require $configFile;
+
 $application = new yii\console\Application($config);
 $exitCode = $application->run();
 exit($exitCode);

@@ -95,8 +95,6 @@ class AdminClearController extends AdminController
 
             \Yii::$app->db->getSchema()->refresh();
             \Yii::$app->cache->flush();
-            \Yii::$app->cms->generateTmpConfig();
-            \Yii::$app->cms->generateTmpConsoleConfig();
 
             $rr->success = true;
             $rr->message = \Yii::t('skeeks/cms','Cache cleared');

@@ -3,6 +3,15 @@ CHANGELOG
 
 4.1.0.pre
 ---------------
+ * Removed APP_ENV_CONFIG_DIR
+ * Removed APP_CONFIG_DIR
+ * Removed COMMON_ENV_CONFIG_DIR
+ * Removed COMMON_CONFIG_DIR
+ * Removed console cmd cms/cache/flush-tmp-config
+ * Removed Installer postUpdate
+ * Removed Installer postInstall
+ * Update Installer plugin
+ * Removed \Yii::$app->cms->generateTmpConsoleConfig();
  * Full transition to the use of the component hiqdev/composer-config-plugin
  * Loss of compatibility with older components
  

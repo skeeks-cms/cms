@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
+ * @copyright 2010 SkeekS (пїЅпїЅпїЅпїЅпїЅ)
  * @date 19.03.2016
  */
 
@@ -61,10 +61,6 @@ class CacheController extends \yii\console\controllers\CacheController
                 FileHelper::createDirectory(\Yii::getAlias($path));
             }
         }
-
-        //It is important to the proper configuration is cached differently
-        \Yii::$app->cms->generateTmpConsoleConfig();
-        \Yii::$app->cms->generateTmpConfig();
     }
 
     /**
@@ -85,15 +81,5 @@ class CacheController extends \yii\console\controllers\CacheController
                 FileHelper::createDirectory(\Yii::getAlias($path));
             }
         }
-    }
-
-    /**
-     * Генерация файла со списком модулей
-     */
-    public function actionFlushTmpConfig()
-    {
-        \Yii::$app->cms->generateTmpConfig();
-        \Yii::$app->cms->generateTmpConsoleConfig();
-        $this->stdout("Clear tmp config file success\n");
     }
 }
