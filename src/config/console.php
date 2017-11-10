@@ -1,16 +1,14 @@
 <?php
 /**
- * Самый базовый конфиг приложения на базе skeeks cms
- * По умолчанию конфигурирование всех базовых используемых компонентов и админки
- *
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 31.10.2014
- * @since 1.0.0
+ * @link https://skeeks.com/
+ * @copyright (c) 2010 SkeekS
+ * @date 10.11.2017
  */
 $config =
 [
+    'id'                    => 'app-skeeks-console',
+
     'modules' => [
 
         'cms' =>
@@ -23,6 +21,15 @@ $config =
             'private_tmp_dir'       => '@frontend/runtime/ajaxfileupload'
         ]
     ],
+
+    'components' => [
+
+        'urlManager' => [
+            'baseUrl'   => '',
+            //'hostInfo' => 'https://demo.ru'
+        ]
+
+    ]
 ];
 
 return $config;

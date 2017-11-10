@@ -20,6 +20,10 @@ $config =
 
     'components' => [
 
+        'errorHandler' => [
+            'errorAction' => 'cms/error/error',
+        ],
+
         'user' => [
             'class'             => '\yii\web\User',
             'identityClass'     => 'skeeks\cms\models\CmsUser',

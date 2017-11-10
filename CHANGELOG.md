@@ -3,6 +3,7 @@ CHANGELOG
 
 4.1.0.pre
 ---------------
+ * Added default configs
  * Fixed composer versions
  * Removed APP_ENV_CONFIG_DIR
  * Removed APP_CONFIG_DIR
