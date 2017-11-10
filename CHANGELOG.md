@@ -3,6 +3,7 @@ CHANGELOG
 
 4.1.0.pre
 ---------------
+ * Removed skeeks\cms\composer. Use skeeks/cms-composer.
  * Added default configs
  * Fixed composer versions
  * Removed APP_ENV_CONFIG_DIR

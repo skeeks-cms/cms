@@ -32,6 +32,7 @@
         "skeeks/cms-admin": "~2.0.1",
         "skeeks/cms-rbac": "~2.1.0",
         "skeeks/cms-marketplace": "~1.2.0",
+        "skeeks/cms-composer": "~1.0.0",
         "skeeks/yii2-ajax-file-upload": "~1.0.0",
         "skeeks/yii2-imagine": "~2.0.1",
         "skeeks/yii2-sx": "~1.3.0",
@@ -51,7 +52,6 @@
         "paulzi/yii2-auto-tree": "~1.0.4",
         "paulzi/yii2-adjacency-list": "~2.0.4",
         "paulzi/yii2-materialized-path": "~2.0.8",
-        "hiqdev/composer-config-plugin": "~0.2.5",
         "bower-asset/fancybox": "^3.1",
         "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
     },
