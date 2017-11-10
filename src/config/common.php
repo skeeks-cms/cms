@@ -24,6 +24,10 @@ return [
             'schemaCacheDuration' => 3600,
         ],
 
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
+        ],
+
         'cms' =>
         [
             'class'                         => '\skeeks\cms\components\Cms',
