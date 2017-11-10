@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-4.1.0.pre
+5.0.0.pre
 ---------------
  * Removed skeeks\cms\composer. Use skeeks/cms-composer.
  * Added default configs

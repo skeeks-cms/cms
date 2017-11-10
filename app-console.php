@@ -12,9 +12,9 @@ defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 //Standard loader
 require(__DIR__ . '/bootstrap.php');
 
-$configFile = \hiqdev\composer\config\Builder::path('console-' . YII_ENV);
+$configFile = \skeeks\cms\composer\config\Builder::path('console-' . YII_ENV);
 if (!file_exists($configFile)) {
-    $configFile = \hiqdev\composer\config\Builder::path('console');
+    $configFile = \skeeks\cms\composer\config\Builder::path('console');
 }
 
 $config = (array) require $configFile;

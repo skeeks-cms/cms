@@ -8,9 +8,9 @@
 //Standard loader
 require(__DIR__ . '/bootstrap.php');
 
-$configFile = \hiqdev\composer\config\Builder::path('web-' . YII_ENV);
+$configFile = \skeeks\cms\composer\config\Builder::path('web-' . YII_ENV);
 if (!file_exists($configFile)) {
-    $configFile = \hiqdev\composer\config\Builder::path('web');
+    $configFile = \skeeks\cms\composer\config\Builder::path('web');
 }
 $config = (array) require $configFile;
 
