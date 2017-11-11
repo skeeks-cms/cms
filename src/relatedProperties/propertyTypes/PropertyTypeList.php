@@ -6,6 +6,7 @@
  * @date 30.04.2015
  */
 namespace skeeks\cms\relatedProperties\propertyTypes;
+use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
@@ -32,6 +33,9 @@ class PropertyTypeList extends PropertyType
     const FIELD_ELEMENT_RADIO_LIST          = "radioList";
     const FIELD_ELEMENT_CHECKBOX_LIST       = "checkbox";
 
+    const FIELD_ELEMENT_SELECT_DIALOG           = "selectDialog";
+    const FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE  = "selectDialogMulti";
+
     static public function fieldElements()
     {
         return [
@@ -41,6 +45,9 @@ class PropertyTypeList extends PropertyType
             self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('skeeks/cms', 'Checkbox List'),
             self::FIELD_ELEMENT_LISTBOX         => \Yii::t('skeeks/cms', 'ListBox'),
             self::FIELD_ELEMENT_LISTBOX_MULTI   => \Yii::t('skeeks/cms', 'ListBox Multi'),
+            self::FIELD_ELEMENT_SELECT_DIALOG   => \Yii::t('skeeks/cms','Selection widget in the dialog box'),
+            self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE   => \Yii::t('skeeks/cms','Selection widget in the dialog box (multiple choice)'),
+
         ];
     }
 
@@ -61,7 +68,12 @@ class PropertyTypeList extends PropertyType
      */
     public function getIsMultiple()
     {
-        if (in_array($this->fieldElement, [self::FIELD_ELEMENT_SELECT_MULTI, self::FIELD_ELEMENT_CHECKBOX_LIST, self::FIELD_ELEMENT_LISTBOX_MULTI]))
+        if (in_array($this->fieldElement, [
+            self::FIELD_ELEMENT_SELECT_MULTI,
+            self::FIELD_ELEMENT_CHECKBOX_LIST,
+            self::FIELD_ELEMENT_LISTBOX_MULTI,
+            self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE
+        ]))
         {
             return true;
         }
@@ -274,6 +286,31 @@ class PropertyTypeList extends PropertyType
             $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
                 'size' => 1,
             ]);
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG)
+        {
+            $field = parent::renderForActiveForm();
+            $field->widget(
+                \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
+                [
+                    'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
+                    'dialogRoute' => ['/cms/admin-cms-content-property-enum', 'CmsContentPropertyEnum' => [
+                        'property_id' => $this->property->id
+                    ]],
+                ]
+            );
+        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE)
+        {
+            $field = parent::renderForActiveForm();
+            $field->widget(
+                \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
+                [
+                    'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
+                    'dialogRoute' => ['/cms/admin-cms-content-property-enum', 'CmsContentPropertyEnum' => [
+                        'property_id' => $this->property->id
+                    ]],
+                    'multiple' => true
+                ]
+            );
         } else
         {
             $field = $this->activeForm->fieldSelect(
