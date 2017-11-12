@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha2.pre
+---------------
+ * Rebuild config profiling
+ 
 5.0.0-alpha
 ---------------
  * Removed skeeks\cms\composer. Use skeeks/cms-composer.

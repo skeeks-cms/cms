@@ -12,12 +12,22 @@ defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 //Standard loader
 require(__DIR__ . '/bootstrap.php');
 
-$configFile = \skeeks\cms\composer\config\Builder::path('console-' . YII_ENV);
-if (!file_exists($configFile)) {
-    $configFile = \skeeks\cms\composer\config\Builder::path('console');
-}
+\Yii::beginProfile('Load config app');
 
-$config = (array) require $configFile;
+    if (YII_ENV == 'dev') {
+        \Yii::beginProfile('Rebuild config');
+            \skeeks\cms\composer\config\Builder::rebuild();
+        \Yii::endProfile('Rebuild config');
+    }
+
+    $configFile = \skeeks\cms\composer\config\Builder::path('console-' . YII_ENV);
+    if (!file_exists($configFile)) {
+        $configFile = \skeeks\cms\composer\config\Builder::path('console');
+    }
+
+    $config = (array) require $configFile;
+
+\Yii::endProfile('Load config app');
 
 $application = new yii\console\Application($config);
 $exitCode = $application->run();
