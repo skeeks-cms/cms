@@ -11,7 +11,7 @@
  */
 $config =
 [
-    'bootstrap'     => ['cms', 'cmsToolbar'],
+    'bootstrap'     => ['cms'],
 
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
@@ -29,11 +29,6 @@ $config =
             'identityClass'     => 'skeeks\cms\models\CmsUser',
             'enableAutoLogin'   => true,
             'loginUrl'          => ['cms/auth/login'],
-        ],
-
-        'cmsToolbar' =>
-        [
-            'class' => 'skeeks\cms\components\CmsToolbar',
         ],
 
         'assetManager' =>
