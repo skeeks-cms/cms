@@ -7,6 +7,7 @@
  *
  * @see https://github.com/E96/yii2-relational-behavior
  */
+
 namespace skeeks\cms\behaviors;
 
 use yii\base\Behavior;
@@ -31,13 +32,16 @@ class RelationalBehavior extends Behavior
     public function attach($owner)
     {
         if (!($owner instanceof ActiveRecord)) {
-            throw new ErrorException(\Yii::t('skeeks/cms','Owner must be instance of {yii}',['yii' =>'yii\db\ActiveRecord']));
+            throw new ErrorException(\Yii::t('skeeks/cms', 'Owner must be instance of {yii}',
+                ['yii' => 'yii\db\ActiveRecord']));
         }
         if (count($owner->getTableSchema()->primaryKey) > 1) {
-            throw new ErrorException(\Yii::t('skeeks/cms','RelationalBehavior doesn\'t support composite primary keys'));
+            throw new ErrorException(\Yii::t('skeeks/cms',
+                'RelationalBehavior doesn\'t support composite primary keys'));
         }
         parent::attach($owner);
     }
+
     public function events()
     {
         return [
@@ -45,6 +49,7 @@ class RelationalBehavior extends Behavior
             ActiveRecord::EVENT_AFTER_UPDATE => 'saveRelations',
         ];
     }
+
     public function canSetProperty($name, $checkVars = true)
     {
         $getter = 'get' . $name;
@@ -53,6 +58,7 @@ class RelationalBehavior extends Behavior
         }
         return parent::canSetProperty($name, $checkVars);
     }
+
     public function __set($name, $value)
     {
         if (is_array($value) && count($value) > 0 && !($value[0] instanceof Object) ||
@@ -67,6 +73,7 @@ class RelationalBehavior extends Behavior
         }
         $this->owner->populateRelation($name, $value);
     }
+
     public function saveRelations($event)
     {
         /** @var ActiveRecord $model */
@@ -75,8 +82,7 @@ class RelationalBehavior extends Behavior
 
         foreach ($relatedRecords as $relationName => $relationRecords) {
 
-            if ($this->relationNames && !in_array($relationName, $this->relationNames))
-            {
+            if ($this->relationNames && !in_array($relationName, $this->relationNames)) {
                 continue;
             }
 
@@ -88,7 +94,7 @@ class RelationalBehavior extends Behavior
                 } elseif (is_array($activeQuery->via)) {
                     $viaQuery = $activeQuery->via[1];
                 } else {
-                    throw new ErrorException(\Yii::t('skeeks/cms','Unknown via type'));
+                    throw new ErrorException(\Yii::t('skeeks/cms', 'Unknown via type'));
                 }
                 $junctionTable = reset($viaQuery->from);
                 $primaryModelColumn = array_keys($viaQuery->link)[0];
@@ -99,16 +105,21 @@ class RelationalBehavior extends Behavior
                 $relationPks = array_filter($relationPks);
                 $savedRecords = count($relationPks);
                 if ($passedRecords != $savedRecords) {
-                    throw new ErrorException(\Yii::t('skeeks/cms','All relation records must be saved'));
+                    throw new ErrorException(\Yii::t('skeeks/cms', 'All relation records must be saved'));
                 }
                 foreach ($relationPks as $relationPk) {
                     $junctionRows[] = [$model->primaryKey, $relationPk];
                 }
-                $model->getDb()->transaction(function() use ($junctionTable, $primaryModelColumn, $relatedModelColumn,
-                    $junctionRows, $model
+                $model->getDb()->transaction(function () use (
+                    $junctionTable,
+                    $primaryModelColumn,
+                    $relatedModelColumn,
+                    $junctionRows,
+                    $model
                 ) {
                     $db = $model->getDb();
-                    $db->createCommand()->delete($junctionTable, [$primaryModelColumn => $model->primaryKey])->execute();
+                    $db->createCommand()->delete($junctionTable,
+                        [$primaryModelColumn => $model->primaryKey])->execute();
                     if (!empty($junctionRows)) {
                         $db->createCommand()->batchInsert($junctionTable, [$primaryModelColumn, $relatedModelColumn],
                             $junctionRows)->execute();

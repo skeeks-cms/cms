@@ -6,12 +6,12 @@
  * @date 06.11.2017
  */
 return [
-    "name"          => "SkeekS CMS",
-    'id'            => 'skeeks-cms-app',
+    "name" => "SkeekS CMS",
+    'id' => 'skeeks-cms-app',
 
-    'vendorPath'    => '@vendor',
+    'vendorPath' => '@vendor',
 
-    'language'      => 'ru',
+    'language' => 'ru',
 
     'components' => [
         'db' => [
@@ -28,53 +28,46 @@ return [
             'class' => 'yii\caching\FileCache',
         ],
 
-        'cms' =>
-        [
-            'class'                         => '\skeeks\cms\components\Cms',
+        'cms' => [
+            'class' => '\skeeks\cms\components\Cms',
         ],
 
         'storage' => [
             'class' => 'skeeks\cms\components\Storage',
-            'components' =>
-            [
-                'local' =>
-                [
-                    'class'                 => 'skeeks\cms\components\storage\ClusterLocal',
-                    'priority'              => 100,
+            'components' => [
+                'local' => [
+                    'class' => 'skeeks\cms\components\storage\ClusterLocal',
+                    'priority' => 100,
                 ]
             ],
         ],
 
-        'currentSite' =>
-        [
+        'currentSite' => [
             'class' => '\skeeks\cms\components\CurrentSite',
         ],
 
-        'imaging' =>
-        [
+        'imaging' => [
             'class' => '\skeeks\cms\components\Imaging',
         ],
 
-        'console' =>
-        [
+        'console' => [
             'class' => 'skeeks\cms\components\ConsoleComponent',
         ],
 
         'i18n' => [
             'class' => 'skeeks\cms\i18n\I18N',
-            'translations' =>
-            [
+            'translations' => [
                 'skeeks/cms' => [
-                    'class'             => 'yii\i18n\PhpMessageSource',
-                    'basePath'          => '@skeeks/cms/messages',
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@skeeks/cms/messages',
                     'fileMap' => [
                         'skeeks/cms' => 'main.php',
                     ],
                 ],
 
                 'skeeks/cms/user' => [
-                    'class'             => 'yii\i18n\PhpMessageSource',
-                    'basePath'          => '@skeeks/cms/messages',
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@skeeks/cms/messages',
                     'fileMap' => [
                         'skeeks/cms/user' => 'user.php',
                     ],
@@ -83,9 +76,9 @@ return [
         ],
 
         'urlManager' => [
-            'class'             => 'yii\web\UrlManager',
-            'enablePrettyUrl'   => true,
-            'showScriptName'    => false,
+            'class' => 'yii\web\UrlManager',
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
             'suffix' => '',
             'normalizer' => [
                 'class' => 'yii\web\UrlNormalizer',
@@ -94,14 +87,14 @@ return [
                 'action' => \yii\web\UrlNormalizer::ACTION_REDIRECT_PERMANENT,
             ],
             'rules' => [
-                'u'                           => 'cms/user/index',
-                'u/<username>'                => 'cms/user/view',
-                'u/<username>/<action>'       => 'cms/user/<action>',
+                'u' => 'cms/user/index',
+                'u/<username>' => 'cms/user/view',
+                'u/<username>/<action>' => 'cms/user/<action>',
 
-                '~<_a:(login|logout|register|forget|reset-password)>'                   => 'cms/auth/<_a>',
+                '~<_a:(login|logout|register|forget|reset-password)>' => 'cms/auth/<_a>',
 
-                'skeeks-cms'                            => 'cms/cms/index',
-                'skeeks-cms/<action>'                   => 'cms/cms/<action>',
+                'skeeks-cms' => 'cms/cms/index',
+                'skeeks-cms/<action>' => 'cms/cms/<action>',
 
                 "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'], //Resize image on request
             ]
@@ -110,13 +103,12 @@ return [
 
     'modules' => [
 
-        'cms' =>
-        [
+        'cms' => [
             'class' => '\skeeks\cms\Module',
         ],
 
         'ajaxfileupload' => [
-            'class'         => '\skeeks\yii2\ajaxfileupload\AjaxFileUploadModule',
+            'class' => '\skeeks\yii2\ajaxfileupload\AjaxFileUploadModule',
         ]
     ],
 ];

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.05.2015
  */
+
 namespace skeeks\cms\base;
 
 use skeeks\cms\components\Cms;
@@ -40,10 +41,10 @@ abstract class Widget extends Component implements ViewContextInterface
 
     public function init()
     {
-        $this->_token = \Yii::t('skeeks/cms', 'Widget').': ' . $this->id;
+        $this->_token = \Yii::t('skeeks/cms', 'Widget') . ': ' . $this->id;
 
         \Yii::beginProfile("Cms Widget: " . $this->_token);
-            parent::init();
+        parent::init();
         \Yii::endProfile("Cms Widget: " . $this->_token);
     }
 
@@ -55,28 +56,26 @@ abstract class Widget extends Component implements ViewContextInterface
     public function _begin()
     {
         //Запускается 1 раз
-        if ($this->_isBegin === true)
-        {
+        if ($this->_isBegin === true) {
             return "";
         }
         $this->_isBegin = true;
 
         \Yii::$app->cmsToolbar->initEnabled();
-        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
-        {
+        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled) {
             $id = 'sx-infoblock-' . $this->id;
 
             return Html::beginTag('div',
-            [
-                'class'     => 'skeeks-cms-toolbar-edit-view-block',
-                'id'        => $id,
-                'title'     => \Yii::t('skeeks/cms',"Double-click on the block will open the settings manager"),
-                'data'      =>
                 [
-                    'id' => $this->id,
-                    'config-url' => $this->getCallableEditUrl()
-                ]
-            ]);
+                    'class' => 'skeeks-cms-toolbar-edit-view-block',
+                    'id' => $id,
+                    'title' => \Yii::t('skeeks/cms', "Double-click on the block will open the settings manager"),
+                    'data' =>
+                        [
+                            'id' => $this->id,
+                            'config-url' => $this->getCallableEditUrl()
+                        ]
+                ]);
         }
 
         return "";
@@ -90,18 +89,17 @@ abstract class Widget extends Component implements ViewContextInterface
     {
         $result = "";
 
-        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled)
-        {
+        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled) {
             $id = 'sx-infoblock-' . $this->id;
 
             $this->view->registerJs(<<<JS
 new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
 JS
-);
+            );
             $callableData = $this->callableData;
 
             $callableDataInput = Html::textarea('callableData', base64_encode(serialize($callableData)), [
-                'id'    => $this->callableId,
+                'id' => $this->callableId,
                 'style' => 'display: none;'
             ]);
 
@@ -113,8 +111,8 @@ JS
     }
 
     /**
-     * @param string    $namespace  Unique code, which is attached to the settings in the database
-     * @param array     $config     Standard widget settings
+     * @param string $namespace Unique code, which is attached to the settings in the database
+     * @param array $config Standard widget settings
      *
      * @return static
      */
@@ -159,10 +157,12 @@ JS
                 echo $widget->_end();
                 return $widget;
             } else {
-                throw new InvalidCallException(\Yii::t('skeeks/cms','"Expecting end() of {widget}, found {class}',['widget' => get_class($widget) , 'class' => get_called_class()]));
+                throw new InvalidCallException(\Yii::t('skeeks/cms', '"Expecting end() of {widget}, found {class}',
+                    ['widget' => get_class($widget), 'class' => get_called_class()]));
             }
         } else {
-            throw new InvalidCallException(\Yii::t('skeeks/cms',"Unexpected {class}::end() call. A matching begin() is not found.",['class' => get_called_class()]));
+            throw new InvalidCallException(\Yii::t('skeeks/cms',
+                "Unexpected {class}::end() call. A matching begin() is not found.", ['class' => get_called_class()]));
         }
     }
 
@@ -171,30 +171,24 @@ JS
      */
     public function run()
     {
-        if (YII_ENV == 'prod')
-        {
-            try
-            {
+        if (YII_ENV == 'prod') {
+            try {
                 \Yii::beginProfile("Run: " . $this->_token);
-                    $content = $this->_run();
-                \Yii::endProfile("Run: " . $this->_token);
-            }
-            catch (\Exception $e)
-            {
-                $content = \Yii::t('skeeks/cms','Error widget {class}',['class' => $this->className()]). " (" . $this->descriptor->name . "): " . $e->getMessage();
-            }
-        } else
-        {
-            \Yii::beginProfile("Run: " . $this->_token);
                 $content = $this->_run();
+                \Yii::endProfile("Run: " . $this->_token);
+            } catch (\Exception $e) {
+                $content = \Yii::t('skeeks/cms', 'Error widget {class}',
+                        ['class' => $this->className()]) . " (" . $this->descriptor->name . "): " . $e->getMessage();
+            }
+        } else {
+            \Yii::beginProfile("Run: " . $this->_token);
+            $content = $this->_run();
             \Yii::endProfile("Run: " . $this->_token);
         }
 
-        if ($this->_isBegin)
-        {
+        if ($this->_isBegin) {
             $result = $content;
-        } else
-        {
+        } else {
             $result = $this->_begin();
             $result .= $content;
             $result .= $this->_end();

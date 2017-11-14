@@ -9,6 +9,7 @@
 namespace skeeks\cms\cmsWidgets\breadcrumbs;
 
 use skeeks\cms\base\WidgetRenderable;
+
 /**
  * Class breadcrumbs
  * @package skeeks\cms\cmsWidgets\Breadcrumbs

@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 26.03.2015
  */
+
 namespace skeeks\cms\base;
+
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsComponentSettings;
 use \skeeks\cms\models\CmsSite;
@@ -28,15 +30,16 @@ use yii\base\NotSupportedException;
 use yii\base\UnknownMethodException;
 use yii\base\InvalidCallException;
 use yii\helpers\ArrayHelper;
+
 /**
- * @property array          namespace
- * @property array          settings
- * @property CmsSite        cmsSite
- * @property CmsUser        cmsUser
+ * @property array namespace
+ * @property array settings
+ * @property CmsSite cmsSite
+ * @property CmsUser cmsUser
  *
- * @property array          callAttributes
- * @property string|null    override
- * @property array          overridePath
+ * @property array callAttributes
+ * @property string|null override
+ * @property array overridePath
  *
  * Class Component
  * @package skeeks\cms\base
@@ -47,9 +50,9 @@ abstract class Component extends Model implements ConfigFormInterface
     use HasComponentDescriptorTrait;
 
 
-    const OVERRIDE_DEFAULT  = 'default';
-    const OVERRIDE_SITE     = 'site';
-    const OVERRIDE_USER     = 'user';
+    const OVERRIDE_DEFAULT = 'default';
+    const OVERRIDE_SITE = 'site';
+    const OVERRIDE_USER = 'user';
 
     /**
      * @return array
@@ -108,20 +111,17 @@ abstract class Component extends Model implements ConfigFormInterface
 
         \Yii::beginProfile("Init: " . static::class);
 
-            if (!\Yii::$app instanceof Application)
-            {
-                if ($this->cmsSite === null && isset(\Yii::$app->currentSite) && \Yii::$app->currentSite->site)
-                {
-                    $this->cmsSite = \Yii::$app->currentSite->site;
-                }
-
-                if (isset(\Yii::$app->user) && $this->cmsUser === null && !\Yii::$app->user->isGuest)
-                {
-                    $this->cmsUser = \Yii::$app->user->identity;
-                }
+        if (!\Yii::$app instanceof Application) {
+            if ($this->cmsSite === null && isset(\Yii::$app->currentSite) && \Yii::$app->currentSite->site) {
+                $this->cmsSite = \Yii::$app->currentSite->site;
             }
 
-            $this->_initSettings();
+            if (isset(\Yii::$app->user) && $this->cmsUser === null && !\Yii::$app->user->isGuest) {
+                $this->cmsUser = \Yii::$app->user->identity;
+            }
+        }
+
+        $this->_initSettings();
 
         \Yii::endProfile("Init: " . static::class);
 
@@ -138,8 +138,7 @@ abstract class Component extends Model implements ConfigFormInterface
         $names = [];
         foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             if (!$property->isStatic()) {
-                if (!is_object($property->getValue($this)))
-                {
+                if (!is_object($property->getValue($this))) {
                     $names[] = $property->getName();
                 }
             }
@@ -170,15 +169,14 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     protected function _initSettings()
     {
-        try
-        {
+        try {
             $this->setAttributes($this->settings);
             $this->_oldAttributes = $this->toArray($this->attributes());
 
-        } catch (Exception $e)
-        {} catch (\Exception $e)
-        {
-            \Yii::error(\Yii::t('skeeks/cms','{cms} component error load defaul settings',['cms' => 'Cms']).': ' . $e->getMessage());
+        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            \Yii::error(\Yii::t('skeeks/cms', '{cms} component error load defaul settings',
+                    ['cms' => 'Cms']) . ': ' . $e->getMessage());
         }
 
         return $this;
@@ -203,7 +201,6 @@ abstract class Component extends Model implements ConfigFormInterface
     }
 
 
-
     /**
      * @return null|string
      */
@@ -218,8 +215,7 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function setOverride($override)
     {
-        if (!in_array($override, static::getOverrides()))
-        {
+        if (!in_array($override, static::getOverrides())) {
             throw new Exception('Invalid override name');
         }
 
@@ -233,7 +229,7 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function getOverridePath()
     {
-        return (array) $this->_overridePath;
+        return (array)$this->_overridePath;
     }
 
     /**
@@ -242,20 +238,15 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function setOverridePath($overridePath)
     {
-        foreach ((array) $overridePath as $override)
-        {
-            if (!in_array($override, static::getOverrides()))
-            {
+        foreach ((array)$overridePath as $override) {
+            if (!in_array($override, static::getOverrides())) {
                 throw new Exception('Invalid override name');
             }
         }
 
-        $this->_overridePath = (array) $overridePath;
+        $this->_overridePath = (array)$overridePath;
         return $this;
     }
-
-
-
 
 
     /**
@@ -304,11 +295,8 @@ abstract class Component extends Model implements ConfigFormInterface
     }
 
     public function renderConfigForm(ActiveForm $form)
-    {}
-
-
-
-
+    {
+    }
 
 
     /**
@@ -320,15 +308,15 @@ abstract class Component extends Model implements ConfigFormInterface
         $key = $this->getCacheKey();
 
         $dependency = new TagDependency([
-            'tags'      =>
-            [
-                \Yii::getAlias('@webroot'),
-                static::class,
-                $this->namespace,
-                implode('.', $this->overridePath),
-                $this->cmsUser ? (string) $this->cmsUser->id : '',
-                $this->cmsSite ? (string) $this->cmsSite->id : '',
-            ],
+            'tags' =>
+                [
+                    \Yii::getAlias('@webroot'),
+                    static::class,
+                    $this->namespace,
+                    implode('.', $this->overridePath),
+                    $this->cmsUser ? (string)$this->cmsUser->id : '',
+                    $this->cmsSite ? (string)$this->cmsSite->id : '',
+                ],
         ]);
 
         $settingsValues = \Yii::$app->cache->get($key);
@@ -337,10 +325,8 @@ abstract class Component extends Model implements ConfigFormInterface
 
             $settingsValues = [];
 
-            if ($this->overridePath)
-            {
-                foreach ($this->overridePath as $overrideName)
-                {
+            if ($this->overridePath) {
+                foreach ($this->overridePath as $overrideName) {
                     $settingsValues = ArrayHelper::merge($settingsValues,
                         $this->fetchOverrideSettings($overrideName)
                     );
@@ -362,21 +348,20 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         $settingsModel = null;
 
-        if ($overrideName == self::OVERRIDE_DEFAULT)
-        {
+        if ($overrideName == self::OVERRIDE_DEFAULT) {
             $settingsModel = CmsComponentSettings::findByComponentDefault($this)->one();
 
-        } else if ($overrideName == self::OVERRIDE_SITE)
-        {
-            if ($this->cmsSite)
-            {
-                $settingsModel = CmsComponentSettings::findByComponentSite($this, $this->cmsSite)->one();
-            }
-        } else if ($overrideName == self::OVERRIDE_USER)
-        {
-            if ($this->cmsUser)
-            {
-                $settingsModel = CmsComponentSettings::findByComponentUser($this, $this->cmsUser)->one();
+        } else {
+            if ($overrideName == self::OVERRIDE_SITE) {
+                if ($this->cmsSite) {
+                    $settingsModel = CmsComponentSettings::findByComponentSite($this, $this->cmsSite)->one();
+                }
+            } else {
+                if ($overrideName == self::OVERRIDE_USER) {
+                    if ($this->cmsUser) {
+                        $settingsModel = CmsComponentSettings::findByComponentUser($this, $this->cmsUser)->one();
+                    }
+                }
             }
         }
 
@@ -390,36 +375,34 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     protected function _createOverrideSettingsModel($overrideName)
     {
-        $overrideName = (string) $overrideName;
+        $overrideName = (string)$overrideName;
 
         $settingsModel = new CmsComponentSettings([
             'component' => static::class
         ]);
 
-        if ($this->namespace)
-        {
+        if ($this->namespace) {
             $settingsModel->namespace = $this->namespace;
         }
 
-        if ($overrideName == self::OVERRIDE_DEFAULT)
-        {}
-        else if ($overrideName == self::OVERRIDE_SITE)
-        {
-            if (!$this->cmsSite)
-            {
-                throw new Exception('Need set site');
+        if ($overrideName == self::OVERRIDE_DEFAULT) {
+        } else {
+            if ($overrideName == self::OVERRIDE_SITE) {
+                if (!$this->cmsSite) {
+                    throw new Exception('Need set site');
+                }
+
+                $settingsModel->cms_site_id = $this->cmsSite->id;
+
+            } else {
+                if ($overrideName == self::OVERRIDE_USER) {
+                    if (!$this->cmsUser) {
+                        throw new Exception('Need set user');
+                    }
+
+                    $settingsModel->user_id = $this->cmsUser->id;
+                }
             }
-
-            $settingsModel->cms_site_id = $this->cmsSite->id;
-
-        } else if ($overrideName == self::OVERRIDE_USER)
-        {
-            if (!$this->cmsUser)
-            {
-                throw new Exception('Need set user');
-            }
-
-            $settingsModel->user_id = $this->cmsUser->id;
         }
 
         return $settingsModel;
@@ -434,9 +417,8 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         $settingsModel = $this->_getOverrideSettingsModel($overrideName);
 
-        if ($settingsModel)
-        {
-            return (array) $settingsModel->value;
+        if ($settingsModel) {
+            return (array)$settingsModel->value;
         }
 
         return [];
@@ -450,8 +432,7 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function save($runValidation = true, $attributeNames = null)
     {
-        if (!$this->override)
-        {
+        if (!$this->override) {
             throw new Exception('Need set current override');
         }
 
@@ -460,15 +441,14 @@ abstract class Component extends Model implements ConfigFormInterface
         }
 
         $modelSettings = $this->_getOverrideSettingsModel($this->override);
-        if (!$modelSettings)
-        {
+        if (!$modelSettings) {
             $modelSettings = $this->_createOverrideSettingsModel($this->override);
         }
 
         $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
 
-        $modelSettings->value       = $this->attributes;
-        $result                     = $modelSettings->save();
+        $modelSettings->value = $this->attributes;
+        $result = $modelSettings->save();
 
         $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
             'changedAttributes' => $this->getDirtyAttributes(),
@@ -489,8 +469,8 @@ abstract class Component extends Model implements ConfigFormInterface
             \Yii::getAlias('@webroot'),
             static::class,
             $this->namespace,
-            $this->cmsUser ? (string) $this->cmsUser->id : '',
-            $this->cmsSite ? (string) $this->cmsSite->id : '',
+            $this->cmsUser ? (string)$this->cmsUser->id : '',
+            $this->cmsSite ? (string)$this->cmsSite->id : '',
         ]);
     }
 
@@ -525,8 +505,6 @@ abstract class Component extends Model implements ConfigFormInterface
      */
 
 
-
-
     /**
      * @return UrlHelper
      */
@@ -534,22 +512,20 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         $attributes = [];
 
-        foreach ($this->callAttributes as $key => $value)
-        {
-            if (!is_object($value))
-            {
+        foreach ($this->callAttributes as $key => $value) {
+            if (!is_object($value)) {
                 $attributes[$key] = $value;
             }
         }
 
         return \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/index'])
-                    ->merge([
-                        'componentClassName'                => $this->className(),
-                        'attributes'                        => $attributes,
-                        'componentNamespace'                => $this->namespace,
-                    ])
-                    ->enableEmptyLayout()
-                    ->url;
+            ->merge([
+                'componentClassName' => $this->className(),
+                'attributes' => $attributes,
+                'componentNamespace' => $this->namespace,
+            ])
+            ->enableEmptyLayout()
+            ->url;
     }
 
     /**
@@ -558,13 +534,13 @@ abstract class Component extends Model implements ConfigFormInterface
     public function getCallableEditUrl()
     {
         return \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/call-edit'])
-                    ->merge([
-                        'componentClassName'                => $this->className(),
-                        'componentNamespace'                => $this->namespace,
-                        'callableId'                        => $this->callableId,
-                    ])
-                    ->enableEmptyLayout()
-                    ->url;
+            ->merge([
+                'componentClassName' => $this->className(),
+                'componentNamespace' => $this->namespace,
+                'callableId' => $this->callableId,
+            ])
+            ->enableEmptyLayout()
+            ->url;
     }
 
 
@@ -575,16 +551,14 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         $attributes = [];
 
-        foreach ($this->callAttributes as $key => $value)
-        {
-            if (!is_object($value))
-            {
+        foreach ($this->callAttributes as $key => $value) {
+            if (!is_object($value)) {
                 $attributes[$key] = $value;
             }
         }
 
         return [
-            'attributes'                        => $attributes,
+            'attributes' => $attributes,
         ];
     }
 
@@ -595,7 +569,6 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         return $this->settingsId . '-callable';
     }
-
 
 
     /**
@@ -633,16 +606,6 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         $this->_settingsId = $value;
     }
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -687,9 +650,6 @@ abstract class Component extends Model implements ConfigFormInterface
     const EVENT_AFTER_REFRESH = 'afterRefresh';
 
 
-
-
-
     /**
      * @inheritdoc
      */
@@ -723,8 +683,6 @@ abstract class Component extends Model implements ConfigFormInterface
             return false;
         }
     }
-
-
 
 
     /**
@@ -872,14 +830,14 @@ abstract class Component extends Model implements ConfigFormInterface
             }
         } else {
             foreach ($this->toArray() as $name => $value) {
-                if (isset($names[$name]) && (!array_key_exists($name, $this->_oldAttributes) || $value !== $this->_oldAttributes[$name])) {
+                if (isset($names[$name]) && (!array_key_exists($name,
+                            $this->_oldAttributes) || $value !== $this->_oldAttributes[$name])) {
                     $attributes[$name] = $value;
                 }
             }
         }
         return $attributes;
     }
-
 
 
     /**
@@ -903,8 +861,7 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function delete()
     {
-        if (!$this->override)
-        {
+        if (!$this->override) {
             throw new Exception('Set current override');
         }
 
@@ -912,8 +869,7 @@ abstract class Component extends Model implements ConfigFormInterface
         if ($this->beforeDelete()) {
             // we do not check the return value of deleteAll() because it's possible
             // the record is already deleted in the database and thus the method will return 0
-            if (!$model = $this->_getOverrideSettingsModel($this->override))
-            {
+            if (!$model = $this->_getOverrideSettingsModel($this->override)) {
                 return false;
             }
 
@@ -1023,8 +979,6 @@ abstract class Component extends Model implements ConfigFormInterface
     }
 
 
-
-
     /**
      * Populates an active record object using a row of data from the database/storage.
      *
@@ -1115,7 +1069,6 @@ abstract class Component extends Model implements ConfigFormInterface
         }
         return '';
     }
-
 
 
     /**

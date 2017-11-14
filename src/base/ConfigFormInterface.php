@@ -7,6 +7,7 @@
  */
 
 namespace skeeks\cms\base;
+
 use yii\widgets\ActiveForm;
 
 /**

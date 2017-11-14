@@ -6,30 +6,29 @@
  * @date 10.11.2017
  */
 $config =
-[
-    'id'                    => 'app-skeeks-console',
+    [
+        'id' => 'app-skeeks-console',
 
-    'modules' => [
+        'modules' => [
 
-        'cms' =>
-        [
-            'controllerNamespace' => 'skeeks\cms\console\controllers'
+            'cms' => [
+                'controllerNamespace' => 'skeeks\cms\console\controllers'
+            ],
+
+            'ajaxfileupload' => [
+                'controllerNamespace' => 'skeeks\yii2\ajaxfileupload\console\controllers',
+                'private_tmp_dir' => '@frontend/runtime/ajaxfileupload'
+            ]
         ],
-        
-        'ajaxfileupload' => [
-            'controllerNamespace'   => 'skeeks\yii2\ajaxfileupload\console\controllers',
-            'private_tmp_dir'       => '@frontend/runtime/ajaxfileupload'
+
+        'components' => [
+
+            'urlManager' => [
+                'baseUrl' => '',
+                //'hostInfo' => 'https://demo.ru'
+            ]
+
         ]
-    ],
-
-    'components' => [
-
-        'urlManager' => [
-            'baseUrl'   => '',
-            //'hostInfo' => 'https://demo.ru'
-        ]
-
-    ]
-];
+    ];
 
 return $config;

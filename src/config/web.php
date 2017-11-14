@@ -9,13 +9,12 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
-$config =
-[
-    'bootstrap'     => ['cms'],
+$config = [
+    'bootstrap' => ['cms'],
 
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
 
     'components' => [
@@ -25,34 +24,29 @@ $config =
         ],
 
         'user' => [
-            'class'             => '\yii\web\User',
-            'identityClass'     => 'skeeks\cms\models\CmsUser',
-            'enableAutoLogin'   => true,
-            'loginUrl'          => ['cms/auth/login'],
+            'class' => '\yii\web\User',
+            'identityClass' => 'skeeks\cms\models\CmsUser',
+            'enableAutoLogin' => true,
+            'loginUrl' => ['cms/auth/login'],
         ],
 
-        'assetManager' =>
-        [
-            'appendTimestamp'   => true,
+        'assetManager' => [
+            'appendTimestamp' => true,
 
-            'bundles' =>
-            [
-                'yii\web\JqueryAsset' =>
-                [
+            'bundles' => [
+                'yii\web\JqueryAsset' => [
                     'js' => [
                         'jquery.min.js',
                     ]
                 ],
 
-                'yii\bootstrap\BootstrapPluginAsset' =>
-                [
+                'yii\bootstrap\BootstrapPluginAsset' => [
                     'js' => [
                         'js/bootstrap.min.js',
                     ]
                 ],
 
-                'yii\bootstrap\BootstrapAsset' =>
-                [
+                'yii\bootstrap\BootstrapAsset' => [
                     'css' => [
                         'css/bootstrap.min.css',
                     ]
@@ -60,27 +54,23 @@ $config =
             ],
         ],
 
-        'breadcrumbs' =>
-        [
+        'breadcrumbs' => [
             'class' => '\skeeks\cms\components\Breadcrumbs',
         ],
 
-        'cmsAgent' =>
-        [
+        'cmsAgent' => [
             'commands' => [
 
-                'cms/cache/flush-all' =>
-                [
-                    'class'             =>  \skeeks\cms\agent\CmsAgent::class,
-                    'name'              => ['skeeks/cms', 'Clearing the cache'],
-                    'interval'          => 3600*24,
+                'cms/cache/flush-all' => [
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => ['skeeks/cms', 'Clearing the cache'],
+                    'interval' => 3600 * 24,
                 ],
 
-                'ajaxfileupload/cleanup' =>
-                [
-                    'class'             =>  \skeeks\cms\agent\CmsAgent::class,
-                    'name'              => ['skeeks/cms', 'Cleaning temporarily downloaded files'],
-                    'interval'          => 3600*24,
+                'ajaxfileupload/cleanup' => [
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => ['skeeks/cms', 'Cleaning temporarily downloaded files'],
+                    'interval' => 3600 * 24,
                 ],
 
             ]
@@ -89,7 +79,7 @@ $config =
 
 
     'modules' => [
-        'datecontrol' =>  [
+        'datecontrol' => [
             'class' => 'skeeks\cms\modules\datecontrol\Module',
         ],
     ],

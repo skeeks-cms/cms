@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\base;
+
 use yii\base\Exception;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
@@ -29,24 +30,20 @@ class Controller extends YiiWebController
      */
     public function render($view, $params = [])
     {
-        if ($this->module instanceof Application)
-        {
+        if ($this->module instanceof Application) {
             return parent::render($view, $params);
         }
 
-        if (strpos($view, '/') && !strpos($view, '@app/views'))
-        {
+        if (strpos($view, '/') && !strpos($view, '@app/views')) {
             return parent::render($view, $params);
         }
 
         $viewDir = "@app/views/modules/" . $this->module->id . '/' . $this->id;
         $viewApp = $viewDir . '/' . $view;
 
-        if (isset(\Yii::$app->view->theme->pathMap['@app/views']))
-        {
+        if (isset(\Yii::$app->view->theme->pathMap['@app/views'])) {
             $tmpPaths = [];
-            foreach (\Yii::$app->view->theme->pathMap['@app/views'] as $path)
-            {
+            foreach (\Yii::$app->view->theme->pathMap['@app/views'] as $path) {
                 $tmpPaths[] = $path . "/modules/" . $this->module->id . '/' . $this->id;
             }
 

@@ -22,19 +22,19 @@ use skeeks\cms\components\storage\Storage;
 use skeeks\cms\i18n\I18N;
 
 /**
- * @property Storage                        $storage
- * @property Cms                            $cms
- * @property Imaging                        $imaging
- * @property Breadcrumbs                    $breadcrumbs
- * @property CmsToolbar                     $cmsToolbar
- * @property CurrentSite                    $currentSite
- * @property ConsoleComponent               $console
- * @property I18N                           $i18n
+ * @property Storage $storage
+ * @property Cms $cms
+ * @property Imaging $imaging
+ * @property Breadcrumbs $breadcrumbs
+ * @property CurrentSite $currentSite
+ * @property ConsoleComponent $console
+ * @property I18N $i18n
  *
- * @property \yii\web\User|UserIde                 $user
+ * @property \yii\web\User|UserIde $user
  *
  * Class Application
  * @package yii\web
  */
 class Application
-{}
+{
+}

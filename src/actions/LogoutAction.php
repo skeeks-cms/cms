@@ -8,6 +8,7 @@
  * @date 05.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\actions;
 
 
@@ -27,11 +28,9 @@ class LogoutAction extends Action
     public function run()
     {
         Yii::$app->user->logout();
-        if ($ref = UrlHelper::getCurrent()->getRef())
-        {
+        if ($ref = UrlHelper::getCurrent()->getRef()) {
             return Yii::$app->getResponse()->redirect($ref);
-        } else
-        {
+        } else {
             return Yii::$app->getResponse()->redirect(Yii::$app->getUser()->getReturnUrl());
         }
     }

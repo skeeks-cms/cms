@@ -30,41 +30,41 @@ use yii\widgets\ActiveForm;
  */
 class ContentElementsCmsWidget extends WidgetRenderable
 {
-    public $contentElementClass         = '\skeeks\cms\models\CmsContentElement';
+    public $contentElementClass = '\skeeks\cms\models\CmsContentElement';
 
     //Навигация
-    public $enabledPaging               = CMS::BOOL_Y;
-    public $enabledPjaxPagination       = CMS::BOOL_Y;
+    public $enabledPaging = CMS::BOOL_Y;
+    public $enabledPjaxPagination = CMS::BOOL_Y;
 
-    public $pageSize                    = 10;
-    public $pageSizeLimitMin            = 1;
-    public $pageSizeLimitMax            = 50;
-    public $pageParamName               = 'page';
+    public $pageSize = 10;
+    public $pageSizeLimitMin = 1;
+    public $pageSizeLimitMax = 50;
+    public $pageParamName = 'page';
 
     //Сортировка
-    public $orderBy                     = "published_at";
-    public $order                       = SORT_DESC;
+    public $orderBy = "published_at";
+    public $order = SORT_DESC;
 
     //Дополнительные настройки
-    public $label                       = null;
-    public $enabledSearchParams         = CMS::BOOL_Y;
-    public $enabledCurrentTree          = CMS::BOOL_Y;
-    public $enabledCurrentTreeChild     = CMS::BOOL_Y;
-    public $enabledCurrentTreeChildAll  = CMS::BOOL_Y;
+    public $label = null;
+    public $enabledSearchParams = CMS::BOOL_Y;
+    public $enabledCurrentTree = CMS::BOOL_Y;
+    public $enabledCurrentTreeChild = CMS::BOOL_Y;
+    public $enabledCurrentTreeChildAll = CMS::BOOL_Y;
 
-    public $tree_ids                    = [];
+    public $tree_ids = [];
 
     //Условия для запроса
-    public $limit                       = 0;
-    public $active                      = "";
-    public $createdBy                   = [];
-    public $content_ids                 = [];
+    public $limit = 0;
+    public $active = "";
+    public $createdBy = [];
+    public $content_ids = [];
 
-    public $enabledActiveTime           = CMS::BOOL_Y;
+    public $enabledActiveTime = CMS::BOOL_Y;
 
 
-    public $enabledRunCache             = Cms::BOOL_N;
-    public $runCacheDuration            = 0;
+    public $enabledRunCache = Cms::BOOL_N;
+    public $runCacheDuration = 0;
 
     public $activeQueryCallback;
     public $dataProviderCallback;
@@ -101,76 +101,81 @@ class ContentElementsCmsWidget extends WidgetRenderable
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('skeeks/cms','Content elements')
+            'name' => \Yii::t('skeeks/cms', 'Content elements')
         ]);
     }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'enabledPaging'             => \Yii::t('skeeks/cms','Enable paging'),
-            'enabledPjaxPagination'     => \Yii::t('skeeks/cms','Enable ajax navigation'),
-            'pageParamName'             => \Yii::t('skeeks/cms','Parameter name pages, pagination'),
-            'pageSize'                  => \Yii::t('skeeks/cms','Number of records on one page'),
-            'pageSizeLimitMin'          => \Yii::t('skeeks/cms','The minimum allowable value for pagination'),
-            'pageSizeLimitMax'          => \Yii::t('skeeks/cms','The maximum allowable value for pagination'),
+            [
+                'enabledPaging' => \Yii::t('skeeks/cms', 'Enable paging'),
+                'enabledPjaxPagination' => \Yii::t('skeeks/cms', 'Enable ajax navigation'),
+                'pageParamName' => \Yii::t('skeeks/cms', 'Parameter name pages, pagination'),
+                'pageSize' => \Yii::t('skeeks/cms', 'Number of records on one page'),
+                'pageSizeLimitMin' => \Yii::t('skeeks/cms', 'The minimum allowable value for pagination'),
+                'pageSizeLimitMax' => \Yii::t('skeeks/cms', 'The maximum allowable value for pagination'),
 
-            'orderBy'                   => \Yii::t('skeeks/cms','Sort by what parameter'),
-            'order'                     => \Yii::t('skeeks/cms','Sorting direction'),
+                'orderBy' => \Yii::t('skeeks/cms', 'Sort by what parameter'),
+                'order' => \Yii::t('skeeks/cms', 'Sorting direction'),
 
-            'label'                     => \Yii::t('skeeks/cms','Title'),
-            'enabledSearchParams'       => \Yii::t('skeeks/cms','Take into account the parameters from search string (for filtering)'),
+                'label' => \Yii::t('skeeks/cms', 'Title'),
+                'enabledSearchParams' => \Yii::t('skeeks/cms',
+                    'Take into account the parameters from search string (for filtering)'),
 
-            'limit'                     => \Yii::t('skeeks/cms','The maximum number of entries in the sample ({limit})',['limit' => 'limit']),
-            'active'                    => \Yii::t('skeeks/cms','Take into consideration active flag'),
-            'createdBy'                 => \Yii::t('skeeks/cms','Selecting the user records'),
-            'content_ids'               => \Yii::t('skeeks/cms','Elements of content'),
-            'enabledCurrentTree'        => \Yii::t('skeeks/cms','For the colection taken into account the current section (which shows the widget)'),
-            'enabledCurrentTreeChild'   => \Yii::t('skeeks/cms','For the colection taken into account the current section and its subsections'),
-            'enabledCurrentTreeChildAll'=> \Yii::t('skeeks/cms','For the colection taken into account the current section and all its subsections'),
-            'tree_ids'                  => \Yii::t('skeeks/cms','Show items linked to sections'),
-            'enabledActiveTime'         => \Yii::t('skeeks/cms','Take into consideration activity time'),
+                'limit' => \Yii::t('skeeks/cms', 'The maximum number of entries in the sample ({limit})',
+                    ['limit' => 'limit']),
+                'active' => \Yii::t('skeeks/cms', 'Take into consideration active flag'),
+                'createdBy' => \Yii::t('skeeks/cms', 'Selecting the user records'),
+                'content_ids' => \Yii::t('skeeks/cms', 'Elements of content'),
+                'enabledCurrentTree' => \Yii::t('skeeks/cms',
+                    'For the colection taken into account the current section (which shows the widget)'),
+                'enabledCurrentTreeChild' => \Yii::t('skeeks/cms',
+                    'For the colection taken into account the current section and its subsections'),
+                'enabledCurrentTreeChildAll' => \Yii::t('skeeks/cms',
+                    'For the colection taken into account the current section and all its subsections'),
+                'tree_ids' => \Yii::t('skeeks/cms', 'Show items linked to sections'),
+                'enabledActiveTime' => \Yii::t('skeeks/cms', 'Take into consideration activity time'),
 
-            'enabledRunCache'       => 'Включить кэширование',
-            'runCacheDuration'      => 'Время жизни кэша',
-        ]);
+                'enabledRunCache' => 'Включить кэширование',
+                'runCacheDuration' => 'Время жизни кэша',
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            [['enabledPaging'], 'string'],
-            [['enabledPjaxPagination'], 'string'],
-            [['pageParamName'], 'string'],
-            [['pageSize'], 'string'],
-            [['orderBy'], 'string'],
-            [['order'], 'integer'],
-            [['label'], 'string'],
-            [['label'], 'string'],
-            [['enabledSearchParams'], 'string'],
-            [['limit'], 'integer'],
-            [['pageSizeLimitMin'], 'integer'],
-            [['pageSizeLimitMax'], 'integer'],
-            [['active'], 'string'],
-            [['createdBy'], 'safe'],
-            [['content_ids'], 'safe'],
-            [['enabledCurrentTree'], 'string'],
-            [['enabledCurrentTreeChild'], 'string'],
-            [['enabledCurrentTreeChildAll'], 'string'],
-            [['tree_ids'], 'safe'],
-            [['enabledActiveTime'], 'string'],
+            [
+                [['enabledPaging'], 'string'],
+                [['enabledPjaxPagination'], 'string'],
+                [['pageParamName'], 'string'],
+                [['pageSize'], 'string'],
+                [['orderBy'], 'string'],
+                [['order'], 'integer'],
+                [['label'], 'string'],
+                [['label'], 'string'],
+                [['enabledSearchParams'], 'string'],
+                [['limit'], 'integer'],
+                [['pageSizeLimitMin'], 'integer'],
+                [['pageSizeLimitMax'], 'integer'],
+                [['active'], 'string'],
+                [['createdBy'], 'safe'],
+                [['content_ids'], 'safe'],
+                [['enabledCurrentTree'], 'string'],
+                [['enabledCurrentTreeChild'], 'string'],
+                [['enabledCurrentTreeChildAll'], 'string'],
+                [['tree_ids'], 'safe'],
+                [['enabledActiveTime'], 'string'],
 
-            [['enabledRunCache'], 'string'],
-            [['runCacheDuration'], 'integer'],
-        ]);
+                [['enabledRunCache'], 'string'],
+                [['runCacheDuration'], 'integer'],
+            ]);
     }
 
     public function renderConfigForm(ActiveForm $form)
     {
         echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
-            'form'  => $form,
+            'form' => $form,
             'model' => $this
         ], $this);
     }
@@ -180,19 +185,18 @@ class ContentElementsCmsWidget extends WidgetRenderable
         $cacheKey = $this->getCacheKey() . 'run';
 
         $dependency = new TagDependency([
-            'tags'      =>
-            [
-                $this->className() . (string) $this->namespace,
-                (new CmsContentElement())->getTableCacheTag(),
-            ],
+            'tags' =>
+                [
+                    $this->className() . (string)$this->namespace,
+                    (new CmsContentElement())->getTableCacheTag(),
+                ],
         ]);
 
         $result = \Yii::$app->cache->get($cacheKey);
-        if ($result === false || $this->enabledRunCache == Cms::BOOL_N)
-        {
+        if ($result === false || $this->enabledRunCache == Cms::BOOL_N) {
             $result = parent::_run();
 
-            \Yii::$app->cache->set($cacheKey, $result, (int) $this->runCacheDuration, $dependency);
+            \Yii::$app->cache->set($cacheKey, $result, (int)$this->runCacheDuration, $dependency);
         }
 
         return $result;
@@ -210,16 +214,12 @@ class ContentElementsCmsWidget extends WidgetRenderable
          */
         $childrens = $tree->getChildren()->with('children')->all();
 
-        if ($childrens)
-        {
-            foreach ($childrens as $chidren)
-            {
-                if ($chidren->children)
-                {
+        if ($childrens) {
+            foreach ($childrens as $chidren) {
+                if ($chidren->children) {
                     $treeIds[$chidren->id] = $chidren->id;
                     $treeIds = array_merge($treeIds, $this->getAllIdsForChildren($chidren));
-                } else
-                {
+                } else {
                     $treeIds[$chidren->id] = $chidren->id;
                 }
             }
@@ -227,15 +227,16 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         return $treeIds;
     }
+
     /**
      * @var ActiveDataProvider
      */
-    public $dataProvider    = null;
+    public $dataProvider = null;
 
     /**
      * @var Search
      */
-    public $search          = null;
+    public $search = null;
 
     /**
      * @return $this
@@ -245,46 +246,35 @@ class ContentElementsCmsWidget extends WidgetRenderable
         $className = $this->contentElementClass;
         $this->initDataProvider();
 
-        if ($this->createdBy)
-        {
+        if ($this->createdBy) {
             $this->dataProvider->query->andWhere([$className::tableName() . '.created_by' => $this->createdBy]);
         }
 
-        if ($this->active)
-        {
+        if ($this->active) {
             $this->dataProvider->query->andWhere([$className::tableName() . '.active' => $this->active]);
         }
 
-        if ($this->content_ids)
-        {
+        if ($this->content_ids) {
             $this->dataProvider->query->andWhere([$className::tableName() . '.content_id' => $this->content_ids]);
         }
 
-        if ($this->limit)
-        {
+        if ($this->limit) {
             $this->dataProvider->query->limit($this->limit);
         }
 
 
-        $treeIds = (array) $this->tree_ids;
+        $treeIds = (array)$this->tree_ids;
 
-        if ($this->enabledCurrentTree == Cms::BOOL_Y)
-        {
+        if ($this->enabledCurrentTree == Cms::BOOL_Y) {
             $tree = \Yii::$app->cms->currentTree;
-            if ($tree)
-            {
-                if ($this->enabledCurrentTreeChild == Cms::BOOL_Y)
-                {
-                    if ($this->enabledCurrentTreeChildAll == Cms::BOOL_Y)
-                    {
+            if ($tree) {
+                if ($this->enabledCurrentTreeChild == Cms::BOOL_Y) {
+                    if ($this->enabledCurrentTreeChildAll == Cms::BOOL_Y) {
                         $treeIds = $tree->getDescendants()->select(['id'])->indexBy('id')->asArray()->all();
                         $treeIds = array_keys($treeIds);
-                    } else
-                    {
-                        if ($childrens = $tree->children)
-                        {
-                            foreach ($childrens as $chidren)
-                            {
+                    } else {
+                        if ($childrens = $tree->children) {
+                            foreach ($childrens as $chidren) {
                                 $treeIds[] = $chidren->id;
                             }
                         }
@@ -296,25 +286,20 @@ class ContentElementsCmsWidget extends WidgetRenderable
             }
         }
 
-        if ($treeIds)
-        {
-            foreach ($treeIds as $key => $treeId)
-            {
-                if (!$treeId)
-                {
+        if ($treeIds) {
+            foreach ($treeIds as $key => $treeId) {
+                if (!$treeId) {
                     unset($treeIds[$key]);
                 }
             }
 
-            if ($treeIds)
-            {
+            if ($treeIds) {
                 /**
                  * @var $query ActiveQuery
                  */
                 $query = $this->dataProvider->query;
 
-                if ($this->isJoinTreeMap === true)
-                {
+                if ($this->isJoinTreeMap === true) {
                     $query->joinWith('cmsContentElementTrees');
                     $query->andWhere(
                         [
@@ -323,8 +308,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                             [CmsContentElementTree::tableName() . '.tree_id' => $treeIds]
                         ]
                     );
-                } else
-                {
+                } else {
                     $query->andWhere([$className::tableName() . '.tree_id' => $treeIds]);
                 }
 
@@ -333,8 +317,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
         }
 
 
-        if ($this->enabledActiveTime == Cms::BOOL_Y)
-        {
+        if ($this->enabledActiveTime == Cms::BOOL_Y) {
             $this->dataProvider->query->andWhere(
                 ["<=", $className::tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(time())]
             );
@@ -351,21 +334,18 @@ class ContentElementsCmsWidget extends WidgetRenderable
         /**
          *
          */
-        if ($this->with)
-        {
+        if ($this->with) {
             $this->dataProvider->query->with($this->with);
         }
 
         $this->dataProvider->query->groupBy([$className::tableName() . '.id']);
 
-        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
-        {
+        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback)) {
             $callback = $this->activeQueryCallback;
             $callback($this->dataProvider->query);
         }
 
-        if ($this->dataProviderCallback && is_callable($this->dataProviderCallback))
-        {
+        if ($this->dataProviderCallback && is_callable($this->dataProviderCallback)) {
             $callback = $this->dataProviderCallback;
             $callback($this->dataProvider);
         }
@@ -377,25 +357,25 @@ class ContentElementsCmsWidget extends WidgetRenderable
     {
         $className = $this->contentElementClass;
 
-        $this->search         = new Search($className::className());
-        $this->dataProvider   = $this->search->getDataProvider();
+        $this->search = new Search($className::className());
+        $this->dataProvider = $this->search->getDataProvider();
 
-        if ($this->enabledPaging == Cms::BOOL_Y)
-        {
-            $this->dataProvider->getPagination()->defaultPageSize   = $this->pageSize;
-            $this->dataProvider->getPagination()->pageParam         = $this->pageParamName;
-            $this->dataProvider->getPagination()->pageSizeLimit         = [(int) $this->pageSizeLimitMin, (int) $this->pageSizeLimitMax];
-        } else
-        {
+        if ($this->enabledPaging == Cms::BOOL_Y) {
+            $this->dataProvider->getPagination()->defaultPageSize = $this->pageSize;
+            $this->dataProvider->getPagination()->pageParam = $this->pageParamName;
+            $this->dataProvider->getPagination()->pageSizeLimit = [
+                (int)$this->pageSizeLimitMin,
+                (int)$this->pageSizeLimitMax
+            ];
+        } else {
             $this->dataProvider->pagination = false;
         }
 
-        if ($this->orderBy)
-        {
+        if ($this->orderBy) {
             $this->dataProvider->getSort()->defaultOrder =
-            [
-                $this->orderBy => (int) $this->order
-            ];
+                [
+                    $this->orderBy => (int)$this->order
+                ];
         }
 
         return $this;

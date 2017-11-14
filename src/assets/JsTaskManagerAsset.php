@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.03.2015
  */
+
 namespace skeeks\cms\assets;
+
 use skeeks\cms\base\AssetBundle;
 
 /**
@@ -19,8 +21,7 @@ class JsTaskManagerAsset extends AssetBundle
     public $css = [
     ];
 
-    public $js =
-    [
+    public $js = [
         'classes/tasks/Task.js',
         'classes/tasks/AjaxTask.js',
         'classes/tasks/ProgressBar.js',
