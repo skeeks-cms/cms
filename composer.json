@@ -33,6 +33,7 @@
         "skeeks/cms-rbac": "~2.1.0",
         "skeeks/cms-marketplace": "~1.2.0",
         "skeeks/cms-composer": "~1.0.0",
+        "skeeks/cms-toolbar": "~1.0.0 || dev-master",
         "skeeks/yii2-ajax-file-upload": "~1.0.0",
         "skeeks/yii2-imagine": "~2.0.1",
         "skeeks/yii2-sx": "~1.3.0",

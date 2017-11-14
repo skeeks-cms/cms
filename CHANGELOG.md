@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.0-alpha2.pre
 ---------------
+ * Use skeeks/cms-toolbar
  * Removed skeeks/cms/components/CmsToolbar
  * Fixed filters
  * Rebuild config profiling
