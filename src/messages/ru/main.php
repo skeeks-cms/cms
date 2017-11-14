@@ -9,6 +9,8 @@ return
     "Loading"               =>  "Загрузка",
     "Users"                 =>  "Пользователи",
 
+    "Cleaning temporarily downloaded files"            =>  "Чистка временно загружаемых файлов",
+    "Clearing the cache"            =>  "Очистка кэша",
     "First name"            =>  "Имя",
     "Last name"             =>  "Фамилия",
     "Patronymic"            =>  "Отчество",

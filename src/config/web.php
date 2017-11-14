@@ -68,17 +68,21 @@ $config =
         'cmsAgent' =>
         [
             'commands' => [
+
                 'cms/cache/flush-all' =>
                 [
-                    'description'       => 'Чистка кэша',
-                    'agent_interval'    => 3600*24,
+                    'class'             =>  \skeeks\cms\agent\CmsAgent::class,
+                    'name'              => ['skeeks/cms', 'Clearing the cache'],
+                    'interval'          => 3600*24,
                 ],
 
                 'ajaxfileupload/cleanup' =>
                 [
-                    'description'       => 'Чистка временно загружаемых файлов',
-                    'agent_interval'    => 3600*24,
+                    'class'             =>  \skeeks\cms\agent\CmsAgent::class,
+                    'name'              => ['skeeks/cms', 'Cleaning temporarily downloaded files'],
+                    'interval'          => 3600*24,
                 ],
+
             ]
         ],
     ],

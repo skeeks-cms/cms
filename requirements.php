@@ -11,7 +11,7 @@
  */
 // you may need to adjust this path to the correct Yii framework path
 
-define("ROOT_DIR",              dirname(dirname(__DIR__)));
+define("ROOT_DIR", dirname(dirname(__DIR__)));
 
 $frameworkPath = ROOT_DIR . '/vendor/yiisoft/yii2';
 if (!is_dir($frameworkPath)) {
@@ -51,17 +51,14 @@ function wriatableCheck()
         'frontend/web/assets',
     ];
 
-    foreach ($dirs as $dirPath)
-    {
+    foreach ($dirs as $dirPath) {
         $dirPath = ROOT_DIR . "/" . $dirPath;
-        if (!is_dir($dirPath))
-        {
+        if (!is_dir($dirPath)) {
             return 0;
             break;
         }
 
-        if (!is_writable($dirPath))
-        {
+        if (!is_writable($dirPath)) {
             return 0;
             break;
         }
@@ -69,6 +66,7 @@ function wriatableCheck()
 
     return 1;
 }
+
 /**
  * Adjust requirements according to your application specifics.
  */
