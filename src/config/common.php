@@ -99,6 +99,24 @@ return [
                 "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'], //Resize image on request
             ]
         ],
+
+        'cmsAgent' => [
+            'commands' => [
+
+                'cms/cache/flush-all' => [
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => ['skeeks/cms', 'Clearing the cache'],
+                    'interval' => 3600 * 24,
+                ],
+
+                'ajaxfileupload/cleanup' => [
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => ['skeeks/cms', 'Cleaning temporarily downloaded files'],
+                    'interval' => 3600 * 24,
+                ],
+
+            ]
+        ],
     ],
 
     'modules' => [
