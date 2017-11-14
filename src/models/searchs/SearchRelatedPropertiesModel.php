@@ -226,6 +226,28 @@ class SearchRelatedPropertiesModel extends DynamicModel
                         ->all();*/
                         $unionQueries[] = $query;
 
+                    } else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL)
+                    {
+                        $query = $classSearch::find()->select(['element_id as id'])->where([
+                            "value_bool"         => $value,
+                            "property_id"   => $property->id
+                        ]);
+                        //print_r($query->createCommand()->rawSql);die;
+                        //$elementIds = $query->indexBy('element_id')->all();
+                        $unionQueries[] = $query;
+                    } else if (in_array($property->property_type, [
+                        \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT
+                        , \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+                        , \skeeks\cms\relatedProperties\PropertyType::CODE_TREE
+                    ]))
+                    {
+                        $query = $classSearch::find()->select(['element_id as id'])->where([
+                            "value_enum"         => $value,
+                            "property_id"   => $property->id
+                        ]);
+                        //print_r($query->createCommand()->rawSql);die;
+                        //$elementIds = $query->indexBy('element_id')->all();
+                        $unionQueries[] = $query;
                     } else
                     {
                         $query = $classSearch::find()->select(['element_id as id'])->where([

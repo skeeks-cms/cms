@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.0-alpha2.pre
 ---------------
+ * Fixed filters
  * Rebuild config profiling
  
 5.0.0-alpha
