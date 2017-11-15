@@ -3,6 +3,8 @@ CHANGELOG
 
 5.0.0-alpha2.pre
 ---------------
+ * Update marketplace
+ * Update agents
  * Change agents configuration
  * Use skeeks/cms-toolbar
  * Removed skeeks/cms/components/CmsToolbar
