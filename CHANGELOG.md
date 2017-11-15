@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-alpha2.pre
+5.0.0-alpha2
 ---------------
  * Update marketplace
  * Update agents
