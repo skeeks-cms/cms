@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 27.03.2015
  */
+
 namespace skeeks\cms\components;
 
 use skeeks\cms\assets\CmsAsset;
@@ -53,16 +54,16 @@ use yii\web\View;
 use yii\widgets\ActiveForm;
 
 /**
- * @property CmsSite                            $site
- * @property Tree                               $currentTree
+ * @property CmsSite $site
+ * @property Tree $currentTree
  *
- * @property CmsLang[]                          $languages
+ * @property CmsLang[] $languages
  *
- * @property \skeeks\cms\modules\admin\Module   $moduleAdmin
- * @property \skeeks\cms\Module                 $moduleCms
- * @property CmsLang                            $cmsLanguage
- * @property PropertyType[]                     $relatedHandlers
- * @property array                              $relatedHandlersDataForSelect
+ * @property \skeeks\cms\modules\admin\Module $moduleAdmin
+ * @property \skeeks\cms\Module $moduleCms
+ * @property CmsLang $cmsLanguage
+ * @property PropertyType[] $relatedHandlers
+ * @property array $relatedHandlersDataForSelect
  *
  * @package skeeks\cms\components
  */
@@ -74,14 +75,14 @@ class Cms extends \skeeks\cms\base\Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            "version"  => ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version'),
+            "version" => ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version'),
         ]);
     }
 
     public function renderConfigForm(ActiveForm $form)
     {
         echo \Yii::$app->view->renderFile(__DIR__ . '/cms/_form.php', [
-            'form'  => $form,
+            'form' => $form,
             'model' => $this
         ], $this);
     }
@@ -92,7 +93,7 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var string E-Mail администратора сайта (отправитель по умолчанию).
      */
-    public $adminEmail                  = 'admin@skeeks.com';
+    public $adminEmail = 'admin@skeeks.com';
 
     /**
      * @var string
@@ -105,29 +106,29 @@ class Cms extends \skeeks\cms\base\Component
     public $noImageUrl;
 
     //После регистрации пользователю будут присвоены эти роли
-    public $registerRoles                   = [
+    public $registerRoles = [
         CmsManager::ROLE_USER
     ];
 
     /**
      * @var string язык по умолчанию
      */
-    public $languageCode                    = "";
+    public $languageCode = "";
 
     /**
      * @var int Reset password token one hour later
      */
-    public $passwordResetTokenExpire        = 3600;
+    public $passwordResetTokenExpire = 3600;
 
     /**
      * @var int
      */
-    public $tree_max_code_length            = 64;
+    public $tree_max_code_length = 64;
 
     /**
      * @var int
      */
-    public $element_max_code_length            = 128;
+    public $element_max_code_length = 128;
 
     /**
      * Схема временных папок
@@ -136,17 +137,18 @@ class Cms extends \skeeks\cms\base\Component
      * @var array
      */
     public $tmpFolderScheme =
-    [
-        'runtime' =>
         [
-            '@frontend/runtime', '@console/runtime'
-        ],
+            'runtime' =>
+                [
+                    '@frontend/runtime',
+                    '@console/runtime'
+                ],
 
-        'assets' =>
-        [
-            '@frontend/web/assets'
-        ]
-    ];
+            'assets' =>
+                [
+                    '@frontend/web/assets'
+                ]
+        ];
 
 
     /**
@@ -161,12 +163,11 @@ class Cms extends \skeeks\cms\base\Component
 
     public function getLanguages()
     {
-        if ($this->_languages === null)
-        {
+        if ($this->_languages === null) {
             $this->_languages = CmsLang::find()->active()->indexBy('code')->all();
         }
 
-        return (array) $this->_languages;
+        return (array)$this->_languages;
     }
 
 
@@ -177,121 +178,108 @@ class Cms extends \skeeks\cms\base\Component
         parent::init();
 
         //Название проекта.
-        if (!$this->appName)
-        {
+        if (!$this->appName) {
             $this->appName = \Yii::$app->name;
-        } else
-        {
+        } else {
             \Yii::$app->name = $this->appName;
         }
 
         //Язык
-        if ($this->languageCode)
-        {
+        if ($this->languageCode) {
             \Yii::$app->language = $this->languageCode;
-        } else
-        {
+        } else {
             $this->languageCode = \Yii::$app->language;
         }
 
 
-        if (\Yii::$app instanceof Application)
-        {
+        if (\Yii::$app instanceof Application) {
 
-        } else
-        {
+        } else {
             $this->relatedHandlers = ArrayHelper::merge([
                 PropertyTypeText::className() =>
-                [
-                    'class' => PropertyTypeText::className()
-                ],
+                    [
+                        'class' => PropertyTypeText::className()
+                    ],
                 PropertyTypeNumber::className() =>
-                [
-                    'class' => PropertyTypeNumber::className()
-                ],
+                    [
+                        'class' => PropertyTypeNumber::className()
+                    ],
                 PropertyTypeBool::className() =>
-                [
-                    'class' => PropertyTypeBool::className()
-                ],
+                    [
+                        'class' => PropertyTypeBool::className()
+                    ],
                 PropertyTypeList::className() =>
-                [
-                    'class' => PropertyTypeList::className()
-                ],
+                    [
+                        'class' => PropertyTypeList::className()
+                    ],
                 PropertyTypeFile::className() =>
-                [
-                    'class' => PropertyTypeFile::className()
-                ],
+                    [
+                        'class' => PropertyTypeFile::className()
+                    ],
                 PropertyTypeTree::className() =>
-                [
-                    'class' => PropertyTypeTree::className()
-                ],
+                    [
+                        'class' => PropertyTypeTree::className()
+                    ],
                 PropertyTypeElement::className() =>
-                [
-                    'class' => PropertyTypeElement::className()
-                ],
-
+                    [
+                        'class' => PropertyTypeElement::className()
+                    ],
 
 
                 UserPropertyTypeDate::className() =>
-                [
-                    'class' => UserPropertyTypeDate::className()
-                ],
+                    [
+                        'class' => UserPropertyTypeDate::className()
+                    ],
                 UserPropertyTypeComboText::className() =>
-                [
-                    'class' => UserPropertyTypeComboText::className()
-                ],
+                    [
+                        'class' => UserPropertyTypeComboText::className()
+                    ],
                 UserPropertyTypeColor::className() =>
-                [
-                    'class' => UserPropertyTypeColor::className()
-                ],
+                    [
+                        'class' => UserPropertyTypeColor::className()
+                    ],
                 UserPropertyTypeSelectFile::className() =>
-                [
-                    'class' => UserPropertyTypeSelectFile::className()
-                ],
+                    [
+                        'class' => UserPropertyTypeSelectFile::className()
+                    ],
 
             ], $this->relatedHandlers);
 
             //web init
-            if (!$this->noImageUrl)
-            {
+            if (!$this->noImageUrl) {
                 $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
             }
 
-            \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e)
-            {
-                if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-                {
-                    \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS', $this->descriptor->name . " {$this->descriptor->homepage}");
+            \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function (Event $e) {
+                if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
+                    \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS',
+                        $this->descriptor->name . " {$this->descriptor->homepage}");
 
                     /**
                      * @var $view View
                      */
                     $view = $e->sender;
-                    if (!isset($view->metaTags[self::$_huck]))
-                    {
+                    if (!isset($view->metaTags[self::$_huck])) {
                         $view->registerMetaTag([
-                            "name"      => base64_decode(self::$_huck),
-                            "content"   => $this->descriptor->name . " — {$this->descriptor->homepage}"
+                            "name" => base64_decode(self::$_huck),
+                            "content" => $this->descriptor->name . " — {$this->descriptor->homepage}"
                         ], self::$_huck);
                     }
 
-                    if (!isset($view->metaTags['cmsmagazine']))
-                    {
+                    if (!isset($view->metaTags['cmsmagazine'])) {
                         $view->registerMetaTag([
-                            "name"      => 'cmsmagazine',
-                            "content"   => "7170fe3a42c6f80cd95fd8bce765333d"
+                            "name" => 'cmsmagazine',
+                            "content" => "7170fe3a42c6f80cd95fd8bce765333d"
                         ], 'cmsmagazine');
                     }
                 }
             });
 
-            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e)
-            {
+            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
                 $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
                 $e->identity->save(false);
 
-                if (\Yii::$app->admin->requestIsAdmin)
-                {
+                if (\Yii::$app->admin->requestIsAdmin) {
                     \Yii::$app->user->identity->updateLastAdminActivity();
                 }
             });
@@ -313,13 +301,13 @@ class Cms extends \skeeks\cms\base\Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'adminEmail'                => 'Основной Email Администратора сайта',
-            'noImageUrl'                => 'Изображение заглушка',
-            'appName'                   => 'Название проекта',
-            'languageCode'              => 'Язык по умолчанию',
-            'registerRoles'             => 'При регистрации добавлять в группу',
-            'tree_max_code_length'      => 'Максимальная длинна кода (url) разделов',
-            'element_max_code_length'   => 'Максимальная длинна кода (url) элементов',
+            'adminEmail' => 'Основной Email Администратора сайта',
+            'noImageUrl' => 'Изображение заглушка',
+            'appName' => 'Название проекта',
+            'languageCode' => 'Язык по умолчанию',
+            'registerRoles' => 'При регистрации добавлять в группу',
+            'tree_max_code_length' => 'Максимальная длинна кода (url) разделов',
+            'element_max_code_length' => 'Максимальная длинна кода (url) элементов',
         ]);
     }
 
@@ -387,9 +375,8 @@ class Cms extends \skeeks\cms\base\Component
         ));
 
         $result = [];
-        foreach ($configs as $filePath)
-        {
-            $fileData = (array) include $filePath;
+        foreach ($configs as $filePath) {
+            $fileData = (array)include $filePath;
             $result = \yii\helpers\ArrayHelper::merge($result, $fileData);
         }
 
@@ -421,8 +408,6 @@ class Cms extends \skeeks\cms\base\Component
     }
 
 
-
-
     /**
      * @return array|null|CmsLang
      */
@@ -438,24 +423,20 @@ class Cms extends \skeeks\cms\base\Component
     {
         $baseTypes = [];
         $userTypes = [];
-        if ($this->relatedHandlers)
-        {
-            foreach ($this->relatedHandlers as $id => $handler)
-            {
+        if ($this->relatedHandlers) {
+            foreach ($this->relatedHandlers as $id => $handler) {
                 if ($handler instanceof PropertyTypeBool || $handler instanceof PropertyTypeText || $handler instanceof PropertyTypeNumber || $handler instanceof PropertyTypeList
-                    || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement)
-                {
+                    || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement) {
                     $baseTypes[$handler->id] = $handler->name;
-                } else
-                {
+                } else {
                     $userTypes[$handler->id] = $handler->name;
                 }
             }
         }
 
         return [
-            \Yii::t('skeeks/cms', 'Base types')          => $baseTypes,
-            \Yii::t('skeeks/cms', 'Custom types')        => $userTypes,
+            \Yii::t('skeeks/cms', 'Base types') => $baseTypes,
+            \Yii::t('skeeks/cms', 'Custom types') => $userTypes,
         ];
     }
 

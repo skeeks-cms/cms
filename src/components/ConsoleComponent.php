@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 01.11.2015
  */
+
 namespace skeeks\cms\components;
+
 use yii\base\Component;
 
 /**
@@ -21,11 +23,9 @@ class ConsoleComponent extends Component
      */
     public function execute($cmd)
     {
-        if (function_exists('system'))
-        {
+        if (function_exists('system')) {
             return $this->executeSystem($cmd);
-        } else
-        {
+        } else {
             list($output, $error, $code) = $this->executeProcOpen($cmd);
             return trim($output);
         }
@@ -37,10 +37,9 @@ class ConsoleComponent extends Component
      */
     public function executeSystem($command)
     {
-        if (function_exists('system'))
-        {
+        if (function_exists('system')) {
             ob_start();
-                @system($command);
+            @system($command);
             $result = ob_get_clean();
 
             $result = trim($result);

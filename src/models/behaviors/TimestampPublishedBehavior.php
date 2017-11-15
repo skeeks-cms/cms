@@ -8,6 +8,7 @@
  * @date 09.12.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models\behaviors;
 
 use yii\behaviors\AttributeBehavior;

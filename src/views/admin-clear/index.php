@@ -12,15 +12,15 @@ $data = \yii\helpers\Json::encode([
 ])
 ?>
 
-<div class="sx-box sx-p-10 sx-bg-primary">
-    <?= \yii\helpers\Html::a(\Yii::t('skeeks/cms','Delete temporary files'), $url, [
-        'class'             => 'btn btn-primary',
-        'onclick'           => 'new sx.classes.Clear(' . $data . '); return false;'
-    ]); ?>
-    <hr />
+    <div class="sx-box sx-p-10 sx-bg-primary">
+        <?= \yii\helpers\Html::a(\Yii::t('skeeks/cms', 'Delete temporary files'), $url, [
+            'class' => 'btn btn-primary',
+            'onclick' => 'new sx.classes.Clear(' . $data . '); return false;'
+        ]); ?>
+        <hr/>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-            'dataProvider'  => new \yii\data\ArrayDataProvider([
+        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+            'dataProvider' => new \yii\data\ArrayDataProvider([
                 'allModels' => $clearDirs
             ]),
             'columns' => [
@@ -28,8 +28,7 @@ $data = \yii\helpers\Json::encode([
                 'label',
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function($data)
-                    {
+                    'value' => function ($data) {
                         /**
                          * @var $dir \skeeks\sx\Dir
                          */
@@ -40,8 +39,7 @@ $data = \yii\helpers\Json::encode([
 
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function($data)
-                    {
+                    'value' => function ($data) {
                         /**
                          * @var $dir \skeeks\sx\Dir
                          */
@@ -51,10 +49,10 @@ $data = \yii\helpers\Json::encode([
                 ],
             ]
         ]);
-    ?>
-</div>
+        ?>
+    </div>
 <?
-    $this->registerJs(<<<JS
+$this->registerJs(<<<JS
     (function(sx, $, _)
     {
         sx.classes.Clear = sx.classes.Component.extend({

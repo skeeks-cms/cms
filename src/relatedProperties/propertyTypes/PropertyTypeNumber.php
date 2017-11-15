@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\propertyTypes;
+
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
@@ -17,35 +19,34 @@ use yii\widgets\ActiveForm;
  */
 class PropertyTypeNumber extends PropertyType
 {
-    public $code                 = self::CODE_NUMBER;
-    public $name                 = "";
+    public $code = self::CODE_NUMBER;
+    public $name = "";
 
-    public $default_value        = null;
+    public $default_value = null;
 
     public function init()
     {
         parent::init();
 
-        if(!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms','Number');
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', 'Number');
         }
     }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'default_value'  => \Yii::t('skeeks/cms','Default Value'),
-        ]);
+            [
+                'default_value' => \Yii::t('skeeks/cms', 'Default Value'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['default_value', 'number'],
-        ]);
+            [
+                ['default_value', 'number'],
+            ]);
     }
 
     /**
@@ -93,8 +94,7 @@ class PropertyTypeNumber extends PropertyType
      */
     public function getDefaultValue()
     {
-        if ($this->default_value !== null)
-        {
+        if ($this->default_value !== null) {
             return $this->default_value;
         }
         return;

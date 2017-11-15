@@ -5,6 +5,7 @@
  * @copyright (c) 2010 SkeekS
  * @date 15.05.2017
  */
+
 namespace skeeks\cms\models;
 
 use Yii;
@@ -39,11 +40,38 @@ class CmsTreeTypeProperty2type extends Core
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_tree_type_property_id', 'cms_tree_type_id'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'cms_tree_type_property_id',
+                    'cms_tree_type_id'
+                ],
+                'integer'
+            ],
             [['cms_tree_type_property_id', 'cms_tree_type_id'], 'required'],
-            [['cms_tree_type_property_id', 'cms_tree_type_id'], 'unique', 'targetAttribute' => ['cms_tree_type_property_id', 'cms_tree_type_id'], 'message' => 'The combination of Cms Tree Type Property ID and Cms Tree Type ID has already been taken.'],
-            [['cms_tree_type_property_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsTreeTypeProperty::className(), 'targetAttribute' => ['cms_tree_type_property_id' => 'id']],
-            [['cms_tree_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsTreeType::className(), 'targetAttribute' => ['cms_tree_type_id' => 'id']],
+            [
+                ['cms_tree_type_property_id', 'cms_tree_type_id'],
+                'unique',
+                'targetAttribute' => ['cms_tree_type_property_id', 'cms_tree_type_id'],
+                'message' => 'The combination of Cms Tree Type Property ID and Cms Tree Type ID has already been taken.'
+            ],
+            [
+                ['cms_tree_type_property_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsTreeTypeProperty::className(),
+                'targetAttribute' => ['cms_tree_type_property_id' => 'id']
+            ],
+            [
+                ['cms_tree_type_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsTreeType::className(),
+                'targetAttribute' => ['cms_tree_type_id' => 'id']
+            ],
         ]);
     }
 

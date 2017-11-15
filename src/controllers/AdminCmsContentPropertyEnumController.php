@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
@@ -22,9 +23,9 @@ class AdminCmsContentPropertyEnumController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = \Yii::t('skeeks/cms', 'Managing property values');
-        $this->modelShowAttribute      = "value";
-        $this->modelClassName          = CmsContentPropertyEnum::class;
+        $this->name = \Yii::t('skeeks/cms', 'Managing property values');
+        $this->modelShowAttribute = "value";
+        $this->modelClassName = CmsContentPropertyEnum::class;
 
         parent::init();
     }

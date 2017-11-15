@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 02.03.2015
  */
+
 namespace skeeks\cms\widgets\formInputs;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -20,16 +21,16 @@ use yii\widgets\InputWidget;
  *
  *
  * <?= $form->field($model, 'images')->widget(
-    \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
-    [
-        'backendUrl' => \yii\helpers\Url::to(['/cms/storage-files/link-to-models']),
-        'viewItemTemplate' => '',
-        'controllWidgetOptions' => [
-            'backendSimpleUploadUrl' => \yii\helpers\Url::to(['/cms/storage-files/upload']),
-            'backendRemoteUploadUrl' => \yii\helpers\Url::to(['/cms/storage-files/remote-upload']),
-        ],
-    ]
-); ?>
+ * \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
+ * [
+ * 'backendUrl' => \yii\helpers\Url::to(['/cms/storage-files/link-to-models']),
+ * 'viewItemTemplate' => '',
+ * 'controllWidgetOptions' => [
+ * 'backendSimpleUploadUrl' => \yii\helpers\Url::to(['/cms/storage-files/upload']),
+ * 'backendRemoteUploadUrl' => \yii\helpers\Url::to(['/cms/storage-files/remote-upload']),
+ * ],
+ * ]
+ * ); ?>
  *
  *
  * @property StorageFile[] $files
@@ -64,11 +65,11 @@ class ModelStorageFiles extends InputWidget
     {
         parent::init();
 
-        if ($this->backendUrl === null)
-        {
+        if ($this->backendUrl === null) {
             $this->backendUrl = UrlHelper::construct('cms/admin-storage-files/link-to-models')->enableAdmin()->toString();
         }
     }
+
     /**
      * @param $cmsStorageFile
      * @return string
@@ -85,34 +86,29 @@ class ModelStorageFiles extends InputWidget
      */
     public function run()
     {
-        try
-        {
-            if (!$this->hasModel())
-            {
-                throw new Exception(\Yii::t('skeeks/cms',"Current widget works only in form with model"));
+        try {
+            if (!$this->hasModel()) {
+                throw new Exception(\Yii::t('skeeks/cms', "Current widget works only in form with model"));
             }
 
-            if ($this->model->isNewRecord)
-            {
-                throw new Exception(\Yii::t('skeeks/cms',"Images can be downloaded after you save the form data"));
+            if ($this->model->isNewRecord) {
+                throw new Exception(\Yii::t('skeeks/cms', "Images can be downloaded after you save the form data"));
             }
 
 
-            if (!$this->model->hasProperty($this->attribute))
-            {
+            if (!$this->model->hasProperty($this->attribute)) {
                 throw new Exception("Relation {$this->attribute} не найдена");
             }
 
             echo $this->render('model-storage-files', [
-                'model'         => $this->model,
-                'widget'        => $this,
+                'model' => $this->model,
+                'widget' => $this,
             ]);
 
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             echo Alert::widget([
                 'options' => [
-                      'class' => 'alert-warning',
+                    'class' => 'alert-warning',
                 ],
                 'body' => $e->getMessage()
             ]);
@@ -130,10 +126,10 @@ class ModelStorageFiles extends InputWidget
     public function getJsonString()
     {
         return Json::encode([
-            'backendUrl'        => $this->backendUrl,
-            'modelId'           => $this->model->id,
-            'modelClassName'    => $this->model->className(),
-            'modelRelation'     => $this->attribute,
+            'backendUrl' => $this->backendUrl,
+            'modelId' => $this->model->id,
+            'modelClassName' => $this->model->className(),
+            'modelRelation' => $this->attribute,
         ]);
     }
 }

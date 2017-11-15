@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 27.03.2015
  */
+
 namespace skeeks\cms\controllers;
+
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -22,21 +24,21 @@ class AdminSettingsController extends AdminController
 {
     public function init()
     {
-        $this->name                   = "Управление настройками";
+        $this->name = "Управление настройками";
         parent::init();
     }
 
     public function actions()
     {
         return
-        [
-            "index" =>
             [
-                "class"        => AdminAction::className(),
-                "name"         => "Настройки",
-                "callback"     => [$this, 'actionIndex'],
-            ],
-        ];
+                "index" =>
+                    [
+                        "class" => AdminAction::className(),
+                        "name" => "Настройки",
+                        "callback" => [$this, 'actionIndex'],
+                    ],
+            ];
     }
 
     public function actionIndex()
@@ -46,73 +48,59 @@ class AdminSettingsController extends AdminController
         $component = '';
         $componentSelect = Cms::className();
 
-        foreach (\Yii::$app->getComponents(true) as $id => $data)
-        {
+        foreach (\Yii::$app->getComponents(true) as $id => $data) {
             $loadedComponent = \Yii::$app->get($id);
-            if ($loadedComponent instanceof Component)
-            {
-                $loadedComponents[$loadedComponent->className()]    = $loadedComponent;
+            if ($loadedComponent instanceof Component) {
+                $loadedComponents[$loadedComponent->className()] = $loadedComponent;
 
-                if ($name = $loadedComponent->descriptor->name)
-                {
-                    $loadedForSelect[$loadedComponent->className()]     = $name;
-                } else
-                {
-                    $loadedForSelect[$loadedComponent->className()]     = $loadedComponent->className();
+                if ($name = $loadedComponent->descriptor->name) {
+                    $loadedForSelect[$loadedComponent->className()] = $name;
+                } else {
+                    $loadedForSelect[$loadedComponent->className()] = $loadedComponent->className();
                 }
 
             }
         }
 
-        if (\Yii::$app->request->get("component"))
-        {
+        if (\Yii::$app->request->get("component")) {
             $componentSelect = \Yii::$app->request->get("component");
         }
 
         $component = ArrayHelper::getValue($loadedComponents, $componentSelect);
 
-        if ($component && $component instanceof Component)
-        {
+        if ($component && $component instanceof Component) {
 
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-            {
+            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
                 $component->load(\Yii::$app->request->post());
                 \Yii::$app->response->format = Response::FORMAT_JSON;
                 return ActiveForm::validate($component);
             }
 
-            if (\Yii::$app->request->isAjax)
-            {
-                if ($component->load(\Yii::$app->request->post()))
-                {
+            if (\Yii::$app->request->isAjax) {
+                if ($component->load(\Yii::$app->request->post())) {
                     $component->override = Component::OVERRIDE_DEFAULT;
-                    if ($component->save())
-                    {
+                    if ($component->save()) {
                         \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                    } else
-                    {
+                    } else {
                         \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                     }
 
-                } else
-                {
+                } else {
                     \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                 }
 
             }
         }
 
-        if ($component)
-        {
+        if ($component) {
 
         }
 
 
-
         return $this->render('index', [
-            'loadedComponents'  => $loadedComponents,
-            'loadedForSelect'   => $loadedForSelect,
-            'component'         => $component
+            'loadedComponents' => $loadedComponents,
+            'loadedForSelect' => $loadedForSelect,
+            'component' => $component
         ]);
     }
 

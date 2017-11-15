@@ -47,11 +47,12 @@ class LoginFormUsernameOrEmail extends Model
     public function attributeLabels()
     {
         return [
-            'identifier'    => \Yii::t('skeeks/cms','Username or Email'),
-            'password'      => \Yii::t('skeeks/cms','Password'),
-            'rememberMe'    => \Yii::t('skeeks/cms','Remember me'),
+            'identifier' => \Yii::t('skeeks/cms', 'Username or Email'),
+            'password' => \Yii::t('skeeks/cms', 'Password'),
+            'rememberMe' => \Yii::t('skeeks/cms', 'Remember me'),
         ];
     }
+
     /**
      * Validates the password.
      * This method serves as the inline validation for password.
@@ -61,12 +62,10 @@ class LoginFormUsernameOrEmail extends Model
      */
     public function validatePassword($attribute, $params)
     {
-        if (!$this->hasErrors())
-        {
+        if (!$this->hasErrors()) {
             $user = $this->getUser();
-            if (!$user || !$user->validatePassword($this->password))
-            {
-                $this->addError($attribute, \Yii::t('skeeks/cms','Incorrect username or password.'));
+            if (!$user || !$user->validatePassword($this->password)) {
+                $this->addError($attribute, \Yii::t('skeeks/cms', 'Incorrect username or password.'));
             }
         }
     }
@@ -78,11 +77,9 @@ class LoginFormUsernameOrEmail extends Model
      */
     public function login()
     {
-        if ($this->validate())
-        {
+        if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
-        } else
-        {
+        } else {
             return false;
         }
     }
@@ -94,8 +91,7 @@ class LoginFormUsernameOrEmail extends Model
      */
     public function getUser()
     {
-        if ($this->_user === false)
-        {
+        if ($this->_user === false) {
             $this->_user = User::findByUsernameOrEmail($this->identifier);
         }
 

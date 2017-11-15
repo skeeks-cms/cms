@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 09.07.2015
  */
+
 namespace skeeks\cms\helpers;
+
 /**
  * Class StringHelper
  * @package skeeks\cms\helpers
@@ -24,8 +26,8 @@ class StringHelper
      */
     static public function strReplaceOnce($search, $replace, $text)
     {
-       $pos = strpos($text, $search);
-       return $pos!==false ? substr_replace($text, $replace, $pos, strlen($search)) : $text;
+        $pos = strpos($text, $search);
+        return $pos !== false ? substr_replace($text, $replace, $pos, strlen($search)) : $text;
     }
 
     /**
@@ -33,15 +35,15 @@ class StringHelper
      * Склонение слов
      *
      * @static
-     * @param $number   |   число
-     * @param $suffix   |   array("минута", "минуты", "минут");
+     * @param $number |   число
+     * @param $suffix |   array("минута", "минуты", "минут");
      * @return mixed
      */
     static public function declination($number, $suffix)
     {
         $keys = array(2, 0, 1, 1, 1, 2);
         $mod = $number % 100;
-        $suffix_key = ($mod > 7 && $mod < 20) ? 2: $keys[min($mod % 10, 5)];
+        $suffix_key = ($mod > 7 && $mod < 20) ? 2 : $keys[min($mod % 10, 5)];
         return $suffix[$suffix_key];
     }
 
@@ -72,7 +74,8 @@ class StringHelper
     {
         $str = $string;
         $encoding = \Yii::$app->charset;
-        return mb_substr(mb_strtoupper($str, $encoding), 0, 1, $encoding) . mb_substr($str, 1, mb_strlen($str)-1, $encoding);
+        return mb_substr(mb_strtoupper($str, $encoding), 0, 1, $encoding) . mb_substr($str, 1, mb_strlen($str) - 1,
+                $encoding);
     }
 
     /**
@@ -83,9 +86,8 @@ class StringHelper
     {
         $str = $string;
         $encoding = \Yii::$app->charset;
-        return  mb_strlen($str, $encoding);
+        return mb_strlen($str, $encoding);
     }
-
 
 
     /**
@@ -114,7 +116,6 @@ class StringHelper
     }
 
 
-
     /**
      * @param $data
      * @return string
@@ -122,7 +123,7 @@ class StringHelper
     static public function compressBase64EncodeUrl($data)
     {
         return rtrim(strtr(base64_encode(
-            gzcompress(serialize($data),9)
+            gzcompress(serialize($data), 9)
         ), '+/', '-_'), '=');
     }
 
@@ -132,7 +133,8 @@ class StringHelper
      */
     static public function compressBase64DecodeUrl($string)
     {
-        return unserialize(gzuncompress(base64_decode(str_pad(strtr($string, '-_', '+/'), strlen($string) % 4, '=', STR_PAD_RIGHT))));
+        return unserialize(gzuncompress(base64_decode(str_pad(strtr($string, '-_', '+/'), strlen($string) % 4, '=',
+            STR_PAD_RIGHT))));
     }
 
 

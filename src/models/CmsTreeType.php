@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.05.2015
  */
+
 namespace skeeks\cms\models;
 
 use Yii;
@@ -77,7 +78,10 @@ class CmsTreeType extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_children_tree_type'], 'integer'],
+            [
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_children_tree_type'],
+                'integer'
+            ],
             [['name', 'code'], 'required'],
             [['description'], 'string'],
             [['name', 'viewFile'], 'string', 'max' => 255],
@@ -86,18 +90,19 @@ class CmsTreeType extends Core
             [['name_meny', 'name_one'], 'string', 'max' => 100],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
-            ['priority', 'default', 'value'         => 500],
-            ['active', 'default', 'value'           => "Y"],
-            ['name_meny', 'default', 'value'        => \Yii::t('skeeks/cms','Sections')],
-            ['name_one', 'default', 'value'         => \Yii::t('skeeks/cms','Section')],
+            ['priority', 'default', 'value' => 500],
+            ['active', 'default', 'value' => "Y"],
+            ['name_meny', 'default', 'value' => \Yii::t('skeeks/cms', 'Sections')],
+            ['name_one', 'default', 'value' => \Yii::t('skeeks/cms', 'Section')],
         ]);
     }
 
     public function validateCode($attribute)
     {
-        if(!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute))
-        {
-            $this->addError($attribute, \Yii::t('skeeks/cms','Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',['code' => 'code1']));
+        if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute)) {
+            $this->addError($attribute, \Yii::t('skeeks/cms',
+                'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
+                ['code' => 'code1']));
         }
     }
 
@@ -114,8 +119,10 @@ class CmsTreeType extends Core
      */
     public function getCmsTreeTypeProperties()
     {
-        return $this->hasMany(CmsTreeTypeProperty::className(), ['id' => 'cms_tree_type_property_id'])->viaTable('cms_tree_type_property2type', ['cms_tree_type_id' => 'id']);
-        
+        return $this->hasMany(CmsTreeTypeProperty::className(),
+            ['id' => 'cms_tree_type_property_id'])->viaTable('cms_tree_type_property2type',
+            ['cms_tree_type_id' => 'id']);
+
         //return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);;
     }
 

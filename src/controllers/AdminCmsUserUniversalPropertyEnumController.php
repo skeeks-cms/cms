@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
@@ -20,9 +21,9 @@ class AdminCmsUserUniversalPropertyEnumController extends AdminModelEditorContro
 {
     public function init()
     {
-        $this->name                   = "Управление значениями свойств пользователя";
-        $this->modelShowAttribute      = "value";
-        $this->modelClassName          = CmsUserUniversalPropertyEnum::className();
+        $this->name = "Управление значениями свойств пользователя";
+        $this->modelShowAttribute = "value";
+        $this->modelClassName = CmsUserUniversalPropertyEnum::className();
 
         parent::init();
 

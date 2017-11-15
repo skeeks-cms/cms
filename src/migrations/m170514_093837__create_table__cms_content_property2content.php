@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m170514_093837__create_table__cms_content_property2content extends Migrati
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_content_property2content}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,16 +24,16 @@ class m170514_093837__create_table__cms_content_property2content extends Migrati
         }
 
         $this->createTable("{{%cms_content_property2content}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'cms_content_property_id'   => $this->integer()->notNull(),
-            'cms_content_id'            => $this->integer()->notNull(),
+            'cms_content_property_id' => $this->integer()->notNull(),
+            'cms_content_id' => $this->integer()->notNull(),
 
         ], $tableOptions);
 
@@ -44,7 +44,8 @@ class m170514_093837__create_table__cms_content_property2content extends Migrati
         $this->createIndex('cms_content_property_id', '{{%cms_content_property2content}}', 'cms_content_property_id');
         $this->createIndex('cms_content_id', '{{%cms_content_property2content}}', 'cms_content_id');
 
-        $this->createIndex('property2content', '{{%cms_content_property2content}}', ['cms_content_property_id', 'cms_content_id'], true);
+        $this->createIndex('property2content', '{{%cms_content_property2content}}',
+            ['cms_content_property_id', 'cms_content_id'], true);
 
         $this->addForeignKey(
             'cms_content_property2content__created_by', "{{%cms_content_property2content}}",

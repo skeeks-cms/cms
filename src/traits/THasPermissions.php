@@ -5,15 +5,18 @@
  * @copyright 2010 SkeekS
  * @date 05.03.2017
  */
+
 namespace skeeks\cms\traits;
+
 use skeeks\cms\rbac\CmsManager;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\web\Application;
+
 /**
- * @property callable|null       $accessCallback;
- * @property string|null         $permissionName;
- * @property array|null          $permissionNames;
+ * @property callable|null $accessCallback;
+ * @property string|null $permissionName;
+ * @property array|null $permissionNames;
  * @property bool $isAllow;
  *
  * Class THasPermissions
@@ -25,6 +28,7 @@ trait THasPermissions
      * @var array
      */
     protected $_permissionNames = null;
+
     /**
      * @return array
      */
@@ -32,6 +36,7 @@ trait THasPermissions
     {
         return $this->_permissionNames;
     }
+
     /**
      * @param array $permissionNames
      * @return $this
@@ -62,8 +67,7 @@ trait THasPermissions
      */
     public function setAccessCallback($accessCallback = null)
     {
-        if ($accessCallback !== null && !is_callable($accessCallback) && !is_bool($accessCallback))
-        {
+        if ($accessCallback !== null && !is_callable($accessCallback) && !is_bool($accessCallback)) {
             throw new InvalidConfigException('accessCallback must be callable or null or boolean');
         }
         $this->_accessCallback = $accessCallback;
@@ -74,6 +78,7 @@ trait THasPermissions
      * @var string
      */
     protected $_permissionName = null;
+
     /**
      * @return string
      */
@@ -81,6 +86,7 @@ trait THasPermissions
     {
         return $this->_permissionName;
     }
+
     /**
      * @param string|null $permissionName
      * @return $this
@@ -90,20 +96,19 @@ trait THasPermissions
         $this->_permissionName = $permissionName;
         return $this;
     }
+
     /**
      * @return bool
      */
     public function getIsAllow()
     {
-        if ($this->accessCallback && is_callable($this->accessCallback))
-        {
+        if ($this->accessCallback && is_callable($this->accessCallback)) {
             $callback = $this->accessCallback;
-            return (bool) call_user_func($callback, $this);
+            return (bool)call_user_func($callback, $this);
         }
 
-        if ($this->accessCallback && is_bool($this->accessCallback))
-        {
-            return (bool) $this->accessCallback;
+        if ($this->accessCallback && is_bool($this->accessCallback)) {
+            return (bool)$this->accessCallback;
         }
 
         return $this->_isAllow();
@@ -114,26 +119,20 @@ trait THasPermissions
      */
     protected function _isAllow()
     {
-        if ($this->permissionNames)
-        {
-            foreach ($this->permissionNames as $permissionName => $permissionLabel)
-            {
+        if ($this->permissionNames) {
+            foreach ($this->permissionNames as $permissionName => $permissionLabel) {
                 //Привилегия доступу к админке
-                if (!$permission = \Yii::$app->authManager->getPermission($permissionName))
-                {
+                if (!$permission = \Yii::$app->authManager->getPermission($permissionName)) {
                     $permission = \Yii::$app->authManager->createPermission($permissionName);
                     $permission->description = $permissionLabel;
                     \Yii::$app->authManager->add($permission);
                 }
-                if ($roleRoot = \Yii::$app->authManager->getRole(CmsManager::ROLE_ROOT))
-                {
-                    if (!\Yii::$app->authManager->hasChild($roleRoot, $permission))
-                    {
+                if ($roleRoot = \Yii::$app->authManager->getRole(CmsManager::ROLE_ROOT)) {
+                    if (!\Yii::$app->authManager->hasChild($roleRoot, $permission)) {
                         \Yii::$app->authManager->addChild($roleRoot, $permission);
                     }
                 }
-                if (\Yii::$app instanceof Application && !\Yii::$app->user->can($permissionName))
-                {
+                if (\Yii::$app instanceof Application && !\Yii::$app->user->can($permissionName)) {
                     return false;
                 }
             }

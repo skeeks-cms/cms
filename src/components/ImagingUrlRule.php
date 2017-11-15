@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\components;
+
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\Tree;
 use skeeks\sx\File;
@@ -33,8 +34,7 @@ class ImagingUrlRule
 
     public function init()
     {
-        if ($this->name === null)
-        {
+        if ($this->name === null) {
             $this->name = __CLASS__;
         }
     }
@@ -57,19 +57,17 @@ class ImagingUrlRule
      */
     public function parseRequest($manager, $request)
     {
-        $pathInfo           = $request->getPathInfo();
-        $params             = $request->getQueryParams();
+        $pathInfo = $request->getPathInfo();
+        $params = $request->getQueryParams();
 
-        $sourceOriginalFile     = File::object($pathInfo);
-        $extension              = $sourceOriginalFile->getExtension();
+        $sourceOriginalFile = File::object($pathInfo);
+        $extension = $sourceOriginalFile->getExtension();
 
-        if (!$extension)
-        {
+        if (!$extension) {
             return false;
         }
 
-        if (!in_array(StringHelper::strtolower($extension), (array) \Yii::$app->imaging->extensions))
-        {
+        if (!in_array(StringHelper::strtolower($extension), (array)\Yii::$app->imaging->extensions)) {
             return false;
         }
 

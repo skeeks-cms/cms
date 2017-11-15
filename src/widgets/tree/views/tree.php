@@ -12,7 +12,7 @@ $widget = $this->context;
 <div class="row">
     <div class="sx-container-tree col-md-12">
         <?= \yii\helpers\Html::beginTag("div", $widget->options); ?>
-            <?= $widget->renderNodes($widget->models); ?>
+        <?= $widget->renderNodes($widget->models); ?>
         <?= \yii\helpers\Html::endTag("div"); ?>
     </div>
 </div>

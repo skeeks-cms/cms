@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.07.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150715_103220_create_table__cms_agent extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_agent}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -26,20 +26,20 @@ class m150715_103220_create_table__cms_agent extends Migration
 
         $this->createTable("{{%cms_agent}}", [
 
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'last_exec_at'          => Schema::TYPE_INTEGER . ' NULL',
-            'next_exec_at'          => Schema::TYPE_INTEGER . ' NOT NULL',
+            'last_exec_at' => Schema::TYPE_INTEGER . ' NULL',
+            'next_exec_at' => Schema::TYPE_INTEGER . ' NOT NULL',
 
-            'name'                  => Schema::TYPE_TEXT . " NOT NULL",
-            'description'           => Schema::TYPE_TEXT . " NULL",
+            'name' => Schema::TYPE_TEXT . " NOT NULL",
+            'description' => Schema::TYPE_TEXT . " NULL",
 
-            'agent_interval'        => Schema::TYPE_INTEGER . " NOT NULL DEFAULT '86400'",
-            'priority'              => Schema::TYPE_INTEGER . " NOT NULL DEFAULT '100'",
+            'agent_interval' => Schema::TYPE_INTEGER . " NOT NULL DEFAULT '86400'",
+            'priority' => Schema::TYPE_INTEGER . " NOT NULL DEFAULT '100'",
 
-            'active'                => "CHAR(1) NOT NULL DEFAULT 'Y'",
-            'is_period'             => "CHAR(1) NOT NULL DEFAULT 'Y'",
-            'is_running'            => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'active' => "CHAR(1) NOT NULL DEFAULT 'Y'",
+            'is_period' => "CHAR(1) NOT NULL DEFAULT 'Y'",
+            'is_running' => "CHAR(1) NOT NULL DEFAULT 'N'",
 
         ], $tableOptions);
 

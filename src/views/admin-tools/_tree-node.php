@@ -12,23 +12,18 @@ $widget = $this->context;
 
 $result = $model->name;
 $additionalName = '';
-if ($model->level == 0)
-{
+if ($model->level == 0) {
     $site = \skeeks\cms\models\CmsSite::findOne(['id' => $model->cms_site_id]);
-    if ($site)
-    {
+    if ($site) {
         $additionalName = $site->name;
     }
-} else
-{
-    if ($model->name_hidden)
-    {
+} else {
+    if ($model->name_hidden) {
         $additionalName = $model->name_hidden;
     }
 }
 
-if ($additionalName)
-{
+if ($additionalName) {
     $result .= " [{$additionalName}]";
 }
 
@@ -45,7 +40,9 @@ $controllElement = \Yii::$app->controller->renderNodeControll($model);
 <!-- Possible actions -->
 <div class="sx-controll-node row">
     <div class="pull-left sx-controll-act">
-        <a href="<?= $model->absoluteUrl; ?>" target="_blank" class="btn-tree-node-controll btn btn-default btn-sm show-at-site" title="<?= \Yii::t('skeeks/cms',"Show at site"); ?>">
+        <a href="<?= $model->absoluteUrl; ?>" target="_blank"
+           class="btn-tree-node-controll btn btn-default btn-sm show-at-site"
+           title="<?= \Yii::t('skeeks/cms', "Show at site"); ?>">
             <span class="glyphicon glyphicon-eye-open"></span>
         </a>
     </div>

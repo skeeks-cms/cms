@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 06.06.2015
  */
+
 namespace skeeks\cms\widgets\formInputs\componentSettings;
 
 use Yii;
@@ -21,9 +22,9 @@ class ComponentSettingsWidgetAsset extends AssetBundle
     public $css = [];
 
     public $js =
-    [
-        'component-settings.js',
-    ];
+        [
+            'component-settings.js',
+        ];
 
     public $depends = [
         '\skeeks\sx\assets\Core',

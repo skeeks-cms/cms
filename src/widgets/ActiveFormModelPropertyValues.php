@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.03.2015
  */
+
 namespace skeeks\cms\widgets;
+
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit;
 use skeeks\modules\cms\form\models\Form;
 use skeeks\widget\chosen\Chosen;
@@ -25,10 +27,10 @@ class ActiveFormModelPropertyValues extends ActiveFormAjaxSubmit
 
     public function __construct($config = [])
     {
-        $this->validationUrl                = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/validate')->toString();
-        $this->action                       = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/submit')->toString();
+        $this->validationUrl = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/validate')->toString();
+        $this->action = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/submit')->toString();
 
-        $this->enableAjaxValidation         = true;
+        $this->enableAjaxValidation = true;
 
         parent::__construct($config);
     }
@@ -60,14 +62,12 @@ class ActiveFormModelPropertyValues extends ActiveFormAjaxSubmit
             ['allowDeselect' => false],
             $config,
             [
-                'items'         => $items,
+                'items' => $items,
             ]
         );
 
-        foreach ($config as $key => $value)
-        {
-            if (property_exists(Chosen::className(), $key) === false)
-            {
+        foreach ($config as $key => $value) {
+            if (property_exists(Chosen::className(), $key) === false) {
                 unset($config[$key]);
             }
         }

@@ -8,6 +8,7 @@
  * @date 16.11.2014
  * @since 1.0.0
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -19,32 +20,30 @@ class m141117_100557_create_teable_site extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_site}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql')
-        {
+        if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable('{{%cms_site}}', [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'host_name'             => Schema::TYPE_STRING . '(255) NULL',
-            'name'                  => Schema::TYPE_STRING . '(255) NULL',
-            'description'           => Schema::TYPE_TEXT . ' NULL',
-            'params'                => Schema::TYPE_TEXT . ' NULL',
+            'host_name' => Schema::TYPE_STRING . '(255) NULL',
+            'name' => Schema::TYPE_STRING . '(255) NULL',
+            'description' => Schema::TYPE_TEXT . ' NULL',
+            'params' => Schema::TYPE_TEXT . ' NULL',
 
-            'cms_tree_id'           => Schema::TYPE_INTEGER . ' NULL',
+            'cms_tree_id' => Schema::TYPE_INTEGER . ' NULL',
         ], $tableOptions);
 
         $this->execute("ALTER TABLE {{%cms_site}} ADD INDEX(created_at);");

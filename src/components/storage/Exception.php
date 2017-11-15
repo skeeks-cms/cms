@@ -20,4 +20,5 @@ use skeeks\cms\Exception as CmsException;
  */
 class Exception
     extends CmsException
-{}
+{
+}

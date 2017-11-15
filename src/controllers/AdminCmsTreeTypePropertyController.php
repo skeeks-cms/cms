@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
@@ -24,9 +25,9 @@ class AdminCmsTreeTypePropertyController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                   = "Управление свойствами раздела";
-        $this->modelShowAttribute      = "name";
-        $this->modelClassName          = CmsTreeTypeProperty::className();
+        $this->name = "Управление свойствами раздела";
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = CmsTreeTypeProperty::className();
 
         parent::init();
     }
@@ -39,14 +40,14 @@ class AdminCmsTreeTypePropertyController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 'create' =>
-                [
-                    'callback'         => [$this, 'create'],
-                ],
+                    [
+                        'callback' => [$this, 'create'],
+                    ],
 
                 'update' =>
-                [
-                    'callback'         => [$this, 'update'],
-                ],
+                    [
+                        'callback' => [$this, 'update'],
+                    ],
             ]
         );
     }
@@ -59,49 +60,42 @@ class AdminCmsTreeTypePropertyController extends AdminModelEditorController
         $model = new $modelClass();
         $model->loadDefaultValues();
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load($post);
         }
 
         $handler = $model->handler;
-        if ($handler)
-        {
-            if ($post = \Yii::$app->request->post())
-            {
+        if ($handler) {
+            if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
                 $model->component_settings = $handler->toArray();
                 $handler->load(\Yii::$app->request->post());
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handler->validate())
-                {
+                    && $model->validate() && $handler->validate()) {
                     $model->save();
 
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
                     return $this->redirect(
                         UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
                             ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
                             ->toString()
                     );
-                } else
-                {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
+                } else {
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms', 'Could not save'));
                 }
             }
         }
 
         return $this->render('_form', [
-            'model'     => $model,
-            'handler'   => $handler,
+            'model' => $model,
+            'handler' => $handler,
         ]);
     }
 
@@ -112,41 +106,32 @@ class AdminCmsTreeTypePropertyController extends AdminModelEditorController
 
         $model = $this->model;
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load($post);
         }
 
         $handler = $model->handler;
-        if ($handler)
-        {
-            if ($post = \Yii::$app->request->post())
-            {
+        if ($handler) {
+            if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
-                if ($rr->isRequestPjaxPost())
-                {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
+                if ($rr->isRequestPjaxPost()) {
                     $model->component_settings = $handler->toArray();
                     $handler->load(\Yii::$app->request->post());
 
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handler->validate())
-                    {
+                        && $model->validate() && $handler->validate()) {
                         $model->save();
 
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
-                        if (\Yii::$app->request->post('submit-btn') == 'apply')
-                        {
+                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
 
-                        } else
-                        {
+                        } else {
                             return $this->redirect(
                                 $this->url
                             );
@@ -160,8 +145,8 @@ class AdminCmsTreeTypePropertyController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model'     => $model,
-            'handler'   => $handler,
+            'model' => $model,
+            'handler' => $handler,
         ]);
     }
 }

@@ -7,6 +7,7 @@
  */
 
 namespace skeeks\cms\console\controllers;
+
 use skeeks\cms\helpers\FileHelper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
@@ -51,10 +52,8 @@ class CacheController extends \yii\console\controllers\CacheController
 
         $this->stdout("Clear runtimes directories\n", Console::FG_YELLOW);
 
-        if ($paths)
-        {
-            foreach ($paths as $path)
-            {
+        if ($paths) {
+            foreach ($paths as $path) {
                 $realPath = \Yii::getAlias($path);
                 $this->stdout("\tClear runtime directory: {$realPath}\n");
                 FileHelper::removeDirectory(\Yii::getAlias($path));
@@ -71,10 +70,8 @@ class CacheController extends \yii\console\controllers\CacheController
         $paths = ArrayHelper::getValue(\Yii::$app->cms->tmpFolderScheme, 'assets');
         $this->stdout("Clear assets directories\n", Console::FG_YELLOW);
 
-        if ($paths)
-        {
-            foreach ($paths as $path)
-            {
+        if ($paths) {
+            foreach ($paths as $path) {
                 $realPath = \Yii::getAlias($path);
                 $this->stdout("\tClear asset directory: {$realPath}\n");
                 FileHelper::removeDirectory(\Yii::getAlias($path));

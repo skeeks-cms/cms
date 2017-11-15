@@ -64,9 +64,9 @@ class StorageFilesController extends Controller
     public function actionUpload()
     {
         $response =
-        [
-            'success' => false
-        ];
+            [
+                'success' => false
+            ];
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
@@ -82,8 +82,7 @@ class StorageFilesController extends Controller
         $uploader->newFileName = $file->getBaseName();
         $result = $uploader->handleUpload($dir->getPath() . DIRECTORY_SEPARATOR);
 
-        if (!$result)
-        {
+        if (!$result) {
             $response["msg"] = $uploader->getErrorMsg();
             return $result;
 
@@ -97,9 +96,7 @@ class StorageFilesController extends Controller
             ));
 
 
-
-            if ($request->get('modelData') && is_array($request->get('modelData')))
-            {
+            if ($request->get('modelData') && is_array($request->get('modelData'))) {
                 $storageFile->setAttributes($request->get('modelData'));
             }
 
@@ -114,8 +111,6 @@ class StorageFilesController extends Controller
     }
 
 
-
-
     /**
      * ���������� � ������ ������ ����
      * @see skeeks\cms\widgets\formInputs\StorageImage
@@ -125,23 +120,18 @@ class StorageFilesController extends Controller
     {
         $rr = new RequestResponse();
 
-        if ($rr->isRequestAjaxPost())
-        {
-            try
-            {
-                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelAttribute'))
-                {
+        if ($rr->isRequestAjaxPost()) {
+            try {
+                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelAttribute')) {
                     throw new \yii\base\Exception("�� ���������� ������� ������");
                 }
 
                 $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
-                if (!$file)
-                {
+                if (!$file) {
                     throw new \yii\base\Exception("�������� ���� ��� ������ ��� �� ����������");
                 }
 
-                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
-                {
+                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className())) {
                     throw new \yii\base\Exception("���������� ��������� ���� � ���� ������");
                 }
 
@@ -150,19 +140,16 @@ class StorageFilesController extends Controller
                  * @var $model ActiveRecord
                  */
                 $model = $className::findOne(\Yii::$app->request->post('modelId'));
-                if (!$model)
-                {
+                if (!$model) {
                     throw new \yii\base\Exception("������ � ������� ���������� ��������� ���� �� �������");
                 }
 
-                if (!$model->hasAttribute(\Yii::$app->request->post('modelAttribute')))
-                {
+                if (!$model->hasAttribute(\Yii::$app->request->post('modelAttribute'))) {
                     throw new \yii\base\Exception("� ������ �� ������ ������� �������� �����: " . \Yii::$app->request->post('modelAttribute'));
                 }
 
                 //�������� ������� �����
-                if ($oldFileId = $model->{\Yii::$app->request->post('modelAttribute')})
-                {
+                if ($oldFileId = $model->{\Yii::$app->request->post('modelAttribute')}) {
                     /**
                      * @var $oldFile CmsStorageFile
                      * @var $file CmsStorageFile
@@ -172,8 +159,7 @@ class StorageFilesController extends Controller
                 }
 
                 $model->{\Yii::$app->request->post('modelAttribute')} = $file->id;
-                if (!$model->save(false))
-                {
+                if (!$model->save(false)) {
                     throw new \yii\base\Exception("�� ������� ��������� ������");
                 }
 
@@ -183,8 +169,7 @@ class StorageFilesController extends Controller
                 $rr->success = true;
                 $rr->message = "";
 
-            } catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $rr->success = false;
                 $rr->message = $e->getMessage();
             }
@@ -203,23 +188,18 @@ class StorageFilesController extends Controller
     {
         $rr = new RequestResponse();
 
-        if ($rr->isRequestAjaxPost())
-        {
-            try
-            {
-                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelRelation'))
-                {
+        if ($rr->isRequestAjaxPost()) {
+            try {
+                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelRelation')) {
                     throw new \yii\base\Exception("�� ���������� ������� ������");
                 }
 
                 $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
-                if (!$file)
-                {
+                if (!$file) {
                     throw new \yii\base\Exception("�������� ���� ��� ������ ��� �� ����������");
                 }
 
-                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
-                {
+                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className())) {
                     throw new \yii\base\Exception("���������� ��������� ���� � ���� ������");
                 }
 
@@ -228,40 +208,31 @@ class StorageFilesController extends Controller
                  * @var $model ActiveRecord
                  */
                 $model = $className::findOne(\Yii::$app->request->post('modelId'));
-                if (!$model)
-                {
+                if (!$model) {
                     throw new \yii\base\Exception("������ � ������� ���������� ��������� ���� �� �������");
                 }
 
-                if (!$model->hasProperty(\Yii::$app->request->post('modelRelation')))
-                {
+                if (!$model->hasProperty(\Yii::$app->request->post('modelRelation'))) {
                     throw new \yii\base\Exception("� ������ �� ������ ������� �������� � ������ modelRelation: " . \Yii::$app->request->post('modelRelation'));
                 }
 
-                try
-                {
+                try {
                     $model->link(\Yii::$app->request->post('modelRelation'), $file);
 
-                    if (!$file->name)
-                    {
+                    if (!$file->name) {
                         $file->name = $model->name;
                         $file->save(false);
                     }
 
                     $rr->success = true;
                     $rr->message = "";
-                } catch(\Exception $e)
-                {
+                } catch (\Exception $e) {
                     $rr->success = false;
                     $rr->message = $e->getMessage();
                 }
 
 
-
-
-
-            } catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $rr->success = false;
                 $rr->message = $e->getMessage();
             }
@@ -286,23 +257,21 @@ class StorageFilesController extends Controller
 
         $request = Yii::$app->getRequest();
 
-        if (\Yii::$app->request->post('link'))
-        {
+        if (\Yii::$app->request->post('link')) {
             $storageFile = Yii::$app->storage->upload(\Yii::$app->request->post('link'), array_merge(
                 [
-                    "name"          => isset($model->name) ? $model->name : "",
+                    "name" => isset($model->name) ? $model->name : "",
                     "original_name" => basename($post['link'])
                 ]
             ));
 
-            if ($request->post('modelData') && is_array($request->post('modelData')))
-            {
+            if ($request->post('modelData') && is_array($request->post('modelData'))) {
                 $storageFile->setAttributes($request->post('modelData'));
             }
 
             $storageFile->save(false);
-            $response["success"]  = true;
-            $response["file"]     = $storageFile;
+            $response["success"] = true;
+            $response["file"] = $storageFile;
             return $response;
         }
 

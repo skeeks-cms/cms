@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 25.05.2015
  */
+
 namespace skeeks\cms\models\searchs;
+
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
@@ -50,8 +52,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
         /**
          * @var $prop CmsContentProperty
          */
-        if ($props = $this->cmsContent->cmsContentProperties)
-        {
+        if ($props = $this->cmsContent->cmsContentProperties) {
             $this->initProperties($props);
         }
     }
@@ -59,14 +60,15 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
     public function initProperties($props = [])
     {
-        foreach ($props as $prop)
-        {
-            if ($prop->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
-            {
+        foreach ($props as $prop) {
+            if ($prop->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) {
                 $this->defineAttribute($this->getAttributeNameRangeFrom($prop->code), '');
                 $this->defineAttribute($this->getAttributeNameRangeTo($prop->code), '');
 
-                $this->addRule([$this->getAttributeNameRangeFrom($prop->code), $this->getAttributeNameRangeTo($prop->code)], "safe");
+                $this->addRule([
+                    $this->getAttributeNameRangeFrom($prop->code),
+                    $this->getAttributeNameRangeTo($prop->code)
+                ], "safe");
 
             }
 
@@ -93,13 +95,10 @@ class SearchRelatedPropertiesModel extends DynamicModel
     {
         $result = [];
 
-        foreach ($this->attributes() as $code)
-        {
-            if ($property = $this->getProperty($code))
-            {
+        foreach ($this->attributes() as $code) {
+            if ($property = $this->getProperty($code)) {
                 $result[$code] = $property->name;
-            } else
-            {
+            } else {
                 $result[$code] = $code;
             }
 
@@ -107,7 +106,6 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
         return $result;
     }
-
 
 
     public $prefixRange = "Sxrange";
@@ -137,8 +135,7 @@ class SearchRelatedPropertiesModel extends DynamicModel
      */
     public function isAttributeRange($propertyCode)
     {
-        if (strpos($propertyCode, $this->prefixRange))
-        {
+        if (strpos($propertyCode, $this->prefixRange)) {
             return true;
         }
 
@@ -162,101 +159,96 @@ class SearchRelatedPropertiesModel extends DynamicModel
         $applyFilters = false;
         $unionQueries = [];
 
-        foreach ($this->toArray() as $propertyCode => $value)
-        {
+        foreach ($this->toArray() as $propertyCode => $value) {
             //TODO: add to validator related properties
-            if ($propertyCode == 'properties')
-            {
+            if ($propertyCode == 'properties') {
                 continue;
             }
 
-            if ($property = $this->getProperty($propertyCode))
-            {
-                if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
-                {
+            if ($property = $this->getProperty($propertyCode)) {
+                if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) {
                     $elementIds = [];
 
                     $query = $classSearch::find()->select(['element_id as id'])->where([
-                        "property_id"   => $property->id
+                        "property_id" => $property->id
                     ])->indexBy('element_id');
 
-                    if ($fromValue = $this->{$this->getAttributeNameRangeFrom($propertyCode)})
-                    {
+                    if ($fromValue = $this->{$this->getAttributeNameRangeFrom($propertyCode)}) {
                         $applyFilters = true;
 
-                        $query->andWhere(['>=', 'value_num', (float) $fromValue]);
+                        $query->andWhere(['>=', 'value_num', (float)$fromValue]);
                     }
 
-                    if ($toValue = $this->{$this->getAttributeNameRangeTo($propertyCode)})
-                    {
+                    if ($toValue = $this->{$this->getAttributeNameRangeTo($propertyCode)}) {
 
                         $applyFilters = true;
 
-                        $query->andWhere(['<=', 'value_num', (float) $toValue]);
+                        $query->andWhere(['<=', 'value_num', (float)$toValue]);
                     }
 
-                    if (!$fromValue && !$toValue)
-                    {
+                    if (!$fromValue && !$toValue) {
                         continue;
                     }
 
                     $unionQueries[] = $query;
                     //$elementIds = $query->all();
 
-                } else
-                {
-                    if (!$value)
-                    {
+                } else {
+                    if (!$value) {
                         continue;
                     }
 
                     $applyFilters = true;
 
-                    if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING)
-                    {
+                    if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
                         $query = $classSearch::find()->select(['element_id as id'])
                             ->where([
-                                "property_id"   => $property->id
+                                "property_id" => $property->id
                             ])
                             ->andWhere([
-                                'like', 'value', $value
+                                'like',
+                                'value',
+                                $value
                             ]);
 
                         /*->indexBy('element_id')
                         ->all();*/
                         $unionQueries[] = $query;
 
-                    } else if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL)
-                    {
-                        $query = $classSearch::find()->select(['element_id as id'])->where([
-                            "value_bool"         => $value,
-                            "property_id"   => $property->id
-                        ]);
-                        //print_r($query->createCommand()->rawSql);die;
-                        //$elementIds = $query->indexBy('element_id')->all();
-                        $unionQueries[] = $query;
-                    } else if (in_array($property->property_type, [
-                        \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT
-                        , \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
-                        , \skeeks\cms\relatedProperties\PropertyType::CODE_TREE
-                    ]))
-                    {
-                        $query = $classSearch::find()->select(['element_id as id'])->where([
-                            "value_enum"         => $value,
-                            "property_id"   => $property->id
-                        ]);
-                        //print_r($query->createCommand()->rawSql);die;
-                        //$elementIds = $query->indexBy('element_id')->all();
-                        $unionQueries[] = $query;
-                    } else
-                    {
-                        $query = $classSearch::find()->select(['element_id as id'])->where([
-                            "value"         => $value,
-                            "property_id"   => $property->id
-                        ]);
-                        //print_r($query->createCommand()->rawSql);die;
-                        //$elementIds = $query->indexBy('element_id')->all();
-                        $unionQueries[] = $query;
+                    } else {
+                        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL) {
+                            $query = $classSearch::find()->select(['element_id as id'])->where([
+                                "value_bool" => $value,
+                                "property_id" => $property->id
+                            ]);
+                            //print_r($query->createCommand()->rawSql);die;
+                            //$elementIds = $query->indexBy('element_id')->all();
+                            $unionQueries[] = $query;
+                        } else {
+                            if (in_array($property->property_type, [
+                                \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT
+                                ,
+                                \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+                                ,
+                                \skeeks\cms\relatedProperties\PropertyType::CODE_TREE
+                            ])) {
+                                $query = $classSearch::find()->select(['element_id as id'])->where([
+                                    "value_enum" => $value,
+                                    "property_id" => $property->id
+                                ]);
+                                //print_r($query->createCommand()->rawSql);die;
+                                //$elementIds = $query->indexBy('element_id')->all();
+                                $unionQueries[] = $query;
+                            } else {
+                                $query = $classSearch::find()->select(['element_id as id'])->where([
+                                    "value" => $value,
+                                    "property_id" => $property->id
+                                ]);
+                                //print_r($query->createCommand()->rawSql);die;
+                                //$elementIds = $query->indexBy('element_id')->all();
+                                $unionQueries[] = $query;
+                            }
+                        }
                     }
                 }
 
@@ -283,30 +275,24 @@ class SearchRelatedPropertiesModel extends DynamicModel
         }
 
 
-        if ($applyFilters)
-        {
-            if ($unionQueries)
-            {
+        if ($applyFilters) {
+            if ($unionQueries) {
                 /**
                  * @var $unionQuery ActiveQuery
                  */
                 $lastQuery = null;
                 $unionQuery = null;
                 $unionQueriesStings = [];
-                foreach ($unionQueries as $query)
-                {
-                    if ($lastQuery)
-                    {
+                foreach ($unionQueries as $query) {
+                    if ($lastQuery) {
                         $lastQuery->andWhere(['in', 'element_id', $query]);
                         $lastQuery = $query;
                         continue;
                     }
-                    
-                    if ($unionQuery === null)
-                    {
+
+                    if ($unionQuery === null) {
                         $unionQuery = $query;
-                    } else
-                    {
+                    } else {
                         $unionQuery->andWhere(['in', 'element_id', $query]);
                         $lastQuery = $query;
                     }

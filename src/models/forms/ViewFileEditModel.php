@@ -32,17 +32,14 @@ class ViewFileEditModel extends Model
     {
         parent::init();
 
-        if (is_readable($this->rootViewFile) && file_exists($this->rootViewFile))
-        {
-            $fp = fopen ($this->rootViewFile, 'a+');
-            if ($fp)
-            {
-                $content = fread ( $fp, filesize($this->rootViewFile) );
-                fclose ( $fp );
+        if (is_readable($this->rootViewFile) && file_exists($this->rootViewFile)) {
+            $fp = fopen($this->rootViewFile, 'a+');
+            if ($fp) {
+                $content = fread($fp, filesize($this->rootViewFile));
+                fclose($fp);
                 $this->source = $content;
 
-            } else
-            {
+            } else {
                 $this->error = "file is not exist or is not readable";
             }
         }
@@ -55,7 +52,7 @@ class ViewFileEditModel extends Model
     public function attributeLabels()
     {
         return [
-            'source'      => \Yii::t('skeeks/cms','Code'),
+            'source' => \Yii::t('skeeks/cms', 'Code'),
         ];
     }
 
@@ -75,8 +72,7 @@ class ViewFileEditModel extends Model
      */
     public function saveFile()
     {
-        if (is_writable($this->rootViewFile) && file_exists($this->rootViewFile))
-        {
+        if (is_writable($this->rootViewFile) && file_exists($this->rootViewFile)) {
             $file = fopen($this->rootViewFile, 'w');
             fwrite($file, $this->source);
             fclose($file);

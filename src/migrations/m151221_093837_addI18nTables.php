@@ -1,7 +1,9 @@
 <?php
+
 use yii\base\InvalidConfigException;
 use yii\db\Migration;
 use yii\db\Schema;
+
 class m151221_093837_addI18nTables extends Migration
 {
     /**
@@ -28,8 +30,10 @@ class m151221_093837_addI18nTables extends Migration
             'translation' => Schema::TYPE_TEXT
         ]);
         $this->addPrimaryKey('id', $messageTable, ['id', 'language']);
-        $this->addForeignKey('fk_source_message_message', $messageTable, 'id', $sourceMessageTable, 'id', 'cascade', 'restrict');
+        $this->addForeignKey('fk_source_message_message', $messageTable, 'id', $sourceMessageTable, 'id', 'cascade',
+            'restrict');
     }
+
     public function safeDown()
     {
         $i18n = new \skeeks\cms\i18n\components\I18NDb();

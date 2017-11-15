@@ -2,9 +2,10 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
+ * @copyright 2010 SkeekS (пїЅпїЅпїЅпїЅпїЅ)
  * @date 24.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 

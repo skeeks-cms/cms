@@ -16,8 +16,7 @@ $filter->addRule('fill', 'integer');
 
 $filter->load(\Yii::$app->request->get());
 
-if ($filter->fill)
-{
+if ($filter->fill) {
     $query->joinWith('cmsTreeProperties as tp');
     $query->andWhere(['!=', 'tp.value', '']);
     $query->andWhere(['tp.property_id' => $filter->fill]);
@@ -35,23 +34,23 @@ if ($filter->fill)
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
-    <?= $form->field($searchModel, 'name')->setVisible(true)->textInput([
-        'placeholder' => \Yii::t('skeeks/cms', 'Search by name')
-    ]) ?>
+<?= $form->field($searchModel, 'name')->setVisible(true)->textInput([
+    'placeholder' => \Yii::t('skeeks/cms', 'Search by name')
+]) ?>
 
-    <?= $form->field($searchModel, 'id') ?>
+<?= $form->field($searchModel, 'id') ?>
 
-    <?= $form->field($searchModel, 'code'); ?>
+<?= $form->field($searchModel, 'code'); ?>
 
-    <?= $form->field($searchModel, 'active')->listBox(\yii\helpers\ArrayHelper::merge([
-        '' => ' - '
-    ], \Yii::$app->cms->booleanFormat()), [
-        'size' => 1
-    ]); ?>
+<?= $form->field($searchModel, 'active')->listBox(\yii\helpers\ArrayHelper::merge([
+    '' => ' - '
+], \Yii::$app->cms->booleanFormat()), [
+    'size' => 1
+]); ?>
 
-    <?= $form->field($filter, 'fill')
-        ->label(\Yii::t('skeeks/cms', 'Связь с разделами'))
-        ->widget(
+<?= $form->field($filter, 'fill')
+    ->label(\Yii::t('skeeks/cms', 'Связь с разделами'))
+    ->widget(
         \skeeks\widget\chosen\Chosen::class,
         [
             'items' => \yii\helpers\ArrayHelper::map(

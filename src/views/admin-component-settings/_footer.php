@@ -9,5 +9,5 @@
  */
 /* @var $this yii\web\View */
 ?>
-    </div>
+</div>
 </div>

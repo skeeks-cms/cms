@@ -10,6 +10,7 @@
 namespace skeeks\cms\models;
 
 use Yii;
+
 /**
  * This is the model class for table "{{%cms_content_element_tree}}".
  *
@@ -58,7 +59,12 @@ class CmsContentElementTree extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'element_id', 'tree_id'], 'integer'],
             [['element_id', 'tree_id'], 'required'],
-            [['element_id', 'tree_id'], 'unique', 'targetAttribute' => ['element_id', 'tree_id'], 'message' => \Yii::t('skeeks/cms','The combination of Element ID and Tree ID has already been taken.')]
+            [
+                ['element_id', 'tree_id'],
+                'unique',
+                'targetAttribute' => ['element_id', 'tree_id'],
+                'message' => \Yii::t('skeeks/cms', 'The combination of Element ID and Tree ID has already been taken.')
+            ]
         ]);
     }
 

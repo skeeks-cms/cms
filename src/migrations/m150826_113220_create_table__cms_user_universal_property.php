@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 10.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150826_113220_create_table__cms_user_universal_property extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_user_universal_property}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,32 +24,32 @@ class m150826_113220_create_table__cms_user_universal_property extends Migration
         }
 
         $this->createTable("{{%cms_user_universal_property}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'name'                  => Schema::TYPE_STRING . '(255) NOT NULL',
-            'code'                  => Schema::TYPE_STRING . '(64) NULL',
+            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'code' => Schema::TYPE_STRING . '(64) NULL',
 
-            'active'                => "CHAR(1) NOT NULL DEFAULT 'Y'",
-            'priority'              => "INT NOT NULL DEFAULT '500'",
-            'property_type'         => "CHAR(1) NOT NULL DEFAULT 'S'",
-            'list_type'             => "CHAR(1) NOT NULL DEFAULT 'L'",
-            'multiple'              => "CHAR(1) NOT NULL DEFAULT 'N'",
-            'multiple_cnt'          => "INT NULL",
-            'with_description'      => "CHAR(1) NULL",
-            'searchable'            => "CHAR(1) NOT NULL DEFAULT 'N'",
-            'filtrable'             => "CHAR(1) NOT NULL DEFAULT 'N'",
-            'is_required'           => "CHAR(1) NULL",
-            'version'               => "INT NOT NULL DEFAULT '1'",
-            'component'             => "VARCHAR(255) NULL",
-            'component_settings'    => "TEXT NULL",
-            'hint'                  => "VARCHAR(255) NULL",
-            'smart_filtrable'       => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'active' => "CHAR(1) NOT NULL DEFAULT 'Y'",
+            'priority' => "INT NOT NULL DEFAULT '500'",
+            'property_type' => "CHAR(1) NOT NULL DEFAULT 'S'",
+            'list_type' => "CHAR(1) NOT NULL DEFAULT 'L'",
+            'multiple' => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'multiple_cnt' => "INT NULL",
+            'with_description' => "CHAR(1) NULL",
+            'searchable' => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'filtrable' => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'is_required' => "CHAR(1) NULL",
+            'version' => "INT NOT NULL DEFAULT '1'",
+            'component' => "VARCHAR(255) NULL",
+            'component_settings' => "TEXT NULL",
+            'hint' => "VARCHAR(255) NULL",
+            'smart_filtrable' => "CHAR(1) NOT NULL DEFAULT 'N'",
 
         ], $tableOptions);
 

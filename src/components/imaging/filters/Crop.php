@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\components\imaging\filters;
+
 use yii\base\Component;
 use skeeks\imagine\Image;
 
@@ -19,9 +20,9 @@ use skeeks\imagine\Image;
  */
 class Crop extends \skeeks\cms\components\imaging\Filter
 {
-    public $w       = 0;
-    public $h       = 0;
-    public $s       = [0, 0];
+    public $w = 0;
+    public $h = 0;
+    public $s = [0, 0];
 
     protected function _save()
     {

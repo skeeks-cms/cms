@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.06.2015
  */
+
 namespace skeeks\cms\helpers;
+
 use skeeks\cms\components\imaging\Filter;
 
 /**
@@ -34,10 +36,8 @@ class FileHelper extends \yii\helpers\FileHelper
      */
     static public function getFirstExistingFileArray($files = [])
     {
-        foreach ($files as $file)
-        {
-            if (file_exists(\Yii::getAlias($file)))
-            {
+        foreach ($files as $file) {
+            if (file_exists(\Yii::getAlias($file))) {
                 return $file;
             }
         }
@@ -54,36 +54,29 @@ class FileHelper extends \yii\helpers\FileHelper
      */
     static public function findExtensionsFiles($fileName = '/config/main.php', $onlyFileExists = true)
     {
-        $configs     = [];
+        $configs = [];
 
         $fileNames = [];
-        if (is_string($fileName))
-        {
+        if (is_string($fileName)) {
             $fileNames[] = $fileName;
-        } else if (is_array($fileName))
-        {
-            $fileNames = $fileName;
+        } else {
+            if (is_array($fileName)) {
+                $fileNames = $fileName;
+            }
         }
 
-        foreach ((array) \Yii::$app->extensions as $code => $data)
-        {
-            if (is_array($data['alias']))
-            {
-                $configTmp  = [];
+        foreach ((array)\Yii::$app->extensions as $code => $data) {
+            if (is_array($data['alias'])) {
+                $configTmp = [];
 
-                foreach ($data['alias'] as $code => $path)
-                {
-                    foreach ($fileNames as $fileName)
-                    {
+                foreach ($data['alias'] as $code => $path) {
+                    foreach ($fileNames as $fileName) {
                         $file = $path . $fileName;
-                        if ($onlyFileExists === true)
-                        {
-                            if (file_exists($file))
-                            {
+                        if ($onlyFileExists === true) {
+                            if (file_exists($file)) {
                                 $configs[] = $file;
                             }
-                        } else
-                        {
+                        } else {
                             $configs[] = $file;
                         }
                     }

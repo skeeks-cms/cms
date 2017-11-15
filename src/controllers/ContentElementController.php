@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 14.04.2016
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
@@ -34,14 +35,16 @@ class ContentElementController extends Controller
 
     public function init()
     {
-        if ($this->model && \Yii::$app->cmsToolbar)
-        {
+        if ($this->model && \Yii::$app->cmsToolbar) {
             $controller = \Yii::$app->createController('cms/admin-cms-content-element')[0];
-            $adminControllerRoute = ['/cms/admin-cms-content-element/update', $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}];
+            $adminControllerRoute = [
+                '/cms/admin-cms-content-element/update',
+                $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}
+            ];
 
             $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
-                                    ->enableEmptyLayout()
-                                    ->url;
+                ->enableEmptyLayout()
+                ->url;
 
             \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
         }
@@ -53,32 +56,28 @@ class ContentElementController extends Controller
     {
         return ArrayHelper::merge(parent::behaviors(), [
             'viewAccess' =>
-            [
-                'class'         => CmsAccessControl::className(),
-                'only'          => ['view'],
-                'rules'         =>
                 [
-                    [
-                        'allow'         => true,
-                        'matchCallback' => function($rule, $action)
-                        {
-                            if ($this->model->cmsContent && $this->model->cmsContent->access_check_element == 'Y')
-                            {
-                                //Если такая привилегия заведена, нужно ее проверять.
-                                if ($permission = \Yii::$app->authManager->getPermission($this->model->permissionName))
-                                {
-                                    if (!\Yii::$app->user->can($permission->name))
-                                    {
-                                        return false;
+                    'class' => CmsAccessControl::className(),
+                    'only' => ['view'],
+                    'rules' =>
+                        [
+                            [
+                                'allow' => true,
+                                'matchCallback' => function ($rule, $action) {
+                                    if ($this->model->cmsContent && $this->model->cmsContent->access_check_element == 'Y') {
+                                        //Если такая привилегия заведена, нужно ее проверять.
+                                        if ($permission = \Yii::$app->authManager->getPermission($this->model->permissionName)) {
+                                            if (!\Yii::$app->user->can($permission->name)) {
+                                                return false;
+                                            }
+                                        }
                                     }
-                                }
-                            }
 
-                            return true;
-                        }
-                    ],
-                ],
-            ]
+                                    return true;
+                                }
+                            ],
+                        ],
+                ]
         ]);
     }
 
@@ -87,13 +86,11 @@ class ContentElementController extends Controller
      */
     public function getModel()
     {
-        if ($this->_model !== false)
-        {
+        if ($this->_model !== false) {
             return $this->_model;
         }
 
-        if (!$id = \Yii::$app->request->get('id'))
-        {
+        if (!$id = \Yii::$app->request->get('id')) {
             $this->_model = null;
             return false;
         }
@@ -113,28 +110,23 @@ class ContentElementController extends Controller
             throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Page not found'));
         }
 
-        $contentElement     = $this->model;
-        $tree               = $contentElement->cmsTree;
+        $contentElement = $this->model;
+        $tree = $contentElement->cmsTree;
 
 
-        if (Url::isRelative($contentElement->url))
-        {
-            if ($contentElement->url != \Yii::$app->request->url)
-            {
+        if (Url::isRelative($contentElement->url)) {
+            if ($contentElement->url != \Yii::$app->request->url) {
                 $url = $contentElement->url;
                 \Yii::$app->response->redirect($url, 301);
             }
-        } else
-        {
+        } else {
 
-            if ($urlData = parse_url($contentElement->url))
-            {
+            if ($urlData = parse_url($contentElement->url)) {
                 $contentUrl = \Yii::$app->request->url;
                 /*if (\Yii::$app->homeUrl != '/') {
                     $contentUrl = "/" . StringHelper::substr(\Yii::$app->request->url, StringHelper::strlen(\Yii::$app->homeUrl), StringHelper::strlen(\Yii::$app->request->url));
                 }*/
-                if (ArrayHelper::getValue($urlData, 'path') != $contentUrl)
-                {
+                if (ArrayHelper::getValue($urlData, 'path') != $contentUrl) {
                     $url = $contentElement->url;
                     \Yii::$app->response->redirect($url, 301);
                 }
@@ -142,27 +134,23 @@ class ContentElementController extends Controller
         }
 
 
-        if ($tree)
-        {
+        if ($tree) {
             \Yii::$app->cms->setCurrentTree($tree);
             \Yii::$app->breadcrumbs->setPartsByTree($tree);
 
             \Yii::$app->breadcrumbs->append([
-                'url'   => $contentElement->url,
-                'name'  => $contentElement->name
+                'url' => $contentElement->url,
+                'name' => $contentElement->name
             ]);
         }
 
         $viewFile = $this->action->id;
 
         $cmsContent = $this->model->cmsContent;
-        if ($cmsContent)
-        {
-            if ($cmsContent->viewFile)
-            {
+        if ($cmsContent) {
+            if ($cmsContent->viewFile) {
                 $viewFile = $cmsContent->viewFile;
-            } else
-            {
+            } else {
                 $viewFile = $cmsContent->code;
             }
         }
@@ -185,39 +173,31 @@ class ContentElementController extends Controller
     {
         $model = $this->model;
 
-        if ($title = $model->meta_title)
-        {
+        if ($title = $model->meta_title) {
             $this->view->title = $title;
-        } else
-        {
-            if (isset($model->name))
-            {
+        } else {
+            if (isset($model->name)) {
                 $this->view->title = $model->name;
             }
         }
 
-        if ($meta_keywords = $model->meta_keywords)
-        {
+        if ($meta_keywords = $model->meta_keywords) {
             $this->view->registerMetaTag([
-                "name"      => 'keywords',
-                "content"   => $meta_keywords
+                "name" => 'keywords',
+                "content" => $meta_keywords
             ], 'keywords');
         }
 
-        if ($meta_descripption = $model->meta_description)
-        {
+        if ($meta_descripption = $model->meta_description) {
             $this->view->registerMetaTag([
-                "name"      => 'description',
-                "content"   => $meta_descripption
+                "name" => 'description',
+                "content" => $meta_descripption
             ], 'description');
-        }
-        else
-        {
-            if (isset($model->name))
-            {
+        } else {
+            if (isset($model->name)) {
                 $this->view->registerMetaTag([
-                    "name"      => 'description',
-                    "content"   => $model->name
+                    "name" => 'description',
+                    "content" => $model->name
                 ], 'description');
             }
         }

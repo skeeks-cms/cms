@@ -8,6 +8,7 @@
  * @date 07.02.2015
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 use mihaildev\elfinder\Controller;

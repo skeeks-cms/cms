@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.06.2015
  */
+
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\components\Cms;
@@ -37,8 +38,7 @@ class UpdateController extends Controller
      */
     public function actionUserNameToFirstName()
     {
-        if (!CmsUser::find()->count())
-        {
+        if (!CmsUser::find()->count()) {
             $this->stdout("Content not found!\n", Console::BOLD);
             return;
         }
@@ -48,12 +48,10 @@ class UpdateController extends Controller
         /**
          * @var CmsUser $cmsUser
          */
-        foreach (CmsUser::find()->orderBy(['id' => SORT_ASC])->each(10) as $cmsUser)
-        {
+        foreach (CmsUser::find()->orderBy(['id' => SORT_ASC])->each(10) as $cmsUser) {
             $this->stdout("\t User: {$cmsUser->id}\n", Console::FG_YELLOW);
 
-            if (!$cmsUser->_to_del_name)
-            {
+            if (!$cmsUser->_to_del_name) {
                 $this->stdout("\t NOT found property: _to_del_name\n", Console::FG_YELLOW);
                 continue;
             }
@@ -74,11 +72,9 @@ class UpdateController extends Controller
             }
 
 
-            if ( $cmsUser->save() )
-            {
+            if ($cmsUser->save()) {
                 $this->stdout("\t Updated name: {$cmsUser->name}\n", Console::FG_GREEN);
-            } else
-            {
+            } else {
                 $this->stdout("\t NOT updated name: {$cmsUser->id}\n", Console::FG_RED);
             }
         }

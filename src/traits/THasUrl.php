@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS
  * @date 05.03.2017
  */
+
 namespace skeeks\cms\traits;
+
 use yii\helpers\Url;
 
 /**
@@ -27,12 +29,11 @@ trait THasUrl
      */
     public function getUrl()
     {
-        if (is_array($this->_url))
-        {
+        if (is_array($this->_url)) {
             return Url::to($this->_url);
         }
 
-        return (string) $this->_url;
+        return (string)$this->_url;
     }
 
     /**

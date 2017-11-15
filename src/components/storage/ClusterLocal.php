@@ -24,20 +24,18 @@ class ClusterLocal extends Cluster
 {
     public function init()
     {
-        if (!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms',"Local storage");
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', "Local storage");
         }
-        if (!$this->publicBaseUrl)
-        {
+        if (!$this->publicBaseUrl) {
             $this->publicBaseUrl = \Yii::getAlias("@web/uploads/all");
         }
-        if (!$this->rootBasePath)
-        {
+        if (!$this->rootBasePath) {
             $this->rootBasePath = \Yii::getAlias("@frontend/web/uploads/all");
         }
         parent::init();
     }
+
     /**
      * @var bool
      */
@@ -52,26 +50,23 @@ class ClusterLocal extends Cluster
      */
     public function upload(File $tmpFile)
     {
-        $clusterFileName     =  $this->_generateClusterFileName($tmpFile);
+        $clusterFileName = $this->_generateClusterFileName($tmpFile);
 
-        $dir                =  $this->rootBasePath;
-        $localPath          =  $this->getClusterDir($clusterFileName);
+        $dir = $this->rootBasePath;
+        $localPath = $this->getClusterDir($clusterFileName);
 
-        $clusterFileSrc     = $clusterFileName;
+        $clusterFileSrc = $clusterFileName;
 
-        if ($localPath)
-        {
+        if ($localPath) {
             $clusterFileSrc = $localPath . DIRECTORY_SEPARATOR . $clusterFileSrc;
         }
 
-        try
-        {
+        try {
             $dir = new Dir($dir . DIRECTORY_SEPARATOR . $localPath);
             $resultFile = $dir->newFile($clusterFileName);
             $tmpFile->move($resultFile);
 
-        } catch (Exception $e)
-        {
+        } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
 
@@ -88,8 +83,7 @@ class ClusterLocal extends Cluster
     public function delete($clusterFileUniqSrc)
     {
         $file = new File($this->getRootSrc($clusterFileUniqSrc));
-        if ($file->isExist())
-        {
+        if ($file->isExist()) {
             $file->remove();
         }
 
@@ -106,8 +100,7 @@ class ClusterLocal extends Cluster
     public function deleteTmpDir($clusterFileUniqSrc)
     {
         $dir = new Dir($this->rootTmpDir($clusterFileUniqSrc), false);
-        if ($dir->isExist())
-        {
+        if ($dir->isExist()) {
             $dir->remove();
         }
 
@@ -115,7 +108,8 @@ class ClusterLocal extends Cluster
     }
 
     public function update($clusterFileUniqSrc, $file)
-    {}
+    {
+    }
 
     /**
      * @param $clusterFileUniqSrc
@@ -123,11 +117,9 @@ class ClusterLocal extends Cluster
      */
     public function getAbsoluteUrl($clusterFileUniqSrc)
     {
-        if ($this->publicBaseUrlIsAbsolute)
-        {
+        if ($this->publicBaseUrlIsAbsolute) {
             return $this->getPublicSrc($clusterFileUniqSrc);
-        } else
-        {
+        } else {
             return \Yii::$app->urlManager->hostInfo . $this->getPublicSrc($clusterFileUniqSrc);
         }
     }
@@ -137,32 +129,30 @@ class ClusterLocal extends Cluster
      */
     public function existsRootPath()
     {
-        if (is_dir($this->rootBasePath))
-        {
+        if (is_dir($this->rootBasePath)) {
             return true;
         }
 
         //Создать папку для файлов если ее нет
         $dir = new Dir($this->rootBasePath);
-        if ($dir->make())
-        {
+        if ($dir->make()) {
             return true;
         }
 
         return false;
     }
+
     /**
      * Свободное место на сервере
      * @return float
      */
     public function getFreeSpace()
     {
-        if ($this->existsRootPath())
-        {
-            return (float) disk_free_space($this->rootBasePath);
+        if ($this->existsRootPath()) {
+            return (float)disk_free_space($this->rootBasePath);
         }
 
-        return (float) 0;
+        return (float)0;
     }
 
     /**
@@ -171,11 +161,10 @@ class ClusterLocal extends Cluster
      */
     public function getTotalSpace()
     {
-        if ($this->existsRootPath())
-        {
-            return (float) disk_total_space($this->rootBasePath);
+        if ($this->existsRootPath()) {
+            return (float)disk_total_space($this->rootBasePath);
         }
 
-        return (float) 0;
+        return (float)0;
     }
 }

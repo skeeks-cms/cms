@@ -60,29 +60,29 @@ CSS
 );
 ?>
 <div class="col-md-12">
-<? $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([
-    "models"        => $models,
-    "viewNodeContentFile"  => '@skeeks/cms/views/admin-tree/_tree-node',
+    <? $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([
+        "models" => $models,
+        "viewNodeContentFile" => '@skeeks/cms/views/admin-tree/_tree-node',
 
-    'pjaxClass'     => \skeeks\cms\modules\admin\widgets\Pjax::class,
-    'pjaxOptions'   =>
-    [
-        'blockPjaxContainer' => false,
-        'blockContainer' => '.sx-panel',
-    ]
-]); ?>
+        'pjaxClass' => \skeeks\cms\modules\admin\widgets\Pjax::class,
+        'pjaxOptions' =>
+            [
+                'blockPjaxContainer' => false,
+                'blockContainer' => '.sx-panel',
+            ]
+    ]); ?>
     <?
-        \yii\jui\Sortable::widget();
+    \yii\jui\Sortable::widget();
 
-        $options    = \yii\helpers\Json::encode([
-            'id'                => $widget->id,
-            'pjaxid'            => $widget->pjax->id,
-            'backendNewChild'   => \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-tree/new-children'])->enableAdmin()->toString(),
-            'backendResort'     => \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-tree/resort'])->enableAdmin()->toString()
-        ]);
+    $options = \yii\helpers\Json::encode([
+        'id' => $widget->id,
+        'pjaxid' => $widget->pjax->id,
+        'backendNewChild' => \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-tree/new-children'])->enableAdmin()->toString(),
+        'backendResort' => \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-tree/resort'])->enableAdmin()->toString()
+    ]);
 
 
-        $this->registerJs(<<<JS
+    $this->registerJs(<<<JS
         (function(window, sx, $, _)
         {
             sx.createNamespace('classes.tree.admin', sx);
@@ -219,8 +219,8 @@ CSS
 
         })(window, sx, sx.$, sx._);
 JS
-);
+    );
     ?>
-<? $widget::end(); ?>
+    <? $widget::end(); ?>
 
 </div>

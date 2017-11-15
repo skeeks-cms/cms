@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.05.2015
  */
+
 namespace skeeks\cms\models;
+
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\base\Component;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
@@ -47,10 +49,10 @@ class CmsComponentSettings extends Core
     {
         return array_merge(parent::behaviors(), [
             HasJsonFieldsBehavior::className() =>
-            [
-                'class'     => HasJsonFieldsBehavior::className(),
-                'fields'    => ['value']
-            ]
+                [
+                    'class' => HasJsonFieldsBehavior::className(),
+                    'fields' => ['value']
+                ]
         ]);
     }
 
@@ -74,17 +76,15 @@ class CmsComponentSettings extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'            => Yii::t('skeeks/cms', 'ID'),
-            'value'         => Yii::t('skeeks/cms', 'Value'),
-            'component'     => Yii::t('skeeks/cms', 'Component'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
+            'value' => Yii::t('skeeks/cms', 'Value'),
+            'component' => Yii::t('skeeks/cms', 'Component'),
 
             'cms_site_id' => Yii::t('skeeks/cms', 'Site Code'),
             'user_id' => Yii::t('skeeks/cms', 'User ID'),
             'namespace' => Yii::t('skeeks/cms', 'Namespace'),
         ]);
     }
-
-
 
 
     /**
@@ -104,10 +104,6 @@ class CmsComponentSettings extends Core
     }
 
 
-
-
-
-
     /**
      * @param $component
      * @return ActiveQuery
@@ -118,8 +114,7 @@ class CmsComponentSettings extends Core
             'component' => $component->className(),
         ]);
 
-        if ($component->namespace)
-        {
+        if ($component->namespace) {
             $query->andWhere(['namespace' => $component->namespace]);
         }
 
@@ -128,9 +123,9 @@ class CmsComponentSettings extends Core
 
 
 
-        /**
-         * Overrides
-         */
+    /**
+     * Overrides
+     */
     /**
      * @param Component $component
      * @return ActiveQuery
@@ -143,13 +138,11 @@ class CmsComponentSettings extends Core
                 ['cms_site_id' => ""],
                 ['cms_site_id' => null],
             ])
-
             ->andWhere([
                 'or',
                 ['user_id' => ""],
                 ['user_id' => null],
-            ])
-        ;
+            ]);
     }
 
 
@@ -160,7 +153,7 @@ class CmsComponentSettings extends Core
      */
     static public function findByComponentUser(Component $component, $user)
     {
-        return static::findByComponent($component)->andWhere(['user_id' => (int) $user->id]);
+        return static::findByComponent($component)->andWhere(['user_id' => (int)$user->id]);
     }
 
     /**
@@ -170,6 +163,6 @@ class CmsComponentSettings extends Core
      */
     static public function findByComponentSite(Component $component, CmsSite $cmsSite)
     {
-        return static::findByComponent($component)->andWhere(['cms_site_id' => (int) $cmsSite->id]);
+        return static::findByComponent($component)->andWhere(['cms_site_id' => (int)$cmsSite->id]);
     }
 }

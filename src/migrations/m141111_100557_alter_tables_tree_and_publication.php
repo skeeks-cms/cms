@@ -30,7 +30,7 @@ class m141111_100557_alter_tables_tree_and_publication extends Migration
 INSERT INTO `cms_tree` (`id`, `created_by`, `updated_by`, `created_at`, `updated_at`, `name`, `description_short`, `description_full`, `files`, `page_options`, `seo_page_name`, `count_comment`, `count_subscribe`, `users_subscribers`, `count_vote`, `result_vote`, `users_votes_up`, `users_votes_down`, `status`, `status_adult`, `pid`, `pid_main`, `pids`, `level`, `dir`, `has_children`, `main_root`, `priority`, `type`) VALUES
 (1, 1, 1, 1416084922, 1416839464, 'Главная страница', '', '', '', '{"_":{"meta_title":{"value":"Главная страница по умолчанию"},"meta_keywords":{"value":"Главная страница по умолчанию"},"meta_description":{"value":"Главная страница по умолчанию"}}}', NULL, NULL, NULL, NULL, NULL, NULL, '', '', 10, 0, NULL, NULL, '', 0, NULL, 1, 1, 0, 'homePage');
 SQL
-);
+        );
 
     }
 

@@ -8,6 +8,7 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
@@ -44,9 +45,9 @@ class AdminUserController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Управление пользователями";
-        $this->modelShowAttribute       = "username";
-        $this->modelClassName           = User::className();
+        $this->name = "Управление пользователями";
+        $this->modelShowAttribute = "username";
+        $this->modelClassName = User::className();
 
         parent::init();
     }
@@ -56,19 +57,19 @@ class AdminUserController extends AdminModelEditorController
         $actions = ArrayHelper::merge(parent::actions(), [
 
             "index" =>
-            [
-                'modelSearchClassName' => CmsUserSearch::className()
-            ],
+                [
+                    'modelSearchClassName' => CmsUserSearch::className()
+                ],
 
             'create' =>
-            [
-                "callback"      => [$this, 'create'],
-            ],
+                [
+                    "callback" => [$this, 'create'],
+                ],
 
             'update' =>
-            [
-                "callback"      => [$this, 'update'],
-            ],
+                [
+                    "callback" => [$this, 'update'],
+                ],
 
             /*'change-password' =>
             [
@@ -88,20 +89,20 @@ class AdminUserController extends AdminModelEditorController
 
 
             "activate-multi" =>
-            [
-                'class' => AdminMultiModelEditAction::className(),
-                "name" => "Активировать",
-                //"icon"              => "glyphicon glyphicon-trash",
-                "eachCallback" => [$this, 'eachMultiActivate'],
-            ],
+                [
+                    'class' => AdminMultiModelEditAction::className(),
+                    "name" => "Активировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiActivate'],
+                ],
 
             "inActivate-multi" =>
-            [
-                'class' => AdminMultiModelEditAction::className(),
-                "name" => "Деактивировать",
-                //"icon"              => "glyphicon glyphicon-trash",
-                "eachCallback" => [$this, 'eachMultiInActivate'],
-            ]
+                [
+                    'class' => AdminMultiModelEditAction::className(),
+                    "name" => "Деактивировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiInActivate'],
+                ]
         ]);
 
 
@@ -112,7 +113,7 @@ class AdminUserController extends AdminModelEditorController
     public function create($adminAction)
     {
         $modelClassName = $this->modelClassName;
-        $model          = new $modelClassName();
+        $model = new $modelClassName();
         $model->loadDefaultValues();
 
         $relatedModel = $model->relatedPropertiesModel;
@@ -124,44 +125,39 @@ class AdminUserController extends AdminModelEditorController
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $passwordChange->load(\Yii::$app->request->post());
 
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel, $passwordChange
+                $model,
+                $relatedModel,
+                $passwordChange
             ]);
         }
 
 
-        if ($rr->isRequestPjaxPost())
-        {
+        if ($rr->isRequestPjaxPost()) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
 
-            if ($model->save() && $relatedModel->save())
-            {
-                if ($passwordChange->new_password)
-                {
-                    if (!$passwordChange->changePassword())
-                    {
+            if ($model->save() && $relatedModel->save()) {
+                if ($passwordChange->new_password) {
+                    if (!$passwordChange->changePassword()) {
                         \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
                     }
                 }
 
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {
+                if (\Yii::$app->request->post('submit-btn') == 'apply') {
                     return $this->redirect(
                         UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
                             ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
                             ->toString()
                     );
-                } else
-                {
+                } else {
                     return $this->redirect(
                         $this->url
                     );
@@ -170,9 +166,9 @@ class AdminUserController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model'           => $model,
-            'relatedModel'    => $relatedModel,
-            'passwordChange'  => $passwordChange,
+            'model' => $model,
+            'relatedModel' => $relatedModel,
+            'passwordChange' => $passwordChange,
         ]);
     }
 
@@ -182,48 +178,43 @@ class AdminUserController extends AdminModelEditorController
         /**
          * @var $model CmsUser
          */
-        $model          = $this->model;
-        $relatedModel   = $model->relatedPropertiesModel;
+        $model = $this->model;
+        $relatedModel = $model->relatedPropertiesModel;
         $passwordChange = new PasswordChangeForm([
             'user' => $model
         ]);
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $passwordChange->load(\Yii::$app->request->post());
 
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel, $passwordChange
+                $model,
+                $relatedModel,
+                $passwordChange
             ]);
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
+        if ($rr->isRequestPjaxPost()) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $passwordChange->load(\Yii::$app->request->post());
 
-            if ($model->save() && $relatedModel->save())
-            {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+            if ($model->save() && $relatedModel->save()) {
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
-                if ($passwordChange->new_password)
-                {
-                    if (!$passwordChange->changePassword())
-                    {
+                if ($passwordChange->new_password) {
+                    if (!$passwordChange->changePassword()) {
                         \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
                     }
                 }
 
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {
+                if (\Yii::$app->request->post('submit-btn') == 'apply') {
 
-                } else
-                {
+                } else {
                     return $this->redirect(
                         $this->url
                     );
@@ -235,9 +226,9 @@ class AdminUserController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model'           => $model,
-            'relatedModel'    => $relatedModel,
-            'passwordChange'  => $passwordChange,
+            'model' => $model,
+            'relatedModel' => $relatedModel,
+            'passwordChange' => $passwordChange,
         ]);
     }
 
@@ -257,19 +248,15 @@ class AdminUserController extends AdminModelEditorController
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             return $rr->ajaxValidateForm($modelForm);
         }
 
 
-        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
-        {
+        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword()) {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-        } else
-        {
-            if (\Yii::$app->request->isPost)
-            {
+        } else {
+            if (\Yii::$app->request->isPost) {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
             }
         }
@@ -304,20 +291,19 @@ class AdminUserController extends AdminModelEditorController
         }
 
         return $this->render('permission', [
-                'model' => $model,
-                'avaliable' => $avaliable,
-                'assigned' => $assigned,
-                'idField' => 'id',
-                'usernameField' => 'username',
+            'model' => $model,
+            'avaliable' => $avaliable,
+            'assigned' => $assigned,
+            'idField' => 'id',
+            'usernameField' => 'username',
         ]);
     }
-
 
 
     /**
      * Assign or revoke assignment to user
      * @param  integer $id
-     * @param  string  $action
+     * @param  string $action
      * @return mixed
      */
     public function actionAssign($id, $action)
@@ -330,7 +316,7 @@ class AdminUserController extends AdminModelEditorController
             foreach ($roles as $name) {
                 try {
                     $item = $manager->getRole($name);
-                    $item = $item ? : $manager->getPermission($name);
+                    $item = $item ?: $manager->getPermission($name);
                     $manager->assign($item, $id);
                 } catch (\Exception $exc) {
                     $error[] = $exc->getMessage();
@@ -340,7 +326,7 @@ class AdminUserController extends AdminModelEditorController
             foreach ($roles as $name) {
                 try {
                     $item = $manager->getRole($name);
-                    $item = $item ? : $manager->getPermission($name);
+                    $item = $item ?: $manager->getPermission($name);
                     $manager->revoke($item, $id);
                 } catch (\Exception $exc) {
                     $error[] = $exc->getMessage();
@@ -349,16 +335,18 @@ class AdminUserController extends AdminModelEditorController
         }
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return [$this->actionRoleSearch($id, 'avaliable', $post['search_av']),
+        return [
+            $this->actionRoleSearch($id, 'avaliable', $post['search_av']),
             $this->actionRoleSearch($id, 'assigned', $post['search_asgn']),
-            $error];
+            $error
+        ];
     }
 
     /**
      * Search roles of user
      * @param  integer $id
-     * @param  string  $target
-     * @param  string  $term
+     * @param  string $target
+     * @param  string $term
      * @return string
      */
     public function actionRoleSearch($id, $target, $term = '')

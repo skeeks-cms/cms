@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 09.03.2015
  */
+
 namespace skeeks\cms\query;
 
 use skeeks\cms\components\Cms;

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 06.10.2015
  */
+
 namespace skeeks\cms\filters;
 
 use skeeks\cms\helpers\RequestResponse;
@@ -29,22 +30,18 @@ class CmsAccessControl extends \yii\filters\AccessControl
     {
         $rr = new RequestResponse();
 
-        if ($user->getIsGuest())
-        {
+        if ($user->getIsGuest()) {
             $authUrl = UrlHelper::construct(["/cms/auth/login"])->setCurrentRef()->createUrl();
 
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-            {
+            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
                 \Yii::$app->getResponse()->redirect($authUrl);
                 $rr->redirect = $authUrl;
-                return (array) $rr;
-            } else
-            {
+                return (array)$rr;
+            } else {
                 \Yii::$app->getResponse()->redirect($authUrl);
             }
 
-        } else
-        {
+        } else {
             throw new ForbiddenHttpException(\Yii::t('yii', 'You are not allowed to perform this action.'));
         }
     }

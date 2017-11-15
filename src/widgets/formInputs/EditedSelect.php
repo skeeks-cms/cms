@@ -7,6 +7,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 16.03.2015
  */
+
 namespace skeeks\cms\widgets\formInputs;
 
 use skeeks\cms\Exception;
@@ -38,7 +39,7 @@ class EditedSelect extends Chosen
 
     public function init()
     {
-        $this->_pjaxId = 'pjax-'  . $this->id;
+        $this->_pjaxId = 'pjax-' . $this->id;
 
         Pjax::begin([
             'id' => $this->_pjaxId
@@ -46,19 +47,18 @@ class EditedSelect extends Chosen
 
         parent::init();
     }
+
     /**
      * @inheritdoc
      */
     public function run()
     {
 
-    echo "<div class='row'>";
+        echo "<div class='row'>";
         echo "<div class='col-md-6'>";
-        if ($this->hasModel())
-        {
+        if ($this->hasModel()) {
             echo Html::activeListBox($this->model, $this->attribute, $this->items, $this->options);
-        } else
-        {
+        } else {
             echo Html::listBox($this->name, $this->value, $this->items, $this->options);
         }
         echo "</div>";
@@ -66,39 +66,36 @@ class EditedSelect extends Chosen
         echo "<div class='col-md-6'>";
 
 
-        $createUrl = (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([$this->controllerRoute . '/' . $this->createAction])
-                                    ->merge($this->additionalData)
-                                    ->enableEmptyLayout()
-                                    ->enableNoActions()
-                                    ->url;
+        $createUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([$this->controllerRoute . '/' . $this->createAction])
+            ->merge($this->additionalData)
+            ->enableEmptyLayout()
+            ->enableNoActions()
+            ->url;
 
-        $updateUrl =  (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([$this->controllerRoute . '/' . $this->updateAction])
-                                    ->merge($this->additionalData)
-                                    ->enableEmptyLayout()
-                                    ->url;
+        $updateUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([$this->controllerRoute . '/' . $this->updateAction])
+            ->merge($this->additionalData)
+            ->enableEmptyLayout()
+            ->url;
 
 
-            $create_w = \Yii::t('skeeks/cms','Create');
-            $edit_w = \Yii::t('skeeks/cms','Edit');
-            echo <<<HTML
+        $create_w = \Yii::t('skeeks/cms', 'Create');
+        $edit_w = \Yii::t('skeeks/cms', 'Edit');
+        echo <<<HTML
             <a href="{$createUrl}" class="btn btn-default sx-btn-create sx-btn-controll" ><span class="glyphicon glyphicon-plus"></span> {$create_w}</a>
             <a href="{$updateUrl}" class="btn btn-default sx-btn-update sx-btn-controll" ><span class="glyphicon glyphicon-pencil"></span> {$edit_w}</a>
 HTML;
 
 
-
         echo "</div>";
 
 
-
-
-    echo "</div>";
+        echo "</div>";
 
 
         Pjax::end();
 
         $options = [
-            'multiple'              => (int) $this->multiple,
+            'multiple' => (int)$this->multiple,
         ];
 
         $optionsString = Json::encode($options);
@@ -218,7 +215,7 @@ HTML;
             new sx.classes.FormElementEditedSelect('#{$this->_pjaxId}', {$optionsString});
         })(sx, sx.$, sx._);
 JS
-);
+        );
 
 
     }

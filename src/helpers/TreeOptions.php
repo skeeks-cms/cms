@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 14.10.2015
  */
+
 namespace skeeks\cms\helpers;
+
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
 use yii\caching\TagDependency;
@@ -34,16 +36,14 @@ class TreeOptions extends \skeeks\cms\models\Tree
     static public function getAllMultiOptions($parentTree = null)
     {
         $key = [
-            ROOT_DIR, static::className()
+            ROOT_DIR,
+            static::className()
         ];
 
-        if ($parentTree)
-        {
-            if ($parentTree instanceof CmsTree)
-            {
+        if ($parentTree) {
+            if ($parentTree instanceof CmsTree) {
                 $parentTreeId = $parentTree->id;
-            } else
-            {
+            } else {
                 $parentTreeId = $parentTree;
             }
 
@@ -53,29 +53,26 @@ class TreeOptions extends \skeeks\cms\models\Tree
         $cacheKey = md5(implode($key));
 
         $dependency = new TagDependency([
-            'tags'      =>
-            [
-                (new CmsTree())->getTableCacheTag(),
-            ],
+            'tags' =>
+                [
+                    (new CmsTree())->getTableCacheTag(),
+                ],
         ]);
 
         $options = \Yii::$app->cache->get($cacheKey);
 
-        if (!$options)
-        {
-            if ($parentTree)
-            {
+        if (!$options) {
+            if ($parentTree) {
                 $options = \yii\helpers\ArrayHelper::map(
-                     self::findOne($parentTreeId)->getMultiOptions(),
-                     "id",
-                     "name"
+                    self::findOne($parentTreeId)->getMultiOptions(),
+                    "id",
+                    "name"
                 );
-            } else
-            {
+            } else {
                 $options = \yii\helpers\ArrayHelper::map(
-                     (new static())->getMultiOptions(),
-                     "id",
-                     "name"
+                    (new static())->getMultiOptions(),
+                    "id",
+                    "name"
                 );
             }
 
@@ -94,8 +91,7 @@ class TreeOptions extends \skeeks\cms\models\Tree
     public function getMultiOptions($includeSelf = true)
     {
         $this->_tmpResult = [];
-        if (!$this->isNewRecord && $includeSelf)
-        {
+        if (!$this->isNewRecord && $includeSelf) {
             $this->_tmpResult[$this->id] = $this;
         }
         return $this->_buildTreeArrayRecursive($this, $this->_filter);
@@ -103,6 +99,7 @@ class TreeOptions extends \skeeks\cms\models\Tree
 
 
     protected $_tmpResult = [];
+
     /**
      * Строит рекурсивно массив дерева
      * @param \skeeks\cms\models\Tree $model
@@ -113,24 +110,19 @@ class TreeOptions extends \skeeks\cms\models\Tree
     {
         $is_filter_set = !empty($filter);
 
-        if ($model->isNewRecord)
-        {
+        if ($model->isNewRecord) {
             $childs = static::findRoots()->all();
-        } else
-        {
+        } else {
             $childs = $model->children;
         }
 
 
-        foreach ($childs as $child)
-        {
-            $level  = $child->level;
-            $id     = $child->id;
-            if (!$is_filter_set || in_array($id, $filter))
-            {
+        foreach ($childs as $child) {
+            $level = $child->level;
+            $id = $child->id;
+            if (!$is_filter_set || in_array($id, $filter)) {
                 $name = $child->name;
-                if ($level == 0)
-                {
+                if ($level == 0) {
                     $name = "[" . $child->site->name . "] " . $child->name;
                 }
 
@@ -162,8 +154,7 @@ class TreeOptions extends \skeeks\cms\models\Tree
     {
         $result = [];
 
-        foreach ($nodes as $node)
-        {
+        foreach ($nodes as $node) {
             $result[] = $node->id;
         }
 

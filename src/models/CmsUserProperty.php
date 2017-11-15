@@ -30,7 +30,7 @@ use Yii;
  * @property string $description
  *
  * @property CmsContentProperty $property
- * @property CmsContentElement  $element
+ * @property CmsContentElement $element
  */
 class CmsUserProperty extends RelatedElementPropertyModel
 {

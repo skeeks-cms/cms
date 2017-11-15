@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\components\Cms;
@@ -24,9 +25,9 @@ class AdminCmsSiteController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                   = \Yii::t('skeeks/cms', "Site management");
-        $this->modelShowAttribute      = "name";
-        $this->modelClassName          = CmsSite::class;
+        $this->name = \Yii::t('skeeks/cms', "Site management");
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = CmsSite::class;
 
         parent::init();
     }
@@ -39,29 +40,29 @@ class AdminCmsSiteController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 "def-multi" =>
-                [
-                    'class'             => AdminMultiModelEditAction::className(),
-                    "name"              => "По умолчанию",
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback"      => [$this, 'eachMultiDef'],
-                    "priority"          => 0,
-                ],
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => "По умолчанию",
+                        //"icon"              => "glyphicon glyphicon-trash",
+                        "eachCallback" => [$this, 'eachMultiDef'],
+                        "priority" => 0,
+                    ],
 
                 "activate-multi" =>
-                [
-                    'class'             => AdminMultiModelEditAction::className(),
-                    "name"              => "Активировать",
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback"      => [$this, 'eachMultiActivate'],
-                ],
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => "Активировать",
+                        //"icon"              => "glyphicon glyphicon-trash",
+                        "eachCallback" => [$this, 'eachMultiActivate'],
+                    ],
 
                 "inActivate-multi" =>
-                [
-                    'class'             => AdminMultiModelEditAction::className(),
-                    "name"              => "Деактивировать",
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback"      => [$this, 'eachMultiInActivate'],
-                ]
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => "Деактивировать",
+                        //"icon"              => "glyphicon glyphicon-trash",
+                        "eachCallback" => [$this, 'eachMultiInActivate'],
+                    ]
             ]
         );
     }
@@ -73,12 +74,10 @@ class AdminCmsSiteController extends AdminModelEditorController
      */
     public function eachMultiDef($model, $action)
     {
-        try
-        {
+        try {
             $model->def = Cms::BOOL_Y;
             return $model->save(false);
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return false;
         }
     }

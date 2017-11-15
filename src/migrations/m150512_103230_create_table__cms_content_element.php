@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.05.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -16,46 +17,44 @@ class m150512_103230_create_table__cms_content_element extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_content_element}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql')
-        {
+        if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable("{{%cms_content_element}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'published_at'          => Schema::TYPE_INTEGER . ' NULL',
-            'published_to'          => Schema::TYPE_INTEGER . ' NULL',
+            'published_at' => Schema::TYPE_INTEGER . ' NULL',
+            'published_to' => Schema::TYPE_INTEGER . ' NULL',
 
-            'priority'              => Schema::TYPE_INTEGER. "(11) NOT NULL DEFAULT '500'",
+            'priority' => Schema::TYPE_INTEGER . "(11) NOT NULL DEFAULT '500'",
 
-            'active'                => "CHAR(1) NOT NULL DEFAULT 'Y'",
+            'active' => "CHAR(1) NOT NULL DEFAULT 'Y'",
 
-            'name'                  => Schema::TYPE_STRING. '(255) NOT NULL',
-            'code'                  => Schema::TYPE_STRING. '(255) NULL',
+            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'code' => Schema::TYPE_STRING . '(255) NULL',
 
-            'description_short'     => Schema::TYPE_TEXT. ' NULL',
-            'description_full'      => Schema::TYPE_TEXT. ' NULL',
+            'description_short' => Schema::TYPE_TEXT . ' NULL',
+            'description_full' => Schema::TYPE_TEXT . ' NULL',
 
-            'files'                 => Schema::TYPE_TEXT. ' NULL',
+            'files' => Schema::TYPE_TEXT . ' NULL',
 
-            'content_id'            => Schema::TYPE_INTEGER . ' NULL',
-            'tree_id'               => Schema::TYPE_INTEGER . ' NULL',
+            'content_id' => Schema::TYPE_INTEGER . ' NULL',
+            'tree_id' => Schema::TYPE_INTEGER . ' NULL',
 
-            'show_counter'          => Schema::TYPE_INTEGER . ' NULL',
-            'show_counter_start'    => Schema::TYPE_INTEGER . ' NULL',
+            'show_counter' => Schema::TYPE_INTEGER . ' NULL',
+            'show_counter_start' => Schema::TYPE_INTEGER . ' NULL',
 
         ], $tableOptions);
 

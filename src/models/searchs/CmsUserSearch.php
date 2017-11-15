@@ -77,8 +77,7 @@ class CmsUserSearch extends CmsUser
             'query' => static::find()
         ]);
 
-        if (!($this->load($params)))
-        {
+        if (!($this->load($params))) {
             return $activeDataProvider;
         }
         /**
@@ -87,80 +86,87 @@ class CmsUserSearch extends CmsUser
         $query = $activeDataProvider->query;
 
         //Standart
-        if ($columns = $this->getTableSchema()->columns)
-        {
+        if ($columns = $this->getTableSchema()->columns) {
             /**
              * @var \yii\db\ColumnSchema $column
              */
-            foreach ($columns as $column)
-            {
-                if ($column->phpType == "integer")
-                {
+            foreach ($columns as $column) {
+                if ($column->phpType == "integer") {
                     $query->andFilterWhere([$this->tableName() . '.' . $column->name => $this->{$column->name}]);
-                } else if ($column->phpType == "string")
-                {
-                    $query->andFilterWhere(['like', $this->tableName() . '.' . $column->name, $this->{$column->name}]);
+                } else {
+                    if ($column->phpType == "string") {
+                        $query->andFilterWhere([
+                            'like',
+                            $this->tableName() . '.' . $column->name,
+                            $this->{$column->name}
+                        ]);
+                    }
                 }
             }
         }
 
 
-        if ($this->created_at_from)
-        {
+        if ($this->created_at_from) {
             $query->andFilterWhere([
-                '>=', $this->tableName() . '.created_at', \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_from))
+                '>=',
+                $this->tableName() . '.created_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_from))
             ]);
         }
 
-        if ($this->created_at_to)
-        {
+        if ($this->created_at_to) {
             $query->andFilterWhere([
-                '<=', $this->tableName() . '.created_at', \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_to))
-            ]);
-        }
-
-
-        if ($this->updated_at_from)
-        {
-            $query->andFilterWhere([
-                '>=', $this->tableName() . '.updated_at', \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_from))
-            ]);
-        }
-
-        if ($this->updated_at_to)
-        {
-            $query->andFilterWhere([
-                '<=', $this->tableName() . '.created_at', \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_to))
+                '<=',
+                $this->tableName() . '.created_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_to))
             ]);
         }
 
 
-
-        if ($this->auth_at_from)
-        {
+        if ($this->updated_at_from) {
             $query->andFilterWhere([
-                '>=', $this->tableName() . '.logged_at', \Yii::$app->formatter->asTimestamp(strtotime($this->auth_at_from))
+                '>=',
+                $this->tableName() . '.updated_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_from))
             ]);
         }
 
-        if ($this->auth_at_to)
-        {
+        if ($this->updated_at_to) {
             $query->andFilterWhere([
-                '<=', $this->tableName() . '.logged_at', \Yii::$app->formatter->asTimestamp(strtotime($this->auth_at_to))
-            ]);
-        }
-
-
-        if ($this->has_image)
-        {
-            $query->andFilterWhere([
-                '>', $this->tableName() . '.image_id', 0
+                '<=',
+                $this->tableName() . '.created_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_to))
             ]);
         }
 
 
-        if ($this->q)
-        {
+        if ($this->auth_at_from) {
+            $query->andFilterWhere([
+                '>=',
+                $this->tableName() . '.logged_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->auth_at_from))
+            ]);
+        }
+
+        if ($this->auth_at_to) {
+            $query->andFilterWhere([
+                '<=',
+                $this->tableName() . '.logged_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->auth_at_to))
+            ]);
+        }
+
+
+        if ($this->has_image) {
+            $query->andFilterWhere([
+                '>',
+                $this->tableName() . '.image_id',
+                0
+            ]);
+        }
+
+
+        if ($this->q) {
             $query->andFilterWhere([
                 'or',
                 ['like', $this->tableName() . '.name', $this->q],
@@ -170,8 +176,7 @@ class CmsUserSearch extends CmsUser
             ]);
         }
 
-        if ($this->role)
-        {
+        if ($this->role) {
             $query->innerJoin('auth_assignment', 'auth_assignment.user_id = cms_user.id');
 
             $query->andFilterWhere([

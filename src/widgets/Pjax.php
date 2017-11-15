@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 19.12.2016
  */
+
 namespace skeeks\cms\widgets;
+
 /**
  * Class Pjax
  *
@@ -17,18 +19,18 @@ class Pjax extends \yii\widgets\Pjax
      * Block container Pjax
      * @var bool
      */
-    public $isBlock     = true;
+    public $isBlock = true;
 
     /**
      * @var bool
      */
-    public $isShowError     = false;
+    public $isShowError = false;
 
     /**
      * Block other container
      * @var string
      */
-    public $blockContainer          = '';
+    public $blockContainer = '';
 
     /**
      * @var int
@@ -50,8 +52,7 @@ class Pjax extends \yii\widgets\Pjax
             $errorNotify = "sx.notify.error('{$errorMessage}');";
         }
 
-        if ($this->isBlock === true)
-        {
+        if ($this->isBlock === true) {
             $this->getView()->registerJs(<<<JS
                 (function(sx, $, _)
                 {
@@ -77,8 +78,7 @@ JS
             );
         }
 
-        if ($this->blockContainer)
-        {
+        if ($this->blockContainer) {
             $this->getView()->registerJs(<<<JS
                 (function(sx, $, _)
                 {

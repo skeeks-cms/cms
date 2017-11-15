@@ -47,9 +47,9 @@ class AdminTreeController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                   = "Дерево страниц";
-        $this->modelShowAttribute     = "name";
-        $this->modelClassName         = Tree::className();
+        $this->name = "Дерево страниц";
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = Tree::className();
 
         parent::init();
     }
@@ -58,31 +58,30 @@ class AdminTreeController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(), [
             'index' =>
-            [
-                'class'         => AdminAction::className(),
-                'name'          => \Yii::t('skeeks/cms', 'Tree'),
-                'callback'      => [$this, 'indexAction']
-            ],
+                [
+                    'class' => AdminAction::className(),
+                    'name' => \Yii::t('skeeks/cms', 'Tree'),
+                    'callback' => [$this, 'indexAction']
+                ],
 
             'list' =>
-            [
-                'class'         => ModelEditorGridAction::className(),
-                'name'          => \Yii::t('skeeks/cms', 'List'),
-                "icon"          => "glyphicon glyphicon-th-list",
-                "priority"      => 10,
-            ],
+                [
+                    'class' => ModelEditorGridAction::className(),
+                    'name' => \Yii::t('skeeks/cms', 'List'),
+                    "icon" => "glyphicon glyphicon-th-list",
+                    "priority" => 10,
+                ],
 
             'create' =>
-            [
-                'visible'    => false
-            ],
+                [
+                    'visible' => false
+                ],
 
             "update" =>
-            [
-                'class'         => BackendModelUpdateAction::className(),
-                "callback"      => [$this, 'update'],
-            ],
-
+                [
+                    'class' => BackendModelUpdateAction::className(),
+                    "callback" => [$this, 'update'],
+                ],
 
 
         ]);
@@ -91,8 +90,6 @@ class AdminTreeController extends AdminModelEditorController
 
         return $actions;
     }
-
-
 
 
     public function update($adminAction)
@@ -108,35 +105,30 @@ class AdminTreeController extends AdminModelEditorController
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel
+                $model,
+                $relatedModel
             ]);
         }
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load($post);
             $relatedModel->load($post);
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
 
-                if ($model->save() && $relatedModel->save())
-                {
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                if ($model->save() && $relatedModel->save()) {
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
-                    if (\Yii::$app->request->post('submit-btn') == 'apply')
-                    {} else
-                    {
+                    if (\Yii::$app->request->post('submit-btn') == 'apply') {
+                    } else {
                         return $this->redirect(
                             $this->url
                         );
@@ -150,11 +142,10 @@ class AdminTreeController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model'           => $model,
-            'relatedModel'    => $relatedModel
+            'model' => $model,
+            'relatedModel' => $relatedModel
         ]);
     }
-
 
 
     public function indexAction()
@@ -168,8 +159,7 @@ class AdminTreeController extends AdminModelEditorController
         $models = $query
             ->joinWith('cmsSiteRelation')
             ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])
-            ->all()
-        ;
+            ->all();
 
         return $this->render($this->action->id, ['models' => $models]);
     }
@@ -181,8 +171,7 @@ class AdminTreeController extends AdminModelEditorController
          */
         $parent = $this->model;
 
-        if (\Yii::$app->request->isPost)
-        {
+        if (\Yii::$app->request->isPost) {
             $post = \Yii::$app->request->post();
 
 
@@ -191,13 +180,11 @@ class AdminTreeController extends AdminModelEditorController
 
             $childTree->load($post);
 
-            if (!$childTree->priority)
-            {
+            if (!$childTree->priority) {
                 $childTree->priority = Tree::PRIORITY_STEP;
 
                 //Элемент с большим приоритетом
-                if ($treeChildrens = $parent->getChildren()->orderBy(['priority' => SORT_DESC])->one())
-                {
+                if ($treeChildrens = $parent->getChildren()->orderBy(['priority' => SORT_DESC])->one()) {
                     $childTree->priority = $treeChildrens->priority + Tree::PRIORITY_STEP;
                 }
             }
@@ -206,45 +193,37 @@ class AdminTreeController extends AdminModelEditorController
 
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-            try
-            {
-                if ($parent && $parent->processAddNode($childTree))
-                {
+            try {
+                if ($parent && $parent->processAddNode($childTree)) {
                     $response['success'] = true;
                 }
-            } catch (\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $response['success'] = false;
                 $response['message'] = $e->getMessage();
             }
 
 
-            if (!$post["no_redirect"])
-            {
+            if (!$post["no_redirect"]) {
                 $this->redirect(Url::to(["new-children", "id" => $parent->primaryKey]));
-            }
-            else
-            {
+            } else {
                 return $response;
             }
-        }
-        else
-        {
-            $tree   = new Tree();
+        } else {
+            $tree = new Tree();
             $search = new Search(Tree::className());
-            $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-            $searchModel    = $search->getLoadedModel();
+            $dataProvider = $search->search(\Yii::$app->request->queryParams);
+            $searchModel = $search->getLoadedModel();
 
             $dataProvider->query->andWhere(['pid' => $parent->primaryKey]);
 
             $controller = \Yii::$app->cms->moduleCms->createControllerByID("admin-tree");
 
             return $this->render('new-children', [
-                'model'         => new Tree(),
+                'model' => new Tree(),
 
-                'searchModel'   => $searchModel,
-                'dataProvider'  => $dataProvider,
-                'controller'    => $controller,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'controller' => $controller,
             ]);
         }
     }
@@ -262,14 +241,13 @@ class AdminTreeController extends AdminModelEditorController
     public function actionResort()
     {
         $response =
-        [
-            'success' => false
-        ];
+            [
+                'success' => false
+            ];
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        if (\Yii::$app->request->isPost)
-        {
+        if (\Yii::$app->request->isPost) {
             $tree = new Tree();
 
             $post = \Yii::$app->request->post();
@@ -279,9 +257,8 @@ class AdminTreeController extends AdminModelEditorController
 
             $priority = 100;
 
-            foreach($ids as $id)
-            {
-                $node = $tree->find()->where(['id'=>$id])->one();
+            foreach ($ids as $id) {
+                $node = $tree->find()->where(['id' => $id])->one();
                 $node->priority = $priority;
                 $node->save(false);
                 $priority += 100;

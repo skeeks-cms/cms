@@ -9,6 +9,7 @@
  */
 
 namespace skeeks\cms\models\behaviors;
+
 use yii\base\Behavior;
 use yii\db\ActiveQuery;
 use yii\db\AfterSaveEvent;
@@ -53,8 +54,8 @@ class HasTrees extends Behavior
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_AFTER_UPDATE    => "afterSaveTree",
-            BaseActiveRecord::EVENT_AFTER_INSERT    => "afterSaveTree",
+            BaseActiveRecord::EVENT_AFTER_UPDATE => "afterSaveTree",
+            BaseActiveRecord::EVENT_AFTER_INSERT => "afterSaveTree",
         ];
     }
 
@@ -63,77 +64,63 @@ class HasTrees extends Behavior
      */
     public function afterSaveTree($event)
     {
-        if ($this->owner->_tree_ids === null)
-        {
+        if ($this->owner->_tree_ids === null) {
             return $this;
         }
 
         //Старые атрибуты
-        $oldIds = (array) ArrayHelper::map($this->owner->elementTrees, $this->attributeTreeName, $this->attributeTreeName);
-        $newIds = (array) $this->owner->treeIds; //Новые
+        $oldIds = (array)ArrayHelper::map($this->owner->elementTrees, $this->attributeTreeName,
+            $this->attributeTreeName);
+        $newIds = (array)$this->owner->treeIds; //Новые
 
 
         //Если старых не было, просто записать новые
         $writeIds = [];
         $deleteIds = [];
 
-        if (!$oldIds)
-        {
+        if (!$oldIds) {
             $writeIds = $newIds;
-        } else
-        {
-            foreach ($oldIds as $oldId)
-            {
+        } else {
+            foreach ($oldIds as $oldId) {
                 //Старый элемент есть в новом массиве, его не трогаем он остается
-                if (in_array($oldId, $newIds))
-                {
+                if (in_array($oldId, $newIds)) {
 
-                } else
-                {
+                } else {
                     $deleteIds[] = $oldId; //Иначе его надо удалить.
                 }
             }
 
-            foreach ($newIds as $newId)
-            {
+            foreach ($newIds as $newId) {
                 //Если новый элемент уже был, то ничего не делаем
-                if (in_array($newId, $oldIds))
-                {
+                if (in_array($newId, $oldIds)) {
 
-                } else
-                {
+                } else {
                     $writeIds[] = $newId; //Иначе запишем
                 }
             }
         }
 
 
-
         //Есть элементы на удаление
-        if ($deleteIds)
-        {
-            $elementTrees  = $this->owner->getElementTrees()->andWhere([
+        if ($deleteIds) {
+            $elementTrees = $this->owner->getElementTrees()->andWhere([
                 $this->attributeTreeName => $deleteIds
             ])->limit(count($deleteIds))->all();
 
-            foreach ($elementTrees as $elementTree)
-            {
+            foreach ($elementTrees as $elementTree) {
                 $elementTree->delete();
             }
         }
 
         //Есть элементы на запись
-        if ($writeIds)
-        {
+        if ($writeIds) {
             $className = $this->elementTreesClassName;
 
-            foreach ($writeIds as $treeId)
-            {
-                if ($treeId)
-                {
+            foreach ($writeIds as $treeId) {
+                if ($treeId) {
                     $elementTree = new $className([
-                        $this->attributeElementName    => $this->owner->id,
-                        $this->attributeTreeName       => $treeId,
+                        $this->attributeElementName => $this->owner->id,
+                        $this->attributeTreeName => $treeId,
                     ]);
 
                     $elementTree->save(false);
@@ -150,19 +137,18 @@ class HasTrees extends Behavior
      */
     public function getTreeIds()
     {
-        if ($this->owner->_tree_ids === null)
-        {
+        if ($this->owner->_tree_ids === null) {
             $this->owner->_tree_ids = [];
 
-            if ($this->owner->elementTrees)
-            {
-                $this->_tree_ids = (array) ArrayHelper::map($this->owner->elementTrees, $this->attributeTreeName, $this->attributeTreeName);
+            if ($this->owner->elementTrees) {
+                $this->_tree_ids = (array)ArrayHelper::map($this->owner->elementTrees, $this->attributeTreeName,
+                    $this->attributeTreeName);
             }
 
             return $this->_tree_ids;
         }
 
-        return (array) $this->_tree_ids;
+        return (array)$this->_tree_ids;
     }
 
     /**
@@ -190,10 +176,10 @@ class HasTrees extends Behavior
      */
     public function getCmsTrees()
     {
-        $className      = $this->elementTreesClassName;
+        $className = $this->elementTreesClassName;
         $treesClassName = $this->treesClassName;
 
         return $this->owner->hasMany($treesClassName::className(), ['id' => 'tree_id'])
-                ->via('elementTrees');
+            ->via('elementTrees');
     }
 }

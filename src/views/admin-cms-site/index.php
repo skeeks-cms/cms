@@ -13,18 +13,18 @@ $dataProvider->setSort(['defaultOrder' => ['priority' => SORT_ASC]]);
 ?>
 <? $pjax = \yii\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel' => $searchModel,
-        'dataProvider' => $dataProvider,
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider,
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'autoColumns'       => false,
-        'pjax'              => $pjax,
-        'adminController'   => $controller,
-        'columns' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'autoColumns' => false,
+    'pjax' => $pjax,
+    'adminController' => $controller,
+    'columns' =>
         [
             [
                 'class' => \skeeks\cms\grid\ImageColumn2::className(),
@@ -34,17 +34,17 @@ $dataProvider->setSort(['defaultOrder' => ['priority' => SORT_ASC]]);
             'code',
 
             [
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute'     => "active"
+                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => "active"
             ],
 
             [
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute'     => "def"
+                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => "def"
             ],
 
             'priority',
         ]
-    ]); ?>
+]); ?>
 
 <? \yii\widgets\Pjax::end(); ?>

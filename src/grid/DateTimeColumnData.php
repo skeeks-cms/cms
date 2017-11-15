@@ -8,6 +8,7 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\grid;
 
 use yii\grid\DataColumn;
@@ -18,7 +19,7 @@ use yii\grid\DataColumn;
  */
 class DateTimeColumnData extends DataColumn
 {
-    public $filter      = false;
+    public $filter = false;
 
     /**
      * @inheritdoc

@@ -36,42 +36,42 @@ class CmsTreeWidget extends Widget
     /**
      * @var array Nodes for which to build a tree.
      */
-    public $models      = [];
+    public $models = [];
 
     /**
      * @var string Widget session param name
      */
-    public $sessionName                 = "cms-tree-opened";
+    public $sessionName = "cms-tree-opened";
 
     /**
      * @var string
      */
-    public $openedRequestName           = "o";
+    public $openedRequestName = "o";
 
     /**
      * @var string Widget view file
      */
-    public $viewFile                    = 'tree';
+    public $viewFile = 'tree';
     /**
      * @var string Widget one node view file
      */
-    public $viewNodeFile                = '_node';
+    public $viewNodeFile = '_node';
     /**
      * @var string Inner node content file
      */
-    public $viewNodeContentFile         = '_node-content';
+    public $viewNodeContentFile = '_node-content';
 
     /**
      * @var array Additional information in the context of a call widget
      */
-    public $contextData                     = [];
+    public $contextData = [];
 
     /**
      * @var \yii\widgets\Pjax
      */
-    public $pjax                        = null;
-    public $pjaxClass                   = 'skeeks\cms\widgets\Pjax';
-    public $pjaxOptions                 = [
+    public $pjax = null;
+    public $pjaxClass = 'skeeks\cms\widgets\Pjax';
+    public $pjaxOptions = [
         'isBlock' => true
     ];
 
@@ -86,8 +86,7 @@ class CmsTreeWidget extends Widget
         Html::addCssClass($this->options, 'sx-tree');
 
         //Automatic filling models
-        if ($this->models !== false && is_array($this->models) && count($this->models) == 0)
-        {
+        if ($this->models !== false && is_array($this->models) && count($this->models) == 0) {
             $this->models = CmsTree::findRoots()
                 ->joinWith('cmsSiteRelation')
                 ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
@@ -103,17 +102,13 @@ class CmsTreeWidget extends Widget
     {
         $opened = [];
 
-        if ($fromRequest = (array) \Yii::$app->request->getQueryParam($this->openedRequestName))
-        {
+        if ($fromRequest = (array)\Yii::$app->request->getQueryParam($this->openedRequestName)) {
             $opened = array_unique($fromRequest);
-            if ($this->sessionName)
-            {
+            if ($this->sessionName) {
                 \Yii::$app->getSession()->set($this->sessionName, $opened);
             }
-        } else
-        {
-            if ($this->sessionName)
-            {
+        } else {
+            if ($this->sessionName) {
                 $opened = array_unique(\Yii::$app->getSession()->get($this->sessionName, []));
             }
         }
@@ -137,8 +132,7 @@ class CmsTreeWidget extends Widget
      */
     protected function _beginPjax()
     {
-        if (!$this->pjax)
-        {
+        if (!$this->pjax) {
             $pjaxClass = $this->pjaxClass;
             $pjaxOptions = ArrayHelper::merge($this->pjaxOptions, [
                 'id' => 'sx-pjax-' . $this->id,
@@ -156,8 +150,7 @@ class CmsTreeWidget extends Widget
      */
     protected function _endPjax()
     {
-        if ($this->_pjaxIsStart === true)
-        {
+        if ($this->_pjaxIsStart === true) {
             $className = $this->pjax->className();
             $className::end();
         }
@@ -208,17 +201,13 @@ class CmsTreeWidget extends Widget
     {
         $currentLink = "";
 
-        if ($model->children)
-        {
+        if ($model->children) {
             $openedIds = $this->openedIds;
 
-            if ($this->isOpenNode($model))
-            {
+            if ($this->isOpenNode($model)) {
                 $newOptionsOpen = [];
-                foreach ($openedIds as $id)
-                {
-                    if ($id != $model->id)
-                    {
+                foreach ($openedIds as $id) {
+                    if ($id != $model->id) {
                         $newOptionsOpen[] = $id;
                     }
                 }
@@ -229,8 +218,7 @@ class CmsTreeWidget extends Widget
                 $params[$this->openedRequestName] = $urlOptionsOpen;
 
                 $currentLink = "/{$pathInfo}?" . http_build_query($params);
-            } else
-            {
+            } else {
                 $urlOptionsOpen = array_unique(array_merge($openedIds, [$model->id]));
                 $params = \Yii::$app->request->getQueryParams();
                 $params[$this->openedRequestName] = $urlOptionsOpen;
@@ -253,10 +241,8 @@ class CmsTreeWidget extends Widget
     {
         $isOpen = false;
 
-        if ($openedIds = (array) $this->openedIds)
-        {
-            if (in_array($model->id, $openedIds))
-            {
+        if ($openedIds = (array)$this->openedIds) {
+            if (in_array($model->id, $openedIds)) {
                 $isOpen = true;
             }
         }
@@ -279,23 +265,18 @@ class CmsTreeWidget extends Widget
         $result = $model->name;
 
         $additionalName = '';
-        if ($model->level == 0)
-        {
+        if ($model->level == 0) {
             $site = CmsSite::findOne(['id' => $model->cms_site_id]);
-            if ($site)
-            {
+            if ($site) {
                 $additionalName = $site->name;
             }
-        } else
-        {
-            if ($model->name_hidden)
-            {
+        } else {
+            if ($model->name_hidden) {
                 $additionalName = $model->name_hidden;
             }
         }
 
-        if ($additionalName)
-        {
+        if ($additionalName) {
             $result .= " [{$additionalName}]";
         }
 
@@ -303,10 +284,9 @@ class CmsTreeWidget extends Widget
     }
 
 
-
     public function registerAssets()
     {
-        $options    = Json::encode([
+        $options = Json::encode([
             'id' => $this->id,
             'pjaxid' => $this->pjax->id
         ]);
@@ -335,12 +315,12 @@ class CmsTreeWidget extends Widget
 
         })(window, sx, sx.$, sx._);
 JS
-    );
+        );
 
         $this->getView()->registerCss(<<<CSS
 
 
 CSS
-);
+        );
     }
 }

@@ -8,6 +8,7 @@
  * @date 16.11.2014
  * @since 1.0.0
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -19,31 +20,29 @@ class m141116_100557_create_teable_static_block extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_static_block}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql')
-        {
+        if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable('{{%cms_static_block}}', [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'code'                  => Schema::TYPE_STRING . '(32) NOT NULL',
-            'description'           => Schema::TYPE_TEXT . ' NULL',
-            'value'                 => Schema::TYPE_TEXT . ' NULL',
+            'code' => Schema::TYPE_STRING . '(32) NOT NULL',
+            'description' => Schema::TYPE_TEXT . ' NULL',
+            'value' => Schema::TYPE_TEXT . ' NULL',
 
-            'files'                 => Schema::TYPE_TEXT. ' NULL', //
+            'files' => Schema::TYPE_TEXT . ' NULL', //
 
         ], $tableOptions);
 

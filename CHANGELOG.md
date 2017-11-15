@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha3
+---------------
+ * Code style
+ 
 5.0.0-alpha2
 ---------------
  * Update marketplace

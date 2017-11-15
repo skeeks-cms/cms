@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 05.03.2017
  */
+
 namespace skeeks\cms\helpers;
 
 use skeeks\cms\modules\admin\components\UrlRule;
@@ -41,8 +42,7 @@ class UrlHelper
      */
     static public function getCurrent()
     {
-        if (static::$currentUrl === null)
-        {
+        if (static::$currentUrl === null) {
             //TODO: доработать вычисление текущего роута
             static::$currentUrl = static::constructCurrent();
         }
@@ -57,8 +57,7 @@ class UrlHelper
     {
 
         $route = [];
-        if (!\Yii::$app->controller->module instanceof Application)
-        {
+        if (!\Yii::$app->controller->module instanceof Application) {
             $route[] = \Yii::$app->controller->module->id;
         }
 
@@ -79,15 +78,17 @@ class UrlHelper
         $this->_route = self::normalizeRoute($this->_route);
         return $this;
     }
+
     /**
      * @param $route
      * @return $this
      */
     public function setRoute($route)
     {
-        $this->_route = (string) $route;
+        $this->_route = (string)$route;
         return $this;
     }
+
     /**
      * @param $route
      * @param array $data
@@ -95,20 +96,19 @@ class UrlHelper
      */
     static public function construct($route, $data = [])
     {
-        if (is_string($route))
-        {
+        if (is_string($route)) {
             return new static($route, $data);
-        } else if (is_array($route))
-        {
-            $routeString = $route[0];
+        } else {
+            if (is_array($route)) {
+                $routeString = $route[0];
 
-            unset($route[0]);
-            if ($route)
-            {
-                $data = ArrayHelper::merge($route, $data);
+                unset($route[0]);
+                if ($route) {
+                    $data = ArrayHelper::merge($route, $data);
+                }
+
+                return new static($routeString, $data);
             }
-
-            return new static($routeString, $data);
         }
 
         throw new \InvalidArgumentException('Url not create');
@@ -120,23 +120,21 @@ class UrlHelper
      */
     public function __construct($route, $data = [])
     {
-        if (is_string($route))
-        {
-            $this->_route   = (string) $route;
-            $this->_data    = (array) $data;
-        } else if (is_array($route))
-        {
-            $this->_route   = (string) $route[0];
+        if (is_string($route)) {
+            $this->_route = (string)$route;
+            $this->_data = (array)$data;
+        } else {
+            if (is_array($route)) {
+                $this->_route = (string)$route[0];
 
-            unset($route[0]);
-            if ($route)
-            {
-                $this->_data    = array_merge($route, (array) $data);
-            } else
-            {
-                $this->_data    = (array) $data;
+                unset($route[0]);
+                if ($route) {
+                    $this->_data = array_merge($route, (array)$data);
+                } else {
+                    $this->_data = (array)$data;
+                }
+
             }
-
         }
 
     }
@@ -149,12 +147,10 @@ class UrlHelper
      */
     public function getSystem($key = null, $default = null)
     {
-        $systemData = (array) $this->get(self::SYSTEM_CMS_NAME, []);
-        if ($key)
-        {
+        $systemData = (array)$this->get(self::SYSTEM_CMS_NAME, []);
+        if ($key) {
             return ArrayHelper::getValue($systemData, $key, $default);
-        } else
-        {
+        } else {
             return $systemData;
         }
     }
@@ -165,8 +161,8 @@ class UrlHelper
      */
     public function issetSystemParam($key)
     {
-        $systemData = (array) $this->get(self::SYSTEM_CMS_NAME, []);
-        return (bool) isset($systemData[$key]);
+        $systemData = (array)$this->get(self::SYSTEM_CMS_NAME, []);
+        return (bool)isset($systemData[$key]);
     }
 
     /**
@@ -188,7 +184,7 @@ class UrlHelper
      */
     public function setSystem($systemData = [])
     {
-        return $this->set(self::SYSTEM_CMS_NAME, (array) $systemData);
+        return $this->set(self::SYSTEM_CMS_NAME, (array)$systemData);
     }
 
     /**
@@ -196,8 +192,7 @@ class UrlHelper
      */
     public function setCurrentRef()
     {
-        if (!$this->getRef())
-        {
+        if (!$this->getRef()) {
             return $this->setRef(\Yii::$app->request->getUrl());
         }
 
@@ -210,7 +205,7 @@ class UrlHelper
      */
     public function setRef($ref)
     {
-        return $this->setSystemParam("ref", (string) $ref);
+        return $this->setSystemParam("ref", (string)$ref);
     }
 
     /**
@@ -237,6 +232,7 @@ class UrlHelper
     {
         return \Yii::$app->urlManager->createUrl($this->toArray());
     }
+
     /**
      * @return string
      */
@@ -264,15 +260,14 @@ class UrlHelper
 
     public function toString()
     {
-        if ($this->_absolute)
-        {
+        if ($this->_absolute) {
             return $this->createAbsoluteUrl();
-        } else
-        {
+        } else {
             return $this->createUrl();
         }
 
     }
+
     /**
      * @return array
      */
@@ -280,23 +275,6 @@ class UrlHelper
     {
         return array_merge([$this->_route], $this->_data);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**

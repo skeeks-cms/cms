@@ -21,25 +21,23 @@ class m140814_223103_create_user_authclient_table extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_user_authclient}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql')
-        {
+        if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable("{{%cms_user_authclient}}", [
-            'id'                    => Schema::TYPE_PK,
-            'user_id'               => Schema::TYPE_INTEGER . ' NOT NULL',
-            'provider'              => Schema::TYPE_STRING. '(50)',
-            'provider_identifier'   => Schema::TYPE_STRING. '(100)',
-            'provider_data'         => Schema::TYPE_TEXT,
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'id' => Schema::TYPE_PK,
+            'user_id' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'provider' => Schema::TYPE_STRING . '(50)',
+            'provider_identifier' => Schema::TYPE_STRING . '(100)',
+            'provider_data' => Schema::TYPE_TEXT,
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
         ], $tableOptions);
 
         $this->execute("ALTER TABLE {{%cms_user_authclient}} ADD INDEX(user_id);");

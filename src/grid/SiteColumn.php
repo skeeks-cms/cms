@@ -2,9 +2,10 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (ï¿½ï¿½ï¿½ï¿½ï¿½)
  * @date 01.09.2015
  */
+
 namespace skeeks\cms\grid;
 
 use skeeks\cms\models\CmsSite;
@@ -23,8 +24,7 @@ class SiteColumn extends DataColumn
     {
         parent::init();
 
-        if (!$this->filter)
-        {
+        if (!$this->filter) {
             $this->filter = \yii\helpers\ArrayHelper::map(
                 \skeeks\cms\models\CmsSite::find()->all(),
                 'code',
@@ -32,22 +32,19 @@ class SiteColumn extends DataColumn
             );
         }
     }
+
     /**
      * @inheritdoc
      */
     protected function renderDataCellContent($model, $key, $index)
     {
-        if ($model->site && $model->site instanceof CmsSite)
-        {
+        if ($model->site && $model->site instanceof CmsSite) {
             $site = $model->site;
-        }
-        else
-        {
+        } else {
 
         }
 
-        if ($site)
-        {
+        if ($site) {
             return $site->name;
         }
 

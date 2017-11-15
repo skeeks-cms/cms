@@ -8,6 +8,7 @@
  * @date 06.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
@@ -48,32 +49,32 @@ class AdminProfileController extends BackendModelController
 
     public function init()
     {
-        $this->name                     = "Личный кабинет";
-        $this->modelShowAttribute      = "username";
-        $this->modelClassName          = User::className();
+        $this->name = "Личный кабинет";
+        $this->modelShowAttribute = "username";
+        $this->modelClassName = User::className();
         parent::init();
     }
 
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(),
-        [
-            /*'file-manager' =>
             [
-                "class"         => BackendModelAction::class,
-                "name"          => "Личные файлы",
-                "icon"          => "glyphicon glyphicon-folder-open",
-                "callback"      => [$this, 'actionFileManager'],
-            ],*/
+                /*'file-manager' =>
+                [
+                    "class"         => BackendModelAction::class,
+                    "name"          => "Личные файлы",
+                    "icon"          => "glyphicon glyphicon-folder-open",
+                    "callback"      => [$this, 'actionFileManager'],
+                ],*/
 
-            'update' =>
-            [
-                'class'                 => BackendModelUpdateAction::class,
-                "callback"              => [$this, 'update'],
-                "isVisible"             => false,
-                "accessCallback"        => false
-            ],
-        ]);
+                'update' =>
+                    [
+                        'class' => BackendModelUpdateAction::class,
+                        "callback" => [$this, 'update'],
+                        "isVisible" => false,
+                        "accessCallback" => false
+                    ],
+            ]);
 
 
         ArrayHelper::remove($actions, 'delete');
@@ -89,8 +90,8 @@ class AdminProfileController extends BackendModelController
         /**
          * @var $model CmsUser
          */
-        $model          = $this->model;
-        $relatedModel   = $model->relatedPropertiesModel;
+        $model = $this->model;
+        $relatedModel = $model->relatedPropertiesModel;
         $passwordChange = new PasswordChangeForm([
             'user' => $model
         ]);
@@ -98,40 +99,35 @@ class AdminProfileController extends BackendModelController
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $passwordChange->load(\Yii::$app->request->post());
 
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel, $passwordChange
+                $model,
+                $relatedModel,
+                $passwordChange
             ]);
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
+        if ($rr->isRequestPjaxPost()) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $passwordChange->load(\Yii::$app->request->post());
 
-            if ($model->save() && $relatedModel->save())
-            {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+            if ($model->save() && $relatedModel->save()) {
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
-                if ($passwordChange->new_password)
-                {
-                    if (!$passwordChange->changePassword())
-                    {
+                if ($passwordChange->new_password) {
+                    if (!$passwordChange->changePassword()) {
                         \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
                     }
                 }
 
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {
+                if (\Yii::$app->request->post('submit-btn') == 'apply') {
 
-                } else
-                {
+                } else {
                     return $this->redirect(
                         $this->url
                     );
@@ -139,29 +135,26 @@ class AdminProfileController extends BackendModelController
 
                 $model->refresh();
 
-            } else
-            {
+            } else {
                 $errors = [];
 
-                if ($model->getErrors())
-                {
-                    foreach ($model->getErrors() as $error)
-                    {
+                if ($model->getErrors()) {
+                    foreach ($model->getErrors() as $error) {
                         $errors[] = implode(', ', $error);
                     }
                 }
 
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save') . ". " . implode($errors));
+                \Yii::$app->getSession()->setFlash('error',
+                    \Yii::t('skeeks/cms', 'Could not save') . ". " . implode($errors));
             }
         }
 
         return $this->render('_form', [
-            'model'           => $model,
-            'relatedModel'    => $relatedModel,
-            'passwordChange'  => $passwordChange,
+            'model' => $model,
+            'relatedModel' => $relatedModel,
+            'passwordChange' => $passwordChange,
         ]);
     }
-
 
 
     public function beforeAction($action)
@@ -208,22 +201,18 @@ class AdminProfileController extends BackendModelController
             'user' => $model
         ]);
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $modelForm->load(\Yii::$app->request->post());
             \Yii::$app->response->format = Response::FORMAT_JSON;
             return \skeeks\cms\modules\admin\widgets\ActiveForm::validate($modelForm);
         }
 
 
-        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
-        {
+        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword()) {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
             return $this->redirect(['change-password', 'id' => $model->id]);
-        } else
-        {
-            if (\Yii::$app->request->isPost)
-            {
+        } else {
+            if (\Yii::$app->request->isPost) {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
             }
 

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 10.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150826_123220_create_table__cms_user_universal_property_enum extends Migr
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_user_universal_property_enum}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,20 +24,20 @@ class m150826_123220_create_table__cms_user_universal_property_enum extends Migr
         }
 
         $this->createTable("{{%cms_user_universal_property_enum}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'property_id'           => Schema::TYPE_INTEGER . ' NULL',
+            'property_id' => Schema::TYPE_INTEGER . ' NULL',
 
-            'value'                 => Schema::TYPE_STRING . '(255) NOT NULL',
-            'def'                   => "CHAR(1) NOT NULL DEFAULT 'N'",
-            'code'                  => Schema::TYPE_STRING. '(32) NOT NULL',
-            'priority'              => Schema::TYPE_INTEGER. "(11) NOT NULL DEFAULT '500'",
+            'value' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'def' => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'code' => Schema::TYPE_STRING . '(32) NOT NULL',
+            'priority' => Schema::TYPE_INTEGER . "(11) NOT NULL DEFAULT '500'",
 
         ], $tableOptions);
 

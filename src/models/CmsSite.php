@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 20.05.2015
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
@@ -75,8 +76,7 @@ class CmsSite extends Core
     public function beforeDeleteRemoveTree()
     {
         //Before delete site delete all tree
-        foreach ($this->cmsTrees as $tree)
-        {
+        foreach ($this->cmsTrees as $tree) {
             //$tree->delete();
             /*if (!$tree->deleteWithChildren())
             {
@@ -90,10 +90,10 @@ class CmsSite extends Core
         return ArrayHelper::merge(parent::behaviors(), [
 
             HasStorageFile::className() =>
-            [
-                'class'     => HasStorageFile::className(),
-                'fields'    => ['image_id']
-            ],
+                [
+                    'class' => HasStorageFile::className(),
+                    'fields' => ['image_id']
+                ],
         ]);
     }
 
@@ -104,8 +104,7 @@ class CmsSite extends Core
     public function beforeUpdateChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y)
-        {
+        if ($this->def == Cms::BOOL_Y) {
             static::updateAll(
                 [
                     'def' => Cms::BOOL_N
@@ -113,10 +112,11 @@ class CmsSite extends Core
                 ['!=', 'id', $this->id]
             );
 
-            $this->active   = Cms::BOOL_Y; //сайт по умолчанию всегда активный
+            $this->active = Cms::BOOL_Y; //сайт по умолчанию всегда активный
         }
 
     }
+
     /**
      * @param Event $e
      * @throws Exception
@@ -124,13 +124,12 @@ class CmsSite extends Core
     public function beforeInsertChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y)
-        {
+        if ($this->def == Cms::BOOL_Y) {
             static::updateAll([
                 'def' => Cms::BOOL_N
             ]);
 
-            $this->active   = Cms::BOOL_Y; //сайт по умолчанию всегда активный
+            $this->active = Cms::BOOL_Y; //сайт по умолчанию всегда активный
         }
 
     }
@@ -138,26 +137,23 @@ class CmsSite extends Core
     public function createTreeAfterInsert(Event $e)
     {
         $tree = new Tree([
-            'name'      => 'Главная страница',
+            'name' => 'Главная страница',
         ]);
 
         $tree->makeRoot();
         $tree->cms_site_id = $this->id;
 
-        try
-        {
-            if (!$tree->save())
-            {
+        try {
+            if (!$tree->save()) {
                 throw new Exception('Failed to create a section of the tree');
             }
-        } catch (\Exception $e)
-        {
-            var_dump($e->getMessage());die;
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+            die;
             throw $e;
         }
 
     }
-
 
 
     /**
@@ -202,29 +198,33 @@ class CmsSite extends Core
             ['def', 'default', 'value' => Cms::BOOL_N],
             [['image_id'], 'safe'],
 
-            [['image_id'], \skeeks\cms\validators\FileValidator::class,
-                'skipOnEmpty'   => false,
-                'extensions' => ['jpg', 'jpeg', 'gif','png'],
+            [
+                ['image_id'],
+                \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty' => false,
+                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
                 'maxFiles' => 1,
-                'maxSize'       => 1024*1024*2,
-                'minSize'       => 1024,
+                'maxSize' => 1024 * 1024 * 2,
+                'minSize' => 1024,
             ],
         ]);
     }
 
     public function validateCode($attribute)
     {
-        if(!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute))
-        {
-            $this->addError($attribute, \Yii::t('skeeks/cms','Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',['code' => 'code1']));
+        if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute)) {
+            $this->addError($attribute, \Yii::t('skeeks/cms',
+                'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
+                ['code' => 'code1']));
         }
     }
 
     public function validateServerName($attribute)
     {
-        if(!preg_match('/^[а-яa-z0-9.-]{2,255}$/', $this->$attribute))
-        {
-            $this->addError($attribute, \Yii::t('skeeks/cms','Use only lowercase letters and numbers. Example {site} (2-255 characters)',['site' => 'site.ru']));
+        if (!preg_match('/^[а-яa-z0-9.-]{2,255}$/', $this->$attribute)) {
+            $this->addError($attribute,
+                \Yii::t('skeeks/cms', 'Use only lowercase letters and numbers. Example {site} (2-255 characters)',
+                    ['site' => 'site.ru']));
         }
     }
 
@@ -236,9 +236,8 @@ class CmsSite extends Core
      */
     static public function getById($id)
     {
-        if (!array_key_exists($id, static::$sites))
-        {
-            static::$sites[$id] = static::find()->where(['id' => (integer) $id])->one();
+        if (!array_key_exists($id, static::$sites)) {
+            static::$sites[$id] = static::find()->where(['id' => (integer)$id])->one();
         }
 
         return static::$sites[$id];
@@ -252,9 +251,8 @@ class CmsSite extends Core
      */
     static public function getByCode($code)
     {
-        if (!array_key_exists($code, static::$sites_by_code))
-        {
-            static::$sites_by_code[$code] = static::find()->where(['code' => (string) $code])->one();
+        if (!array_key_exists($code, static::$sites_by_code)) {
+            static::$sites_by_code[$code] = static::find()->where(['code' => (string)$code])->one();
         }
 
         return static::$sites_by_code[$code];
@@ -282,8 +280,7 @@ class CmsSite extends Core
      */
     public function getUrl()
     {
-        if ($this->server_name)
-        {
+        if ($this->server_name) {
             return '//' . $this->server_name;
         }
 

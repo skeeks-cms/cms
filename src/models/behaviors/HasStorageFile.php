@@ -8,7 +8,9 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models\behaviors;
+
 use common\models\User;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
@@ -51,13 +53,13 @@ class HasStorageFile extends Behavior
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_DELETE => "deleteStorgaFile",
 
-            BaseActiveRecord::EVENT_BEFORE_INSERT      => "saveStorgaFile",
-            BaseActiveRecord::EVENT_BEFORE_UPDATE      => "saveStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_INSERT => "saveStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE => "saveStorgaFile",
 
-            BaseActiveRecord::EVENT_AFTER_INSERT      => "afterSaveStorgaFile",
-            BaseActiveRecord::EVENT_AFTER_UPDATE      => "afterSaveStorgaFile",
+            BaseActiveRecord::EVENT_AFTER_INSERT => "afterSaveStorgaFile",
+            BaseActiveRecord::EVENT_AFTER_UPDATE => "afterSaveStorgaFile",
         ];
     }
 
@@ -68,44 +70,34 @@ class HasStorageFile extends Behavior
      */
     public function saveStorgaFile($e)
     {
-        foreach ($this->fields as $fieldCode)
-        {
+        foreach ($this->fields as $fieldCode) {
             /**
              * Удалить старые файлы
              */
-            if ($this->owner->isAttributeChanged($fieldCode))
-            {
-                if ($this->owner->getOldAttribute($fieldCode) && $this->owner->getOldAttribute($fieldCode) != $this->owner->{$fieldCode})
-                {
+            if ($this->owner->isAttributeChanged($fieldCode)) {
+                if ($this->owner->getOldAttribute($fieldCode) && $this->owner->getOldAttribute($fieldCode) != $this->owner->{$fieldCode}) {
                     $this->_removeFiles[] = $this->owner->getOldAttribute($fieldCode);
                 }
             }
 
-            if ($this->owner->{$fieldCode} && is_string($this->owner->{$fieldCode}) && ((string) (int) $this->owner->{$fieldCode} != (string) $this->owner->{$fieldCode}))
-            {
-                try
-                {
+            if ($this->owner->{$fieldCode} && is_string($this->owner->{$fieldCode}) && ((string)(int)$this->owner->{$fieldCode} != (string)$this->owner->{$fieldCode})) {
+                try {
                     $data = [];
 
-                    if (isset($this->owner->{$this->nameAttribute}))
-                    {
-                        if ($name = $this->owner->{$this->nameAttribute})
-                        {
+                    if (isset($this->owner->{$this->nameAttribute})) {
+                        if ($name = $this->owner->{$this->nameAttribute}) {
                             $data['name'] = $name;
                         }
                     }
 
                     $file = \Yii::$app->storage->upload($this->owner->{$fieldCode}, $data);
-                    if ($file)
-                    {
+                    if ($file) {
                         $this->owner->{$fieldCode} = $file->id;
-                    } else
-                    {
+                    } else {
                         $this->owner->{$fieldCode} = null;
                     }
 
-                } catch (\Exception $e)
-                {
+                } catch (\Exception $e) {
                     \Yii::error($e->getMessage());
                     $this->owner->{$fieldCode} = null;
                 }
@@ -119,12 +111,9 @@ class HasStorageFile extends Behavior
      */
     public function afterSaveStorgaFile()
     {
-        if ($this->_removeFiles)
-        {
-            if ($files = StorageFile::find()->where(['id' => $this->_removeFiles])->all())
-            {
-                foreach ($files as $file)
-                {
+        if ($this->_removeFiles) {
+            if ($files = StorageFile::find()->where(['id' => $this->_removeFiles])->all()) {
+                foreach ($files as $file) {
                     $file->delete();
                 }
             }
@@ -137,17 +126,13 @@ class HasStorageFile extends Behavior
      */
     public function deleteStorgaFile()
     {
-        if (!$this->onDeleteCascade)
-        {
+        if (!$this->onDeleteCascade) {
             return $this;
         }
 
-        foreach ($this->fields as $fieldValue)
-        {
-            if ($fileId = $this->owner->{$fieldValue})
-            {
-                if ($storageFile = CmsStorageFile::findOne($fileId))
-                {
+        foreach ($this->fields as $fieldValue) {
+            if ($fileId = $this->owner->{$fieldValue}) {
+                if ($storageFile = CmsStorageFile::findOne($fileId)) {
                     $storageFile->delete();
                 }
             }

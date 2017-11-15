@@ -8,7 +8,9 @@
  * @date 28.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models\forms;
+
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -29,10 +31,12 @@ class PasswordResetRequestForm extends Model
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'exist',
+            [
+                'email',
+                'exist',
                 'targetClass' => $identityClassName,
                 'filter' => ['status' => $identityClassName::STATUS_ACTIVE],
-                'message' => \Yii::t('skeeks/cms','There is no user with such email.')
+                'message' => \Yii::t('skeeks/cms', 'There is no user with such email.')
             ],
         ];
     }
@@ -58,18 +62,18 @@ class PasswordResetRequestForm extends Model
             if ($user->save()) {
 
 
-
-                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
-                    '@app/mail' =>
+                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap,
                     [
-                        '@skeeks/cms/mail-templates'
-                    ]
-                ]);
+                        '@app/mail' =>
+                            [
+                                '@skeeks/cms/mail-templates'
+                            ]
+                    ]);
 
                 return \Yii::$app->mailer->compose('@app/mail/password-reset-token', ['user' => $user])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
                     ->setTo($this->email)
-                    ->setSubject(\Yii::t('skeeks/cms','Password reset for ') . \Yii::$app->cms->appName)
+                    ->setSubject(\Yii::t('skeeks/cms', 'Password reset for ') . \Yii::$app->cms->appName)
                     ->send();
             }
         }

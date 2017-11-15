@@ -51,20 +51,20 @@ use yii\helpers\ArrayHelper;
  *
  * @property string $adminPermissionName
  *
- * @property CmsTree                $rootTree
- * @property CmsTree                $defaultTree
- * @property CmsContentType         $contentType
- * @property CmsContentElement[]    $cmsContentElements
- * @property CmsContentProperty[]   $cmsContentProperties
+ * @property CmsTree $rootTree
+ * @property CmsTree $defaultTree
+ * @property CmsContentType $contentType
+ * @property CmsContentElement[] $cmsContentElements
+ * @property CmsContentProperty[] $cmsContentProperties
  *
- * @property CmsContent             $parentContent
- * @property CmsContent[]           $childrenContents
+ * @property CmsContent $parentContent
+ * @property CmsContent[] $childrenContents
  */
 class CmsContent extends Core
 {
-    const CASCADE   = 'CASCADE';
-    const RESTRICT  = 'RESTRICT';
-    const SET_NULL  = 'SET_NULL';
+    const CASCADE = 'CASCADE';
+    const RESTRICT = 'RESTRICT';
+    const SET_NULL = 'SET_NULL';
 
     /**
      * @return array
@@ -72,11 +72,13 @@ class CmsContent extends Core
     static public function getOnDeleteOptions()
     {
         return [
-            self::CASCADE => "CASCADE (" . \Yii::t('skeeks/cms', 'Remove all items of that content') .  ")",
-            self::RESTRICT => "RESTRICT (" . \Yii::t('skeeks/cms', 'Deny delete parent is not removed, these elements') .  ")",
-            self::SET_NULL => "SET NULL (" . \Yii::t('skeeks/cms', 'Remove the connection to a remote parent') .  ")",
+            self::CASCADE => "CASCADE (" . \Yii::t('skeeks/cms', 'Remove all items of that content') . ")",
+            self::RESTRICT => "RESTRICT (" . \Yii::t('skeeks/cms',
+                    'Deny delete parent is not removed, these elements') . ")",
+            self::SET_NULL => "SET NULL (" . \Yii::t('skeeks/cms', 'Remove the connection to a remote parent') . ")",
         ];
     }
+
     /**
      * @inheritdoc
      */
@@ -117,12 +119,12 @@ class CmsContent extends Core
             'meta_description_template' => Yii::t('skeeks/cms', 'Шаблон META KEYWORDS'),
             'meta_keywords_template' => Yii::t('skeeks/cms', 'Шаблон META DESCRIPTION'),
 
-            'access_check_element'  => Yii::t('skeeks/cms', 'Включить управление доступом к элементам'),
-            'parent_content_id'     => Yii::t('skeeks/cms', 'Parent content'),
+            'access_check_element' => Yii::t('skeeks/cms', 'Включить управление доступом к элементам'),
+            'parent_content_id' => Yii::t('skeeks/cms', 'Parent content'),
 
-            'visible'                       => Yii::t('skeeks/cms', 'Show in menu'),
-            'parent_content_on_delete'      => Yii::t('skeeks/cms', 'At the time of removal of the parent element'),
-            'parent_content_is_required'    => Yii::t('skeeks/cms', 'Parent element is required to be filled'),
+            'visible' => Yii::t('skeeks/cms', 'Show in menu'),
+            'parent_content_on_delete' => Yii::t('skeeks/cms', 'At the time of removal of the parent element'),
+            'parent_content_is_required' => Yii::t('skeeks/cms', 'Parent element is required to be filled'),
         ]);
     }
 
@@ -132,7 +134,10 @@ class CmsContent extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id'], 'integer'],
+            [
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id'],
+                'integer'
+            ],
             [['name', 'content_type'], 'required'],
             [['description'], 'string'],
             [['meta_title_template'], 'string'],
@@ -146,32 +151,36 @@ class CmsContent extends Core
             [['active', 'index_for_search', 'tree_chooser', 'list_mode', 'is_allow_change_tree'], 'string', 'max' => 1],
             [['content_type'], 'string', 'max' => 32],
             [['name_meny', 'name_one'], 'string', 'max' => 100],
-            ['priority', 'default', 'value'         => 500],
-            ['active', 'default', 'value'           => Cms::BOOL_Y],
-            ['is_allow_change_tree', 'default', 'value'           => Cms::BOOL_Y],
-            ['access_check_element', 'default', 'value'           => Cms::BOOL_N],
-            ['name_meny', 'default', 'value'    => Yii::t('skeeks/cms', 'Elements')],
-            ['name_one', 'default', 'value'     => Yii::t('skeeks/cms', 'Element')],
+            ['priority', 'default', 'value' => 500],
+            ['active', 'default', 'value' => Cms::BOOL_Y],
+            ['is_allow_change_tree', 'default', 'value' => Cms::BOOL_Y],
+            ['access_check_element', 'default', 'value' => Cms::BOOL_N],
+            ['name_meny', 'default', 'value' => Yii::t('skeeks/cms', 'Elements')],
+            ['name_one', 'default', 'value' => Yii::t('skeeks/cms', 'Element')],
 
 
-            ['visible', 'default', 'value'                              => Cms::BOOL_Y],
-            ['parent_content_is_required', 'default', 'value'           => Cms::BOOL_Y],
-            ['parent_content_on_delete', 'default', 'value'             => self::CASCADE],
+            ['visible', 'default', 'value' => Cms::BOOL_Y],
+            ['parent_content_is_required', 'default', 'value' => Cms::BOOL_Y],
+            ['parent_content_on_delete', 'default', 'value' => self::CASCADE],
 
             ['parent_content_id', 'integer'],
 
-            ['code', 'default', 'value' => function($model, $attribute)
-            {
-                return "sxauto" . md5(rand(1, 10) . time());
-            }],
+            [
+                'code',
+                'default',
+                'value' => function ($model, $attribute) {
+                    return "sxauto" . md5(rand(1, 10) . time());
+                }
+            ],
         ]);
     }
 
     public function validateCode($attribute)
     {
-        if(!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute))
-        {
-            $this->addError($attribute, \Yii::t('skeeks/cms','Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',['code' => 'code1']));
+        if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute)) {
+            $this->addError($attribute, \Yii::t('skeeks/cms',
+                'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
+                ['code' => 'code1']));
         }
     }
 
@@ -186,23 +195,19 @@ class CmsContent extends Core
      */
     static public function getDataForSelect($refetch = false, $contentQueryCallback = null)
     {
-        if ($refetch === false && static::$_selectData)
-        {
+        if ($refetch === false && static::$_selectData) {
             return static::$_selectData;
         }
 
         static::$_selectData = [];
 
-        if ($cmsContentTypes = CmsContentType::find()->orderBy("priority ASC")->all())
-        {
+        if ($cmsContentTypes = CmsContentType::find()->orderBy("priority ASC")->all()) {
             /**
              * @var $cmsContentType CmsContentType
              */
-            foreach ($cmsContentTypes as $cmsContentType)
-            {
+            foreach ($cmsContentTypes as $cmsContentType) {
                 $query = $cmsContentType->getCmsContents();
-                if ($contentQueryCallback && is_callable($contentQueryCallback))
-                {
+                if ($contentQueryCallback && is_callable($contentQueryCallback)) {
                     $contentQueryCallback($query);
                 }
 
@@ -255,9 +260,6 @@ class CmsContent extends Core
     }*/
 
 
-
-
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -271,9 +273,9 @@ class CmsContent extends Core
      */
     public function getCmsContentProperties()
     {
-        return $this->hasMany(CmsContentProperty::className(), ['id' => 'cms_content_property_id'])->viaTable('cms_content_property2content', ['cms_content_id' => 'id']);
+        return $this->hasMany(CmsContentProperty::className(),
+            ['id' => 'cms_content_property_id'])->viaTable('cms_content_property2content', ['cms_content_id' => 'id']);
     }
-
 
 
     /**
@@ -285,8 +287,7 @@ class CmsContent extends Core
     }
 
 
-
-     /**
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getParentContent()

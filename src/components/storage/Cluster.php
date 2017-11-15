@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\components\storage;
+
 use Yii;
 use yii\base\Component;
 
@@ -124,22 +125,18 @@ abstract class Cluster extends Model
      */
     public function getClusterDir($newName)
     {
-        $localDir        =  "";
+        $localDir = "";
 
-        if ($this->directoryLevel > 0)
-        {
+        if ($this->directoryLevel > 0) {
             $count = 0;
-            for ($i = 0; $i < $this->directoryLevel; ++$i)
-            {
-                $count ++;
-                if (($prefix = substr($newName, $i + $i, 2)) !== false)
-                {
-                    if ($count > 1)
-                    {
+            for ($i = 0; $i < $this->directoryLevel; ++$i) {
+                $count++;
+                if (($prefix = substr($newName, $i + $i, 2)) !== false) {
+                    if ($count > 1) {
                         $localDir .= DIRECTORY_SEPARATOR;
                     }
 
-                    $localDir .=  $prefix;
+                    $localDir .= $prefix;
                 }
             }
         }
@@ -158,11 +155,9 @@ abstract class Cluster extends Model
     {
         $originalFileName->getExtension();
         // generate a unique file name
-        $newName =  md5(microtime() . rand(0,100)) ;
-        return $originalFileName->getExtension() ? $newName .  "." . $originalFileName->getExtension() : $newName;
+        $newName = md5(microtime() . rand(0, 100));
+        return $originalFileName->getExtension() ? $newName . "." . $originalFileName->getExtension() : $newName;
     }
-
-
 
 
     /**
@@ -189,7 +184,7 @@ abstract class Cluster extends Model
      */
     public function getUsedSpace()
     {
-        return (float) ($this->getTotalSpace() - $this->getFreeSpace());
+        return (float)($this->getTotalSpace() - $this->getFreeSpace());
     }
 
     /**
@@ -207,6 +202,6 @@ abstract class Cluster extends Model
      */
     public function getUsedSpacePct()
     {
-        return (float) (100 - $this->getFreeSpacePct());
+        return (float)(100 - $this->getFreeSpacePct());
     }
 }

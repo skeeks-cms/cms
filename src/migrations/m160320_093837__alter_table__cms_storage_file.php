@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -14,9 +15,9 @@ class m160320_093837__alter_table__cms_storage_file extends Migration
     {
         //m220319_093837__alter_table__cms_storage_file
 
-        if ($this->db->createCommand('SELECT * FROM migration WHERE version="m220319_093837__alter_table__cms_storage_file"')->queryOne())
-        {
-            $this->db->createCommand()->delete('migration', 'version = "m220319_093837__alter_table__cms_storage_file"')->execute();
+        if ($this->db->createCommand('SELECT * FROM migration WHERE version="m220319_093837__alter_table__cms_storage_file"')->queryOne()) {
+            $this->db->createCommand()->delete('migration',
+                'version = "m220319_093837__alter_table__cms_storage_file"')->execute();
             return true;
         }
 

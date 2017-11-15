@@ -5,7 +5,9 @@
  * @copyright (c) 2010 SkeekS
  * @date 05.05.2017
  */
+
 namespace skeeks\cms\validators;
+
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
@@ -23,8 +25,7 @@ class FileValidator extends \yii\validators\FileValidator
      */
     protected function validateValue($value)
     {
-        if (is_string($value) && file_exists($value))
-        {
+        if (is_string($value) && file_exists($value)) {
             $uploadFile = new UploadedFile();
             $uploadFile->size = filesize($value);
             $uploadFile->type = FileHelper::getMimeType($value, null, false);
@@ -34,8 +35,7 @@ class FileValidator extends \yii\validators\FileValidator
             $value = $uploadFile;
 
             return parent::validateValue($value);
-        } else
-        {
+        } else {
             //TODO:: Создавать UploadedFile из CmsStorageFile
             return null;
         }

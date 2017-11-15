@@ -13,8 +13,7 @@ $filter->addRule('id', 'integer');
 
 $filter->load(\Yii::$app->request->get());
 
-if ($filter->id)
-{
+if ($filter->id) {
     $dataProvider->query->andWhere(['id' => $filter->id]);
 }
 
@@ -23,18 +22,18 @@ if ($filter->id)
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
-    <?= $form->field($searchModel, 'value')->setVisible(true)->textInput([
-        'placeholder' => \Yii::t('skeeks/cms', 'Search by name')
-    ]); ?>
+<?= $form->field($searchModel, 'value')->setVisible(true)->textInput([
+    'placeholder' => \Yii::t('skeeks/cms', 'Search by name')
+]); ?>
 
-    <?= $form->field($searchModel, 'property_id')->label(\Yii::t('skeeks/cms', 'Property'))->setVisible(true)->widget(
-        \skeeks\widget\chosen\Chosen::class,
-        [
-            'multiple' => true,
-            'items' => \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\models\CmsContentProperty::find()->all(), 'id', 'name'
-            )
-        ]
-    ); ?>
+<?= $form->field($searchModel, 'property_id')->label(\Yii::t('skeeks/cms', 'Property'))->setVisible(true)->widget(
+    \skeeks\widget\chosen\Chosen::class,
+    [
+        'multiple' => true,
+        'items' => \yii\helpers\ArrayHelper::map(
+            \skeeks\cms\models\CmsContentProperty::find()->all(), 'id', 'name'
+        )
+    ]
+); ?>
 
 <? $form::end(); ?>

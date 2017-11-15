@@ -20,7 +20,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsContent[] $cmsContents
  * @property CmsContentProperty2content[] $cmsContentProperty2contents
- * 
+ *
  * @property CmsContentPropertyEnum[] $enums
  * @property CmsContentElementProperty[] $elementProperties
  *
@@ -90,7 +90,7 @@ class CmsContentProperty extends RelatedPropertyModel
 
         return $rules;
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -104,7 +104,8 @@ class CmsContentProperty extends RelatedPropertyModel
      */
     public function getCmsContents()
     {
-        return $this->hasMany(CmsContent::className(), ['id' => 'cms_content_id'])->viaTable('cms_content_property2content', ['cms_content_property_id' => 'id']);
+        return $this->hasMany(CmsContent::className(),
+            ['id' => 'cms_content_id'])->viaTable('cms_content_property2content', ['cms_content_property_id' => 'id']);
     }
 
 
@@ -121,6 +122,7 @@ class CmsContentProperty extends RelatedPropertyModel
      */
     public function getCmsTrees()
     {
-        return $this->hasMany(CmsTree::className(), ['id' => 'cms_tree_id'])->viaTable('cms_content_property2tree', ['cms_content_property_id' => 'id']);
+        return $this->hasMany(CmsTree::className(), ['id' => 'cms_tree_id'])->viaTable('cms_content_property2tree',
+            ['cms_content_property_id' => 'id']);
     }
 }

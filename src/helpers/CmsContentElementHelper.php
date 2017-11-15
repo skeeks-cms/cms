@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 13.08.2015
  */
+
 namespace skeeks\cms\helpers;
 
 use skeeks\cms\models\CmsContentElement;
@@ -49,8 +50,7 @@ abstract class CmsContentElementHelper extends Component
      */
     static public function instance($model, $data = [])
     {
-        if ($package = ArrayHelper::getValue(static::$instances, $model->id))
-        {
+        if ($package = ArrayHelper::getValue(static::$instances, $model->id)) {
             return $package;
         }
 

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 14.04.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\forms\PasswordChangeForm;
@@ -34,8 +35,8 @@ class ModelPropertiesController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'validate'  => ['post'],
-                    'submit'    => ['post'],
+                    'validate' => ['post'],
+                    'submit' => ['post'],
                 ],
             ],
         ]);
@@ -48,8 +49,7 @@ class ModelPropertiesController extends Controller
      */
     public function actionSubmit()
     {
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             \Yii::$app->response->format = Response::FORMAT_JSON;
 
             $response = [
@@ -57,8 +57,7 @@ class ModelPropertiesController extends Controller
                 'message' => 'Произошла ошибка',
             ];
 
-            if (\Yii::$app->request->post('sx-model') && \Yii::$app->request->post('sx-model-value'))
-            {
+            if (\Yii::$app->request->post('sx-model') && \Yii::$app->request->post('sx-model-value')) {
                 $modelClass = \Yii::$app->request->post('sx-model');
                 $modelValue = \Yii::$app->request->post('sx-model-value');
                 /**
@@ -66,22 +65,18 @@ class ModelPropertiesController extends Controller
                  */
                 $modelForm = $modelClass::find()->where(['id' => $modelValue])->one();
 
-                if (method_exists($modelForm, "createPropertiesValidateModel"))
-                {
+                if (method_exists($modelForm, "createPropertiesValidateModel")) {
                     $validateModel = $modelForm->createPropertiesValidateModel();
-                } else
-                {
+                } else {
                     $validateModel = $modelForm->getRelatedPropertiesModel();
                 }
 
-                if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate())
-                {
+                if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate()) {
                     $validateModel->save();
                     $response['success'] = true;
                     $response['message'] = 'Успешно отправлена';
 
-                } else
-                {
+                } else {
                     $response['message'] = 'Форма заполнена неправильно';
                 }
 
@@ -96,10 +91,8 @@ class ModelPropertiesController extends Controller
      */
     public function actionValidate()
     {
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
-            if (\Yii::$app->request->post('sx-model') && \Yii::$app->request->post('sx-model-value'))
-            {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
+            if (\Yii::$app->request->post('sx-model') && \Yii::$app->request->post('sx-model-value')) {
                 $modelClass = \Yii::$app->request->post('sx-model');
                 $modelValue = \Yii::$app->request->post('sx-model-value');
 
@@ -108,11 +101,9 @@ class ModelPropertiesController extends Controller
                  */
                 $modelForm = $modelClass::find()->where(['id' => $modelValue])->one();
 
-                if (method_exists($modelForm, "createPropertiesValidateModel"))
-                {
+                if (method_exists($modelForm, "createPropertiesValidateModel")) {
                     $model = $modelForm->createPropertiesValidateModel();
-                } else
-                {
+                } else {
                     $model = $modelForm->getRelatedPropertiesModel();
                 }
 

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -19,9 +20,9 @@ class AdminCmsContentController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/cms', 'Content management');
-        $this->modelShowAttribute      = "name";
-        $this->modelClassName          = CmsContent::class;
+        $this->name = \Yii::t('skeeks/cms', 'Content management');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = CmsContent::class;
 
         parent::init();
     }
@@ -33,14 +34,15 @@ class AdminCmsContentController extends AdminModelEditorController
     {
         $contentTypePk = null;
 
-        if ($this->model)
-        {
-            if ($contentType = $this->model->contentType)
-            {
+        if ($this->model) {
+            if ($contentType = $this->model->contentType) {
                 $contentTypePk = $contentType->id;
             }
         }
 
-        return UrlHelper::construct(["cms/admin-cms-content-type/update", 'pk' => $contentTypePk])->enableAdmin()->toString();
+        return UrlHelper::construct([
+            "cms/admin-cms-content-type/update",
+            'pk' => $contentTypePk
+        ])->enableAdmin()->toString();
     }
 }

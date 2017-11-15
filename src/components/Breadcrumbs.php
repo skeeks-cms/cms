@@ -8,6 +8,7 @@
  * @date 15.01.2015
  * @since 1.0.0
  */
+
 namespace skeeks\cms\components;
 
 use skeeks\cms\base\components\Descriptor;
@@ -45,14 +46,14 @@ class Breadcrumbs extends Component
      */
     public function append($data)
     {
-        if (is_array($data))
-        {
+        if (is_array($data)) {
             $this->parts[] = $data;
-        } else if (is_string($data))
-        {
-            $this->parts[] = [
-                'name' => $data
-            ];
+        } else {
+            if (is_string($data)) {
+                $this->parts[] = [
+                    'name' => $data
+                ];
+            }
         }
 
         return $this;
@@ -64,15 +65,14 @@ class Breadcrumbs extends Component
      */
     public function setPartsByTree(Tree $tree)
     {
-        $parents    = $tree->parents;
-        $parents[]  = $tree;
+        $parents = $tree->parents;
+        $parents[] = $tree;
 
-        foreach ($parents as $tree)
-        {
+        foreach ($parents as $tree) {
             $this->append([
-                'name'          => $tree->name,
-                'url'           => $tree->url,
-                'data'          => [
+                'name' => $tree->name,
+                'url' => $tree->url,
+                'data' => [
                     'model' => $tree
                 ],
             ]);
@@ -83,8 +83,7 @@ class Breadcrumbs extends Component
 
     public function createBase($baseData = [])
     {
-        if (!$baseData)
-        {
+        if (!$baseData) {
             $baseData = [
                 'name' => \Yii::t('yii', 'Home'),
                 'url' => '/'

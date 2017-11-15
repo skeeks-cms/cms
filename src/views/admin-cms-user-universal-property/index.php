@@ -16,26 +16,26 @@
 ?>
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php /*echo $this->render('_search', [
+<?php /*echo $this->render('_search', [
         'searchModel' => $searchModel,
         'dataProvider' => $dataProvider
-    ]); */?>
+    ]); */ ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'  => $dataProvider,
-        'filterModel'   => $searchModel,
-        'adminController'   => $controller,
-        'pjax'              => $pjax,
-        'columns' => [
-            'name',
-            'code',
-            [
-                'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                'falseValue' => \skeeks\cms\components\Cms::BOOL_N,
-                'trueValue' => \skeeks\cms\components\Cms::BOOL_Y,
-                'attribute' => 'active'
-            ],
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'adminController' => $controller,
+    'pjax' => $pjax,
+    'columns' => [
+        'name',
+        'code',
+        [
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'falseValue' => \skeeks\cms\components\Cms::BOOL_N,
+            'trueValue' => \skeeks\cms\components\Cms::BOOL_Y,
+            'attribute' => 'active'
         ],
-    ]); ?>
+    ],
+]); ?>
 
 <? $pjax::end(); ?>

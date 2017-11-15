@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (�����)
  * @date 14.04.2016
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
@@ -29,14 +30,16 @@ class TreeController extends Controller
 
     public function init()
     {
-        if ($this->model && \Yii::$app->cmsToolbar)
-        {
+        if ($this->model && \Yii::$app->cmsToolbar) {
             $controller = \Yii::$app->createController('cms/admin-tree')[0];
-            $adminControllerRoute = ['/cms/admin-tree/update', $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}];
+            $adminControllerRoute = [
+                '/cms/admin-tree/update',
+                $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}
+            ];
 
             $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
-                                    ->enableEmptyLayout()
-                                    ->url;
+                ->enableEmptyLayout()
+                ->url;
             /*$urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
                 ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();*/
 
@@ -52,13 +55,11 @@ class TreeController extends Controller
      */
     public function getModel()
     {
-        if ($this->_model !== false)
-        {
+        if ($this->_model !== false) {
             return $this->_model;
         }
 
-        if (!$id = \Yii::$app->request->get('id'))
-        {
+        if (!$id = \Yii::$app->request->get('id')) {
             $this->_model = null;
             return false;
         }
@@ -76,36 +77,31 @@ class TreeController extends Controller
      */
     public function actionView()
     {
-        if (!$this->model)
-        {
+        if (!$this->model) {
             throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Page not found'));
         }
 
         \Yii::$app->cms->setCurrentTree($this->model);
         \Yii::$app->breadcrumbs->setPartsByTree($this->model);
 
-        if ($this->model->redirect || $this->model->redirect_tree_id)
-        {
+        if ($this->model->redirect || $this->model->redirect_tree_id) {
             return \Yii::$app->response->redirect($this->model->url, $this->model->redirect_code);
         }
 
         $viewFile = $this->action->id;
         //������� ��������� view ��� �������� ���� ��������
-        if ($this->model)
-        {
+        if ($this->model) {
             //���� � ������� ������ ������������ ������, �������� ���, ����� ������ ���� ��������
-            if ($this->model->view_file)
-            {
+            if ($this->model->view_file) {
                 $viewFile = $this->model->view_file;
 
-            } else if ($this->model->treeType)
-            {
-                if ($this->model->treeType->viewFile)
-                {
-                    $viewFile = $this->model->treeType->viewFile;
-                } else
-                {
-                    $viewFile = $this->model->treeType->code;
+            } else {
+                if ($this->model->treeType) {
+                    if ($this->model->treeType->viewFile) {
+                        $viewFile = $this->model->treeType->viewFile;
+                    } else {
+                        $viewFile = $this->model->treeType->code;
+                    }
                 }
             }
         }
@@ -128,39 +124,31 @@ class TreeController extends Controller
     {
         $model = $this->model;
 
-        if ($title = $model->meta_title)
-        {
+        if ($title = $model->meta_title) {
             $this->view->title = $title;
-        } else
-        {
-            if (isset($model->name))
-            {
+        } else {
+            if (isset($model->name)) {
                 $this->view->title = $model->name;
             }
         }
 
-        if ($meta_keywords = $model->meta_keywords)
-        {
+        if ($meta_keywords = $model->meta_keywords) {
             $this->view->registerMetaTag([
-                "name"      => 'keywords',
-                "content"   => $meta_keywords
+                "name" => 'keywords',
+                "content" => $meta_keywords
             ], 'keywords');
         }
 
-        if ($meta_descripption = $model->meta_description)
-        {
+        if ($meta_descripption = $model->meta_description) {
             $this->view->registerMetaTag([
-                "name"      => 'description',
-                "content"   => $meta_descripption
+                "name" => 'description',
+                "content" => $meta_descripption
             ], 'description');
-        }
-        else
-        {
-            if (isset($model->name))
-            {
+        } else {
+            if (isset($model->name)) {
                 $this->view->registerMetaTag([
-                    "name"      => 'description',
-                    "content"   => $model->name
+                    "name" => 'description',
+                    "content" => $model->name
                 ], 'description');
             }
         }

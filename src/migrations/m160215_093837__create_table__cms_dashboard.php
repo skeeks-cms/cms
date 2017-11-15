@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m160215_093837__create_table__cms_dashboard extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_dashboard}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,21 +24,21 @@ class m160215_093837__create_table__cms_dashboard extends Migration
         }
 
         $this->createTable("{{%cms_dashboard}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'name'                  => $this->string(255)->notNull(),
-            'cms_user_id'           => $this->integer(),
+            'name' => $this->string(255)->notNull(),
+            'cms_user_id' => $this->integer(),
 
-            'priority'              => $this->integer()->notNull()->defaultValue(100),
+            'priority' => $this->integer()->notNull()->defaultValue(100),
 
-            'columns'               => $this->integer()->notNull()->unsigned()->defaultValue(1),
-            'columns_settings'      => $this->text(),
+            'columns' => $this->integer()->notNull()->unsigned()->defaultValue(1),
+            'columns_settings' => $this->text(),
 
         ], $tableOptions);
 

@@ -11,30 +11,31 @@
 
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Showing')); ?>
-    <?= $form->field($model, 'viewFile')->textInput(); ?>
+<?= $form->field($model, 'viewFile')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Data source')); ?>
-    <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
+<?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
 
-    <?/*= $form->fieldSelectMulti($model, 'searchModelAttributes', [
+<? /*= $form->fieldSelectMulti($model, 'searchModelAttributes', [
         'image' => \Yii::t('skeeks/cms', 'Filter by photo'),
         'hasQuantity' => \Yii::t('skeeks/cms', 'Filter by availability')
-    ]); */?>
+    ]); */ ?>
 
-    <?/*= $form->field($model, 'searchModelAttributes')->dropDownList([
+<? /*= $form->field($model, 'searchModelAttributes')->dropDownList([
         'image' => \Yii::t('skeeks/cms', 'Filter by photo'),
         'hasQuantity' => \Yii::t('skeeks/cms', 'Filter by availability')
     ], [
 'multiple' => true,
 'size' => 4
-]); */?>
+]); */ ?>
 
-    <? if ($model->cmsContent) : ?>
-        <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
-    <? else: ?>
-        Дополнительные свойства появятся после сохранения настроек
-    <? endif; ?>
+<? if ($model->cmsContent) : ?>
+    <?= $form->fieldSelectMulti($model, 'realatedProperties',
+        \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
+<? else: ?>
+    Дополнительные свойства появятся после сохранения настроек
+<? endif; ?>
 
 
 

@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 06.03.2016
  */
+
 namespace skeeks\cms\helpers;
+
 use yii\base\Behavior;
 use yii\base\Component;
 
@@ -24,25 +26,22 @@ class ComponentHelper extends Component
      */
     static public function hasBehavior($component, $behavior)
     {
-        if ($behavior instanceof Behavior)
-        {
-            $behavior = (string) $behavior->className();
-        } else if (is_string($behavior))
-        {
-            $behavior = (string) $behavior;
+        if ($behavior instanceof Behavior) {
+            $behavior = (string)$behavior->className();
+        } else {
+            if (is_string($behavior)) {
+                $behavior = (string)$behavior;
+            }
         }
 
-        if (!method_exists($component, 'getBehaviors'))
-        {
+        if (!method_exists($component, 'getBehaviors')) {
             return false;
         }
 
         $hasBehaviors = $component->getBehaviors();
 
-        foreach ($hasBehaviors as $hasBehavior)
-        {
-            if ($hasBehavior instanceof $behavior)
-            {
+        foreach ($hasBehaviors as $hasBehavior) {
+            if ($hasBehavior instanceof $behavior) {
                 return true;
             }
         }
@@ -60,10 +59,8 @@ class ComponentHelper extends Component
      */
     static public function hasBehaviorsOr(Component $component, $behaviors = [])
     {
-        foreach ($behaviors as $behavior)
-        {
-            if (static::hasBehavior($component, $behavior))
-            {
+        foreach ($behaviors as $behavior) {
+            if (static::hasBehavior($component, $behavior)) {
                 return true;
             }
         }

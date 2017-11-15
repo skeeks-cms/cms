@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 25.05.2015
  */
+
 namespace skeeks\cms\cmsWidgets\filters;
 
 use skeeks\cms\base\Widget;
@@ -28,7 +29,7 @@ use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
- * @property CmsContent         $cmsContent;
+ * @property CmsContent $cmsContent;
  *
  * Class ShopProductFiltersWidget
  * @package skeeks\cms\cmsWidgets\filters
@@ -37,34 +38,34 @@ class ContentElementFiltersWidget extends WidgetRenderable
 {
     //Навигация
     public $content_id;
-    public $searchModelAttributes       = [];
+    public $searchModelAttributes = [];
 
-    public $realatedProperties          = [];
+    public $realatedProperties = [];
 
     /**
      * @var bool Учитывать только доступные фильтры для текущей выборки
      */
-    public $onlyExistsFilters           = false;
+    public $onlyExistsFilters = false;
     /**
      * @var array (Массив ids записей, для показа только нужных фильтров)
      */
-    public $elementIds          = [];
+    public $elementIds = [];
 
 
     /**
      * @var SearchProductsModel
      */
-    public $searchModel                 = null;
+    public $searchModel = null;
 
     /**
      * @var SearchRelatedPropertiesModel
      */
-    public $searchRelatedPropertiesModel  = null;
+    public $searchRelatedPropertiesModel = null;
 
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Фильтры',
+            'name' => 'Фильтры',
         ]);
     }
 
@@ -72,57 +73,51 @@ class ContentElementFiltersWidget extends WidgetRenderable
     {
         parent::init();
 
-        if (!$this->searchModelAttributes)
-        {
+        if (!$this->searchModelAttributes) {
             $this->searchModelAttributes = [];
         }
 
-        if (!$this->searchModel)
-        {
+        if (!$this->searchModel) {
             $this->searchModel = new \skeeks\cms\cmsWidgets\filters\models\SearchProductsModel();
         }
 
-        if (!$this->searchRelatedPropertiesModel && $this->cmsContent)
-        {
+        if (!$this->searchRelatedPropertiesModel && $this->cmsContent) {
             $this->searchRelatedPropertiesModel = new SearchRelatedPropertiesModel();
             $this->searchRelatedPropertiesModel->initCmsContent($this->cmsContent);
         }
 
         $this->searchModel->load(\Yii::$app->request->get());
 
-        if ($this->searchRelatedPropertiesModel)
-        {
+        if ($this->searchRelatedPropertiesModel) {
             $this->searchRelatedPropertiesModel->load(\Yii::$app->request->get());
         }
     }
 
 
-
-
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'content_id'                => \Yii::t('skeeks/cms', 'Content'),
-            'searchModelAttributes'     => \Yii::t('skeeks/cms', 'Fields'),
-            'realatedProperties'        => \Yii::t('skeeks/cms', 'Properties'),
-        ]);
+            [
+                'content_id' => \Yii::t('skeeks/cms', 'Content'),
+                'searchModelAttributes' => \Yii::t('skeeks/cms', 'Fields'),
+                'realatedProperties' => \Yii::t('skeeks/cms', 'Properties'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            [['content_id'], 'integer'],
-            [['searchModelAttributes'], 'safe'],
-            [['realatedProperties'], 'safe'],
-        ]);
+            [
+                [['content_id'], 'integer'],
+                [['searchModelAttributes'], 'safe'],
+                [['realatedProperties'], 'safe'],
+            ]);
     }
 
     public function renderConfigForm(ActiveForm $form)
     {
         echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
-            'form'  => $form,
+            'form' => $form,
             'model' => $this
         ], $this);
     }
@@ -140,28 +135,25 @@ class ContentElementFiltersWidget extends WidgetRenderable
      */
     public function search(ActiveDataProvider $activeDataProvider)
     {
-        if ($this->onlyExistsFilters)
-        {
+        if ($this->onlyExistsFilters) {
             /**
              * @var $query \yii\db\ActiveQuery
              */
-            $query  = clone $activeDataProvider->query;
+            $query = clone $activeDataProvider->query;
 
             $query->with = [];
             $query->select(['cms_content_element.id as mainId', 'cms_content_element.id as id'])->indexBy('mainId');
-            $ids    = $query->asArray()->all();
+            $ids = $query->asArray()->all();
 
             $this->elementIds = array_keys($ids);
         }
 
         $this->searchModel->search($activeDataProvider);
 
-        if ($this->searchRelatedPropertiesModel)
-        {
+        if ($this->searchRelatedPropertiesModel) {
             $this->searchRelatedPropertiesModel->search($activeDataProvider);
         }
     }
-
 
 
     /**
@@ -174,20 +166,17 @@ class ContentElementFiltersWidget extends WidgetRenderable
     {
         $options = [];
 
-        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
-        {
+        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
             $propertyType = $property->handler;
 
-            if ($this->elementIds)
-            {
+            if ($this->elementIds) {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
                     ->select(['value_enum'])
                     ->indexBy('value_enum')
                     ->andWhere(['element_id' => $this->elementIds])
                     ->andWhere(['property_id' => $property->id])
                     ->asArray()
-                    ->all()
-                ;
+                    ->all();
 
                 $availables = array_keys($availables);
             }
@@ -195,10 +184,9 @@ class ContentElementFiltersWidget extends WidgetRenderable
             $options = \skeeks\cms\models\CmsContentElement::find()
                 ->active()
                 ->andWhere(['content_id' => $propertyType->content_id]);
-                if ($this->elementIds)
-                {
-                    $options->andWhere(['id' => $availables]);
-                }
+            if ($this->elementIds) {
+                $options->andWhere(['id' => $availables]);
+            }
 
             $options = $options->select(['id', 'name'])->asArray()->all();
 
@@ -206,20 +194,17 @@ class ContentElementFiltersWidget extends WidgetRenderable
                 $options, 'id', 'name'
             );
 
-        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
-        {
+        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
             $options = $property->getEnums()->select(['id', 'value']);
 
-            if ($this->elementIds)
-            {
+            if ($this->elementIds) {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
                     ->select(['value_enum'])
                     ->indexBy('value_enum')
                     ->andWhere(['element_id' => $this->elementIds])
                     ->andWhere(['property_id' => $property->id])
                     ->asArray()
-                    ->all()
-                ;
+                    ->all();
 
                 $availables = array_keys($availables);
                 $options->andWhere(['id' => $availables]);

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 use yii\helpers\Json;
@@ -14,7 +15,8 @@ class m151023_173220_alter_table__cms_tree_type extends Migration
     public function safeUp()
     {
         $this->addColumn('{{%cms_tree_type}}', 'viewFile', $this->string(255));
-        $this->addColumn('{{%cms_tree_type}}', 'default_children_tree_type', $this->integer()); //При создании дочерние разделы будут этого типа.
+        $this->addColumn('{{%cms_tree_type}}', 'default_children_tree_type',
+            $this->integer()); //При создании дочерние разделы будут этого типа.
 
 
         $this->createIndex('viewFile', '{{%cms_tree_type}}', 'viewFile');

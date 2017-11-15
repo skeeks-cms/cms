@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.05.2015
  */
+
 namespace skeeks\cms\controllers;
+
 use skeeks\cms\admin\AdminController;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\UrlHelper;
@@ -39,46 +41,46 @@ class AdminInfoController extends AdminController
     public function actions()
     {
         return
-        [
-            'index' =>
             [
-                'class'         => BackendAction::className(),
-                'name'          => \Yii::t('skeeks/cms', 'General information'),
-                'callback'      => [$this, 'actionIndex'],
-            ]
-        ];
+                'index' =>
+                    [
+                        'class' => BackendAction::className(),
+                        'name' => \Yii::t('skeeks/cms', 'General information'),
+                        'callback' => [$this, 'actionIndex'],
+                    ]
+            ];
     }
 
     public function actionIndex()
     {
         return $this->render($this->action->id,
-        [
-            'phpVersion' => PHP_VERSION,
-            'yiiVersion' => \Yii::getVersion(),
-            'application' => [
-                'yii' => \Yii::getVersion(),
-                'name' => \Yii::$app->cms->appName,
-                'env' => YII_ENV,
-                'debug' => YII_DEBUG,
-            ],
-            'php' => [
-                'version' => PHP_VERSION,
-                'xdebug' => extension_loaded('xdebug'),
-                'apc' => extension_loaded('apc'),
-                'memcache' => extension_loaded('memcache'),
-                'xcache' => extension_loaded('xcache'),
-                'imagick' => extension_loaded('imagick'),
-                'gd' => extension_loaded('gd'),
-            ],
-            'extensions' => $this->getExtensions(),
-        ]);
+            [
+                'phpVersion' => PHP_VERSION,
+                'yiiVersion' => \Yii::getVersion(),
+                'application' => [
+                    'yii' => \Yii::getVersion(),
+                    'name' => \Yii::$app->cms->appName,
+                    'env' => YII_ENV,
+                    'debug' => YII_DEBUG,
+                ],
+                'php' => [
+                    'version' => PHP_VERSION,
+                    'xdebug' => extension_loaded('xdebug'),
+                    'apc' => extension_loaded('apc'),
+                    'memcache' => extension_loaded('memcache'),
+                    'xcache' => extension_loaded('xcache'),
+                    'imagick' => extension_loaded('imagick'),
+                    'gd' => extension_loaded('gd'),
+                ],
+                'extensions' => $this->getExtensions(),
+            ]);
     }
 
 
     public function actionPhp()
     {
-         phpinfo();
-         die;
+        phpinfo();
+        die;
     }
 
     /**
@@ -87,25 +89,22 @@ class AdminInfoController extends AdminController
      */
     public function actionWriteEnvGlobalFile()
     {
-        $env = (string) \Yii::$app->request->get('env');
-        if (!$env)
-        {
-            \Yii::$app->session->setFlash('error', \Yii::t('skeeks/cms','Not Specified Places to record'));
+        $env = (string)\Yii::$app->request->get('env');
+        if (!$env) {
+            \Yii::$app->session->setFlash('error', \Yii::t('skeeks/cms', 'Not Specified Places to record'));
             return $this->redirect(\Yii::$app->request->getReferrer());
         }
 
-        $content =<<<PHP
+        $content = <<<PHP
 <?php
 defined('YII_ENV') or define('YII_ENV', '{$env}');
 PHP;
 
         $file = new File(APP_ENV_GLOBAL_FILE);
-        if ($file->write($content))
-        {
-            \Yii::$app->session->setFlash('success', \Yii::t('skeeks/cms','File successfully created and written'));
-        } else
-        {
-            \Yii::$app->session->setFlash('error', \Yii::t('skeeks/cms','Failed to write file'));
+        if ($file->write($content)) {
+            \Yii::$app->session->setFlash('success', \Yii::t('skeeks/cms', 'File successfully created and written'));
+        } else {
+            \Yii::$app->session->setFlash('error', \Yii::t('skeeks/cms', 'Failed to write file'));
         }
 
         return $this->redirect(\Yii::$app->request->getReferrer());
@@ -114,17 +113,14 @@ PHP;
     public function actionRemoveEnvGlobalFile()
     {
         $file = new File(APP_ENV_GLOBAL_FILE);
-        if ($file->remove())
-        {
-            \Yii::$app->session->setFlash('success', \Yii::t('skeeks/cms','File deleted successfully'));
-        } else
-        {
-            \Yii::$app->session->setFlash('error', \Yii::t('skeeks/cms','Could not delete the file'));
+        if ($file->remove()) {
+            \Yii::$app->session->setFlash('success', \Yii::t('skeeks/cms', 'File deleted successfully'));
+        } else {
+            \Yii::$app->session->setFlash('error', \Yii::t('skeeks/cms', 'Could not delete the file'));
         }
 
         return $this->redirect(\Yii::$app->request->getReferrer());
     }
-
 
 
     /**
@@ -141,7 +137,6 @@ PHP;
 
         return $data;
     }
-
 
 
 }

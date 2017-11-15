@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m160315_093837__create_table__cms_user2cms_content_elements extends Migrat
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_content_element2cms_user}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,16 +24,16 @@ class m160315_093837__create_table__cms_user2cms_content_elements extends Migrat
         }
 
         $this->createTable("{{%cms_content_element2cms_user}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'cms_user_id'           => $this->integer()->notNull(),
-            'cms_content_element_id'=> $this->integer()->notNull(),
+            'cms_user_id' => $this->integer()->notNull(),
+            'cms_content_element_id' => $this->integer()->notNull(),
 
         ], $tableOptions);
 
@@ -41,7 +41,8 @@ class m160315_093837__create_table__cms_user2cms_content_elements extends Migrat
         $this->createIndex('created_by', '{{%cms_content_element2cms_user}}', 'created_by');
         $this->createIndex('created_at', '{{%cms_content_element2cms_user}}', 'created_at');
         $this->createIndex('updated_at', '{{%cms_content_element2cms_user}}', 'updated_at');
-        $this->createIndex('user2elements', '{{%cms_content_element2cms_user}}', ['cms_user_id', 'cms_content_element_id'], true);
+        $this->createIndex('user2elements', '{{%cms_content_element2cms_user}}',
+            ['cms_user_id', 'cms_content_element_id'], true);
 
         $this->execute("ALTER TABLE {{%cms_content_element2cms_user}} COMMENT = 'Favorites content items';");
 
@@ -73,7 +74,8 @@ class m160315_093837__create_table__cms_user2cms_content_elements extends Migrat
         $this->dropForeignKey("cms_content_element2cms_user_updated_by", "{{%cms_content_element2cms_user}}");
         $this->dropForeignKey("cms_content_element2cms_user_updated_by", "{{%cms_content_element2cms_user}}");
         $this->dropForeignKey("cms_content_element2cms_user__cms_user_id", "{{%cms_content_element2cms_user}}");
-        $this->dropForeignKey("cms_content_element2cms_user__cms_content_element_id", "{{%cms_content_element2cms_user}}");
+        $this->dropForeignKey("cms_content_element2cms_user__cms_content_element_id",
+            "{{%cms_content_element2cms_user}}");
 
         $this->dropTable("{{%cms_content_element2cms_user}}");
     }

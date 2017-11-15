@@ -57,8 +57,8 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property integer $logged_at
  * @property integer $last_activity_at
  * @property integer $last_admin_activity_at
- * @property string  $email
- * @property string  $phone
+ * @property string $email
+ * @property string $phone
  * @property integer $email_is_approved
  * @property integer $phone_is_approved
  *
@@ -71,14 +71,12 @@ use skeeks\cms\models\behaviors\HasSubscribes;
  * @property CmsStorageFile $image
  * @property string $avatarSrc
  * @property string $profileUrl
-
-
  *
- * @property CmsUserEmail[]     $cmsUserEmails
- * @property CmsUserPhone[]     $cmsUserPhones
- * @property UserAuthClient[]   $cmsUserAuthClients
+ * @property CmsUserEmail[] $cmsUserEmails
+ * @property CmsUserPhone[] $cmsUserPhones
+ * @property UserAuthClient[] $cmsUserAuthClients
  *
- * @property \yii\rbac\Role[]   $roles
+ * @property \yii\rbac\Role[] $roles
  * @property []   $roleNames
  *
  * @property string $displayName
@@ -118,53 +116,45 @@ class User
     {
         parent::init();
 
-        $this->on(self::EVENT_AFTER_INSERT,     [$this, "_cmsAfterSave"]);
-        $this->on(self::EVENT_AFTER_UPDATE,     [$this, "_cmsAfterSave"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "_cmsAfterSave"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "_cmsAfterSave"]);
 
-        $this->on(self::EVENT_BEFORE_DELETE,    [$this, "checkDataBeforeDelete"]);
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
     }
 
     public function _cmsAfterSave($e)
     {
-        if ($this->_roleNames !== null)
-        {
-            if ($this->roles)
-            {
-                foreach ($this->roles as $roleExist)
-                {
-                    if (!in_array($roleExist->name, (array) $this->_roleNames))
-                    {
+        if ($this->_roleNames !== null) {
+            if ($this->roles) {
+                foreach ($this->roles as $roleExist) {
+                    if (!in_array($roleExist->name, (array)$this->_roleNames)) {
                         \Yii::$app->authManager->revoke($roleExist, $this->id);
                     }
                 }
             }
 
-            foreach ((array) $this->_roleNames as $roleName)
-            {
-                if ($role = \Yii::$app->authManager->getRole($roleName))
-                {
-                    try
-                    {
+            foreach ((array)$this->_roleNames as $roleName) {
+                if ($role = \Yii::$app->authManager->getRole($roleName)) {
+                    try {
                         \Yii::$app->authManager->assign($role, $this->id);
-                    } catch(\Exception $e)
-                    {}
+                    } catch (\Exception $e) {
+                    }
                 }
             }
         }
     }
+
     /**
      * @throws Exception
      */
     public function checkDataBeforeDelete($e)
     {
-        if (in_array($this->username, static::getProtectedUsernames()))
-        {
-            throw new Exception(\Yii::t('skeeks/cms','This user can not be removed'));
+        if (in_array($this->username, static::getProtectedUsernames())) {
+            throw new Exception(\Yii::t('skeeks/cms', 'This user can not be removed'));
         }
 
-        if ($this->id == \Yii::$app->user->identity->id)
-        {
-            throw new Exception(\Yii::t('skeeks/cms','You can not delete yourself'));
+        if ($this->id == \Yii::$app->user->identity->id) {
+            throw new Exception(\Yii::t('skeeks/cms', 'You can not delete yourself'));
         }
     }
 
@@ -179,17 +169,17 @@ class User
             TimestampBehavior::className(),
 
             HasStorageFile::className() =>
-            [
-                'class'     => HasStorageFile::className(),
-                'fields'    => ['image_id']
-            ],
+                [
+                    'class' => HasStorageFile::className(),
+                    'fields' => ['image_id']
+                ],
 
             HasRelatedProperties::className() =>
-            [
-                'class'                             => HasRelatedProperties::className(),
-                'relatedElementPropertyClassName'   => CmsUserProperty::className(),
-                'relatedPropertyClassName'          => CmsUserUniversalProperty::className(),
-            ],
+                [
+                    'class' => HasRelatedProperties::className(),
+                    'relatedElementPropertyClassName' => CmsUserProperty::className(),
+                    'relatedPropertyClassName' => CmsUserUniversalProperty::className(),
+                ],
 
         ]);
     }
@@ -207,16 +197,22 @@ class User
             [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved'], 'integer'],
 
             [['image_id'], 'safe'],
-            [['image_id'], \skeeks\cms\validators\FileValidator::class,
-                'skipOnEmpty'   => false,
-                'extensions'    => ['jpg', 'jpeg', 'gif','png'],
-                'maxFiles'      => 1,
-                'maxSize'       => 1024*1024*1,
-                'minSize'       => 1024,
+            [
+                ['image_id'],
+                \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty' => false,
+                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles' => 1,
+                'maxSize' => 1024 * 1024 * 1,
+                'minSize' => 1024,
             ],
 
             [['gender'], 'string'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'first_name', 'last_name', 'patronymic'], 'string', 'max' => 255],
+            [
+                ['username', 'password_hash', 'password_reset_token', 'email', 'first_name', 'last_name', 'patronymic'],
+                'string',
+                'max' => 255
+            ],
             [['auth_key'], 'string', 'max' => 32],
 
             [['phone'], 'string', 'max' => 64],
@@ -237,23 +233,32 @@ class User
             [['last_activity_at'], 'integer'],
             [['last_admin_activity_at'], 'integer'],
 
-            [['username'], 'default', 'value' => function(self $model)
-            {
-                $userLast = static::find()->orderBy("id DESC")->one();
-                return "id" . ($userLast->id + 1);
-            }],
+            [
+                ['username'],
+                'default',
+                'value' => function (self $model) {
+                    $userLast = static::find()->orderBy("id DESC")->one();
+                    return "id" . ($userLast->id + 1);
+                }
+            ],
 
             [['email_is_approved', 'phone_is_approved'], 'default', 'value' => 0],
 
-            [['auth_key'], 'default', 'value' => function(self $model)
-            {
-                return \Yii::$app->security->generateRandomString();
-            }],
+            [
+                ['auth_key'],
+                'default',
+                'value' => function (self $model) {
+                    return \Yii::$app->security->generateRandomString();
+                }
+            ],
 
-            [['password_hash'], 'default', 'value' => function(self $model)
-            {
-                return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
-            }],
+            [
+                ['password_hash'],
+                'default',
+                'value' => function (self $model) {
+                    return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
+                }
+            ],
 
             [['roleNames'], 'safe'],
             [['roleNames'], 'default', 'value' => \Yii::$app->cms->registerRoles]
@@ -266,6 +271,7 @@ class User
             'displayName',
         ];
     }
+
     /**
      * @inheritdoc
      */
@@ -304,7 +310,7 @@ class User
      */
     public function lockAdmin()
     {
-        $this->last_admin_activity_at   = \Yii::$app->formatter->asTimestamp(time()) - (\Yii::$app->admin->blockedTime + 1);
+        $this->last_admin_activity_at = \Yii::$app->formatter->asTimestamp(time()) - (\Yii::$app->admin->blockedTime + 1);
         $this->save(false);
 
         return $this;
@@ -318,8 +324,9 @@ class User
     public function getLastAdminActivityAgo()
     {
         $now = \Yii::$app->formatter->asTimestamp(time());
-        return (int) ($now - (int) $this->last_admin_activity_at);
+        return (int)($now - (int)$this->last_admin_activity_at);
     }
+
     /**
      * Обновление времени последней актиности пользователя.
      * Только в том случае, если время его последней актиности больше 10 сек.
@@ -329,10 +336,9 @@ class User
     {
         $now = \Yii::$app->formatter->asTimestamp(time());
 
-        if (!$this->lastAdminActivityAgo || $this->lastAdminActivityAgo > 10)
-        {
-            $this->last_activity_at         = $now;
-            $this->last_admin_activity_at   = $now;
+        if (!$this->lastAdminActivityAgo || $this->lastAdminActivityAgo > 10) {
+            $this->last_activity_at = $now;
+            $this->last_admin_activity_at = $now;
 
             $this->save(false);
         }
@@ -349,8 +355,9 @@ class User
     public function getLastActivityAgo()
     {
         $now = \Yii::$app->formatter->asTimestamp(time());
-        return (int) ($now - (int) $this->last_activity_at);
+        return (int)($now - (int)$this->last_activity_at);
     }
+
     /**
      * Обновление времени последней актиности пользователя.
      * Только в том случае, если время его последней актиности больше 10 сек.
@@ -360,15 +367,13 @@ class User
     {
         $now = \Yii::$app->formatter->asTimestamp(time());
 
-        if (!$this->lastActivityAgo || $this->lastActivityAgo > 10)
-        {
+        if (!$this->lastActivityAgo || $this->lastActivityAgo > 10) {
             $this->last_activity_at = $now;
             $this->save(false);
         }
 
         return $this;
     }
-
 
 
     /**
@@ -445,8 +450,6 @@ class User
     }
 
 
-
-
     /**
      * @inheritdoc
      */
@@ -460,7 +463,7 @@ class User
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException(\Yii::t('skeeks/cms','"findIdentityByAccessToken" is not implemented.'));
+        throw new NotSupportedException(\Yii::t('skeeks/cms', '"findIdentityByAccessToken" is not implemented.'));
     }
 
     /**
@@ -504,13 +507,11 @@ class User
      */
     static public function findByUsernameOrEmail($value)
     {
-        if ($user = static::findByUsername($value))
-        {
+        if ($user = static::findByUsername($value)) {
             return $user;
         }
 
-        if ($user = static::findByEmail($value))
-        {
+        if ($user = static::findByEmail($value)) {
             return $user;
         }
 
@@ -525,8 +526,7 @@ class User
      */
     public static function findByPasswordResetToken($token)
     {
-        if (!static::isPasswordResetTokenValid($token))
-        {
+        if (!static::isPasswordResetTokenValid($token)) {
             return null;
         }
 
@@ -544,13 +544,12 @@ class User
      */
     public static function isPasswordResetTokenValid($token)
     {
-        if (empty($token))
-        {
+        if (empty($token)) {
             return false;
         }
         $expire = Yii::$app->cms->passwordResetTokenExpire;
         $parts = explode('_', $token);
-        $timestamp = (int) end($parts);
+        $timestamp = (int)end($parts);
         return $timestamp + $expire >= time();
     }
 
@@ -561,7 +560,7 @@ class User
      */
     public function populate()
     {
-        $password               = \Yii::$app->security->generateRandomString(6);
+        $password = \Yii::$app->security->generateRandomString(6);
 
         $this->generateUsername();
         $this->setPassword($password);
@@ -569,6 +568,7 @@ class User
 
         return $this;
     }
+
     /**
      * @inheritdoc
      */
@@ -628,9 +628,8 @@ class User
         $userLast = static::find()->orderBy("id DESC")->one();
         $this->username = "id" . ($userLast->id + 1);
 
-        if (static::find()->where(['username' => $this->username])->one())
-        {
-            $this->username = $this->username . "_" . \skeeks\cms\helpers\StringHelper::substr( md5(time()), 0, 6);
+        if (static::find()->where(['username' => $this->username])->one()) {
+            $this->username = $this->username . "_" . \skeeks\cms\helpers\StringHelper::substr(md5(time()), 0, 6);
         }
 
         return $this;
@@ -668,16 +667,15 @@ class User
      */
     public function getAvatarSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
     {
-        if ($this->image)
-        {
-            return \Yii::$app->imaging->getImagingUrl($this->image->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
-                'w'    => $width,
-                'h'    => $height,
-                'm'    => $mode,
-            ]));
+        if ($this->image) {
+            return \Yii::$app->imaging->getImagingUrl($this->image->src,
+                new \skeeks\cms\components\imaging\filters\Thumbnail([
+                    'w' => $width,
+                    'h' => $height,
+                    'm' => $mode,
+                ]));
         }
     }
-
 
 
     /**
@@ -713,8 +711,6 @@ class User
     }
 
 
-
-
     protected $_roleNames = null;
 
     /**
@@ -722,12 +718,11 @@ class User
      */
     public function getRoleNames()
     {
-        if ($this->_roleNames !== null)
-        {
+        if ($this->_roleNames !== null) {
             return $this->_roleNames;
         }
 
-        $this->_roleNames = (array) ArrayHelper::map($this->roles, 'name', 'name');
+        $this->_roleNames = (array)ArrayHelper::map($this->roles, 'name', 'name');
         return $this->_roleNames;
     }
 
@@ -741,9 +736,6 @@ class User
 
         return $this;
     }
-
-
-
 
 
     /**
@@ -760,7 +752,7 @@ class User
     public function getFavoriteCmsContentElements()
     {
         return $this->hasMany(CmsContentElement::className(), ['id' => 'cms_content_element_id'])
-                    ->via('cmsContentElement2cmsUsers');
+            ->via('cmsContentElement2cmsUsers');
     }
 
 }

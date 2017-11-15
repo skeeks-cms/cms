@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 10.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150516_103230_create_table__cms_content_element_tree extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_content_element_tree}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,16 +24,16 @@ class m150516_103230_create_table__cms_content_element_tree extends Migration
         }
 
         $this->createTable("{{%cms_content_element_tree}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'element_id'            => Schema::TYPE_INTEGER . ' NOT NULL',
-            'tree_id'               => Schema::TYPE_INTEGER . ' NOT NULL',
+            'element_id' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'tree_id' => Schema::TYPE_INTEGER . ' NOT NULL',
 
         ], $tableOptions);
 

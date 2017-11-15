@@ -77,33 +77,33 @@ class CmsContentElementSearch extends CmsContentElement
             'query' => static::find()
         ]);
 
-        if (!($this->load($params)))
-        {
+        if (!($this->load($params))) {
             return $activeDataProvider;
         }
 
         $query = $activeDataProvider->query;
 
         //Standart
-        if ($columns = $this->getTableSchema()->columns)
-        {
+        if ($columns = $this->getTableSchema()->columns) {
             /**
              * @var \yii\db\ColumnSchema $column
              */
-            foreach ($columns as $column)
-            {
-                if ($column->phpType == "integer")
-                {
+            foreach ($columns as $column) {
+                if ($column->phpType == "integer") {
                     $query->andFilterWhere([$this->tableName() . '.' . $column->name => $this->{$column->name}]);
-                } else if ($column->phpType == "string")
-                {
-                    $query->andFilterWhere(['like', $this->tableName() . '.' . $column->name, $this->{$column->name}]);
+                } else {
+                    if ($column->phpType == "string") {
+                        $query->andFilterWhere([
+                            'like',
+                            $this->tableName() . '.' . $column->name,
+                            $this->{$column->name}
+                        ]);
+                    }
                 }
             }
         }
 
-        if ($this->section)
-        {
+        if ($this->section) {
             $query->joinWith('cmsContentElementTrees');
             $query->andFilterWhere([
                 'or',
@@ -112,67 +112,74 @@ class CmsContentElementSearch extends CmsContentElement
             ]);
         }
 
-        if ($this->created_at_from)
-        {
+        if ($this->created_at_from) {
             $query->andFilterWhere([
-                '>=', $this->tableName() . '.created_at', \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_from))
+                '>=',
+                $this->tableName() . '.created_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_from))
             ]);
         }
 
-        if ($this->created_at_to)
-        {
+        if ($this->created_at_to) {
             $query->andFilterWhere([
-                '<=', $this->tableName() . '.created_at', \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_to))
-            ]);
-        }
-
-
-        if ($this->updated_at_from)
-        {
-            $query->andFilterWhere([
-                '>=', $this->tableName() . '.updated_at', \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_from))
-            ]);
-        }
-
-        if ($this->updated_at_to)
-        {
-            $query->andFilterWhere([
-                '<=', $this->tableName() . '.created_at', \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_to))
+                '<=',
+                $this->tableName() . '.created_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->created_at_to))
             ]);
         }
 
 
-        if ($this->published_at_from)
-        {
+        if ($this->updated_at_from) {
             $query->andFilterWhere([
-                '>=', $this->tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(strtotime($this->published_at_from))
+                '>=',
+                $this->tableName() . '.updated_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_from))
             ]);
         }
 
-        if ($this->published_at_to)
-        {
+        if ($this->updated_at_to) {
             $query->andFilterWhere([
-                '<=', $this->tableName() . '.published_at', \Yii::$app->formatter->asTimestamp(strtotime($this->published_at_to))
+                '<=',
+                $this->tableName() . '.created_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->updated_at_to))
             ]);
         }
 
 
-        if ($this->has_image)
-        {
+        if ($this->published_at_from) {
             $query->andFilterWhere([
-                '>', $this->tableName() . '.image_id', 0
+                '>=',
+                $this->tableName() . '.published_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->published_at_from))
             ]);
         }
 
-        if ($this->has_full_image)
-        {
+        if ($this->published_at_to) {
             $query->andFilterWhere([
-                '>', $this->tableName() . '.image_full_id', 0
+                '<=',
+                $this->tableName() . '.published_at',
+                \Yii::$app->formatter->asTimestamp(strtotime($this->published_at_to))
             ]);
         }
 
-        if ($this->q)
-        {
+
+        if ($this->has_image) {
+            $query->andFilterWhere([
+                '>',
+                $this->tableName() . '.image_id',
+                0
+            ]);
+        }
+
+        if ($this->has_full_image) {
+            $query->andFilterWhere([
+                '>',
+                $this->tableName() . '.image_full_id',
+                0
+            ]);
+        }
+
+        if ($this->q) {
             $query->andFilterWhere([
                 'or',
                 ['like', $this->tableName() . '.name', $this->q],

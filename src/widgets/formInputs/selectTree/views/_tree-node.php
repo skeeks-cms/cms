@@ -21,15 +21,15 @@ $selectTreeInputWidget = \yii\helpers\ArrayHelper::getValue($widget->contextData
 <!-- Possible actions -->
 <!--<div class="sx-controll-node row">
     <div class="pull-left sx-controll-act">
-        <a href="<?/*= $model->absoluteUrl; */?>" target="_blank" class="btn-tree-node-controll btn btn-default btn-sm show-at-site" title="<?/*= \Yii::t('skeeks/cms',"Show at site"); */?>">
+        <a href="<? /*= $model->absoluteUrl; */ ?>" target="_blank" class="btn-tree-node-controll btn btn-default btn-sm show-at-site" title="<? /*= \Yii::t('skeeks/cms',"Show at site"); */ ?>">
             <span class="glyphicon glyphicon-eye-open"></span>
         </a>
     </div>
 </div>-->
 
-<?/* if ($model->treeType) : */?><!--
+<? /* if ($model->treeType) : */ ?><!--
     <div class="pull-right sx-tree-type">
-        <?/*= $model->treeType->name; */?>
+        <? /*= $model->treeType->name; */ ?>
     </div>
---><?/* endif; */?>
+--><? /* endif; */ ?>
 

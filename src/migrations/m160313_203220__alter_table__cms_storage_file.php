@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.02.2016
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 use yii\helpers\Json;

@@ -2,13 +2,13 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (ï¿½ï¿½ï¿½ï¿½ï¿½)
  * @date 01.03.2016
  */
 /* @var $this yii\web\View */
 
 echo $this->render('@skeeks/cms/views/admin-user/_form', [
-    'model'           => $model,
-    'relatedModel'    => $relatedModel,
-    'passwordChange'  => $passwordChange,
+    'model' => $model,
+    'relatedModel' => $relatedModel,
+    'passwordChange' => $passwordChange,
 ]);

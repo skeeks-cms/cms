@@ -8,6 +8,7 @@
  * @date 19.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models\behaviors;
 
 use yii\db\BaseActiveRecord;
@@ -24,7 +25,7 @@ class HasJsonFieldsBehavior extends Behavior
     /**
      * @var array
      */
-    public $fields      = [];
+    public $fields = [];
 
     /**
      * @return array
@@ -32,11 +33,11 @@ class HasJsonFieldsBehavior extends Behavior
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_INSERT   => "jsonEncodeFields",
-            BaseActiveRecord::EVENT_BEFORE_UPDATE   => "jsonEncodeFields",
-            BaseActiveRecord::EVENT_AFTER_FIND      => "jsonDecodeFields",
-            BaseActiveRecord::EVENT_AFTER_UPDATE    => "jsonDecodeFields",
-            BaseActiveRecord::EVENT_AFTER_INSERT    => "jsonDecodeFields",
+            BaseActiveRecord::EVENT_BEFORE_INSERT => "jsonEncodeFields",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE => "jsonEncodeFields",
+            BaseActiveRecord::EVENT_AFTER_FIND => "jsonDecodeFields",
+            BaseActiveRecord::EVENT_AFTER_UPDATE => "jsonDecodeFields",
+            BaseActiveRecord::EVENT_AFTER_INSERT => "jsonDecodeFields",
         ];
     }
 
@@ -45,16 +46,12 @@ class HasJsonFieldsBehavior extends Behavior
      */
     public function jsonEncodeFields($event)
     {
-        foreach ($this->fields as $fielName)
-        {
-            if ($this->owner->{$fielName})
-            {
-                if (is_array($this->owner->{$fielName}))
-                {
-                    $this->owner->{$fielName} = Json::encode((array) $this->owner->{$fielName});
+        foreach ($this->fields as $fielName) {
+            if ($this->owner->{$fielName}) {
+                if (is_array($this->owner->{$fielName})) {
+                    $this->owner->{$fielName} = Json::encode((array)$this->owner->{$fielName});
                 }
-            } else
-            {
+            } else {
                 $this->owner->{$fielName} = "";
             }
         }
@@ -66,26 +63,19 @@ class HasJsonFieldsBehavior extends Behavior
      */
     public function jsonDecodeFields($event)
     {
-        foreach ($this->fields as $fielName)
-        {
-            if ($this->owner->{$fielName})
-            {
-                if (is_string($this->owner->{$fielName}))
-                {
-                    try
-                    {
+        foreach ($this->fields as $fielName) {
+            if ($this->owner->{$fielName}) {
+                if (is_string($this->owner->{$fielName})) {
+                    try {
                         $this->owner->{$fielName} = Json::decode($this->owner->{$fielName});
 
-                    } catch(\Exception $e)
-                    {
+                    } catch (\Exception $e) {
                         \Yii::error($e->getMessage());
                         $this->owner->{$fielName} = [];
                     }
 
                 }
-            }
-            else
-            {
+            } else {
                 $this->owner->{$fielName} = [];
             }
         }

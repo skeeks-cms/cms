@@ -52,11 +52,31 @@ class CmsContentProperty2content extends Core
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_content_property_id', 'cms_content_id'], 'integer'],
+            [
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_content_property_id', 'cms_content_id'],
+                'integer'
+            ],
             [['cms_content_property_id', 'cms_content_id'], 'required'],
-            [['cms_content_property_id', 'cms_content_id'], 'unique', 'targetAttribute' => ['cms_content_property_id', 'cms_content_id'], 'message' => 'The combination of Cms Content Property ID and Cms Content ID has already been taken.'],
-            [['cms_content_property_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentProperty::className(), 'targetAttribute' => ['cms_content_property_id' => 'id']],
-            [['cms_content_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContent::className(), 'targetAttribute' => ['cms_content_id' => 'id']],
+            [
+                ['cms_content_property_id', 'cms_content_id'],
+                'unique',
+                'targetAttribute' => ['cms_content_property_id', 'cms_content_id'],
+                'message' => 'The combination of Cms Content Property ID and Cms Content ID has already been taken.'
+            ],
+            [
+                ['cms_content_property_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsContentProperty::className(),
+                'targetAttribute' => ['cms_content_property_id' => 'id']
+            ],
+            [
+                ['cms_content_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsContent::className(),
+                'targetAttribute' => ['cms_content_id' => 'id']
+            ],
         ]);
     }
 

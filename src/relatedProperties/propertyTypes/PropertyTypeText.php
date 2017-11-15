@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\propertyTypes;
+
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
@@ -17,10 +19,10 @@ use yii\widgets\ActiveForm;
  */
 class PropertyTypeText extends PropertyType
 {
-    public $code             = self::CODE_STRING;
-    public $name             = "";
+    public $code = self::CODE_STRING;
+    public $name = "";
 
-    public $default_value        = null;
+    public $default_value = null;
 
     /*static public $fieldElements    =
     [
@@ -28,16 +30,16 @@ class PropertyTypeText extends PropertyType
         'textInput' => 'Текстовая строка (input)',
     ];*/
 
-    public $fieldElement            = 'textInput';
-    public $rows                    = 5;
+    public $fieldElement = 'textInput';
+    public $rows = 5;
 
     static public function fieldElements()
     {
         return [
-            'textarea'      => \Yii::t('skeeks/cms','Text field').' (textarea)',
-            'textInput'     => \Yii::t('skeeks/cms','Text string').' (input)',
-            'hiddenInput'   => \Yii::t('skeeks/cms','Скрытое поле').' (hiddenInput)',
-            'default_value'  => \Yii::t('skeeks/cms','Default Value'),
+            'textarea' => \Yii::t('skeeks/cms', 'Text field') . ' (textarea)',
+            'textInput' => \Yii::t('skeeks/cms', 'Text string') . ' (input)',
+            'hiddenInput' => \Yii::t('skeeks/cms', 'Скрытое поле') . ' (hiddenInput)',
+            'default_value' => \Yii::t('skeeks/cms', 'Default Value'),
         ];
     }
 
@@ -45,30 +47,29 @@ class PropertyTypeText extends PropertyType
     {
         parent::init();
 
-        if(!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms','Text');
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', 'Text');
         }
     }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'fieldElement'  => \Yii::t('skeeks/cms','Element form'),
-            'rows'          => \Yii::t('skeeks/cms','The number of lines of the text field'),
-            'default_value'  => \Yii::t('skeeks/cms','Default Value'),
-        ]);
+            [
+                'fieldElement' => \Yii::t('skeeks/cms', 'Element form'),
+                'rows' => \Yii::t('skeeks/cms', 'The number of lines of the text field'),
+                'default_value' => \Yii::t('skeeks/cms', 'Default Value'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['fieldElement', 'string'],
-            ['rows', 'integer', 'min' => 1, 'max' => 50],
-            ['default_value', 'string'],
-        ]);
+            [
+                ['fieldElement', 'string'],
+                ['rows', 'integer', 'min' => 1, 'max' => 50],
+                ['default_value', 'string'],
+            ]);
     }
 
     /**
@@ -76,7 +77,8 @@ class PropertyTypeText extends PropertyType
      */
     public function renderConfigForm(ActiveForm $activeForm)
     {
-        echo $activeForm->fieldSelect($this, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText::fieldElements());
+        echo $activeForm->fieldSelect($this, 'fieldElement',
+            \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText::fieldElements());
         echo $activeForm->fieldInputInt($this, 'rows');
         echo $activeForm->field($this, 'default_value');
     }
@@ -88,19 +90,16 @@ class PropertyTypeText extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        if (in_array($this->fieldElement, array_keys(self::fieldElements())))
-        {
+        if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
             $field->$fieldElement([
                 'rows' => $this->rows
             ]);
 
-            if ($this->fieldElement == 'hiddenInput')
-            {
+            if ($this->fieldElement == 'hiddenInput') {
                 $field->label(false);
             }
-        } else
-        {
+        } else {
             $field->textInput([]);
         }
 
@@ -130,8 +129,7 @@ class PropertyTypeText extends PropertyType
      */
     public function getDefaultValue()
     {
-        if ($this->default_value !== null)
-        {
+        if ($this->default_value !== null) {
             return $this->default_value;
         }
         return;

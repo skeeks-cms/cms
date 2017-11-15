@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\userPropertyTypes;
+
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
@@ -24,51 +26,54 @@ class UserPropertyTypeColor extends PropertyType
     public $name = "";
 
 
-    public $showDefaultPalette  = Cms::BOOL_Y;
-    public $saveValueAs         = Cms::BOOL_Y;
-    public $useNative           = Cms::BOOL_N;
+    public $showDefaultPalette = Cms::BOOL_Y;
+    public $saveValueAs = Cms::BOOL_Y;
+    public $useNative = Cms::BOOL_N;
 
-    public $showAlpha           = Cms::BOOL_Y;
-    public $showInput           = Cms::BOOL_Y;
-    public $showPalette         = Cms::BOOL_Y;
+    public $showAlpha = Cms::BOOL_Y;
+    public $showInput = Cms::BOOL_Y;
+    public $showPalette = Cms::BOOL_Y;
 
     public function init()
     {
         parent::init();
 
-        if(!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms','Choice of color');
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', 'Choice of color');
         }
     }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'showDefaultPalette'    => \Yii::t('skeeks/cms','Show extended palette of colors'),
-            'saveValueAs'           => \Yii::t('skeeks/cms','Format conservation values'),
-            'useNative'             => \Yii::t('skeeks/cms','Use the native color selection'),
-            'showAlpha'             => \Yii::t('skeeks/cms','Management transparency'),
-            'showInput'             => \Yii::t('skeeks/cms','Show input field values'),
-            'showPalette'           => \Yii::t('skeeks/cms','Generally show the palette'),
-        ]);
+            [
+                'showDefaultPalette' => \Yii::t('skeeks/cms', 'Show extended palette of colors'),
+                'saveValueAs' => \Yii::t('skeeks/cms', 'Format conservation values'),
+                'useNative' => \Yii::t('skeeks/cms', 'Use the native color selection'),
+                'showAlpha' => \Yii::t('skeeks/cms', 'Management transparency'),
+                'showInput' => \Yii::t('skeeks/cms', 'Show input field values'),
+                'showPalette' => \Yii::t('skeeks/cms', 'Generally show the palette'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['showDefaultPalette', 'string'],
-            ['useNative', 'string'],
-            ['showAlpha', 'string'],
-            ['showInput', 'string'],
-            ['showPalette', 'string'],
-            [['showDefaultPalette', 'useNative', 'showAlpha', 'showInput', 'showPalette'], 'in', 'range' => array_keys(\Yii::$app->cms->booleanFormat())],
+            [
+                ['showDefaultPalette', 'string'],
+                ['useNative', 'string'],
+                ['showAlpha', 'string'],
+                ['showInput', 'string'],
+                ['showPalette', 'string'],
+                [
+                    ['showDefaultPalette', 'useNative', 'showAlpha', 'showInput', 'showPalette'],
+                    'in',
+                    'range' => array_keys(\Yii::$app->cms->booleanFormat())
+                ],
 
-            ['saveValueAs', 'string'],
-            ['saveValueAs', 'in', 'range' => array_keys(ColorInput::$possibleSaveAs)],
-        ]);
+                ['saveValueAs', 'string'],
+                ['saveValueAs', 'in', 'range' => array_keys(ColorInput::$possibleSaveAs)],
+            ]);
     }
 
     /**
@@ -79,16 +84,16 @@ class UserPropertyTypeColor extends PropertyType
         $field = parent::renderForActiveForm();
 
         $pluginOptions = [
-            'showAlpha' => (bool) ($this->showAlpha === Cms::BOOL_Y),
-            'showInput' => (bool) ($this->showInput === Cms::BOOL_Y),
-            'showPalette' => (bool) ($this->showPalette === Cms::BOOL_Y),
+            'showAlpha' => (bool)($this->showAlpha === Cms::BOOL_Y),
+            'showInput' => (bool)($this->showInput === Cms::BOOL_Y),
+            'showPalette' => (bool)($this->showPalette === Cms::BOOL_Y),
         ];
 
         $field->widget(ColorInput::className(), [
-            'showDefaultPalette'    => (bool) ($this->showDefaultPalette === Cms::BOOL_Y),
-            'useNative'             => (bool) ($this->useNative === Cms::BOOL_Y),
-            'saveValueAs'           => (string) $this->saveValueAs,
-            'pluginOptions'         => $pluginOptions,
+            'showDefaultPalette' => (bool)($this->showDefaultPalette === Cms::BOOL_Y),
+            'useNative' => (bool)($this->useNative === Cms::BOOL_Y),
+            'saveValueAs' => (string)$this->saveValueAs,
+            'pluginOptions' => $pluginOptions,
         ]);
 
         return $field;
@@ -102,7 +107,8 @@ class UserPropertyTypeColor extends PropertyType
     {
         echo $activeForm->fieldRadioListBoolean($this, 'showDefaultPalette');
         echo $activeForm->fieldRadioListBoolean($this, 'useNative');
-        echo $activeForm->fieldRadioListBoolean($this, 'showInput')->hint(\Yii::t('skeeks/cms','This INPUT to opened the palette'));
+        echo $activeForm->fieldRadioListBoolean($this, 'showInput')->hint(\Yii::t('skeeks/cms',
+            'This INPUT to opened the palette'));
         echo $activeForm->fieldRadioListBoolean($this, 'showAlpha');
         echo $activeForm->fieldRadioListBoolean($this, 'showPalette');
         echo $activeForm->field($this, 'saveValueAs')->radioList(\skeeks\cms\widgets\ColorInput::$possibleSaveAs);

@@ -9,23 +9,24 @@ $model = new \skeeks\cms\models\CmsContentElement();
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
-    <?/*= $form->field($model, 'treeIds')->widget(
+<? /*= $form->field($model, 'treeIds')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
         [
             'multiple' => true
         ]
-    ); */?>
+    ); */ ?>
 
-    <?= $form->field($model, 'treeIds')->widget(
-        \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class,
-        [
-            'multiple' => true
-        ]
-    ); ?>
+<?= $form->field($model, 'treeIds')->widget(
+    \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class,
+    [
+        'multiple' => true
+    ]
+); ?>
 
 
-    <?= \yii\helpers\Html::checkbox('removeCurrent', false); ?> <label><?=\Yii::t('skeeks/cms','Get rid of the already linked (in this case, the selected records bind only to the selected section)')?></label>
-    <?= $form->buttonsStandart($model, ['save']);?>
+<?= \yii\helpers\Html::checkbox('removeCurrent', false); ?> <label><?= \Yii::t('skeeks/cms',
+        'Get rid of the already linked (in this case, the selected records bind only to the selected section)') ?></label>
+<?= $form->buttonsStandart($model, ['save']); ?>
 
 <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 
@@ -35,7 +36,7 @@ $model = new \skeeks\cms\models\CmsContentElement();
         'class' => 'alert-info',
         'style' => 'margin-top: 20px;',
     ],
-])?>
-    <p><?=\Yii::t('skeeks/cms','You can specify some additional sections that will show your records.')?></p>
-    <p><?=\Yii::t('skeeks/cms','This does not affect the final address of the page, and hence safe.')?></p>
+]) ?>
+    <p><?= \Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.') ?></p>
+    <p><?= \Yii::t('skeeks/cms', 'This does not affect the final address of the page, and hence safe.') ?></p>
 <? \yii\bootstrap\Alert::end(); ?>

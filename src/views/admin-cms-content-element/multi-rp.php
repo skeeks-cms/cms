@@ -6,7 +6,7 @@
  * @date 14.10.2015
  */
 /* @var $this yii\web\View */
-/* @var $action \skeeks\cms\modules\admin\actions\modelEditor\AdminMultiDialogModelEditAction*/
+/* @var $action \skeeks\cms\modules\admin\actions\modelEditor\AdminMultiDialogModelEditAction */
 /* @var $content \skeeks\cms\models\CmsContent */
 
 $model = new \skeeks\cms\models\CmsContentElement();
@@ -67,47 +67,47 @@ JS
                     'class' => 'sx-form',
                 ]
             ]); ?>
-                <?= \skeeks\widget\chosen\Chosen::widget([
-                    'multiple' => true,
-                    'name' => 'fields',
-                    'options' => [
-                        'class' => 'sx-select'
-                    ],
-                    'items' => $element->relatedPropertiesModel->attributeLabels()
-                ]); ?>
+            <?= \skeeks\widget\chosen\Chosen::widget([
+                'multiple' => true,
+                'name' => 'fields',
+                'options' => [
+                    'class' => 'sx-select'
+                ],
+                'items' => $element->relatedPropertiesModel->attributeLabels()
+            ]); ?>
 
-                <?= \yii\helpers\Html::hiddenInput('content_id', $content->id); ?>
+            <?= \yii\helpers\Html::hiddenInput('content_id', $content->id); ?>
 
-                <? foreach ($element->relatedPropertiesModel->properties as $property) : ?>
-                    <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
-                        <? if($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
+            <? foreach ($element->relatedPropertiesModel->properties as $property) : ?>
+                <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
+                    <? if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
 
-                            <? if($property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
-                                <?
-                                    echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
-                                        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                                        [
-                                            'content_id' => $property->handler->content_id
-                                        ]
-                                    );
-                                ?>
-                            <? else : ?>
-                                <?
-                                    echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
-                                        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                                        [
-                                            'content_id' => $property->handler->content_id,
-                                            'multiple' => true
-                                        ]
-                                    );
-                                ?>
-                            <? endif; ?>
+                        <? if ($property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
+                            <?
+                            echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
+                                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+                                [
+                                    'content_id' => $property->handler->content_id
+                                ]
+                            );
+                            ?>
                         <? else : ?>
-                            <?= $property->renderActiveForm($form); ?>
+                            <?
+                            echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
+                                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+                                [
+                                    'content_id' => $property->handler->content_id,
+                                    'multiple' => true
+                                ]
+                            );
+                            ?>
                         <? endif; ?>
-                    </div>
-                <? endforeach; ?>
-                <?= $form->buttonsStandart($model, ['save']);?>
+                    <? else : ?>
+                        <?= $property->renderActiveForm($form); ?>
+                    <? endif; ?>
+                </div>
+            <? endforeach; ?>
+            <?= $form->buttonsStandart($model, ['save']); ?>
             <? $form::end(); ?>
         <? else : ?>
             Not found properties

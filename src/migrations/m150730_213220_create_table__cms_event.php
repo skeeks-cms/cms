@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.07.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150730_213220_create_table__cms_event extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_event}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -25,13 +25,13 @@ class m150730_213220_create_table__cms_event extends Migration
 
         $this->createTable("{{%cms_event}}", [
 
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'event_name'            => Schema::TYPE_STRING . '(255) NOT NULL',
-            'name'                  => Schema::TYPE_STRING . '(100) NULL',
-            'description'           => Schema::TYPE_TEXT . ' NULL',
+            'event_name' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'name' => Schema::TYPE_STRING . '(100) NULL',
+            'description' => Schema::TYPE_TEXT . ' NULL',
 
-            'priority'              => Schema::TYPE_INTEGER. "(11) NOT NULL DEFAULT '150'",
+            'priority' => Schema::TYPE_INTEGER . "(11) NOT NULL DEFAULT '150'",
 
         ], $tableOptions);
 

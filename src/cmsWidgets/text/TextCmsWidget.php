@@ -35,17 +35,17 @@ class TextCmsWidget extends Widget
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'text' => 'Текст'
-        ]);
+            [
+                'text' => 'Текст'
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['text', 'string']
-        ]);
+            [
+                ['text', 'string']
+            ]);
     }
 
     public function renderConfigForm(ActiveForm $form)
@@ -65,11 +65,9 @@ class TextCmsWidget extends Widget
 
     public function run()
     {
-        if ($this->_isBegin)
-        {
+        if ($this->_isBegin) {
             $this->_obContent = ob_get_clean();
-            if (!$this->text)
-            {
+            if (!$this->text) {
                 $this->text = $this->_obContent;
             }
         }
@@ -83,8 +81,7 @@ class TextCmsWidget extends Widget
     public function getCallableData()
     {
         $attributes = parent::getCallableData();
-        if (!$attributes['attributes']['text'])
-        {
+        if (!$attributes['attributes']['text']) {
             $attributes['attributes']['text'] = $this->_obContent;
         }
         return $attributes;

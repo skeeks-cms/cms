@@ -35,9 +35,26 @@ class CmsContentElementFile extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'storage_file_id', 'content_element_id', 'priority'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'storage_file_id',
+                    'content_element_id',
+                    'priority'
+                ],
+                'integer'
+            ],
             [['storage_file_id', 'content_element_id'], 'required'],
-            [['storage_file_id', 'content_element_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'content_element_id'], 'message' => \Yii::t('skeeks/cms','The combination of Storage File ID and Content Element ID has already been taken.')]
+            [
+                ['storage_file_id', 'content_element_id'],
+                'unique',
+                'targetAttribute' => ['storage_file_id', 'content_element_id'],
+                'message' => \Yii::t('skeeks/cms',
+                    'The combination of Storage File ID and Content Element ID has already been taken.')
+            ]
         ];
     }
 
@@ -65,7 +82,6 @@ class CmsContentElementFile extends \skeeks\cms\models\Core
     {
         return $this->hasOne(CmsContentElement::className(), ['id' => 'content_element_id']);
     }
-
 
 
     /**

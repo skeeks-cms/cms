@@ -12,41 +12,40 @@
 
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'pjax'              => $pjax,
-        'adminController'   => \Yii::$app->controller,
-        'settingsData' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'pjax' => $pjax,
+    'adminController' => \Yii::$app->controller,
+    'settingsData' =>
         [
             'order' => SORT_ASC,
             'orderBy' => "priority",
         ],
-        'columns'           =>
+    'columns' =>
         [
             'name',
             'code',
 
             [
-                'class'         => \yii\grid\DataColumn::className(),
-                'label'         => \Yii::t('skeeks/cms', 'Number of sections'),
-                'value'     => function(\skeeks\cms\models\CmsTreeType $cmsTreeType)
-                {
+                'class' => \yii\grid\DataColumn::className(),
+                'label' => \Yii::t('skeeks/cms', 'Number of sections'),
+                'value' => function (\skeeks\cms\models\CmsTreeType $cmsTreeType) {
                     return $cmsTreeType->getCmsTrees()->count();
                 }
             ],
 
             [
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute'     => 'active'
+                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => 'active'
             ],
             'priority',
         ]
-    ]); ?>
+]); ?>
 
 <? $pjax::end(); ?>

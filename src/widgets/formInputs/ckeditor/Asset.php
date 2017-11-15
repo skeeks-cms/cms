@@ -6,7 +6,9 @@
  * @date 16.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\widgets\formInputs\ckeditor;
+
 use yii\web\AssetBundle;
 
 /**

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 24.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -17,7 +18,6 @@ class m150607_114030_alter_table__cms_tree_and_cms_content_element extends Migra
 
         $this->execute("ALTER TABLE {{%cms_content_element}} ADD `description_short_type` VARCHAR(10) NOT NULL DEFAULT 'text';");
         $this->execute("ALTER TABLE {{%cms_content_element}} ADD `description_full_type` VARCHAR(10) NOT NULL DEFAULT 'text';");
-
 
 
         $this->execute("ALTER TABLE {{%cms_tree}} ADD INDEX(description_short_type);");

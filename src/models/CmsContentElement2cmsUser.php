@@ -34,9 +34,17 @@ class CmsContentElement2cmsUser extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_user_id', 'cms_content_element_id'], 'integer'],
+            [
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_user_id', 'cms_content_element_id'],
+                'integer'
+            ],
             [['cms_user_id', 'cms_content_element_id'], 'required'],
-            [['cms_user_id', 'cms_content_element_id'], 'unique', 'targetAttribute' => ['cms_user_id', 'cms_content_element_id'], 'message' => 'The combination of Cms User ID and Cms Content Element ID has already been taken.']
+            [
+                ['cms_user_id', 'cms_content_element_id'],
+                'unique',
+                'targetAttribute' => ['cms_user_id', 'cms_content_element_id'],
+                'message' => 'The combination of Cms User ID and Cms Content Element ID has already been taken.'
+            ]
         ];
     }
 

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 10.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150512_153230_create_table__cms_content_element_property extends Migratio
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_content_element_property}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,22 +24,22 @@ class m150512_153230_create_table__cms_content_element_property extends Migratio
         }
 
         $this->createTable("{{%cms_content_element_property}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'property_id'           => Schema::TYPE_INTEGER . ' NULL',
-            'element_id'            => Schema::TYPE_INTEGER . ' NULL',
+            'property_id' => Schema::TYPE_INTEGER . ' NULL',
+            'element_id' => Schema::TYPE_INTEGER . ' NULL',
 
-            'value'                 => Schema::TYPE_STRING . '(255) NOT NULL',
+            'value' => Schema::TYPE_STRING . '(255) NOT NULL',
 
-            'value_enum'            => Schema::TYPE_INTEGER . '(11) NULL',
-            'value_num'             => 'decimal(18,4) NULL',
-            'description'           => Schema::TYPE_STRING . '(255) NULL',
+            'value_enum' => Schema::TYPE_INTEGER . '(11) NULL',
+            'value_num' => 'decimal(18,4) NULL',
+            'description' => Schema::TYPE_STRING . '(255) NULL',
 
         ], $tableOptions);
 

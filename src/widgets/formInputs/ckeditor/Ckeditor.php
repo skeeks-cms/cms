@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.04.2015
  */
+
 namespace skeeks\cms\widgets\formInputs\ckeditor;
 
 use skeeks\cms\Exception;
@@ -30,8 +31,7 @@ class Ckeditor extends CKEditorWidget
 
     public function __construct($config = [])
     {
-        if (\Yii::$app->admin->requestIsAdmin)
-        {
+        if (\Yii::$app->admin->requestIsAdmin) {
             $config = ArrayHelper::merge(\Yii::$app->admin->getCkeditorOptions(), $config);
         }
 
@@ -41,18 +41,17 @@ class Ckeditor extends CKEditorWidget
     public function init()
     {
         $additionalData = [];
-        if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord))
-        {
+        if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord)) {
             $additionalData = [
                 'className' => $this->relatedModel->className(),
-                'pk'        => $this->relatedModel->primaryKey,
+                'pk' => $this->relatedModel->primaryKey,
             ];
         }
 
         $this->clientOptions['filebrowserImageBrowseUrl'] = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-tools/select-file'])
-                                    ->merge($additionalData)
-                                    ->enableEmptyLayout()
-                                    ->url;
+            ->merge($additionalData)
+            ->enableEmptyLayout()
+            ->url;
 
         parent::init();
     }

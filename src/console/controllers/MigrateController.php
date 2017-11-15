@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 07.03.2015
  */
+
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\models\User;
@@ -53,18 +54,15 @@ class MigrateController extends \yii\console\controllers\MigrateController
         FileHelper::removeDirectory($tmpMigrateDir);
         FileHelper::createDirectory($tmpMigrateDir);
 
-        if (!is_dir($tmpMigrateDir))
-        {
+        if (!is_dir($tmpMigrateDir)) {
             $this->stdout("Could not create a temporary directory migration\n");
             die;
         }
 
         $this->stdout("\tCreated a directory migration\n");
 
-        if ($dirs = $this->_findMigrationDirs())
-        {
-            foreach ($dirs as $path)
-            {
+        if ($dirs = $this->_findMigrationDirs()) {
+            foreach ($dirs as $path) {
                 FileHelper::copyDirectory($path, $tmpMigrateDir);
             }
         }
@@ -72,8 +70,7 @@ class MigrateController extends \yii\console\controllers\MigrateController
         $this->stdout("\tThe copied files modules migrations\n");
 
         $appMigrateDir = \Yii::getAlias("@console/migrations");
-        if (is_dir($appMigrateDir))
-        {
+        if (is_dir($appMigrateDir)) {
             FileHelper::copyDirectory($appMigrateDir, $tmpMigrateDir);
         }
 
@@ -88,10 +85,8 @@ class MigrateController extends \yii\console\controllers\MigrateController
     {
         $result = [];
 
-        foreach ($this->_findMigrationPossibleDirs() as $migrationPath)
-        {
-            if (is_dir($migrationPath))
-            {
+        foreach ($this->_findMigrationPossibleDirs() as $migrationPath) {
+            if (is_dir($migrationPath)) {
                 $result[] = $migrationPath;
             }
         }
@@ -106,12 +101,9 @@ class MigrateController extends \yii\console\controllers\MigrateController
     {
         $result = [];
 
-        foreach (\Yii::$app->extensions as $code => $data)
-        {
-            if ($data['alias'])
-            {
-                foreach ($data['alias'] as $code => $path)
-                {
+        foreach (\Yii::$app->extensions as $code => $data) {
+            if ($data['alias']) {
+                foreach ($data['alias'] as $code => $path) {
                     $migrationsPath = $path . '/migrations';
                     $result[] = $migrationsPath;
                 }

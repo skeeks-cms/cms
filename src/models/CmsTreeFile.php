@@ -35,9 +35,18 @@ class CmsTreeFile extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'storage_file_id', 'tree_id', 'priority'], 'integer'],
+            [
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'storage_file_id', 'tree_id', 'priority'],
+                'integer'
+            ],
             [['storage_file_id', 'tree_id'], 'required'],
-            [['storage_file_id', 'tree_id'], 'unique', 'targetAttribute' => ['storage_file_id', 'tree_id'], 'message' => \Yii::t('skeeks/cms','The combination of Storage File ID and Tree ID has already been taken.')]
+            [
+                ['storage_file_id', 'tree_id'],
+                'unique',
+                'targetAttribute' => ['storage_file_id', 'tree_id'],
+                'message' => \Yii::t('skeeks/cms',
+                    'The combination of Storage File ID and Tree ID has already been taken.')
+            ]
         ];
     }
 

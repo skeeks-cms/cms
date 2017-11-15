@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 24.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150520_173310_create_table__cms_site_domain extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_site_domain}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -25,16 +25,16 @@ class m150520_173310_create_table__cms_site_domain extends Migration
         }
 
         $this->createTable("{{%cms_site_domain}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'site_code'             => "CHAR(5) NOT NULL",
-            'domain'                => Schema::TYPE_STRING . '(255) NOT NULL',
+            'site_code' => "CHAR(5) NOT NULL",
+            'domain' => Schema::TYPE_STRING . '(255) NOT NULL',
 
         ], $tableOptions);
 

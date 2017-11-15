@@ -8,19 +8,20 @@
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget */
 
-$options        = $widget->clientOptions;
-$clientOptions  = \yii\helpers\Json::encode($options);
+$options = $widget->clientOptions;
+$clientOptions = \yii\helpers\Json::encode($options);
 ?>
 <div id="<?= $widget->id; ?>">
     <div class="sx-select-controll">
         <? if ($widget->modelAttributeSaveType) : ?>
-            <?= \yii\helpers\Html::activeRadioList($widget->model, $widget->modelAttributeSaveType, \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::editors())?>
+            <?= \yii\helpers\Html::activeRadioList($widget->model, $widget->modelAttributeSaveType,
+                \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::editors()) ?>
         <? else : ?>
             <?= \yii\helpers\Html::radioList(
                 $widget->id . '-radio',
                 $widget->defaultEditor,
                 \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::editors()
-            )?>
+            ) ?>
         <? endif; ?>
     </div>
     <div class="sx-controll">

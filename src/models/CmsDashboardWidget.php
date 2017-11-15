@@ -44,10 +44,10 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
     {
         return ArrayHelper::merge(parent::behaviors(), [
             Serialize::className() =>
-            [
-                'class' => Serialize::className(),
-                'fields' => ['component_settings']
-            ]
+                [
+                    'class' => Serialize::className(),
+                    'fields' => ['component_settings']
+                ]
         ]);
     }
 
@@ -88,7 +88,6 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
     }
 
 
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -98,17 +97,14 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
     }
 
 
-
     /**
      * @return AdminDashboardWidget
      * @throws \yii\base\InvalidConfigException
      */
     public function getWidget()
     {
-        if ($this->component)
-        {
-            if (class_exists($this->component))
-            {
+        if ($this->component) {
+            if (class_exists($this->component)) {
                 /**
                  * @var $component AdminDashboardWidget
                  */
@@ -127,11 +123,9 @@ class CmsDashboardWidget extends \skeeks\cms\models\Core
      */
     public function getName()
     {
-        if ($this->widget)
-        {
-            if ($this->widget->getAttributes(['name']))
-            {
-                return (string) $this->widget->name;
+        if ($this->widget) {
+            if ($this->widget->getAttributes(['name'])) {
+                return (string)$this->widget->name;
             }
         }
 

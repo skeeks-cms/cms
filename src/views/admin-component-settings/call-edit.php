@@ -10,9 +10,9 @@
  */
 /* @var $this yii\web\View */
 $jsData = \yii\helpers\Json::encode([
-    'callableId'            => $callableId,
-    'saveCallabaleBackend'  => \yii\helpers\Url::to('save-callable') . "?" . http_build_query(\Yii::$app->request->get()),
-    'afterSaveUrl'             => \yii\helpers\Url::to('index') . "?" . http_build_query(\Yii::$app->request->get())
+    'callableId' => $callableId,
+    'saveCallabaleBackend' => \yii\helpers\Url::to('save-callable') . "?" . http_build_query(\Yii::$app->request->get()),
+    'afterSaveUrl' => \yii\helpers\Url::to('index') . "?" . http_build_query(\Yii::$app->request->get())
 ]);
 
 $this->registerJs(<<<JS

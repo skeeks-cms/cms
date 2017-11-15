@@ -7,6 +7,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.05.2015
  */
+
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\components\Cms;
@@ -61,14 +62,20 @@ abstract class RelatedPropertyEnumModel extends Core
             [['value'], 'string', 'max' => 255],
             [['def'], 'string', 'max' => 1],
             [['code'], 'string', 'max' => 32],
-            ['code', 'default', 'value' => function($model, $attribute)
-            {
-                return md5(rand(1, 10) . time());
-            }],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
+            [
+                'code',
+                'default',
+                'value' => function ($model, $attribute) {
+                    return md5(rand(1, 10) . time());
+                }
+            ],
+            [
+                'priority',
+                'default',
+                'value' => function ($model, $attribute) {
+                    return 500;
+                }
+            ],
         ]);
     }
 

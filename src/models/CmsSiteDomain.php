@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 20.05.2015
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\Widget;
@@ -27,7 +28,7 @@ use yii\db\BaseActiveRecord;
  * @property integer $cms_site_id
  * @property string $domain
  *
- *  @property CmsSite $cmsSite
+ * @property CmsSite $cmsSite
  */
 class CmsSiteDomain extends Core
 {

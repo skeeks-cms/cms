@@ -8,7 +8,9 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models\behaviors;
+
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
 use yii\base\Behavior;
@@ -50,20 +52,20 @@ class HasStorageFileMulti extends Behavior
     protected $_removeFiles = [];
     protected $_linkFiles = [];
 
-    
+
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "deleteStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_DELETE => "deleteStorgaFile",
 
-            BaseActiveRecord::EVENT_BEFORE_INSERT        => [$this, "saveStorgaFile"],
-            BaseActiveRecord::EVENT_BEFORE_UPDATE       => "saveStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_INSERT => [$this, "saveStorgaFile"],
+            BaseActiveRecord::EVENT_BEFORE_UPDATE => "saveStorgaFile",
 
-            BaseActiveRecord::EVENT_AFTER_INSERT      => "afterSaveStorgaFile",
-            BaseActiveRecord::EVENT_AFTER_UPDATE      => "afterSaveStorgaFile",
+            BaseActiveRecord::EVENT_AFTER_INSERT => "afterSaveStorgaFile",
+            BaseActiveRecord::EVENT_AFTER_UPDATE => "afterSaveStorgaFile",
         ];
     }
-    
+
     /**
      * Загрузка файлов в хранилище и их сохранение со связанной сущьностью
      *
@@ -71,56 +73,44 @@ class HasStorageFileMulti extends Behavior
      */
     public function saveStorgaFile($e)
     {
-        foreach ($this->relations as $data)
-        {
+        foreach ($this->relations as $data) {
             $fieldCode = ArrayHelper::getValue($data, 'property');
             $relation = ArrayHelper::getValue($data, 'relation');
 
             $oldFiles = $this->owner->{$relation};
             $oldIds = [];
 
-            if ($oldFiles)
-            {
+            if ($oldFiles) {
                 $oldIds = ArrayHelper::map($oldFiles, 'id', 'id');
             }
 
             $files = [];
-            if ($this->owner->{$fieldCode} && is_array($this->owner->{$fieldCode}))
-            {
-                foreach ($this->owner->{$fieldCode} as $fileId)
-                {
-                    if (is_string($fileId) && ((string) (int) $fileId != (string) $fileId))
-                    {
-                        try
-                        {
+            if ($this->owner->{$fieldCode} && is_array($this->owner->{$fieldCode})) {
+                foreach ($this->owner->{$fieldCode} as $fileId) {
+                    if (is_string($fileId) && ((string)(int)$fileId != (string)$fileId)) {
+                        try {
                             $data = [];
 
-                            if (isset($this->owner->{$this->nameAttribute}))
-                            {
-                                if ($name = $this->owner->{$this->nameAttribute})
-                                {
+                            if (isset($this->owner->{$this->nameAttribute})) {
+                                if ($name = $this->owner->{$this->nameAttribute}) {
                                     $data['name'] = $name;
                                 }
                             }
 
 
                             $file = \Yii::$app->storage->upload($fileId, $data);
-                            if ($file)
-                            {
-                                if ($this->owner->isNewRecord)
-                                {
+                            if ($file) {
+                                if ($this->owner->isNewRecord) {
                                     $this->_linkFiles[$relation][] = $file;
-                                } else
-                                {
+                                } else {
                                     $this->owner->link($relation, $file);
                                 }
                                 $files[] = $file->id;
                             }
 
-                        } catch (\Exception $e)
-                        {}
-                    } else
-                    {
+                        } catch (\Exception $e) {
+                        }
+                    } else {
                         $files[] = $fileId;
                         ArrayHelper::remove($oldIds, $fileId);
                     }
@@ -132,8 +122,7 @@ class HasStorageFileMulti extends Behavior
             /**
              * Удалить старые файлы
              */
-            if ($oldIds)
-            {
+            if ($oldIds) {
                 $this->_removeFiles = $oldIds;
             }
 
@@ -147,52 +136,41 @@ class HasStorageFileMulti extends Behavior
      */
     public function afterSaveStorgaFile()
     {
-        if ($this->_linkFiles)
-        {
-            foreach ($this->_linkFiles as $relation => $files)
-            {
-                foreach ($files as $file)
-                {
+        if ($this->_linkFiles) {
+            foreach ($this->_linkFiles as $relation => $files) {
+                foreach ($files as $file) {
                     $this->owner->link($relation, $file);
                 }
 
             }
         }
 
-        if ($this->_removeFiles)
-        {
-            if ($files = StorageFile::find()->where(['id' => $this->_removeFiles])->all())
-            {
-                foreach ($files as $file)
-                {
+        if ($this->_removeFiles) {
+            if ($files = StorageFile::find()->where(['id' => $this->_removeFiles])->all()) {
+                foreach ($files as $file) {
                     $file->delete();
                 }
             }
         }
     }
-    
+
     /**
      * До удаления сущьности, текущей необходим проверить все описанные модели, и сделать операции с ними (удалить, убрать привязку или ничего не делать кинуть Exception)
      * @throws Exception
      */
     public function deleteStorgaFile()
     {
-        if (!$this->onDeleteCascade)
-        {
+        if (!$this->onDeleteCascade) {
             return $this;
         }
 
 
-        foreach ($this->relations as $data)
-        {
+        foreach ($this->relations as $data) {
             $fieldName = ArrayHelper::getValue($data, 'property');
 
-            if ($fileIds = $this->owner->{$fieldName})
-            {
-                if ($storageFiles = CmsStorageFile::find()->where(['id' => $fileIds])->all())
-                {
-                    foreach ($storageFiles as $file)
-                    {
+            if ($fileIds = $this->owner->{$fieldName}) {
+                if ($storageFiles = CmsStorageFile::find()->where(['id' => $fileIds])->all()) {
+                    foreach ($storageFiles as $file) {
                         $file->delete();
                     }
 

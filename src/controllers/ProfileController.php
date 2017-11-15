@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 13.04.2016
  */
+
 namespace skeeks\cms\controllers;
+
 use skeeks\cms\filters\CmsAccessControl;
 use yii\web\Controller;
 
@@ -21,21 +23,21 @@ class ProfileController extends Controller
     public function behaviors()
     {
         return
-        [
-            //Closed all by default
-            'access' =>
             [
-                'class'         => CmsAccessControl::className(),
-                'rules' =>
-                [
+                //Closed all by default
+                'access' =>
                     [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'actions' => ['index'],
-                    ]
-                ]
-            ],
-        ];
+                        'class' => CmsAccessControl::className(),
+                        'rules' =>
+                            [
+                                [
+                                    'allow' => true,
+                                    'roles' => ['@'],
+                                    'actions' => ['index'],
+                                ]
+                            ]
+                    ],
+            ];
     }
 
     /**

@@ -8,10 +8,10 @@
 /* @var $this yii\web\View */
 /* @var $component \skeeks\cms\relatedProperties\PropertyType */
 /* @var $saved bool */
-$getData            = \Yii::$app->request->get();
-$clientOptions      = $getData;
+$getData = \Yii::$app->request->get();
+$clientOptions = $getData;
 $clientOptions['saveUrl'] = \skeeks\cms\helpers\UrlHelper::constructCurrent()->setRoute('/cms/admin-universal-component-settings/save')->toString();
-$clientOptions      = \yii\helpers\Json::encode($clientOptions);
+$clientOptions = \yii\helpers\Json::encode($clientOptions);
 
 
 ?>
@@ -23,8 +23,8 @@ $clientOptions      = \yii\helpers\Json::encode($clientOptions);
 
 
     <? $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
-        <? $component->renderConfigForm($form); ?>
-        <?= $form->buttonsStandart($component); ?>
+    <? $component->renderConfigForm($form); ?>
+    <?= $form->buttonsStandart($component); ?>
     <? \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
 
 <? else: ?>
@@ -101,4 +101,4 @@ $clientOptions      = \yii\helpers\Json::encode($clientOptions);
 
 
 JS
-);?>
+); ?>

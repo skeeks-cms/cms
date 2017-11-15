@@ -7,6 +7,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.05.2015
  */
+
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\components\Cms;
@@ -29,7 +30,7 @@ use yii\widgets\ActiveForm;
  * @property string $description
  *
  * @property RelatedPropertyModel $property
- * @property RelatedElementModel  $element
+ * @property RelatedElementModel $element
  */
 abstract class RelatedElementPropertyModel extends Core
 {
@@ -64,38 +65,49 @@ abstract class RelatedElementPropertyModel extends Core
             //[['value_string'], 'string', 'max' => 255],
             [['value', 'value_string'], 'string'],
 
-            [['value_enum', 'value_int2'], 'filter', 'filter' => function ($value) {
-                $value = (int) $value;
-                $filter_options = [
-                    'options' => [
-                        'default' => 0,
-                        'min_range' => -2147483648,
-                        'max_range' => 2147483647
-                    ]
-                ];
-                return filter_var($value, FILTER_VALIDATE_INT, $filter_options);
-            }],
+            [
+                ['value_enum', 'value_int2'],
+                'filter',
+                'filter' => function ($value) {
+                    $value = (int)$value;
+                    $filter_options = [
+                        'options' => [
+                            'default' => 0,
+                            'min_range' => -2147483648,
+                            'max_range' => 2147483647
+                        ]
+                    ];
+                    return filter_var($value, FILTER_VALIDATE_INT, $filter_options);
+                }
+            ],
             [['value_enum', 'value_int2'], 'integer'],
 
 
-            [['value_num', 'value_num2'], 'filter', 'filter' => function ($value) {
-                $value = (float) $value;
-                $min_range = -1.0E+14;
-                $max_range = 1.0E+14;
-                if($value <= $min_range || $value >= $max_range )
-                {
-                    return 0.0;
+            [
+                ['value_num', 'value_num2'],
+                'filter',
+                'filter' => function ($value) {
+                    $value = (float)$value;
+                    $min_range = -1.0E+14;
+                    $max_range = 1.0E+14;
+                    if ($value <= $min_range || $value >= $max_range) {
+                        return 0.0;
+                    }
+                    return $value;
                 }
-                return $value;
-            }],
+            ],
             [['value_num', 'value_num2'], 'number'],
 
 
             ['value_bool', 'boolean'],
-            ['value_bool', 'filter', 'filter' => function ($value) {
-                $value = (bool) $value;
-                return $value;
-            }],
+            [
+                'value_bool',
+                'filter',
+                'filter' => function ($value) {
+                    $value = (bool)$value;
+                    return $value;
+                }
+            ],
 
         ]);
     }

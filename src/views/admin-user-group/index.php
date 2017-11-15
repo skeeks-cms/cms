@@ -16,14 +16,14 @@
 ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
-    'dataProvider'  => $dataProvider,
-    'filterModel'   => $searchModel,
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
 
         [
-            'class'         => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
-            'controller'    => $controller
+            'class' => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+            'controller' => $controller
         ]
 
         /*['class' => \skeeks\cms\grid\ImageColumn::className()]*/,

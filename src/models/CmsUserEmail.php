@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.02.2015
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
@@ -56,7 +57,7 @@ class CmsUserEmail extends ActiveRecord
     {
         parent::init();
 
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeSaveEvent"]);
     }
 
     /**
@@ -64,24 +65,25 @@ class CmsUserEmail extends ActiveRecord
      */
     public function beforeSaveEvent($event)
     {
-        if ($this->def == Cms::BOOL_N)
-        {
-            if ($this->user_id)
-            {
-                if (!static::find()->where(['def' => Cms::BOOL_Y])->andWhere(['!=', 'id', $this->id])->andWhere(['user_id' => $this->user_id])->count())
-                {
+        if ($this->def == Cms::BOOL_N) {
+            if ($this->user_id) {
+                if (!static::find()->where(['def' => Cms::BOOL_Y])->andWhere([
+                    '!=',
+                    'id',
+                    $this->id
+                ])->andWhere(['user_id' => $this->user_id])->count()) {
                     $this->def = Cms::BOOL_Y;
                 }
             }
-        } else if ($this->def == Cms::BOOL_Y)
-        {
-            if ($this->user_id)
-            {
-                static::updateAll(['def' => Cms::BOOL_N], [
-                    'and',
-                    ['user_id' => $this->user_id],
-                    ['!=', 'id', $this->id]
-                ]);
+        } else {
+            if ($this->def == Cms::BOOL_Y) {
+                if ($this->user_id) {
+                    static::updateAll(['def' => Cms::BOOL_N], [
+                        'and',
+                        ['user_id' => $this->user_id],
+                        ['!=', 'id', $this->id]
+                    ]);
+                }
             }
         }
     }
@@ -105,7 +107,6 @@ class CmsUserEmail extends ActiveRecord
     }
 
 
-
     /**
      * @inheritdoc
      */
@@ -115,7 +116,7 @@ class CmsUserEmail extends ActiveRecord
             'id' => Yii::t('skeeks/cms', 'ID'),
             'user_id' => Yii::t('skeeks/cms', 'User'),
             'value' => "Email",
-            'approved' => \Yii::t('skeeks/cms',"Approved"),
+            'approved' => \Yii::t('skeeks/cms', "Approved"),
             'created_at' => Yii::t('skeeks/cms', 'Created At'),
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
             'def' => Yii::t('skeeks/cms', 'Default'),

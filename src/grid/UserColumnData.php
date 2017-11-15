@@ -10,6 +10,7 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\grid;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -37,8 +38,7 @@ class UserColumnData extends DataColumn
             'displayName'
         );*/
 
-        if ($this->grid->filterModel && $this->attribute)
-        {
+        if ($this->grid->filterModel && $this->attribute) {
             $this->filter = false;
             /*$this->filter = \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::widget([
                 'model'             => $this->grid->filterModel,
@@ -53,13 +53,11 @@ class UserColumnData extends DataColumn
      */
     protected function renderDataCellContent($model, $key, $index)
     {
-        $userId = (int) $model->{$this->attribute};
+        $userId = (int)$model->{$this->attribute};
         $user = User::findOne($userId);
 
-        if ($user)
-        {
-            if (!$srcImage = $user->getAvatarSrc())
-            {
+        if ($user) {
+            if (!$srcImage = $user->getAvatarSrc()) {
                 $srcImage = \Yii::$app->cms->noImageUrl;
             }
 
@@ -78,18 +76,18 @@ class UserColumnData extends DataColumn
     display: inline;
 }
 CSS
-);
+            );
             return "<div class='sx-user-preview'>" . Html::img($srcImage, [
-                'width' => 25,
-                'style' => 'margin-right: 5px;'
-            ]) . $user->getDisplayName() . "
-                <div class='sx-user-preview-controll'>" . Html::a("<i class='glyphicon glyphicon-pencil' title='Редактировать'></i>", UrlHelper::construct(['/cms/admin-user/update', 'pk' => $user->id])->enableAdmin()->toString(),
-                [
-                    'class' => 'btn btn-xs btn-default',
-                    'data-pjax' => 0
-                ]) . '</div></div>';
-        } else
-        {
+                    'width' => 25,
+                    'style' => 'margin-right: 5px;'
+                ]) . $user->getDisplayName() . "
+                <div class='sx-user-preview-controll'>" . Html::a("<i class='glyphicon glyphicon-pencil' title='Редактировать'></i>",
+                    UrlHelper::construct(['/cms/admin-user/update', 'pk' => $user->id])->enableAdmin()->toString(),
+                    [
+                        'class' => 'btn btn-xs btn-default',
+                        'data-pjax' => 0
+                    ]) . '</div></div>';
+        } else {
             return null;
         }
     }

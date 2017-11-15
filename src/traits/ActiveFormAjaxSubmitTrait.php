@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 19.05.2015
  */
+
 namespace skeeks\cms\traits;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -26,8 +27,7 @@ trait ActiveFormAjaxSubmitTrait
     public function registerJs()
     {
         $afterValidateCallback = $this->afterValidateCallback;
-        if ($afterValidateCallback)
-        {
+        if ($afterValidateCallback) {
             $this->view->registerJs(<<<JS
 
                     $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
@@ -63,11 +63,10 @@ trait ActiveFormAjaxSubmitTrait
                     });
 
 JS
-);
+            );
 
 
-        } else
-        {
+        } else {
             $this->view->registerJs(<<<JS
 
                     $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
@@ -99,7 +98,7 @@ JS
                     });
 
 JS
-);
+            );
         }
 
     }

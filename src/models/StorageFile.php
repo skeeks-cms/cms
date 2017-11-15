@@ -64,12 +64,21 @@ class StorageFile extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width'], 'integer'],
+            [
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width'],
+                'integer'
+            ],
             [['description_short', 'description_full'], 'string'],
             [['cluster_file', 'original_name', 'name'], 'string', 'max' => 255],
             [['cluster_id', 'mime_type', 'extension'], 'string', 'max' => 16],
             [['name_to_save'], 'string', 'max' => 32],
-            [['cluster_id', 'cluster_file'], 'unique', 'targetAttribute' => ['cluster_id', 'cluster_file'], 'message' => Yii::t('skeeks/cms','The combination of Cluster ID and Cluster Src has already been taken.')],
+            [
+                ['cluster_id', 'cluster_file'],
+                'unique',
+                'targetAttribute' => ['cluster_id', 'cluster_file'],
+                'message' => Yii::t('skeeks/cms',
+                    'The combination of Cluster ID and Cluster Src has already been taken.')
+            ],
         ]);
     }
 
@@ -100,8 +109,8 @@ class StorageFile extends Core
     }
 
 
-    const TYPE_FILE     = "file";
-    const TYPE_IMAGE    = "image";
+    const TYPE_FILE = "file";
+    const TYPE_IMAGE = "image";
 
 
     /**
@@ -111,15 +120,13 @@ class StorageFile extends Core
     public function delete()
     {
         //Сначала удалить файл
-        try
-        {
+        try {
             $cluster = $this->cluster;
 
             $cluster->deleteTmpDir($this->cluster_file);
             $cluster->delete($this->cluster_file);
 
-        } catch (\common\components\storage\Exception $e)
-        {
+        } catch (\common\components\storage\Exception $e) {
             return false;
         }
 
@@ -143,7 +150,7 @@ class StorageFile extends Core
     public function getFileType()
     {
         $dataMimeType = explode('/', $this->mime_type);
-        return (string) $dataMimeType[0];
+        return (string)$dataMimeType[0];
     }
 
     /**
@@ -151,11 +158,9 @@ class StorageFile extends Core
      */
     public function isImage()
     {
-        if ($this->getFileType() == 'image')
-        {
+        if ($this->getFileType() == 'image') {
             return true;
-        } else
-        {
+        } else {
             return false;
         }
     }
@@ -170,23 +175,19 @@ class StorageFile extends Core
     {
         $src = $this->src;
 
-        if ($this->cluster instanceof ClusterLocal)
-        {
-            if (!\Yii::$app->request->hostInfo)
-            {
+        if ($this->cluster instanceof ClusterLocal) {
+            if (!\Yii::$app->request->hostInfo) {
                 return $this;
             }
 
             $src = \Yii::$app->request->hostInfo . $this->src;
         }
         //Елси это изображение
-        if ($this->isImage())
-        {
-            if (extension_loaded('gd'))
-            {
+        if ($this->isImage()) {
+            if (extension_loaded('gd')) {
                 list($width, $height, $type, $attr) = getimagesize($src);
-                $this->image_height       = $height;
-                $this->image_width        = $width;
+                $this->image_height = $height;
+                $this->image_width = $width;
             }
         }
 
@@ -226,11 +227,9 @@ class StorageFile extends Core
      */
     public function getFileName()
     {
-        if ($this->original_name)
-        {
+        if ($this->original_name) {
             return $this->original_name;
-        } else
-        {
+        } else {
             return $this->cluster_file;
         }
     }

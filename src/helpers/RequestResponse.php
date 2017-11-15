@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 25.03.2015
  */
+
 namespace skeeks\cms\helpers;
 
 use yii\base\Model;
@@ -25,7 +26,7 @@ class RequestResponse extends Model
 
     public $success = false;
     public $message = '';
-    public $data    = [];
+    public $data = [];
 
     public $redirect;
 
@@ -33,8 +34,7 @@ class RequestResponse extends Model
     {
         parent::init();
 
-        if (\Yii::$app->request->isAjax)
-        {
+        if (\Yii::$app->request->isAjax) {
             $this->setResponseFormatJson();
         }
     }
@@ -55,8 +55,7 @@ class RequestResponse extends Model
      */
     public function isRequestOnValidateAjaxForm()
     {
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax && UrlHelper::getCurrent()->issetSystemParam(static::VALIDATION_AJAX_FORM_SYSTEM_NAME))
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax && UrlHelper::getCurrent()->issetSystemParam(static::VALIDATION_AJAX_FORM_SYSTEM_NAME)) {
             return true;
         }
 
@@ -69,8 +68,7 @@ class RequestResponse extends Model
      */
     public function isRequestAjaxPost()
     {
-        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost)
-        {
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost) {
             return true;
         }
 
@@ -82,8 +80,7 @@ class RequestResponse extends Model
      */
     public function isRequestPjaxPost()
     {
-        if (\Yii::$app->request->isPjax && \Yii::$app->request->isPost)
-        {
+        if (\Yii::$app->request->isPjax && \Yii::$app->request->isPost) {
             return true;
         }
 

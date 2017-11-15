@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 20.05.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150520_153305_cms_alter_table__cms_lang extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_lang}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,21 +24,21 @@ class m150520_153305_cms_alter_table__cms_lang extends Migration
         }
 
         $this->createTable("{{%cms_lang}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'active'                => "CHAR(1) NOT NULL DEFAULT 'Y'",
-            'def'                   => "CHAR(1) NOT NULL DEFAULT 'N'",
-            'priority'              => Schema::TYPE_INTEGER. "(11) NOT NULL DEFAULT '500'",
+            'active' => "CHAR(1) NOT NULL DEFAULT 'Y'",
+            'def' => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'priority' => Schema::TYPE_INTEGER . "(11) NOT NULL DEFAULT '500'",
 
-            'code'                  => "CHAR(5) NOT NULL",
-            'name'                  => Schema::TYPE_STRING . '(255) NOT NULL',
-            'description'           => Schema::TYPE_STRING . '(255) NULL',
+            'code' => "CHAR(5) NOT NULL",
+            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'description' => Schema::TYPE_STRING . '(255) NULL',
 
         ], $tableOptions);
 

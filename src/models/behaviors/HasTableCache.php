@@ -7,6 +7,7 @@
  */
 
 namespace skeeks\cms\models\behaviors;
+
 use yii\base\Behavior;
 use yii\caching\Cache;
 use yii\caching\TagDependency;
@@ -33,11 +34,11 @@ class HasTableCache extends Behavior
     public function events()
     {
         return
-        [
-            BaseActiveRecord::EVENT_AFTER_UPDATE => "invalidateTableCache",
-            BaseActiveRecord::EVENT_AFTER_INSERT => "invalidateTableCache",
-            BaseActiveRecord::EVENT_AFTER_DELETE => "invalidateTableCache",
-        ];
+            [
+                BaseActiveRecord::EVENT_AFTER_UPDATE => "invalidateTableCache",
+                BaseActiveRecord::EVENT_AFTER_INSERT => "invalidateTableCache",
+                BaseActiveRecord::EVENT_AFTER_DELETE => "invalidateTableCache",
+            ];
     }
 
     /**

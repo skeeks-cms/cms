@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.05.2015
  */
+
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\components\Cms;
@@ -49,11 +50,9 @@ class RelatedPropertiesModel extends DynamicModel
     {
         parent::init();
 
-        if ($this->relatedElementModel->relatedProperties)
-        {
-            foreach ($this->relatedElementModel->relatedProperties as $property)
-            {
-                $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null );
+        if ($this->relatedElementModel->relatedProperties) {
+            foreach ($this->relatedElementModel->relatedProperties as $property) {
+                $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null);
 
                 $property->relatedPropertiesModel = $this;
                 $property->addRules();
@@ -62,19 +61,14 @@ class RelatedPropertiesModel extends DynamicModel
             }
         }
 
-        if ($relatedElementProperties = $this->relatedElementModel->relatedElementProperties)
-        {
-            foreach ($this->_properties as $code => $property)
-            {
-                if ($property->handler->isMultiple)
-                {
+        if ($relatedElementProperties = $this->relatedElementModel->relatedElementProperties) {
+            foreach ($this->_properties as $code => $property) {
+                if ($property->handler->isMultiple) {
                     $values = [];
                     $valuesModels = [];
 
-                    foreach ($relatedElementProperties as $propertyElementVal)
-                    {
-                        if ($propertyElementVal->property_id == $property->id)
-                        {
+                    foreach ($relatedElementProperties as $propertyElementVal) {
+                        if ($propertyElementVal->property_id == $property->id) {
                             $values[$propertyElementVal->id] = $propertyElementVal->value;
                             $valuesModels[$propertyElementVal->id] = $propertyElementVal;
                         }
@@ -84,15 +78,12 @@ class RelatedPropertiesModel extends DynamicModel
 
                     $this->setAttribute($code, $values);
                     $this->_propertyValues[$code] = $valuesModels;
-                } else
-                {
+                } else {
                     $value = null;
                     $valueModel = null;
 
-                    foreach ($relatedElementProperties as $propertyElementVal)
-                    {
-                        if ($propertyElementVal->property_id == $property->id)
-                        {
+                    foreach ($relatedElementProperties as $propertyElementVal) {
+                        if ($propertyElementVal->property_id == $property->id) {
                             $value = $propertyElementVal->value;
                             $valueModel = $propertyElementVal;
                             break;
@@ -140,21 +131,17 @@ class RelatedPropertiesModel extends DynamicModel
 
         $hasErrors = false;
 
-        try
-        {
-            foreach ($this->_properties as $property)
-            {
+        try {
+            foreach ($this->_properties as $property) {
                 $this->_saveRelatedPropertyValue($property);
             }
 
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $hasErrors = true;
             $this->addError($property->code, $e->getMessage());
         }
 
-        if ($hasErrors)
-        {
+        if ($hasErrors) {
             return false;
         }
 
@@ -174,15 +161,12 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function delete()
     {
-        try
-        {
-            foreach ($this->_properties as $property)
-            {
+        try {
+            foreach ($this->_properties as $property) {
                 $this->_deleteRelatedPropertyValue($property);
             }
 
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return false;
         }
 
@@ -198,81 +182,70 @@ class RelatedPropertiesModel extends DynamicModel
      */
     protected function _saveRelatedPropertyValue($property)
     {
-        $value      = $this->getAttribute($property->code);
-        $element    = $this->relatedElementModel;
+        $value = $this->getAttribute($property->code);
+        $element = $this->relatedElementModel;
 
-        if ($element->isNewRecord)
-        {
+        if ($element->isNewRecord) {
             throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
         }
 
-        if ($property->handler->isMultiple)
-        {
+        if ($property->handler->isMultiple) {
             $propertyValues = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
-            if ($propertyValues)
-            {
-                foreach ($propertyValues as $pv)
-                {
+            if ($propertyValues) {
+                foreach ($propertyValues as $pv) {
                     $pv->delete();
                 }
             }
 
-            $values  = (array) $this->getAttribute($property->code);
+            $values = (array)$this->getAttribute($property->code);
             $values = $property->handler->beforeSaveValue($values);
 
-            if ($values)
-            {
-                foreach ($values as $key => $value)
-                {
+            if ($values) {
+                foreach ($values as $key => $value) {
                     $className = $element->relatedElementPropertyClassName;
                     $productPropertyValue = new $className([
-                        'element_id'    => $element->id,
-                        'property_id'   => $property->id,
-                        'value'         => (string) $value,
-                        'value_enum'    => $value,
-                        'value_num'     => $value,
-                        'value_bool'    => (bool) $value,
-                        'value_num2'    => $value,
-                        'value_int2'    => $value,
-                        'value_string'  => (string) $value,
+                        'element_id' => $element->id,
+                        'property_id' => $property->id,
+                        'value' => (string)$value,
+                        'value_enum' => $value,
+                        'value_num' => $value,
+                        'value_bool' => (bool)$value,
+                        'value_num2' => $value,
+                        'value_int2' => $value,
+                        'value_string' => (string)$value,
                     ]);
 
-                    if (!$productPropertyValue->save())
-                    {
+                    if (!$productPropertyValue->save()) {
                         throw new Exception("{$property->code} not save");
                     }
                 }
             }
 
-        } else
-        {
-            $value      = $this->getAttribute($property->code);
-            $value      = $property->handler->beforeSaveValue($value);
+        } else {
+            $value = $this->getAttribute($property->code);
+            $value = $property->handler->beforeSaveValue($value);
 
-            if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one())
-            {
-                $productPropertyValue->value        = (string) $value;
-                $productPropertyValue->value_enum   = $value;
-                $productPropertyValue->value_num    = $value;
-            } else
-            {
+            if ($productPropertyValue = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->one()) {
+                $productPropertyValue->value = (string)$value;
+                $productPropertyValue->value_enum = $value;
+                $productPropertyValue->value_num = $value;
+            } else {
                 $className = $element->relatedElementPropertyClassName;
 
                 $productPropertyValue = new $className([
-                    'element_id'    => $element->id,
-                    'property_id'   => $property->id,
-                    'value'         => (string) $value,
-                    'value_enum'    => $value,
-                    'value_num'     => $value,
-                    'value_bool'    => (bool) $value,
-                    'value_num2'    => $value,
-                    'value_int2'    => $value,
-                    'value_string'  => (string) $value,
+                    'element_id' => $element->id,
+                    'property_id' => $property->id,
+                    'value' => (string)$value,
+                    'value_enum' => $value,
+                    'value_num' => $value,
+                    'value_bool' => (bool)$value,
+                    'value_num2' => $value,
+                    'value_int2' => $value,
+                    'value_string' => (string)$value,
                 ]);
             }
 
-            if (!$productPropertyValue->save())
-            {
+            if (!$productPropertyValue->save()) {
                 throw new Exception("{$property->code} not save. " . Json::encode($productPropertyValue->errors));
             }
         }
@@ -289,36 +262,29 @@ class RelatedPropertiesModel extends DynamicModel
      */
     protected function _deleteRelatedPropertyValue($property)
     {
-        $element    = $this->relatedElementModel;
+        $element = $this->relatedElementModel;
 
-        if ($element->isNewRecord)
-        {
+        if ($element->isNewRecord) {
             throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
         }
 
 
-        if ($property->handler->isMultiple)
-        {
+        if ($property->handler->isMultiple) {
             $property->handler->beforeDeleteValue();
 
             $propertyValues = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
-            if ($propertyValues)
-            {
-                foreach ($propertyValues as $pv)
-                {
+            if ($propertyValues) {
+                foreach ($propertyValues as $pv) {
                     $pv->delete();
                 }
             }
 
-        } else
-        {
+        } else {
             $property->handler->beforeDeleteValue();
 
             $propertyValues = $element->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
-            if ($propertyValues)
-            {
-                foreach ($propertyValues as $pv)
-                {
+            if ($propertyValues) {
+                foreach ($propertyValues as $pv) {
                     $pv->delete();
                 }
             }
@@ -334,8 +300,7 @@ class RelatedPropertiesModel extends DynamicModel
     {
         $result = [];
 
-        foreach ($this->relatedElementModel->relatedProperties as $property)
-        {
+        foreach ($this->relatedElementModel->relatedProperties as $property) {
             $result[$property->code] = $property->name;
         }
 
@@ -349,8 +314,7 @@ class RelatedPropertiesModel extends DynamicModel
     {
         $result = [];
 
-        foreach ($this->relatedElementModel->relatedProperties as $property)
-        {
+        foreach ($this->relatedElementModel->relatedProperties as $property) {
             $result[$property->code] = $property->hint;
         }
 
@@ -374,8 +338,7 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function loadDefaultValues($skipIfSet = true)
     {
-        foreach ($this->_properties as $property)
-        {
+        foreach ($this->_properties as $property) {
             if ((!$skipIfSet || $this->{$property->code} === null)) {
                 $this->{$property->code} = $property->defaultValue;
             }
@@ -430,8 +393,7 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getAttribute($name)
     {
-        if ($this->hasAttribute($name))
-        {
+        if ($this->hasAttribute($name)) {
             return $this->$name;
         }
 
@@ -447,12 +409,11 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function setAttribute($name, $value)
     {
-        if ($this->hasAttribute($name))
-        {
+        if ($this->hasAttribute($name)) {
             $this->$name = $value;
-        } else
-        {
-            throw new InvalidParamException(get_class($this) . ' '.\Yii::t('skeeks/cms','has no attribute named "{name}".',['name' => $name]));
+        } else {
+            throw new InvalidParamException(get_class($this) . ' ' . \Yii::t('skeeks/cms',
+                    'has no attribute named "{name}".', ['name' => $name]));
         }
     }
 
@@ -462,10 +423,9 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getSmartAttribute($name)
     {
-        $property       = $this->getRelatedProperty($name);
+        $property = $this->getRelatedProperty($name);
 
-        if (!$property)
-        {
+        if (!$property) {
             return '';
         }
 
@@ -482,21 +442,16 @@ class RelatedPropertiesModel extends DynamicModel
         /**
          * @var $property RelatedPropertyModel
          */
-        $value      = $this->getAttribute($name);
-        $property   = $this->getRelatedProperty($name);
+        $value = $this->getAttribute($name);
+        $property = $this->getRelatedProperty($name);
 
-        if ($property && $property->property_type == PropertyType::CODE_LIST)
-        {
-            if ($property->handler->isMultiple)
-            {
-                if ($property->enums)
-                {
+        if ($property && $property->property_type == PropertyType::CODE_LIST) {
+            if ($property->handler->isMultiple) {
+                if ($property->enums) {
                     $result = [];
 
-                    foreach ($property->enums as $enum)
-                    {
-                        if (in_array($enum->id, $value))
-                        {
+                    foreach ($property->enums as $enum) {
+                        if (in_array($enum->id, $value)) {
                             $result[$enum->code] = $enum;
                         }
 
@@ -504,16 +459,12 @@ class RelatedPropertiesModel extends DynamicModel
 
                     return $result;
                 }
-            } else
-            {
-                if ($property->enums)
-                {
-                    $enums = (array) $property->enums;
+            } else {
+                if ($property->enums) {
+                    $enums = (array)$property->enums;
 
-                    foreach ($enums as $enum)
-                    {
-                        if ($enum->id == $value)
-                        {
+                    foreach ($enums as $enum) {
+                        if ($enum->id == $value) {
                             return $enum;
                         }
                     }

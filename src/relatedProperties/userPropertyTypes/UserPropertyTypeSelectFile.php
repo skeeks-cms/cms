@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\userPropertyTypes;
+
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
@@ -25,25 +27,24 @@ class UserPropertyTypeSelectFile extends PropertyType
     {
         parent::init();
 
-        if(!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms','Standard file selection');
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', 'Standard file selection');
         }
     }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'type'  => \Yii::t('skeeks/cms','Type'),
-        ]);
+            [
+                'type' => \Yii::t('skeeks/cms', 'Type'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-        ]);
+            [
+            ]);
     }
 
     /**
@@ -54,9 +55,9 @@ class UserPropertyTypeSelectFile extends PropertyType
         $field = parent::renderForActiveForm();
 
         $field->widget(\skeeks\cms\modules\admin\widgets\formInputs\OneImage::className(),
-        [
-            'filesModel' => $this->property->relatedPropertiesModel->relatedElementModel
-        ]);
+            [
+                'filesModel' => $this->property->relatedPropertiesModel->relatedElementModel
+            ]);
 
         return $field;
     }

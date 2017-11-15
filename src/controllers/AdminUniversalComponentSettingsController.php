@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
@@ -21,7 +22,7 @@ class AdminUniversalComponentSettingsController extends AdminController
 {
     public function init()
     {
-        $this->name                   = "Управление настройками компонента";
+        $this->name = "Управление настройками компонента";
         parent::init();
     }
 
@@ -30,9 +31,8 @@ class AdminUniversalComponentSettingsController extends AdminController
         $rr = new RequestResponse();
 
         $classComponent = \Yii::$app->request->get('component');
-        $classComponentSettings = (string) \Yii::$app->request->get('settings');
-        if ($classComponentSettings)
-        {
+        $classComponentSettings = (string)\Yii::$app->request->get('settings');
+        if ($classComponentSettings) {
             $classComponentSettings = unserialize(StringHelper::base64DecodeUrl($classComponentSettings));
         }
 
@@ -40,35 +40,30 @@ class AdminUniversalComponentSettingsController extends AdminController
          * @var $component \skeeks\cms\relatedProperties\PropertyType;
          */
         $component = new $classComponent();
-        try
-        {
+        try {
             $component->attributes = $classComponentSettings;
-        } catch (\Exception $e)
-        {}
+        } catch (\Exception $e) {
+        }
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             return $rr->ajaxValidateForm($component);
         }
 
 
         $forSave = "";
-        if ($rr->isRequestPjaxPost())
-        {
-            if ($component->load(\Yii::$app->request->post()))
-            {
+        if ($rr->isRequestPjaxPost()) {
+            if ($component->load(\Yii::$app->request->post())) {
                 \Yii::$app->session->setFlash('success', 'Сохранено');
                 $forSave = StringHelper::base64EncodeUrl(serialize($component->attributes));
 
-            } else
-            {
+            } else {
                 \Yii::$app->session->setFlash('error', 'Ошибка');
             };
         }
 
         return $this->render($this->action->id, [
             "component" => $component,
-            "forSave"   => $forSave,
+            "forSave" => $forSave,
         ]);
     }
 
@@ -77,15 +72,14 @@ class AdminUniversalComponentSettingsController extends AdminController
     {
         $rr = new RequestResponse();
 
-        $classComponent             = \Yii::$app->request->get('component');
+        $classComponent = \Yii::$app->request->get('component');
 
         /**
          * @var $component \skeeks\cms\relatedProperties\PropertyType;
          */
         $component = new $classComponent();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $component->load(\Yii::$app->request->post());
             $forSave = StringHelper::base64EncodeUrl(serialize($component->attributes));
 
@@ -93,9 +87,9 @@ class AdminUniversalComponentSettingsController extends AdminController
             $rr->message;
 
             $rr->data =
-            [
-                'forSave' => $forSave
-            ];
+                [
+                    'forSave' => $forSave
+                ];
 
             return $rr;
         }

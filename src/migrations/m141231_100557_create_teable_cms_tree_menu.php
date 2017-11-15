@@ -8,6 +8,7 @@
  * @date 31.12.2014
  * @since 1.0.0
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -19,28 +20,26 @@ class m141231_100557_create_teable_cms_tree_menu extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_tree_menu}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql')
-        {
+        if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable('{{%cms_tree_menu}}', [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'name'                  => Schema::TYPE_STRING . '(255) NOT NULL',
-            'description'           => Schema::TYPE_TEXT . ' NULL',
+            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'description' => Schema::TYPE_TEXT . ' NULL',
 
         ], $tableOptions);
 

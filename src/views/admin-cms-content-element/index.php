@@ -12,8 +12,7 @@
 
 $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);
 
-if ($content_id = \Yii::$app->request->get('content_id'))
-{
+if ($content_id = \Yii::$app->request->get('content_id')) {
     $dataProvider->query->andWhere(['content_id' => $content_id]);
     /**
      * @var $cmsContent \skeeks\cms\models\CmsContent
@@ -24,32 +23,31 @@ if ($content_id = \Yii::$app->request->get('content_id'))
 ?>
 <? $pjax = \yii\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel' => $searchModel,
-        'dataProvider' => $dataProvider,
-        'content_id' => $content_id,
-        'cmsContent' => $cmsContent,
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider,
+    'content_id' => $content_id,
+    'cmsContent' => $cmsContent,
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'autoColumns'       => false,
-        'pjax'              => $pjax,
-        'adminController'   => $controller,
-        'chooseCallback'   => function($model)
-        {
-            return \yii\helpers\ArrayHelper::merge($model->toArray(), [
-                'url' => $model->url,
-                'image' => $model->image ? $model->image->src : ""
-            ]);
-        },
-        'settingsData'  =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'autoColumns' => false,
+    'pjax' => $pjax,
+    'adminController' => $controller,
+    'chooseCallback' => function ($model) {
+        return \yii\helpers\ArrayHelper::merge($model->toArray(), [
+            'url' => $model->url,
+            'image' => $model->image ? $model->image->src : ""
+        ]);
+    },
+    'settingsData' =>
         [
             'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
         ],
-        'columns' => \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider)
-    ]); ?>
+    'columns' => \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider)
+]); ?>
 
 <? \yii\widgets\Pjax::end(); ?>
 
@@ -58,8 +56,10 @@ if ($content_id = \Yii::$app->request->get('content_id'))
         'class' => 'alert-info',
     ],
 ]); ?>
-    Изменить свойства и права доступа к информационному блоку вы можете в <?= \yii\helpers\Html::a('Настройках контента', \skeeks\cms\helpers\UrlHelper::construct([
-        '/cms/admin-cms-content/update', 'pk' => $content_id
+Изменить свойства и права доступа к информационному блоку вы можете в <?= \yii\helpers\Html::a('Настройках контента',
+    \skeeks\cms\helpers\UrlHelper::construct([
+        '/cms/admin-cms-content/update',
+        'pk' => $content_id
     ])->enableAdmin()->toString()); ?>.
 <? \yii\bootstrap\Alert::end(); ?>
 

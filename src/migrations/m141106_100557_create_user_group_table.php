@@ -8,6 +8,7 @@
  * @date 28.10.2014
  * @since 1.0.0
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -19,32 +20,30 @@ class m141106_100557_create_user_group_table extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_user_group}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql')
-        {
+        if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable('{{%cms_user_group}}', [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'groupname'             => Schema::TYPE_STRING . ' NOT NULL',
-            'description'           => Schema::TYPE_STRING . '(32) NOT NULL',
+            'groupname' => Schema::TYPE_STRING . ' NOT NULL',
+            'description' => Schema::TYPE_STRING . '(32) NOT NULL',
 
-            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10',
+            'status' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10',
 
-            'files'                 => Schema::TYPE_TEXT. ' NULL', //
+            'files' => Schema::TYPE_TEXT . ' NULL', //
 
         ], $tableOptions);
 
@@ -68,29 +67,28 @@ class m141106_100557_create_user_group_table extends Migration
         );
 
 
-
         $this->insert('{{%cms_user_group}}', [
-            "groupname"             => "root",
-            "description"           => "Суперпользователи",
-            "status"                => 10,
+            "groupname" => "root",
+            "description" => "Суперпользователи",
+            "status" => 10,
         ]);
 
         $this->insert('{{%cms_user_group}}', [
-            "groupname"             => "admin",
-            "description"           => "Администраторы",
-            "status"                => 10,
+            "groupname" => "admin",
+            "description" => "Администраторы",
+            "status" => 10,
         ]);
 
         $this->insert('{{%cms_user_group}}', [
-            "groupname"             => "manager",
-            "description"           => "Менеджер",
-            "status"                => 10,
+            "groupname" => "manager",
+            "description" => "Менеджер",
+            "status" => 10,
         ]);
 
         $this->insert('{{%cms_user_group}}', [
-            "groupname"             => "user",
-            "description"           => "Пользователь",
-            "status"                => 10,
+            "groupname" => "user",
+            "description" => "Пользователь",
+            "status" => 10,
         ]);
 
 
@@ -103,17 +101,17 @@ class m141106_100557_create_user_group_table extends Migration
 
 
         $this->insert('{{%cms_user}}', [
-            "username"              => "root",
-            "name"                  => "Семенов Александр",
-            "city"                  => "Зеленоград",
-            "address"               => "Зеленоград, ул. Каменка, 2004-25",
-            "auth_key"              => "otv60YW-nV6-8GRI4La3vYNhu_-dmp_n",
-            "password_hash"         => '$2y$13$tEMlbu9DvkU3RDCg.sZwM.JNScy.HJXFqG.Ew.n5fwcdAPxHsFdla',
-            "password_reset_token"  => 'wn49wJLj9OMVjgj8bBzBjND4nFixyJgt_1413297645',
-            "email"                 => 'admin@skeeks.com',
-            "role"                  => 10,
-            "status"                => 10,
-            "group_id"              => 1,
+            "username" => "root",
+            "name" => "Семенов Александр",
+            "city" => "Зеленоград",
+            "address" => "Зеленоград, ул. Каменка, 2004-25",
+            "auth_key" => "otv60YW-nV6-8GRI4La3vYNhu_-dmp_n",
+            "password_hash" => '$2y$13$tEMlbu9DvkU3RDCg.sZwM.JNScy.HJXFqG.Ew.n5fwcdAPxHsFdla',
+            "password_reset_token" => 'wn49wJLj9OMVjgj8bBzBjND4nFixyJgt_1413297645',
+            "email" => 'admin@skeeks.com',
+            "role" => 10,
+            "status" => 10,
+            "group_id" => 1,
         ]);
     }
 

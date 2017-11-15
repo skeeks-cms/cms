@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.02.2015
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
@@ -76,8 +77,8 @@ class CmsUserPhone extends ActiveRecord
         return [
             'id' => Yii::t('skeeks/cms', 'ID'),
             'user_id' => Yii::t('skeeks/cms', 'User'),
-            'value' => \Yii::t('skeeks/cms',"Phone Number"),
-            'approved' => \Yii::t('skeeks/cms',"Approved"),
+            'value' => \Yii::t('skeeks/cms', "Phone Number"),
+            'approved' => \Yii::t('skeeks/cms', "Approved"),
             'created_at' => Yii::t('skeeks/cms', 'Created At'),
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
             'def' => 'Def',

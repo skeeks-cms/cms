@@ -70,8 +70,8 @@ class PasswordChangeForm extends Model
     public function attributeLabels()
     {
         return [
-            'new_password'          => \Yii::t('skeeks/cms','New Password'),
-            'new_password_confirm'  => \Yii::t('skeeks/cms','New Password Confirm'),
+            'new_password' => \Yii::t('skeeks/cms', 'New Password'),
+            'new_password_confirm' => \Yii::t('skeeks/cms', 'New Password Confirm'),
         ];
     }
 
@@ -84,9 +84,8 @@ class PasswordChangeForm extends Model
      */
     public function validateNewPassword($attribute, $params)
     {
-        if ($this->new_password_confirm != $this->new_password)
-        {
-            $this->addError($attribute, \Yii::t('skeeks/cms','New passwords do not match'));
+        if ($this->new_password_confirm != $this->new_password) {
+            $this->addError($attribute, \Yii::t('skeeks/cms', 'New passwords do not match'));
         }
     }
 
@@ -97,12 +96,10 @@ class PasswordChangeForm extends Model
      */
     public function changePassword()
     {
-        if ($this->validate() && $this->new_password == $this->new_password_confirm && $this->new_password)
-        {
+        if ($this->validate() && $this->new_password == $this->new_password_confirm && $this->new_password) {
             $this->user->setPassword($this->new_password);
             return $this->user->save(false);
-        } else
-        {
+        } else {
             return false;
         }
     }

@@ -7,7 +7,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 26.02.2015
  */
+
 namespace skeeks\cms\models\forms;
+
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\web\User;
@@ -50,7 +52,7 @@ class PasswordResetRequestFormEmailOrLogin extends Model
     public function attributeLabels()
     {
         return [
-            'identifier'    => \Yii::t('skeeks/cms','Username or Email'),
+            'identifier' => \Yii::t('skeeks/cms', 'Username or Email'),
         ];
     }
 
@@ -59,11 +61,11 @@ class PasswordResetRequestFormEmailOrLogin extends Model
         $identityClassName = \Yii::$app->user->identityClass;
         $user = $identityClassName::findByUsernameOrEmail($this->identifier);
 
-        if (!$user)
-        {
-            $this->addError($attr, \Yii::t('skeeks/cms','User not found'));
+        if (!$user) {
+            $this->addError($attr, \Yii::t('skeeks/cms', 'User not found'));
         }
     }
+
     /**
      * Sends an email with a link, for resetting the password.
      *
@@ -77,44 +79,42 @@ class PasswordResetRequestFormEmailOrLogin extends Model
         $user = $identityClassName::findByUsernameOrEmail($this->identifier);
         //$user = $identityClassName::
 
-        if ($user)
-        {
-            if (!$identityClassName::isPasswordResetTokenValid($user->password_reset_token))
-            {
+        if ($user) {
+            if (!$identityClassName::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();
             }
 
-            if ($user->save())
-            {
-                if (!$user->email)
-                {
+            if ($user->save()) {
+                if (!$user->email) {
                     return false;
                 }
 
-                if ($this->isAdmin)
-                {
-                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('admin/auth/reset-password', ['token' => $user->password_reset_token])->enableAbsolute()->enableAdmin();
-                } else
-                {
-                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('cms/auth/reset-password', ['token' => $user->password_reset_token])->enableAbsolute();
+                if ($this->isAdmin) {
+                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('admin/auth/reset-password',
+                        ['token' => $user->password_reset_token])->enableAbsolute()->enableAdmin();
+                } else {
+                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('cms/auth/reset-password',
+                        ['token' => $user->password_reset_token])->enableAbsolute();
                 }
 
 
-                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
-                    '@app/mail' =>
+                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap,
                     [
-                        '@skeeks/cms/mail-templates'
-                    ]
-                ]);
+                        '@app/mail' =>
+                            [
+                                '@skeeks/cms/mail-templates'
+                            ]
+                    ]);
 
 
                 $message = \Yii::$app->mailer->compose('@app/mail/password-reset-token', [
-                        'user'      => $user,
-                        'resetLink' => $resetLink
-                    ])
+                    'user' => $user,
+                    'resetLink' => $resetLink
+                ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
-                    ->setSubject(\Yii::t('skeeks/cms','The request to change the password for') . \Yii::$app->cms->appName);
+                    ->setSubject(\Yii::t('skeeks/cms',
+                            'The request to change the password for') . \Yii::$app->cms->appName);
 
                 return $message->send();
             }

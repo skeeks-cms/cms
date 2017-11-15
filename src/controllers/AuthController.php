@@ -8,6 +8,7 @@
  * @date 05.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 
@@ -44,34 +45,34 @@ class AuthController extends Controller
     public function behaviors()
     {
         return
-        [
-            'access' =>
             [
-                'class' => \yii\filters\AccessControl::className(),
-                'only' => ['logout', 'login'],
-                'rules' => [
+                'access' =>
                     [
-                        'actions' => [
-                            'login',
+                        'class' => \yii\filters\AccessControl::className(),
+                        'only' => ['logout', 'login'],
+                        'rules' => [
+                            [
+                                'actions' => [
+                                    'login',
+                                ],
+                                'allow' => true,
+                                'roles' => ['?'],
+                            ],
+                            [
+                                'actions' => ['logout'],
+                                'allow' => true,
+                                'roles' => ['@'],
+                            ],
                         ],
-                        'allow' => true,
-                        'roles' => ['?'],
                     ],
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
 
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
+                'verbs' => [
+                    'class' => VerbFilter::className(),
+                    'actions' => [
+                        'logout' => ['post'],
+                    ],
                 ],
-            ],
-        ];
+            ];
     }
 
     /**
@@ -94,40 +95,34 @@ class AuthController extends Controller
      */
     public function actionForget()
     {
-        $rr         = new RequestResponse();
-        $model      = new PasswordResetRequestFormEmailOrLogin();
+        $rr = new RequestResponse();
+        $model = new PasswordResetRequestFormEmailOrLogin();
         //Не админка
         $model->isAdmin = false;
 
         //Запрос на валидацию ajax формы
-        if ($rr->isRequestOnValidateAjaxForm())
-        {
+        if ($rr->isRequestOnValidateAjaxForm()) {
             return $rr->ajaxValidateForm($model);
         }
         //Запрос ajax post
-        if ($rr->isRequestAjaxPost())
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->sendEmail())
-            {
+        if ($rr->isRequestAjaxPost()) {
+            if ($model->load(\Yii::$app->request->post()) && $model->sendEmail()) {
                 $rr->success = true;
                 $rr->message = 'Проверьте ваш email, дальнейшие инструкции мы отправили туда';
-            } else
-            {
+            } else {
                 $rr->message = 'Не удалось выполнить запрос на восстановление пароля';
             }
 
-            return (array) $rr;
+            return (array)$rr;
 
-        } else if (\Yii::$app->request->isPost)
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->sendEmail())
-            {
-                if ($ref = UrlHelper::getCurrent()->getRef())
-                {
-                    return $this->redirect($ref);
-                } else
-                {
-                    return $this->goBack();
+        } else {
+            if (\Yii::$app->request->isPost) {
+                if ($model->load(\Yii::$app->request->post()) && $model->sendEmail()) {
+                    if ($ref = UrlHelper::getCurrent()->getRef()) {
+                        return $this->redirect($ref);
+                    } else {
+                        return $this->goBack();
+                    }
                 }
             }
         }
@@ -139,8 +134,7 @@ class AuthController extends Controller
 
     public function actionLogin()
     {
-        if (!\Yii::$app->user->isGuest)
-        {
+        if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
@@ -149,44 +143,36 @@ class AuthController extends Controller
         $model = new LoginFormUsernameOrEmail();
 
         //Запрос на валидацию ajax формы
-        if ($rr->isRequestOnValidateAjaxForm())
-        {
+        if ($rr->isRequestOnValidateAjaxForm()) {
             return $rr->ajaxValidateForm($model);
         }
         //Запрос ajax post
-        if ($rr->isRequestAjaxPost())
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->login())
-            {
+        if ($rr->isRequestAjaxPost()) {
+            if ($model->load(\Yii::$app->request->post()) && $model->login()) {
                 $rr->success = true;
                 $rr->message = 'Авторизация прошла успешно';
 
-                if ($ref = UrlHelper::getCurrent()->getRef())
-                {
+                if ($ref = UrlHelper::getCurrent()->getRef()) {
                     $rr->redirect = $ref;
-                } else
-                {
+                } else {
                     $rr->redirect = Yii::$app->getUser()->getReturnUrl();;
                 }
-            } else
-            {
+            } else {
                 $rr->message = 'Не удалось авторизоваться';
             }
 
-            return (array) $rr;
+            return (array)$rr;
 
-        } else if (\Yii::$app->request->isPost)
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->login())
-            {
-                if ($ref = UrlHelper::getCurrent()->getRef())
-                {
-                    return $this->redirect($ref);
-                } else
-                {
-                    return $this->goBack();
+        } else {
+            if (\Yii::$app->request->isPost) {
+                if ($model->load(\Yii::$app->request->post()) && $model->login()) {
+                    if ($ref = UrlHelper::getCurrent()->getRef()) {
+                        return $this->redirect($ref);
+                    } else {
+                        return $this->goBack();
+                    }
+
                 }
-
             }
         }
 
@@ -201,26 +187,22 @@ class AuthController extends Controller
      */
     public function actionRegister()
     {
-        if (!\Yii::$app->user->isGuest)
-        {
+        if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        $rr         = new RequestResponse();
-        $model      = new SignupForm();
+        $rr = new RequestResponse();
+        $model = new SignupForm();
 
         $model->scenario = SignupForm::SCENARION_FULLINFO;
 
         //Запрос на валидацию ajax формы
-        if ($rr->isRequestOnValidateAjaxForm())
-        {
+        if ($rr->isRequestOnValidateAjaxForm()) {
             return $rr->ajaxValidateForm($model);
         }
         //Запрос ajax post
-        if ($rr->isRequestAjaxPost())
-        {
-            if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup())
-            {
+        if ($rr->isRequestAjaxPost()) {
+            if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup()) {
                 $rr->success = true;
                 $rr->message = 'Вы успешно зарегистрированны';
 
@@ -228,23 +210,20 @@ class AuthController extends Controller
 
                 return $this->redirect($registeredUser->getPageUrl());
 
-            } else
-            {
+            } else {
                 $rr->message = 'Не удалось зарегистрироваться';
             }
 
-            return (array) $rr;
+            return (array)$rr;
 
-        } else if (\Yii::$app->request->isPost)
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->sendEmail())
-            {
-                if ($ref = UrlHelper::getCurrent()->getRef())
-                {
-                    return $this->redirect($ref);
-                } else
-                {
-                    return $this->goBack();
+        } else {
+            if (\Yii::$app->request->isPost) {
+                if ($model->load(\Yii::$app->request->post()) && $model->sendEmail()) {
+                    if ($ref = UrlHelper::getCurrent()->getRef()) {
+                        return $this->redirect($ref);
+                    } else {
+                        return $this->goBack();
+                    }
                 }
             }
         }
@@ -253,44 +232,40 @@ class AuthController extends Controller
             'model' => $model,
         ]);
     }
+
     /**
      * Восстановлеине пароля
      * @return string|Response
      */
     public function actionRegisterByEmail()
     {
-        if (!\Yii::$app->user->isGuest)
-        {
+        if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        $rr         = new RequestResponse();
-        $model      = new SignupForm();
+        $rr = new RequestResponse();
+        $model = new SignupForm();
 
         $model->scenario = SignupForm::SCENARION_ONLYEMAIL;
 
 
         //Запрос на валидацию ajax формы
-        if ($rr->isRequestOnValidateAjaxForm())
-        {
+        if ($rr->isRequestOnValidateAjaxForm()) {
             return $rr->ajaxValidateForm($model);
         }
         //Запрос ajax post
-        if ($rr->isRequestAjaxPost())
-        {
-            if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup())
-            {
+        if ($rr->isRequestAjaxPost()) {
+            if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup()) {
                 $rr->success = true;
                 $rr->message = 'Для дальнейших действий, проверьте вашу почту.';
 
                 return $rr;
 
-            } else
-            {
+            } else {
                 $rr->message = 'Не удалось зарегистрироваться';
             }
 
-            return (array) $rr;
+            return (array)$rr;
 
         }
 
@@ -304,16 +279,14 @@ class AuthController extends Controller
         $rr = new RequestResponse();
         $token = \Yii::$app->request->get('token');
 
-        if (!$token)
-        {
+        if (!$token) {
             return $this->goHome();
         }
 
-        $className  = \Yii::$app->user->identityClass;
-        $user       = $className::findByPasswordResetToken($token);
+        $className = \Yii::$app->user->identityClass;
+        $user = $className::findByPasswordResetToken($token);
 
-        if ($user)
-        {
+        if ($user) {
             $password = \Yii::$app->getSecurity()->generateRandomString(10);
 
             $user->setPassword($password);
@@ -321,17 +294,18 @@ class AuthController extends Controller
 
             if ($user->save()) {
 
-                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
-                    '@app/mail' =>
+                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap,
                     [
-                        '@skeeks/cms/mail-templates'
-                    ]
-                ]);
+                        '@app/mail' =>
+                            [
+                                '@skeeks/cms/mail-templates'
+                            ]
+                    ]);
 
                 \Yii::$app->mailer->compose('@app/mail/new-password', [
-                        'user'      => $user,
-                        'password'  => $password
-                    ])
+                    'user' => $user,
+                    'password' => $password
+                ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
                     ->setSubject('Новый пароль для ' . \Yii::$app->cms->appName)
@@ -340,12 +314,11 @@ class AuthController extends Controller
                 $rr->success = true;
                 $rr->message = 'Новый пароль отправлен на ваш e-mail';
             }
-        } else
-        {
+        } else {
             $rr->message = 'Ошибка, скорее всего данная ссылка уже устарела';
         }
 
-        return $this->render('reset-password', (array) $rr);
+        return $this->render('reset-password', (array)$rr);
     }
 
 

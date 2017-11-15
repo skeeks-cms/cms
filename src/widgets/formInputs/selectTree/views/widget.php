@@ -8,28 +8,34 @@
  * @date 13.11.2014
  * @since 1.0.0
  */
+
 use \skeeks\cms\widgets\formInputs\selectTree\SelectTree;
+
 /**
  * @var \skeeks\cms\widgets\formInputs\selectTree\SelectTree $widget
  */
 ?>
 
-<div id="<?= $id; ?>">
-    <p>
-        <? if ($widget->mode == SelectTree::MOD_COMBO) : ?>
+    <div id="<?= $id; ?>">
+        <p>
+            <? if ($widget->mode == SelectTree::MOD_COMBO) : ?>
 
-        <small><?=\Yii::t('skeeks/cms','Circle — the main section (you can choose one section, it will affect the construction of bread crumbs)')?></small><br />
-        <small><?=\Yii::t('skeeks/cms','The square - an additional section (you can mark several additional sections)')?></small>
-        <? elseif($widget->mode == SelectTree::MOD_MULTI) : ?>
-            <small><?=\Yii::t('skeeks/cms','The square - an additional section (you can mark several additional sections)')?></small>
-        <? endif; ?>
-    </p>
-    <iframe data-src="<?= $src; ?>" width="100%;" height="200px;" id="<?= $idSmartFrame; ?>"></iframe>
-    <div class="sx-selected">
-        <?= $select; ?>
-        <?= $singleInput; ?>
+                <small><?= \Yii::t('skeeks/cms',
+                        'Circle — the main section (you can choose one section, it will affect the construction of bread crumbs)') ?></small>
+                <br/>
+                <small><?= \Yii::t('skeeks/cms',
+                        'The square - an additional section (you can mark several additional sections)') ?></small>
+            <? elseif ($widget->mode == SelectTree::MOD_MULTI) : ?>
+                <small><?= \Yii::t('skeeks/cms',
+                        'The square - an additional section (you can mark several additional sections)') ?></small>
+            <? endif; ?>
+        </p>
+        <iframe data-src="<?= $src; ?>" width="100%;" height="200px;" id="<?= $idSmartFrame; ?>"></iframe>
+        <div class="sx-selected">
+            <?= $select; ?>
+            <?= $singleInput; ?>
+        </div>
     </div>
-</div>
 
 <? $this->registerJs(<<<JS
 
@@ -127,4 +133,4 @@ use \skeeks\cms\widgets\formInputs\selectTree\SelectTree;
 })(sx, sx.$, sx._);
 
 JS
-);?>
+); ?>

@@ -10,6 +10,7 @@
  */
 
 namespace skeeks\cms\components\imaging;
+
 use Faker\Provider\File;
 use yii\base\Component;
 
@@ -20,9 +21,9 @@ use yii\base\Component;
 abstract class Filter extends Component
 {
     protected $_config = [];
-    
-    protected $_originalRootFilePath    = null;
-    protected $_newRootFilePath         = null;
+
+    protected $_originalRootFilePath = null;
+    protected $_newRootFilePath = null;
 
     public function __construct($config = [])
     {
@@ -52,7 +53,7 @@ abstract class Filter extends Component
      */
     public function setOriginalRootFilePath($originalRootFilePath)
     {
-        $this->_originalRootFilePath = (string) $originalRootFilePath;
+        $this->_originalRootFilePath = (string)$originalRootFilePath;
         return $this;
     }
 
@@ -62,7 +63,7 @@ abstract class Filter extends Component
      */
     public function setNewRootFilePath($newRootFilePath)
     {
-        $this->_newRootFilePath = (string) $newRootFilePath;
+        $this->_newRootFilePath = (string)$newRootFilePath;
         return $this;
     }
 
@@ -73,27 +74,24 @@ abstract class Filter extends Component
      */
     public function save()
     {
-        if (!$this->_originalRootFilePath)
-        {
+        if (!$this->_originalRootFilePath) {
             throw new \ErrorException("not configurated original file");
         }
 
-        if (!$this->_newRootFilePath)
-        {
+        if (!$this->_newRootFilePath) {
             throw new \ErrorException("not configurated new file path");
         }
 
         //Все проверки прошли, результирующая дирректория создана или найдена, результирующий файл можно перезаписывать если он существует
         //try
         //{
-            $this->_createNewDir();
-            $this->_save();
-            $file = new \skeeks\sx\File($this->_newRootFilePath);
+        $this->_createNewDir();
+        $this->_save();
+        $file = new \skeeks\sx\File($this->_newRootFilePath);
 
-            if (!$file->isExist())
-            {
-                throw new \ErrorException('Файл не найден');
-            }
+        if (!$file->isExist()) {
+            throw new \ErrorException('Файл не найден');
+        }
 
         //} catch (\Cx_Exception $e)
         //{
@@ -111,8 +109,7 @@ abstract class Filter extends Component
     {
         $newFile = new \skeeks\sx\File($this->_newRootFilePath);
 
-        if (!$newFile->getDir()->make())
-        {
+        if (!$newFile->getDir()->make()) {
             throw new \ErrorException("Не удалось создать диррикторию для нового файла");
         }
 

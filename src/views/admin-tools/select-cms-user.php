@@ -6,9 +6,11 @@
  * @date 28.04.2015
  */
 /* @var $this yii\web\View */
+
 /* @var $model \yii\db\ActiveRecord */
 
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
+
 ?>
 
 <?
@@ -62,34 +64,34 @@ JS
 <?
 
 
+$search = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsUser::className());
+$dataProvider = $search->getDataProvider();
 
-    $search = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsUser::className());
-    $dataProvider = $search->getDataProvider();
+$dataProvider->sort->defaultOrder = [
+    'created_at' => SORT_DESC
+];
 
-    $dataProvider->sort->defaultOrder = [
-        'created_at' => SORT_DESC
-    ];
-
-    $dataProvider   = $search->search(\Yii::$app->request->queryParams);
-    $searchModel    = $search->loadedModel;
+$dataProvider = $search->search(\Yii::$app->request->queryParams);
+$searchModel = $search->loadedModel;
 
 
 ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider'      => $dataProvider,
-    'filterModel'       => $searchModel,
-    'adminController'   => @$controller,
-    'enabledCheckbox'   => false,
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'adminController' => @$controller,
+    'enabledCheckbox' => false,
     'columns' => [
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
-            'value'     => function(\skeeks\cms\models\User $model)
-            {
-                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms','Choose'), '#', [
+            'class' => \yii\grid\DataColumn::className(),
+            'value' => function (\skeeks\cms\models\User $model) {
+                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
+                        'Choose'), '#', [
                     'class' => 'btn btn-primary sx-row-action',
-                    'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($model->toArray([], ['displayName'])) . '); return false;',
+                    'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($model->toArray([],
+                            ['displayName'])) . '); return false;',
                     'data-pjax' => 0
                 ]);
             },
@@ -97,9 +99,9 @@ JS
         ],
 
         [
-            'class'             => \skeeks\cms\grid\ImageColumn2::className(),
-            'attribute'         => 'image_id',
-            'relationName'      => 'image',
+            'class' => \skeeks\cms\grid\ImageColumn2::className(),
+            'attribute' => 'image_id',
+            'relationName' => 'image',
         ],
 
         'username',
@@ -115,28 +117,25 @@ JS
         ],
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
-            'value'     => function(\skeeks\cms\models\User $model)
-            {
+            'class' => \yii\grid\DataColumn::className(),
+            'value' => function (\skeeks\cms\models\User $model) {
                 $result = [];
 
-                if ($roles = \Yii::$app->authManager->getRolesByUser($model->id))
-                {
-                    foreach ($roles as $role)
-                    {
+                if ($roles = \Yii::$app->authManager->getRolesByUser($model->id)) {
+                    foreach ($roles as $role) {
                         $result[] = $role->description . " ({$role->name})";
                     }
                 }
 
                 return implode(', ', $result);
             },
-            'format'    => 'html',
-            'label'     => \Yii::t('skeeks/cms','Roles'),
+            'format' => 'html',
+            'label' => \Yii::t('skeeks/cms', 'Roles'),
         ],
 
         [
-            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-            'attribute'     => "active",
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute' => "active",
         ],
 
     ],

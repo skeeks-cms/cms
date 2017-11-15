@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\propertyTypes;
+
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
@@ -17,20 +19,20 @@ use yii\widgets\ActiveForm;
  */
 class PropertyTypeBool extends PropertyType
 {
-    public $code             = self::CODE_BOOL;
-    public $name             = "";
+    public $code = self::CODE_BOOL;
+    public $name = "";
 
-    public $default_value        = null;
+    public $default_value = null;
 
-    public $fieldElement            = 'radioInput';
-    public $rows                    = 5;
+    public $fieldElement = 'radioInput';
+    public $rows = 5;
 
     static public function fieldElements()
     {
         return [
-            'radioList'      => \Yii::t('skeeks/cms', 'Radio'),
-            'checkbox'   => \Yii::t('skeeks/cms', 'Checkbox'),
-            'listBox'        => \Yii::t('skeeks/cms', 'listBox'),
+            'radioList' => \Yii::t('skeeks/cms', 'Radio'),
+            'checkbox' => \Yii::t('skeeks/cms', 'Checkbox'),
+            'listBox' => \Yii::t('skeeks/cms', 'listBox'),
         ];
     }
 
@@ -38,8 +40,7 @@ class PropertyTypeBool extends PropertyType
     {
         parent::init();
 
-        if(!$this->name)
-        {
+        if (!$this->name) {
             $this->name = \Yii::t('skeeks/cms', 'Yes/No');
         }
     }
@@ -47,19 +48,19 @@ class PropertyTypeBool extends PropertyType
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'fieldElement'  => \Yii::t('skeeks/cms','Element form'),
-            'default_value'  => \Yii::t('skeeks/cms','Default Value'),
-        ]);
+            [
+                'fieldElement' => \Yii::t('skeeks/cms', 'Element form'),
+                'default_value' => \Yii::t('skeeks/cms', 'Default Value'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['fieldElement', 'string'],
-            ['default_value', 'boolean'],
-        ]);
+            [
+                ['fieldElement', 'string'],
+                ['default_value', 'boolean'],
+            ]);
     }
 
     /**
@@ -78,20 +79,16 @@ class PropertyTypeBool extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        if (in_array($this->fieldElement, array_keys(self::fieldElements())))
-        {
+        if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
 
-            if ($fieldElement == 'radioList' || $fieldElement == 'listBox')
-            {
+            if ($fieldElement == 'radioList' || $fieldElement == 'listBox') {
                 $field->{$fieldElement}(\Yii::$app->formatter->booleanFormat);
-            } else
-            {
+            } else {
                 $field->{$fieldElement}();
             }
 
-        } else
-        {
+        } else {
             $field->textInput([]);
         }
 
@@ -129,8 +126,7 @@ class PropertyTypeBool extends PropertyType
      */
     public function getDefaultValue()
     {
-        if ($this->default_value !== null)
-        {
+        if ($this->default_value !== null) {
             return $this->default_value;
         }
 
@@ -143,7 +139,7 @@ class PropertyTypeBool extends PropertyType
     public function getStringValue()
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
-        return (string) \Yii::$app->formatter->asBoolean($value);
+        return (string)\Yii::$app->formatter->asBoolean($value);
     }
 
 }

@@ -27,25 +27,24 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
 ?>
 <? $pjax = \yii\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel' => $searchModel,
-        'dataProvider' => $dataProvider,
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider,
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        //'autoColumns'       => false,
-        'pjax'              => $pjax,
-        'adminController'   => $controller,
-        'columns' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    //'autoColumns'       => false,
+    'pjax' => $pjax,
+    'adminController' => $controller,
+    'columns' =>
         [
             'id',
             [
                 'label' => \Yii::t('skeeks/cms', 'Property'),
                 'attribute' => 'p.name',
-                'value' => function(\skeeks\cms\models\CmsTreeTypePropertyEnum $cmsContentPropertyEnum)
-                {
+                'value' => function (\skeeks\cms\models\CmsTreeTypePropertyEnum $cmsContentPropertyEnum) {
                     return $cmsContentPropertyEnum->property->name;
                 }
             ],
@@ -54,6 +53,6 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
             'code',
             'priority',
         ]
-    ]); ?>
+]); ?>
 
 <? \yii\widgets\Pjax::end(); ?>

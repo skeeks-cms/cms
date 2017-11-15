@@ -1,5 +1,7 @@
 <?php
+
 use yii\helpers\Html;
+
 /* @var $caption string */
 /* @var $values array */
 ?>
@@ -13,10 +15,10 @@ use yii\helpers\Html;
 
     <table class="table table-condensed table-bordered table-striped table-hover sx-table" style="table-layout: fixed;">
         <thead>
-            <tr>
-                <th><?=\Yii::t('skeeks/cms','Name')?></th>
-                <th><?=\Yii::t('skeeks/cms','Value')?></th>
-            </tr>
+        <tr>
+            <th><?= \Yii::t('skeeks/cms', 'Name') ?></th>
+            <th><?= \Yii::t('skeeks/cms', 'Value') ?></th>
+        </tr>
         </thead>
         <tbody>
         <?php foreach ($values as $name => $value): ?>

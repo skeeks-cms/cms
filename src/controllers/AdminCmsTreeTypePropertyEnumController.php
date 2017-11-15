@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
@@ -18,9 +19,9 @@ class AdminCmsTreeTypePropertyEnumController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = \Yii::t('skeeks/cms', 'Managing partition property values');
-        $this->modelShowAttribute      = "value";
-        $this->modelClassName          = CmsTreeTypePropertyEnum::className();
+        $this->name = \Yii::t('skeeks/cms', 'Managing partition property values');
+        $this->modelShowAttribute = "value";
+        $this->modelClassName = CmsTreeTypePropertyEnum::className();
 
         parent::init();
 

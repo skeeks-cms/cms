@@ -7,7 +7,7 @@
  */
 /* @var $this yii\web\View */
 /* @var $action \skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction */
-/* @var $controller \skeeks\cms\controllers\AdminCmsContentElementController  */
+/* @var $controller \skeeks\cms\controllers\AdminCmsContentElementController */
 $controller = $action->controller;
 ?>
 <?= $this->render('@skeeks/cms/views/admin-cms-content/_form.php', [

@@ -8,6 +8,7 @@
  * @date 10.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models\behaviors;
 
 use yii\db\BaseActiveRecord;
@@ -23,7 +24,7 @@ class Serialize extends Behavior
     /**
      * @var array
      */
-    public $fields      = [];
+    public $fields = [];
 
     /**
      * @return array
@@ -31,11 +32,11 @@ class Serialize extends Behavior
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_INSERT   => "serializeFields",
-            BaseActiveRecord::EVENT_BEFORE_UPDATE   => "serializeFields",
-            BaseActiveRecord::EVENT_AFTER_FIND      => "unserializeFields",
-            BaseActiveRecord::EVENT_AFTER_UPDATE    => "unserializeFields",
-            BaseActiveRecord::EVENT_AFTER_INSERT    => "unserializeFields",
+            BaseActiveRecord::EVENT_BEFORE_INSERT => "serializeFields",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE => "serializeFields",
+            BaseActiveRecord::EVENT_AFTER_FIND => "unserializeFields",
+            BaseActiveRecord::EVENT_AFTER_UPDATE => "unserializeFields",
+            BaseActiveRecord::EVENT_AFTER_INSERT => "unserializeFields",
         ];
     }
 
@@ -44,16 +45,12 @@ class Serialize extends Behavior
      */
     public function serializeFields($event)
     {
-        foreach ($this->fields as $fielName)
-        {
-            if ($this->owner->{$fielName})
-            {
-                if (is_array($this->owner->{$fielName}))
-                {
+        foreach ($this->fields as $fielName) {
+            if ($this->owner->{$fielName}) {
+                if (is_array($this->owner->{$fielName})) {
                     $this->owner->{$fielName} = serialize($this->owner->{$fielName});
                 }
-            } else
-            {
+            } else {
                 $this->owner->{$fielName} = "";
             }
         }
@@ -65,17 +62,12 @@ class Serialize extends Behavior
      */
     public function unserializeFields($event)
     {
-        foreach ($this->fields as $fielName)
-        {
-            if ($this->owner->{$fielName})
-            {
-                if (is_string($this->owner->{$fielName}))
-                {
+        foreach ($this->fields as $fielName) {
+            if ($this->owner->{$fielName}) {
+                if (is_string($this->owner->{$fielName})) {
                     $this->owner->{$fielName} = @unserialize($this->owner->{$fielName});
                 }
-            }
-            else
-            {
+            } else {
                 $this->owner->{$fielName} = [];
             }
         }

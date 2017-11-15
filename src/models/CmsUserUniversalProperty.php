@@ -21,8 +21,8 @@ use yii\widgets\ActiveForm;
 /**
  * This is the model class for table "{{%cms_content_property}}".
  *
- * @property CmsUserUniversalPropertyEnum[]         $enums
- * @property CmsUserProperty[]                      $elementProperties
+ * @property CmsUserUniversalPropertyEnum[] $enums
+ * @property CmsUserProperty[] $elementProperties
  */
 class CmsUserUniversalProperty extends RelatedPropertyModel
 {

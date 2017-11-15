@@ -9,6 +9,7 @@
  */
 
 namespace skeeks\cms\models\behaviors;
+
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Behavior;
@@ -51,7 +52,7 @@ class HasRelatedProperties extends Behavior
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_DELETE      => "_deleteRelatedProperties",
+            BaseActiveRecord::EVENT_BEFORE_DELETE => "_deleteRelatedProperties",
         ];
     }
 
@@ -74,8 +75,8 @@ class HasRelatedProperties extends Behavior
      */
     public function getRelatedProperties()
     {
-        $className  = $this->relatedPropertyClassName;
-        $find       = $className::find()->orderBy(['priority' => SORT_ASC]);;
+        $className = $this->relatedPropertyClassName;
+        $find = $className::find()->orderBy(['priority' => SORT_ASC]);;
         $find->multiple = true;
 
         return $find;
@@ -101,8 +102,7 @@ class HasRelatedProperties extends Behavior
      */
     public function getRelatedPropertiesModel()
     {
-        if ($this->_relatedPropertiesModel === null)
-        {
+        if ($this->_relatedPropertiesModel === null) {
             $this->_relatedPropertiesModel = $this->createRelatedPropertiesModel();
         }
 

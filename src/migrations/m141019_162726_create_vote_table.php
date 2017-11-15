@@ -8,8 +8,7 @@ class m141019_162726_create_vote_table extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_vote}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -19,18 +18,20 @@ class m141019_162726_create_vote_table extends Migration
         }
 
         $this->createTable("{{%cms_vote}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'value'                 => Schema::TYPE_SMALLINT . '(1)',
+            'value' => Schema::TYPE_SMALLINT . '(1)',
 
-            'linked_to_model'       => Schema::TYPE_STRING. '(255) NOT NULL', //Коммент обязательно должен быть к кому то привязан
-            'linked_to_value'       => Schema::TYPE_STRING. '(255) NOT NULL', //Коммент обязательно должен быть к кому то привязан
+            'linked_to_model' => Schema::TYPE_STRING . '(255) NOT NULL',
+            //Коммент обязательно должен быть к кому то привязан
+            'linked_to_value' => Schema::TYPE_STRING . '(255) NOT NULL',
+            //Коммент обязательно должен быть к кому то привязан
 
         ], $tableOptions);
 

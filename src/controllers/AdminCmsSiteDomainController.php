@@ -8,6 +8,7 @@
  * @date 16.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\CmsSiteDomain;
@@ -21,9 +22,9 @@ class AdminCmsSiteDomainController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление доменами";
-        $this->modelShowAttribute      = "domain";
-        $this->modelClassName          = CmsSiteDomain::className();
+        $this->name = "Управление доменами";
+        $this->modelShowAttribute = "domain";
+        $this->modelClassName = CmsSiteDomain::className();
 
         parent::init();
     }

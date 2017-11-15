@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 29.10.2015
  */
+
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\helpers\FileHelper;
@@ -41,8 +42,6 @@ class InitController extends Controller
         }
         echo "\n  ... initialization completed.\n\n";
     }
-
-
 
 
     function getFileList($root, $basePath = '')
@@ -113,8 +112,7 @@ class InitController extends Controller
             if (!is_dir("$root/$writable")) {
                 echo "      create dir and chmod 0777 $writable\n";
                 FileHelper::createDirectory("$root/$writable", 0777);
-            } else
-            {
+            } else {
                 echo "      chmod 0777 $writable\n";
                 @chmod("$root/$writable", 0777);
             }
@@ -137,12 +135,14 @@ class InitController extends Controller
             $length = 32;
             $bytes = openssl_random_pseudo_bytes($length);
             $key = strtr(substr(base64_encode($bytes), 0, $length), '+/=', '_-.');
-            $content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'$key'", file_get_contents($file));
+            $content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'$key'",
+                file_get_contents($file));
             file_put_contents($file, $content);
         }
     }
 
-    function createSymlink($root, $links) {
+    function createSymlink($root, $links)
+    {
         foreach ($links as $link => $target) {
             echo "      symlink " . $root . "/" . $target . " " . $root . "/" . $link . "\n";
             //first removing folders to avoid errors if the folder already exists

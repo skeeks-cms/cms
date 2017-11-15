@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.03.2015
  */
+
 namespace skeeks\cms\widgets;
+
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
@@ -32,10 +34,10 @@ class ActiveFormRelatedProperties extends ActiveForm
 
     public function __construct($config = [])
     {
-        $this->validationUrl                = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/validate')->toString();
-        $this->action                       = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/submit')->toString();
+        $this->validationUrl = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/validate')->toString();
+        $this->action = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/submit')->toString();
 
-        $this->enableAjaxValidation         = true;
+        $this->enableAjaxValidation = true;
 
         parent::__construct($config);
     }
@@ -44,7 +46,7 @@ class ActiveFormRelatedProperties extends ActiveForm
     {
         parent::init();
 
-        echo \yii\helpers\Html::hiddenInput("sx-model-value",   $this->modelHasRelatedProperties->id);
-        echo \yii\helpers\Html::hiddenInput("sx-model",         $this->modelHasRelatedProperties->className());
+        echo \yii\helpers\Html::hiddenInput("sx-model-value", $this->modelHasRelatedProperties->id);
+        echo \yii\helpers\Html::hiddenInput("sx-model", $this->modelHasRelatedProperties->className());
     }
 }

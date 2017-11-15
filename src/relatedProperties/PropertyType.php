@@ -9,6 +9,7 @@
  */
 
 namespace skeeks\cms\relatedProperties;
+
 use skeeks\cms\base\Component;
 use skeeks\cms\base\ConfigFormInterface;
 use skeeks\cms\components\Cms;
@@ -22,9 +23,9 @@ use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
- * @property bool           $isMultiple
- * @property mixed          $defaultValue
- * @property string         $stringValue
+ * @property bool $isMultiple
+ * @property mixed $defaultValue
+ * @property string $stringValue
  *
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
@@ -59,7 +60,8 @@ abstract class PropertyType extends Model implements ConfigFormInterface
      * @param ActiveForm $form
      */
     public function renderConfigForm(ActiveForm $form)
-    {}
+    {
+    }
 
     /**
      * From the result of this function will depend on how the property values are stored in the database
@@ -78,8 +80,7 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     {
         $field = $this->activeForm->field($this->property->relatedPropertiesModel, $this->property->code);
 
-        if (!$field)
-        {
+        if (!$field) {
             return '';
         }
 
@@ -123,12 +124,10 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
 
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             return Json::encode($value);
-        } else
-        {
-            return (string) $value;
+        } else {
+            return (string)$value;
         }
     }
 
@@ -182,25 +181,24 @@ abstract class PropertyType extends Model implements ConfigFormInterface
 
 
 
-        /**
-         * TODO: It may be deprecated
-         */
+    /**
+     * TODO: It may be deprecated
+     */
 
 
     /**
      * TODO: It may be deprecated @version > 3.0.2
      */
-    const CODE_STRING   = 'S';
-    const CODE_NUMBER   = 'N';
-    const CODE_FILE     = 'F';
+    const CODE_STRING = 'S';
+    const CODE_NUMBER = 'N';
+    const CODE_FILE = 'F';
 
-    const CODE_LIST     = 'L';
-    const CODE_TREE     = 'T';
-    const CODE_ELEMENT  = 'E';
-    const CODE_BOOL     = 'B';
+    const CODE_LIST = 'L';
+    const CODE_TREE = 'T';
+    const CODE_ELEMENT = 'E';
+    const CODE_BOOL = 'B';
 
-    const CODE_RANGE    = 'R';
-
+    const CODE_RANGE = 'R';
 
 
     /**

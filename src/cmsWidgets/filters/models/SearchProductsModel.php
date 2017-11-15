@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 25.05.2015
  */
+
 namespace skeeks\cms\cmsWidgets\filters\models;
 
 use skeeks\cms\base\Widget;
@@ -42,7 +43,7 @@ class SearchProductsModel extends Model
     public function attributeLabels()
     {
         return [
-            'image' =>  \Yii::t('skeeks/cms', 'With photo'),
+            'image' => \Yii::t('skeeks/cms', 'With photo'),
         ];
     }
 
@@ -55,20 +56,20 @@ class SearchProductsModel extends Model
     {
         $query = $dataProvider->query;
 
-        if ($this->image == Cms::BOOL_Y)
-        {
+        if ($this->image == Cms::BOOL_Y) {
             $query->andWhere([
                 'or',
                 ['!=', 'cms_content_element.image_id', null],
                 ['!=', 'cms_content_element.image_id', ""],
             ]);
-        } else if ($this->image == Cms::BOOL_N)
-        {
-            $query->andWhere([
-                'or',
-                ['cms_content_element.image_id' => null],
-                ['cms_content_element.image_id' => ""],
-            ]);
+        } else {
+            if ($this->image == Cms::BOOL_N) {
+                $query->andWhere([
+                    'or',
+                    ['cms_content_element.image_id' => null],
+                    ['cms_content_element.image_id' => ""],
+                ]);
+            }
         }
 
 

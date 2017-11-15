@@ -8,6 +8,7 @@
  * @date 28.10.2014
  * @since 1.0.0
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -16,8 +17,7 @@ class m141019_162721_subscribe_create_table extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_subscribe}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -27,16 +27,18 @@ class m141019_162721_subscribe_create_table extends Migration
         }
 
         $this->createTable("{{%cms_subscribe}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'linked_to_model'       => Schema::TYPE_STRING. '(255) NOT NULL', //Коммент обязательно должен быть к кому то привязан
-            'linked_to_value'       => Schema::TYPE_STRING. '(255) NOT NULL', //Коммент обязательно должен быть к кому то привязан
+            'linked_to_model' => Schema::TYPE_STRING . '(255) NOT NULL',
+            //Коммент обязательно должен быть к кому то привязан
+            'linked_to_value' => Schema::TYPE_STRING . '(255) NOT NULL',
+            //Коммент обязательно должен быть к кому то привязан
 
         ], $tableOptions);
 

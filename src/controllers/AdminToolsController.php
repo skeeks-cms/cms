@@ -41,29 +41,29 @@ class AdminToolsController extends AdminController
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(),
-        [
-            //Проверка доступа к админ панели
-            'adminViewEditAccess' =>
             [
-                'class' => AdminAccessControl::className(),
-                'only' => ['view-file-edit'],
-                'rules' =>
-                [
+                //Проверка доступа к админ панели
+                'adminViewEditAccess' =>
                     [
-                        'allow' => true,
-                        'roles' =>
-                        [
-                            CmsManager::PERMISSION_EDIT_VIEW_FILES
-                        ],
+                        'class' => AdminAccessControl::className(),
+                        'only' => ['view-file-edit'],
+                        'rules' =>
+                            [
+                                [
+                                    'allow' => true,
+                                    'roles' =>
+                                        [
+                                            CmsManager::PERMISSION_EDIT_VIEW_FILES
+                                        ],
+                                ],
+                            ]
                     ],
-                ]
-            ],
-        ]);
+            ]);
     }
 
     public function init()
     {
-        $this->name                   = "Управление шаблоном";
+        $this->name = "Управление шаблоном";
         parent::init();
     }
 
@@ -86,12 +86,9 @@ class AdminToolsController extends AdminController
 
         $rr = new RequestResponse();
 
-        if ($rr->isRequestAjaxPost())
-        {
-            if ($model->load(\Yii::$app->request->post()))
-            {
-                if (!$model->saveFile())
-                {
+        if ($rr->isRequestAjaxPost()) {
+            if ($model->load(\Yii::$app->request->post())) {
+                if (!$model->saveFile()) {
                     $rr->success = false;
                     $rr->message = "Не удалось сохранить файл.";
                 }
@@ -109,7 +106,6 @@ class AdminToolsController extends AdminController
     }
 
 
-
     /**
      * Выбор файла
      * @return string
@@ -123,10 +119,8 @@ class AdminToolsController extends AdminController
         $className = \Yii::$app->request->get('className');
         $pk = \Yii::$app->request->get('pk');
 
-        if ($className && $pk)
-        {
-            if ($model = $className::findOne($pk))
-            {
+        if ($className && $pk) {
+            if ($model = $className::findOne($pk)) {
 
             }
         }
@@ -138,7 +132,6 @@ class AdminToolsController extends AdminController
     }
 
 
-
     /**
      * Данные о текущем пользователе
      * @return RequestResponse
@@ -148,8 +141,8 @@ class AdminToolsController extends AdminController
         $rr = new RequestResponse();
 
         $rr->data = [
-            'identity'  => \Yii::$app->user->identity,
-            'user'      => \Yii::$app->user,
+            'identity' => \Yii::$app->user->identity,
+            'user' => \Yii::$app->user,
         ];
 
         return $rr;
@@ -163,11 +156,9 @@ class AdminToolsController extends AdminController
     {
         $rr = new RequestResponse();
 
-        if (!\Yii::$app->user->isGuest)
-        {
+        if (!\Yii::$app->user->isGuest) {
             $rr->data = (new UserLastActivityWidget())->getOptions();
-        } else
-        {
+        } else {
             $rr->data = [
                 'isGuest' => true
             ];
@@ -178,15 +169,13 @@ class AdminToolsController extends AdminController
     }
 
 
-
     /**
      * @return string
      */
     protected function _getMode()
     {
-        if ($mode = \Yii::$app->request->getQueryParam('mode'))
-        {
-            return (string) $mode;
+        if ($mode = \Yii::$app->request->getQueryParam('mode')) {
+            return (string)$mode;
         }
 
         return '';
@@ -199,58 +188,58 @@ class AdminToolsController extends AdminController
      */
     public function renderNodeControll($model)
     {
-        if ($this->_getMode() == SelectTree::MOD_MULTI)
-        {
+        if ($this->_getMode() == SelectTree::MOD_MULTI) {
             $controllElement = Html::checkbox('tree_id', false, [
-                'value'     => $model->id,
-                'class'     => 'sx-checkbox',
-                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
-                'onclick'   => new JsExpression(<<<JS
+                'value' => $model->id,
+                'class' => 'sx-checkbox',
+                'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'onclick' => new JsExpression(<<<JS
     sx.Tree.select("{$model->id}");
 JS
-)
+                )
             ]);
 
 
-        } else if ($this->_getMode() == SelectTree::MOD_SINGLE)
-        {
+        } else {
+            if ($this->_getMode() == SelectTree::MOD_SINGLE) {
 
-            $controllElement = Html::radio('tree_id', false, [
-                'value'     => $model->id,
-                'class'     => 'sx-readio',
-                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
-                'onclick'   => new JsExpression(<<<JS
+                $controllElement = Html::radio('tree_id', false, [
+                    'value' => $model->id,
+                    'class' => 'sx-readio',
+                    'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
+                    'onclick' => new JsExpression(<<<JS
     sx.Tree.selectSingle("{$model->id}");
 JS
-)
-            ]);
-
-        }  else if ($this->_getMode() == SelectTree::MOD_COMBO)
-        {
-
-            $controllElement = Html::radio('tree_id', false, [
-                                'value'     => $model->id,
-                                'class'     => 'sx-readio',
-                                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
-                                'onclick'   => new JsExpression(<<<JS
-                    sx.Tree.selectSingle("{$model->id}");
-JS
-            )
+                    )
                 ]);
 
-            $controllElement .= Html::checkbox('tree_id', false, [
-                'value'     => $model->id,
-                'class'     => 'sx-checkbox',
-                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
-                'onclick'   => new JsExpression(<<<JS
+            } else {
+                if ($this->_getMode() == SelectTree::MOD_COMBO) {
+
+                    $controllElement = Html::radio('tree_id', false, [
+                        'value' => $model->id,
+                        'class' => 'sx-readio',
+                        'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
+                        'onclick' => new JsExpression(<<<JS
+                    sx.Tree.selectSingle("{$model->id}");
+JS
+                        )
+                    ]);
+
+                    $controllElement .= Html::checkbox('tree_id', false, [
+                        'value' => $model->id,
+                        'class' => 'sx-checkbox',
+                        'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
+                        'onclick' => new JsExpression(<<<JS
     sx.Tree.select("{$model->id}");
 JS
-)
-            ]);
+                        )
+                    ]);
 
-        } else
-        {
-            $controllElement = '';
+                } else {
+                    $controllElement = '';
+                }
+            }
         }
 
         return $controllElement;

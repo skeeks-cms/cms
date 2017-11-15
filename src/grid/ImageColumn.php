@@ -8,6 +8,7 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\grid;
 
 /**
@@ -15,4 +16,5 @@ namespace skeeks\cms\grid;
  * @package skeeks\cms\grid
  */
 class ImageColumn extends ImageColumn2
-{}
+{
+}

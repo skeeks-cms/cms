@@ -26,15 +26,18 @@ class Imaging extends Component
     /**
      * @var array   Расширения файлов с которыми работают фильтры. Может и не совсем правильно указывать их тут... но пока будет так.
      */
-    public $extensions      =
-    [
-        "jpg", "png", "jpeg", "gif"
-    ];
+    public $extensions =
+        [
+            "jpg",
+            "png",
+            "jpeg",
+            "gif"
+        ];
 
     /**
      * @var string  Соль подмешивается к параметрам
      */
-    public $sold  = "sold_for_check_params";
+    public $sold = "sold_for_check_params";
 
     /**
      * Константа для разбора URL - это некая метка, с этого момента идет указание фильтра
@@ -48,45 +51,40 @@ class Imaging extends Component
      *
      *
      * @param $originalSrc          Путь к оригинальному изображению
-     * @param Filter $filter        Объект фильтр, который будет заниматься преобразованием
-     * @param string $nameForSave   Название для сохраненеия файла (нужно для сео)
+     * @param Filter $filter Объект фильтр, который будет заниматься преобразованием
+     * @param string $nameForSave Название для сохраненеия файла (нужно для сео)
      * @return string
      */
     public function thumbnailUrlOnRequest($originalSrc, Filter $filter, $nameForSave = '')
     {
-        $originalSrc                = (string) $originalSrc;
-        $extension                  = static::getExtension($originalSrc);
+        $originalSrc = (string)$originalSrc;
+        $extension = static::getExtension($originalSrc);
 
-        if (!$extension)
-        {
+        if (!$extension) {
             return $originalSrc;
         }
 
-        if (!$this->isAllowExtension($extension))
-        {
+        if (!$this->isAllowExtension($extension)) {
             return $originalSrc;
         }
 
-        if (!$nameForSave)
-        {
+        if (!$nameForSave) {
             $nameForSave = static::DEFAULT_THUMBNAIL_FILENAME;
         }
 
         $params = [];
-        if ($filter->getConfig())
-        {
+        if ($filter->getConfig()) {
             $params = $filter->getConfig();
         }
 
 
-        $replacePart    =   DIRECTORY_SEPARATOR . static::THUMBNAIL_PREFIX . $filter->id
-                            . ($params ? DIRECTORY_SEPARATOR . $this->getParamsCheckString($params) : "")
-                            . DIRECTORY_SEPARATOR . $nameForSave;
+        $replacePart = DIRECTORY_SEPARATOR . static::THUMBNAIL_PREFIX . $filter->id
+            . ($params ? DIRECTORY_SEPARATOR . $this->getParamsCheckString($params) : "")
+            . DIRECTORY_SEPARATOR . $nameForSave;
 
         $imageSrcResult = str_replace('.' . $extension, $replacePart . '.' . $extension, $originalSrc);
 
-        if ($params)
-        {
+        if ($params) {
             $imageSrcResult = $imageSrcResult . '?' . http_build_query($params);
         }
 
@@ -99,7 +97,7 @@ class Imaging extends Component
      */
     public function isAllowExtension($extension)
     {
-        return (bool) in_array(strtolower($extension), $this->extensions);
+        return (bool)in_array(strtolower($extension), $this->extensions);
     }
 
     /**
@@ -109,10 +107,9 @@ class Imaging extends Component
     static public function getExtension($filePath)
     {
         $parts = explode(".", $filePath);
-        $extension                  = end($parts);
+        $extension = end($parts);
 
-        if (!$extension)
-        {
+        if (!$extension) {
             return false;
         }
 
@@ -130,8 +127,7 @@ class Imaging extends Component
      */
     public function getParamsCheckString($params = [])
     {
-        if ($params)
-        {
+        if ($params) {
             return md5($this->sold . http_build_query($params));
         }
 
@@ -147,7 +143,6 @@ class Imaging extends Component
     {
         return $this->thumbnailUrlOnRequest($imageSrc, $filter);
     }
-
 
 
     /**

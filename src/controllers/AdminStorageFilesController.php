@@ -8,6 +8,7 @@
  * @date 25.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
@@ -45,8 +46,8 @@ class AdminStorageFilesController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                   = "Управление файлами хранилища";
-        $this->modelClassName          = StorageFile::className();
+        $this->name = "Управление файлами хранилища";
+        $this->modelClassName = StorageFile::className();
 
         parent::init();
     }
@@ -70,31 +71,31 @@ class AdminStorageFilesController extends AdminModelEditorController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(),
-        [
-            'delete-tmp-dir' =>
             [
-                "class"         => AdminOneModelEditAction::className(),
-                "name"          => "Удалить временные файлы",
-                "icon"          => "glyphicon glyphicon-folder-open",
-                "method"        => "post",
-                "request"       => "ajax",
-                "callback"      => [$this, 'actionDeleteTmpDir'],
-            ],
+                'delete-tmp-dir' =>
+                    [
+                        "class" => AdminOneModelEditAction::className(),
+                        "name" => "Удалить временные файлы",
+                        "icon" => "glyphicon glyphicon-folder-open",
+                        "method" => "post",
+                        "request" => "ajax",
+                        "callback" => [$this, 'actionDeleteTmpDir'],
+                    ],
 
-            'download' =>
-            [
-                "class"         => AdminOneModelEditAction::className(),
-                "name"          => "Скачать",
-                "icon"          => "glyphicon glyphicon-circle-arrow-down",
-                "method"        => "post",
-                "callback"      => [$this, 'actionDownload'],
-            ],
+                'download' =>
+                    [
+                        "class" => AdminOneModelEditAction::className(),
+                        "name" => "Скачать",
+                        "icon" => "glyphicon glyphicon-circle-arrow-down",
+                        "method" => "post",
+                        "callback" => [$this, 'actionDownload'],
+                    ],
 
-            'create' =>
-            [
-                'isVisible' => false
-            ]
-        ]);
+                'create' =>
+                    [
+                        'isVisible' => false
+                    ]
+            ]);
     }
 
     public function actionDownload()
@@ -118,8 +119,7 @@ class AdminStorageFilesController extends AdminModelEditorController
 
     public function actionDeleteTmpDir()
     {
-        if (\Yii::$app->request->isAjax)
-        {
+        if (\Yii::$app->request->isAjax) {
             \Yii::$app->response->format = Response::FORMAT_JSON;
             $success = false;
 
@@ -137,18 +137,12 @@ class AdminStorageFilesController extends AdminModelEditorController
     }
 
 
-
-
-
-
-
-
     public function actionUpload()
     {
         $response =
-        [
-            'success' => false
-        ];
+            [
+                'success' => false
+            ];
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
@@ -165,8 +159,7 @@ class AdminStorageFilesController extends AdminModelEditorController
         $uploader->newFileName = $file->getBaseName();
         $result = $uploader->handleUpload($dir->getPath() . DIRECTORY_SEPARATOR);
 
-        if (!$result)
-        {
+        if (!$result) {
             $response["msg"] = $uploader->getErrorMsg();
             return $result;
 
@@ -180,9 +173,7 @@ class AdminStorageFilesController extends AdminModelEditorController
             ));
 
 
-
-            if ($request->get('modelData') && is_array($request->get('modelData')))
-            {
+            if ($request->get('modelData') && is_array($request->get('modelData'))) {
                 $storageFile->setAttributes($request->get('modelData'));
             }
 
@@ -210,23 +201,21 @@ class AdminStorageFilesController extends AdminModelEditorController
 
         $request = Yii::$app->getRequest();
 
-        if (\Yii::$app->request->post('link'))
-        {
+        if (\Yii::$app->request->post('link')) {
             $storageFile = Yii::$app->storage->upload(\Yii::$app->request->post('link'), array_merge(
                 [
-                    "name"          => isset($model->name) ? $model->name : "",
+                    "name" => isset($model->name) ? $model->name : "",
                     "original_name" => basename($post['link'])
                 ]
             ));
 
-            if ($request->post('modelData') && is_array($request->post('modelData')))
-            {
+            if ($request->post('modelData') && is_array($request->post('modelData'))) {
                 $storageFile->setAttributes($request->post('modelData'));
             }
 
             $storageFile->save(false);
-            $response["success"]  = true;
-            $response["file"]     = $storageFile;
+            $response["success"] = true;
+            $response["file"] = $storageFile;
             return $response;
         }
 
@@ -243,23 +232,18 @@ class AdminStorageFilesController extends AdminModelEditorController
     {
         $rr = new RequestResponse();
 
-        if ($rr->isRequestAjaxPost())
-        {
-            try
-            {
-                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelAttribute'))
-                {
+        if ($rr->isRequestAjaxPost()) {
+            try {
+                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelAttribute')) {
                     throw new \yii\base\Exception("Не достаточно входных данных");
                 }
 
                 $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
-                if (!$file)
-                {
+                if (!$file) {
                     throw new \yii\base\Exception("Возможно файл уже удален или не загрузился");
                 }
 
-                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
-                {
+                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className())) {
                     throw new \yii\base\Exception("Невозможно привязать файл к этой моделе");
                 }
 
@@ -268,19 +252,16 @@ class AdminStorageFilesController extends AdminModelEditorController
                  * @var $model ActiveRecord
                  */
                 $model = $className::findOne(\Yii::$app->request->post('modelId'));
-                if (!$model)
-                {
+                if (!$model) {
                     throw new \yii\base\Exception("Модель к которой необходимо привязать файл не найдена");
                 }
 
-                if (!$model->hasAttribute(\Yii::$app->request->post('modelAttribute')))
-                {
+                if (!$model->hasAttribute(\Yii::$app->request->post('modelAttribute'))) {
                     throw new \yii\base\Exception("У модели не найден атрибут привязки файла: " . \Yii::$app->request->post('modelAttribute'));
                 }
 
                 //Удаление старого файла
-                if ($oldFileId = $model->{\Yii::$app->request->post('modelAttribute')})
-                {
+                if ($oldFileId = $model->{\Yii::$app->request->post('modelAttribute')}) {
                     /**
                      * @var $oldFile CmsStorageFile
                      * @var $file CmsStorageFile
@@ -290,8 +271,7 @@ class AdminStorageFilesController extends AdminModelEditorController
                 }
 
                 $model->{\Yii::$app->request->post('modelAttribute')} = $file->id;
-                if (!$model->save(false))
-                {
+                if (!$model->save(false)) {
                     throw new \yii\base\Exception("Не удалось сохранить модель");
                 }
 
@@ -301,8 +281,7 @@ class AdminStorageFilesController extends AdminModelEditorController
                 $rr->success = true;
                 $rr->message = "";
 
-            } catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $rr->success = false;
                 $rr->message = $e->getMessage();
             }
@@ -321,23 +300,18 @@ class AdminStorageFilesController extends AdminModelEditorController
     {
         $rr = new RequestResponse();
 
-        if ($rr->isRequestAjaxPost())
-        {
-            try
-            {
-                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelRelation'))
-                {
+        if ($rr->isRequestAjaxPost()) {
+            try {
+                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelRelation')) {
                     throw new \yii\base\Exception("Не достаточно входных данных");
                 }
 
                 $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
-                if (!$file)
-                {
+                if (!$file) {
                     throw new \yii\base\Exception("Возможно файл уже удален или не загрузился");
                 }
 
-                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className()))
-                {
+                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className())) {
                     throw new \yii\base\Exception("Невозможно привязать файл к этой моделе");
                 }
 
@@ -346,40 +320,31 @@ class AdminStorageFilesController extends AdminModelEditorController
                  * @var $model ActiveRecord
                  */
                 $model = $className::findOne(\Yii::$app->request->post('modelId'));
-                if (!$model)
-                {
+                if (!$model) {
                     throw new \yii\base\Exception("Модель к которой необходимо привязать файл не найдена");
                 }
 
-                if (!$model->hasProperty(\Yii::$app->request->post('modelRelation')))
-                {
+                if (!$model->hasProperty(\Yii::$app->request->post('modelRelation'))) {
                     throw new \yii\base\Exception("У модели не найден атрибут привязки к файлам modelRelation: " . \Yii::$app->request->post('modelRelation'));
                 }
 
-                try
-                {
+                try {
                     $model->link(\Yii::$app->request->post('modelRelation'), $file);
 
-                    if (!$file->name)
-                    {
+                    if (!$file->name) {
                         $file->name = $model->name;
                         $file->save(false);
                     }
 
                     $rr->success = true;
                     $rr->message = "";
-                } catch(\Exception $e)
-                {
+                } catch (\Exception $e) {
                     $rr->success = false;
                     $rr->message = $e->getMessage();
                 }
 
 
-
-
-
-            } catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $rr->success = false;
                 $rr->message = $e->getMessage();
             }

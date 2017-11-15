@@ -8,6 +8,7 @@
  * @date 04.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;

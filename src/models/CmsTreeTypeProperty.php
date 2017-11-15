@@ -21,7 +21,7 @@ use Yii;
  * @property CmsTreeProperty[] $cmsTreeProperties
  * @property CmsTreeTypeProperty2type[] $cmsTreeTypeProperty2types
  * @property CmsTreeType[] $cmsTreeTypes
- * 
+ *
  * @property CmsTreeType $treeType
  * @property CmsTreeTypePropertyEnum[] $enums
  * @property CmsTreeProperty[] $elementProperties
@@ -83,9 +83,11 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
      */
     public function getCmsTreeTypes()
     {
-        return $this->hasMany(CmsTreeType::className(), ['id' => 'cms_tree_type_id'])->viaTable('cms_tree_type_property2type', ['cms_tree_type_property_id' => 'id']);
+        return $this->hasMany(CmsTreeType::className(),
+            ['id' => 'cms_tree_type_id'])->viaTable('cms_tree_type_property2type',
+            ['cms_tree_type_property_id' => 'id']);
     }
-    
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
@@ -103,7 +105,12 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
             [['tree_type_id'], 'integer'],
             [['cmsTreeTypes'], 'safe'],
             //[['code'], 'unique'],
-            [['code', 'tree_type_id'], 'unique', 'targetAttribute' => ['tree_type_id', 'code'], 'message' => \Yii::t('skeeks/cms',"For this section's type of the code is already in use.")],
+            [
+                ['code', 'tree_type_id'],
+                'unique',
+                'targetAttribute' => ['tree_type_id', 'code'],
+                'message' => \Yii::t('skeeks/cms', "For this section's type of the code is already in use.")
+            ],
         ]);
     }
 }

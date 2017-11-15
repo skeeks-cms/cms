@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 24.05.2015
  */
+
 namespace skeeks\cms\components\urlRules;
+
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
@@ -24,8 +26,7 @@ class UrlRuleTree
 {
     public function init()
     {
-        if ($this->name === null)
-        {
+        if ($this->name === null) {
             $this->name = __CLASS__;
         }
     }
@@ -40,48 +41,37 @@ class UrlRuleTree
      */
     public function createUrl($manager, $route, $params)
     {
-        if ($route == 'cms/tree/view')
-        {
-            $defaultParams      = $params;
+        if ($route == 'cms/tree/view') {
+            $defaultParams = $params;
 
             //Из параметров получаем модель дерева, если модель не найдена просто остановка
             $tree = $this->_getCreateUrlTree($params);
-            if (!$tree)
-            {
+            if (!$tree) {
                 return false;
             }
 
             //Для раздела задан редиррект
-            if ($tree->redirect)
-            {
-                if (strpos($tree->redirect, '://') !== false)
-                {
+            if ($tree->redirect) {
+                if (strpos($tree->redirect, '://') !== false) {
                     return $tree->redirect;
-                } else
-                {
+                } else {
                     $url = trim($tree->redirect, '/');
 
-                    if ($tree->site)
-                    {
-                        if ($tree->site->server_name)
-                        {
+                    if ($tree->site) {
+                        if ($tree->site->server_name) {
                             return $tree->site->url . '/' . $url;
-                        } else
-                        {
+                        } else {
                             return $url;
                         }
-                    } else
-                    {
+                    } else {
                         return $url;
                     }
                 }
             }
 
             //Указан редиррект на другой раздел
-            if ($tree->redirect_tree_id)
-            {
-                if ($tree->redirectTree->id != $tree->id)
-                {
+            if ($tree->redirect_tree_id) {
+                if ($tree->redirectTree->id != $tree->id) {
                     $paramsNew = ArrayHelper::merge($defaultParams, ['model' => $tree->redirectTree]);
                     $url = $this->createUrl($manager, $route, $paramsNew);
                     return $url;
@@ -89,11 +79,9 @@ class UrlRuleTree
             }
 
             //Стандартно берем dir раздела
-            if ($tree->dir)
-            {
+            if ($tree->dir) {
                 $url = $tree->dir;
-            } else
-            {
+            } else {
                 $url = "";
             }
 
@@ -119,11 +107,9 @@ class UrlRuleTree
 
 
             //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
-            if ($tree->site)
-            {
+            if ($tree->site) {
                 //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
-                if ($tree->site->server_name)
-                {
+                if ($tree->site->server_name) {
                     return $tree->site->url . '/' . $url;
                 }
             }
@@ -142,11 +128,11 @@ class UrlRuleTree
      */
     protected function _getCreateUrlTree(&$params)
     {
-        $id             = (int) ArrayHelper::getValue($params, 'id');
-        $treeModel      = ArrayHelper::getValue($params, 'model');
+        $id = (int)ArrayHelper::getValue($params, 'id');
+        $treeModel = ArrayHelper::getValue($params, 'model');
 
-        $dir            = ArrayHelper::getValue($params, 'dir');
-        $site_code      = ArrayHelper::getValue($params, 'site_code');
+        $dir = ArrayHelper::getValue($params, 'dir');
+        $site_code = ArrayHelper::getValue($params, 'site_code');
 
         ArrayHelper::remove($params, 'id');
         ArrayHelper::remove($params, 'model');
@@ -155,23 +141,19 @@ class UrlRuleTree
         ArrayHelper::remove($params, 'site_code');
 
 
-        if ($treeModel && $treeModel instanceof Tree)
-        {
+        if ($treeModel && $treeModel instanceof Tree) {
             $tree = $treeModel;
             self::$models[$treeModel->id] = $treeModel;
 
             return $tree;
         }
 
-        if ($id)
-        {
+        if ($id) {
             $tree = ArrayHelper::getValue(self::$models, $id);
 
-            if ($tree)
-            {
+            if ($tree) {
                 return $tree;
-            } else
-            {
+            } else {
                 $tree = CmsTree::findOne(['id' => $id]);
                 self::$models[$id] = $tree;
                 return $tree;
@@ -179,30 +161,25 @@ class UrlRuleTree
         }
 
 
-        if ($dir)
-        {
-            if (!$site_code && \Yii::$app->cms && \Yii::$app->cms->site)
-            {
+        if ($dir) {
+            if (!$site_code && \Yii::$app->cms && \Yii::$app->cms->site) {
                 $site_code = \Yii::$app->cms->site->code;
             }
 
-            if ($site_code)
-            {
+            if ($site_code) {
                 $cmsSite = CmsSite::getByCode($site_code);
             }
 
-            if (!$cmsSite)
-            {
+            if (!$cmsSite) {
                 return null;
             }
 
             $tree = CmsTree::findOne([
-                'dir'       => $dir,
+                'dir' => $dir,
                 'cms_site_id' => $cmsSite->id
             ]);
 
-            if ($tree)
-            {
+            if ($tree) {
                 self::$models[$id] = $tree;
                 return $tree;
             }
@@ -228,7 +205,7 @@ class UrlRuleTree
         }
 
         $suffix = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
-        $pathInfo           = $request->getPathInfo();
+        $pathInfo = $request->getPathInfo();
         $normalized = false;
         if ($this->hasNormalizer($manager)) {
             $pathInfo = $this->getNormalizer($manager)->normalizePathInfo($pathInfo, $suffix, $normalized);
@@ -250,8 +227,8 @@ class UrlRuleTree
             $pathInfo = strtolower($request->getHostInfo()) . ($pathInfo === '' ? '' : '/' . $pathInfo);
         }
 
-        $params             = $request->getQueryParams();
-        $treeNode           = null;
+        $params = $request->getQueryParams();
+        $treeNode = null;
 
         $originalDir = $pathInfo;
         /*if ($suffix)
@@ -260,10 +237,10 @@ class UrlRuleTree
         }*/
 
         $dependency = new TagDependency([
-            'tags'      =>
-            [
-                (new Tree())->getTableCacheTag(),
-            ],
+            'tags' =>
+                [
+                    (new Tree())->getTableCacheTag(),
+                ],
         ]);
 
 
@@ -271,8 +248,8 @@ class UrlRuleTree
         {
             $treeNode = Tree::getDb()->cache(function ($db) {
                 return Tree::find()->where([
-                    "cms_site_id"         => \Yii::$app->cms->site->id,
-                    "level"             => 0,
+                    "cms_site_id" => \Yii::$app->cms->site->id,
+                    "level" => 0,
                 ])->one();
             }, null, $dependency);
 
@@ -280,18 +257,17 @@ class UrlRuleTree
         {
 
             $treeNode = Tree::find()->where([
-                "dir"                           => $originalDir,
-                "cms_site_id"                     => \Yii::$app->cms->site->id,
+                "dir" => $originalDir,
+                "cms_site_id" => \Yii::$app->cms->site->id,
             ])->one();
         }
 
 
-        if ($treeNode)
-        {
+        if ($treeNode) {
 
             \Yii::$app->cms->setCurrentTree($treeNode);
 
-            $params['id']        = $treeNode->id;
+            $params['id'] = $treeNode->id;
 
             if ($normalized) {
 
@@ -301,8 +277,7 @@ class UrlRuleTree
                 return ['cms/tree/view', $params];
             }
 
-        } else
-        {
+        } else {
             return false;
         }
     }

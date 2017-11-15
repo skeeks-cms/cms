@@ -12,18 +12,18 @@
 ?>
 <? $pjax = \yii\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel' => $searchModel,
-        'dataProvider' => $dataProvider,
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider,
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'autoColumns'       => false,
-        'pjax'              => $pjax,
-        'adminController'   => $controller,
-        'columns' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'autoColumns' => false,
+    'pjax' => $pjax,
+    'adminController' => $controller,
+    'columns' =>
         [
             'name',
             'code',
@@ -49,6 +49,6 @@
                 'attribute'     => "active"
             ],*/
         ]
-    ]); ?>
+]); ?>
 
 <? \yii\widgets\Pjax::end(); ?>

@@ -30,7 +30,7 @@ use Yii;
  * @property string $description
  *
  * @property CmsTreeTypeProperty $property
- * @property Tree  $element
+ * @property Tree $element
  */
 class CmsTreeProperty extends RelatedElementPropertyModel
 {

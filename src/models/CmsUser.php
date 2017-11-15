@@ -13,4 +13,5 @@ namespace skeeks\cms\models;
  * @package skeeks\cms\models
  */
 class CmsUser extends User
-{}
+{
+}

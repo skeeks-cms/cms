@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 27.03.2015
  */
+
 namespace skeeks\cms\controllers;
+
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
@@ -38,7 +40,7 @@ class AdminComponentSettingsController extends AdminController
 
     public function init()
     {
-        $this->name                   = "Управление настройками компонентов";
+        $this->name = "Управление настройками компонентов";
         parent::init();
     }
 
@@ -59,26 +61,23 @@ class AdminComponentSettingsController extends AdminController
     {
         if (parent::beforeAction($action)) {
 
-            $componentClassName         = \Yii::$app->request->get('componentClassName');
-            $namespace                  = \Yii::$app->request->get('componentNamespace');
+            $componentClassName = \Yii::$app->request->get('componentClassName');
+            $namespace = \Yii::$app->request->get('componentNamespace');
 
-            if ($namespace)
-            {
-                $component                  = new $componentClassName([
+            if ($namespace) {
+                $component = new $componentClassName([
                     'namespace' => $namespace
                 ]);
-            } else
-            {
-                $component                  = new $componentClassName();
+            } else {
+                $component = new $componentClassName();
             }
 
-            if (!$component || !$component instanceof Component)
-            {
+            if (!$component || !$component instanceof Component) {
                 throw new UserException("Указан некорректный компонент");
             }
 
-            $this->_component       = $component;
-            $this->_callableData    = $this->_getCallableData($component);
+            $this->_component = $component;
+            $this->_callableData = $this->_getCallableData($component);
 
             //TODO: Добавить возможность настройки
             \Yii::$app->language = \Yii::$app->admin->languageCode;
@@ -107,25 +106,22 @@ class AdminComponentSettingsController extends AdminController
     {
         $component = $this->_component;
 
-        if (\Yii::$app->request->get('attributes') && !$settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one())
-        {
-            $attributes                 = \Yii::$app->request->get('attributes');
-            $component->attributes      = $attributes;
-        } else
-        {
+        if (\Yii::$app->request->get('attributes') && !$settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one()) {
+            $attributes = \Yii::$app->request->get('attributes');
+            $component->attributes = $attributes;
+        } else {
             $component->overridePath = [Component::OVERRIDE_DEFAULT];
             $component->refresh();
         }
 
-        if (!\Yii::$app->request->get('callableId'))
-        {
+        if (!\Yii::$app->request->get('callableId')) {
             return $this->redirect(\yii\helpers\Url::to('index') . "?" . http_build_query(\Yii::$app->request->get()));
         }
 
 
         return $this->render($this->action->id, [
-            'component'         => $component,
-            'callableId'         => \Yii::$app->request->get('callableId'),
+            'component' => $component,
+            'callableId' => \Yii::$app->request->get('callableId'),
         ]);
     }
 
@@ -134,8 +130,7 @@ class AdminComponentSettingsController extends AdminController
         $rr = new RequestResponse();
 
         //Callable дата (с этими настройками разработчик вызвал этот компонент в коде + еще какие то настройки окружения)
-        if ($data = \Yii::$app->request->post('data'))
-        {
+        if ($data = \Yii::$app->request->post('data')) {
             $component = $this->_component;
             $this->_saveCallableData($component, unserialize(base64_decode($data)));
         }
@@ -153,51 +148,42 @@ class AdminComponentSettingsController extends AdminController
          */
         $component = $this->_component;
 
-        $attibutes = (array) \Yii::$app->request->get('attributes');
+        $attibutes = (array)\Yii::$app->request->get('attributes');
 
-        if ($attributesCallable = ArrayHelper::getValue($this->_callableData, 'attributes'))
-        {
+        if ($attributesCallable = ArrayHelper::getValue($this->_callableData, 'attributes')) {
             $attibutes = ArrayHelper::merge($attibutes, $attributesCallable);
         }
 
-        if ($attibutes && !\skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one())
-        {
-            $attributes                 = $attibutes;
-            $component->attributes      = $attributes;
-        } else
-        {
+        if ($attibutes && !\skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one()) {
+            $attributes = $attibutes;
+            $component->attributes = $attributes;
+        } else {
             $component->overridePath = [Component::OVERRIDE_DEFAULT];
             $component->refresh();
         }
 
 
         $rr = new RequestResponse();
-        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax) {
             return $rr->ajaxValidateForm($component);
         }
 
-        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax)
-        {
-            if ($component->load(\Yii::$app->request->post()) && $component->validate())
-            {
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
+            if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
                 $component->override = Component::OVERRIDE_DEFAULT;
-                if ($component->save())
-                {
+                if ($component->save()) {
                     \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                } else
-                {
+                } else {
                     \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                 }
 
-            } else
-            {
+            } else {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
         }
 
         return $this->render($this->action->id, [
-            'component'         => $component
+            'component' => $component
         ]);
     }
 
@@ -209,14 +195,12 @@ class AdminComponentSettingsController extends AdminController
         $component = $this->_component;
 
         $site_id = \Yii::$app->request->get('site_id');
-        if (!$site_id)
-        {
+        if (!$site_id) {
             throw new UserException("Не передан параметр site_id");
         }
 
         $site = CmsSite::findOne($site_id);
-        if (!$site)
-        {
+        if (!$site) {
             throw new UserException("Не найден сайт");
         }
 
@@ -226,36 +210,30 @@ class AdminComponentSettingsController extends AdminController
 
 
         $rr = new RequestResponse();
-        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax) {
             return $rr->ajaxValidateForm($component);
         }
 
 
-        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax)
-        {
-            if ($component->load(\Yii::$app->request->post()) && $component->validate())
-            {
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
+            if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
                 $component->override = Component::OVERRIDE_SITE;
                 $component->cmsSite = $site;
-                if ($component->save())
-                {
+                if ($component->save()) {
                     \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                } else
-                {
+                } else {
                     \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                 }
 
-            } else
-            {
+            } else {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
         }
 
 
         return $this->render($this->action->id, [
-            'component'         => $component,
-            'site'              => $site
+            'component' => $component,
+            'site' => $site
         ]);
     }
 
@@ -264,14 +242,12 @@ class AdminComponentSettingsController extends AdminController
         $component = $this->_component;
 
         $user_id = \Yii::$app->request->get('user_id');
-        if (!$user_id)
-        {
+        if (!$user_id) {
             throw new UserException("Не передан параметр user_id");
         }
 
         $user = User::findOne($user_id);
-        if (!$user)
-        {
+        if (!$user) {
             throw new UserException("Не найден пользователь");
         }
 
@@ -280,34 +256,28 @@ class AdminComponentSettingsController extends AdminController
         $component->refresh();
 
         $rr = new RequestResponse();
-        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax) {
             return $rr->ajaxValidateForm($component);
         }
 
-        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax)
-        {
-            if ($component->load(\Yii::$app->request->post()) && $component->validate())
-            {
+        if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
+            if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
                 $component->override = Component::OVERRIDE_USER;
                 $component->cmsUser = $user;
-                if ($component->save())
-                {
+                if ($component->save()) {
                     \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-                } else
-                {
+                } else {
                     \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                 }
 
-            } else
-            {
+            } else {
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
             }
         }
 
         return $this->render($this->action->id, [
-            'component'         => $component,
-            'user'              => $user
+            'component' => $component,
+            'user' => $user
         ]);
     }
 
@@ -316,7 +286,7 @@ class AdminComponentSettingsController extends AdminController
         $component = $this->_component;
 
         return $this->render($this->action->id, [
-            'component'         => $component
+            'component' => $component
         ]);
     }
 
@@ -325,7 +295,7 @@ class AdminComponentSettingsController extends AdminController
         $component = $this->_component;
 
         return $this->render($this->action->id, [
-            'component'         => $component
+            'component' => $component
         ]);
     }
 
@@ -335,16 +305,15 @@ class AdminComponentSettingsController extends AdminController
 
         $rr = new RequestResponse();
 
-        if ($rr->isRequestAjaxPost())
-        {
+        if ($rr->isRequestAjaxPost()) {
             $component->invalidateCache();
             $rr->message = 'Кэш успешно очещен';
             $rr->success = true;
-            return (array) $rr;
+            return (array)$rr;
         }
 
         return $this->render($this->action->id, [
-            'component'         => $component
+            'component' => $component
         ]);
     }
 
@@ -354,123 +323,113 @@ class AdminComponentSettingsController extends AdminController
 
         $rr = new RequestResponse();
 
-        if ($rr->isRequestAjaxPost())
-        {
-            if (\Yii::$app->request->post('do') == 'all')
-            {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->all())
-                {
+        if ($rr->isRequestAjaxPost()) {
+            if (\Yii::$app->request->post('do') == 'all') {
+                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->all()) {
                     /**
                      * @var $setting CmsComponentSettings
                      */
-                    foreach ($settings as $setting)
-                    {
+                    foreach ($settings as $setting) {
                         //TODO: добавить отладочную информацию.
-                        if ($setting->delete())
-                        {}
+                        if ($setting->delete()) {
+                        }
                     }
 
                     $component->invalidateCache();
                     $rr->message = 'Настройки успешно удалены';
                     $rr->success = true;
                 };
-            } else if (\Yii::$app->request->post('do') == 'default')
-            {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one())
-                {
-                    $settings->delete();
-                    $component->invalidateCache();
-                    $rr->message = 'Настройки успешно удалены';
-                    $rr->success = true;
-                };
-            } else if (\Yii::$app->request->post('do') == 'sites')
-            {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere(['>', 'cms_site_id', 0])->all())
-                {
-                    /**
-                     * @var $setting CmsComponentSettings
-                     */
-                    foreach ($settings as $setting)
-                    {
-                        //TODO: добавить отладочную информацию.
-                        if ($setting->delete())
-                        {}
-                    }
-
-                    $component->invalidateCache();
-                    $rr->message = 'Настройки успешно удалены';
-                    $rr->success = true;
-                };
-            } else if (\Yii::$app->request->post('do') == 'users')
-            {
-                if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere(['>', 'user_id', 0])->all())
-                {
-                    /**
-                     * @var $setting CmsComponentSettings
-                     */
-                    foreach ($settings as $setting)
-                    {
-                        //TODO: добавить отладочную информацию.
-                        if ($setting->delete())
-                        {}
-                    }
-
-                    $component->invalidateCache();
-                    $rr->message = 'Настройки успешно удалены';
-                    $rr->success = true;
-                };
-            }
-
-            else if (\Yii::$app->request->post('do') == 'site')
-            {
-                $code = \Yii::$app->request->post('code');
-                $site = CmsSite::find()->where(['code' => $code])->one();
-
-                if ($site)
-                {
-                    $component->setOverride(Component::OVERRIDE_SITE)->setCmsSite($site);
-                    if ($component->delete())
-                    {
+            } else {
+                if (\Yii::$app->request->post('do') == 'default') {
+                    if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one()) {
+                        $settings->delete();
+                        $component->invalidateCache();
                         $rr->message = 'Настройки успешно удалены';
                         $rr->success = true;
                     };
+                } else {
+                    if (\Yii::$app->request->post('do') == 'sites') {
+                        if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere([
+                            '>',
+                            'cms_site_id',
+                            0
+                        ])->all()) {
+                            /**
+                             * @var $setting CmsComponentSettings
+                             */
+                            foreach ($settings as $setting) {
+                                //TODO: добавить отладочную информацию.
+                                if ($setting->delete()) {
+                                }
+                            }
+
+                            $component->invalidateCache();
+                            $rr->message = 'Настройки успешно удалены';
+                            $rr->success = true;
+                        };
+                    } else {
+                        if (\Yii::$app->request->post('do') == 'users') {
+                            if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere([
+                                '>',
+                                'user_id',
+                                0
+                            ])->all()) {
+                                /**
+                                 * @var $setting CmsComponentSettings
+                                 */
+                                foreach ($settings as $setting) {
+                                    //TODO: добавить отладочную информацию.
+                                    if ($setting->delete()) {
+                                    }
+                                }
+
+                                $component->invalidateCache();
+                                $rr->message = 'Настройки успешно удалены';
+                                $rr->success = true;
+                            };
+                        } else {
+                            if (\Yii::$app->request->post('do') == 'site') {
+                                $code = \Yii::$app->request->post('code');
+                                $site = CmsSite::find()->where(['code' => $code])->one();
+
+                                if ($site) {
+                                    $component->setOverride(Component::OVERRIDE_SITE)->setCmsSite($site);
+                                    if ($component->delete()) {
+                                        $rr->message = 'Настройки успешно удалены';
+                                        $rr->success = true;
+                                    };
+                                }
+
+                            } else {
+                                if (\Yii::$app->request->post('do') == 'user') {
+                                    $id = \Yii::$app->request->post('id');
+                                    $user = User::find()->where(['id' => $id])->one();
+
+                                    if ($user) {
+                                        $component->setOverride(Component::OVERRIDE_USER)->setCmsUser($user);
+                                        if ($component->delete()) {
+                                            $rr->message = 'Настройки успешно удалены';
+                                            $rr->success = true;
+                                        };
+                                    }
+
+                                } else {
+                                    $rr->message = 'Все настройки удалены';
+                                    $rr->success = true;
+                                }
+                            }
+                        }
+                    }
                 }
-
             }
 
-            else if (\Yii::$app->request->post('do') == 'user')
-            {
-                $id = \Yii::$app->request->post('id');
-                $user = User::find()->where(['id' => $id])->one();
-
-                if ($user)
-                {
-                    $component->setOverride(Component::OVERRIDE_USER)->setCmsUser($user);
-                    if ($component->delete())
-                    {
-                        $rr->message = 'Настройки успешно удалены';
-                        $rr->success = true;
-                    };
-                }
-
-            }
-
-            else
-            {
-                $rr->message = 'Все настройки удалены';
-                $rr->success = true;
-            }
-
-            return (array) $rr;
+            return (array)$rr;
         }
 
         return $this->render($this->action->id, [
-            'component'         => $component
+            'component' => $component
         ]);
     }
-
-
-
 
 
     /**
@@ -491,6 +450,6 @@ class AdminComponentSettingsController extends AdminController
     protected function _getCallableData($component)
     {
         $key = md5($component::className() . $component->namespace);
-        return (array) \Yii::$app->cache->get($key);
+        return (array)\Yii::$app->cache->get($key);
     }
 }

@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\propertyTypes;
+
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsTree;
@@ -26,16 +28,16 @@ class PropertyTypeTree extends PropertyType
     public $root_tree_id = null;
 
 
-    const FIELD_ELEMENT_DEFAULT                 = "selectDefault";
-    const FIELD_ELEMENT_SELECT_DIALOG           = "selectDialog";
+    const FIELD_ELEMENT_DEFAULT = "selectDefault";
+    const FIELD_ELEMENT_SELECT_DIALOG = "selectDialog";
 
-    public $fieldElement            = self::FIELD_ELEMENT_DEFAULT;
+    public $fieldElement = self::FIELD_ELEMENT_DEFAULT;
 
     static public function fieldElements()
     {
         return [
-            self::FIELD_ELEMENT_DEFAULT          => \Yii::t('skeeks/cms', 'Standard selection element'),
-            self::FIELD_ELEMENT_SELECT_DIALOG    => \Yii::t('skeeks/cms','Selection in the dialog box'),
+            self::FIELD_ELEMENT_DEFAULT => \Yii::t('skeeks/cms', 'Standard selection element'),
+            self::FIELD_ELEMENT_SELECT_DIALOG => \Yii::t('skeeks/cms', 'Selection in the dialog box'),
         ];
     }
 
@@ -56,22 +58,22 @@ class PropertyTypeTree extends PropertyType
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'is_multiple'  => \Yii::t('skeeks/cms','Multiple choice'),
-            'fieldElement'  => \Yii::t('skeeks/cms','Form element type'),
-            'root_tree_id'  => \Yii::t('skeeks/cms','Root partition'),
-        ]);
+            [
+                'is_multiple' => \Yii::t('skeeks/cms', 'Multiple choice'),
+                'fieldElement' => \Yii::t('skeeks/cms', 'Form element type'),
+                'root_tree_id' => \Yii::t('skeeks/cms', 'Root partition'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['is_multiple', 'boolean'],
-            ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
-            ['fieldElement', 'string'],
-            ['root_tree_id', 'integer'],
-        ]);
+            [
+                ['is_multiple', 'boolean'],
+                ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
+                ['fieldElement', 'string'],
+                ['root_tree_id', 'integer'],
+            ]);
     }
 
 
@@ -116,13 +118,12 @@ class PropertyTypeTree extends PropertyType
                 [
                     "multiple" => $this->isMultiple ? true : false,
                     'treeWidgetOptions' =>
-                    [
-                        'models' => $rootTreeModels
-                    ]
+                        [
+                            'models' => $rootTreeModels
+                        ]
                 ]
             );
         }
-
 
 
         return $field;

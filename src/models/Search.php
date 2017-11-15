@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 20.04.2015
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\models\User;
@@ -43,13 +44,12 @@ class Search extends Component
     protected $_dataProvider = null;
 
     /**
-    * @return ActiveRecord
-    */
+     * @return ActiveRecord
+     */
     public function getLoadedModel()
     {
-        if ($this->_loadedModel === null)
-        {
-            $className          = $this->modelClassName;
+        if ($this->_loadedModel === null) {
+            $className = $this->modelClassName;
             $this->_loadedModel = new $className();
         }
 
@@ -61,8 +61,7 @@ class Search extends Component
      */
     public function getDataProvider()
     {
-        if ($this->_dataProvider === null)
-        {
+        if ($this->_dataProvider === null) {
             $className = $this->modelClassName;
 
             $this->_dataProvider = new ActiveDataProvider([
@@ -80,26 +79,27 @@ class Search extends Component
      */
     public function search($params)
     {
-        if (!($this->loadedModel->load($params)))
-        {
+        if (!($this->loadedModel->load($params))) {
             return $this->dataProvider;
         }
 
         $query = $this->dataProvider->query;
 
-        if ($columns = $this->loadedModel->getTableSchema()->columns)
-        {
+        if ($columns = $this->loadedModel->getTableSchema()->columns) {
             /**
              * @var \yii\db\ColumnSchema $column
              */
-            foreach ($columns as $column)
-            {
-                if ($column->phpType == "integer")
-                {
+            foreach ($columns as $column) {
+                if ($column->phpType == "integer") {
                     $query->andFilterWhere([$this->loadedModel->tableName() . '.' . $column->name => $this->loadedModel->{$column->name}]);
-                } else if ($column->phpType == "string")
-                {
-                    $query->andFilterWhere(['like', $this->loadedModel->tableName() . '.' . $column->name, $this->loadedModel->{$column->name}]);
+                } else {
+                    if ($column->phpType == "string") {
+                        $query->andFilterWhere([
+                            'like',
+                            $this->loadedModel->tableName() . '.' . $column->name,
+                            $this->loadedModel->{$column->name}
+                        ]);
+                    }
                 }
             }
         }

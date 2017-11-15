@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 02.03.2015
  */
+
 namespace skeeks\cms\widgets\formInputs;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -45,28 +46,24 @@ class StorageImage extends InputWidget
      */
     public function run()
     {
-        try
-        {
-            if (!$this->hasModel())
-            {
-                throw new Exception(\Yii::t('skeeks/cms',"Current widget works only in form with model"));
+        try {
+            if (!$this->hasModel()) {
+                throw new Exception(\Yii::t('skeeks/cms', "Current widget works only in form with model"));
             }
 
-            if ($this->model->isNewRecord)
-            {
-                throw new Exception(\Yii::t('skeeks/cms',"The image can be downloaded after you save the form data"));
+            if ($this->model->isNewRecord) {
+                throw new Exception(\Yii::t('skeeks/cms', "The image can be downloaded after you save the form data"));
             }
 
             echo $this->render('storage-image', [
-                'model'         => $this->model,
-                'widget'        => $this,
+                'model' => $this->model,
+                'widget' => $this,
             ]);
 
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             echo Alert::widget([
                 'options' => [
-                      'class' => 'alert-warning',
+                    'class' => 'alert-warning',
                 ],
                 'body' => $e->getMessage()
             ]);
@@ -79,8 +76,7 @@ class StorageImage extends InputWidget
     public function getImage()
     {
         $imageId = $this->model->{$this->attribute};
-        if (!$imageId)
-        {
+        if (!$imageId) {
             return null;
         }
 
@@ -90,10 +86,10 @@ class StorageImage extends InputWidget
     public function getJsonString()
     {
         return Json::encode([
-            'backendUrl'        => UrlHelper::construct('cms/admin-storage-files/link-to-model')->enableAdmin()->toString(),
-            'modelId'           => $this->model->id,
-            'modelClassName'    => $this->model->className(),
-            'modelAttribute'    => $this->attribute,
+            'backendUrl' => UrlHelper::construct('cms/admin-storage-files/link-to-model')->enableAdmin()->toString(),
+            'modelId' => $this->model->id,
+            'modelClassName' => $this->model->className(),
+            'modelAttribute' => $this->attribute,
         ]);
     }
 }

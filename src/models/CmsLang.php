@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 20.05.2015
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
@@ -56,10 +57,10 @@ class CmsLang extends Core
         return ArrayHelper::merge(parent::behaviors(), [
 
             HasStorageFile::className() =>
-            [
-                'class'     => HasStorageFile::className(),
-                'fields'    => ['image_id']
-            ],
+                [
+                    'class' => HasStorageFile::className(),
+                    'fields' => ['image_id']
+                ],
         ]);
     }
 
@@ -70,12 +71,10 @@ class CmsLang extends Core
     public function afterBeforeChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->active != Cms::BOOL_Y)
-        {
+        if ($this->active != Cms::BOOL_Y) {
             $active = static::find()->where(['!=', 'id', $this->id])->active()->one();
 
-            if (!$active)
-            {
+            if (!$active) {
                 $this->active = Cms::BOOL_Y;
             }
         }
@@ -121,21 +120,24 @@ class CmsLang extends Core
             ['def', 'default', 'value' => Cms::BOOL_N],
             [['image_id'], 'safe'],
 
-            [['image_id'], \skeeks\cms\validators\FileValidator::class,
-                'skipOnEmpty'   => false,
-                'extensions' => ['jpg', 'jpeg', 'gif','png'],
+            [
+                ['image_id'],
+                \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty' => false,
+                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
                 'maxFiles' => 1,
-                'maxSize'       => 1024*1024*2,
-                'minSize'       => 1024,
+                'maxSize' => 1024 * 1024 * 2,
+                'minSize' => 1024,
             ],
         ]);
     }
 
     public function validateCode($attribute)
     {
-        if(!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute))
-        {
-            $this->addError($attribute, \Yii::t('skeeks/cms','Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',['code' => 'code1']));
+        if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute)) {
+            $this->addError($attribute, \Yii::t('skeeks/cms',
+                'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
+                ['code' => 'code1']));
         }
     }
 

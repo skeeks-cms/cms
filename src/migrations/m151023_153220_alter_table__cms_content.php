@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 use yii\helpers\Json;
@@ -14,9 +15,11 @@ class m151023_153220_alter_table__cms_content extends Migration
     public function safeUp()
     {
         $this->addColumn('{{%cms_content}}', 'default_tree_id', $this->integer()); //Главный раздел по умолчанию
-        $this->addColumn('{{%cms_content}}', 'is_allow_change_tree', $this->string(1)->notNull()->defaultValue('Y')); //Разрешено ли менять главный раздел
+        $this->addColumn('{{%cms_content}}', 'is_allow_change_tree',
+            $this->string(1)->notNull()->defaultValue('Y')); //Разрешено ли менять главный раздел
 
-        $this->addColumn('{{%cms_content}}', 'root_tree_id', $this->integer()); //Корневой раздел, от него будет строится дерево с подразделами к которым можно привязывать элементы.
+        $this->addColumn('{{%cms_content}}', 'root_tree_id',
+            $this->integer()); //Корневой раздел, от него будет строится дерево с подразделами к которым можно привязывать элементы.
 
 
         $this->createIndex('default_tree_id', '{{%cms_content}}', 'default_tree_id');

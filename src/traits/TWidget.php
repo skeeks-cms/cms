@@ -5,10 +5,12 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.05.2015
  */
+
 namespace skeeks\cms\traits;
 
 use Yii;
 use ReflectionClass;
+
 /**
  * Оригинальный yii\base\Widget
  * Взят из yii 2.0.4
@@ -68,10 +70,12 @@ trait TWidget
                 echo $widget->run();
                 return $widget;
             } else {
-                throw new InvalidCallException(\Yii::t('skeeks/cms','"Expecting end() of {widget}, found {class}',['widget' => get_class($widget) , 'class' => get_called_class()]));
+                throw new InvalidCallException(\Yii::t('skeeks/cms', '"Expecting end() of {widget}, found {class}',
+                    ['widget' => get_class($widget), 'class' => get_called_class()]));
             }
         } else {
-            throw new InvalidCallException(\Yii::t('skeeks/cms',"Unexpected {class}::end() call. A matching begin() is not found.",['class' => get_called_class()]));
+            throw new InvalidCallException(\Yii::t('skeeks/cms',
+                "Unexpected {class}::end() call. A matching begin() is not found.", ['class' => get_called_class()]));
         }
     }
 

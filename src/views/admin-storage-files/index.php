@@ -1,4 +1,3 @@
-
 <?php
 /**
  * index
@@ -22,30 +21,30 @@
 <? $pjaxId = $pjax->id; ?>
 <?= \skeeks\cms\widgets\StorageFileManager::widget([
     'clientOptions' =>
-    [
-        'completeUploadFile' => new \yii\web\JsExpression(<<<JS
+        [
+            'completeUploadFile' => new \yii\web\JsExpression(<<<JS
         function(data)
         {
             $.pjax.reload('#{$pjaxId}', {});
         }
 JS
-)
-    ],
+            )
+        ],
 ]); ?>
 <p></p>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
 
-    'dataProvider'      => $dataProvider,
-    'filterModel'       => $searchModel,
-    'adminController'   => $controller,
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'adminController' => $controller,
 
-    'pjax'              => $pjax,
+    'pjax' => $pjax,
 
     'pjaxOptions' => [
         'id' => 'sx-storage-files'
@@ -54,19 +53,20 @@ JS
     'columns' => [
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
-            'value'     => function(\skeeks\cms\models\StorageFile $model)
-            {
-                if ($model->isImage())
-                {
+            'class' => \yii\grid\DataColumn::className(),
+            'value' => function (\skeeks\cms\models\StorageFile $model) {
+                if ($model->isImage()) {
 
-                    $smallImage = \Yii::$app->imaging->getImagingUrl($model->src, new \skeeks\cms\components\imaging\filters\Thumbnail());
-                    return "<a href='" . $model->src . "' class='sx-fancybox' data-pjax='0' title='" . \Yii::t('skeeks/cms','Increase') ."'>
+                    $smallImage = \Yii::$app->imaging->getImagingUrl($model->src,
+                        new \skeeks\cms\components\imaging\filters\Thumbnail());
+                    return "<a href='" . $model->src . "' class='sx-fancybox' data-pjax='0' title='" . \Yii::t('skeeks/cms',
+                            'Increase') . "'>
                             <img src='" . $smallImage . "' style='max-width: 50px;'/>
                         </a>";
                 }
 
-                return \yii\helpers\Html::tag('span', $model->extension, ['class' => 'label label-primary', 'style' => 'font-size: 18px;']);
+                return \yii\helpers\Html::tag('span', $model->extension,
+                    ['class' => 'label label-primary', 'style' => 'font-size: 18px;']);
             },
             'format' => 'raw'
         ],
@@ -85,9 +85,8 @@ JS
         ],*/
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
-            'value'     => function(\skeeks\cms\models\StorageFile $model)
-            {
+            'class' => \yii\grid\DataColumn::className(),
+            'value' => function (\skeeks\cms\models\StorageFile $model) {
                 $model->cluster_id;
                 $cluster = \Yii::$app->storage->getCluster($model->cluster_id);
                 return $cluster->name;
@@ -100,12 +99,14 @@ JS
 
         [
             'attribute' => 'mime_type',
-            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->groupBy(['mime_type'])->all(), 'mime_type', 'mime_type'),
+            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->groupBy(['mime_type'])->all(),
+                'mime_type', 'mime_type'),
         ],
 
         [
             'attribute' => 'extension',
-            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->groupBy(['extension'])->all(), 'extension', 'extension'),
+            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->groupBy(['extension'])->all(),
+                'extension', 'extension'),
         ],
 
         [

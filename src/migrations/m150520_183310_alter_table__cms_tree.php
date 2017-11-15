@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 24.03.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 

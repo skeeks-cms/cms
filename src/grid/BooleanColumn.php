@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 26.03.2015
  */
+
 namespace skeeks\cms\grid;
+
 use skeeks\cms\components\Cms;
 use yii\grid\DataColumn;
 use yii\grid\GridView;
@@ -50,8 +52,8 @@ class BooleanColumn extends DataColumn
     /**
      * @var null
      */
-    public $falseValue  = Cms::BOOL_N;
-    public $trueValue   = Cms::BOOL_Y;
+    public $falseValue = Cms::BOOL_N;
+    public $trueValue = Cms::BOOL_Y;
 
     /**
      * @var string icon/indicator for the true value. If this is not set, it will use the value from `trueLabel`.
@@ -69,6 +71,7 @@ class BooleanColumn extends DataColumn
      * @var bool whether to show null value as a false icon.
      */
     public $showNullAsFalse = false;
+
     /**
      * @inheritdoc
      */
@@ -80,8 +83,7 @@ class BooleanColumn extends DataColumn
         if (empty($this->falseLabel)) {
             $this->falseLabel = \Yii::t('yii', 'No');
         }
-        if (!$this->filter)
-        {
+        if (!$this->filter) {
             $this->filter = [$this->trueValue => $this->trueLabel, $this->falseValue => $this->falseLabel];
         }
         if (empty($this->trueIcon)) {
@@ -100,19 +102,14 @@ class BooleanColumn extends DataColumn
     {
         $value = parent::getDataCellValue($model, $key, $index);
 
-        if ($this->trueValue !== true)
-        {
-            if ($value == $this->falseValue)
-            {
+        if ($this->trueValue !== true) {
+            if ($value == $this->falseValue) {
                 return $this->falseIcon;
-            } else
-            {
+            } else {
                 return $this->trueIcon;
             }
-        } else
-        {
-            if ($value !== null)
-            {
+        } else {
+            if ($value !== null) {
                 return $value ? $this->trueIcon : $this->falseIcon;
             }
             return $this->showNullAsFalse ? $this->falseIcon : $value;

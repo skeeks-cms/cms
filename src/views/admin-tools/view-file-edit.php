@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (ï¿½ï¿½ï¿½ï¿½ï¿½)
  * @date 07.11.2015
  */
 /* @var $this yii\web\View */
@@ -24,22 +24,22 @@ CSS
     'enableAjaxValidation' => false
 ]); ?>
 
-    <?= $form->field($model, 'source')->label($model->rootViewFile)->widget(
-        \skeeks\widget\codemirror\CodemirrorWidget::className(),
-        [
-            'preset'    => 'htmlmixed',
-            'assets'    =>
+<?= $form->field($model, 'source')->label($model->rootViewFile)->widget(
+    \skeeks\widget\codemirror\CodemirrorWidget::className(),
+    [
+        'preset' => 'htmlmixed',
+        'assets' =>
             [
                 \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
             ],
-            'clientOptions'   =>
+        'clientOptions' =>
             [
                 'theme' => 'night'
             ],
-            'options'=>['rows' => 40],
-        ]
-    ); ?>
+        'options' => ['rows' => 40],
+    ]
+); ?>
 
-    <?= $form->buttonsStandart($model); ?>
+<?= $form->buttonsStandart($model); ?>
 
 <? \skeeks\cms\modules\admin\widgets\form\ActiveFormStyled::end(); ?>

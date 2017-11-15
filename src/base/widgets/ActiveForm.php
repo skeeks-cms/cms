@@ -8,7 +8,9 @@
  * @date 11.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\base\widgets;
+
 use skeeks\cms\components\Cms;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -30,7 +32,10 @@ class ActiveForm extends \yii\widgets\ActiveForm
      */
     public function fieldCheckboxBoolean($model, $attribute, $items = [], $enclosedByLabel = true, $fieldOptions = [])
     {
-        return $this->field($model, $attribute, $fieldOptions)->checkbox(['uncheck' => Cms::BOOL_N, 'value' => Cms::BOOL_Y], $enclosedByLabel);
+        return $this->field($model, $attribute, $fieldOptions)->checkbox([
+            'uncheck' => Cms::BOOL_N,
+            'value' => Cms::BOOL_Y
+        ], $enclosedByLabel);
     }
 
     /**
@@ -43,8 +48,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
      */
     public function fieldRadioListBoolean($model, $attribute, $items = [], $options = [], $fieldOptions = [])
     {
-        if (!$items)
-        {
+        if (!$items) {
             $items = \Yii::$app->cms->booleanFormat();
         }
 
@@ -67,7 +71,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
             'type' => 'number'
         ];
 
-        $config = ArrayHelper::merge($defaultConfig, (array) $config);
+        $config = ArrayHelper::merge($defaultConfig, (array)$config);
         return $this->field($model, $attribute, $fieldOptions)->textInput($config);
     }
 

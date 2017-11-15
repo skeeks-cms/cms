@@ -9,16 +9,16 @@ $model = new \skeeks\cms\models\CmsContentElement();
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
-    <?/*= $form->field($model, 'tree_id')->widget(
+<? /*= $form->field($model, 'tree_id')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
-    ); */?>
+    ); */ ?>
 
-    <?= $form->field($model, 'tree_id')->widget(
-        \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
-    ); ?>
+<?= $form->field($model, 'tree_id')->widget(
+    \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+); ?>
 
-    <?/*= $form->fieldSelect($model, 'tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions());*/?>
-    <?= $form->buttonsStandart($model, ['save']);?>
+<? /*= $form->fieldSelect($model, 'tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions());*/ ?>
+<?= $form->buttonsStandart($model, ['save']); ?>
 
 <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 
@@ -28,7 +28,8 @@ $model = new \skeeks\cms\models\CmsContentElement();
         'class' => 'alert-warning',
         'style' => 'margin-top: 20px;',
     ],
-])?>
-    <p><?=\Yii::t('skeeks/cms','Attention! For checked items will be given a new primary section.')?></p>
-    <p><?=\Yii::t('skeeks/cms','This will alter the page record, and it will cease to be available at the old address.')?></p>
+]) ?>
+    <p><?= \Yii::t('skeeks/cms', 'Attention! For checked items will be given a new primary section.') ?></p>
+    <p><?= \Yii::t('skeeks/cms',
+            'This will alter the page record, and it will cease to be available at the old address.') ?></p>
 <? \yii\bootstrap\Alert::end(); ?>

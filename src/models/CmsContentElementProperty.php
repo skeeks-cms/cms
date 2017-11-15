@@ -27,9 +27,9 @@ use Yii;
  * @property string $description
  *
  * @property CmsContentProperty $property
- * @property CmsContentElement  $element
+ * @property CmsContentElement $element
  *
- * @property CmsContentElement[]  $valueCmsContentElements
+ * @property CmsContentElement[] $valueCmsContentElements
  */
 class CmsContentElementProperty extends RelatedElementPropertyModel
 {

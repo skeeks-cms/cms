@@ -8,8 +8,7 @@ class m141019_100557_create_publication_table extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_publication}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -19,41 +18,55 @@ class m141019_100557_create_publication_table extends Migration
         }
 
         $this->createTable("{{%cms_publication}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'name'                  => Schema::TYPE_STRING. '(255) NOT NULL',
+            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
 
-            'description_short'     => Schema::TYPE_TEXT,
-            'description_full'      => Schema::TYPE_TEXT,
+            'description_short' => Schema::TYPE_TEXT,
+            'description_full' => Schema::TYPE_TEXT,
 
-            'files'                 => Schema::TYPE_TEXT. ' NULL', //
+            'files' => Schema::TYPE_TEXT . ' NULL',
+            //
 
-            'linked_to_model'       => Schema::TYPE_STRING. '(255) NULL', //Коммент обязательно должен быть к кому то привязан
-            'linked_to_value'       => Schema::TYPE_STRING. '(255) NULL', //Коммент обязательно должен быть к кому то привязан
+            'linked_to_model' => Schema::TYPE_STRING . '(255) NULL',
+            //Коммент обязательно должен быть к кому то привязан
+            'linked_to_value' => Schema::TYPE_STRING . '(255) NULL',
+            //Коммент обязательно должен быть к кому то привязан
 
-            'seo_page_name'         => Schema::TYPE_STRING. '(64) NOT NULL', //обложка
+            'seo_page_name' => Schema::TYPE_STRING . '(64) NOT NULL',
+            //обложка
 
-            'count_comment'         => Schema::TYPE_INTEGER . ' NULL', //Количество комментариев
+            'count_comment' => Schema::TYPE_INTEGER . ' NULL',
+            //Количество комментариев
 
-            'count_subscribe'       => Schema::TYPE_INTEGER . ' NULL', //Количество подписчиков
-            'users_subscribers'     => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые подписались (их id через запятую)
+            'count_subscribe' => Schema::TYPE_INTEGER . ' NULL',
+            //Количество подписчиков
+            'users_subscribers' => Schema::TYPE_TEXT . ' NULL',
+            //Пользователи которые подписались (их id через запятую)
 
 
-            'count_vote'            => Schema::TYPE_INTEGER . ' NULL', //Количество голосов
-            'result_vote'           => Schema::TYPE_INTEGER . ' NULL', //Результат голосования
-            'users_votes_up'        => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые проголосовали +
-            'users_votes_down'      => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые проголосовали -
+            'count_vote' => Schema::TYPE_INTEGER . ' NULL',
+            //Количество голосов
+            'result_vote' => Schema::TYPE_INTEGER . ' NULL',
+            //Результат голосования
+            'users_votes_up' => Schema::TYPE_TEXT . ' NULL',
+            //Пользователи которые проголосовали +
+            'users_votes_down' => Schema::TYPE_TEXT . ' NULL',
+            //Пользователи которые проголосовали -
 
-            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10', //статус, активна некативна, удалено
-            'status_adult'          => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0', //Возрастной статус 0 - не проверено, 1-для всех, 2-типо эротические материалы, 3-порно
+            'status' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10',
+            //статус, активна некативна, удалено
+            'status_adult' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',
+            //Возрастной статус 0 - не проверено, 1-для всех, 2-типо эротические материалы, 3-порно
 
-            'page_options'          => Schema::TYPE_TEXT. ' NULL', //
+            'page_options' => Schema::TYPE_TEXT . ' NULL',
+            //
 
         ], $tableOptions);
 

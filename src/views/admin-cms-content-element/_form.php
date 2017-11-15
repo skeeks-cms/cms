@@ -13,26 +13,23 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 /* @var $model \skeeks\cms\models\CmsLang */
 $controller = $this->context;
-$action     = $controller->action;
+$action = $controller->action;
 
- if ($model->isNewRecord)
- {
-     if ($tree_id = \Yii::$app->request->get("tree_id"))
-     {
-         $model->tree_id = $tree_id;
-     }
+if ($model->isNewRecord) {
+    if ($tree_id = \Yii::$app->request->get("tree_id")) {
+        $model->tree_id = $tree_id;
+    }
 
-     if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id"))
-     {
-         $model->parent_content_element_id = $parent_content_element_id;
-     }
- }
+    if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
+        $model->parent_content_element_id = $parent_content_element_id;
+    }
+}
 ?>
 
 <?php $form = $action->beginActiveForm([
-    'id'                                            => 'sx-dynamic-form',
-    'enableAjaxValidation'                          => false,
-    'enableClientValidation'                        => false,
+    'id' => 'sx-dynamic-form',
+    'enableAjaxValidation' => false,
+    'enableClientValidation' => false,
 ]); ?>
 <? $this->registerJs(<<<JS
 
@@ -70,7 +67,7 @@ JS
 
 
 
-    <?php echo $form->errorSummary([$model, $relatedModel]); ?>
+<?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <div style="display: none;">
 
     <? if ($model->isNewRecord) : ?>
@@ -84,63 +81,63 @@ JS
     <? endif; ?>
 
     <? if ($contentModel && $contentModel->parentContent) : ?>
-            <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
+        <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
     <? endif; ?>
 </div>
 
-    <?= $this->render('_form-main', [
-        'form'              => $form,
-        'contentModel'      => $contentModel,
-        'model'             => $model,
-    ]); ?>
+<?= $this->render('_form-main', [
+    'form' => $form,
+    'contentModel' => $contentModel,
+    'model' => $model,
+]); ?>
 
-    <?= $this->render('_form-announce', [
-        'form'              => $form,
-        'contentModel'      => $contentModel,
-        'model'             => $model,
-    ]); ?>
+<?= $this->render('_form-announce', [
+    'form' => $form,
+    'contentModel' => $contentModel,
+    'model' => $model,
+]); ?>
 
-    <?= $this->render('_form-detail', [
-        'form'              => $form,
-        'contentModel'      => $contentModel,
-        'model'             => $model,
-    ]); ?>
+<?= $this->render('_form-detail', [
+    'form' => $form,
+    'contentModel' => $contentModel,
+    'model' => $model,
+]); ?>
 
-    <?= $this->render('_form-sections', [
-        'form'              => $form,
-        'contentModel'      => $contentModel,
-        'model'             => $model,
-    ]); ?>
+<?= $this->render('_form-sections', [
+    'form' => $form,
+    'contentModel' => $contentModel,
+    'model' => $model,
+]); ?>
 
-    <?= $this->render('_form-seo', [
-        'form'              => $form,
-        'contentModel'      => $contentModel,
-        'model'             => $model,
-    ]); ?>
+<?= $this->render('_form-seo', [
+    'form' => $form,
+    'contentModel' => $contentModel,
+    'model' => $model,
+]); ?>
 
-    <?= $this->render('_form-images', [
-        'form'              => $form,
-        'contentModel'      => $contentModel,
-        'model'             => $model,
-    ]); ?>
+<?= $this->render('_form-images', [
+    'form' => $form,
+    'contentModel' => $contentModel,
+    'model' => $model,
+]); ?>
 
-    <?= $this->render('_form-additionaly', [
-        'form'              => $form,
-        'contentModel'      => $contentModel,
-        'model'             => $model,
-    ]); ?>
+<?= $this->render('_form-additionaly', [
+    'form' => $form,
+    'contentModel' => $contentModel,
+    'model' => $model,
+]); ?>
 
 
 
 
 <? if (!$model->isNewRecord) : ?>
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
-        <?= $form->fieldSet(\Yii::t('skeeks/cms','Access')); ?>
-            <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                'permissionName'                => $model->permissionName,
-                'permissionDescription'         => 'Доступ к этому элементу: ' . $model->name,
-                'label'                         => 'Доступ к этому элементу',
-            ]); ?>
+        <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Access')); ?>
+        <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
+            'permissionName' => $model->permissionName,
+            'permissionDescription' => 'Доступ к этому элементу: ' . $model->name,
+            'label' => 'Доступ к этому элементу',
+        ]); ?>
         <?= $form->fieldSetEnd() ?>
     <? endif; ?>
 <? endif; ?>
@@ -153,42 +150,42 @@ JS
      * @var $content \skeeks\cms\models\CmsContent
      */
     ?>
-    <? foreach($model->cmsContent->childrenContents as $childContent) : ?>
+    <? foreach ($model->cmsContent->childrenContents as $childContent) : ?>
         <?= $form->fieldSet($childContent->name); ?>
 
-            <? if ($model->isNewRecord) : ?>
+        <? if ($model->isNewRecord) : ?>
 
-                <?= \yii\bootstrap\Alert::widget([
-                    'options' =>
+            <?= \yii\bootstrap\Alert::widget([
+                'options' =>
                     [
                         'class' => 'alert-warning'
                     ],
-                    'body' => \Yii::t('skeeks/cms', 'Management will be available after saving')
-                ]); ?>
-            <? else:  ?>
-                <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                    'label'             => $childContent->name,
-                    'namespace'         => md5($model->className() . $childContent->id),
-                    'parentModel'       => $model,
-                    'relation'          => [
-                        'content_id'                    => $childContent->id,
-                        'parent_content_element_id'     => $model->id
-                    ],
+                'body' => \Yii::t('skeeks/cms', 'Management will be available after saving')
+            ]); ?>
+        <? else: ?>
+            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                'label' => $childContent->name,
+                'namespace' => md5($model->className() . $childContent->id),
+                'parentModel' => $model,
+                'relation' => [
+                    'content_id' => $childContent->id,
+                    'parent_content_element_id' => $model->id
+                ],
 
-                    'sort'              => [
-                        'defaultOrder' =>
+                'sort' => [
+                    'defaultOrder' =>
                         [
                             'priority' => 'published_at'
                         ]
-                    ],
+                ],
 
-                    'controllerRoute'   => 'cms/admin-cms-content-element',
-                    'gridViewOptions'   => [
-                        'columns' => (array) \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent)
-                    ],
-                ]); ?>
+                'controllerRoute' => 'cms/admin-cms-content-element',
+                'gridViewOptions' => [
+                    'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent)
+                ],
+            ]); ?>
 
-            <? endif;  ?>
+        <? endif; ?>
 
 
 

@@ -8,6 +8,7 @@
  * @date 27.01.2015
  * @since 1.0.0
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -19,56 +20,54 @@ class m150512_103220_create_table__cms_content extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_content}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql')
-        {
+        if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable("{{%cms_content}}", [
-            'id'                    => Schema::TYPE_PK,
-            
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'id' => Schema::TYPE_PK,
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'name'                  => Schema::TYPE_STRING. '(255) NOT NULL',
-            'code'                  => Schema::TYPE_STRING. '(50) NOT NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'active'                => "CHAR(1) NOT NULL DEFAULT 'Y'",
+            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'code' => Schema::TYPE_STRING . '(50) NOT NULL',
 
-            'priority'              => Schema::TYPE_INTEGER. "(11) NOT NULL DEFAULT '500'",
+            'active' => "CHAR(1) NOT NULL DEFAULT 'Y'",
 
-            'description'           => Schema::TYPE_TEXT. " NULL",
+            'priority' => Schema::TYPE_INTEGER . "(11) NOT NULL DEFAULT '500'",
 
-            'files'                 => Schema::TYPE_TEXT. ' NULL',
+            'description' => Schema::TYPE_TEXT . " NULL",
 
-            'index_for_search'         => "CHAR(1) NOT NULL DEFAULT 'Y'", //Индексировать элементы для модуля поиска
+            'files' => Schema::TYPE_TEXT . ' NULL',
 
-            'name_meny'         => Schema::TYPE_STRING. '(100) NULL',
-            'name_one'          => Schema::TYPE_STRING. '(100) NULL',
+            'index_for_search' => "CHAR(1) NOT NULL DEFAULT 'Y'", //Индексировать элементы для модуля поиска
+
+            'name_meny' => Schema::TYPE_STRING . '(100) NULL',
+            'name_one' => Schema::TYPE_STRING . '(100) NULL',
 
 
-            'tree_chooser'          => "CHAR(1) NULL", //Интерфейс привязки элемента к разделам
-            'list_mode'             => "CHAR(1) NULL", //Режим просмотра разделов и элементов
+            'tree_chooser' => "CHAR(1) NULL", //Интерфейс привязки элемента к разделам
+            'list_mode' => "CHAR(1) NULL", //Режим просмотра разделов и элементов
 
-            'content_type'          => Schema::TYPE_STRING. '(32) NOT NULL',
+            'content_type' => Schema::TYPE_STRING . '(32) NOT NULL',
 
         ], $tableOptions);
-        
+
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(updated_by);");
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(created_by);");
 
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(created_at);");
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(updated_at);");
-        
+
 
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(priority);");
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(name);");
@@ -76,7 +75,6 @@ class m150512_103220_create_table__cms_content extends Migration
         $this->execute("ALTER TABLE {{%cms_content}} ADD UNIQUE(code);");
 
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(index_for_search);");
-
 
 
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(name_meny);");
@@ -87,7 +85,7 @@ class m150512_103220_create_table__cms_content extends Migration
 
         $this->execute("ALTER TABLE {{%cms_content}} ADD INDEX(content_type);");
 
-        
+
         $this->addForeignKey(
             'cms_content_created_by', "{{%cms_content}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

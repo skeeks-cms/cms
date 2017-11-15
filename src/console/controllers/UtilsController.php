@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.06.2015
  */
+
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\components\Cms;
@@ -44,15 +45,12 @@ class UtilsController extends Controller
         $controllerHelp = \Yii::$app->createController('help')[0];
         $commands = $controllerHelp->getCommands();
 
-        foreach ($controllerHelp->getCommands() as $controller)
-        {
+        foreach ($controllerHelp->getCommands() as $controller) {
             $subController = \Yii::$app->createController($controller)[0];
             $actions = $controllerHelp->getActions($subController);
 
-            if ($actions)
-            {
-                foreach ($actions as $actionId)
-                {
+            if ($actions) {
+                foreach ($actions as $actionId) {
                     $commands[] = $controller . "/" . $actionId;
                 }
             }
@@ -69,15 +67,12 @@ class UtilsController extends Controller
         /**
          * @var $files StorageFile[]
          */
-        if ($files = StorageFile::find()->count())
-        {
-            foreach (StorageFile::find()->orderBy(['id' => SORT_ASC])->each(10) as $file)
-            {
+        if ($files = StorageFile::find()->count()) {
+            foreach (StorageFile::find()->orderBy(['id' => SORT_ASC])->each(10) as $file) {
                 $this->stdout("{$file->id}");
                 if ($file->deleteTmpDir()) {
                     $this->stdout(" - true\n", Console::FG_GREEN);
-                } else
-                {
+                } else {
                     $this->stdout(" - false\n", Console::FG_RED);
                 }
             }
@@ -90,8 +85,7 @@ class UtilsController extends Controller
      */
     public function actionNormalizeTree()
     {
-        if (!CmsTree::find()->count())
-        {
+        if (!CmsTree::find()->count()) {
             $this->stdout("Tree not found!\n", Console::BOLD);
             return;
         }
@@ -101,57 +95,45 @@ class UtilsController extends Controller
         /**
          * @var CmsTree $tree
          */
-        foreach (CmsTree::find()->orderBy(['id' => SORT_ASC])->andWhere(['level' => 0])->each(10) as $tree)
-        {
+        foreach (CmsTree::find()->orderBy(['id' => SORT_ASC])->andWhere(['level' => 0])->each(10) as $tree) {
             $this->_normalizeTreePids($tree);
         }
     }
 
     protected function _normalizeTreePids(CmsTree $tree)
     {
-        if ($tree->level == 0)
-        {
+        if ($tree->level == 0) {
             $this->stdout("\tStart normalize tree: {$tree->id} - {$tree->name}\n", Console::BOLD);
-            if ((int) $tree->pids != (int) $tree->id)
-            {
+            if ((int)$tree->pids != (int)$tree->id) {
                 if (\Yii::$app->db->createCommand()->update(CmsTree::tableName(), [
                     'pids' => $tree->id,
-                ], ['id' => $tree->id])->execute())
-                {
+                ], ['id' => $tree->id])->execute()) {
                     $this->stdout("\t{$tree->id} - {$tree->name}: is normalized\n", Console::FG_GREEN);
-                } else
-                {
+                } else {
                     $this->stdout("\t{$tree->id} - {$tree->name}: not save!\n", Console::FG_RED);
                     return false;
                 }
             }
-        } else
-        {
+        } else {
             $newPids = $tree->parent->pids . "/" . $tree->id;
-            if ($newPids != $tree->pids)
-            {
+            if ($newPids != $tree->pids) {
                 if (\Yii::$app->db->createCommand()->update(CmsTree::tableName(), [
                     'pids' => $newPids,
-                ], ['id' => $tree->id])->execute())
-                {
+                ], ['id' => $tree->id])->execute()) {
                     $this->stdout("\t{$tree->id} - {$tree->name}: is normalized\n", Console::FG_GREEN);
-                } else
-                {
+                } else {
                     $this->stdout("\t{$tree->id} - {$tree->name}: not save!\n", Console::FG_RED);
                     return false;
                 }
             }
         }
 
-        if ($tree->children)
-        {
-            foreach ($tree->children as $tree)
-            {
+        if ($tree->children) {
+            foreach ($tree->children as $tree) {
                 $this->_normalizeTreePids($tree);
             }
         }
     }
-
 
 
     /**
@@ -159,8 +141,7 @@ class UtilsController extends Controller
      */
     public function actionNormalizeContent()
     {
-        if (!CmsContent::find()->count())
-        {
+        if (!CmsContent::find()->count()) {
             $this->stdout("Content not found!\n", Console::BOLD);
             return;
         }
@@ -170,12 +151,10 @@ class UtilsController extends Controller
         /**
          * @var CmsContentProperty $cmsContentProperty
          */
-        foreach (CmsContentProperty::find()->orderBy(['id' => SORT_ASC])->each(10) as $cmsContentProperty)
-        {
+        foreach (CmsContentProperty::find()->orderBy(['id' => SORT_ASC])->each(10) as $cmsContentProperty) {
             $this->stdout("\t content property: {$cmsContentProperty->name}\n", Console::FG_YELLOW);
 
-            if (!$cmsContentProperty->content_id)
-            {
+            if (!$cmsContentProperty->content_id) {
                 continue;
             }
 
@@ -183,16 +162,13 @@ class UtilsController extends Controller
                 ->where(['cms_content_id' => $cmsContentProperty->content_id])
                 ->andWhere(['cms_content_property_id' => $cmsContentProperty->id])
                 ->exists()
-            )
-            {
-                if ( (new CmsContentProperty2content([
+            ) {
+                if ((new CmsContentProperty2content([
                     'cms_content_id' => $cmsContentProperty->content_id,
                     'cms_content_property_id' => $cmsContentProperty->id
-                ]))->save() )
-                {
+                ]))->save()) {
                     $this->stdout("\t Created: {$cmsContentProperty->name}\n", Console::FG_GREEN);
-                } else
-                {
+                } else {
                     $this->stdout("\t NOT Created: {$cmsContentProperty->name}\n", Console::FG_RED);
                 }
             }
@@ -211,8 +187,7 @@ class UtilsController extends Controller
             $query->andWhere(['content_id' => $contentId]);
         }
 
-        if (!$count = $query->count())
-        {
+        if (!$count = $query->count()) {
             $this->stdout("Content elements not found!\n", Console::BOLD);
             return;
         }
@@ -222,15 +197,12 @@ class UtilsController extends Controller
         foreach ($query->orderBy([
             'content_id' => SORT_ASC,
             'id' => SORT_ASC
-        ])->each(10) as $cmsContentElement)
-        {
+        ])->each(10) as $cmsContentElement) {
             $this->stdout("\t{$cmsContentElement->id}: {$cmsContentElement->name}");
 
-            if ($cmsContentElement->delete())
-            {
+            if ($cmsContentElement->delete()) {
                 $this->stdout(" - deleted\n", Console::FG_GREEN);
-            } else
-            {
+            } else {
                 $this->stdout(" - NOT deleted\n", Console::FG_RED);
             }
         }

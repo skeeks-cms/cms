@@ -8,6 +8,7 @@
  * @date 20.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models\behaviors;
 
 use yii\db\BaseActiveRecord;
@@ -23,12 +24,12 @@ class Implode extends Behavior
     /**
      * @var array
      */
-    public $fields      = [];
+    public $fields = [];
 
     /**
      * @var string
      */
-    public $delimetr    = ',';
+    public $delimetr = ',';
 
     /**
      * @return array
@@ -36,11 +37,11 @@ class Implode extends Behavior
     public function events()
     {
         return [
-            BaseActiveRecord::EVENT_BEFORE_INSERT   => "implodeFields",
-            BaseActiveRecord::EVENT_BEFORE_UPDATE   => "implodeFields",
-            BaseActiveRecord::EVENT_AFTER_FIND      => "explodeFields",
-            BaseActiveRecord::EVENT_AFTER_UPDATE    => "explodeFields",
-            BaseActiveRecord::EVENT_AFTER_INSERT    => "explodeFields",
+            BaseActiveRecord::EVENT_BEFORE_INSERT => "implodeFields",
+            BaseActiveRecord::EVENT_BEFORE_UPDATE => "implodeFields",
+            BaseActiveRecord::EVENT_AFTER_FIND => "explodeFields",
+            BaseActiveRecord::EVENT_AFTER_UPDATE => "explodeFields",
+            BaseActiveRecord::EVENT_AFTER_INSERT => "explodeFields",
         ];
     }
 
@@ -49,16 +50,12 @@ class Implode extends Behavior
      */
     public function implodeFields($event)
     {
-        foreach ($this->fields as $fielName)
-        {
-            if ($this->owner->{$fielName})
-            {
-                if (is_array($this->owner->{$fielName}))
-                {
+        foreach ($this->fields as $fielName) {
+            if ($this->owner->{$fielName}) {
+                if (is_array($this->owner->{$fielName})) {
                     $this->owner->{$fielName} = implode($this->delimetr, $this->owner->{$fielName});
                 }
-            } else
-            {
+            } else {
                 $this->owner->{$fielName} = "";
             }
         }
@@ -70,17 +67,12 @@ class Implode extends Behavior
      */
     public function explodeFields($event)
     {
-        foreach ($this->fields as $fielName)
-        {
-            if ($this->owner->{$fielName})
-            {
-                if (is_string($this->owner->{$fielName}))
-                {
+        foreach ($this->fields as $fielName) {
+            if ($this->owner->{$fielName}) {
+                if (is_string($this->owner->{$fielName})) {
                     $this->owner->{$fielName} = explode($this->delimetr, $this->owner->{$fielName});
                 }
-            }
-            else
-            {
+            } else {
                 $this->owner->{$fielName} = [];
             }
         }

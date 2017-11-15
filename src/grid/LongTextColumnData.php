@@ -8,6 +8,7 @@
  * @date 30.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\grid;
 
 use skeeks\cms\helpers\StringHelper;
@@ -20,13 +21,15 @@ use yii\grid\DataColumn;
 class LongTextColumnData extends DataColumn
 {
     public $maxLength = 200;
+
     /**
      * @inheritdoc
      */
     protected function renderDataCellContent($model, $key, $index)
     {
         $text = $model->{$this->attribute};
-        return "<small>" . StringHelper::substr($text, 0, $this->maxLength) . ( (StringHelper::strlen($text) > $this->maxLength) ? " ..." : "" ) . "</small>";
+        return "<small>" . StringHelper::substr($text, 0,
+                $this->maxLength) . ((StringHelper::strlen($text) > $this->maxLength) ? " ..." : "") . "</small>";
 
     }
 }

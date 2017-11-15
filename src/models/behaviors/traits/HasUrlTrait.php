@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 24.05.2015
  */
+
 namespace skeeks\cms\models\behaviors\traits;
+
 use skeeks\cms\models\CmsContentElementTree;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -14,8 +16,8 @@ use yii\db\ActiveRecord;
  * @method string                               getAbsoluteUrl()
  * @method string                               getUrl()
  *
- * @property string                             absoluteUrl
- * @property string                             url
+ * @property string absoluteUrl
+ * @property string url
  */
 trait HasUrlTrait
 {

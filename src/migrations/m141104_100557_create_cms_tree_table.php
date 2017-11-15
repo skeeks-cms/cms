@@ -8,8 +8,7 @@ class m141104_100557_create_cms_tree_table extends Migration
     public function up()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_tree}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             $this->dropTable("{{%cms_tree}}");
         }
 
@@ -19,48 +18,60 @@ class m141104_100557_create_cms_tree_table extends Migration
         }
 
         $this->createTable("{{%cms_tree}}", [
-            'id'                    => Schema::TYPE_PK,
+            'id' => Schema::TYPE_PK,
 
-            'created_by'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
 
-            'created_at'            => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
 
-            'name'                  => Schema::TYPE_STRING. '(255) NOT NULL',
+            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
 
-            'description_short'     => Schema::TYPE_TEXT,
-            'description_full'      => Schema::TYPE_TEXT,
+            'description_short' => Schema::TYPE_TEXT,
+            'description_full' => Schema::TYPE_TEXT,
 
-            'files'                 => Schema::TYPE_TEXT. ' NULL', //
+            'files' => Schema::TYPE_TEXT . ' NULL',
+            //
 
-            'page_options'          => Schema::TYPE_TEXT. ' NULL', //
+            'page_options' => Schema::TYPE_TEXT . ' NULL',
+            //
 
-            'seo_page_name'         => Schema::TYPE_STRING. '(64) NULL', //обложка
+            'seo_page_name' => Schema::TYPE_STRING . '(64) NULL',
+            //обложка
 
-            'count_comment'         => Schema::TYPE_INTEGER . ' NULL', //Количество комментариев
+            'count_comment' => Schema::TYPE_INTEGER . ' NULL',
+            //Количество комментариев
 
-            'count_subscribe'       => Schema::TYPE_INTEGER . ' NULL', //Количество подписчиков
-            'users_subscribers'     => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые подписались (их id через запятую)
+            'count_subscribe' => Schema::TYPE_INTEGER . ' NULL',
+            //Количество подписчиков
+            'users_subscribers' => Schema::TYPE_TEXT . ' NULL',
+            //Пользователи которые подписались (их id через запятую)
 
-            'count_vote'            => Schema::TYPE_INTEGER . ' NULL', //Количество голосов
-            'result_vote'           => Schema::TYPE_INTEGER . ' NULL', //Результат голосования
-            'users_votes_up'        => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые проголосовали +
-            'users_votes_down'      => Schema::TYPE_TEXT. ' NULL',   //Пользователи которые проголосовали -
+            'count_vote' => Schema::TYPE_INTEGER . ' NULL',
+            //Количество голосов
+            'result_vote' => Schema::TYPE_INTEGER . ' NULL',
+            //Результат голосования
+            'users_votes_up' => Schema::TYPE_TEXT . ' NULL',
+            //Пользователи которые проголосовали +
+            'users_votes_down' => Schema::TYPE_TEXT . ' NULL',
+            //Пользователи которые проголосовали -
 
-            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10', //статус, активна некативна, удалено
-            'status_adult'          => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0', //Возрастной статус 0 - не проверено, 1-для всех, 2-типо эротические материалы, 3-порно
-            
-            
-            'pid'                   => Schema::TYPE_INTEGER . ' NULL',
-            'pid_main'              => Schema::TYPE_INTEGER . ' NULL',
-            'pids'                  => Schema::TYPE_STRING . '(255) NULL',
-            'level'                 => Schema::TYPE_INTEGER . ' DEFAULT 0',
-            'dir'                   => Schema::TYPE_TEXT . ' NULL',
-            'has_children'          => Schema::TYPE_SMALLINT . '(1) DEFAULT 0',
+            'status' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10',
+            //статус, активна некативна, удалено
+            'status_adult' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',
+            //Возрастной статус 0 - не проверено, 1-для всех, 2-типо эротические материалы, 3-порно
 
-            'main_root'              => Schema::TYPE_SMALLINT . ' NULL',
-            'priority'               => Schema::TYPE_INTEGER . '  NOT NULL DEFAULT 0',
+
+            'pid' => Schema::TYPE_INTEGER . ' NULL',
+            'pid_main' => Schema::TYPE_INTEGER . ' NULL',
+            'pids' => Schema::TYPE_STRING . '(255) NULL',
+            'level' => Schema::TYPE_INTEGER . ' DEFAULT 0',
+            'dir' => Schema::TYPE_TEXT . ' NULL',
+            'has_children' => Schema::TYPE_SMALLINT . '(1) DEFAULT 0',
+
+            'main_root' => Schema::TYPE_SMALLINT . ' NULL',
+            'priority' => Schema::TYPE_INTEGER . '  NOT NULL DEFAULT 0',
 
         ], $tableOptions);
 
@@ -93,7 +104,6 @@ class m141104_100557_create_cms_tree_table extends Migration
         $this->execute("ALTER TABLE {{%cms_tree}} ADD UNIQUE(main_root);");
 
         $this->execute("ALTER TABLE {{%cms_tree}} COMMENT = 'Страницы дерево';");
-
 
 
         $this->addForeignKey(

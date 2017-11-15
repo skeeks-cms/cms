@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 19.12.2016
  */
+
 namespace skeeks\cms\widgets\tree\assets;
+
 use yii\web\AssetBundle;
 
 /**

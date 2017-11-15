@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.05.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\components\Cms;
@@ -25,9 +26,9 @@ class AdminCmsLangController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/cms', 'Management of languages');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = CmsLang::class;
+        $this->name = \Yii::t('skeeks/cms', 'Management of languages');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = CmsLang::class;
 
         parent::init();
     }
@@ -40,20 +41,20 @@ class AdminCmsLangController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 "activate-multi" =>
-                [
-                    'class'             => AdminMultiModelEditAction::className(),
-                    "name"              => "Активировать",
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback"      => [$this, 'eachMultiActivate'],
-                ],
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => "Активировать",
+                        //"icon"              => "glyphicon glyphicon-trash",
+                        "eachCallback" => [$this, 'eachMultiActivate'],
+                    ],
 
                 "inActivate-multi" =>
-                [
-                    'class'             => AdminMultiModelEditAction::className(),
-                    "name"              => "Деактивировать",
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback"      => [$this, 'eachMultiInActivate'],
-                ]
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => "Деактивировать",
+                        //"icon"              => "glyphicon glyphicon-trash",
+                        "eachCallback" => [$this, 'eachMultiInActivate'],
+                    ]
             ]
         );
     }

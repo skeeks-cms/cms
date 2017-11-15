@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\propertyTypes;
+
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
@@ -20,46 +22,46 @@ use yii\widgets\ActiveForm;
  */
 class PropertyTypeList extends PropertyType
 {
-    public $enumRoute               = 'cms/admin-cms-content-property-enum';
+    public $enumRoute = 'cms/admin-cms-content-property-enum';
 
-    public $code                 = self::CODE_LIST;
-    public $name                 = "";
+    public $code = self::CODE_LIST;
+    public $name = "";
 
-    const FIELD_ELEMENT_SELECT              = "select";
-    const FIELD_ELEMENT_SELECT_MULTI        = "selectMulti";
-    const FIELD_ELEMENT_LISTBOX             = "listbox";
-    const FIELD_ELEMENT_LISTBOX_MULTI       = "listboxmulti";
+    const FIELD_ELEMENT_SELECT = "select";
+    const FIELD_ELEMENT_SELECT_MULTI = "selectMulti";
+    const FIELD_ELEMENT_LISTBOX = "listbox";
+    const FIELD_ELEMENT_LISTBOX_MULTI = "listboxmulti";
 
-    const FIELD_ELEMENT_RADIO_LIST          = "radioList";
-    const FIELD_ELEMENT_CHECKBOX_LIST       = "checkbox";
+    const FIELD_ELEMENT_RADIO_LIST = "radioList";
+    const FIELD_ELEMENT_CHECKBOX_LIST = "checkbox";
 
-    const FIELD_ELEMENT_SELECT_DIALOG           = "selectDialog";
-    const FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE  = "selectDialogMulti";
+    const FIELD_ELEMENT_SELECT_DIALOG = "selectDialog";
+    const FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE = "selectDialogMulti";
 
     static public function fieldElements()
     {
         return [
-            self::FIELD_ELEMENT_SELECT          => \Yii::t('skeeks/cms', 'Combobox').' (select)',
-            self::FIELD_ELEMENT_SELECT_MULTI    => \Yii::t('skeeks/cms', 'Combobox').' (select multiple)',
-            self::FIELD_ELEMENT_RADIO_LIST      => \Yii::t('skeeks/cms', 'Radio Buttons (selecting one value)'),
-            self::FIELD_ELEMENT_CHECKBOX_LIST   => \Yii::t('skeeks/cms', 'Checkbox List'),
-            self::FIELD_ELEMENT_LISTBOX         => \Yii::t('skeeks/cms', 'ListBox'),
-            self::FIELD_ELEMENT_LISTBOX_MULTI   => \Yii::t('skeeks/cms', 'ListBox Multi'),
-            self::FIELD_ELEMENT_SELECT_DIALOG   => \Yii::t('skeeks/cms','Selection widget in the dialog box'),
-            self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE   => \Yii::t('skeeks/cms','Selection widget in the dialog box (multiple choice)'),
+            self::FIELD_ELEMENT_SELECT => \Yii::t('skeeks/cms', 'Combobox') . ' (select)',
+            self::FIELD_ELEMENT_SELECT_MULTI => \Yii::t('skeeks/cms', 'Combobox') . ' (select multiple)',
+            self::FIELD_ELEMENT_RADIO_LIST => \Yii::t('skeeks/cms', 'Radio Buttons (selecting one value)'),
+            self::FIELD_ELEMENT_CHECKBOX_LIST => \Yii::t('skeeks/cms', 'Checkbox List'),
+            self::FIELD_ELEMENT_LISTBOX => \Yii::t('skeeks/cms', 'ListBox'),
+            self::FIELD_ELEMENT_LISTBOX_MULTI => \Yii::t('skeeks/cms', 'ListBox Multi'),
+            self::FIELD_ELEMENT_SELECT_DIALOG => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
+            self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE => \Yii::t('skeeks/cms',
+                'Selection widget in the dialog box (multiple choice)'),
 
         ];
     }
 
-    public $fieldElement            = self::FIELD_ELEMENT_SELECT;
+    public $fieldElement = self::FIELD_ELEMENT_SELECT;
 
     public function init()
     {
         parent::init();
 
-        if(!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms','List');
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', 'List');
         }
     }
 
@@ -73,8 +75,7 @@ class PropertyTypeList extends PropertyType
             self::FIELD_ELEMENT_CHECKBOX_LIST,
             self::FIELD_ELEMENT_LISTBOX_MULTI,
             self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE
-        ]))
-        {
+        ])) {
             return true;
         }
 
@@ -84,19 +85,19 @@ class PropertyTypeList extends PropertyType
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'fieldElement'  => \Yii::t('skeeks/cms','Element form'),
-        ]);
+            [
+                'fieldElement' => \Yii::t('skeeks/cms', 'Element form'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['fieldElement', 'required'],
-            ['fieldElement', 'string'],
-            ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
-        ]);
+            [
+                ['fieldElement', 'required'],
+                ['fieldElement', 'string'],
+                ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
+            ]);
     }
 
     /**
@@ -104,10 +105,10 @@ class PropertyTypeList extends PropertyType
      */
     public function renderConfigForm(ActiveForm $activeForm)
     {
-        echo $activeForm->fieldSelect($this, 'fieldElement', \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements());
+        echo $activeForm->fieldSelect($this, 'fieldElement',
+            \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements());
 
-        if ($controllerProperty = \Yii::$app->createController($this->enumRoute)[0])
-        {
+        if ($controllerProperty = \Yii::$app->createController($this->enumRoute)[0]) {
             /**
              * @var \skeeks\cms\backend\BackendAction $actionIndex
              * @var \skeeks\cms\backend\BackendAction $actionCreate
@@ -115,35 +116,31 @@ class PropertyTypeList extends PropertyType
             $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
             $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
 
-            if ($this->property->isNewRecord)
-            {
+            if ($this->property->isNewRecord) {
                 echo Alert::widget([
                     'options' => [
                         'class' => 'alert-info'
                     ],
                     'body' => \Yii::t('skeeks/cms', 'To start setting up options, save this property.')
                 ]);
-            } else
-            {
-                if ($actionIndex)
-                {
+            } else {
+                if ($actionIndex) {
                     $pjax = \yii\widgets\Pjax::begin();
 
-                    if ($actionCreate)
-                    {
+                    if ($actionCreate) {
                         $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
                             'property_id' => $this->property->id
                         ]);
 
                         echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
                             'actions' => ['create' => $actionCreate],
-                            'clientOptions'     => ['pjax-id' => $pjax->id],
-                            'isOpenNewWindow'   => true,
-                            'tag'               => 'div',
-                            'itemWrapperTag'    => 'span',
-                            'itemTag'           => 'button',
-                            'itemOptions'       => ['class' => 'btn btn-default'],
-                            'options'           => ['class' => 'sx-controll-actions'],
+                            'clientOptions' => ['pjax-id' => $pjax->id],
+                            'isOpenNewWindow' => true,
+                            'tag' => 'div',
+                            'itemWrapperTag' => 'span',
+                            'itemTag' => 'button',
+                            'itemOptions' => ['class' => 'btn btn-default'],
+                            'options' => ['class' => 'sx-controll-actions'],
                         ]);
                     }
 
@@ -151,42 +148,42 @@ class PropertyTypeList extends PropertyType
                     $query->andWhere(['property_id' => $this->property->id]);
 
                     echo \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-                        'dataProvider'      => new \yii\data\ActiveDataProvider([
+                        'dataProvider' => new \yii\data\ActiveDataProvider([
                             'query' => $query
                         ]),
                         'settingsData' =>
-                        [
-                            'namespace' => \Yii::$app->controller->uniqueId . "__" . $this->property->id
-                        ],
+                            [
+                                'namespace' => \Yii::$app->controller->uniqueId . "__" . $this->property->id
+                            ],
                         'adminController' => $controllerProperty,
-                        'isOpenNewWindow'       => true,
+                        'isOpenNewWindow' => true,
                         //'filterModel'       => $searchModel,
-                        'autoColumns'       => false,
-                        'pjax'      => $pjax,
+                        'autoColumns' => false,
+                        'pjax' => $pjax,
                         'columns' => [
                             [
-                                'attribute'     => 'id',
+                                'attribute' => 'id',
                                 'enableSorting' => false
                             ],
 
                             [
-                                'attribute'     => 'code',
+                                'attribute' => 'code',
                                 'enableSorting' => false
                             ],
 
                             [
-                                'attribute'     => 'value',
+                                'attribute' => 'value',
                                 'enableSorting' => false
                             ],
 
                             [
-                                'attribute'     => 'priority',
+                                'attribute' => 'priority',
                                 'enableSorting' => false
                             ],
 
                             [
-                                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                                'attribute'     => 'def',
+                                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                                'attribute' => 'def',
                                 'enableSorting' => false
                             ],
                         ]
@@ -247,78 +244,89 @@ class PropertyTypeList extends PropertyType
     {
         $field = '';
 
-        if ($this->fieldElement == self::FIELD_ELEMENT_SELECT)
-        {
+        if ($this->fieldElement == self::FIELD_ELEMENT_SELECT) {
             $field = $this->activeForm->fieldSelect(
                 $this->property->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($this->property->enums, 'id', 'value'),
                 []
             );
-        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI)
-        {
-            $field = $this->activeForm->fieldSelectMulti(
-                $this->property->relatedPropertiesModel,
-                $this->property->code,
-                ArrayHelper::map($this->property->enums, 'id', 'value'),
-                []
-            );
-        } else if ($this->fieldElement == self::FIELD_ELEMENT_RADIO_LIST)
-        {
-            $field = parent::renderForActiveForm();
-            $field->radioList(ArrayHelper::map($this->property->enums, 'id', 'value'));
+        } else {
+            if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI) {
+                $field = $this->activeForm->fieldSelectMulti(
+                    $this->property->relatedPropertiesModel,
+                    $this->property->code,
+                    ArrayHelper::map($this->property->enums, 'id', 'value'),
+                    []
+                );
+            } else {
+                if ($this->fieldElement == self::FIELD_ELEMENT_RADIO_LIST) {
+                    $field = parent::renderForActiveForm();
+                    $field->radioList(ArrayHelper::map($this->property->enums, 'id', 'value'));
 
-        } else if ($this->fieldElement == self::FIELD_ELEMENT_CHECKBOX_LIST)
-        {
-            $field = parent::renderForActiveForm();
-            $field->checkboxList(ArrayHelper::map($this->property->enums, 'id', 'value'));
+                } else {
+                    if ($this->fieldElement == self::FIELD_ELEMENT_CHECKBOX_LIST) {
+                        $field = parent::renderForActiveForm();
+                        $field->checkboxList(ArrayHelper::map($this->property->enums, 'id', 'value'));
 
-        } else if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX_MULTI)
-        {
-            $field = parent::renderForActiveForm();
-            $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
-                'size' => 5,
-                'multiple' => 'multiple'
-            ]);
-        } else if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX)
-        {
-            $field = parent::renderForActiveForm();
-            $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
-                'size' => 1,
-            ]);
-        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG)
-        {
-            $field = parent::renderForActiveForm();
-            $field->widget(
-                \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
-                [
-                    'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
-                    'dialogRoute' => ['/cms/admin-cms-content-property-enum', 'CmsContentPropertyEnum' => [
-                        'property_id' => $this->property->id
-                    ]],
-                ]
-            );
-        } else if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE)
-        {
-            $field = parent::renderForActiveForm();
-            $field->widget(
-                \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
-                [
-                    'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
-                    'dialogRoute' => ['/cms/admin-cms-content-property-enum', 'CmsContentPropertyEnum' => [
-                        'property_id' => $this->property->id
-                    ]],
-                    'multiple' => true
-                ]
-            );
-        } else
-        {
-            $field = $this->activeForm->fieldSelect(
-                $this->property->relatedPropertiesModel,
-                $this->property->code,
-                ArrayHelper::map($this->property->enums, 'id', 'value'),
-                []
-            );
+                    } else {
+                        if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX_MULTI) {
+                            $field = parent::renderForActiveForm();
+                            $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
+                                'size' => 5,
+                                'multiple' => 'multiple'
+                            ]);
+                        } else {
+                            if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX) {
+                                $field = parent::renderForActiveForm();
+                                $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
+                                    'size' => 1,
+                                ]);
+                            } else {
+                                if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG) {
+                                    $field = parent::renderForActiveForm();
+                                    $field->widget(
+                                        \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
+                                        [
+                                            'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
+                                            'dialogRoute' => [
+                                                '/cms/admin-cms-content-property-enum',
+                                                'CmsContentPropertyEnum' => [
+                                                    'property_id' => $this->property->id
+                                                ]
+                                            ],
+                                        ]
+                                    );
+                                } else {
+                                    if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE) {
+                                        $field = parent::renderForActiveForm();
+                                        $field->widget(
+                                            \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
+                                            [
+                                                'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
+                                                'dialogRoute' => [
+                                                    '/cms/admin-cms-content-property-enum',
+                                                    'CmsContentPropertyEnum' => [
+                                                        'property_id' => $this->property->id
+                                                    ]
+                                                ],
+                                                'multiple' => true
+                                            ]
+                                        );
+                                    } else {
+                                        $field = $this->activeForm->fieldSelect(
+                                            $this->property->relatedPropertiesModel,
+                                            $this->property->code,
+                                            ArrayHelper::map($this->property->enums, 'id', 'value'),
+                                            []
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return $field;
@@ -331,11 +339,9 @@ class PropertyTypeList extends PropertyType
      */
     public function addRules()
     {
-        if ($this->isMultiple)
-        {
+        if ($this->isMultiple) {
             $this->property->relatedPropertiesModel->addRule($this->property->code, 'safe');
-        } else
-        {
+        } else {
             $this->property->relatedPropertiesModel->addRule($this->property->code, 'integer');
         }
 
@@ -354,16 +360,12 @@ class PropertyTypeList extends PropertyType
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
 
-        if ($this->isMultiple)
-        {
-            if ($this->property->enums)
-            {
+        if ($this->isMultiple) {
+            if ($this->property->enums) {
                 $result = [];
 
-                foreach ($this->property->enums as $enum)
-                {
-                    if (in_array($enum->id, $value))
-                    {
+                foreach ($this->property->enums as $enum) {
+                    if (in_array($enum->id, $value)) {
                         $result[$enum->code] = $enum->value;
                     }
 
@@ -371,16 +373,12 @@ class PropertyTypeList extends PropertyType
 
                 return implode(", ", $result);
             }
-        } else
-        {
-            if ($this->property->enums)
-            {
-                $enums = (array) $this->property->enums;
+        } else {
+            if ($this->property->enums) {
+                $enums = (array)$this->property->enums;
 
-                foreach ($enums as $enum)
-                {
-                    if ($enum->id == $value)
-                    {
+                foreach ($enums as $enum) {
+                    if ($enum->id == $value) {
                         return $enum->value;
                     }
                 }

@@ -2,9 +2,10 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
+ * @copyright 2010 SkeekS (пїЅпїЅпїЅпїЅпїЅ)
  * @date 29.07.2016
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertyEnumModel;

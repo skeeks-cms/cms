@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\searchs\Game */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = \Yii::t('skeeks/cms',"User List");
+$this->title = \Yii::t('skeeks/cms', "User List");
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div id="main" class="eh">
         <div class="game-index sx-list">
             <h1><?= Html::encode($this->title) ?></h1>
-            <?php /*echo $this->render('_search', ['model' => $searchModel]); */?>
+            <?php /*echo $this->render('_search', ['model' => $searchModel]); */ ?>
             <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
                 'showHeader' => false,
                 'dataProvider' => $dataProvider,

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 19.04.2015
  */
+
 namespace skeeks\cms\helpers\elfinder;
 
 use skeeks\cms\rbac\CmsManager;
@@ -14,8 +15,7 @@ class UserPath extends \mihaildev\elfinder\UserPath
 {
     public function isAvailable()
     {
-        if (!\Yii::$app->user->can(CmsManager::PERMISSION_ELFINDER_USER_FILES))
-        {
+        if (!\Yii::$app->user->can(CmsManager::PERMISSION_ELFINDER_USER_FILES)) {
             return false;
         }
 

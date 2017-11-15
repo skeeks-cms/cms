@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.06.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\actions\user\UserAction;
@@ -23,8 +24,8 @@ use yii\rest\UpdateAction;
 use yii\web\NotFoundHttpException;
 
 /**
- * @property CmsUser    $user
- * @property bool       $isOwner
+ * @property CmsUser $user
+ * @property bool $isOwner
  *
  * Class UserController
  * @package skeeks\cms\controllers
@@ -40,19 +41,22 @@ class UserController extends Controller
 
     public function init()
     {
-        if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && !$this->user)
-        {
+        if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && !$this->user) {
             throw new NotFoundHttpException("User not found or inactive");
-        } else if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && \Yii::$app->cmsToolbar)
-        {
-            $controller = \Yii::$app->createController('cms/admin-user')[0];
-            $adminControllerRoute = ['/cms/admin-user/update', $controller->requestPkParamName => $this->user->{$controller->modelPkAttribute}];
+        } else {
+            if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && \Yii::$app->cmsToolbar) {
+                $controller = \Yii::$app->createController('cms/admin-user')[0];
+                $adminControllerRoute = [
+                    '/cms/admin-user/update',
+                    $controller->requestPkParamName => $this->user->{$controller->modelPkAttribute}
+                ];
 
-            $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
-                                    ->enableEmptyLayout()
-                                    ->url;
+                $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
+                    ->enableEmptyLayout()
+                    ->url;
 
-            \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
+                \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
+            }
         }
 
 
@@ -65,23 +69,22 @@ class UserController extends Controller
     public function behaviors()
     {
         return
-        [
-            //Closed all by default
-            'access' =>
             [
-                'class'         => CmsAccessControl::className(),
-                'rules' =>
-                [
+                //Closed all by default
+                'access' =>
                     [
-                        'allow'         => true,
-                        'matchCallback' => function($rule, $action)
-                        {
-                            return $this->isOwner;
-                        }
-                    ]
-                ]
-            ],
-        ];
+                        'class' => CmsAccessControl::className(),
+                        'rules' =>
+                            [
+                                [
+                                    'allow' => true,
+                                    'matchCallback' => function ($rule, $action) {
+                                        return $this->isOwner;
+                                    }
+                                ]
+                            ]
+                    ],
+            ];
     }
 
     /**
@@ -89,7 +92,7 @@ class UserController extends Controller
      */
     public function getIsOwner()
     {
-        return (bool) ($this->user && $this->user->id == \Yii::$app->user->id);
+        return (bool)($this->user && $this->user->id == \Yii::$app->user->id);
     }
 
     /**
@@ -98,21 +101,19 @@ class UserController extends Controller
      */
     public function getUser()
     {
-        if ($this->_user !== false)
-        {
+        if ($this->_user !== false) {
             return $this->_user;
         }
 
-        if (!$username = \Yii::$app->request->get(static::REQUEST_PARAM_USERNAME))
-        {
+        if (!$username = \Yii::$app->request->get(static::REQUEST_PARAM_USERNAME)) {
             $this->_user = null;
             return false;
         }
 
         $userClass = \Yii::$app->user->identityClass;
         $this->_user = $userClass::find()->where([
-            "username"  => $username,
-            'active'    => Cms::BOOL_Y
+            "username" => $username,
+            'active' => Cms::BOOL_Y
         ])->one();
 
         return $this->_user;
@@ -136,8 +137,6 @@ class UserController extends Controller
     }
 
 
-
-
     /**
      * @param $username
      * @return string
@@ -150,19 +149,15 @@ class UserController extends Controller
 
         $rr = new RequestResponse();
 
-        if ($rr->isRequestOnValidateAjaxForm())
-        {
+        if ($rr->isRequestOnValidateAjaxForm()) {
             return $rr->ajaxValidateForm($modelForm);
         }
 
-        if ($rr->isRequestAjaxPost())
-        {
-            if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword())
-            {
+        if ($rr->isRequestAjaxPost()) {
+            if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword()) {
                 $rr->success = true;
                 $rr->message = 'Пароль успешно изменен';
-            } else
-            {
+            } else {
                 $rr->message = 'Не удалось изменить пароль';
             }
 
@@ -183,19 +178,15 @@ class UserController extends Controller
 
         $rr = new RequestResponse();
 
-        if ($rr->isRequestOnValidateAjaxForm())
-        {
+        if ($rr->isRequestOnValidateAjaxForm()) {
             return $rr->ajaxValidateForm($model);
         }
 
-        if ($rr->isRequestAjaxPost())
-        {
-            if ($model->load(\Yii::$app->request->post()) && $model->save())
-            {
+        if ($rr->isRequestAjaxPost()) {
+            if ($model->load(\Yii::$app->request->post()) && $model->save()) {
                 $rr->success = true;
                 $rr->message = 'Данные успешно сохранены';
-            } else
-            {
+            } else {
                 $rr->message = 'Не получилось сохранить данные';
             }
 

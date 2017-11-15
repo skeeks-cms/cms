@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 20.05.2015
  */
+
 namespace skeeks\cms\traits;
+
 use skeeks\cms\base\ComponentDescriptor;
 
 /**
@@ -32,48 +34,48 @@ trait HasComponentDescriptorTrait
     static public function descriptorConfig()
     {
         return
-        [
-            "version"               => "1.0.0",
-
-            "name"                  => "Skeeks CMS",
-            "description"           => "",
-            "keywords"              => "skeeks, cms",
-
-            "homepage"              => "https://cms.skeeks.com/",
-            "license"               => "BSD-3-Clause",
-
-            "support"               =>
             [
-                "issues"    =>  "https://www.skeeks.com/",
-                "wiki"      =>  "https://cms.skeeks.com/docs/",
-                "source"    =>  "https://github.com/skeeks-cms/cms"
-            ],
+                "version" => "1.0.0",
 
-            "companies"   =>
-            [
-                [
-                    "name"      =>  "SkeekS",
-                    "emails"    => ["info@skeeks.com", "support@skeeks.com"],
-                    "phones"    => ["+7 (495) 722-28-73"],
-                    "sites"     => ["skeeks.com"]
-                ]
-            ],
+                "name" => "Skeeks CMS",
+                "description" => "",
+                "keywords" => "skeeks, cms",
 
-            "authors"    =>
-            [
-                [
-                    "name"      => "Semenov Alexander",
-                    "emails"    => ["semenov@skeeks.com"],
-                    "phones"    => ["+7 (495) 722-28-73"]
-                ],
+                "homepage" => "https://cms.skeeks.com/",
+                "license" => "BSD-3-Clause",
 
-                [
-                    "name"      => "Semenov Alexander",
-                    "emails"    => ["semenov@skeeks.com"],
-                    "phones"    => ["+7 (495) 722-28-73"]
-                ],
-            ],
-        ];
+                "support" =>
+                    [
+                        "issues" => "https://www.skeeks.com/",
+                        "wiki" => "https://cms.skeeks.com/docs/",
+                        "source" => "https://github.com/skeeks-cms/cms"
+                    ],
+
+                "companies" =>
+                    [
+                        [
+                            "name" => "SkeekS",
+                            "emails" => ["info@skeeks.com", "support@skeeks.com"],
+                            "phones" => ["+7 (495) 722-28-73"],
+                            "sites" => ["skeeks.com"]
+                        ]
+                    ],
+
+                "authors" =>
+                    [
+                        [
+                            "name" => "Semenov Alexander",
+                            "emails" => ["semenov@skeeks.com"],
+                            "phones" => ["+7 (495) 722-28-73"]
+                        ],
+
+                        [
+                            "name" => "Semenov Alexander",
+                            "emails" => ["semenov@skeeks.com"],
+                            "phones" => ["+7 (495) 722-28-73"]
+                        ],
+                    ],
+            ];
     }
 
     /**
@@ -81,14 +83,11 @@ trait HasComponentDescriptorTrait
      */
     public function getDescriptor()
     {
-        if ($this->_descriptor === null)
-        {
+        if ($this->_descriptor === null) {
             $classDescriptor = static::$descriptorClassName;
-            if (class_exists($classDescriptor))
-            {
+            if (class_exists($classDescriptor)) {
                 $this->_descriptor = new $classDescriptor(static::descriptorConfig());
-            } else
-            {
+            } else {
                 $this->_descriptor = new ComponentDescriptor(static::descriptorConfig());
             }
         }

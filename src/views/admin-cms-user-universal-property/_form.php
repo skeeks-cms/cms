@@ -7,8 +7,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
-if ($model->isNewRecord)
-{
+if ($model->isNewRecord) {
     $model->loadDefaultValues();
 }
 
@@ -16,8 +15,8 @@ if ($model->isNewRecord)
 
 
 <?php $form = ActiveForm::begin([
-    'id'                                            => 'sx-dynamic-form',
-    'enableAjaxValidation'                          => false,
+    'id' => 'sx-dynamic-form',
+    'enableAjaxValidation' => false,
 ]); ?>
 
 <? $this->registerJs(<<<JS
@@ -54,37 +53,37 @@ if ($model->isNewRecord)
 JS
 ); ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Basic settings')) ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Basic settings')) ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'active') ?>
-    <?= $form->fieldRadioListBoolean($model, 'is_required') ?>
+<?= $form->fieldRadioListBoolean($model, 'active') ?>
+<?= $form->fieldRadioListBoolean($model, 'is_required') ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput() ?>
+<?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+<?= $form->field($model, 'code')->textInput() ?>
 
-    <?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect), [
-            'size' => 1,
-            'data-form-reload' => 'true'
-        ])
-        ->label(\Yii::t('skeeks/cms',"Property type"))
-        ;
-    ?>
+<?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '],
+    \Yii::$app->cms->relatedHandlersDataForSelect), [
+    'size' => 1,
+    'data-form-reload' => 'true'
+])
+    ->label(\Yii::t('skeeks/cms', "Property type"));
+?>
 
-    <? if ($handler) : ?>
-        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
-            <? if($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
-                <? $handler->enumRoute = 'cms/admin-cms-user-universal-property-enum'; ?>
-            <? endif; ?>
-            <?= $handler->renderConfigForm($form); ?>
+<? if ($handler) : ?>
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
+    <? if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
+        <? $handler->enumRoute = 'cms/admin-cms-user-universal-property-enum'; ?>
     <? endif; ?>
+    <?= $handler->renderConfigForm($form); ?>
+<? endif; ?>
 
 
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) ?>
-    <?= $form->field($model, 'hint')->textInput() ?>
-    <?= $form->fieldInputInt($model, 'priority') ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')) ?>
+<?= $form->field($model, 'hint')->textInput() ?>
+<?= $form->fieldInputInt($model, 'priority') ?>
 
 <?= $form->fieldSetEnd(); ?>
 

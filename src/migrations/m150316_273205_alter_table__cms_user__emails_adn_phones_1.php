@@ -8,6 +8,7 @@
  * @date 24.02.2015
  * @since 1.0.0
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 

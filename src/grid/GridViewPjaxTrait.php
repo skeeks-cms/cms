@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 02.06.2015
  */
+
 namespace skeeks\cms\grid;
 
 use yii\helpers\ArrayHelper;
@@ -18,15 +19,15 @@ use yii\widgets\Pjax;
  */
 trait GridViewPjaxTrait
 {
-    public $pjaxClassName    = 'yii\widgets\Pjax';
+    public $pjaxClassName = 'yii\widgets\Pjax';
     /**
      * @var bool влючить/выключить pjax навигацию
      */
-    public $enabledPjax     = true;
+    public $enabledPjax = true;
     /**
      * @var array
      */
-    public $pjaxOptions     = [];
+    public $pjaxOptions = [];
     /**
      * @var Pjax для того чтобы потом можно было обратиться к объекту pjax.
      */
@@ -36,10 +37,8 @@ trait GridViewPjaxTrait
 
     public function pjaxBegin()
     {
-        if ($this->enabledPjax)
-        {
-            if (!$this->pjax)
-            {
+        if ($this->enabledPjax) {
+            if (!$this->pjax) {
                 $this->_pjaxCreated = true;
 
                 $pjaxClassName = $this->pjaxClassName;
@@ -53,8 +52,7 @@ trait GridViewPjaxTrait
 
     public function pjaxEnd()
     {
-        if ($this->enabledPjax && $this->_pjaxCreated)
-        {
+        if ($this->enabledPjax && $this->_pjaxCreated) {
             $pjaxClassName = $this->pjax->className();
             $pjaxClassName::end();
         }

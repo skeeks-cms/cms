@@ -7,6 +7,7 @@
  */
 
 namespace skeeks\cms\widgets;
+
 use skeeks\cms\admin\assets\ActionFilesAsset;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\components\UrlRule;
@@ -19,7 +20,7 @@ use yii\helpers\Url;
  *
  * Class ControllerActions
  * @package skeeks\cms\modules\admin\widgets
- * @deprecated 
+ * @deprecated
  */
 class StorageFileManager extends Widget
 {
@@ -42,12 +43,10 @@ class StorageFileManager extends Widget
     {
         parent::init();
 
-        if (!$this->backendSimpleUploadUrl)
-        {
+        if (!$this->backendSimpleUploadUrl) {
             $this->backendSimpleUploadUrl = Url::to(['/cms/admin-storage-files/upload']);
         }
-        if (!$this->backendRemoteUploadUrl)
-        {
+        if (!$this->backendRemoteUploadUrl) {
             $this->backendRemoteUploadUrl = Url::to(['/cms/admin-storage-files/remote-upload']);
         }
 
@@ -78,20 +77,20 @@ class StorageFileManager extends Widget
 
         })(sx, sx.$, sx._);
 JS
-);
+        );
 
     }
 
 
     public function run()
     {
-        $str_upload = \Yii::t('skeeks/cms','Upload');
-        $str_togg_drop = \Yii::t('skeeks/cms','Toggle Dropdow');
-        $str_upl_from_comp = \Yii::t('skeeks/cms','Upload from your computer');
-        $str_remote_upl = \Yii::t('skeeks/cms','Upload by link {http}',['http' => 'http://']);
-        $str_up_f = \Yii::t('skeeks/cms','The upload file');
-        $str_up_fs = \Yii::t('skeeks/cms','The upload files');
-    return <<<HTML
+        $str_upload = \Yii::t('skeeks/cms', 'Upload');
+        $str_togg_drop = \Yii::t('skeeks/cms', 'Toggle Dropdow');
+        $str_upl_from_comp = \Yii::t('skeeks/cms', 'Upload from your computer');
+        $str_remote_upl = \Yii::t('skeeks/cms', 'Upload by link {http}', ['http' => 'http://']);
+        $str_up_f = \Yii::t('skeeks/cms', 'The upload file');
+        $str_up_fs = \Yii::t('skeeks/cms', 'The upload files');
+        return <<<HTML
     <div id="sx-file-manager-{$this->id}">
 
         <div class="sx-upload-sources">
@@ -135,8 +134,8 @@ HTML;
 
     public function getDefaultClientOptions()
     {
-        $result['simpleUpload']['options']  = $this->_getSourceSimpleUploadOptions();
-        $result['remoteUpload']             = $this->_getSourceRemoteUploadOptions();
+        $result['simpleUpload']['options'] = $this->_getSourceSimpleUploadOptions();
+        $result['remoteUpload'] = $this->_getSourceRemoteUploadOptions();
 
         return $result;
     }
@@ -145,31 +144,31 @@ HTML;
     {
         //Опции которые перетирать нельзя
         $options =
-        [
-            "url"               => $this->backendSimpleUploadUrl,
-            "name"              => "imgfile", //TODO: хардкод
-            "hoverClass"        => 'btn-hover',
-            "focusClass"        => 'active',
-            "disabledClass"     => 'disabled',
-            "responseType"      => 'json',
-            "multiple"          => true,
-        ];
+            [
+                "url" => $this->backendSimpleUploadUrl,
+                "name" => "imgfile", //TODO: хардкод
+                "hoverClass" => 'btn-hover',
+                "focusClass" => 'active',
+                "disabledClass" => 'disabled',
+                "responseType" => 'json',
+                "multiple" => true,
+            ];
 
         return $options;
     }
 
     protected function _getSourceRemoteUploadOptions()
     {
-        $options=
-        [
-            "url"               => $this->backendRemoteUploadUrl,
-            "name"              => "imgfile", //TODO: хардкод
-            "hoverClass"        => 'btn-hover',
-            "focusClass"        => 'active',
-            "disabledClass"     => 'disabled',
-            "responseType"      => 'json',
-            "multiple"          => true,
-        ];
+        $options =
+            [
+                "url" => $this->backendRemoteUploadUrl,
+                "name" => "imgfile", //TODO: хардкод
+                "hoverClass" => 'btn-hover',
+                "focusClass" => 'active',
+                "disabledClass" => 'disabled',
+                "responseType" => 'json',
+                "multiple" => true,
+            ];
 
         return $options;
     }

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m170515_203837__create_table__cms_content_property2tree extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%cms_content_property2tree}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,16 +24,16 @@ class m170515_203837__create_table__cms_content_property2tree extends Migration
         }
 
         $this->createTable("{{%cms_content_property2tree}}", [
-            'id'                        => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'cms_content_property_id'   => $this->integer()->notNull(),
-            'cms_tree_id'               => $this->integer()->notNull(),
+            'cms_content_property_id' => $this->integer()->notNull(),
+            'cms_tree_id' => $this->integer()->notNull(),
 
         ], $tableOptions);
 
@@ -44,7 +44,8 @@ class m170515_203837__create_table__cms_content_property2tree extends Migration
         $this->createIndex('cms_content_property_id', '{{%cms_content_property2tree}}', 'cms_content_property_id');
         $this->createIndex('cms_tree_id', '{{%cms_content_property2tree}}', 'cms_tree_id');
 
-        $this->createIndex('property2tree', '{{%cms_content_property2tree}}', ['cms_content_property_id', 'cms_tree_id'], true);
+        $this->createIndex('property2tree', '{{%cms_content_property2tree}}',
+            ['cms_content_property_id', 'cms_tree_id'], true);
 
         $this->addForeignKey(
             'cms_content_property2tree__created_by', "{{%cms_content_property2tree}}",

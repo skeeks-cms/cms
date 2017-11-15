@@ -8,10 +8,15 @@
  * @date 28.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms;
+
 /**
  * Class Exception
  * @package skeeks\cms
  */
 class Exception extends \yii\base\Exception
-{};
+{
+}
+
+;

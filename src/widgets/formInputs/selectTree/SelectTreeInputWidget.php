@@ -8,6 +8,7 @@
  * @date 13.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\widgets\formInputs\selectTree;
 
 use skeeks\cms\Exception;
@@ -28,11 +29,11 @@ use Yii;
  *
  *
  *  <?= $form->field($model, 'treeIds')->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
-        [
-            'multiple' => true
-        ]
-    ); ?>
+ * \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+ * [
+ * 'multiple' => true
+ * ]
+ * ); ?>
  *
  *
  * @property CmsTree[] $sections
@@ -59,13 +60,13 @@ class SelectTreeInputWidget extends InputWidget
      *
      * @var array
      */
-    public $treeWidgetOptions   = [];
-    public $treeWidgetClass     = 'skeeks\cms\widgets\tree\CmsTreeWidget';
+    public $treeWidgetOptions = [];
+    public $treeWidgetClass = 'skeeks\cms\widgets\tree\CmsTreeWidget';
 
     /**
      * @var bool
      */
-    public $multiple      = false;
+    public $multiple = false;
 
     /**
      * @var null|callable
@@ -75,14 +76,14 @@ class SelectTreeInputWidget extends InputWidget
     public function init()
     {
         $this->treeWidgetOptions = ArrayHelper::merge([
-            "models"                => [],
-            "sessionName"           => 'select-' . (int) $this->multiple,
-            "viewNodeContentFile"   => '@skeeks/cms/widgets/formInputs/selectTree/views/_tree-node',
+            "models" => [],
+            "sessionName" => 'select-' . (int)$this->multiple,
+            "viewNodeContentFile" => '@skeeks/cms/widgets/formInputs/selectTree/views/_tree-node',
 
-            'pjaxOptions'   =>
-            [
-                'enablePushState' => false,
-            ],
+            'pjaxOptions' =>
+                [
+                    'enablePushState' => false,
+                ],
 
             'contextData' => [
                 'selectTreeInputWidget' => $this
@@ -91,8 +92,8 @@ class SelectTreeInputWidget extends InputWidget
 
         $this->wrapperOptions['id'] = $this->id . "-wrapper";
 
-        $this->clientOptions['id']          = $this->id;
-        $this->clientOptions['wrapperid']   = $this->wrapperOptions['id'];
+        $this->clientOptions['id'] = $this->id;
+        $this->clientOptions['wrapperid'] = $this->wrapperOptions['id'];
 
         parent::init();
     }
@@ -104,29 +105,23 @@ class SelectTreeInputWidget extends InputWidget
     {
         $value = $this->model->{$this->attribute};
         $items = $value;
-        if ($value && is_string($value) || is_int($value))
-        {
+        if ($value && is_string($value) || is_int($value)) {
             $items = [$value => $value];
         }
 
-        if (!$items)
-        {
+        if (!$items) {
             $items = [];
         }
 
-        if (is_array($items))
-        {
+        if (is_array($items)) {
             $tmpItems = [];
-            foreach ($items as $key => $item)
-            {
-                if ($item instanceof CmsTree)
-                {
+            foreach ($items as $key => $item) {
+                if ($item instanceof CmsTree) {
                     $tmpItems[$item->id] = $item->id;
                 }
             }
 
-            if ($tmpItems)
-            {
+            if ($tmpItems) {
                 $items = $tmpItems;
             }
 
@@ -137,8 +132,8 @@ class SelectTreeInputWidget extends InputWidget
 
         $select = Html::activeListBox($this->model, $this->attribute, $items, $this->options);
 
-        $this->clientOptions['value']       = $value;
-        $this->clientOptions['multiple']    = (int) $this->multiple;
+        $this->clientOptions['value'] = $value;
+        $this->clientOptions['multiple'] = (int)$this->multiple;
         $this->registerAssets();
 
         return $this->render('select-tree-widget', [
@@ -162,8 +157,7 @@ class SelectTreeInputWidget extends InputWidget
      */
     public function getNodeName($tree)
     {
-        if ($models = ArrayHelper::getValue($this->treeWidgetOptions, 'models'))
-        {
+        if ($models = ArrayHelper::getValue($this->treeWidgetOptions, 'models')) {
             $model = $models[0];
             $rootLevel = $model->level;
 
@@ -171,30 +165,25 @@ class SelectTreeInputWidget extends InputWidget
              * @var \skeeks\cms\models\CmsTree $tree
              */
             $name = $tree->name;
-            if ($tree->parents)
-            {
+            if ($tree->parents) {
                 $parents = $tree->getParents()->andWhere(['>=', 'level', $rootLevel])->all();
-                if ($parents)
-                {
+                if ($parents) {
                     $name = implode(" / ", \yii\helpers\ArrayHelper::map($parents, 'id', 'name'));
                     $name .= " / " . $tree->name;
                 }
             }
 
             return $name;
-        } else
-        {
+        } else {
             $rootLevel = 0;
 
             /**
              * @var \skeeks\cms\models\CmsTree $tree
              */
             $name = $tree->name;
-            if ($tree->parents)
-            {
+            if ($tree->parents) {
                 $parents = $tree->getParents()->andWhere(['>=', 'level', $rootLevel])->all();
-                if ($parents)
-                {
+                if ($parents) {
                     $name = implode(" / ", \yii\helpers\ArrayHelper::map($parents, 'id', 'name'));
                     $name .= " / " . $tree->name;
                 }
@@ -214,30 +203,26 @@ class SelectTreeInputWidget extends InputWidget
     public function renderNodeControll($model)
     {
         $disabled = false;
-        if ($this->isAllowNodeSelectCallback && is_callable($this->isAllowNodeSelectCallback))
-        {
+        if ($this->isAllowNodeSelectCallback && is_callable($this->isAllowNodeSelectCallback)) {
             $function = $this->isAllowNodeSelectCallback;
-            if (!$function($model))
-            {
+            if (!$function($model)) {
                 $disabled = "disabled";
             }
         }
 
-        if ($this->multiple)
-        {
+        if ($this->multiple) {
             $controllElement = Html::checkbox($this->id . '-checkbox', false, [
-                'value'     => $model->id,
-                'class'     => 'sx-checkbox',
-                'disabled'  => $disabled,
-                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'value' => $model->id,
+                'class' => 'sx-checkbox',
+                'disabled' => $disabled,
+                'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
             ]);
-        } else
-        {
+        } else {
             $controllElement = Html::radio($this->id . '-radio', false, [
-                'value'     => $model->id,
-                'class'     => 'sx-radio',
-                'disabled'  => $disabled,
-                'style'     => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'value' => $model->id,
+                'class' => 'sx-radio',
+                'disabled' => $disabled,
+                'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
             ]);
         }
 
@@ -253,17 +238,14 @@ class SelectTreeInputWidget extends InputWidget
     {
         $result = $model->name;
         $additionalName = '';
-        if ($model->level == 0)
-        {
+        if ($model->level == 0) {
             $site = \skeeks\cms\models\CmsSite::findOne(['id' => $model->cms_site_id]);
-            if ($site)
-            {
+            if ($site) {
                 $additionalName = $site->name;
             }
         }
 
-        if ($additionalName)
-        {
+        if ($additionalName) {
             $result .= " [{$additionalName}]";
         }
 
@@ -276,30 +258,24 @@ class SelectTreeInputWidget extends InputWidget
     public function getSections()
     {
         $value = $this->model->{$this->attribute};
-        if (!$value)
-        {
+        if (!$value) {
             return [];
         }
 
         $items = $value;
-        if (is_string($value) || is_int($value))
-        {
+        if (is_string($value) || is_int($value)) {
             $items = [$value => $value];
         }
 
-        if (is_array($items))
-        {
+        if (is_array($items)) {
             $tmpItems = [];
-            foreach ($items as $key => $item)
-            {
-                if ($item instanceof CmsTree)
-                {
+            foreach ($items as $key => $item) {
+                if ($item instanceof CmsTree) {
                     $tmpItems[$item->id] = $item->id;
                 }
             }
 
-            if ($tmpItems)
-            {
+            if ($tmpItems) {
                 $items = $tmpItems;
             }
 

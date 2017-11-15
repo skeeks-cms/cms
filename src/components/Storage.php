@@ -16,4 +16,5 @@ namespace skeeks\cms\components;
  * @package skeeks\cms\components
  */
 class Storage extends storage\Storage
-{}
+{
+}

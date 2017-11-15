@@ -9,8 +9,8 @@
 /* @var $widget \skeeks\cms\widgets\formInputs\componentSettings\ComponentSettingsWidget */
 /* @var $element string */
 
-$options        = $widget->clientOptions;
-$clientOptions  = \yii\helpers\Json::encode($options);
+$options = $widget->clientOptions;
+$clientOptions = \yii\helpers\Json::encode($options);
 ?>
 <div id="<?= $widget->id; ?>">
     <div class="sx-select-controll">

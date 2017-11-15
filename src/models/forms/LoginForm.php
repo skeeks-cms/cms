@@ -50,12 +50,10 @@ class LoginForm extends Model
      */
     public function validatePassword($attribute, $params)
     {
-        if (!$this->hasErrors())
-        {
+        if (!$this->hasErrors()) {
             $user = $this->getUser();
-            if (!$user || !$user->validatePassword($this->password))
-            {
-                $this->addError($attribute, \Yii::t('skeeks/cms','Incorrect username or password.'));
+            if (!$user || !$user->validatePassword($this->password)) {
+                $this->addError($attribute, \Yii::t('skeeks/cms', 'Incorrect username or password.'));
             }
         }
     }
@@ -67,11 +65,9 @@ class LoginForm extends Model
      */
     public function login()
     {
-        if ($this->validate())
-        {
+        if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
-        } else
-        {
+        } else {
             return false;
         }
     }
@@ -83,8 +79,7 @@ class LoginForm extends Model
      */
     public function getUser()
     {
-        if ($this->_user === false)
-        {
+        if ($this->_user === false) {
             $this->_user = User::findByUsername($this->username);
         }
 

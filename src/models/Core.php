@@ -8,6 +8,7 @@
  * @date 31.10.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\HasTableCache;
@@ -42,34 +43,31 @@ abstract class Core extends ActiveRecord
     {
         return array_merge(parent::behaviors(), [
             BlameableBehavior::className() =>
-            [
-                'class' => BlameableBehavior::className(),
-                'value' => function($event)
-                {
-                    if (\Yii::$app instanceof \yii\console\Application)
-                    {
-                        return null;
-                    } else
-                    {
-                        $user = Yii::$app->get('user', false);
-                        return $user && !$user->isGuest ? $user->id : null;
-                    }
-                },
-            ],
+                [
+                    'class' => BlameableBehavior::className(),
+                    'value' => function ($event) {
+                        if (\Yii::$app instanceof \yii\console\Application) {
+                            return null;
+                        } else {
+                            $user = Yii::$app->get('user', false);
+                            return $user && !$user->isGuest ? $user->id : null;
+                        }
+                    },
+                ],
             TimestampBehavior::className() =>
-            [
-                'class' => TimestampBehavior::className(),
-                /*'value' => function()
-                {
-                    return date('U');
-                },*/
-            ],
+                [
+                    'class' => TimestampBehavior::className(),
+                    /*'value' => function()
+                    {
+                        return date('U');
+                    },*/
+                ],
 
             HasTableCache::className() =>
-            [
-                'class' => HasTableCache::className(),
-                'cache' => \Yii::$app->cache
-            ]
+                [
+                    'class' => HasTableCache::className(),
+                    'cache' => \Yii::$app->cache
+                ]
         ]);
     }
 
@@ -88,6 +86,7 @@ abstract class Core extends ActiveRecord
     {
         return $this->hasOne(\Yii::$app->user->identityClass, ['id' => 'created_by']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -102,7 +101,7 @@ abstract class Core extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id'         => Yii::t('skeeks/cms', 'ID'),
+            'id' => Yii::t('skeeks/cms', 'ID'),
             'created_by' => Yii::t('skeeks/cms', 'Created By'),
             'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
             'created_at' => Yii::t('skeeks/cms', 'Created At'),

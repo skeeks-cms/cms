@@ -60,9 +60,9 @@ class CmsContentType extends Core
 
     public function _actionBeforeDelete($e)
     {
-        if ($this->cmsContents)
-        {
-            throw new Exception(\Yii::t('skeeks/cms', "Before you delete this type of content you want to delete the contents invested in it"));
+        if ($this->cmsContents) {
+            throw new Exception(\Yii::t('skeeks/cms',
+                "Before you delete this type of content you want to delete the contents invested in it"));
         }
     }
 
@@ -94,14 +94,20 @@ class CmsContentType extends Core
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 32],
             [['code'], 'unique'],
-            ['code', 'default', 'value' => function($model, $attribute)
-            {
-                return "sx_auto_" . md5(rand(1, 10) . time());
-            }],
-            ['priority', 'default', 'value' => function($model, $attribute)
-            {
-                return 500;
-            }],
+            [
+                'code',
+                'default',
+                'value' => function ($model, $attribute) {
+                    return "sx_auto_" . md5(rand(1, 10) . time());
+                }
+            ],
+            [
+                'priority',
+                'default',
+                'value' => function ($model, $attribute) {
+                    return 500;
+                }
+            ],
         ]);
     }
 
@@ -110,7 +116,8 @@ class CmsContentType extends Core
      */
     public function getCmsContents()
     {
-        return $this->hasMany(CmsContent::className(), ['content_type' => 'code'])->orderBy("priority ASC")->andWhere(['active' => Cms::BOOL_Y]);
+        return $this->hasMany(CmsContent::className(),
+            ['content_type' => 'code'])->orderBy("priority ASC")->andWhere(['active' => Cms::BOOL_Y]);
     }
 
 }

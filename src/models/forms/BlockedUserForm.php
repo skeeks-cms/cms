@@ -43,12 +43,10 @@ class BlockedUserForm extends Model
      */
     public function validatePassword($attribute, $params)
     {
-        if (!$this->hasErrors())
-        {
+        if (!$this->hasErrors()) {
             $user = $this->getUser();
-            if (!$user || !$user->validatePassword($this->password))
-            {
-                $this->addError($attribute, \Yii::t('skeeks/cms','Incorrect password.'));
+            if (!$user || !$user->validatePassword($this->password)) {
+                $this->addError($attribute, \Yii::t('skeeks/cms', 'Incorrect password.'));
             }
         }
     }
@@ -60,12 +58,10 @@ class BlockedUserForm extends Model
      */
     public function login()
     {
-        if ($this->validate())
-        {
+        if ($this->validate()) {
             $this->getUser()->updateLastAdminActivity();
             return true;
-        } else
-        {
+        } else {
             return false;
         }
     }
@@ -77,8 +73,7 @@ class BlockedUserForm extends Model
      */
     public function getUser()
     {
-        if ($this->_user === false)
-        {
+        if ($this->_user === false) {
             $this->_user = \Yii::$app->user->identity;
         }
 

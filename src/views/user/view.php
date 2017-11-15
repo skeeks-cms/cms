@@ -1,7 +1,9 @@
 <?php
+
 use yii\helpers\Html;
 
 use yii\widgets\ActiveForm;
+
 /**
  * index
  *
@@ -24,28 +26,28 @@ $this->title = $model->getDisplayName();
 <div class="row">
 
     <aside id="sidebar-right" class="col-md-3">
-		<div id="column-right" class="hidden-xs sidebar">
+        <div id="column-right" class="hidden-xs sidebar">
             <h1 class="heading_title"><span><?= $model->getDisplayName(); ?></span></h1>
         </div>
     </aside>
 
-   <section id="sidebar-main" class="col-md-6">
+    <section id="sidebar-main" class="col-md-6">
 
         <div id="content">
             <h1 class="heading_title"><span><?= $model->name; ?></span></h1>
-                <div class="category-info clearfix">
-                    <div class="category-description wrapper">
+            <div class="category-info clearfix">
+                <div class="category-description wrapper">
 
-                    </div>
                 </div>
+            </div>
 
         </div>
-   </section>
+    </section>
 
 </div>
- <!--
-  $ospans: allow overrides width of columns base on thiers indexs. format array( column-index=>span number ), example array( 1=> 3 )[value from 1->12]
- -->
+<!--
+ $ospans: allow overrides width of columns base on thiers indexs. format array( column-index=>span number ), example array( 1=> 3 )[value from 1->12]
+-->
 
 
 

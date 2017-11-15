@@ -24,8 +24,8 @@ use yii\helpers\Json;
  */
 class SignupForm extends Model
 {
-    const SCENARION_FULLINFO    = 'fullInfo';
-    const SCENARION_ONLYEMAIL   = 'onlyEmail';
+    const SCENARION_FULLINFO = 'fullInfo';
+    const SCENARION_ONLYEMAIL = 'onlyEmail';
 
     public $username;
     public $email;
@@ -37,9 +37,9 @@ class SignupForm extends Model
     public function attributeLabels()
     {
         return [
-            'username'      => \Yii::t('skeeks/cms','Login'),
-            'email'         => \Yii::t('skeeks/cms','Email'),
-            'password'      => \Yii::t('skeeks/cms','Password'),
+            'username' => \Yii::t('skeeks/cms', 'Login'),
+            'email' => \Yii::t('skeeks/cms', 'Email'),
+            'password' => \Yii::t('skeeks/cms', 'Password'),
         ];
     }
 
@@ -48,7 +48,9 @@ class SignupForm extends Model
         $scenarions = parent::scenarios();
 
         $scenarions[self::SCENARION_FULLINFO] = [
-            'username', 'email', 'password'
+            'username',
+            'email',
+            'password'
         ];
 
         $scenarions[self::SCENARION_ONLYEMAIL] = [
@@ -66,13 +68,23 @@ class SignupForm extends Model
         return [
             ['username', 'filter', 'filter' => 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('skeeks/cms','This login is already in use by another user.')],
+            [
+                'username',
+                'unique',
+                'targetClass' => \Yii::$app->user->identityClass,
+                'message' => \Yii::t('skeeks/cms', 'This login is already in use by another user.')
+            ],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'unique', 'targetClass' => \Yii::$app->user->identityClass, 'message' => \Yii::t('skeeks/cms', 'This Email is already in use by another user')],
+            [
+                'email',
+                'unique',
+                'targetClass' => \Yii::$app->user->identityClass,
+                'message' => \Yii::t('skeeks/cms', 'This Email is already in use by another user')
+            ],
 
             //[['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value'],
 
@@ -88,57 +100,56 @@ class SignupForm extends Model
      */
     public function signup()
     {
-        if ($this->validate())
-        {
+        if ($this->validate()) {
             /**
              * @var User $user
              */
-            $userClassName          = \Yii::$app->user->identityClass;
-            $user                   = new $userClassName();
+            $userClassName = \Yii::$app->user->identityClass;
+            $user = new $userClassName();
 
-            if ($this->scenario == self::SCENARION_FULLINFO)
-            {
-                $user->username         = $this->username;
-                $user->email            = $this->email;
+            if ($this->scenario == self::SCENARION_FULLINFO) {
+                $user->username = $this->username;
+                $user->email = $this->email;
                 $user->setPassword($this->password);
                 $user->generateAuthKey();
                 $user->save();
 
                 return $user;
 
-            } else if ($this->scenario == self::SCENARION_ONLYEMAIL)
-            {
+            } else {
+                if ($this->scenario == self::SCENARION_ONLYEMAIL) {
 
-                $password               = \Yii::$app->security->generateRandomString(6);
+                    $password = \Yii::$app->security->generateRandomString(6);
 
-                $user->generateUsername();
-                $user->setPassword($password);
-                $user->email            = $this->email;
-                $user->generateAuthKey();
+                    $user->generateUsername();
+                    $user->setPassword($password);
+                    $user->email = $this->email;
+                    $user->generateAuthKey();
 
-                if ($user->save())
-                {
-                    \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
-                        '@app/mail' =>
-                        [
-                            '@skeeks/cms/mail-templates'
-                        ]
-                    ]);
+                    if ($user->save()) {
+                        \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap,
+                            [
+                                '@app/mail' =>
+                                    [
+                                        '@skeeks/cms/mail-templates'
+                                    ]
+                            ]);
 
-                    \Yii::$app->mailer->compose('@app/mail/register-by-email', [
-                        'user'      => $user,
-                        'password'  => $password
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                        ->setTo($user->email)
-                        ->setSubject(\Yii::t('skeeks/cms','Sign up at site') . \Yii::$app->cms->appName)
-                        ->send();
+                        \Yii::$app->mailer->compose('@app/mail/register-by-email', [
+                            'user' => $user,
+                            'password' => $password
+                        ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                            ->setTo($user->email)
+                            ->setSubject(\Yii::t('skeeks/cms', 'Sign up at site') . \Yii::$app->cms->appName)
+                            ->send();
 
-                    return $user;
-                } else
-                {
-                    \Yii::error("User rgister by email error: {$user->username} " . Json::encode($user->getFirstErrors()), 'RegisterError');
-                    return null;
+                        return $user;
+                    } else {
+                        \Yii::error("User rgister by email error: {$user->username} " . Json::encode($user->getFirstErrors()),
+                            'RegisterError');
+                        return null;
+                    }
                 }
             }
 
@@ -157,25 +168,25 @@ class SignupForm extends Model
     {
         /* @var $user User */
 
-        if ($user = User::findByEmail($this->email))
-        {
+        if ($user = User::findByEmail($this->email)) {
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();
             }
 
             if ($user->save()) {
 
-                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
-                    '@app/mail' =>
+                \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap,
                     [
-                        '@skeeks/cms/mail'
-                    ]
-                ]);
+                        '@app/mail' =>
+                            [
+                                '@skeeks/cms/mail'
+                            ]
+                    ]);
 
                 return \Yii::$app->mailer->compose('@app/mail/password-reset-token', ['user' => $user])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
                     ->setTo($this->email)
-                    ->setSubject(\Yii::t('skeeks/cms','Password reset for ') . \Yii::$app->cms->appName)
+                    ->setSubject(\Yii::t('skeeks/cms', 'Password reset for ') . \Yii::$app->cms->appName)
                     ->send();
             }
         }

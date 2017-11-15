@@ -8,6 +8,7 @@
  * @date 26.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\grid;
 
 use yii\grid\DataColumn;
@@ -18,7 +19,8 @@ use yii\grid\DataColumn;
  */
 class FileSizeColumnData extends DataColumn
 {
-    public $filter      = false;
+    public $filter = false;
+
     /**
      * @inheritdoc
      */

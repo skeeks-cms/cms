@@ -16,29 +16,29 @@ $widget = $this->context;
     "title" => ""
 ]); ?>
 
-    <div class="row">
-        <? if ($model->children) : ?>
-            <div class="sx-node-open-close">
-                <? if ($widget->isOpenNode($model)) : ?>
-                    <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-minus" title="<?= \Yii::t('skeeks/cms',"Minimize"); ?>"></span>
-                    </a>
-                <? else : ?>
-                    <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-plus" title="<?= \Yii::t('skeeks/cms',"Restore"); ?>"></span>
-                    </a>
-                <? endif; ?>
-            </div>
-        <? endif; ?>
+<div class="row">
+    <? if ($model->children) : ?>
+        <div class="sx-node-open-close">
+            <? if ($widget->isOpenNode($model)) : ?>
+                <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
+                    <span class="glyphicon glyphicon-minus" title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"></span>
+                </a>
+            <? else : ?>
+                <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
+                    <span class="glyphicon glyphicon-plus" title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"></span>
+                </a>
+            <? endif; ?>
+        </div>
+    <? endif; ?>
 
-        <?= $widget->renderNodeContent($model); ?>
+    <?= $widget->renderNodeContent($model); ?>
 
-    </div>
+</div>
 
-    <!-- Construction of child elements -->
-    <? if ($widget->isOpenNode($model) && $model->children) : ?>
-        <?= $widget->renderNodes($model->children); ?>
-    <? endif;  ?>
+<!-- Construction of child elements -->
+<? if ($widget->isOpenNode($model) && $model->children) : ?>
+    <?= $widget->renderNodes($model->children); ?>
+<? endif; ?>
 
 <?= \yii\helpers\Html::endTag('li'); ?>
 

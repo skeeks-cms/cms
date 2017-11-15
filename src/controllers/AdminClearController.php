@@ -8,7 +8,9 @@
  * @date 08.11.2014
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
+
 use skeeks\cms\admin\AdminController;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\RequestResponse;
@@ -29,21 +31,21 @@ class AdminClearController extends AdminController
 {
     public function init()
     {
-        $this->name = \Yii::t('skeeks/cms',"Deleting temporary files");
+        $this->name = \Yii::t('skeeks/cms', "Deleting temporary files");
         parent::init();
     }
 
     public function actions()
     {
         return
-        [
-            "index" =>
             [
-                "class"        => BackendAction::className(),
-                "name"         => \Yii::t('skeeks/cms', 'Clearing temporary data'),
-                "callback"     => [$this, 'actionIndex'],
-            ],
-        ];
+                "index" =>
+                    [
+                        "class" => BackendAction::className(),
+                        "name" => \Yii::t('skeeks/cms', 'Clearing temporary data'),
+                        "callback" => [$this, 'actionIndex'],
+                    ],
+            ];
     }
 
     public function actionIndex()
@@ -52,42 +54,36 @@ class AdminClearController extends AdminController
 
         $clearDirs = [];
 
-        if ($paths)
-        {
-            foreach ($paths as $path)
-            {
+        if ($paths) {
+            foreach ($paths as $path) {
                 $clearDirs[] = [
-                    'label'         => 'Корневая временная дирриктория',
-                    'dir'           => new Dir(\Yii::getAlias($path), false)
+                    'label' => 'Корневая временная дирриктория',
+                    'dir' => new Dir(\Yii::getAlias($path), false)
                 ];
 
                 $clearDirs[] = [
-                    'label'         => 'Логи',
-                    'dir'           => new Dir(\Yii::getAlias($path . "/logs"), false)
+                    'label' => 'Логи',
+                    'dir' => new Dir(\Yii::getAlias($path . "/logs"), false)
                 ];
 
                 $clearDirs[] = [
-                    'label'         => 'Кэш',
-                    'dir'           => new Dir(\Yii::getAlias($path . "/cache"), false)
+                    'label' => 'Кэш',
+                    'dir' => new Dir(\Yii::getAlias($path . "/cache"), false)
                 ];
 
                 $clearDirs[] = [
-                    'label'         => 'Дебаг',
-                    'dir'           => new Dir(\Yii::getAlias($path . "/debug"), false)
+                    'label' => 'Дебаг',
+                    'dir' => new Dir(\Yii::getAlias($path . "/debug"), false)
                 ];
             }
         }
 
         $rr = new RequestResponse();
-        if ($rr->isRequestAjaxPost())
-        {
-            foreach ($clearDirs as $data)
-            {
+        if ($rr->isRequestAjaxPost()) {
+            foreach ($clearDirs as $data) {
                 $dir = ArrayHelper::getValue($data, 'dir');
-                if ($dir instanceof Dir)
-                {
-                    if ($dir->isExist())
-                    {
+                if ($dir instanceof Dir) {
+                    if ($dir->isExist()) {
                         $dir->clear();
                     }
                 }
@@ -97,12 +93,12 @@ class AdminClearController extends AdminController
             \Yii::$app->cache->flush();
 
             $rr->success = true;
-            $rr->message = \Yii::t('skeeks/cms','Cache cleared');
+            $rr->message = \Yii::t('skeeks/cms', 'Cache cleared');
             return $rr;
         }
 
         return $this->render('index', [
-            'clearDirs'     => $clearDirs,
+            'clearDirs' => $clearDirs,
         ]);
     }
 

@@ -11,39 +11,39 @@ use common\models\User;
 
 
 <?php $form = ActiveForm::begin(); ?>
-<?php  ?>
+<?php ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms','General information'))?>
-    <?= $form->field($model, 'name')->textInput(); ?>
-    <?= $form->field($model, 'code')->textInput(); ?>
-    <?= $form->fieldInputInt($model, 'priority')->textInput(); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'General information')) ?>
+<?= $form->field($model, 'name')->textInput(); ?>
+<?= $form->field($model, 'code')->textInput(); ?>
+<?= $form->fieldInputInt($model, 'priority')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms','Content'))?>
-    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => \Yii::t('skeeks/cms',"Content"),
-        'hint'              => "",
-        'parentModel'       => $model,
-        'relation'          => [
-            'content_type' => 'code'
-        ],
-        'controllerRoute'   => '/cms/admin-cms-content',
-        'gridViewOptions'   => [
-            'sortable' => true,
-            'columns' => [
-                //['class' => 'yii\grid\SerialColumn'],
-                'name',
-                'code',
-                [
-                    'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                    'falseValue' => \skeeks\cms\components\Cms::BOOL_N,
-                    'trueValue' => \skeeks\cms\components\Cms::BOOL_Y,
-                    'attribute' => 'active'
-                ],
+<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Content')) ?>
+<?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+    'label' => \Yii::t('skeeks/cms', "Content"),
+    'hint' => "",
+    'parentModel' => $model,
+    'relation' => [
+        'content_type' => 'code'
+    ],
+    'controllerRoute' => '/cms/admin-cms-content',
+    'gridViewOptions' => [
+        'sortable' => true,
+        'columns' => [
+            //['class' => 'yii\grid\SerialColumn'],
+            'name',
+            'code',
+            [
+                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'falseValue' => \skeeks\cms\components\Cms::BOOL_N,
+                'trueValue' => \skeeks\cms\components\Cms::BOOL_Y,
+                'attribute' => 'active'
             ],
         ],
-    ]); ?>
+    ],
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

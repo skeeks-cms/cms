@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 24.05.2015
  */
+
 namespace skeeks\cms\components\urlRules;
+
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
@@ -22,8 +24,7 @@ class UrlRuleContentElement
 
     public function init()
     {
-        if ($this->name === null)
-        {
+        if ($this->name === null) {
             $this->name = __CLASS__;
         }
     }
@@ -38,27 +39,23 @@ class UrlRuleContentElement
      */
     public function createUrl($manager, $route, $params)
     {
-        if ($route == 'cms/content-element/view')
-        {
+        if ($route == 'cms/content-element/view') {
             $contentElement = $this->_getElement($params);
 
-            if (!$contentElement)
-            {
+            if (!$contentElement) {
                 return false;
             }
 
             $url = '';
 
-            $cmsTree                = ArrayHelper::getValue($params, 'cmsTree');
+            $cmsTree = ArrayHelper::getValue($params, 'cmsTree');
             ArrayHelper::remove($params, 'cmsTree');
             //We need to build on what that particular section of the settings
-            if (!$cmsTree)
-            {
+            if (!$cmsTree) {
                 $cmsTree = $contentElement->cmsTree;
             }
 
-            if ($cmsTree)
-            {
+            if ($cmsTree) {
                 $url = $cmsTree->dir . "/";
             }
 
@@ -85,11 +82,9 @@ class UrlRuleContentElement
             }
 
             //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
-            if ($cmsTree && $cmsTree->site)
-            {
+            if ($cmsTree && $cmsTree->site) {
                 //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
-                if ($cmsTree->site->server_name)
-                {
+                if ($cmsTree->site->server_name) {
                     return $cmsTree->site->url . '/' . $url;
                 }
             }
@@ -107,26 +102,22 @@ class UrlRuleContentElement
      */
     protected function _getElement(&$params)
     {
-        $id                     = (int) ArrayHelper::getValue($params, 'id');
-        $contentElement         = ArrayHelper::getValue($params, 'model');
+        $id = (int)ArrayHelper::getValue($params, 'id');
+        $contentElement = ArrayHelper::getValue($params, 'model');
 
-        if (!$id && !$contentElement)
-        {
+        if (!$id && !$contentElement) {
             return false;
         }
 
-        if ($contentElement && $contentElement instanceof CmsContentElement)
-        {
+        if ($contentElement && $contentElement instanceof CmsContentElement) {
             self::$models[$contentElement->id] = $contentElement;
-        } else
-        {
+        } else {
             /**
              * @var $contentElement CmsContentElement
              */
-            if (!$contentElement = ArrayHelper::getValue(self::$models, $id))
-            {
-                $contentElement     = CmsContentElement::findOne(['id' => $id]);
-                self::$models[$id]  = $contentElement;
+            if (!$contentElement = ArrayHelper::getValue(self::$models, $id)) {
+                $contentElement = CmsContentElement::findOne(['id' => $id]);
+                self::$models[$id] = $contentElement;
             }
         }
 
@@ -152,31 +143,32 @@ class UrlRuleContentElement
             return false;
         }
 
-        $pathInfo           = $request->getPathInfo();
+        $pathInfo = $request->getPathInfo();
         if ($this->host !== null) {
             $pathInfo = strtolower($request->getHostInfo()) . ($pathInfo === '' ? '' : '/' . $pathInfo);
         }
 
 
-        $params             = $request->getQueryParams();
-        $suffix             = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
-        $treeNode           = null;
+        $params = $request->getQueryParams();
+        $suffix = (string)($this->suffix === null ? $manager->suffix : $this->suffix);
+        $treeNode = null;
 
-        if (!$pathInfo)
-        {
+        if (!$pathInfo) {
             return false;
         }
 
-        if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches))
-        {
+        if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
             return false;
         }
 
 
-        return ['cms/content-element/view', [
-            'id'    => $matches['id'],
-            'code'  => $matches['code']
-        ]];
+        return [
+            'cms/content-element/view',
+            [
+                'id' => $matches['id'],
+                'code' => $matches['code']
+            ]
+        ];
     }
 
 

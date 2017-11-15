@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\propertyTypes;
+
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
@@ -20,15 +22,14 @@ use yii\widgets\ActiveForm;
  */
 class PropertyTypeRange extends PropertyType
 {
-    public $code             = self::CODE_RANGE;
-    public $name             = "";
+    public $code = self::CODE_RANGE;
+    public $name = "";
 
     public function init()
     {
         parent::init();
 
-        if(!$this->name)
-        {
+        if (!$this->name) {
             $this->name = \Yii::t('skeeks/cms', 'Range');
         }
     }
@@ -36,15 +37,15 @@ class PropertyTypeRange extends PropertyType
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-        ]);
+            [
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-        ]);
+            [
+            ]);
     }
 
     /**
@@ -61,20 +62,16 @@ class PropertyTypeRange extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        if (in_array($this->fieldElement, array_keys(self::fieldElements())))
-        {
+        if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
 
-            if ($fieldElement == 'radioList' || $fieldElement == 'listbox')
-            {
+            if ($fieldElement == 'radioList' || $fieldElement == 'listbox') {
                 $field->{$fieldElement}(\Yii::$app->formatter->booleanFormat);
-            } else
-            {
+            } else {
                 $field->{$fieldElement}();
             }
 
-        } else
-        {
+        } else {
             $field->textInput([]);
         }
 
@@ -103,7 +100,7 @@ class PropertyTypeRange extends PropertyType
     public function getStringValue()
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
-        return (string) \Yii::$app->formatter->asBoolean($value);
+        return (string)\Yii::$app->formatter->asBoolean($value);
     }
 
 }

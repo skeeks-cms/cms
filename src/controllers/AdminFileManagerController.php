@@ -8,6 +8,7 @@
  * @date 06.02.2015
  * @since 1.0.0
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -26,9 +27,8 @@ class AdminFileManagerController extends AdminController
 {
     public function init()
     {
-        if (!$this->name)
-        {
-            $this->name                   = "Файловый менеджер";
+        if (!$this->name) {
+            $this->name = "Файловый менеджер";
         }
 
         parent::init();

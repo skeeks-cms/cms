@@ -10,13 +10,12 @@
 /* @var $this       yii\web\View */
 /* @var $model      \yii\db\ActiveRecord */
 
-if (!$widget->viewItemTemplate)
-{
+if (!$widget->viewItemTemplate) {
     $controller = \Yii::$app->createController('cms/admin-storage-files')[0];
 }
 ?>
 <?
-    $this->registerCss(<<<CSS
+$this->registerCss(<<<CSS
 .sx-fromWidget-storageImages
 {}
 
@@ -84,20 +83,21 @@ JS
     <? \skeeks\cms\modules\admin\widgets\Pjax::begin([
         'id' => 'pjax-storage-images-widget-' . $widget->id,
         'blockPjaxContainer' => true,
-    ]);?>
+    ]); ?>
 
 
     <div class="sx-group-images">
         <div class="row col-md-12">
             <? if ($files = $widget->files) : ?>
                 <? foreach ($files as $imageFile) : ?>
-                    <? if ( $imageFile instanceof \skeeks\cms\models\StorageFile) : ?>
+                    <? if ($imageFile instanceof \skeeks\cms\models\StorageFile) : ?>
                         <div class="sx-image">
                             <? if (!$widget->viewItemTemplate) : ?>
 
                                 <? if ($imageFile->isImage()) : ?>
                                     <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
-                                        <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>" />
+                                        <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src,
+                                            new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
                                     </a>
                                 <? else : ?>
                                     <?= $imageFile->name ? $imageFile->name : $imageFile->original_name; ?>
@@ -105,23 +105,21 @@ JS
 
                                 <div class="sx-controlls">
                                     <?
-                                        try
-                                        {
-                                            $controllerTmp = clone $controller;
-                                            $controllerTmp->setModel($imageFile);
+                                    try {
+                                        $controllerTmp = clone $controller;
+                                        $controllerTmp->setModel($imageFile);
 
-                                            echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-                                                "actions"               => $controllerTmp->modelActions,
-                                                "isOpenNewWindow"       => true,
-                                                "clientOptions"         =>
+                                        echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                                            "actions" => $controllerTmp->modelActions,
+                                            "isOpenNewWindow" => true,
+                                            "clientOptions" =>
                                                 [
                                                     'pjax-id' => 'pjax-storage-images-widget-' . $widget->id
                                                 ],
-                                            ]);
-                                        } catch (\Exception $e)
-                                        {
-                                            echo $e->getMessage();
-                                        }
+                                        ]);
+                                    } catch (\Exception $e) {
+                                        echo $e->getMessage();
+                                    }
                                     ?>
                                 </div>
                             <? else : ?>
@@ -138,17 +136,17 @@ JS
 
     <div class="sx-controlls">
         <?= \skeeks\cms\widgets\StorageFileManager::widget(\yii\helpers\ArrayHelper::merge([
-            'clientOptions'     =>
-            [
-                'simpleUpload' =>
+            'clientOptions' =>
                 [
-                    'options' =>
-                    [
-                        'multiple' => true
-                    ]
-                ],
+                    'simpleUpload' =>
+                        [
+                            'options' =>
+                                [
+                                    'multiple' => true
+                                ]
+                        ],
 
-                'completeUploadFile' => new \yii\web\JsExpression(<<<JS
+                    'completeUploadFile' => new \yii\web\JsExpression(<<<JS
                 function(data)
                 {
                     var result = data.response;
@@ -165,8 +163,8 @@ JS
                     $.pjax.reload('#pjax-storage-images-widget-{$widget->id}', {});
                 }
 JS
-)
-            ],
+                    )
+                ],
         ], $widget->controllWidgetOptions)); ?>
     </div>
 </div>

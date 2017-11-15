@@ -32,57 +32,57 @@ class TreeMenuCmsWidget extends WidgetRenderable
      * Родительский раздел дерева
      * @var null
      */
-    public $treePid                     = null;
+    public $treePid = null;
 
     /**
      * Выбор только активных пунктов
      * @var string
      */
-    public $active                      = Cms::BOOL_Y;
+    public $active = Cms::BOOL_Y;
 
     /**
      * Добавить условие уровня раздела
      * @var null
      */
-    public $level                       = null;
+    public $level = null;
 
     /**
      * Название
      * @var null
      */
-    public $label                       = null;
+    public $label = null;
 
     /**
      * Условие выборки по сайтам
      * @var array
      */
-    public $site_codes                  = [];
+    public $site_codes = [];
 
     /**
      * Сортировка по умолчанию
      * @var string
      */
-    public $orderBy                     = "priority";
-    public $order                       = SORT_ASC;
+    public $orderBy = "priority";
+    public $order = SORT_ASC;
 
     /**
      * Добавить условие выборки разделов, только текущего сайта
      * @var string
      */
-    public $enabledCurrentSite          = Cms::BOOL_Y;
+    public $enabledCurrentSite = Cms::BOOL_Y;
 
     /**
      * Включить выключить кэш
      * @var string
      */
-    public $enabledRunCache             = Cms::BOOL_Y;
-    public $runCacheDuration            = 0;
+    public $enabledRunCache = Cms::BOOL_Y;
+    public $runCacheDuration = 0;
 
     /**
      * Типы разделов
      * @var array
      */
-    public $tree_type_ids               = [];
+    public $tree_type_ids = [];
 
     /**
      * Дополнительный activeQueryCallback
@@ -114,47 +114,49 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'treePid'               => \Yii::t('skeeks/cms', 'The parent section'),
-            'active'                => \Yii::t('skeeks/cms', 'Activity'),
-            'level'                 => \Yii::t('skeeks/cms', 'The nesting level'),
-            'label'                 => \Yii::t('skeeks/cms', 'Header'),
-            'site_codes'            => \Yii::t('skeeks/cms', 'Linking to sites'),
-            'orderBy'               => \Yii::t('skeeks/cms', 'Sorting'),
-            'order'                 => \Yii::t('skeeks/cms', 'Sorting direction'),
-            'enabledCurrentSite'    => \Yii::t('skeeks/cms', 'Consider the current site'),
-            'enabledRunCache'       => \Yii::t('skeeks/cms', 'Enable caching'),
-            'runCacheDuration'      => \Yii::t('skeeks/cms', 'Cache lifetime'),
-            'tree_type_ids'         => \Yii::t('skeeks/cms', 'Section types'),
-        ]);
+            [
+                'treePid' => \Yii::t('skeeks/cms', 'The parent section'),
+                'active' => \Yii::t('skeeks/cms', 'Activity'),
+                'level' => \Yii::t('skeeks/cms', 'The nesting level'),
+                'label' => \Yii::t('skeeks/cms', 'Header'),
+                'site_codes' => \Yii::t('skeeks/cms', 'Linking to sites'),
+                'orderBy' => \Yii::t('skeeks/cms', 'Sorting'),
+                'order' => \Yii::t('skeeks/cms', 'Sorting direction'),
+                'enabledCurrentSite' => \Yii::t('skeeks/cms', 'Consider the current site'),
+                'enabledRunCache' => \Yii::t('skeeks/cms', 'Enable caching'),
+                'runCacheDuration' => \Yii::t('skeeks/cms', 'Cache lifetime'),
+                'tree_type_ids' => \Yii::t('skeeks/cms', 'Section types'),
+            ]);
     }
 
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(),
-        [
-            'enabledCurrentSite'   => \Yii::t('skeeks/cms', 'If you select "yes", then the sample section, add the filter condition, sections of the site, which is called the widget'),
-            'level'                => \Yii::t('skeeks/cms', 'Adds the sample sections, the condition of nesting choice. 0 - will not use this condition at all.'),
-        ]);
+            [
+                'enabledCurrentSite' => \Yii::t('skeeks/cms',
+                    'If you select "yes", then the sample section, add the filter condition, sections of the site, which is called the widget'),
+                'level' => \Yii::t('skeeks/cms',
+                    'Adds the sample sections, the condition of nesting choice. 0 - will not use this condition at all.'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['text', 'string'],
-            [['viewFile', 'label', 'active', 'orderBy', 'enabledCurrentSite', 'enabledRunCache'], 'string'],
-            [['treePid', 'level', 'runCacheDuration'], 'integer'],
-            [['order'], 'integer'],
-            [['site_codes'], 'safe'],
-            [['tree_type_ids'], 'safe'],
-        ]);
+            [
+                ['text', 'string'],
+                [['viewFile', 'label', 'active', 'orderBy', 'enabledCurrentSite', 'enabledRunCache'], 'string'],
+                [['treePid', 'level', 'runCacheDuration'], 'integer'],
+                [['order'], 'integer'],
+                [['site_codes'], 'safe'],
+                [['tree_type_ids'], 'safe'],
+            ]);
     }
 
     public function renderConfigForm(ActiveForm $form)
     {
         echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
-            'form'  => $form,
+            'form' => $form,
             'model' => $this
         ], $this);
     }
@@ -174,54 +176,44 @@ class TreeMenuCmsWidget extends WidgetRenderable
     {
         $this->activeQuery = Tree::find();
 
-        if ($this->treePid)
-        {
+        if ($this->treePid) {
             $this->activeQuery->andWhere(['pid' => $this->treePid]);
         }
 
-        if ($this->level)
-        {
+        if ($this->level) {
             $this->activeQuery->andWhere(['level' => $this->level]);
         }
 
-        if ($this->active)
-        {
+        if ($this->active) {
             $this->activeQuery->andWhere(['active' => $this->active]);
         }
 
-        if ($this->site_codes)
-        {
+        if ($this->site_codes) {
             $cmsSites = CmsSite::find()->where(['code' => $this->site_codes])->all();
-            if ($cmsSites)
-            {
+            if ($cmsSites) {
                 $ids = ArrayHelper::map($cmsSites, 'id', 'id');
                 $this->activeQuery->andWhere(['cms_site_id' => $ids]);
             }
         }
 
-        if ($this->enabledCurrentSite == Cms::BOOL_Y && \Yii::$app->cms->site)
-        {
+        if ($this->enabledCurrentSite == Cms::BOOL_Y && \Yii::$app->cms->site) {
             $this->activeQuery->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
         }
 
-        if ($this->orderBy)
-        {
-            $this->activeQuery->orderBy([$this->orderBy => (int) $this->order]);
+        if ($this->orderBy) {
+            $this->activeQuery->orderBy([$this->orderBy => (int)$this->order]);
         }
 
-        if ($this->tree_type_ids)
-        {
+        if ($this->tree_type_ids) {
             $this->activeQuery->andWhere(['tree_type_id' => $this->tree_type_ids]);
         }
 
 
-        if ($this->with)
-        {
+        if ($this->with) {
             $this->activeQuery->with($this->with);
         }
 
-        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback))
-        {
+        if ($this->activeQueryCallback && is_callable($this->activeQueryCallback)) {
             $callback = $this->activeQueryCallback;
             $callback($this->activeQuery);
         }
@@ -234,18 +226,17 @@ class TreeMenuCmsWidget extends WidgetRenderable
         $key = $this->getCacheKey() . 'run';
 
         $dependency = new TagDependency([
-            'tags'      =>
-            [
-                $this->className() . (string) $this->namespace,
-                (new Tree())->getTableCacheTag(),
-            ],
+            'tags' =>
+                [
+                    $this->className() . (string)$this->namespace,
+                    (new Tree())->getTableCacheTag(),
+                ],
         ]);
 
         $result = \Yii::$app->cache->get($key);
-        if ($result === false || $this->enabledRunCache == Cms::BOOL_N)
-        {
+        if ($result === false || $this->enabledRunCache == Cms::BOOL_N) {
             $result = parent::_run();
-            \Yii::$app->cache->set($key, $result, (int) $this->runCacheDuration, $dependency);
+            \Yii::$app->cache->set($key, $result, (int)$this->runCacheDuration, $dependency);
         }
 
         return $result;

@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.04.2015
  */
+
 namespace skeeks\cms\relatedProperties\userPropertyTypes;
+
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\PropertyType;
@@ -21,11 +23,11 @@ class UserPropertyTypeDate extends PropertyType
     public $code = self::CODE_NUMBER;
     public $name = "";
 
-   /* static public $types = [
-        \kartik\datecontrol\DateControl::FORMAT_DATETIME => 'Дата и время',
-        \kartik\datecontrol\DateControl::FORMAT_DATE => 'Только дата',
-        //\kartik\datecontrol\DateControl::FORMAT_TIME => 'Только время',
-    ];*/
+    /* static public $types = [
+         \kartik\datecontrol\DateControl::FORMAT_DATETIME => 'Дата и время',
+         \kartik\datecontrol\DateControl::FORMAT_DATE => 'Только дата',
+         //\kartik\datecontrol\DateControl::FORMAT_TIME => 'Только время',
+     ];*/
 
     public $type = \kartik\datecontrol\DateControl::FORMAT_DATETIME;
 
@@ -33,9 +35,8 @@ class UserPropertyTypeDate extends PropertyType
     {
         parent::init();
 
-        if(!$this->name)
-        {
-            $this->name = \Yii::t('skeeks/cms','Datetime');
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', 'Datetime');
         }
 
     }
@@ -43,8 +44,8 @@ class UserPropertyTypeDate extends PropertyType
     public static function types()
     {
         return [
-            \kartik\datecontrol\DateControl::FORMAT_DATETIME => \Yii::t('skeeks/cms','Datetime'),
-            \kartik\datecontrol\DateControl::FORMAT_DATE => \Yii::t('skeeks/cms','Only date'),
+            \kartik\datecontrol\DateControl::FORMAT_DATETIME => \Yii::t('skeeks/cms', 'Datetime'),
+            \kartik\datecontrol\DateControl::FORMAT_DATE => \Yii::t('skeeks/cms', 'Only date'),
             //\kartik\datecontrol\DateControl::FORMAT_TIME => 'Только время',
         ];
     }
@@ -52,18 +53,18 @@ class UserPropertyTypeDate extends PropertyType
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'type'  => 'Тип',
-        ]);
+            [
+                'type' => 'Тип',
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            ['type', 'string'],
-            ['type', 'in', 'range' => array_keys(self::types())],
-        ]);
+            [
+                ['type', 'string'],
+                ['type', 'in', 'range' => array_keys(self::types())],
+            ]);
     }
 
     /**
@@ -85,7 +86,8 @@ class UserPropertyTypeDate extends PropertyType
      */
     public function renderConfigForm(ActiveForm $activeForm)
     {
-        echo $activeForm->field($this, 'type')->radioList(\skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate::types());
+        echo $activeForm->field($this,
+            'type')->radioList(\skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate::types());
     }
 
 }

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 16.10.2015
  */
+
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Component;
@@ -39,8 +40,7 @@ class AdminAjaxController extends AdminController
         $newLang = \Yii::$app->request->post('code');
         $cmsLang = CmsLang::find()->active()->andWhere(['code' => $newLang])->one();
 
-        if (!$cmsLang)
-        {
+        if (!$cmsLang) {
             $rr->message = 'Указанный язык отлючен или удален';
             $rr->success = false;
             return $rr;
@@ -52,8 +52,7 @@ class AdminAjaxController extends AdminController
         $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
         $component->languageCode = $cmsLang->code;
 
-        if (!$component->save(true, ['languageCode']))
-        {
+        if (!$component->save(true, ['languageCode'])) {
             $rr->message = 'Не удалось сохранить настройки: ';
             $rr->success = false;
             return $rr;

@@ -72,12 +72,11 @@ use yii\web\ErrorHandler;
  *
  * @property CmsContent $cmsContent
  * @property Tree $cmsTree
-
- * @property CmsContentElementProperty[]    $relatedElementProperties
- * @property CmsContentProperty[]           $relatedProperties
- * @property CmsContentElementTree[]        $cmsContentElementTrees
- * @property CmsContentElementProperty[]    $cmsContentElementProperties
- * @property CmsContentProperty[]           $cmsContentProperties
+ * @property CmsContentElementProperty[] $relatedElementProperties
+ * @property CmsContentProperty[] $relatedProperties
+ * @property CmsContentElementTree[] $cmsContentElementTrees
+ * @property CmsContentElementProperty[] $cmsContentElementProperties
+ * @property CmsContentProperty[] $cmsContentProperties
  *
  * @property CmsStorageFile $image
  * @property CmsStorageFile $fullImage
@@ -121,10 +120,8 @@ class CmsContentElement extends RelatedElementModel
     public function _beforeDeleteE($e)
     {
         //TODO: Upgrade this
-        if ($this->childrenContentElements)
-        {
-            foreach ($this->childrenContentElements as $childrenElement)
-            {
+        if ($this->childrenContentElements) {
+            foreach ($this->childrenContentElements as $childrenElement) {
                 $childrenElement->delete();
             }
         }
@@ -132,8 +129,7 @@ class CmsContentElement extends RelatedElementModel
 
     public function _afterDeleteE($e)
     {
-        if ($permission = \Yii::$app->authManager->getPermission($this->permissionName))
-        {
+        if ($permission = \Yii::$app->authManager->getPermission($this->permissionName)) {
             \Yii::$app->authManager->remove($permission);
         }
     }
@@ -147,47 +143,46 @@ class CmsContentElement extends RelatedElementModel
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
 
             HasStorageFile::className() =>
-            [
-                'class'     => HasStorageFile::className(),
-                'fields'    => ['image_id', 'image_full_id']
-            ],
+                [
+                    'class' => HasStorageFile::className(),
+                    'fields' => ['image_id', 'image_full_id']
+                ],
             HasStorageFileMulti::className() =>
-            [
-                'class'     => HasStorageFileMulti::className(),
-                'relations'    => [
-                    [
-                        'relation' => 'images',
-                        'property' => 'imageIds'
-                    ],
-                    [
-                        'relation' => 'files',
-                        'property' => 'fileIds'
-                    ],
-                ]
-            ],
+                [
+                    'class' => HasStorageFileMulti::className(),
+                    'relations' => [
+                        [
+                            'relation' => 'images',
+                            'property' => 'imageIds'
+                        ],
+                        [
+                            'relation' => 'files',
+                            'property' => 'fileIds'
+                        ],
+                    ]
+                ],
 
             HasRelatedProperties::className() =>
-            [
-                'class'                             => HasRelatedProperties::className(),
-                'relatedElementPropertyClassName'   => CmsContentElementProperty::className(),
-                'relatedPropertyClassName'          => CmsContentProperty::className(),
-            ],
+                [
+                    'class' => HasRelatedProperties::className(),
+                    'relatedElementPropertyClassName' => CmsContentElementProperty::className(),
+                    'relatedPropertyClassName' => CmsContentProperty::className(),
+                ],
 
             HasTrees::className() =>
-            [
-                'class'                             => HasTrees::className(),
-            ],
+                [
+                    'class' => HasTrees::className(),
+                ],
 
             YaSlugBehavior::class =>
-            [
-                'class'                             => YaSlugBehavior::class,
-                'attribute'                         => 'name',
-                'slugAttribute'                     => 'code',
-                'maxLength'                         => \Yii::$app->cms->element_max_code_length,
-            ]
+                [
+                    'class' => YaSlugBehavior::class,
+                    'attribute' => 'name',
+                    'slugAttribute' => 'code',
+                    'maxLength' => \Yii::$app->cms->element_max_code_length,
+                ]
         ]);
     }
-
 
 
     /**
@@ -246,13 +241,38 @@ class CmsContentElement extends RelatedElementModel
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'published_at', 'published_to', 'priority', 'content_id', 'tree_id', 'show_counter', 'show_counter_start'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'published_at',
+                    'published_to',
+                    'priority',
+                    'content_id',
+                    'tree_id',
+                    'show_counter',
+                    'show_counter_start'
+                ],
+                'integer'
+            ],
             [['name'], 'required'],
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
-            [['content_id', 'code'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
-            [['tree_id', 'code'], 'unique', 'targetAttribute' => ['tree_id', 'code'], 'message' => \Yii::t('skeeks/cms','For this section of the code is already in use.')],
+            [
+                ['content_id', 'code'],
+                'unique',
+                'targetAttribute' => ['content_id', 'code'],
+                'message' => \Yii::t('skeeks/cms', 'For the content of this code is already in use.')
+            ],
+            [
+                ['tree_id', 'code'],
+                'unique',
+                'targetAttribute' => ['tree_id', 'code'],
+                'message' => \Yii::t('skeeks/cms', 'For this section of the code is already in use.')
+            ],
             [['treeIds'], 'safe'],
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
@@ -263,52 +283,64 @@ class CmsContentElement extends RelatedElementModel
             ['description_full_type', 'string'],
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
-            ['tree_id', 'default', 'value' => function()
-            {
-                if ($this->cmsContent->defaultTree)
-                {
-                    return $this->cmsContent->defaultTree->id;
+            [
+                'tree_id',
+                'default',
+                'value' => function () {
+                    if ($this->cmsContent->defaultTree) {
+                        return $this->cmsContent->defaultTree->id;
+                    }
                 }
-            }],
+            ],
 
             [['image_id', 'image_full_id'], 'safe'],
-            [['image_id', 'image_full_id'], \skeeks\cms\validators\FileValidator::class,
-                'skipOnEmpty'   => false,
-                'extensions'    => ['jpg', 'jpeg', 'gif','png'],
-                'maxFiles'      => 1,
-                'maxSize'       => 1024*1024*10,
-                'minSize'       => 1024,
+            [
+                ['image_id', 'image_full_id'],
+                \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty' => false,
+                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles' => 1,
+                'maxSize' => 1024 * 1024 * 10,
+                'minSize' => 1024,
             ],
             [['imageIds', 'fileIds'], 'safe'],
-            [['imageIds'], \skeeks\cms\validators\FileValidator::class,
-                'skipOnEmpty'   => false,
-                'extensions'    => ['jpg', 'jpeg', 'gif','png'],
-                'maxFiles'      => 40,
-                'maxSize'       => 1024*1024*10,
-                'minSize'       => 1024,
+            [
+                ['imageIds'],
+                \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty' => false,
+                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles' => 40,
+                'maxSize' => 1024 * 1024 * 10,
+                'minSize' => 1024,
             ],
-            [['fileIds'], \skeeks\cms\validators\FileValidator::class,
-                'skipOnEmpty'   => false,
+            [
+                ['fileIds'],
+                \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty' => false,
                 //'extensions'    => [''],
-                'maxFiles'      => 40,
-                'maxSize'       => 1024*1024*50,
-                'minSize'       => 1024,
+                'maxFiles' => 40,
+                'maxSize' => 1024 * 1024 * 50,
+                'minSize' => 1024,
             ],
 
 
             ['parent_content_element_id', 'integer'],
             ['parent_content_element_id', 'validateParentContentElement'],
-            ['parent_content_element_id', 'required', 'when' => function(CmsContentElement $model) {
+            [
+                'parent_content_element_id',
+                'required',
+                'when' => function (CmsContentElement $model) {
 
-                if ($model->cmsContent && $model->cmsContent->parentContent)
-                {
-                    return (bool) ($model->cmsContent->parent_content_is_required == "Y");
-                }
+                    if ($model->cmsContent && $model->cmsContent->parentContent) {
+                        return (bool)($model->cmsContent->parent_content_is_required == "Y");
+                    }
 
-                return false;
-            }, 'whenClient' => "function (attribute, value) {
+                    return false;
+                },
+                'whenClient' => "function (attribute, value) {
                 return $('#cmscontent-parent_content_is_required').val() == 'Y';
-            }"]
+            }"
+            ]
 
         ]);
     }
@@ -321,22 +353,20 @@ class CmsContentElement extends RelatedElementModel
      */
     public function validateParentContentElement($attribute)
     {
-        if (!$this->cmsContent)
-        {
+        if (!$this->cmsContent) {
             return false;
         }
 
-        if (!$this->cmsContent->parentContent)
-        {
+        if (!$this->cmsContent->parentContent) {
             return false;
         }
 
-        if ($this->$attribute)
-        {
+        if ($this->$attribute) {
             $contentElement = static::findOne($this->$attribute);
-            if ($contentElement->cmsContent->id != $this->cmsContent->parentContent->id)
-            {
-                $this->addError($attribute, \Yii::t('skeeks/cms', 'The parent must be a content element: «{contentName}».',['contentName' => $this->cmsContent->parentContent->name]));
+            if ($contentElement->cmsContent->id != $this->cmsContent->parentContent->id) {
+                $this->addError($attribute,
+                    \Yii::t('skeeks/cms', 'The parent must be a content element: «{contentName}».',
+                        ['contentName' => $this->cmsContent->parentContent->name]));
             }
         }
     }
@@ -405,7 +435,7 @@ class CmsContentElement extends RelatedElementModel
     public function getCmsContentProperties()
     {
         return $this->hasMany(CmsContentProperty::className(), ['id' => 'property_id'])
-                    ->via('cmsContentElementProperties');
+            ->via('cmsContentElementProperties');
     }
 
     /**
@@ -413,11 +443,9 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getUrl($scheme = false, $params = [])
     {
-        if ($params)
-        {
+        if ($params) {
             $params = ArrayHelper::merge(['/cms/content-element/view', 'model' => $this], $params);
-        } else
-        {
+        } else {
             $params = ['/cms/content-element/view', 'model' => $this];
         }
 
@@ -450,8 +478,6 @@ class CmsContentElement extends RelatedElementModel
     }
 
 
-
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -467,9 +493,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(CmsContentElementImage::className(), ['content_element_id' => 'id']);
     }
-
-
-
 
 
     protected $_image_ids = null;
@@ -488,13 +511,11 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getImageIds()
     {
-        if ($this->_image_ids !== null)
-        {
+        if ($this->_image_ids !== null) {
             return $this->_image_ids;
         }
 
-        if ($this->images)
-        {
+        if ($this->images) {
             return ArrayHelper::map($this->images, 'id', 'id');
         }
 
@@ -517,13 +538,11 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getFileIds()
     {
-        if ($this->_file_ids !== null)
-        {
+        if ($this->_file_ids !== null) {
             return $this->_file_ids;
         }
 
-        if ($this->files)
-        {
+        if ($this->files) {
             return ArrayHelper::map($this->files, 'id', 'id');
         }
 
@@ -575,7 +594,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(static::className(), ['parent_content_element_id' => 'id']);
     }
-
 
 
     /**
