@@ -30,11 +30,12 @@ class m140801_201442_create_user_table extends Migration
             $sql = fread($file, filesize($filePath));
             fclose($file);
 
+            $this->db->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
             $this->compact = true;
             $this->execute($sql);
 
         } else if ($this->db->driverName === 'pgsql') {
-            $filePath = __DIR__ . "/_pgsql-init-dump.sql";
+            $filePath = __DIR__ . "/_pgsql-migrations-dump.sql";
 
             $file = fopen($filePath, "r");
             if (!$file) {

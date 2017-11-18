@@ -525,7 +525,7 @@ CREATE TABLE "cms_tree_type_property_enum" (
     PRIMARY KEY ("id")
 );
 
-CREATE TYPE cms_user_gender AS ENUM ('men','women'); 
+CREATE TYPE cms_user_gender AS ENUM ('men','women');
 CREATE TABLE "cms_user" (
     "id" integer NOT NULL,
     "username" varchar(510) NOT NULL,
@@ -1012,4 +1012,7 @@ ALTER TABLE "cms_user_universal_property" ALTER COLUMN "id" SET DEFAULT nextval(
 CREATE SEQUENCE cms_user_universal_property_enum_id_seq;
 SELECT setval('cms_user_universal_property_enum_id_seq', max(id)) FROM cms_user_universal_property_enum;
 ALTER TABLE "cms_user_universal_property_enum" ALTER COLUMN "id" SET DEFAULT nextval('cms_user_universal_property_enum_id_seq');
+
+-- Full Text keys --
+
 COMMIT;

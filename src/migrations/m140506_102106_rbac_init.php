@@ -17,7 +17,7 @@ use yii\rbac\DbManager;
  */
 class m140506_102106_rbac_init extends \yii\db\Migration
 {
-    public function up()
+    public function safeUp()
     {
 
         if ($this->db->driverName === 'mysql') {
@@ -44,6 +44,7 @@ class m140506_102106_rbac_init extends \yii\db\Migration
             $sql = fread($file, filesize($filePath));
             fclose($file);
 
+            $this->db->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
             $this->compact = true;
             $this->execute($sql);
         } else {
