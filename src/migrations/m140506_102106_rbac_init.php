@@ -17,7 +17,7 @@ use yii\rbac\DbManager;
  */
 class m140506_102106_rbac_init extends \yii\db\Migration
 {
-    public function safeUp()
+    public function up()
     {
 
         if ($this->db->driverName === 'mysql') {
