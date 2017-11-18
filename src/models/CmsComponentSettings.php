@@ -133,16 +133,8 @@ class CmsComponentSettings extends Core
     static public function findByComponentDefault(Component $component)
     {
         return static::findByComponent($component)
-            ->andWhere([
-                'or',
-                ['cms_site_id' => ""],
-                ['cms_site_id' => null],
-            ])
-            ->andWhere([
-                'or',
-                ['user_id' => ""],
-                ['user_id' => null],
-            ]);
+            ->andWhere(['cms_site_id' => null])
+            ->andWhere(['user_id' => null]);
     }
 
 

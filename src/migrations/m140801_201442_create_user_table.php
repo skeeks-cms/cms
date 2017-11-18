@@ -45,7 +45,9 @@ class m140801_201442_create_user_table extends Migration
             fclose($file);
 
             $this->compact = true;
-            $this->execute($sql);
+            $pdo = $this->db->masterPdo;
+            $pdo->exec($sql);
+
         } else {
             echo "Error for driver {$this->db->driverName} cannot be reverted.\n";
             return false;
