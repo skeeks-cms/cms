@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha5
+---------------
+ * Fixed of pgsql support
+ 
 5.0.0-alpha4
 ---------------
  * Start of pgsql support
