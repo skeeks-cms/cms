@@ -34,7 +34,7 @@ class m140506_102106_rbac_init extends \yii\db\Migration
             $this->compact = true;
             $this->execute($sql);
 
-        } else if ($this->db->driverName === 'mysql') {
+        } else if ($this->db->driverName === 'pgsql') {
             $filePath = __DIR__ . "/_pgsql-init-dump.sql";
 
             $file = fopen($filePath, "r");

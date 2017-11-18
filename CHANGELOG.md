@@ -2,8 +2,9 @@ CHANGELOG
 ==============
 
 5.0.0-alpha4.pre
- * Start of pgsql support
 ---------------
+ * Start of pgsql support
+
 5.0.0-alpha3
 ---------------
  * Code style
