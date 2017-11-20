@@ -1,11 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-alpha7.pre
----------------
- * Fixed
- 
-5.0.0-alpha6
+5.0.0-alpha6.pre
 ---------------
  * Fixed
  
