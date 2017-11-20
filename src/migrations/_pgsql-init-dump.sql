@@ -39,7 +39,7 @@ CREATE TABLE "auth_rule" (
     PRIMARY KEY ("name")
 );
 
-INSERT INTO "auth_rule" VALUES ('isAuthor','O:26:\"skeeks\\cms\\rbac\\AuthorRule\":3:{s:4:\"name\";s:8:\"isAuthor\";s:9:\"createdAt\";i:1439037301;s:9:\"updatedAt\";i:1439037301;}',1439037301,1439037301);
+INSERT INTO "auth_rule" VALUES ('isAuthor','O:26:"skeeks\cms\rbac\AuthorRule":3:{s:4:"name";s:8:"isAuthor";s:9:"createdAt";i:1439037301;s:9:"updatedAt";i:1439037301;}',1439037301,1439037301);
 CREATE TABLE "cms_component_settings" (
     "id" integer NOT NULL,
     "created_by" integer DEFAULT NULL,
