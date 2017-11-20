@@ -65,7 +65,6 @@ INSERT INTO "migration" VALUES ('m140814_223103_create_user_authclient_table', 1
 ('m150608_154030_alter_table__cms_user_emails_and_phones', 1439036966),
 ('m150622_114030_alter_table__cms_user', 1439036967),
 ('m150702_114030_alter_table__cms_user', 1439036969),
-('m150703_162718_create_table__reviews2_message', 1439037016),
 ('m150707_114030_alter_table__big_text', 1439036981),
 ('m150715_103220_create_table__cms_agent', 1439036982),
 ('m150730_103220_create_table__cms_session', 1439036983),
