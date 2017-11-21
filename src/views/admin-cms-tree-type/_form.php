@@ -20,7 +20,7 @@ use common\models\User;
     ->hint(\Yii::t('skeeks/cms',
         'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
 
-<?= $form->field($model, 'viewFile')->textInput()
+<?= $form->field($model, 'view_file')->textInput()
     ->hint(\Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
 
 <?= $form->fieldRadioListBoolean($model, 'active'); ?>

@@ -40,9 +40,6 @@ class TreeController extends Controller
             $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
                 ->enableEmptyLayout()
                 ->url;
-            /*$urlEditModel = UrlHelper::construct($adminControllerRoute)->enableAdmin()
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')->toString();*/
-
 
             \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
         }
@@ -89,16 +86,14 @@ class TreeController extends Controller
         }
 
         $viewFile = $this->action->id;
-        //������� ��������� view ��� �������� ���� ��������
         if ($this->model) {
-            //���� � ������� ������ ������������ ������, �������� ���, ����� ������ ���� ��������
             if ($this->model->view_file) {
                 $viewFile = $this->model->view_file;
 
             } else {
                 if ($this->model->treeType) {
-                    if ($this->model->treeType->viewFile) {
-                        $viewFile = $this->model->treeType->viewFile;
+                    if ($this->model->treeType->view_file) {
+                        $viewFile = $this->model->treeType->view_file;
                     } else {
                         $viewFile = $this->model->treeType->code;
                     }
@@ -114,10 +109,6 @@ class TreeController extends Controller
     }
 
     /**
-     *
-     * TODO: ������� � seo ���������
-     *
-     * ��������� ���������� ��������
      * @return $this
      */
     protected function _initStandartMetaData()

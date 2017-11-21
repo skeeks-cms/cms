@@ -35,7 +35,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $default_tree_id
  * @property string $is_allow_change_tree
  * @property integer $root_tree_id
- * @property string $viewFile
+ * @property string $view_file
  * @property string $access_check_element
  *
  * @property string $meta_title_template
@@ -113,7 +113,7 @@ class CmsContent extends Core
             'default_tree_id' => Yii::t('skeeks/cms', 'Default Section'),
             'is_allow_change_tree' => Yii::t('skeeks/cms', 'Is Allow Change Default Section'),
             'root_tree_id' => Yii::t('skeeks/cms', 'Root Section'),
-            'viewFile' => Yii::t('skeeks/cms', 'Template'),
+            'view_file' => Yii::t('skeeks/cms', 'Template'),
 
             'meta_title_template' => Yii::t('skeeks/cms', 'Шаблон META TITLE'),
             'meta_description_template' => Yii::t('skeeks/cms', 'Шаблон META KEYWORDS'),
@@ -143,7 +143,7 @@ class CmsContent extends Core
             [['meta_title_template'], 'string'],
             [['meta_description_template'], 'string'],
             [['meta_keywords_template'], 'string'],
-            [['name', 'viewFile'], 'string', 'max' => 255],
+            [['name', 'view_file'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],
             [['access_check_element'], 'string'],

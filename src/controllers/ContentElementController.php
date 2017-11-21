@@ -148,8 +148,8 @@ class ContentElementController extends Controller
 
         $cmsContent = $this->model->cmsContent;
         if ($cmsContent) {
-            if ($cmsContent->viewFile) {
-                $viewFile = $cmsContent->viewFile;
+            if ($cmsContent->view_file) {
+                $viewFile = $cmsContent->view_file;
             } else {
                 $viewFile = $cmsContent->code;
             }

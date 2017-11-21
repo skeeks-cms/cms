@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.0-alpha6.pre
 ---------------
+ * Renamed viewFile to view_file
  * Fixed
  
 5.0.0-alpha5
