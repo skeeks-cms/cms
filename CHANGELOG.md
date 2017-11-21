@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha8
+---------------
+ * skeeks/cms-rbac ~2.2.0
+ 
 5.0.0-alpha7
 ---------------
  * Change configuration authManager

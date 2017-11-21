@@ -30,7 +30,7 @@
         "skeeks/cms-backend": "~1.1.1 || dev-master",
         "skeeks/cms-backend-admin": "~1.1.0 || dev-master",
         "skeeks/cms-admin": "~2.0.2 || dev-master",
-        "skeeks/cms-rbac": "~2.1.0 || dev-master",
+        "skeeks/cms-rbac": "~2.2.0 || dev-master",
         "skeeks/cms-marketplace": "~2.0.0 || dev-master",
         "skeeks/cms-composer": "~1.0.0 || dev-master",
         "skeeks/cms-toolbar": "~1.0.0 || dev-master",
