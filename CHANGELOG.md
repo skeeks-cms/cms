@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha9.pre
+---------------
+ * New logo
+
 5.0.0-alpha8
 ---------------
  * skeeks/cms-rbac ~2.2.0
