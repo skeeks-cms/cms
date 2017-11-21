@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-alpha7.pre
+5.0.0-alpha7
 ---------------
  * Change configuration authManager
  
