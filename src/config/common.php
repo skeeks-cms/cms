@@ -38,7 +38,7 @@ return [
                 'local' => [
                     'class' => 'skeeks\cms\components\storage\ClusterLocal',
                     'priority' => 100,
-                ]
+                ],
             ],
         ],
 
@@ -71,8 +71,8 @@ return [
                     'fileMap' => [
                         'skeeks/cms/user' => 'user.php',
                     ],
-                ]
-            ]
+                ],
+            ],
         ],
 
         'urlManager' => [
@@ -96,8 +96,9 @@ return [
                 'skeeks-cms' => 'cms/cms/index',
                 'skeeks-cms/<action>' => 'cms/cms/<action>',
 
-                "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'], //Resize image on request
-            ]
+                "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'],
+                //Resize image on request
+            ],
         ],
 
         'cmsAgent' => [
@@ -115,7 +116,11 @@ return [
                     'interval' => 3600 * 24,
                 ],
 
-            ]
+            ],
+        ],
+
+        'authManager' => [
+            'config' => require __DIR__ . '/_permissions.php'
         ],
     ],
 
@@ -127,6 +132,6 @@ return [
 
         'ajaxfileupload' => [
             'class' => '\skeeks\yii2\ajaxfileupload\AjaxFileUploadModule',
-        ]
+        ],
     ],
 ];

@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha7.pre
+---------------
+ * Change configuration authManager
+ 
 5.0.0-alpha6
 ---------------
  * Renamed viewFile to view_file
