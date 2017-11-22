@@ -446,7 +446,19 @@ class User
      */
     public function getName()
     {
-        return $this->first_name . " " . $this->last_name . " " . $this->patronymic;
+        $data = [];
+
+        if ($this->first_name) {
+            $data[] = $this->first_name;
+        }
+        if ($this->last_name) {
+            $data[] = $this->last_name;
+        }
+        if ($this->patronymic) {
+            $data[] = $this->patronymic;
+        }
+
+        return $data ? implode(" ", $data) : null;
     }
 
 

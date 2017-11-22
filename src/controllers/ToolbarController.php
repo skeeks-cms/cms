@@ -16,6 +16,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsComponentSettings;
+use skeeks\sx\helpers\ResponseHelper;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -37,10 +38,9 @@ class ToolbarController extends Controller
 
     public function actionTriggerEditWidgets()
     {
-        $rr = new RequestResponse();
+        $rr = new ResponseHelper();
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isAjax) {
-            \Yii::$app->response->format = Response::FORMAT_JSON;
 
             if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y) {
                 $component = clone \Yii::$app->cmsToolbar;
