@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.0-alpha9.pre
 ---------------
+ * Fixed user displayName
  * New logo
 
 5.0.0-alpha8
