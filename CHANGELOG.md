@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-alpha9.pre
+5.0.0-alpha9
 ---------------
  * Fixed user displayName
  * New logo
