@@ -104,7 +104,7 @@ class User
      * Логины которые нельзя удалять, и нельзя менять
      * @return array
      */
-    static public function getProtectedUsernames()
+    public static function getProtectedUsernames()
     {
         return ['root', 'admin'];
     }
@@ -517,7 +517,7 @@ class User
      * @param $value
      * @return User
      */
-    static public function findByUsernameOrEmail($value)
+    public static function findByUsernameOrEmail($value)
     {
         if ($user = static::findByUsername($value)) {
             return $user;

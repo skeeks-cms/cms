@@ -33,7 +33,7 @@ class PropertyTypeText extends PropertyType
     public $fieldElement = 'textInput';
     public $rows = 5;
 
-    static public function fieldElements()
+    public static function fieldElements()
     {
         return [
             'textarea' => \Yii::t('skeeks/cms', 'Text field') . ' (textarea)',

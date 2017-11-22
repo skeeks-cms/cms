@@ -33,7 +33,7 @@ trait HasRelatedPropertiesTrait
      * @param $value
      * @return null
      */
-    static public function filterByProperty(
+    public static function filterByProperty(
         ActiveQuery $activeQuery,
         RelatedPropertyModel $relatedPropertyModel = null,
         $value

@@ -19,7 +19,7 @@ class AssetBundle extends \yii\web\AssetBundle
      * @return string
      * @throws \yii\base\InvalidConfigException
      */
-    static public function getAssetUrl($asset)
+    public static function getAssetUrl($asset)
     {
         return \Yii::$app->assetManager->getAssetUrl(\Yii::$app->assetManager->getBundle(static::className()), $asset);
     }

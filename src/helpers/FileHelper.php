@@ -22,7 +22,7 @@ class FileHelper extends \yii\helpers\FileHelper
      * @param $file1
      * @return null|string
      */
-    static public function getFirstExistingFile($file1 /*...*/)
+    public static function getFirstExistingFile($file1 /*...*/)
     {
         $files = func_get_args();
         return self::getFirstExistingFileArray($files);
@@ -34,7 +34,7 @@ class FileHelper extends \yii\helpers\FileHelper
      * @param string[] $files
      * @return string|null
      */
-    static public function getFirstExistingFileArray($files = [])
+    public static function getFirstExistingFileArray($files = [])
     {
         foreach ($files as $file) {
             if (file_exists(\Yii::getAlias($file))) {
@@ -52,7 +52,7 @@ class FileHelper extends \yii\helpers\FileHelper
      * @param string $fileName
      * @return array
      */
-    static public function findExtensionsFiles($fileName = '/config/main.php', $onlyFileExists = true)
+    public static function findExtensionsFiles($fileName = '/config/main.php', $onlyFileExists = true)
     {
         $configs = [];
 

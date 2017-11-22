@@ -33,7 +33,7 @@ class TreeOptions extends \skeeks\cms\models\Tree
      * @param CmsTree $parentTree
      * @return array|mixed
      */
-    static public function getAllMultiOptions($parentTree = null)
+    public static function getAllMultiOptions($parentTree = null)
     {
         $key = [
             ROOT_DIR,

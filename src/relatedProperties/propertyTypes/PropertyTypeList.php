@@ -38,7 +38,7 @@ class PropertyTypeList extends PropertyType
     const FIELD_ELEMENT_SELECT_DIALOG = "selectDialog";
     const FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE = "selectDialogMulti";
 
-    static public function fieldElements()
+    public static function fieldElements()
     {
         return [
             self::FIELD_ELEMENT_SELECT => \Yii::t('skeeks/cms', 'Combobox') . ' (select)',

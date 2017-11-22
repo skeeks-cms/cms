@@ -486,7 +486,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
      * @param CmsContent $cmsContent
      * @return array
      */
-    static public function getColumnsByContent($cmsContent = null, $dataProvider = null)
+    public static function getColumnsByContent($cmsContent = null, $dataProvider = null)
     {
         $autoColumns = [];
 
@@ -545,7 +545,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
      * @param CmsContent $cmsContent
      * @return array
      */
-    static public function getDefaultColumns($cmsContent = null)
+    public static function getDefaultColumns($cmsContent = null)
     {
         $columns = [
             [
@@ -652,7 +652,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
      * @param CmsContent $model
      * @return array
      */
-    static public function getColumns($cmsContent = null, $dataProvider = null)
+    public static function getColumns($cmsContent = null, $dataProvider = null)
     {
         return \yii\helpers\ArrayHelper::merge(
             static::getDefaultColumns($cmsContent),

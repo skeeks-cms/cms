@@ -408,7 +408,7 @@ class Tree extends Core
      *
      * @return ActiveQuery
      */
-    static public function findRoots()
+    public static function findRoots()
     {
         return static::find()->where(['level' => 0])->orderBy(["priority" => SORT_ASC]);
     }

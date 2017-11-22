@@ -18,5 +18,3 @@ namespace skeeks\cms;
 class Exception extends \yii\base\Exception
 {
 }
-
-;

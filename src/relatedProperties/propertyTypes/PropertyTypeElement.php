@@ -35,7 +35,7 @@ class PropertyTypeElement extends PropertyType
     public $fieldElement = self::FIELD_ELEMENT_SELECT;
     public $content_id;
 
-    static public function fieldElements()
+    public static function fieldElements()
     {
         return [
             self::FIELD_ELEMENT_SELECT => \Yii::t('skeeks/cms', 'Combobox') . ' (select)',
