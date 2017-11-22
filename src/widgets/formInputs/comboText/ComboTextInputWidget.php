@@ -28,7 +28,7 @@ class ComboTextInputWidget extends InputWidget
     const CONTROLL_EDITOR = "editor";
     const CONTROLL_HTML = "html";
 
-    static public function editors()
+    public static function editors()
     {
         return [
             self::CONTROLL_TEXT => \Yii::t('skeeks/cms', 'Text'),

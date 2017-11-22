@@ -24,7 +24,7 @@ class StringHelper
      * @param $text
      * @return mixed
      */
-    static public function strReplaceOnce($search, $replace, $text)
+    public static function strReplaceOnce($search, $replace, $text)
     {
         $pos = strpos($text, $search);
         return $pos !== false ? substr_replace($text, $replace, $pos, strlen($search)) : $text;
@@ -39,7 +39,7 @@ class StringHelper
      * @param $suffix |   array("минута", "минуты", "минут");
      * @return mixed
      */
-    static public function declination($number, $suffix)
+    public static function declination($number, $suffix)
     {
         $keys = array(2, 0, 1, 1, 1, 2);
         $mod = $number % 100;
@@ -51,7 +51,7 @@ class StringHelper
      * @param $string
      * @return string
      */
-    static public function strtolower($string)
+    public static function strtolower($string)
     {
         return mb_strtolower($string, \Yii::$app->charset);
     }
@@ -61,7 +61,7 @@ class StringHelper
      * @param $string
      * @return string
      */
-    static public function strtoupper($string)
+    public static function strtoupper($string)
     {
         return mb_strtoupper($string, \Yii::$app->charset);
     }
@@ -70,7 +70,7 @@ class StringHelper
      * @param $string
      * @return string
      */
-    static public function ucfirst($string)
+    public static function ucfirst($string)
     {
         $str = $string;
         $encoding = \Yii::$app->charset;
@@ -82,7 +82,7 @@ class StringHelper
      * @param $string
      * @return int
      */
-    static public function strlen($string)
+    public static function strlen($string)
     {
         $str = $string;
         $encoding = \Yii::$app->charset;
@@ -96,7 +96,7 @@ class StringHelper
      * @param null $length
      * @return string
      */
-    static public function substr($str, $start, $length = null)
+    public static function substr($str, $start, $length = null)
     {
         $encoding = \Yii::$app->charset;
         return mb_substr($str, $start, $length, $encoding);
@@ -109,7 +109,7 @@ class StringHelper
      * @param null $length
      * @return string
      */
-    static public function htmlspecialchars($str, $start, $length = null)
+    public static function htmlspecialchars($str, $start, $length = null)
     {
         $encoding = \Yii::$app->charset;
         return htmlspecialchars($str, $start, $length, $encoding);
@@ -120,7 +120,7 @@ class StringHelper
      * @param $data
      * @return string
      */
-    static public function compressBase64EncodeUrl($data)
+    public static function compressBase64EncodeUrl($data)
     {
         return rtrim(strtr(base64_encode(
             gzcompress(serialize($data), 9)
@@ -131,7 +131,7 @@ class StringHelper
      * @param $string
      * @return mixed
      */
-    static public function compressBase64DecodeUrl($string)
+    public static function compressBase64DecodeUrl($string)
     {
         return unserialize(gzuncompress(base64_decode(str_pad(strtr($string, '-_', '+/'), strlen($string) % 4, '=',
             STR_PAD_RIGHT))));
@@ -142,7 +142,7 @@ class StringHelper
      * @param $data
      * @return string
      */
-    static public function base64EncodeUrl($string)
+    public static function base64EncodeUrl($string)
     {
         return rtrim(strtr(base64_encode($string), '+/', '-_'), '=');
     }
@@ -151,7 +151,7 @@ class StringHelper
      * @param $string
      * @return mixed
      */
-    static public function base64DecodeUrl($string)
+    public static function base64DecodeUrl($string)
     {
         return base64_decode(str_pad(strtr($string, '-_', '+/'), strlen($string) % 4, '=', STR_PAD_RIGHT));
     }

@@ -49,7 +49,7 @@ abstract class CmsTreeHelper extends Component
      * @param array $data
      * @return static
      */
-    static public function instance($model, $data = [])
+    public static function instance($model, $data = [])
     {
         if ($package = ArrayHelper::getValue(static::$instances, $model->id)) {
             return $package;

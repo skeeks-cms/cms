@@ -21,7 +21,7 @@ use yii\widgets\ActiveForm;
  */
 class TextCmsWidget extends Widget
 {
-    static public function descriptorConfig()
+    public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
             'name' => 'Текст'
@@ -55,7 +55,7 @@ class TextCmsWidget extends Widget
         );
     }
 
-    static public function begin($config = [])
+    public static function begin($config = [])
     {
         parent::begin($config);
 

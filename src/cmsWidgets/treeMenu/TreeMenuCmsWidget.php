@@ -102,7 +102,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
      */
     public $activeQuery = null;
 
-    static public function descriptorConfig()
+    public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
             'name' => 'Меню разделов'

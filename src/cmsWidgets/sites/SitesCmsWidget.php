@@ -45,7 +45,7 @@ class SitesCmsWidget extends WidgetRenderable
     public $enabledRunCache = Cms::BOOL_Y;
     public $runCacheDuration = 0;
 
-    static public function descriptorConfig()
+    public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
             'name' => 'Сайты'

@@ -31,7 +31,7 @@ trait HasComponentDescriptorTrait
     /**
      * @return array
      */
-    static public function descriptorConfig()
+    public static function descriptorConfig()
     {
         return
             [

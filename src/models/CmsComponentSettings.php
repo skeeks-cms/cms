@@ -108,7 +108,7 @@ class CmsComponentSettings extends Core
      * @param $component
      * @return ActiveQuery
      */
-    static public function findByComponent(Component $component)
+    public static function findByComponent(Component $component)
     {
         $query = static::find()->where([
             'component' => $component->className(),
@@ -130,7 +130,7 @@ class CmsComponentSettings extends Core
      * @param Component $component
      * @return ActiveQuery
      */
-    static public function findByComponentDefault(Component $component)
+    public static function findByComponentDefault(Component $component)
     {
         return static::findByComponent($component)
             ->andWhere(['cms_site_id' => null])
@@ -143,7 +143,7 @@ class CmsComponentSettings extends Core
      * @param CmsUser $user
      * @return ActiveQuery
      */
-    static public function findByComponentUser(Component $component, $user)
+    public static function findByComponentUser(Component $component, $user)
     {
         return static::findByComponent($component)->andWhere(['user_id' => (int)$user->id]);
     }
@@ -153,7 +153,7 @@ class CmsComponentSettings extends Core
      * @param CmsUser $user
      * @return ActiveQuery
      */
-    static public function findByComponentSite(Component $component, CmsSite $cmsSite)
+    public static function findByComponentSite(Component $component, CmsSite $cmsSite)
     {
         return static::findByComponent($component)->andWhere(['cms_site_id' => (int)$cmsSite->id]);
     }

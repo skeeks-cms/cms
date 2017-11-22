@@ -116,7 +116,7 @@ JS
      *
      * @return static
      */
-    static public function beginWidget($namespace, $config = [])
+    public static function beginWidget($namespace, $config = [])
     {
         $config = ArrayHelper::merge(['namespace' => $namespace], $config);
         return static::begin($config);

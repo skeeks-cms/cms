@@ -234,7 +234,7 @@ class CmsSite extends Core
      * @param (integer) $id
      * @return static
      */
-    static public function getById($id)
+    public static function getById($id)
     {
         if (!array_key_exists($id, static::$sites)) {
             static::$sites[$id] = static::find()->where(['id' => (integer)$id])->one();
@@ -249,7 +249,7 @@ class CmsSite extends Core
      * @param (integer) $id
      * @return static
      */
-    static public function getByCode($code)
+    public static function getByCode($code)
     {
         if (!array_key_exists($code, static::$sites_by_code)) {
             static::$sites_by_code[$code] = static::find()->where(['code' => (string)$code])->one();

@@ -69,7 +69,7 @@ class CmsContent extends Core
     /**
      * @return array
      */
-    static public function getOnDeleteOptions()
+    public static function getOnDeleteOptions()
     {
         return [
             self::CASCADE => "CASCADE (" . \Yii::t('skeeks/cms', 'Remove all items of that content') . ")",
@@ -193,7 +193,7 @@ class CmsContent extends Core
      * @param bool|false $refetch
      * @return array
      */
-    static public function getDataForSelect($refetch = false, $contentQueryCallback = null)
+    public static function getDataForSelect($refetch = false, $contentQueryCallback = null)
     {
         if ($refetch === false && static::$_selectData) {
             return static::$_selectData;

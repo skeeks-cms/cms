@@ -40,7 +40,7 @@ class UrlHelper
     /**
      * @return static
      */
-    static public function getCurrent()
+    public static function getCurrent()
     {
         if (static::$currentUrl === null) {
             //TODO: доработать вычисление текущего роута
@@ -53,7 +53,7 @@ class UrlHelper
     /**
      * @return static
      */
-    static public function constructCurrent()
+    public static function constructCurrent()
     {
 
         $route = [];
@@ -94,7 +94,7 @@ class UrlHelper
      * @param array $data
      * @return static
      */
-    static public function construct($route, $data = [])
+    public static function construct($route, $data = [])
     {
         if (is_string($route)) {
             return new static($route, $data);

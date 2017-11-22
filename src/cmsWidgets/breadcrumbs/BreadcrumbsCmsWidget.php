@@ -16,7 +16,7 @@ use skeeks\cms\base\WidgetRenderable;
  */
 class BreadcrumbsCmsWidget extends WidgetRenderable
 {
-    static public function descriptorConfig()
+    public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
             'name' => \Yii::t('skeeks/cms', 'Breadcrumbs')

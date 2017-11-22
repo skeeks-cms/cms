@@ -98,7 +98,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
         $this->initActiveQuery();
     }
 
-    static public function descriptorConfig()
+    public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
             'name' => \Yii::t('skeeks/cms', 'Content elements')

@@ -24,7 +24,7 @@ class ComponentHelper extends Component
      * @param $behavior
      * @return bool
      */
-    static public function hasBehavior($component, $behavior)
+    public static function hasBehavior($component, $behavior)
     {
         if ($behavior instanceof Behavior) {
             $behavior = (string)$behavior->className();
@@ -57,7 +57,7 @@ class ComponentHelper extends Component
      * @param array $behaviors
      * @return bool
      */
-    static public function hasBehaviorsOr(Component $component, $behaviors = [])
+    public static function hasBehaviorsOr(Component $component, $behaviors = [])
     {
         foreach ($behaviors as $behavior) {
             if (static::hasBehavior($component, $behavior)) {

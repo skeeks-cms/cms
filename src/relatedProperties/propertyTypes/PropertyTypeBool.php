@@ -27,7 +27,7 @@ class PropertyTypeBool extends PropertyType
     public $fieldElement = 'radioInput';
     public $rows = 5;
 
-    static public function fieldElements()
+    public static function fieldElements()
     {
         return [
             'radioList' => \Yii::t('skeeks/cms', 'Radio'),

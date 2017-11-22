@@ -33,7 +33,7 @@ class PropertyTypeTree extends PropertyType
 
     public $fieldElement = self::FIELD_ELEMENT_DEFAULT;
 
-    static public function fieldElements()
+    public static function fieldElements()
     {
         return [
             self::FIELD_ELEMENT_DEFAULT => \Yii::t('skeeks/cms', 'Standard selection element'),

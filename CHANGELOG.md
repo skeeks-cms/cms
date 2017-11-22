@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha10.pre
+----------------
+ * Code style
+ 
 5.0.0-alpha9
 ---------------
  * Fixed user displayName

@@ -10,26 +10,20 @@ namespace skeeks\cms\base;
 
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsComponentSettings;
-use \skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Exception;
+use yii\base\InvalidParamException;
 use yii\base\Model;
+use yii\base\ModelEvent;
 use yii\caching\TagDependency;
 use yii\console\Application;
 use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
-use yii\widgets\ActiveForm;
-
-use yii\base\InvalidConfigException;
-use yii\base\Event;
-use yii\base\InvalidParamException;
-use yii\base\ModelEvent;
-use yii\base\NotSupportedException;
-use yii\base\UnknownMethodException;
-use yii\base\InvalidCallException;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * @property array namespace
@@ -53,43 +47,75 @@ abstract class Component extends Model implements ConfigFormInterface
     const OVERRIDE_DEFAULT = 'default';
     const OVERRIDE_SITE = 'site';
     const OVERRIDE_USER = 'user';
-
     /**
-     * @return array
+     * @event Event an event that is triggered when the record is initialized via [[init()]].
      */
-    static public function getOverrides()
-    {
-        return [
-            self::OVERRIDE_DEFAULT,
-            self::OVERRIDE_SITE,
-            self::OVERRIDE_USER,
-        ];
-    }
-
+    const EVENT_INIT = 'init';
+    /**
+     * @event Event an event that is triggered after the record is created and populated with query result.
+     */
+    const EVENT_AFTER_FIND = 'afterFind';
+    /**
+     * @event ModelEvent an event that is triggered before inserting a record.
+     * You may set [[ModelEvent::isValid]] to be `false` to stop the insertion.
+     */
+    const EVENT_BEFORE_INSERT = 'beforeInsert';
+    /**
+     * @event AfterSaveEvent an event that is triggered after a record is inserted.
+     */
+    const EVENT_AFTER_INSERT = 'afterInsert';
+    /**
+     * @event ModelEvent an event that is triggered before updating a record.
+     * You may set [[ModelEvent::isValid]] to be `false` to stop the update.
+     */
+    const EVENT_BEFORE_UPDATE = 'beforeUpdate';
+    /**
+     * @event AfterSaveEvent an event that is triggered after a record is updated.
+     */
+    const EVENT_AFTER_UPDATE = 'afterUpdate';
+    /**
+     * @event ModelEvent an event that is triggered before deleting a record.
+     * You may set [[ModelEvent::isValid]] to be `false` to stop the deletion.
+     */
+    const EVENT_BEFORE_DELETE = 'beforeDelete';
+    /**
+     * @event Event an event that is triggered after a record is deleted.
+     */
+    const EVENT_AFTER_DELETE = 'afterDelete';
+    /**
+     * @event Event an event that is triggered after a record is refreshed.
+     * @since 2.0.8
+     */
+    const EVENT_AFTER_REFRESH = 'afterRefresh';
+    /**
+     * @var integer a counter used to generate [[id]] for widgets.
+     * @internal
+     */
+    public static $counterSettings = 0;
+    /**
+     * @var string the prefix to the automatically generated widget IDs.
+     * @see getId()
+     */
+    public static $autoSettingsIdPrefix = 'skeeksSettings';
     /**
      * Путь переопределения настроек
      * @var array
      */
     protected $_overridePath = ['default', 'site', 'user'];
-
     /**
      * Текущий путь для которого сохранять настройки
      * @var string|null
      */
     protected $_override = null;
-
-
     /**
      * Callable attributes
      * @var array
      */
     protected $_callAttributes = [];
-
     /**
      * @var array
      */
     protected $_oldAttributes = [];
-
     /**
      * @var CmsSite|null
      */
@@ -98,12 +124,56 @@ abstract class Component extends Model implements ConfigFormInterface
      * @var CmsUser|null
      */
     protected $_cmsUser = null;
-
     /**
      * @var null
      */
     protected $_namespace = null;
+    private $_settingsId;
 
+    /**
+     * Populates an active record object using a row of data from the database/storage.
+     *
+     * This is an internal method meant to be called to create active record objects after
+     * fetching data from the database. It is mainly used by [[ActiveQuery]] to populate
+     * the query results into active records.
+     *
+     * When calling this method manually you should call [[afterFind()]] on the created
+     * record to trigger the [[EVENT_AFTER_FIND|afterFind Event]].
+     *
+     * @param BaseActiveRecord $record the record to be populated. In most cases this will be an instance
+     * created by [[instantiate()]] beforehand.
+     * @param array $row attribute values (name => value)
+     */
+    public static function populateRecord($record, $row)
+    {
+        $columns = array_flip($record->attributes());
+        foreach ($row as $name => $value) {
+            if (isset($columns[$name])) {
+                $record->{$name} = $value;
+            } elseif ($record->canSetProperty($name)) {
+                $record->$name = $value;
+            }
+        }
+        $record->_oldAttributes = $record->toArray();
+    }
+
+    /**
+     * Creates an active record instance.
+     *
+     * This method is called together with [[populateRecord()]] by [[ActiveQuery]].
+     * It is not meant to be used for creating new records directly.
+     *
+     * You may override this method if the instance being created
+     * depends on the row data to be populated into the record.
+     * For example, by creating a record based on the value of a column,
+     * you may implement the so-called single-table inheritance mapping.
+     * @param array $row row data to be populated into the record.
+     * @return static the newly created active record
+     */
+    public static function instantiate($row)
+    {
+        return new static;
+    }
 
     public function init()
     {
@@ -128,6 +198,24 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->trigger(self::EVENT_INIT);
     }
 
+    /**
+     * Загрузка настроек по умолчанию
+     * @return $this
+     */
+    protected function _initSettings()
+    {
+        try {
+            $this->setAttributes($this->settings);
+            $this->_oldAttributes = $this->toArray($this->attributes());
+
+        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            \Yii::error(\Yii::t('skeeks/cms', '{cms} component error load defaul settings',
+                    ['cms' => 'Cms']) . ': ' . $e->getMessage());
+        }
+
+        return $this;
+    }
 
     /**
      * @return array
@@ -157,29 +245,9 @@ abstract class Component extends Model implements ConfigFormInterface
         return true;
     }
 
-
     public function afterRefresh()
     {
         $this->trigger(self::EVENT_AFTER_REFRESH);
-    }
-
-    /**
-     * Загрузка настроек по умолчанию
-     * @return $this
-     */
-    protected function _initSettings()
-    {
-        try {
-            $this->setAttributes($this->settings);
-            $this->_oldAttributes = $this->toArray($this->attributes());
-
-        } catch (Exception $e) {
-        } catch (\Exception $e) {
-            \Yii::error(\Yii::t('skeeks/cms', '{cms} component error load defaul settings',
-                    ['cms' => 'Cms']) . ': ' . $e->getMessage());
-        }
-
-        return $this;
     }
 
     /**
@@ -199,7 +267,6 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->_namespace = $namespace;
         return $this;
     }
-
 
     /**
      * @return null|string
@@ -223,6 +290,17 @@ abstract class Component extends Model implements ConfigFormInterface
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public static function getOverrides()
+    {
+        return [
+            self::OVERRIDE_DEFAULT,
+            self::OVERRIDE_SITE,
+            self::OVERRIDE_USER,
+        ];
+    }
 
     /**
      * @return array
@@ -231,6 +309,23 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         return (array)$this->_overridePath;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * TODO: Revrite and check
+     */
 
     /**
      * @param array $overridePath
@@ -248,7 +343,6 @@ abstract class Component extends Model implements ConfigFormInterface
         return $this;
     }
 
-
     /**
      * @return array
      */
@@ -257,6 +351,13 @@ abstract class Component extends Model implements ConfigFormInterface
         return $this->_callAttributes;
     }
 
+    /**
+     * @return null|CmsSite
+     */
+    public function getCmsSite()
+    {
+        return $this->_cmsSite;
+    }
 
     /**
      * @param CmsSite $cmsSite
@@ -269,6 +370,14 @@ abstract class Component extends Model implements ConfigFormInterface
     }
 
     /**
+     * @return null|CmsUser
+     */
+    public function getCmsUser()
+    {
+        return $this->_cmsUser;
+    }
+
+    /**
      * @param CmsUser $cmsUser
      * @return $this
      */
@@ -278,26 +387,9 @@ abstract class Component extends Model implements ConfigFormInterface
         return $this;
     }
 
-    /**
-     * @return null|CmsSite
-     */
-    public function getCmsSite()
-    {
-        return $this->_cmsSite;
-    }
-
-    /**
-     * @return null|CmsUser
-     */
-    public function getCmsUser()
-    {
-        return $this->_cmsUser;
-    }
-
     public function renderConfigForm(ActiveForm $form)
     {
     }
-
 
     /**
      * Получение настроек согласно пути перекрытия настроек.
@@ -339,6 +431,34 @@ abstract class Component extends Model implements ConfigFormInterface
         return $settingsValues;
     }
 
+    /**
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return implode([
+            \Yii::getAlias('@webroot'),
+            static::class,
+            $this->namespace,
+            $this->cmsUser ? (string)$this->cmsUser->id : '',
+            $this->cmsSite ? (string)$this->cmsSite->id : '',
+        ]);
+    }
+
+    /**
+     * @param $overrideName
+     * @return array
+     */
+    public function fetchOverrideSettings($overrideName)
+    {
+        $settingsModel = $this->_getOverrideSettingsModel($overrideName);
+
+        if ($settingsModel) {
+            return (array)$settingsModel->value;
+        }
+
+        return [];
+    }
 
     /**
      * @param $overrideName
@@ -366,6 +486,41 @@ abstract class Component extends Model implements ConfigFormInterface
         }
 
         return $settingsModel;
+    }
+
+    /**
+     * @param bool $runValidation
+     * @param null $attributeNames
+     * @return bool
+     * @throws Exception
+     */
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        if (!$this->override) {
+            throw new Exception('Need set current override');
+        }
+
+        if ($runValidation && !$this->validate($attributeNames)) {
+            return false;
+        }
+
+        $modelSettings = $this->_getOverrideSettingsModel($this->override);
+        if (!$modelSettings) {
+            $modelSettings = $this->_createOverrideSettingsModel($this->override);
+        }
+
+        $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
+
+        $modelSettings->value = $this->attributes;
+        $result = $modelSettings->save();
+
+        $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
+            'changedAttributes' => $this->getDirtyAttributes(),
+        ]));
+
+        $this->invalidateCache();
+
+        return $result;
     }
 
     /**
@@ -408,72 +563,38 @@ abstract class Component extends Model implements ConfigFormInterface
         return $settingsModel;
     }
 
-
     /**
-     * @param $overrideName
-     * @return array
+     * Returns the attribute values that have been modified since they are loaded or saved most recently.
+     *
+     * The comparison of new and old values is made for identical values using `===`.
+     *
+     * @param string[]|null $names the names of the attributes whose values may be returned if they are
+     * changed recently. If null, [[attributes()]] will be used.
+     * @return array the changed attribute values (name-value pairs)
      */
-    public function fetchOverrideSettings($overrideName)
+    public function getDirtyAttributes($names = null)
     {
-        $settingsModel = $this->_getOverrideSettingsModel($overrideName);
-
-        if ($settingsModel) {
-            return (array)$settingsModel->value;
+        if ($names === null) {
+            $names = $this->attributes();
         }
-
-        return [];
+        $names = array_flip($names);
+        $attributes = [];
+        if ($this->_oldAttributes === null) {
+            foreach ($this->toArray() as $name => $value) {
+                if (isset($names[$name])) {
+                    $attributes[$name] = $value;
+                }
+            }
+        } else {
+            foreach ($this->toArray() as $name => $value) {
+                if (isset($names[$name]) && (!array_key_exists($name,
+                            $this->_oldAttributes) || $value !== $this->_oldAttributes[$name])) {
+                    $attributes[$name] = $value;
+                }
+            }
+        }
+        return $attributes;
     }
-
-    /**
-     * @param bool $runValidation
-     * @param null $attributeNames
-     * @return bool
-     * @throws Exception
-     */
-    public function save($runValidation = true, $attributeNames = null)
-    {
-        if (!$this->override) {
-            throw new Exception('Need set current override');
-        }
-
-        if ($runValidation && !$this->validate($attributeNames)) {
-            return false;
-        }
-
-        $modelSettings = $this->_getOverrideSettingsModel($this->override);
-        if (!$modelSettings) {
-            $modelSettings = $this->_createOverrideSettingsModel($this->override);
-        }
-
-        $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
-
-        $modelSettings->value = $this->attributes;
-        $result = $modelSettings->save();
-
-        $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
-            'changedAttributes' => $this->getDirtyAttributes(),
-        ]));
-
-        $this->invalidateCache();
-
-        return $result;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getCacheKey()
-    {
-        return implode([
-            \Yii::getAlias('@webroot'),
-            static::class,
-            $this->namespace,
-            $this->cmsUser ? (string)$this->cmsUser->id : '',
-            $this->cmsSite ? (string)$this->cmsSite->id : '',
-        ]);
-    }
-
 
     /**
      * @return $this
@@ -486,24 +607,6 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return $this;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * TODO: Revrite and check
-     */
-
 
     /**
      * @return UrlHelper
@@ -543,7 +646,6 @@ abstract class Component extends Model implements ConfigFormInterface
             ->url;
     }
 
-
     /**
      * @return array
      */
@@ -570,20 +672,6 @@ abstract class Component extends Model implements ConfigFormInterface
         return $this->settingsId . '-callable';
     }
 
-
-    /**
-     * @var integer a counter used to generate [[id]] for widgets.
-     * @internal
-     */
-    public static $counterSettings = 0;
-    /**
-     * @var string the prefix to the automatically generated widget IDs.
-     * @see getId()
-     */
-    public static $autoSettingsIdPrefix = 'skeeksSettings';
-
-    private $_settingsId;
-
     /**
      * Returns the ID of the widget.
      * @param boolean $autoGenerate whether to generate an ID if it is not set previously
@@ -607,49 +695,6 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->_settingsId = $value;
     }
 
-
-    /**
-     * @event Event an event that is triggered when the record is initialized via [[init()]].
-     */
-    const EVENT_INIT = 'init';
-    /**
-     * @event Event an event that is triggered after the record is created and populated with query result.
-     */
-    const EVENT_AFTER_FIND = 'afterFind';
-    /**
-     * @event ModelEvent an event that is triggered before inserting a record.
-     * You may set [[ModelEvent::isValid]] to be `false` to stop the insertion.
-     */
-    const EVENT_BEFORE_INSERT = 'beforeInsert';
-    /**
-     * @event AfterSaveEvent an event that is triggered after a record is inserted.
-     */
-    const EVENT_AFTER_INSERT = 'afterInsert';
-    /**
-     * @event ModelEvent an event that is triggered before updating a record.
-     * You may set [[ModelEvent::isValid]] to be `false` to stop the update.
-     */
-    const EVENT_BEFORE_UPDATE = 'beforeUpdate';
-    /**
-     * @event AfterSaveEvent an event that is triggered after a record is updated.
-     */
-    const EVENT_AFTER_UPDATE = 'afterUpdate';
-    /**
-     * @event ModelEvent an event that is triggered before deleting a record.
-     * You may set [[ModelEvent::isValid]] to be `false` to stop the deletion.
-     */
-    const EVENT_BEFORE_DELETE = 'beforeDelete';
-    /**
-     * @event Event an event that is triggered after a record is deleted.
-     */
-    const EVENT_AFTER_DELETE = 'afterDelete';
-    /**
-     * @event Event an event that is triggered after a record is refreshed.
-     * @since 2.0.8
-     */
-    const EVENT_AFTER_REFRESH = 'afterRefresh';
-
-
     /**
      * @inheritdoc
      */
@@ -668,6 +713,16 @@ abstract class Component extends Model implements ConfigFormInterface
     }
 
     /**
+     * Returns a value indicating whether the model has an attribute with the specified name.
+     * @param string $name the name of the attribute
+     * @return bool whether the model has an attribute with the specified name.
+     */
+    public function hasAttribute($name)
+    {
+        return isset($this->{$name});
+    }
+
+    /**
      * @inheritdoc
      */
     public function canSetProperty($name, $checkVars = true, $checkBehaviors = true)
@@ -682,17 +737,6 @@ abstract class Component extends Model implements ConfigFormInterface
             // `hasAttribute()` may fail on base/abstract classes in case automatic attribute list fetching used
             return false;
         }
-    }
-
-
-    /**
-     * Returns a value indicating whether the model has an attribute with the specified name.
-     * @param string $name the name of the attribute
-     * @return bool whether the model has an attribute with the specified name.
-     */
-    public function hasAttribute($name)
-    {
-        return isset($this->{$name});
     }
 
     /**
@@ -807,40 +851,6 @@ abstract class Component extends Model implements ConfigFormInterface
     }
 
     /**
-     * Returns the attribute values that have been modified since they are loaded or saved most recently.
-     *
-     * The comparison of new and old values is made for identical values using `===`.
-     *
-     * @param string[]|null $names the names of the attributes whose values may be returned if they are
-     * changed recently. If null, [[attributes()]] will be used.
-     * @return array the changed attribute values (name-value pairs)
-     */
-    public function getDirtyAttributes($names = null)
-    {
-        if ($names === null) {
-            $names = $this->attributes();
-        }
-        $names = array_flip($names);
-        $attributes = [];
-        if ($this->_oldAttributes === null) {
-            foreach ($this->toArray() as $name => $value) {
-                if (isset($names[$name])) {
-                    $attributes[$name] = $value;
-                }
-            }
-        } else {
-            foreach ($this->toArray() as $name => $value) {
-                if (isset($names[$name]) && (!array_key_exists($name,
-                            $this->_oldAttributes) || $value !== $this->_oldAttributes[$name])) {
-                    $attributes[$name] = $value;
-                }
-            }
-        }
-        return $attributes;
-    }
-
-
-    /**
      * Deletes the table row corresponding to this active record.
      *
      * This method performs the following steps in order:
@@ -883,6 +893,43 @@ abstract class Component extends Model implements ConfigFormInterface
         return $result;
     }
 
+    /**
+     * This method is invoked before deleting a record.
+     * The default implementation raises the [[EVENT_BEFORE_DELETE]] event.
+     * When overriding this method, make sure you call the parent implementation like the following:
+     *
+     * ```php
+     * public function beforeDelete()
+     * {
+     *     if (parent::beforeDelete()) {
+     *         // ...custom code here...
+     *         return true;
+     *     } else {
+     *         return false;
+     *     }
+     * }
+     * ```
+     *
+     * @return bool whether the record should be deleted. Defaults to `true`.
+     */
+    public function beforeDelete()
+    {
+        $event = new ModelEvent;
+        $this->trigger(self::EVENT_BEFORE_DELETE, $event);
+
+        return $event->isValid;
+    }
+
+    /**
+     * This method is invoked after deleting a record.
+     * The default implementation raises the [[EVENT_AFTER_DELETE]] event.
+     * You may override this method to do postprocessing after the record is deleted.
+     * Make sure you call the parent implementation so that the event is raised properly.
+     */
+    public function afterDelete()
+    {
+        $this->trigger(self::EVENT_AFTER_DELETE);
+    }
 
     /**
      * This method is called at the beginning of inserting or updating a record.
@@ -938,90 +985,6 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->trigger($insert ? self::EVENT_AFTER_INSERT : self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
             'changedAttributes' => $changedAttributes,
         ]));
-    }
-
-    /**
-     * This method is invoked before deleting a record.
-     * The default implementation raises the [[EVENT_BEFORE_DELETE]] event.
-     * When overriding this method, make sure you call the parent implementation like the following:
-     *
-     * ```php
-     * public function beforeDelete()
-     * {
-     *     if (parent::beforeDelete()) {
-     *         // ...custom code here...
-     *         return true;
-     *     } else {
-     *         return false;
-     *     }
-     * }
-     * ```
-     *
-     * @return bool whether the record should be deleted. Defaults to `true`.
-     */
-    public function beforeDelete()
-    {
-        $event = new ModelEvent;
-        $this->trigger(self::EVENT_BEFORE_DELETE, $event);
-
-        return $event->isValid;
-    }
-
-    /**
-     * This method is invoked after deleting a record.
-     * The default implementation raises the [[EVENT_AFTER_DELETE]] event.
-     * You may override this method to do postprocessing after the record is deleted.
-     * Make sure you call the parent implementation so that the event is raised properly.
-     */
-    public function afterDelete()
-    {
-        $this->trigger(self::EVENT_AFTER_DELETE);
-    }
-
-
-    /**
-     * Populates an active record object using a row of data from the database/storage.
-     *
-     * This is an internal method meant to be called to create active record objects after
-     * fetching data from the database. It is mainly used by [[ActiveQuery]] to populate
-     * the query results into active records.
-     *
-     * When calling this method manually you should call [[afterFind()]] on the created
-     * record to trigger the [[EVENT_AFTER_FIND|afterFind Event]].
-     *
-     * @param BaseActiveRecord $record the record to be populated. In most cases this will be an instance
-     * created by [[instantiate()]] beforehand.
-     * @param array $row attribute values (name => value)
-     */
-    public static function populateRecord($record, $row)
-    {
-        $columns = array_flip($record->attributes());
-        foreach ($row as $name => $value) {
-            if (isset($columns[$name])) {
-                $record->{$name} = $value;
-            } elseif ($record->canSetProperty($name)) {
-                $record->$name = $value;
-            }
-        }
-        $record->_oldAttributes = $record->toArray();
-    }
-
-    /**
-     * Creates an active record instance.
-     *
-     * This method is called together with [[populateRecord()]] by [[ActiveQuery]].
-     * It is not meant to be used for creating new records directly.
-     *
-     * You may override this method if the instance being created
-     * depends on the row data to be populated into the record.
-     * For example, by creating a record based on the value of a column,
-     * you may implement the so-called single-table inheritance mapping.
-     * @param array $row row data to be populated into the record.
-     * @return static the newly created active record
-     */
-    public static function instantiate($row)
-    {
-        return new static;
     }
 
     /**

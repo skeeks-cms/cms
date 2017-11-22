@@ -72,7 +72,7 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @return array
      */
-    static public function descriptorConfig()
+    public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
             "version" => ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version'),

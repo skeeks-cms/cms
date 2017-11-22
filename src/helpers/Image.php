@@ -19,7 +19,7 @@ class Image
     /**
      * @return string
      */
-    static public function getCapSrc()
+    public static function getCapSrc()
     {
         return (string)\Yii::$app->cms->noImageUrl;
     }
@@ -32,7 +32,7 @@ class Image
      * @param null $capSrc
      * @return string
      */
-    static public function getSrc($originalSrc = '', $capSrc = null)
+    public static function getSrc($originalSrc = '', $capSrc = null)
     {
         if ($originalSrc) {
             return (string)$originalSrc;
@@ -52,7 +52,7 @@ class Image
      * @param null $capSrc
      * @return string
      */
-    static public function thumbnailUrlOnRequest($originalSrc = '', Filter $filter, $nameForSave = '', $capSrc = null)
+    public static function thumbnailUrlOnRequest($originalSrc = '', Filter $filter, $nameForSave = '', $capSrc = null)
     {
         if ($originalSrc) {
             return \Yii::$app->imaging->thumbnailUrlOnRequest($originalSrc, $filter, $nameForSave = '');

@@ -104,7 +104,7 @@ class Imaging extends Component
      * @param $filePath
      * @return string|bool
      */
-    static public function getExtension($filePath)
+    public static function getExtension($filePath)
     {
         $parts = explode(".", $filePath);
         $extension = end($parts);
