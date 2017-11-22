@@ -15,23 +15,23 @@ $widget = $this->context;
 <div class="row">
     <div class="col-md-12">
         <ul class="sx-selected">
-            <? if ($widget->sections) : ?>
-                <? foreach ($widget->sections as $tree) : ?>
+            <?php if ($widget->sections) : ?>
+                <?php foreach ($widget->sections as $tree) : ?>
                     <li data-id="<?= $tree->id; ?>">
                         <a href="<?= $tree->url; ?>" target="_blank" data-pjax="0">
                             <?= $widget->getNodeName($tree); ?>
                         </a>
                         <a href="#" class="sx-close-btn pull-right"><i class="glyphicon glyphicon-remove"></i></a>
                     </li>
-                <? endforeach; ?>
-            <? endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </ul>
     </div>
 
     <div class="col-md-12">
         <div class="col-md-12 sx-select-tree-widget">
-            <? $treeWidgetClass = $widget->treeWidgetClass; ?>
-            <? $widgetTree = $treeWidgetClass::begin($widget->treeWidgetOptions); ?>
+            <?php $treeWidgetClass = $widget->treeWidgetClass; ?>
+            <?php $widgetTree = $treeWidgetClass::begin($widget->treeWidgetOptions); ?>
             <?
 
             $widget->clientOptions['pjaxid'] = $widgetTree->pjax->id;

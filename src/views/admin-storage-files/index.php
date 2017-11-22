@@ -16,9 +16,9 @@
 ?>
 
 
-<? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+<?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-<? $pjaxId = $pjax->id; ?>
+<?php $pjaxId = $pjax->id; ?>
 <?= \skeeks\cms\widgets\StorageFileManager::widget([
     'clientOptions' =>
         [
@@ -124,4 +124,4 @@ JS
 
 ]); ?>
 
-<? $pjax::end(); ?>
+<?php $pjax::end(); ?>

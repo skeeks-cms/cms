@@ -11,7 +11,7 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 $dataProvider->setSort(['defaultOrder' => ['priority' => SORT_ASC]]);
 ?>
-<? $pjax = \yii\widgets\Pjax::begin(); ?>
+<?php $pjax = \yii\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
     'searchModel' => $searchModel,
@@ -39,4 +39,4 @@ $dataProvider->setSort(['defaultOrder' => ['priority' => SORT_ASC]]);
         ]
 ]); ?>
 
-<? \yii\widgets\Pjax::end(); ?>
+<?php \yii\widgets\Pjax::end(); ?>

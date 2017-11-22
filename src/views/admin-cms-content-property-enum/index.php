@@ -25,7 +25,7 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
 ]);
 
 ?>
-<? $pjax = \yii\widgets\Pjax::begin(); ?>
+<?php $pjax = \yii\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
     'searchModel' => $searchModel,
@@ -55,4 +55,4 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
         ]
 ]); ?>
 
-<? \yii\widgets\Pjax::end(); ?>
+<?php \yii\widgets\Pjax::end(); ?>

@@ -47,7 +47,7 @@ $this->title = \Yii::t('skeeks/cms', 'Authorization');
 
                 </div>
                 <!--Или социальные сети
-                --><? /*= yii\authclient\widgets\AuthChoice::widget([
+                --><?php /*= yii\authclient\widgets\AuthChoice::widget([
                      'baseAuthUrl' => ['site/auth']
                 ]) */ ?>
             </div>

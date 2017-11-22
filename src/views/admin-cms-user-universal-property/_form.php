@@ -19,7 +19,7 @@ if ($model->isNewRecord) {
     'enableAjaxValidation' => false,
 ]); ?>
 
-<? $this->registerJs(<<<JS
+<?php $this->registerJs(<<<JS
 
 (function(sx, $, _)
 {
@@ -69,13 +69,13 @@ JS
     ->label(\Yii::t('skeeks/cms', "Property type"));
 ?>
 
-<? if ($handler) : ?>
+<?php if ($handler) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
-    <? if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
-        <? $handler->enumRoute = 'cms/admin-cms-user-universal-property-enum'; ?>
-    <? endif; ?>
+    <?php if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
+        <?php $handler->enumRoute = 'cms/admin-cms-user-universal-property-enum'; ?>
+    <?php endif; ?>
     <?= $handler->renderConfigForm($form); ?>
-<? endif; ?>
+<?php endif; ?>
 
 
 

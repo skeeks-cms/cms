@@ -31,15 +31,15 @@ $action = $controller->action;
 <?= $form->field($model, 'code')->textInput(); ?>
 
 
-<? if ($model->def === \skeeks\cms\components\Cms::BOOL_Y): ?>
+<?php if ($model->def === \skeeks\cms\components\Cms::BOOL_Y): ?>
     <?= $form->field($model, 'active')->hiddenInput()->hint(\Yii::t('skeeks/cms',
         'Site selected by default always active')); ?>
     <?= $form->field($model, 'def')->hiddenInput()->hint(\Yii::t('skeeks/cms',
         'This site is the site selected by default. If you want to change it, you need to choose a different site, the default site.')); ?>
-<? else : ?>
+<?php else : ?>
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
     <?= $form->fieldRadioListBoolean($model, 'def'); ?>
-<? endif; ?>
+<?php endif; ?>
 
 
 
@@ -50,7 +50,7 @@ $action = $controller->action;
 
 <?= $form->fieldSetEnd(); ?>
 
-<? if (!$model->isNewRecord) : ?>
+<?php if (!$model->isNewRecord) : ?>
     <?= $form->fieldSet(\Yii::t('skeeks/cms', "Domains")); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
@@ -71,7 +71,7 @@ $action = $controller->action;
     ]); ?>
 
     <?= $form->fieldSetEnd(); ?>
-<? endif; ?>
+<?php endif; ?>
 <?= $form->buttonsStandart($model) ?>
 
 <?php echo $form->errorSummary($model); ?>

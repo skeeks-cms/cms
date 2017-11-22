@@ -20,7 +20,7 @@
             'This component may have personal preferences for each user. And it works differently depending on which of the sites is displayed.') ?></p>
     <p><?= \Yii::t('skeeks/cms',
             'In that case, if user not has personal settings will be used the default settings.') ?></p>
-    <? if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere([
+    <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere([
         '>',
         'user_id',
         0
@@ -30,9 +30,9 @@
                 onclick="sx.ComponentSettings.Remove.removeUsers(); return false;">
             <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'Reset settings for all users') ?>
         </button>
-    <? else: ?>
+    <?php else: ?>
         <small><?= \Yii::t('skeeks/cms', 'Neither user does not have personal settings for this component') ?></small>
-    <? endif; ?>
+    <?php endif; ?>
 </div>
 
 <?

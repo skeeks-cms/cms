@@ -60,7 +60,7 @@ CSS
 );
 ?>
 <div class="col-md-12">
-    <? $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([
+    <?php $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([
         "models" => $models,
         "viewNodeContentFile" => '@skeeks/cms/views/admin-tree/_tree-node',
 
@@ -221,6 +221,6 @@ CSS
 JS
     );
     ?>
-    <? $widget::end(); ?>
+    <?php $widget::end(); ?>
 
 </div>

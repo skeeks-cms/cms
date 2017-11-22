@@ -19,18 +19,18 @@ $action = $controller->action;
         <div class="row">
             <div class="col-md-12">
                 <div class="pull-left">
-                    <? if ($model->parents) : ?>
-                        <? foreach ($model->parents as $tree) : ?>
+                    <?php if ($model->parents) : ?>
+                        <?php foreach ($model->parents as $tree) : ?>
                             <a href="<?= $tree->url ?>" target="_blank"
                                title="<?= \Yii::t('skeeks/cms', 'Watch to site (opens new window)') ?>">
                                 <?= $tree->name ?>
-                                <? if ($tree->level == 0) : ?>
+                                <?php if ($tree->level == 0) : ?>
                                     [<?= $tree->site->name; ?>]
-                                <? endif; ?>
+                                <?php endif; ?>
                             </a>
                             /
-                        <? endforeach; ?>
-                    <? endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                     <a href="<?= $model->url ?>" target="_blank"
                        title="<?= Yii::t('skeeks/cms', 'Watch to site (opens new window)') ?>">
                         <?= $model->name; ?>
@@ -49,7 +49,7 @@ $action = $controller->action;
     'enableClientValidation' => false,
 ]); ?>
 
-<? $this->registerJs(<<<JS
+<?php $this->registerJs(<<<JS
 
 (function(sx, $, _)
 {
@@ -167,19 +167,19 @@ JS
     </div>
 
 
-<? if ($relatedModel->properties) : ?>
+<?php if ($relatedModel->properties) : ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('skeeks/cms', 'Additional properties')
     ]); ?>
 
-    <? foreach ($relatedModel->properties as $property) : ?>
+    <?php foreach ($relatedModel->properties as $property) : ?>
         <?= $property->renderActiveForm($form); ?>
-    <? endforeach; ?>
+    <?php endforeach; ?>
 
-<? else : ?>
-    <? /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
-<? endif; ?>
+<?php else : ?>
+    <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
+<?php endif; ?>
 
 <?= $form->fieldSetEnd() ?>
 
@@ -203,7 +203,7 @@ JS
             ]);
         ?>
 
-        <? /*= $form->field($model, 'description_short')->widget(
+        <?php /*= $form->field($model, 'description_short')->widget(
         \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
         [
             'modelAttributeSaveType' => 'description_short_type',
@@ -280,8 +280,8 @@ JS
 <?= $form->fieldSetEnd() ?>
 
 
-<? if (!$model->isNewRecord) : ?>
-    <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : ?>
+<?php if (!$model->isNewRecord) : ?>
+    <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : ?>
         <?
         /**
          * @var \skeeks\cms\backend\BackendAction $actionIndex
@@ -291,19 +291,19 @@ JS
         $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
         ?>
 
-        <? if ($actionIndex) : ?>
+        <?php if ($actionIndex) : ?>
 
-            <? if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : ?>
+            <?php if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : ?>
 
                 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Properties of elements')) ?>
 
 
-                <? foreach ($contents as $content) : ?>
+                <?php foreach ($contents as $content) : ?>
 
                     <h2><?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
                             'content' => $content->name
                         ]); ?></h2>
-                    <? $pjax = \yii\widgets\Pjax::begin(); ?>
+                    <?php $pjax = \yii\widgets\Pjax::begin(); ?>
                     <?
                     $query = \skeeks\cms\models\CmsContentProperty::find()->orderBy(['priority' => SORT_ASC]);
                     $query->joinWith('cmsContentProperty2contents cmap');
@@ -413,9 +413,9 @@ JS
                             ]
                     ]); ?>
 
-                    <? \yii\widgets\Pjax::end(); ?>
+                    <?php \yii\widgets\Pjax::end(); ?>
 
-                <? endforeach; ?>
+                <?php endforeach; ?>
 
 
 
@@ -423,17 +423,17 @@ JS
                 <?= $form->fieldSetEnd(); ?>
 
 
-            <? endif; ?>
+            <?php endif; ?>
 
 
-        <? endif; ?>
-    <? endif; ?>
-<? endif; ?>
+        <?php endif; ?>
+    <?php endif; ?>
+<?php endif; ?>
 
         <!--
-<? /*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) */ ?>
+<?php /*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally')) */ ?>
 
-    <? /*= $form->field($model, 'tree_menu_ids')->label(\Yii::t('skeeks/cms','Marks'))->widget(
+    <?php /*= $form->field($model, 'tree_menu_ids')->label(\Yii::t('skeeks/cms','Marks'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\TreeMenu::find()->all(),
@@ -447,7 +447,7 @@ JS
         )->hint(\Yii::t('skeeks/cms','You can link the current section to a few marks, and according to this, section will be displayed in different menus for example.'));
     */ ?>
 
---><? /*= $form->fieldSetEnd() */ ?>
+--><?php /*= $form->fieldSetEnd() */ ?>
 
 
 <?
@@ -456,12 +456,12 @@ JS
  * @var $content \skeeks\cms\models\CmsContent
  */
 ?>
-<? /* if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : */ ?><!--
-    <? /* foreach ($contents as $content) : */ ?>
-        <? /*= $form->fieldSet($content->name) */ ?>
+<?php /* if ($contents = \skeeks\cms\models\CmsContent::find()->active()->all()) : */ ?><!--
+    <?php /* foreach ($contents as $content) : */ ?>
+        <?php /*= $form->fieldSet($content->name) */ ?>
 
 
-            <? /*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+            <?php /*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => $content->name,
                 'hint'              => \Yii::t('skeeks/cms',"Showing all elements of type '{name}' associated with this section. Taken into account only the main binding.",['name' => $content->name]),
                 'parentModel'       => $model,
@@ -483,13 +483,13 @@ JS
                 ],
             ]); */ ?>
 
-        <? /*= $form->fieldSetEnd() */ ?>
-    <? /* endforeach; */ ?>
---><? /* endif; */ ?>
+        <?php /*= $form->fieldSetEnd() */ ?>
+    <?php /* endforeach; */ ?>
+--><?php /* endif; */ ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 
-<? $this->registerJs(<<<JS
+<?php $this->registerJs(<<<JS
     (function(sx, $, _)
     {
         sx.createNamespace('classes', sx);

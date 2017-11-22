@@ -21,9 +21,9 @@ JS
     'placeholder' => '+7 903 722-28-73'
 ])->hint('Формат ввода телефона: +7 903 722-28-73'); ?>
 
-<? if (\Yii::$app->request->get('user_id')) : ?>
+<?php if (\Yii::$app->request->get('user_id')) : ?>
     <?= $form->field($model, 'user_id')->hiddenInput(['value' => \Yii::$app->request->get('user_id')])->label(false) ?>
-<? else: ?>
+<?php else: ?>
     <?= $form->fieldSelect($model, 'user_id', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\User::find()->active()->all(),
         'id',
@@ -31,7 +31,7 @@ JS
     ), [
         'allowDeselect' => true
     ]) ?>
-<? endif; ?>
+<?php endif; ?>
 
 
 <?= $form->fieldRadioListBoolean($model, 'approved'); ?>

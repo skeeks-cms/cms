@@ -35,14 +35,14 @@ if ($additionalName) {
     <a href="<?= $widget->getOpenCloseLink($model); ?>">
         <?= $result; ?>
     </a>
-    <? if ($model->redirect || $model->redirect_tree_id) : ?>
+    <?php if ($model->redirect || $model->redirect_tree_id) : ?>
         →
-    <? endif; ?>
-    <? if ($model->redirect) : ?>
+    <?php endif; ?>
+    <?php if ($model->redirect) : ?>
         <?= $model->redirect; ?>
-    <? endif; ?>
-    <? if ($model->redirectTree) : ?>
-        <? if ($parents = $model->redirectTree->parents) : ?>
+    <?php endif; ?>
+    <?php if ($model->redirectTree) : ?>
+        <?php if ($parents = $model->redirectTree->parents) : ?>
             <?
             $root = $parents[0];
             unset($parents[0]);
@@ -57,14 +57,14 @@ if ($additionalName) {
             $names[] = $model->redirectTree->name;
             echo implode(" / ", $names);
             ?>
-        <? else : ?>
+        <?php else : ?>
             <?
             $names[] = $model->redirectTree->site->name;
             echo implode(" / ", $names);
             ?>
-        <? endif; ?>
+        <?php endif; ?>
 
-    <? endif; ?>
+    <?php endif; ?>
 </div>
 
 
@@ -98,16 +98,16 @@ if ($additionalName) {
             <span class="glyphicon glyphicon-eye-open"></span>
         </a>
     </div>
-    <? if ($model->level > 0) : ?>
+    <?php if ($model->level > 0) : ?>
         <div class="pull-left sx-controll-act">
             <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-tree-move"
                title="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>">
                 <span class="glyphicon glyphicon-move"></span>
             </a>
         </div>
-    <? endif; ?>
+    <?php endif; ?>
 
-    <? if ($callbackEventName = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) : ?>
+    <?php if ($callbackEventName = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) : ?>
 
 
         <?
@@ -167,13 +167,13 @@ JS
             'data-pjax' => 0
         ]);
         ?>
-    <? endif; ?>
+    <?php endif; ?>
 
 </div>
 
-<? if ($model->treeType) : ?>
+<?php if ($model->treeType) : ?>
     <div class="pull-right sx-tree-type">
         <?= $model->treeType->name; ?>
     </div>
-<? endif; ?>
+<?php endif; ?>
 

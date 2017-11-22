@@ -69,51 +69,51 @@ JS
 );
 ?>
 
-<? $form = ActiveForm::begin([
+<?php $form = ActiveForm::begin([
     'usePjax' => false
 ]); ?>
 <!--
-<? /* if ($model) : */ ?>
-    <? /*= $form->fieldSet(\Yii::t('skeeks/cms','Files attached to records')); */ ?>
+<?php /* if ($model) : */ ?>
+    <?php /*= $form->fieldSet(\Yii::t('skeeks/cms','Files attached to records')); */ ?>
 
-        <? /* \yii\bootstrap\Alert::begin(['options' => [
+        <?php /* \yii\bootstrap\Alert::begin(['options' => [
           'class' => 'alert-info',
         ]]); */ ?>
-            <? /*=\Yii::t('skeeks/cms','At this tab displays all the files and images that are tied to the current element.')*/ ?>
-        <? /* \yii\bootstrap\Alert::end(); */ ?>
+            <?php /*=\Yii::t('skeeks/cms','At this tab displays all the files and images that are tied to the current element.')*/ ?>
+        <?php /* \yii\bootstrap\Alert::end(); */ ?>
 
 
-        <? /* foreach($model->getBehaviors() as $behavior) : */ ?>
-            <? /* \yii\bootstrap\ActiveForm::begin(); */ ?>
-            <? /* if ($behavior instanceof \skeeks\cms\models\behaviors\HasStorageFile)  : */ ?>
-                <? /* foreach($behavior->fields as $fieldName) : */ ?>
+        <?php /* foreach($model->getBehaviors() as $behavior) : */ ?>
+            <?php /* \yii\bootstrap\ActiveForm::begin(); */ ?>
+            <?php /* if ($behavior instanceof \skeeks\cms\models\behaviors\HasStorageFile)  : */ ?>
+                <?php /* foreach($behavior->fields as $fieldName) : */ ?>
 
-                    <? /*= $form->field($model, $fieldName)->widget(
+                    <?php /*= $form->field($model, $fieldName)->widget(
                         \skeeks\cms\widgets\formInputs\StorageImage::className(),
                         [
                             'viewItemTemplate' => '@skeeks/cms/views/admin-tools/one-file'
                         ]
                     ); */ ?>
 
-                <? /* endforeach; */ ?>
+                <?php /* endforeach; */ ?>
 
-            <? /* elseif ($behavior instanceof \skeeks\cms\models\behaviors\HasStorageFileMulti) : */ ?>
-                <? /* foreach($behavior->relations as $relationName) : */ ?>
+            <?php /* elseif ($behavior instanceof \skeeks\cms\models\behaviors\HasStorageFileMulti) : */ ?>
+                <?php /* foreach($behavior->relations as $relationName) : */ ?>
 
 
-                <? /*= $form->field($model, $relationName['relation'])->widget(
+                <?php /*= $form->field($model, $relationName['relation'])->widget(
                     \skeeks\cms\widgets\formInputs\ModelStorageFiles::className(),
                     [
                         'viewItemTemplate' => '@skeeks/cms/views/admin-tools/one-file'
                     ]
                 ); */ ?>
 
-                <? /* endforeach; */ ?>
-            <? /* endif; */ ?>
-            <? /* \yii\bootstrap\ActiveForm::end(); */ ?>
-        <? /* endforeach; */ ?>
-    <? /*= $form->fieldSetEnd(); */ ?>
---><? /* endif; */ ?>
+                <?php /* endforeach; */ ?>
+            <?php /* endif; */ ?>
+            <?php /* \yii\bootstrap\ActiveForm::end(); */ ?>
+        <?php /* endforeach; */ ?>
+    <?php /*= $form->fieldSetEnd(); */ ?>
+--><?php /* endif; */ ?>
 
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'File storage')); ?>
@@ -146,7 +146,7 @@ JS
         ],
 ]); ?>
 <p></p>
-<? $dataProvider->pagination->defaultPageSize = 10; ?>
+<?php $dataProvider->pagination->defaultPageSize = 10; ?>
 <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
 
     'dataProvider' => $dataProvider,
@@ -276,7 +276,7 @@ echo \mihaildev\elfinder\ElFinder::widget([
     'onclick' => "sx.dialog({'title' : '" . \Yii::t('skeeks/cms', 'Help') . "', 'content' : '#sx-help'}); return false;"
 ]); ?>
 <div style="display: none;" id="sx-help">
-    <? \Yii::t('skeeks/cms', 'Help in the process of writing ...') ?>
+    <?php \Yii::t('skeeks/cms', 'Help in the process of writing ...') ?>
 </div>
 
-<? ActiveForm::end(); ?>
+<?php ActiveForm::end(); ?>

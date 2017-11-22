@@ -18,7 +18,7 @@ if ($filter->id) {
 }
 
 ?>
-<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
@@ -36,4 +36,4 @@ if ($filter->id) {
     ]
 ); ?>
 
-<? $form::end(); ?>
+<?php $form::end(); ?>

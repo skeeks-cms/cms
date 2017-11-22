@@ -9,7 +9,7 @@ use skeeks\cms\models\Tree;
 
 ?>
 
-<? $this->registerCss(<<<CSS
+<?php $this->registerCss(<<<CSS
     .sx-image-controll .sx-image img
     {
         max-height: 200px;
@@ -22,11 +22,11 @@ CSS
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
-    <? if ($model->isImage()) : ?>
+    <?php if ($model->isImage()) : ?>
         <div class="sx-image">
             <img src="<?= $model->src; ?>"/>
         </div>
-    <? endif; ?>
+    <?php endif; ?>
     <div class="">
 
     </div>
@@ -79,7 +79,7 @@ CSS
             'class' => 'form-control',
         ]) ?>
     </div>
-    <? /*= $form->field($model, 'size')->textInput([
+    <?php /*= $form->field($model, 'size')->textInput([
         'maxlength' => 255,
         'disabled' => 'disabled',
         'value' => \Yii::$app->formatter->asShortSize($model->size)
@@ -96,10 +96,10 @@ CSS
         'disabled' => 'disabled'
     ]); ?>
 
-    <? if ($model->isImage()) : ?>
-        <? if (!$model->image_height || !$model->image_width) : ?>
-            <? $model->updateFileInfo(); ?>
-        <? endif; ?>
+    <?php if ($model->isImage()) : ?>
+        <?php if (!$model->image_height || !$model->image_width) : ?>
+            <?php $model->updateFileInfo(); ?>
+        <?php endif; ?>
         <div class="col-md-12">
             <div class="col-md-2">
                 <?= $form->field($model, 'image_width')->textInput([
@@ -115,14 +115,14 @@ CSS
                 ]); ?>
             </div>
         </div>
-    <? endif; ?>
+    <?php endif; ?>
 
 
 
     <?= $form->fieldSetEnd(); ?>
 
 
-    <? if ($model->isImage()) : ?>
+    <?php if ($model->isImage()) : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Thumbnails')); ?>
         <p><?= \Yii::t('skeeks/cms',
                 'This is an image in different places of the site displayed in different sizes.') ?></p>
@@ -132,7 +132,7 @@ CSS
         <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Image editor')); ?>
 
         <?= $form->fieldSetEnd(); ?>
-    <? endif; ?>
+    <?php endif; ?>
 
     <?= $form->buttonsCreateOrUpdate($model); ?>
     <?php ActiveForm::end(); ?>

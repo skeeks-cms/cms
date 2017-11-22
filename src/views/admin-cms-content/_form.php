@@ -20,14 +20,14 @@ $action = $controller->action;
     'content' => \Yii::t('skeeks/cms', 'Main')
 ]); ?>
 
-<? if ($content_type = \Yii::$app->request->get('content_type')) : ?>
+<?php if ($content_type = \Yii::$app->request->get('content_type')) : ?>
     <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
-<? else: ?>
+<?php else: ?>
     <div style="display: none;">
         <?= $form->fieldSelect($model, 'content_type',
             \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name')); ?>
     </div>
-<? endif; ?>
+<?php endif; ?>
 
 <?= $form->field($model, 'name')->textInput(); ?>
 <?= $form->field($model, 'code')->textInput()
@@ -52,7 +52,7 @@ $action = $controller->action;
         <?= $form->field($model, 'default_tree_id')->widget(
             \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
         ); ?>
-        <? /*= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+        <?php /*= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
                     'allowDeselect' => true
                 ]); */ ?>
     </div>
@@ -66,7 +66,7 @@ $action = $controller->action;
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
 )->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
 
-<? /*= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
+<?php /*= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
             'allowDeselect' => true
         ])->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); */ ?>
 
@@ -97,23 +97,23 @@ $action = $controller->action;
 </div>
 
 
-<? if ($model->childrenContents) : ?>
+<?php if ($model->childrenContents) : ?>
     <p><b><?= \Yii::t('skeeks/cms', 'Children content') ?></b></p>
-    <? foreach ($model->childrenContents as $contentChildren) : ?>
+    <?php foreach ($model->childrenContents as $contentChildren) : ?>
         <p><?= \yii\helpers\Html::a($contentChildren->name, \skeeks\cms\helpers\UrlHelper::construct([
                 '/cms/admin-cms-content/update',
                 'pk' => $contentChildren->id
             ])->enableAdmin()->toString()) ?></p>
-    <? endforeach; ?>
+    <?php endforeach; ?>
 
-<? endif; ?>
+<?php endif; ?>
 
 
 <?= $form->fieldSetEnd(); ?>
 
 
-<? if (!$model->isNewRecord) : ?>
-    <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : ?>
+<?php if (!$model->isNewRecord) : ?>
+    <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : ?>
         <?
         /**
          * @var \skeeks\cms\backend\BackendAction $actionIndex
@@ -123,10 +123,10 @@ $action = $controller->action;
         $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
         ?>
 
-        <? if ($actionIndex) : ?>
+        <?php if ($actionIndex) : ?>
             <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Properties')) ?>
 
-            <? $pjax = \yii\widgets\Pjax::begin(); ?>
+            <?php $pjax = \yii\widgets\Pjax::begin(); ?>
             <?
             $query = \skeeks\cms\models\CmsContentProperty::find()->orderBy(['priority' => SORT_ASC]);
             $query->joinWith('cmsContentProperty2contents map');
@@ -231,11 +231,11 @@ $action = $controller->action;
                     ]
             ]); ?>
 
-            <? \yii\widgets\Pjax::end(); ?>
+            <?php \yii\widgets\Pjax::end(); ?>
 
             <?= $form->fieldSetEnd(); ?>
-        <? endif; ?>
-    <? endif; ?>
+        <?php endif; ?>
+    <?php endif; ?>
 
 
 
@@ -247,7 +247,7 @@ $action = $controller->action;
     <?= $form->field($model, 'meta_keywords_template')->textarea(); ?>
     <?= $form->fieldSetEnd(); ?>
 
-<? endif; ?>
+<?php endif; ?>
 
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Captions')); ?>
@@ -266,7 +266,7 @@ $action = $controller->action;
     'content' => \Yii::t('skeeks/cms', 'Additionally')
 ]); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>
-<? /*= $form->fieldRadioListBoolean($model, 'index_for_search'); */ ?>
+<?php /*= $form->fieldRadioListBoolean($model, 'index_for_search'); */ ?>
 
 <?= $form->fieldSetEnd(); ?>
 

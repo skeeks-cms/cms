@@ -20,7 +20,7 @@
             'This component may have personal preferences. And it works differently depending on which of the sites is displayed.') ?></p>
     <p><?= \Yii::t('skeeks/cms',
             'In that case, if the site not has personal settings will be used the default settings.') ?></p>
-    <? if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere([
+    <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere([
         '>',
         'cms_site_id',
         0
@@ -31,9 +31,9 @@
             <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'reset settings for all sites"') ?>
         </button>
         <small>.</small>
-    <? else: ?>
+    <?php else: ?>
         <small><?= \Yii::t('skeeks/cms', 'Neither site does not have personal settings for this component') ?></small>
-    <? endif; ?>
+    <?php endif; ?>
 </div>
 
 <?

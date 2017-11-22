@@ -38,7 +38,7 @@ $this->registerJs(<<<JS
 JS
 )
 ?>
-<? $form = \skeeks\cms\base\widgets\ActiveForm::begin([
+<?php $form = \skeeks\cms\base\widgets\ActiveForm::begin([
     'options' =>
         [
             'id' => 'sx-filters-form',
@@ -48,27 +48,27 @@ JS
     'action' => "/" . \Yii::$app->request->getPathInfo(),
 ]); ?>
 
-<? if ($widget->searchModel) : ?>
+<?php if ($widget->searchModel) : ?>
 
-    <? if (in_array('image', $widget->searchModelAttributes)) : ?>
+    <?php if (in_array('image', $widget->searchModelAttributes)) : ?>
         <?= $form->fieldSelect($widget->searchModel, "image", [
             '' => \skeeks\cms\shop\Module::t('skeeks/cms', 'Does not matter'),
             'Y' => \skeeks\cms\shop\Module::t('skeeks/cms', 'With photo'),
             'N' => \skeeks\cms\shop\Module::t('skeeks/cms', 'Without photo'),
         ]); ?>
-    <? endif; ?>
+    <?php endif; ?>
 
 
-<? endif; ?>
+<?php endif; ?>
 
 
 
-<? if ($properties = $widget->searchRelatedPropertiesModel->properties) : ?>
+<?php if ($properties = $widget->searchRelatedPropertiesModel->properties) : ?>
 
-    <? foreach ($properties as $property) : ?>
-        <? if (in_array($property->code, $widget->realatedProperties)) : ?>
+    <?php foreach ($properties as $property) : ?>
+        <?php if (in_array($property->code, $widget->realatedProperties)) : ?>
 
-            <? if (in_array($property->property_type, [
+            <?php if (in_array($property->property_type, [
                 \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
                 \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
             ])) : ?>
@@ -77,7 +77,7 @@ JS
                     $widget->getRelatedPropertyOptions($property)
                     , ['class' => 'sx-filters-checkbox-options']); ?>
 
-            <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
+            <?php elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
                 <div class="form-group">
                     <label class="control-label"><?= $property->name; ?></label>
                     <div class="row">
@@ -96,14 +96,14 @@ JS
                     </div>
                 </div>
 
-            <? else : ?>
+            <?php else : ?>
 
-                <? $propertiesValues = \skeeks\cms\models\CmsContentElementProperty::find()->select(['value'])->where([
+                <?php $propertiesValues = \skeeks\cms\models\CmsContentElementProperty::find()->select(['value'])->where([
                     'property_id' => $property->id,
                     'element_id' => $widget->elementIds
                 ])->all(); ?>
 
-                <? if ($propertiesValues) : ?>
+                <?php if ($propertiesValues) : ?>
                     <div class="row">
                         <div class="col-md-12">
 
@@ -114,16 +114,16 @@ JS
 
                         </div>
                     </div>
-                <? endif; ?>
-            <? endif; ?>
+                <?php endif; ?>
+            <?php endif; ?>
 
-        <? endif; ?>
+        <?php endif; ?>
 
 
-    <? endforeach; ?>
-<? endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 
 <button class="btn btn-primary"><?= \Yii::t('skeeks/cms', 'Apply'); ?></button>
 
-<? \skeeks\cms\base\widgets\ActiveForm::end(); ?>
+<?php \skeeks\cms\base\widgets\ActiveForm::end(); ?>

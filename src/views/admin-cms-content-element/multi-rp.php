@@ -54,15 +54,15 @@ JS
 );
 ?>
 <div id="<?= $action->id; ?>">
-    <? if ($action->controller && $action->controller->content) : ?>
+    <?php if ($action->controller && $action->controller->content) : ?>
 
-        <? $content = $action->controller->content; ?>
-        <? $element = $content->createElement(); ?>
-        <? $element->loadDefaultValues(); ?>
+        <?php $content = $action->controller->content; ?>
+        <?php $element = $content->createElement(); ?>
+        <?php $element->loadDefaultValues(); ?>
 
-        <? if ($element && $element->relatedPropertiesModel) : ?>
+        <?php if ($element && $element->relatedPropertiesModel) : ?>
 
-            <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
+            <?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
                 'options' => [
                     'class' => 'sx-form',
                 ]
@@ -78,11 +78,11 @@ JS
 
             <?= \yii\helpers\Html::hiddenInput('content_id', $content->id); ?>
 
-            <? foreach ($element->relatedPropertiesModel->properties as $property) : ?>
+            <?php foreach ($element->relatedPropertiesModel->properties as $property) : ?>
                 <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
-                    <? if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
+                    <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
 
-                        <? if ($property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
+                        <?php if ($property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
                             <?
                             echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
                                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
@@ -91,7 +91,7 @@ JS
                                 ]
                             );
                             ?>
-                        <? else : ?>
+                        <?php else : ?>
                             <?
                             echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
                                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
@@ -101,18 +101,18 @@ JS
                                 ]
                             );
                             ?>
-                        <? endif; ?>
-                    <? else : ?>
+                        <?php endif; ?>
+                    <?php else : ?>
                         <?= $property->renderActiveForm($form); ?>
-                    <? endif; ?>
+                    <?php endif; ?>
                 </div>
-            <? endforeach; ?>
+            <?php endforeach; ?>
             <?= $form->buttonsStandart($model, ['save']); ?>
-            <? $form::end(); ?>
-        <? else : ?>
+            <?php $form::end(); ?>
+        <?php else : ?>
             Not found properties
-        <? endif; ?>
-    <? endif; ?>
+        <?php endif; ?>
+    <?php endif; ?>
 </div>
 
 

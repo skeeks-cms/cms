@@ -55,13 +55,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet('Доступ'); ?>
 
-<? \yii\bootstrap\Alert::begin([
+<?php \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-warning',
     ],
 ]); ?>
 <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
-<? \yii\bootstrap\Alert::end() ?>
+<?php \yii\bootstrap\Alert::end() ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => "Файлы"

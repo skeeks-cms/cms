@@ -41,10 +41,10 @@ use common\models\User;
 <?= $form->field($model, 'name_meny')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<? if (!$model->isNewRecord) : ?>
+<?php if (!$model->isNewRecord) : ?>
     <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Properties')) ?>
 
-    <? $pjax = \yii\widgets\Pjax::begin(); ?>
+    <?php $pjax = \yii\widgets\Pjax::begin(); ?>
     <?
     $query = \skeeks\cms\models\CmsTreeTypeProperty::find()->orderBy(['priority' => SORT_ASC]);
     $query->joinWith('cmsTreeTypeProperty2types map');
@@ -86,11 +86,11 @@ use common\models\User;
             ]
     ]); ?>
 
-    <? \yii\widgets\Pjax::end(); ?>
+    <?php \yii\widgets\Pjax::end(); ?>
 
 
 
     <?= $form->fieldSetEnd(); ?>
-<? endif; ?>
+<?php endif; ?>
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

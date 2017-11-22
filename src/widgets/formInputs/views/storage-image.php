@@ -77,7 +77,7 @@ JS
 );
 ?>
 <div class="sx-fromWidget-storageImages">
-    <? \skeeks\cms\modules\admin\widgets\Pjax::begin([
+    <?php \skeeks\cms\modules\admin\widgets\Pjax::begin([
         'id' => 'pjax-storage-images-widget-' . $widget->id,
         'blockPjaxContainer' => true,
     ]); ?>
@@ -85,9 +85,9 @@ JS
 
     <div class="sx-group-images">
         <div class="row col-md-12">
-            <? if ($imageFile = $widget->image) : ?>
+            <?php if ($imageFile = $widget->image) : ?>
                 <div class="sx-image">
-                    <? if (!$widget->viewItemTemplate) : ?>
+                    <?php if (!$widget->viewItemTemplate) : ?>
                         <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
                             <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src,
                                 new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
@@ -107,16 +107,16 @@ JS
                             ]);
                             ?>
                         </div>
-                    <? else : ?>
+                    <?php else : ?>
                         <?= $widget->renderItem($imageFile); ?>
-                    <? endif; ?>
+                    <?php endif; ?>
 
                 </div>
-            <? endif; ?>
+            <?php endif; ?>
         </div>
     </div>
 
-    <? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
+    <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
 
     <div class="sx-controlls">
         <?= \skeeks\cms\widgets\StorageFileManager::widget([

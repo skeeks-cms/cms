@@ -48,9 +48,9 @@ $controllElement = \Yii::$app->controller->renderNodeControll($model);
     </div>
 </div>
 
-<? if ($model->treeType) : ?>
+<?php if ($model->treeType) : ?>
     <div class="pull-right sx-tree-type">
         <?= $model->treeType->name; ?>
     </div>
-<? endif; ?>
+<?php endif; ?>
 

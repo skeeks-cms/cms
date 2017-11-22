@@ -17,28 +17,28 @@ $widget = $this->context;
 ]); ?>
 
 <div class="row">
-    <? if ($model->children) : ?>
+    <?php if ($model->children) : ?>
         <div class="sx-node-open-close">
-            <? if ($widget->isOpenNode($model)) : ?>
+            <?php if ($widget->isOpenNode($model)) : ?>
                 <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
                     <span class="glyphicon glyphicon-minus" title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"></span>
                 </a>
-            <? else : ?>
+            <?php else : ?>
                 <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
                     <span class="glyphicon glyphicon-plus" title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"></span>
                 </a>
-            <? endif; ?>
+            <?php endif; ?>
         </div>
-    <? endif; ?>
+    <?php endif; ?>
 
     <?= $widget->renderNodeContent($model); ?>
 
 </div>
 
 <!-- Construction of child elements -->
-<? if ($widget->isOpenNode($model) && $model->children) : ?>
+<?php if ($widget->isOpenNode($model) && $model->children) : ?>
     <?= $widget->renderNodes($model->children); ?>
-<? endif; ?>
+<?php endif; ?>
 
 <?= \yii\helpers\Html::endTag('li'); ?>
 

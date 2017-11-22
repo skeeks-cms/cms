@@ -13,9 +13,9 @@ use skeeks\cms\models\Tree;
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', "Main")); ?>
 
-<? if ($code = \Yii::$app->request->get('cms_site_id')) : ?>
+<?php if ($code = \Yii::$app->request->get('cms_site_id')) : ?>
     <?= $form->field($model, 'cms_site_id')->hiddenInput(['value' => $code])->label(false); ?>
-<? else: ?>
+<?php else: ?>
     <?= $form->field($model, 'cms_site_id')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
         'items' => \yii\helpers\ArrayHelper::map(
@@ -25,7 +25,7 @@ use skeeks\cms\models\Tree;
         ),
     ]);
     ?>
-<? endif; ?>
+<?php endif; ?>
 
 <?= $form->field($model, 'domain')->textInput(); ?>
 
