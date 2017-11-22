@@ -10,7 +10,7 @@
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $model \skeeks\cms\models\CmsContentElement */
 ?>
-<? $pjax = \yii\widgets\Pjax::begin(); ?>
+<?php $pjax = \yii\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
     'searchModel' => $searchModel,
@@ -62,4 +62,4 @@
         ]
 ]); ?>
 
-<? \yii\widgets\Pjax::end(); ?>
+<?php \yii\widgets\Pjax::end(); ?>

@@ -15,7 +15,7 @@
 
 
 ?>
-<? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+<?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?
 $user = new \skeeks\cms\models\CmsUser();
@@ -140,4 +140,4 @@ if ($user->relatedPropertiesModel) {
     ], $autoColumns),
 ]); ?>
 
-<? $pjax::end(); ?>
+<?php $pjax::end(); ?>

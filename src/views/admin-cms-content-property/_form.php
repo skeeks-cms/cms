@@ -17,7 +17,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     'enableAjaxValidation' => false,
 ]); ?>
 
-<? $this->registerJs(<<<JS
+<?php $this->registerJs(<<<JS
 
 (function(sx, $, _)
 {
@@ -69,17 +69,17 @@ JS
     ->label(\Yii::t('skeeks/cms', "Property type"));
 ?>
 
-<? if ($handler) : ?>
+<?php if ($handler) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
     <?= $handler->renderConfigForm($form); ?>
-<? endif; ?>
+<?php endif; ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')) ?>
 <?= $form->field($model, 'hint')->textInput() ?>
 <?= $form->fieldInputInt($model, 'priority') ?>
-<? if ($content_id = \Yii::$app->request->get('content_id')) : ?>
+<?php if ($content_id = \Yii::$app->request->get('content_id')) : ?>
 
 
     <div style="display: none;">
@@ -88,10 +88,10 @@ JS
         ), ['value' => $content_id]); ?>
     </div>
 
-    <? /*= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); */ ?>
+    <?php /*= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); */ ?>
 
-<? else: ?>
-    <? /*= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(
+<?php else: ?>
+    <?php /*= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\CmsContent::find()->all(),
@@ -110,9 +110,9 @@ JS
     ); ?>
 
 
-<? endif; ?>
+<?php endif; ?>
 
-<? if ($tree_id = \Yii::$app->request->get('tree_id')) : ?>
+<?php if ($tree_id = \Yii::$app->request->get('tree_id')) : ?>
 
     <div style="display: none;">
         <?= $form->field($model, 'cmsTrees')->checkboxList(
@@ -126,14 +126,14 @@ JS
             ]
         ); ?>
     </div>
-<? else : ?>
+<?php else : ?>
     <?= $form->field($model, 'cmsTrees')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
         [
             'multiple' => true,
         ]
     ); ?>
-<? endif; ?>
+<?php endif; ?>
 
 <?= $form->fieldSetEnd(); ?>
 

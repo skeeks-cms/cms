@@ -18,7 +18,7 @@ CSS
 ?>
 
 
-<? $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormStyled::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormStyled::begin([
     'useAjaxSubmit' => true,
     'usePjax' => false,
     'enableAjaxValidation' => false
@@ -42,4 +42,4 @@ CSS
 
 <?= $form->buttonsStandart($model); ?>
 
-<? \skeeks\cms\modules\admin\widgets\form\ActiveFormStyled::end(); ?>
+<?php \skeeks\cms\modules\admin\widgets\form\ActiveFormStyled::end(); ?>

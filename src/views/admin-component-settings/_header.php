@@ -151,7 +151,7 @@ JS
 );
 ?>
 
-<!--<h1>Управление: <? /*= $component->descriptor->name; */ ?></h1>
+<!--<h1>Управление: <?php /*= $component->descriptor->name; */ ?></h1>
     <hr />-->
 <div class="row">
     <div class="col-lg-2">
@@ -162,20 +162,20 @@ JS
                     <i class="glyphicon glyphicon-asterisk"></i> <?= \Yii::t('skeeks/cms', 'The default settings') ?>
                 </a></li>
 
-            <? if (\skeeks\cms\models\CmsSite::find()->active()->count() > 1) : ?>
+            <?php if (\skeeks\cms\models\CmsSite::find()->active()->count() > 1) : ?>
                 <li role="presentation"
                     class="<?= in_array(\Yii::$app->controller->action->id, ['sites', 'site']) ? "active" : "" ?>"><a
                             href="<?= \yii\helpers\Url::to('sites') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
                         <i class="glyphicon glyphicon-globe"></i> <?= \Yii::t('skeeks/cms', 'Sites settings') ?>
                     </a></li>
-            <? endif; ?>
+            <?php endif; ?>
 
             <li role="presentation"
                 class="<?= in_array(\Yii::$app->controller->action->id, ['users', 'user']) ? "active" : "" ?>"><a
                         href="<?= \yii\helpers\Url::to('users') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
                     <i class="glyphicon glyphicon-user"></i> <?= \Yii::t('skeeks/cms', 'Users settings') ?>
                 </a></li>
-            <!--<li role="presentation" class="<? /*= \Yii::$app->controller->action->id == 'langs' ? "active" : ""*/ ?>"><a href="#">Настройки языков</a></li>-->
+            <!--<li role="presentation" class="<?php /*= \Yii::$app->controller->action->id == 'langs' ? "active" : ""*/ ?>"><a href="#">Настройки языков</a></li>-->
             <!--<li role="presentation"><a href="#">Настройки языков</a></li>-->
             <li class="divider"></li>
             <li role="presentation"

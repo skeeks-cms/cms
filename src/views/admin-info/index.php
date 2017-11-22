@@ -26,7 +26,7 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
         ['env' => 'prod'])->enableAdmin()->toString() . "'>" . \Yii::t('skeeks/cms', 'To record') . " prod</a>";
 
 ?>
-<? $form = ActiveForm::begin(); ?>
+<?php $form = ActiveForm::begin(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Project configuration')); ?>
 <?php
@@ -53,7 +53,7 @@ echo $this->render('table', [
 
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'All extensions and modules {yii}', ['yii' => 'Yii'])); ?>
-<? if (!empty($extensions)) {
+<?php if (!empty($extensions)) {
     echo $this->render('table', [
         'values' => $extensions,
     ]);
@@ -92,7 +92,7 @@ echo $this->render('table', [
         width='100%' height='1000'></iframe>;
 <?= $form->fieldSetEnd(); ?>
 
-<? ActiveForm::end(); ?>
+<?php ActiveForm::end(); ?>
 
 
 

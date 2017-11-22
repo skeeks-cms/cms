@@ -7,7 +7,7 @@
  */
 ?>
 <h2><?= \Yii::t('skeeks/cms', 'Servers to store the files.') ?></h2>
-<? foreach (\Yii::$app->storage->getClusters() as $count => $cluster) : ?>
+<?php foreach (\Yii::$app->storage->getClusters() as $count => $cluster) : ?>
     <div class="sx-box sx-p-10 sx-bg-primary">
         <div class="row">
             <div class="col-md-12">
@@ -26,12 +26,12 @@
                 <p><b><?= \Yii::t('skeeks/cms',
                             'Free') ?></b>: <?= Yii::$app->formatter->asShortSize($cluster->getFreeSpace()); ?></p>
 
-                <? if ($cluster instanceof \skeeks\cms\components\storage\ClusterLocal) : ?>
-                    <? if ($cluster->publicBaseUrlIsAbsolute) : ?>
+                <?php if ($cluster instanceof \skeeks\cms\components\storage\ClusterLocal) : ?>
+                    <?php if ($cluster->publicBaseUrlIsAbsolute) : ?>
                         <p><b><?= \Yii::t('skeeks/cms', 'Files download from domain') ?>
                                 : </b> <?= $cluster->publicBaseUrlIsAbsolute; ?></p>
-                    <? endif; ?>
-                <? endif; ?>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
             <div class="col-md-5">
                 <ul class="statistics">
@@ -93,4 +93,4 @@
             </div>
         </div>
     </div>
-<? endforeach; ?>
+<?php endforeach; ?>

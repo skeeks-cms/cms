@@ -11,7 +11,7 @@
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 ?>
-<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
@@ -83,4 +83,4 @@ $searchRelatedPropertiesModel->search($dataProvider, $searchModel::tableName());
 ?>
 <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
 
-<? $form::end(); ?>
+<?php $form::end(); ?>

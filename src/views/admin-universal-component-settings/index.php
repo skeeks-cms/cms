@@ -15,27 +15,27 @@ $clientOptions = \yii\helpers\Json::encode($clientOptions);
 
 
 ?>
-<? if ($forSave) : ?>
+<?php if ($forSave) : ?>
     <?= $forSave; ?>
-<? endif; ?>
+<?php endif; ?>
 
-<? if ($component instanceof \skeeks\cms\base\ConfigFormInterface) : ?>
+<?php if ($component instanceof \skeeks\cms\base\ConfigFormInterface) : ?>
 
 
-    <? $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
-    <? $component->renderConfigForm($form); ?>
+    <?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
+    <?php $component->renderConfigForm($form); ?>
     <?= $form->buttonsStandart($component); ?>
-    <? \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
+    <?php \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
 
-<? else: ?>
-    <? if ($component->existsConfigFormFile()) : ?>
+<?php else: ?>
+    <?php if ($component->existsConfigFormFile()) : ?>
         <?= $component->renderConfigForm(); ?>
-    <? else: ?>
+    <?php else: ?>
         <p>Настройки отсутствуют</p>
-    <? endif; ?>
-<? endif; ?>
+    <?php endif; ?>
+<?php endif; ?>
 
-<? $this->registerJs(<<<JS
+<?php $this->registerJs(<<<JS
 
 (function(sx, $, _)
 {

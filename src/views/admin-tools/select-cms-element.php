@@ -61,15 +61,15 @@ JS
 );
 ?>
 
-<? $content_id = \Yii::$app->request->get('content_id'); ?>
+<?php $content_id = \Yii::$app->request->get('content_id'); ?>
 
-<? if (!\Yii::$app->request->get('content_id')) : ?>
-    <? if ($content = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->one()) : ?>
-        <? $content_id = $content->id; ?>
-    <? endif; ?>
-<? endif; ?>
+<?php if (!\Yii::$app->request->get('content_id')) : ?>
+    <?php if ($content = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->one()) : ?>
+        <?php $content_id = $content->id; ?>
+    <?php endif; ?>
+<?php endif; ?>
 
-<? if ($content_id) : ?>
+<?php if ($content_id) : ?>
 
     <?
 
@@ -214,4 +214,4 @@ JS
     ]); ?>
 
 
-<? endif; ?>
+<?php endif; ?>

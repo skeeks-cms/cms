@@ -80,7 +80,7 @@ JS
 );
 ?>
 <div class="sx-fromWidget-storageImages">
-    <? \skeeks\cms\modules\admin\widgets\Pjax::begin([
+    <?php \skeeks\cms\modules\admin\widgets\Pjax::begin([
         'id' => 'pjax-storage-images-widget-' . $widget->id,
         'blockPjaxContainer' => true,
     ]); ?>
@@ -88,20 +88,20 @@ JS
 
     <div class="sx-group-images">
         <div class="row col-md-12">
-            <? if ($files = $widget->files) : ?>
-                <? foreach ($files as $imageFile) : ?>
-                    <? if ($imageFile instanceof \skeeks\cms\models\StorageFile) : ?>
+            <?php if ($files = $widget->files) : ?>
+                <?php foreach ($files as $imageFile) : ?>
+                    <?php if ($imageFile instanceof \skeeks\cms\models\StorageFile) : ?>
                         <div class="sx-image">
-                            <? if (!$widget->viewItemTemplate) : ?>
+                            <?php if (!$widget->viewItemTemplate) : ?>
 
-                                <? if ($imageFile->isImage()) : ?>
+                                <?php if ($imageFile->isImage()) : ?>
                                     <a href="<?= $imageFile->src; ?>" class="sx-fancybox" data-pjax="0">
                                         <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src,
                                             new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
                                     </a>
-                                <? else : ?>
+                                <?php else : ?>
                                     <?= $imageFile->name ? $imageFile->name : $imageFile->original_name; ?>
-                                <? endif; ?>
+                                <?php endif; ?>
 
                                 <div class="sx-controlls">
                                     <?
@@ -122,17 +122,17 @@ JS
                                     }
                                     ?>
                                 </div>
-                            <? else : ?>
+                            <?php else : ?>
                                 <?= $widget->renderItem($imageFile); ?>
-                            <? endif; ?>
+                            <?php endif; ?>
                         </div>
-                    <? endif; ?>
-                <? endforeach; ?>
-            <? endif; ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 
-    <? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
+    <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
 
     <div class="sx-controlls">
         <?= \skeeks\cms\widgets\StorageFileManager::widget(\yii\helpers\ArrayHelper::merge([

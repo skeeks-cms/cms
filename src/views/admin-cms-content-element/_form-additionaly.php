@@ -22,12 +22,12 @@
     "This parameter affects the address of the page")); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>
 
-<? if ($contentModel->parent_content_id) : ?>
+<?php if ($contentModel->parent_content_id) : ?>
     <?= $form->field($model, 'parent_content_element_id')->widget(
         \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
         [
             'content_id' => $contentModel->parent_content_id
         ]
     )->label($contentModel->parentContent->name_one) ?>
-<? endif; ?>
+<?php endif; ?>
 <?= $form->fieldSetEnd() ?>

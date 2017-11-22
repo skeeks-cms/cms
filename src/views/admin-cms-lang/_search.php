@@ -6,7 +6,7 @@
  * @date 26.05.2016
  */
 ?>
-<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
@@ -24,4 +24,4 @@
     'size' => 1
 ]); ?>
 
-<? $form::end(); ?>
+<?php $form::end(); ?>

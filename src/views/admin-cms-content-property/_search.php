@@ -29,7 +29,7 @@ if ($filter->tree_ids) {
 }
 
 ?>
-<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
@@ -75,4 +75,4 @@ if ($filter->tree_ids) {
     'size' => 1
 ]); ?>
 
-<? $form::end(); ?>
+<?php $form::end(); ?>

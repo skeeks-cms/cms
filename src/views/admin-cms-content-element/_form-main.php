@@ -9,14 +9,14 @@
 
 
 
-<? if ($contentModel->root_tree_id) : ?>
-    <? $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
-<? else : ?>
-    <? $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all(); ?>
-<? endif; ?>
+<?php if ($contentModel->root_tree_id) : ?>
+    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
+<?php else : ?>
+    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all(); ?>
+<?php endif; ?>
 
-<? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
-    <? if ($rootTreeModels) : ?>
+<?php if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
+    <?php if ($rootTreeModels) : ?>
         <div class="row">
             <div class="col-lg-8 col-md-12 col-sm-12">
                 <?= $form->field($model, 'tree_id')->widget(
@@ -34,8 +34,8 @@
                 ); ?>
             </div>
         </div>
-    <? endif; ?>
-<? endif; ?>
+    <?php endif; ?>
+<?php endif; ?>
 
 <?
 
@@ -62,22 +62,22 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
  * @var $property \skeeks\cms\relatedProperties\models\RelatedPropertyModel
  */
 ?>
-<? if ($properties) : ?>
+<?php if ($properties) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('skeeks/cms', 'Additional properties')
     ]); ?>
 
-    <? foreach ($properties as $property) : ?>
-        <? if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
+    <?php foreach ($properties as $property) : ?>
+        <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
 
-            <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+            <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
             <div class="row">
                 <div class="col-md-8">
                     <?= $property->renderActiveForm($form, $model) ?>
                 </div>
                 <div class="col-md-4">
 
-                    <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property-enum')[0]) : ?>
+                    <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property-enum')[0]) : ?>
                         <label>&nbsp;</label>
                         <?
                         /**
@@ -112,24 +112,24 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                             ]);
                         }
                         ?>
-                    <? endif; ?>
+                    <?php endif; ?>
                     <!--<a href="#" style="border-bottom: 1px dashed">Добавить</a>-->
                 </div>
             </div>
-            <? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
-        <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT): ?>
+            <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
+        <?php elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT): ?>
 
-            <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+            <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
             <div class="row">
                 <div class="col-md-8">
                     <?= $property->renderActiveForm($form, $model) ?>
                 </div>
                 <div class="col-md-4">
-                    <? if (!in_array($property->handler->fieldElement, [
+                    <?php if (!in_array($property->handler->fieldElement, [
                         \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG,
                         \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE
                     ])) : ?>
-                        <? if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
+                        <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
                             <label>&nbsp;</label>
                             <?
                             /**
@@ -164,19 +164,19 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                                 ]);
                             }
                             ?>
-                        <? endif; ?>
-                    <? endif; ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
                     <!--<a href="#" style="border-bottom: 1px dashed">Добавить</a>-->
                 </div>
             </div>
-            <? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
+            <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
 
-        <? else: ?>
+        <?php else: ?>
             <?= $property->renderActiveForm($form, $model) ?>
-        <? endif; ?>
-    <? endforeach; ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
 
-<? else : ?>
-    <? /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
-<? endif; ?>
+<?php else : ?>
+    <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
+<?php endif; ?>
 <?= $form->fieldSetEnd() ?>

@@ -31,7 +31,7 @@ if ($model->isNewRecord) {
     'enableAjaxValidation' => false,
     'enableClientValidation' => false,
 ]); ?>
-<? $this->registerJs(<<<JS
+<?php $this->registerJs(<<<JS
 
 (function(sx, $, _)
 {
@@ -70,19 +70,19 @@ JS
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <div style="display: none;">
 
-    <? if ($model->isNewRecord) : ?>
-        <? if ($content_id = \Yii::$app->request->get("content_id")) : ?>
-            <? $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id); ?>
-            <? $model->content_id = $content_id; ?>
+    <?php if ($model->isNewRecord) : ?>
+        <?php if ($content_id = \Yii::$app->request->get("content_id")) : ?>
+            <?php $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id); ?>
+            <?php $model->content_id = $content_id; ?>
             <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
-        <? endif; ?>
-    <? else : ?>
-        <? $contentModel = $model->cmsContent; ?>
-    <? endif; ?>
+        <?php endif; ?>
+    <?php else : ?>
+        <?php $contentModel = $model->cmsContent; ?>
+    <?php endif; ?>
 
-    <? if ($contentModel && $contentModel->parentContent) : ?>
+    <?php if ($contentModel && $contentModel->parentContent) : ?>
         <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
-    <? endif; ?>
+    <?php endif; ?>
 </div>
 
 <?= $this->render('_form-main', [
@@ -130,8 +130,8 @@ JS
 
 
 
-<? if (!$model->isNewRecord) : ?>
-    <? if ($model->cmsContent->access_check_element == "Y") : ?>
+<?php if (!$model->isNewRecord) : ?>
+    <?php if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Access')); ?>
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
             'permissionName' => $model->permissionName,
@@ -139,10 +139,10 @@ JS
             'label' => 'Доступ к этому элементу',
         ]); ?>
         <?= $form->fieldSetEnd() ?>
-    <? endif; ?>
-<? endif; ?>
+    <?php endif; ?>
+<?php endif; ?>
 
-<? if ($model->cmsContent->childrenContents) : ?>
+<?php if ($model->cmsContent->childrenContents) : ?>
 
     <?
 
@@ -150,10 +150,10 @@ JS
      * @var $content \skeeks\cms\models\CmsContent
      */
     ?>
-    <? foreach ($model->cmsContent->childrenContents as $childContent) : ?>
+    <?php foreach ($model->cmsContent->childrenContents as $childContent) : ?>
         <?= $form->fieldSet($childContent->name); ?>
 
-        <? if ($model->isNewRecord) : ?>
+        <?php if ($model->isNewRecord) : ?>
 
             <?= \yii\bootstrap\Alert::widget([
                 'options' =>
@@ -162,7 +162,7 @@ JS
                     ],
                 'body' => \Yii::t('skeeks/cms', 'Management will be available after saving')
             ]); ?>
-        <? else: ?>
+        <?php else: ?>
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label' => $childContent->name,
                 'namespace' => md5($model->className() . $childContent->id),
@@ -185,14 +185,14 @@ JS
                 ],
             ]); ?>
 
-        <? endif; ?>
+        <?php endif; ?>
 
 
 
 
         <?= $form->fieldSetEnd() ?>
-    <? endforeach; ?>
-<? endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 
 

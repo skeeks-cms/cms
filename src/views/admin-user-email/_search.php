@@ -21,10 +21,10 @@ if ($filter->id) {
     $dataProvider->query->andWhere(['id' => $filter->id]);
 }
 ?>
-<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
 <?= $form->field($searchModel, 'value')->setVisible(); ?>
 
-<? $form::end(); ?>
+<?php $form::end(); ?>

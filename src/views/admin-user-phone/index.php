@@ -14,7 +14,7 @@
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 ?>
-<? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+<?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
     'searchModel' => $searchModel,
@@ -41,4 +41,4 @@
     ],
 ]); ?>
 
-<? $pjax::end(); ?>
+<?php $pjax::end(); ?>

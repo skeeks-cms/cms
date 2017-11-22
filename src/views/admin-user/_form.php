@@ -51,9 +51,9 @@ $action = $controller->action;
 <div class="row">
     <div class="col-md-5">
         <?= $form->field($model, 'email')->textInput(); ?>
-        <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+        <?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
             <?= $form->field($model, 'email_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
-        <? endif; ?>
+        <?php endif; ?>
     </div>
     <div class="col-md-5">
         <?
@@ -68,34 +68,34 @@ JS
         <?= $form->field($model, 'phone')->textInput([
             'placeholder' => '+7 903 722-28-73'
         ]); ?>
-        <? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+        <?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
             <?= $form->field($model, 'phone_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
-        <? endif; ?>
+        <?php endif; ?>
     </div>
 </div>
 
 
-<? if ($model->relatedProperties) : ?>
+<?php if ($model->relatedProperties) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('skeeks/cms', 'Additional properties')
     ]); ?>
-    <? if ($properties = $model->relatedProperties) : ?>
-        <? foreach ($properties as $property) : ?>
+    <?php if ($properties = $model->relatedProperties) : ?>
+        <?php foreach ($properties as $property) : ?>
             <?= $property->renderActiveForm($form, $model) ?>
-        <? endforeach; ?>
-    <? endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
 
-<? else : ?>
-    <? /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
-<? endif; ?>
+<?php else : ?>
+    <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
+<?php endif; ?>
 
 
 <?= $form->fieldSetEnd(); ?>
 
-<? if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+<?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
     <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Groups')) ?>
 
-    <? $this->registerCss(<<<CSS
+    <?php $this->registerCss(<<<CSS
     .sx-checkbox label
     {
         width: 100%;
@@ -109,7 +109,7 @@ CSS
     ); ?>
 
     <?= $form->fieldSetEnd(); ?>
-<? endif; ?>
+<?php endif; ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Password')); ?>
 
@@ -118,14 +118,14 @@ CSS
 
 <?= $form->fieldSetEnd(); ?>
 
-<? /*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally'))*/ ?><!--
-    <? /*= $form->field($model, 'city')->textInput(); */ ?>
-    <? /*= $form->field($model, 'address')->textInput(); */ ?>
-    <? /*= $form->field($model, 'info')->textarea(); */ ?>
-    <? /*= $form->field($model, 'status_of_life')->textarea(); */ ?>
---><? /*= $form->fieldSetEnd(); */ ?>
+<?php /*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally'))*/ ?><!--
+    <?php /*= $form->field($model, 'city')->textInput(); */ ?>
+    <?php /*= $form->field($model, 'address')->textInput(); */ ?>
+    <?php /*= $form->field($model, 'info')->textarea(); */ ?>
+    <?php /*= $form->field($model, 'status_of_life')->textarea(); */ ?>
+--><?php /*= $form->fieldSetEnd(); */ ?>
 
-<? if (!$model->isNewRecord && class_exists('\skeeks\cms\authclient\models\UserAuthClient')) : ?>
+<?php if (!$model->isNewRecord && class_exists('\skeeks\cms\authclient\models\UserAuthClient')) : ?>
     <?= $form->fieldSet(\Yii::t('skeeks/authclient', 'Social profiles')) ?>
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
         'label' => \Yii::t('skeeks/authclient', "Social profiles"),
@@ -142,7 +142,7 @@ CSS
         ],
     ]); ?>
     <?= $form->fieldSetEnd(); ?>
-<? endif; ?>
+<?php endif; ?>
 
 <?= $form->buttonsStandart($model); ?>
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>

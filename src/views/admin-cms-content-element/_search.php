@@ -6,7 +6,7 @@
  * @date 26.05.2016
  */
 ?>
-<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     //'action' => '/' . \Yii::$app->request->pathInfo,
     'namespace' => \Yii::$app->controller->uniqueId . "_" . $content_id
 ]); ?>
@@ -33,7 +33,7 @@
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
 ); ?>
 
-<? /*= $form->field($searchModel, 'section')->widget(
+<?php /*= $form->field($searchModel, 'section')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
         [
             'multiple' => false,
@@ -84,4 +84,4 @@ $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
 ?>
 <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
 
-<? $form::end(); ?>
+<?php $form::end(); ?>

@@ -21,7 +21,7 @@ if ($content_id = \Yii::$app->request->get('content_id')) {
     $searchModel->content_id = $content_id;
 }
 ?>
-<? $pjax = \yii\widgets\Pjax::begin(); ?>
+<?php $pjax = \yii\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
     'searchModel' => $searchModel,
@@ -49,9 +49,9 @@ if ($content_id = \Yii::$app->request->get('content_id')) {
     'columns' => \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider)
 ]); ?>
 
-<? \yii\widgets\Pjax::end(); ?>
+<?php \yii\widgets\Pjax::end(); ?>
 
-<? \yii\bootstrap\Alert::begin([
+<?php \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-info',
     ],
@@ -61,5 +61,5 @@ if ($content_id = \Yii::$app->request->get('content_id')) {
         '/cms/admin-cms-content/update',
         'pk' => $content_id
     ])->enableAdmin()->toString()); ?>.
-<? \yii\bootstrap\Alert::end(); ?>
+<?php \yii\bootstrap\Alert::end(); ?>
 

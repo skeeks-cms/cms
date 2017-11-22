@@ -28,7 +28,7 @@ if ($filter->not_fill == 'fill') {
     $query->groupBy('id');
 }*/
 ?>
-<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
+<?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     'action' => '/' . \Yii::$app->request->pathInfo,
 ]); ?>
 
@@ -52,4 +52,4 @@ if ($filter->not_fill == 'fill') {
     //'not_fill' => 'Показывать свойства, которые еще не заполняли'
 ], ['size' => 1]); ?>
 
-<? $form::end(); ?>
+<?php $form::end(); ?>

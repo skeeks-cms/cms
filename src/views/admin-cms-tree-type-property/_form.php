@@ -15,7 +15,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     'enableAjaxValidation' => false,
 ]); ?>
 
-<? $this->registerJs(<<<JS
+<?php $this->registerJs(<<<JS
 
 (function(sx, $, _)
 {
@@ -66,13 +66,13 @@ JS
     ->label(\Yii::t('skeeks/cms', "Property type"));
 ?>
 
-<? if ($handler) : ?>
+<?php if ($handler) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
-    <? if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
-        <? $handler->enumRoute = 'cms/admin-cms-tree-type-property-enum'; ?>
-    <? endif; ?>
+    <?php if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
+        <?php $handler->enumRoute = 'cms/admin-cms-tree-type-property-enum'; ?>
+    <?php endif; ?>
     <?= $handler->renderConfigForm($form); ?>
-<? endif; ?>
+<?php endif; ?>
 
 
 <?= $form->fieldSetEnd(); ?>
@@ -81,7 +81,7 @@ JS
 <?= $form->field($model, 'hint')->textInput() ?>
 <?= $form->fieldInputInt($model, 'priority') ?>
 
-<? if ($content_id = \Yii::$app->request->get('tree_type_id')) : ?>
+<?php if ($content_id = \Yii::$app->request->get('tree_type_id')) : ?>
 
     <div style="display: none;">
         <?= $form->field($model, 'cmsTreeTypes')->checkboxList(\yii\helpers\ArrayHelper::map(
@@ -89,9 +89,9 @@ JS
         ), ['value' => $content_id]); ?>
     </div>
 
-    <? /*= $form->field($model, 'tree_type_id')->hiddenInput(['value' => $content_id])->label(false); */ ?>
+    <?php /*= $form->field($model, 'tree_type_id')->hiddenInput(['value' => $content_id])->label(false); */ ?>
 
-<? else: ?>
+<?php else: ?>
 
     <?= $form->field($model, 'cmsTreeTypes')->widget(
         \skeeks\widget\chosen\Chosen::class,
@@ -103,7 +103,7 @@ JS
         ]
     ); ?>
 
-<? endif; ?>
+<?php endif; ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsStandart($model); ?>
