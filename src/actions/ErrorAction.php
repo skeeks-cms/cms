@@ -11,7 +11,6 @@
 
 namespace skeeks\cms\actions;
 
-
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\rbac\CmsManager;
 use Yii;

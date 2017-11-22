@@ -56,3 +56,4 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
 ]); ?>
 
 <?php \yii\widgets\Pjax::end(); ?>
+
