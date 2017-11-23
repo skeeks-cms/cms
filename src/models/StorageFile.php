@@ -13,13 +13,8 @@ namespace skeeks\cms\models;
 use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
 use Yii;
-use yii\behaviors\TimestampBehavior;
-use yii\behaviors\BlameableBehavior;
-
-use yii\base\Event;
 
 /**
  * This is the model class for table "{{%cms_storage_file}}".

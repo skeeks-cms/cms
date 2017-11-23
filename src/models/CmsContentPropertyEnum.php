@@ -9,7 +9,6 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertyEnumModel;
-use Yii;
 
 /**
  * This is the model class for table "{{%cms_content_property_enum}}".

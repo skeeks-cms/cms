@@ -9,14 +9,11 @@
 namespace skeeks\cms\base;
 
 use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\traits\TWidget;
 use yii\base\InvalidCallException;
 use yii\base\ViewContextInterface;
-use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\Json;
 
 /**
  * Class Widget

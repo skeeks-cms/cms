@@ -10,8 +10,8 @@ namespace skeeks\cms\filters;
 
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
-use yii\web\User;
 use yii\web\ForbiddenHttpException;
+use yii\web\User;
 
 /**
  * Class AdminAccessControl

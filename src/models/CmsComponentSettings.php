@@ -8,10 +8,9 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\models\CmsSite;
 use skeeks\cms\base\Component;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
-use \Yii;
+use Yii;
 use yii\db\ActiveQuery;
 
 /**

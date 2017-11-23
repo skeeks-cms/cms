@@ -8,8 +8,6 @@
 
 namespace skeeks\cms\models;
 
-use Yii;
-
 /**
  * This is the model class for table "cms_tree_type_property2type".
  *

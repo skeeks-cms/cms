@@ -9,7 +9,6 @@
 namespace skeeks\cms\grid;
 
 use skeeks\cms\models\CmsSite;
-use yii\db\ActiveRecord;
 use yii\grid\DataColumn;
 
 /**

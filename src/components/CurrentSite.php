@@ -12,7 +12,6 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use yii\base\Component;
 use yii\caching\TagDependency;
-use yii\db\Exception;
 
 /**
  * @property CmsSite $site

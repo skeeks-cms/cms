@@ -9,14 +9,7 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use Yii;
-use yii\db\BaseActiveRecord;
-use yii\widgets\ActiveForm;
 
 /**
  * This is the model class for table "{{%cms_content_property}}".

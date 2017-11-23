@@ -8,10 +8,7 @@
 
 namespace skeeks\cms\models;
 
-use Imagine\Image\ManipulatorInterface;
-use skeeks\cms\base\Widget;
 use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -23,15 +20,10 @@ use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasTreesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
-use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\yii2\ajaxfileupload\validators\FileValidator;
-use skeeks\yii2\slug\SlugBehavior;
 use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
-use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use yii\web\ErrorHandler;
 
 /**
  * This is the model class for table "{{%cms_content_element}}".

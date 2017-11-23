@@ -9,8 +9,6 @@
 namespace skeeks\cms\grid;
 
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
-use yii\jui\Sortable;
 use yii\widgets\Pjax;
 
 /**

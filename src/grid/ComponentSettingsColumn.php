@@ -12,7 +12,6 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\User;
-use yii\grid\DataColumn;
 
 /**
  * Class LongTextColumnData
@@ -50,7 +49,7 @@ class ComponentSettingsColumn extends BooleanColumn
             return $this->_result(Cms::BOOL_Y);
         }
 
-        return $this->_result(Cms::BOOL_N); ;
+        return $this->_result(Cms::BOOL_N);;
     }
 
     /**

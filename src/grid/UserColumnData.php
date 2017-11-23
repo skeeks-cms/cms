@@ -15,12 +15,8 @@ namespace skeeks\cms\grid;
 
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\User;
-use skeeks\widget\chosen\Chosen;
 use yii\grid\DataColumn;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\jui\AutoComplete;
-use yii\widgets\ActiveForm;
 
 /**
  * Class UserColumnData

@@ -8,14 +8,12 @@
 
 namespace skeeks\cms\widgets;
 
-use skeeks\cms\modules\admin\widgets\ActiveForm;
 use skeeks\cms\modules\admin\traits\ActiveFormTrait;
 use skeeks\cms\modules\admin\traits\AdminActiveFormTrait;
+use skeeks\cms\modules\admin\widgets\ActiveForm;
 use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
 use skeeks\modules\cms\form\models\Form;
-use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 
 /**
  * Class ActiveFormRelatedProperties

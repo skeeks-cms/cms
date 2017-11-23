@@ -2,8 +2,6 @@
 
 namespace skeeks\cms\models;
 
-use Yii;
-
 /**
  * This is the model class for table "{{%cms_content_element2cms_user}}".
  *

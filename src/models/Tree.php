@@ -11,31 +11,23 @@
 
 namespace skeeks\cms\models;
 
-use Cocur\Slugify\Slugify;
 use paulzi\adjacencyList\AdjacencyListBehavior;
 use paulzi\autotree\AutoTreeTrait;
 use paulzi\materializedPath\MaterializedPathBehavior;
-use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
-use skeeks\cms\models\behaviors\HasTableCache;
-use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
-use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
 use skeeks\yii2\slug\SlugRuleProvider;
 use skeeks\yii2\yaslug\YaSlugHelper;
 use Yii;
 use yii\base\Event;
-use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\AfterSaveEvent;
-use yii\db\BaseActiveRecord;
-use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 

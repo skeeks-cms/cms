@@ -34,27 +34,29 @@ class m140506_102106_rbac_init extends \yii\db\Migration
             $this->compact = true;
             $this->execute($sql);
 
-        } else if ($this->db->driverName === 'pgsql') {
-            $filePath = __DIR__ . "/_pgsql-init-dump.sql";
-
-            $file = fopen($filePath, "r");
-            if (!$file) {
-                throw new \Exception("Unable to open file: '{$filePath}'");
-            }
-            $sql = fread($file, filesize($filePath));
-            fclose($file);
-
-            /*$this->db->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
-            $this->compact = true;
-            $this->execute($sql);
-            */
-            $this->compact = true;
-            $pdo = $this->db->masterPdo;
-            $pdo->exec($sql);
-
         } else {
-            echo "Error for driver {$this->db->driverName} cannot be reverted.\n";
-            return false;
+            if ($this->db->driverName === 'pgsql') {
+                $filePath = __DIR__ . "/_pgsql-init-dump.sql";
+
+                $file = fopen($filePath, "r");
+                if (!$file) {
+                    throw new \Exception("Unable to open file: '{$filePath}'");
+                }
+                $sql = fread($file, filesize($filePath));
+                fclose($file);
+
+                /*$this->db->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
+                $this->compact = true;
+                $this->execute($sql);
+                */
+                $this->compact = true;
+                $pdo = $this->db->masterPdo;
+                $pdo->exec($sql);
+
+            } else {
+                echo "Error for driver {$this->db->driverName} cannot be reverted.\n";
+                return false;
+            }
         }
 
 

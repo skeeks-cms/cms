@@ -8,11 +8,7 @@
 
 namespace skeeks\cms\base;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\helpers\UrlHelper;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
 
 /**
  * Class WidgetRenderable

@@ -12,12 +12,10 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\HasTableCache;
-use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
 use Yii;
-
-use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**

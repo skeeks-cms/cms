@@ -8,8 +8,6 @@
 
 namespace skeeks\cms\helpers;
 
-use skeeks\cms\components\imaging\Filter;
-
 /**
  * Class FileHelper
  * @package skeeks\cms\helpers

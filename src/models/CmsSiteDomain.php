@@ -8,14 +8,8 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\modules\cms\user\models\User;
 use Yii;
-use yii\base\Event;
-use yii\db\BaseActiveRecord;
 
 /**
  * This is the model class for table "{{%cms_site}}".

@@ -9,12 +9,7 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\relatedProperties\models\RelatedPropertyEnumModel;
-use Yii;
-use yii\db\BaseActiveRecord;
 
 /**
  * This is the model class for table "{{%cms_tree_type_property_enum}}".

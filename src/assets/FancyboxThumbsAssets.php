@@ -8,8 +8,6 @@
 
 namespace skeeks\cms\assets;
 
-use skeeks\cms\base\AssetBundle;
-
 /**
  * Class AppAsset
  * @package backend\assets

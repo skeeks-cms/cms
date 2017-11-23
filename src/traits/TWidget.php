@@ -8,8 +8,8 @@
 
 namespace skeeks\cms\traits;
 
-use Yii;
 use ReflectionClass;
+use Yii;
 
 /**
  * Оригинальный yii\base\Widget

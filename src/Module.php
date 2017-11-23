@@ -11,12 +11,6 @@
 
 namespace skeeks\cms;
 
-use skeeks\cms\modules\admin\components\UrlRule;
-use yii\base\BootstrapInterface;
-use yii\base\Event;
-use yii\web\Application;
-use yii\web\View;
-
 /**
  * Class Module
  * @package skeeks\cms

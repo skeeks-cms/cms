@@ -10,7 +10,6 @@ namespace skeeks\cms\grid;
 
 use skeeks\cms\components\Cms;
 use yii\grid\DataColumn;
-use yii\grid\GridView;
 
 /**
  * Class CreatedAtColumn

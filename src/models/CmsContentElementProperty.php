@@ -9,7 +9,6 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\relatedProperties\models\RelatedElementPropertyModel;
-use Yii;
 
 /**
  * This is the model class for table "{{%cms_content_element_property}}".

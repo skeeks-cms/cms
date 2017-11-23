@@ -9,7 +9,6 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use Yii;
 use yii\helpers\ArrayHelper;
 

@@ -12,10 +12,7 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\components\imaging\Filter;
-use skeeks\cms\helpers\UrlHelper;
 use yii\base\Component;
-use Yii;
-use yii\base\Exception;
 
 /**
  * Class Imaging

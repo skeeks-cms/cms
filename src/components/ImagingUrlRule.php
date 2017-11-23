@@ -12,10 +12,7 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\helpers\StringHelper;
-use skeeks\cms\models\Tree;
 use skeeks\sx\File;
-use \yii\base\InvalidConfigException;
-use yii\helpers\Url;
 
 /**
  * Class Storage

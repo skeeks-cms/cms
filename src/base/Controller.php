@@ -11,8 +11,6 @@
 
 namespace skeeks\cms\base;
 
-use yii\base\Exception;
-use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 use yii\web\Controller as YiiWebController;

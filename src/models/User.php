@@ -16,24 +16,16 @@ use skeeks\cms\authclient\models\UserAuthClient;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
-use skeeks\cms\Module;
 use skeeks\cms\validators\PhoneValidator;
 use Yii;
-use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveQuery;
-use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
-use yii\helpers\StringHelper;
-use yii\validators\EmailValidator;
-use yii\validators\UniqueValidator;
 use yii\web\IdentityInterface;
-
-use skeeks\cms\models\behaviors\HasSubscribes;
 
 /**
  * This is the model class for table "{{%cms_user}}".

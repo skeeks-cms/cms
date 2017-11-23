@@ -8,11 +8,9 @@
 
 namespace skeeks\cms\widgets;
 
-use Yii;
+use kartik\color\ColorInputAsset;
 use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
 use yii\web\JsExpression;
-use \kartik\color\ColorInputAsset;
 
 /**
  * Class ColorInput

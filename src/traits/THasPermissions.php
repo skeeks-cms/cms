@@ -10,7 +10,6 @@ namespace skeeks\cms\traits;
 
 use skeeks\cms\rbac\CmsManager;
 use yii\base\InvalidConfigException;
-use yii\base\Model;
 use yii\web\Application;
 
 /**

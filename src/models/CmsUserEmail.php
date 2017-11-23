@@ -9,11 +9,9 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
-use skeeks\cms\models\User;
 use Yii;
-use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
-use \yii\db\ActiveRecord;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "cms_user_email".

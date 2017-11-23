@@ -2,11 +2,9 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\base\Widget;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\modules\admin\base\AdminDashboardWidget;
 use Yii;
-use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
 /**

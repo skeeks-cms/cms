@@ -8,16 +8,6 @@
 
 namespace skeeks\cms\traits;
 
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\widget\chosen\Chosen;
-use yii\base\Model;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\Pjax;
-use yii\helpers\Json;
-use yii\helpers\Url;
-
 /**
  * Class ActiveFormAjaxSubmit
  * @package skeeks\cms\traits

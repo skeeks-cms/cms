@@ -13,16 +13,9 @@ namespace skeeks\cms\components;
 
 use skeeks\cms\base\components\Descriptor;
 use skeeks\cms\models\Site;
-use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
-use skeeks\cms\models\User;
-use Yii;
 use yii\base\Component;
-use yii\base\Event;
-use yii\helpers\ArrayHelper;
-use yii\web\UploadedFile;
-use yii\web\View;
 
 /**
  * Class Cms
