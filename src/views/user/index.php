@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     [
                         'class' => \yii\grid\DataColumn::className(),
-                        'value' => function ($model, $key, $index, $widget) {
+                        'value' => function($model, $key, $index, $widget) {
                             //return "<img src='" . $model->() . "' style='width: 100px;' />";
                         },
                         'attribute' => 'image',
@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     [
                         'class' => \yii\grid\DataColumn::className(),
-                        'value' => function ($model, $key, $index, $widget) {
+                        'value' => function($model, $key, $index, $widget) {
                             return Html::a($model->getDisplayName(), $model->getPageUrl());
                         },
                         'attribute' => 'name',

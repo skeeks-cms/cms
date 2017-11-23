@@ -35,7 +35,7 @@
             [
                 'class' => \yii\grid\DataColumn::className(),
                 'label' => \Yii::t('skeeks/cms', 'Number of sections'),
-                'value' => function (\skeeks\cms\models\CmsTreeType $cmsTreeType) {
+                'value' => function(\skeeks\cms\models\CmsTreeType $cmsTreeType) {
                     return $cmsTreeType->getCmsTrees()->count();
                 }
             ],

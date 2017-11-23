@@ -74,7 +74,7 @@ use common\models\User;
                 'priority',
                 [
                     'label' => \Yii::t('skeeks/cms', 'Sections'),
-                    'value' => function (\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty) {
+                    'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty) {
                         $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTreeTypes, 'id', 'name');
                         return implode(', ', $contents);
                     }

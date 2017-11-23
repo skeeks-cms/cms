@@ -45,7 +45,7 @@ class CurrentSite extends Component
                 ]);
 
 
-                $cmsDomain = CmsSiteDomain::getDb()->cache(function ($db) {
+                $cmsDomain = CmsSiteDomain::getDb()->cache(function($db) {
                     return CmsSiteDomain::find()->where(['domain' => $this->_serverName])->one();
                 }, null, $dependencySiteDomain);
 
@@ -56,7 +56,7 @@ class CurrentSite extends Component
                     $this->_site = $cmsDomain->cmsSite;
                 } else {
 
-                    $this->_site = CmsSiteDomain::getDb()->cache(function ($db) {
+                    $this->_site = CmsSiteDomain::getDb()->cache(function($db) {
                         return CmsSite::find()->active()->andWhere(['def' => Cms::BOOL_Y])->one();
                     },
                         null,

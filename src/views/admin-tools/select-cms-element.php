@@ -101,7 +101,7 @@ JS
                 'visible' => false,
                 'format' => 'raw',
                 'class' => \yii\grid\DataColumn::className(),
-                'value' => function ($model, $key, $index) use ($name) {
+                'value' => function($model, $key, $index) use ($name) {
                     if (is_array($model->{$name})) {
                         return implode(",", $model->{$name});
                     } else {
@@ -178,7 +178,7 @@ JS
                     'format' => 'raw',
                     'filter' => $filter,
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function ($model, $key, $index) use ($name) {
+                    'value' => function($model, $key, $index) use ($name) {
                         /**
                          * @var $model \skeeks\cms\models\CmsContentElement
                          */

@@ -22,10 +22,13 @@ $action = $controller->action;
 
 <?php if ($content_type = \Yii::$app->request->get('content_type')) : ?>
     <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
-<?php else: ?>
+<?php else {
+    : ?>
     <div style="display: none;">
         <?= $form->fieldSelect($model, 'content_type',
-            \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name')); ?>
+            \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name'));
+}
+?>
     </div>
 <?php endif; ?>
 
@@ -77,7 +80,7 @@ $action = $controller->action;
 <div class="row">
     <div class="col-md-3">
         <?= $form->fieldSelect($model, 'parent_content_id', \skeeks\cms\models\CmsContent::getDataForSelect(true,
-            function (\yii\db\ActiveQuery $activeQuery) use ($model) {
+            function(\yii\db\ActiveQuery $activeQuery) use ($model) {
                 if (!$model->isNewRecord) {
                     $activeQuery->andWhere(['!=', 'id', $model->id]);
                 }
@@ -177,14 +180,14 @@ $action = $controller->action;
                         [
                             'label' => \Yii::t('skeeks/cms', 'Type'),
                             'format' => 'raw',
-                            'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                            'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                 return $cmsContentProperty->handler->name;
                             }
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/cms', 'Content'),
-                            'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                            'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                 $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsContents, 'id',
                                     'name');
                                 return implode(', ', $contents);
@@ -194,10 +197,10 @@ $action = $controller->action;
                         [
                             'label' => \Yii::t('skeeks/cms', 'Sections'),
                             'format' => 'raw',
-                            'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                            'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                 if ($cmsContentProperty->cmsTrees) {
                                     $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTrees, 'id',
-                                        function ($cmsTree) {
+                                        function($cmsTree) {
                                             $path = [];
 
                                             if ($cmsTree->parents) {

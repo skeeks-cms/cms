@@ -28,7 +28,7 @@ $data = \yii\helpers\Json::encode([
                 'label',
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function ($data) {
+                    'value' => function($data) {
                         /**
                          * @var $dir \skeeks\sx\Dir
                          */
@@ -39,7 +39,7 @@ $data = \yii\helpers\Json::encode([
 
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function ($data) {
+                    'value' => function($data) {
                         /**
                          * @var $dir \skeeks\sx\Dir
                          */

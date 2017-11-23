@@ -168,7 +168,7 @@ class CmsContent extends Core
             [
                 'code',
                 'default',
-                'value' => function ($model, $attribute) {
+                'value' => function($model, $attribute) {
                     return "sxauto" . md5(rand(1, 10) . time());
                 }
             ],

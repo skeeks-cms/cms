@@ -97,14 +97,14 @@ class CmsContentType extends Core
             [
                 'code',
                 'default',
-                'value' => function ($model, $attribute) {
+                'value' => function($model, $attribute) {
                     return "sx_auto_" . md5(rand(1, 10) . time());
                 }
             ],
             [
                 'priority',
                 'default',
-                'value' => function ($model, $attribute) {
+                'value' => function($model, $attribute) {
                     return 500;
                 }
             ],

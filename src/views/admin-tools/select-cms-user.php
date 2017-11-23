@@ -86,7 +86,7 @@ $searchModel = $search->loadedModel;
 
         [
             'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\models\User $model) {
+            'value' => function(\skeeks\cms\models\User $model) {
                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
                         'Choose'), '#', [
                     'class' => 'btn btn-primary sx-row-action',
@@ -118,7 +118,7 @@ $searchModel = $search->loadedModel;
 
         [
             'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\models\User $model) {
+            'value' => function(\skeeks\cms\models\User $model) {
                 $result = [];
 
                 if ($roles = \Yii::$app->authManager->getRolesByUser($model->id)) {

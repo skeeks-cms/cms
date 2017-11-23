@@ -91,7 +91,8 @@ JS
 
     <?php /*= $form->field($model, 'tree_type_id')->hiddenInput(['value' => $content_id])->label(false); */ ?>
 
-<?php else: ?>
+<?php else {
+    : ?>
 
     <?= $form->field($model, 'cmsTreeTypes')->widget(
         \skeeks\widget\chosen\Chosen::class,
@@ -101,7 +102,9 @@ JS
                 \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
             )
         ]
-    ); ?>
+    );
+}
+?>
 
 <?php endif; ?>
 <?= $form->fieldSetEnd(); ?>

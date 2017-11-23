@@ -30,9 +30,12 @@
                 onclick="sx.ComponentSettings.Remove.removeUsers(); return false;">
             <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'Reset settings for all users') ?>
         </button>
-    <?php else: ?>
+    <?php else {
+    : ?>
         <small><?= \Yii::t('skeeks/cms', 'Neither user does not have personal settings for this component') ?></small>
-    <?php endif; ?>
+    <?php endif;
+}
+?>
 </div>
 
 <?
@@ -46,7 +49,7 @@ $search->getDataProvider()->query->andWhere(['active' => \skeeks\cms\components\
     'columns' => [
         [
             'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\models\User $model, $key, $index) {
+            'value' => function(\skeeks\cms\models\User $model, $key, $index) {
                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-cog"></i>',
                     \skeeks\cms\helpers\UrlHelper::constructCurrent()->setRoute('cms/admin-component-settings/user')->set('user_id',
                         $model->id)->toString(),

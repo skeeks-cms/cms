@@ -236,7 +236,7 @@ class User
             [
                 ['username'],
                 'default',
-                'value' => function (self $model) {
+                'value' => function(self $model) {
                     $userLast = static::find()->orderBy("id DESC")->one();
                     return "id" . ($userLast->id + 1);
                 }
@@ -247,7 +247,7 @@ class User
             [
                 ['auth_key'],
                 'default',
-                'value' => function (self $model) {
+                'value' => function(self $model) {
                     return \Yii::$app->security->generateRandomString();
                 }
             ],
@@ -255,7 +255,7 @@ class User
             [
                 ['password_hash'],
                 'default',
-                'value' => function (self $model) {
+                'value' => function(self $model) {
                     return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
                 }
             ],

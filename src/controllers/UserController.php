@@ -78,7 +78,7 @@ class UserController extends Controller
                             [
                                 [
                                     'allow' => true,
-                                    'matchCallback' => function ($rule, $action) {
+                                    'matchCallback' => function($rule, $action) {
                                         return $this->isOwner;
                                     }
                                 ]

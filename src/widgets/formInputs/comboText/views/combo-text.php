@@ -16,13 +16,16 @@ $clientOptions = \yii\helpers\Json::encode($options);
         <?php if ($widget->modelAttributeSaveType) : ?>
             <?= \yii\helpers\Html::activeRadioList($widget->model, $widget->modelAttributeSaveType,
                 \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::editors()) ?>
-        <?php else : ?>
+        <?php else {
+    : ?>
             <?= \yii\helpers\Html::radioList(
                 $widget->id . '-radio',
                 $widget->defaultEditor,
                 \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::editors()
             ) ?>
-        <?php endif; ?>
+        <?php endif;
+}
+?>
     </div>
     <div class="sx-controll">
         <?= $textarea; ?>

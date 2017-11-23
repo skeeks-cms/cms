@@ -33,11 +33,11 @@ function contentMenu()
                         [
                             'label' => $content->name,
                             'url' => ["cms/admin-cms-content-element", "content_id" => $content->id],
-                            "activeCallback" => function ($adminMenuItem) use ($content) {
+                            "activeCallback" => function($adminMenuItem) use ($content) {
                                 return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'cms/admin-cms-content-element');
                             },
 
-                            "accessCallback" => function ($adminMenuItem) use ($content) {
+                            "accessCallback" => function($adminMenuItem) use ($content) {
                                 $controller = \Yii::$app->createController('cms/admin-cms-content-element')[0];
                                 $controller->setContent($content);
 
@@ -85,7 +85,7 @@ function dashboardsMenu()
                 'label' => $dashboard->name,
                 "img" => ['\skeeks\cms\assets\CmsAsset', 'images/icons/dashboard.png'],
                 'url' => ["admin/index/dashboard", "pk" => $dashboard->id],
-                "activeCallback" => function ($adminMenuItem) {
+                "activeCallback" => function($adminMenuItem) {
                     return (bool)(\Yii::$app->controller->action->uniqueId == 'admin/index/dashboard' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
                             'pk') == \Yii::$app->request->get('pk'));
                 },
@@ -124,7 +124,7 @@ function contentEditMenu()
                 'url' => ["/cms/admin-cms-content-type/update", "pk" => $contentType->id],
                 'label' => $contentType->name,
                 "img" => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
-                "activeCallback" => function ($adminMenuItem) {
+                "activeCallback" => function($adminMenuItem) {
                     return (bool)(\Yii::$app->controller->action->uniqueId == 'cms/admin-cms-content-type/update' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
                             'pk') == \Yii::$app->request->get('pk'));
                 },
@@ -136,7 +136,7 @@ function contentEditMenu()
                         [
                             'label' => $content->name,
                             'url' => ["cms/admin-cms-content/update", "pk" => $content->id],
-                            "activeCallback" => function ($adminMenuItem) {
+                            "activeCallback" => function($adminMenuItem) {
                                 return (bool)(\Yii::$app->controller->action->uniqueId == 'cms/admin-cms-content/update' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
                                         'pk') == \Yii::$app->request->get('pk'));
                             },
@@ -169,7 +169,7 @@ function componentsMenu()
                 $result[] = [
                     'label' => $loadedComponent->descriptor->name,
                     'url' => ["cms/admin-settings", "component" => $loadedComponent->className()],
-                    "activeCallback" => function ($adminMenuItem) {
+                    "activeCallback" => function($adminMenuItem) {
                         return (bool)(\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
                     },
                 ];

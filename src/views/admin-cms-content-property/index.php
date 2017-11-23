@@ -30,14 +30,14 @@
             [
                 'label' => \Yii::t('skeeks/cms', 'Type'),
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                     return $cmsContentProperty->handler->name;
                 }
             ],
 
             [
                 'label' => \Yii::t('skeeks/cms', 'Content'),
-                'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                     $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsContents, 'id', 'name');
                     return implode(', ', $contents);
                 }
@@ -46,10 +46,10 @@
             [
                 'label' => \Yii::t('skeeks/cms', 'Sections'),
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                     if ($cmsContentProperty->cmsTrees) {
                         $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTrees, 'id',
-                            function ($cmsTree) {
+                            function($cmsTree) {
                                 $path = [];
 
                                 if ($cmsTree->parents) {

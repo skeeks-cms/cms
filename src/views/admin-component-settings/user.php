@@ -25,9 +25,12 @@
         </button>
         <small><?= \Yii::t('skeeks/cms',
                 'The settings for this component are stored in the database. This option will erase them from the database, but the component, restore the default values. As they have in the code the developer.') ?></small>
-    <?php else: ?>
+    <?php else {
+    : ?>
         <small><?= \Yii::t('skeeks/cms', 'These settings not yet saved in the database') ?></small>
-    <?php endif; ?>
+    <?php endif;
+}
+?>
 </div>
 
 <?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>

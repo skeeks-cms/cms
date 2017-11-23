@@ -177,9 +177,12 @@ JS
         <?= $property->renderActiveForm($form); ?>
     <?php endforeach; ?>
 
-<?php else : ?>
+<?php else {
+    : ?>
     <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
-<?php endif; ?>
+<?php endif;
+}
+?>
 
 <?= $form->fieldSetEnd() ?>
 
@@ -358,14 +361,14 @@ JS
                                 [
                                     'label' => \Yii::t('skeeks/cms', 'Type'),
                                     'format' => 'raw',
-                                    'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                                    'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                         return $cmsContentProperty->handler->name;
                                     }
                                 ],
 
                                 [
                                     'label' => \Yii::t('skeeks/cms', 'Content'),
-                                    'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                                    'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                         $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsContents,
                                             'id', 'name');
                                         return implode(', ', $contents);
@@ -375,10 +378,10 @@ JS
                                 [
                                     'label' => \Yii::t('skeeks/cms', 'Sections'),
                                     'format' => 'raw',
-                                    'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                                    'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                         if ($cmsContentProperty->cmsTrees) {
                                             $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTrees,
-                                                'id', function ($cmsTree) {
+                                                'id', function($cmsTree) {
                                                     $path = [];
 
                                                     if ($cmsTree->parents) {

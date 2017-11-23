@@ -15,7 +15,8 @@ use skeeks\cms\models\Tree;
 
 <?php if ($code = \Yii::$app->request->get('cms_site_id')) : ?>
     <?= $form->field($model, 'cms_site_id')->hiddenInput(['value' => $code])->label(false); ?>
-<?php else: ?>
+<?php else {
+    : ?>
     <?= $form->field($model, 'cms_site_id')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
         'items' => \yii\helpers\ArrayHelper::map(
@@ -24,6 +25,7 @@ use skeeks\cms\models\Tree;
             "name"
         ),
     ]);
+}
     ?>
 <?php endif; ?>
 

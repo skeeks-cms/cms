@@ -30,7 +30,7 @@ abstract class Cluster extends Model
     public $priority = 100;
 
     public $publicBaseUrl; //   http://c1.s.skeeks.com/uploads/
-    public $rootBasePath;  //   /var/www/sites/test.ru/frontend/web/uploads/
+    public $rootBasePath; //   /var/www/sites/test.ru/frontend/web/uploads/
 
     /**
      * @var integer the level of sub-directories to store uploaded files. Defaults to 1.
