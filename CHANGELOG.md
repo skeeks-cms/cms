@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-alpha10.pre
+5.0.0-alpha10
 ----------------
  * Fixed setting
  * Code style
