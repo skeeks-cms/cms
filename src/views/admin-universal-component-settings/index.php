@@ -27,12 +27,18 @@ $clientOptions = \yii\helpers\Json::encode($clientOptions);
     <?= $form->buttonsStandart($component); ?>
     <?php \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
 
-<?php else: ?>
+<?php else {
+    : ?>
     <?php if ($component->existsConfigFormFile()) : ?>
-        <?= $component->renderConfigForm(); ?>
-    <?php else: ?>
+        <?= $component->renderConfigForm();
+}
+?>
+    <?php else {
+    : ?>
         <p>Настройки отсутствуют</p>
-    <?php endif; ?>
+    <?php endif;
+}
+?>
 <?php endif; ?>
 
 <?php $this->registerJs(<<<JS

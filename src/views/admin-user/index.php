@@ -42,7 +42,7 @@ if ($user->relatedPropertiesModel) {
     'filterModel' => $searchModel,
     'adminController' => $controller,
     'pjax' => $pjax,
-    'chooseCallback' => function ($model) {
+    'chooseCallback' => function($model) {
         return \yii\helpers\ArrayHelper::merge($model->toArray(), [
             //'url' => $model->url,
             'image' => $model->image ? $model->image->src : "",
@@ -93,7 +93,7 @@ if ($user->relatedPropertiesModel) {
                     'size' => 1,
                     'class' => 'form-control'
                 ]),
-            'value' => function (\skeeks\cms\models\User $model) {
+            'value' => function(\skeeks\cms\models\User $model) {
                 $result = [];
 
                 if ($roles = \Yii::$app->authManager->getRolesByUser($model->id)) {
@@ -117,7 +117,7 @@ if ($user->relatedPropertiesModel) {
         [
             'class' => \yii\grid\DataColumn::className(),
             'label' => "Смотреть",
-            'value' => function (\skeeks\cms\models\CmsUser $model) {
+            'value' => function(\skeeks\cms\models\CmsUser $model) {
 
                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->getProfileUrl(),
                     [

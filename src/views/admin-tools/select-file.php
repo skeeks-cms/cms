@@ -160,7 +160,7 @@ JS
 
         [
             'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\models\StorageFile $model) {
+            'value' => function(\skeeks\cms\models\StorageFile $model) {
                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
                         'Choose file'), $model->src, [
                     'class' => 'btn btn-primary',
@@ -179,7 +179,7 @@ JS
 
         [
             'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\models\StorageFile $model) {
+            'value' => function(\skeeks\cms\models\StorageFile $model) {
                 if ($model->isImage()) {
 
                     $smallImage = \Yii::$app->imaging->getImagingUrl($model->src,
@@ -211,7 +211,7 @@ JS
 
         [
             'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\models\StorageFile $model) {
+            'value' => function(\skeeks\cms\models\StorageFile $model) {
                 $model->cluster_id;
                 $cluster = \Yii::$app->storage->getCluster($model->cluster_id);
                 return $cluster->name;

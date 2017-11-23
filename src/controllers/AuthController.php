@@ -155,7 +155,7 @@ class AuthController extends Controller
                 if ($ref = UrlHelper::getCurrent()->getRef()) {
                     $rr->redirect = $ref;
                 } else {
-                    $rr->redirect = Yii::$app->getUser()->getReturnUrl();;
+                    $rr->redirect = Yii::$app->getUser()->getReturnUrl(); ;
                 }
             } else {
                 $rr->message = 'Не удалось авторизоваться';

@@ -9,7 +9,7 @@ return [
 
     [
         'class' => \yii\grid\DataColumn::className(),
-        'value' => function ($model) {
+        'value' => function($model) {
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
                     'Choose'), $model->id, [
                 'class' => 'btn btn-primary sx-row-action',
@@ -25,7 +25,7 @@ return [
 
     [
         'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'value' => function(\skeeks\cms\models\CmsContentElement $model) {
             return $model->cmsContent->name;
         },
         'format' => 'raw',
@@ -52,7 +52,7 @@ return [
 
     [
         'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'value' => function(\skeeks\cms\models\CmsContentElement $model) {
             if (!$model->cmsTree) {
                 return null;
             }
@@ -78,7 +78,7 @@ return [
 
     [
         'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'value' => function(\skeeks\cms\models\CmsContentElement $model) {
             $result = [];
 
             if ($model->cmsContentElementTrees) {
@@ -104,7 +104,7 @@ return [
 
     [
         'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'value' => function(\skeeks\cms\models\CmsContentElement $model) {
 
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
                 'target' => '_blank',

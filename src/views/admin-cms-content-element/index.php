@@ -36,7 +36,7 @@ if ($content_id = \Yii::$app->request->get('content_id')) {
     'autoColumns' => false,
     'pjax' => $pjax,
     'adminController' => $controller,
-    'chooseCallback' => function ($model) {
+    'chooseCallback' => function($model) {
         return \yii\helpers\ArrayHelper::merge($model->toArray(), [
             'url' => $model->url,
             'image' => $model->image ? $model->image->src : ""

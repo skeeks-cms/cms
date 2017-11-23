@@ -23,9 +23,12 @@
                 onclick="sx.ComponentSettings.Remove.removeAll(); return false;">
             <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'reset all settings') ?>
         </button>
-    <?php else: ?>
+    <?php else {
+    : ?>
         <small><?= \Yii::t('skeeks/cms', 'The database no settings for this component.') ?></small>
-    <?php endif; ?>
+    <?php endif;
+}
+?>
 </div>
 
 

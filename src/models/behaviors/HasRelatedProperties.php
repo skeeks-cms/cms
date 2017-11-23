@@ -76,7 +76,7 @@ class HasRelatedProperties extends Behavior
     public function getRelatedProperties()
     {
         $className = $this->relatedPropertyClassName;
-        $find = $className::find()->orderBy(['priority' => SORT_ASC]);;
+        $find = $className::find()->orderBy(['priority' => SORT_ASC]); ;
         $find->multiple = true;
 
         return $find;

@@ -31,9 +31,12 @@
             <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'reset settings for all sites"') ?>
         </button>
         <small>.</small>
-    <?php else: ?>
+    <?php else {
+    : ?>
         <small><?= \Yii::t('skeeks/cms', 'Neither site does not have personal settings for this component') ?></small>
-    <?php endif; ?>
+    <?php endif;
+}
+?>
 </div>
 
 <?
@@ -49,7 +52,7 @@ $search->getDataProvider()->query->andWhere(['active' => \skeeks\cms\components\
 
         [
             'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\models\CmsSite $model, $key, $index) {
+            'value' => function(\skeeks\cms\models\CmsSite $model, $key, $index) {
                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-cog"></i>',
                     \skeeks\cms\helpers\UrlHelper::constructCurrent()->setRoute('cms/admin-component-settings/site')->set('site_id',
                         $model->id)->toString(),

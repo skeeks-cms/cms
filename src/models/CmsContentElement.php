@@ -286,7 +286,7 @@ class CmsContentElement extends RelatedElementModel
             [
                 'tree_id',
                 'default',
-                'value' => function () {
+                'value' => function() {
                     if ($this->cmsContent->defaultTree) {
                         return $this->cmsContent->defaultTree->id;
                     }
@@ -329,7 +329,7 @@ class CmsContentElement extends RelatedElementModel
             [
                 'parent_content_element_id',
                 'required',
-                'when' => function (CmsContentElement $model) {
+                'when' => function(CmsContentElement $model) {
 
                     if ($model->cmsContent && $model->cmsContent->parentContent) {
                         return (bool)($model->cmsContent->parent_content_is_required == "Y");

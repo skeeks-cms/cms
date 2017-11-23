@@ -137,14 +137,15 @@ abstract class RelatedPropertyModel extends Core
             //[['code'], 'string', 'max' => 64],
             [
                 ['code'],
-                function ($attribute) {
+                function($attribute) {
                     if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9]{1,255}$/',
-                        $this->$attribute))
-                        //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
+                        $this->$attribute)) {
+                                            //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
                     {
                         $this->addError($attribute, \Yii::t('skeeks/cms',
                             'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
                             ['code' => 'code1']));
+                    }
                     }
                 }
             ],
@@ -153,7 +154,7 @@ abstract class RelatedPropertyModel extends Core
             [
                 'code',
                 'default',
-                'value' => function ($model, $attribute) {
+                'value' => function($model, $attribute) {
                     return "property" . StringHelper::ucfirst(md5(rand(1, 10) . time()));
                 }
             ],

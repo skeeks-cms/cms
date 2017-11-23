@@ -45,7 +45,7 @@ abstract class Core extends ActiveRecord
             BlameableBehavior::className() =>
                 [
                     'class' => BlameableBehavior::className(),
-                    'value' => function ($event) {
+                    'value' => function($event) {
                         if (\Yii::$app instanceof \yii\console\Application) {
                             return null;
                         } else {

@@ -30,7 +30,7 @@
             'priority',
             [
                 'label' => \Yii::t('skeeks/cms', 'Sections'),
-                'value' => function (\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty) {
+                'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty) {
                     $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTreeTypes, 'id', 'name');
                     return implode(', ', $contents);
                 }
@@ -38,7 +38,7 @@
             [
                 'label' => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty) {
+                'value' => function(\skeeks\cms\models\CmsTreeTypeProperty $cmsContentProperty) {
                     return \yii\helpers\Html::a($cmsContentProperty->getElementProperties()->andWhere([
                         '!=',
                         'value',

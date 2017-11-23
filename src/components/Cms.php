@@ -251,7 +251,7 @@ class Cms extends \skeeks\cms\base\Component
                 $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
             }
 
-            \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function (Event $e) {
+            \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function(Event $e) {
                 if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
                     \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS',
                         $this->descriptor->name . " {$this->descriptor->homepage}");
@@ -276,7 +276,7 @@ class Cms extends \skeeks\cms\base\Component
                 }
             });
 
-            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function (UserEvent $e) {
+            \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, function(UserEvent $e) {
                 $e->identity->logged_at = \Yii::$app->formatter->asTimestamp(time());
                 $e->identity->save(false);
 

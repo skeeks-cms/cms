@@ -110,7 +110,7 @@ class RelationalBehavior extends Behavior
                 foreach ($relationPks as $relationPk) {
                     $junctionRows[] = [$model->primaryKey, $relationPk];
                 }
-                $model->getDb()->transaction(function () use (
+                $model->getDb()->transaction(function() use (
                     $junctionTable,
                     $primaryModelColumn,
                     $relatedModelColumn,

@@ -33,7 +33,7 @@
             'code',
 
             [
-                'value' => function (\skeeks\cms\models\CmsContentType $model) {
+                'value' => function(\skeeks\cms\models\CmsContentType $model) {
                     $contents = \yii\helpers\ArrayHelper::map($model->cmsContents, 'id', 'name');
                     return implode(', ', $contents);
                 },

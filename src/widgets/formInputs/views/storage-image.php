@@ -107,8 +107,11 @@ JS
                             ]);
                             ?>
                         </div>
-                    <?php else : ?>
-                        <?= $widget->renderItem($imageFile); ?>
+                    <?php else {
+    : ?>
+                        <?= $widget->renderItem($imageFile);
+}
+?>
                     <?php endif; ?>
 
                 </div>

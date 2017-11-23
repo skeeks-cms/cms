@@ -96,12 +96,15 @@ JS
                     </div>
                 </div>
 
-            <?php else : ?>
+            <?php else {
+    : ?>
 
                 <?php $propertiesValues = \skeeks\cms\models\CmsContentElementProperty::find()->select(['value'])->where([
                     'property_id' => $property->id,
                     'element_id' => $widget->elementIds
-                ])->all(); ?>
+                ])->all();
+}
+?>
 
                 <?php if ($propertiesValues) : ?>
                     <div class="row">

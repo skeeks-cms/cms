@@ -11,8 +11,11 @@
 
 <?php if ($contentModel->root_tree_id) : ?>
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
-<?php else : ?>
-    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all(); ?>
+<?php else {
+    : ?>
+    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all();
+}
+?>
 <?php endif; ?>
 
 <?php if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
@@ -171,12 +174,18 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
             </div>
             <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
 
-        <?php else: ?>
+        <?php else {
+    : ?>
             <?= $property->renderActiveForm($form, $model) ?>
-        <?php endif; ?>
+        <?php endif;
+}
+?>
     <?php endforeach; ?>
 
-<?php else : ?>
+<?php else {
+    : ?>
     <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
-<?php endif; ?>
+<?php endif;
+}
+?>
 <?= $form->fieldSetEnd() ?>

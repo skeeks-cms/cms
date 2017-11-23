@@ -33,9 +33,12 @@
 <?php if ($model->cmsContent) : ?>
     <?= $form->fieldSelectMulti($model, 'realatedProperties',
         \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
-<?php else: ?>
+<?php else {
+    : ?>
     Дополнительные свойства появятся после сохранения настроек
-<?php endif; ?>
+<?php endif;
+}
+?>
 
 
 

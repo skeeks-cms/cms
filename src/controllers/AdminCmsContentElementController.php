@@ -396,7 +396,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                         ],
                 ]);
 
-                $this->_content = CmsContent::getDb()->cache(function ($db) use ($content_id) {
+                $this->_content = CmsContent::getDb()->cache(function($db) use ($content_id) {
                     return CmsContent::find()->where([
                         "id" => $content_id,
                     ])->one();
@@ -510,7 +510,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'visible' => false,
                     'format' => 'raw',
                     'class' => \yii\grid\DataColumn::class,
-                    'value' => function ($model, $key, $index) use ($name) {
+                    'value' => function($model, $key, $index) use ($name) {
                         if (is_array($model->{$name})) {
                             return implode(",", $model->{$name});
                         } else {
@@ -573,7 +573,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             [
                 'class' => \yii\grid\DataColumn::class,
-                'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+                'value' => function(\skeeks\cms\models\CmsContentElement $model) {
                     if (!$model->cmsTree) {
                         return null;
                     }
@@ -600,7 +600,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             'additionalSections' => [
                 'class' => \yii\grid\DataColumn::class,
-                'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+                'value' => function(\skeeks\cms\models\CmsContentElement $model) {
                     $result = [];
 
                     if ($model->cmsContentElementTrees) {
@@ -628,7 +628,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             [
                 'class' => \yii\grid\DataColumn::class,
                 'label' => "Смотреть",
-                'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+                'value' => function(\skeeks\cms\models\CmsContentElement $model) {
 
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl,
                         [

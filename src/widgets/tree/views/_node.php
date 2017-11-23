@@ -23,8 +23,11 @@ $widget = $this->context;
                 <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
                     <span class="glyphicon glyphicon-minus" title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"></span>
                 </a>
-            <?php else : ?>
-                <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
+            <?php else {
+    : ?>
+                <a href="<?= $widget->getOpenCloseLink($model);
+}
+?>" class="btn btn-sm btn-default">
                     <span class="glyphicon glyphicon-plus" title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"></span>
                 </a>
             <?php endif; ?>

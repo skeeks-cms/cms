@@ -246,7 +246,7 @@ class UrlRuleTree
 
         if (!$pathInfo) //главная страница
         {
-            $treeNode = Tree::getDb()->cache(function ($db) {
+            $treeNode = Tree::getDb()->cache(function($db) {
                 return Tree::find()->where([
                     "cms_site_id" => \Yii::$app->cms->site->id,
                     "level" => 0,

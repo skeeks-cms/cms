@@ -68,7 +68,7 @@ abstract class RelatedElementPropertyModel extends Core
             [
                 ['value_enum', 'value_int2'],
                 'filter',
-                'filter' => function ($value) {
+                'filter' => function($value) {
                     $value = (int)$value;
                     $filter_options = [
                         'options' => [
@@ -86,7 +86,7 @@ abstract class RelatedElementPropertyModel extends Core
             [
                 ['value_num', 'value_num2'],
                 'filter',
-                'filter' => function ($value) {
+                'filter' => function($value) {
                     $value = (float)$value;
                     $min_range = -1.0E+14;
                     $max_range = 1.0E+14;
@@ -103,7 +103,7 @@ abstract class RelatedElementPropertyModel extends Core
             [
                 'value_bool',
                 'filter',
-                'filter' => function ($value) {
+                'filter' => function($value) {
                     $value = (bool)$value;
                     return $value;
                 }

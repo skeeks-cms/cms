@@ -44,7 +44,7 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
             [
                 'label' => \Yii::t('skeeks/cms', 'Property'),
                 'attribute' => 'p.name',
-                'value' => function (\skeeks\cms\models\CmsTreeTypePropertyEnum $cmsContentPropertyEnum) {
+                'value' => function(\skeeks\cms\models\CmsTreeTypePropertyEnum $cmsContentPropertyEnum) {
                     return $cmsContentPropertyEnum->property->name;
                 }
             ],

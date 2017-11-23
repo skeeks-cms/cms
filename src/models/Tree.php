@@ -380,7 +380,7 @@ class Tree extends Core
             [
                 ['name'],
                 'default',
-                'value' => function (self $model) {
+                'value' => function(self $model) {
                     $lastTree = static::find()->orderBy(["id" => SORT_DESC])->one();
                     if ($lastTree) {
                         return "pk-" . $lastTree->primaryKey;
