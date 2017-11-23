@@ -17,11 +17,7 @@ use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
 use Yii;
-use yii\base\DynamicModel;
-use yii\base\Model;
-use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
@@ -69,6 +65,7 @@ abstract class RelatedPropertyModel extends Core
      * @var RelatedPropertiesModel
      */
     public $relatedPropertiesModel = null;
+    protected $_handler = null;
 
     public function behaviors()
     {
@@ -142,7 +139,8 @@ abstract class RelatedPropertyModel extends Core
                 ['code'],
                 function ($attribute) {
                     if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9]{1,255}$/',
-                        $this->$attribute)) //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
+                        $this->$attribute))
+                        //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
                     {
                         $this->addError($attribute, \Yii::t('skeeks/cms',
                             'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
@@ -164,12 +162,6 @@ abstract class RelatedPropertyModel extends Core
             [['is_required'], 'default', 'value' => Cms::BOOL_N],
         ]);
     }
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    abstract public function getElementProperties();
     /*{
         return $this->hasMany(CmsContentElementProperty::className(), ['property_id' => 'id']);
     }*/
@@ -177,10 +169,15 @@ abstract class RelatedPropertyModel extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    abstract public function getEnums();
+    abstract public function getElementProperties();
     /*{
         return $this->hasMany(CmsContentPropertyEnum::className(), ['property_id' => 'id']);
     }*/
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    abstract public function getEnums();
 
     /**
      * @param ActiveForm $activeForm
@@ -204,8 +201,6 @@ abstract class RelatedPropertyModel extends Core
 
         return $handler->renderForActiveForm();
     }
-
-    protected $_handler = null;
 
     /**
      * @return PropertyType

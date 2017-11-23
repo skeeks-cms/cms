@@ -193,6 +193,8 @@ abstract class PropertyType extends Model implements ConfigFormInterface
     const CODE_NUMBER = 'N';
     const CODE_FILE = 'F';
 
+    const CODE_STORAGE_FILE = 'A';
+
     const CODE_LIST = 'L';
     const CODE_TREE = 'T';
     const CODE_ELEMENT = 'E';

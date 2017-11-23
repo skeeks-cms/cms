@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha11.pre
+----------------
+ * Travis
+ 
 5.0.0-alpha10
 ----------------
  * Fixed setting

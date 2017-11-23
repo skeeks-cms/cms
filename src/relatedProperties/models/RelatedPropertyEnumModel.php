@@ -10,11 +10,8 @@
 
 namespace skeeks\cms\relatedProperties\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\Core;
 use Yii;
-use yii\db\BaseActiveRecord;
-use yii\widgets\ActiveForm;
 
 /**
  * @property integer $id
@@ -65,14 +62,14 @@ abstract class RelatedPropertyEnumModel extends Core
             [
                 'code',
                 'default',
-                'value' => function ($model, $attribute) {
+                'value' => function($model, $attribute) {
                     return md5(rand(1, 10) . time());
                 }
             ],
             [
                 'priority',
                 'default',
-                'value' => function ($model, $attribute) {
+                'value' => function($model, $attribute) {
                     return 500;
                 }
             ],

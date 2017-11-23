@@ -26,6 +26,7 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeNumber;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeRadioList;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelect;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelectMulti;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeString;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeTextarea;
@@ -212,10 +213,7 @@ class Cms extends \skeeks\cms\base\Component
                     [
                         'class' => PropertyTypeList::className()
                     ],
-                PropertyTypeFile::className() =>
-                    [
-                        'class' => PropertyTypeFile::className()
-                    ],
+
                 PropertyTypeTree::className() =>
                     [
                         'class' => PropertyTypeTree::className()
@@ -224,7 +222,10 @@ class Cms extends \skeeks\cms\base\Component
                     [
                         'class' => PropertyTypeElement::className()
                     ],
-
+                PropertyTypeStorageFile::className() =>
+                    [
+                        'class' => PropertyTypeStorageFile::className()
+                    ],
 
                 UserPropertyTypeDate::className() =>
                     [
