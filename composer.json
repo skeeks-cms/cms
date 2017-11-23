@@ -55,7 +55,7 @@
         "paulzi/yii2-adjacency-list": "~2.0.4",
         "paulzi/yii2-materialized-path": "~2.0.8",
         "bower-asset/fancybox": "^3.1",
-        "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
+        "bower-asset/jquery": "3.2.*@stable | 3.1.*@stable | 2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable",
     },
     "autoload": {
         "psr-4": {
