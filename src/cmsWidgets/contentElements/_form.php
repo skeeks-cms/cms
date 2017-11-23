@@ -26,7 +26,9 @@
     'allowDeselect' => true
 ]); ?>
 
-<?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat())->hint(\Yii::t('skeeks/cms',
+<?= $form->fieldSelect($model, 'enabledActiveTime', \Yii::$app->cms->booleanFormat(), [
+    'allowDeselect' => true
+])->hint(\Yii::t('skeeks/cms',
     "Will be considered time of beginning and end of the publication")); ?>
 
 <?= $form->fieldSelectMulti($model, 'createdBy', \yii\helpers\ArrayHelper::map(

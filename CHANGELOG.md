@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.0-alpha10.pre
 ----------------
+ * Fixed setting
  * Code style
  
 5.0.0-alpha9
