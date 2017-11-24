@@ -244,7 +244,8 @@ class UrlRuleTree
         ]);
 
 
-        if (!$pathInfo) //главная страница
+        //Main page
+        if (!$pathInfo)
         {
             $treeNode = Tree::getDb()->cache(function($db) {
                 return Tree::find()->where([
