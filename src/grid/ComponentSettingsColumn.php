@@ -49,7 +49,7 @@ class ComponentSettingsColumn extends BooleanColumn
             return $this->_result(Cms::BOOL_Y);
         }
 
-        return $this->_result(Cms::BOOL_N);;
+        return $this->_result(Cms::BOOL_N);
     }
 
     /**
