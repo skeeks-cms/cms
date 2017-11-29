@@ -20,11 +20,27 @@ class m171121_201442_alter__view_file extends Migration
     public function safeUp()
     {
         if ($this->db->driverName === 'pgsql') {
-            $this->renameColumn('{{%cms_tree_type}}', 'viewfile', 'view_file');
-            $this->renameColumn('{{%cms_content}}', 'viewfile', 'view_file');
+            $tableSchema = $this->db->getTableSchema('cms_tree_type');
+            if ($tableSchema->getColumn('viewfile')) {
+                $this->renameColumn('{{%cms_tree_type}}', 'viewfile', 'view_file');
+            }
+
+            $tableSchema = $this->db->getTableSchema('cms_content');
+            if ($tableSchema->getColumn('viewfile')) {
+                $this->renameColumn('{{%cms_content}}', 'viewfile', 'view_file');
+            }
+
         } else {
-            $this->renameColumn('{{%cms_tree_type}}', 'viewFile', 'view_file');
-            $this->renameColumn('{{%cms_content}}', 'viewFile', 'view_file');
+
+            $tableSchema = $this->db->getTableSchema('cms_tree_type');
+            if ($tableSchema->getColumn('viewFile')) {
+                $this->renameColumn('{{%cms_tree_type}}', 'viewFile', 'view_file');
+            }
+
+            $tableSchema = $this->db->getTableSchema('cms_content');
+            if ($tableSchema->getColumn('viewFile')) {
+                $this->renameColumn('{{%cms_content}}', 'viewFile', 'view_file');
+            }
         }
     }
 

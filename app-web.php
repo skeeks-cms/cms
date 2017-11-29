@@ -9,13 +9,15 @@ require(__DIR__ . '/bootstrap.php');
 
 \Yii::beginProfile('Load config app');
 
+defined('ENV') or define('ENV', YII_ENV);
+
 if (YII_ENV == 'dev') {
     \Yii::beginProfile('Rebuild config');
     \skeeks\cms\composer\config\Builder::rebuild();
     \Yii::endProfile('Rebuild config');
 }
 
-$configFile = \skeeks\cms\composer\config\Builder::path('web-' . YII_ENV);
+$configFile = \skeeks\cms\composer\config\Builder::path('web-' . ENV);
 if (!file_exists($configFile)) {
     $configFile = \skeeks\cms\composer\config\Builder::path('web');
 }

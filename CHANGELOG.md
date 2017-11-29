@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha14.pre
+----------------
+ * defined('ENV') or define('ENV', YII_ENV);
+ 
 5.0.0-alpha13
 ----------------
  * Fixed
