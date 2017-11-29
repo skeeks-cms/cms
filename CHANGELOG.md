@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha12
+----------------
+ * Fixed Class 'skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile' not found
+ 
 5.0.0-alpha11
 ----------------
  * @bower to console app

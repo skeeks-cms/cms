@@ -216,10 +216,10 @@ class Cms extends \skeeks\cms\base\Component
                     [
                         'class' => PropertyTypeElement::className()
                     ],
-                PropertyTypeStorageFile::className() =>
+                /*PropertyTypeStorageFile::className() =>
                     [
                         'class' => PropertyTypeStorageFile::className()
-                    ],
+                    ],*/
 
                 UserPropertyTypeDate::className() =>
                     [
