@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-5.0.0-alpha11.pre
+5.0.0-alpha11
 ----------------
+ * @bower to console app
  * Code style
  * Travis
  

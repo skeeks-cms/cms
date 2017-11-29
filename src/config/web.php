@@ -11,12 +11,7 @@
  */
 $config = [
     'bootstrap' => ['cms'],
-
-    'aliases' => [
-        '@bower' => '@vendor/bower-asset',
-        '@npm' => '@vendor/npm-asset',
-    ],
-
+    
     'components' => [
 
         'errorHandler' => [

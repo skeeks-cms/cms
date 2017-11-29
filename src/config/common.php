@@ -13,6 +13,11 @@ return [
 
     'language' => 'ru',
 
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm' => '@vendor/npm-asset',
+    ],
+    
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
