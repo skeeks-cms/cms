@@ -11,7 +11,7 @@ use yii\helpers\Html;
 
     <p>Empty.</p>
 
-<?php else {
+<?php else
     : ?>
 
     <table class="table table-condensed table-bordered table-striped table-hover sx-table" style="table-layout: fixed;">
@@ -28,7 +28,6 @@ use yii\helpers\Html;
                 <td style="overflow:auto"><?= $value ?></td>
             </tr>
         <?php endforeach;
-}
 ?>
         </tbody>
     </table>
