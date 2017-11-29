@@ -10,7 +10,7 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 <?php if ($form_id = \Yii::$app->request->get('property_id')) : ?>
     <?= $form->field($model, 'property_id')->hiddenInput(['value' => $form_id])->label(false); ?>
-<?php else {
+<?php else
     : ?>
     <?= $form->field($model, 'property_id')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
@@ -20,7 +20,6 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
             "name"
         ),
     ]);
-}
     ?>
 <?php endif; ?>
 

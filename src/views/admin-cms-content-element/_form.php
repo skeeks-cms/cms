@@ -76,11 +76,10 @@ JS
             <?php $model->content_id = $content_id; ?>
             <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
         <?php endif; ?>
-    <?php else {
-    : ?>
+    <?php else
+        : ?>
         <?php $contentModel = $model->cmsContent;
-}
-?>
+        ?>
     <?php endif; ?>
 
     <?php if ($contentModel && $contentModel->parentContent) : ?>
@@ -165,8 +164,8 @@ JS
                     ],
                 'body' => \Yii::t('skeeks/cms', 'Management will be available after saving')
             ]); ?>
-        <?php else {
-    : ?>
+        <?php else
+            : ?>
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label' => $childContent->name,
                 'namespace' => md5($model->className() . $childContent->id),
@@ -188,8 +187,7 @@ JS
                     'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent)
                 ],
             ]);
-}
-?>
+            ?>
 
         <?php endif; ?>
 

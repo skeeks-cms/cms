@@ -31,12 +31,11 @@
             <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'reset settings for all sites"') ?>
         </button>
         <small>.</small>
-    <?php else {
-    : ?>
+    <?php else
+        : ?>
         <small><?= \Yii::t('skeeks/cms', 'Neither site does not have personal settings for this component') ?></small>
     <?php endif;
-}
-?>
+    ?>
 </div>
 
 <?

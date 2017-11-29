@@ -36,11 +36,10 @@ $action = $controller->action;
         'Site selected by default always active')); ?>
     <?= $form->field($model, 'def')->hiddenInput()->hint(\Yii::t('skeeks/cms',
         'This site is the site selected by default. If you want to change it, you need to choose a different site, the default site.')); ?>
-<?php else {
+<?php else
     : ?>
     <?= $form->fieldRadioListBoolean($model, 'active');
-}
-?>
+    ?>
     <?= $form->fieldRadioListBoolean($model, 'def'); ?>
 <?php endif; ?>
 

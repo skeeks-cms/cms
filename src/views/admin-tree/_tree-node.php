@@ -57,11 +57,11 @@ if ($additionalName) {
             $names[] = $model->redirectTree->name;
             echo implode(" / ", $names);
             ?>
-        <?php else {
-    : ?>
+        <?php else
+            : ?>
             <?
             $names[] = $model->redirectTree->site->name;
-}
+
             echo implode(" / ", $names);
             ?>
         <?php endif; ?>

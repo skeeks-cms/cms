@@ -91,7 +91,7 @@ JS
 
     <?php /*= $form->field($model, 'tree_type_id')->hiddenInput(['value' => $content_id])->label(false); */ ?>
 
-<?php else {
+<?php else
     : ?>
 
     <?= $form->field($model, 'cmsTreeTypes')->widget(
@@ -103,8 +103,7 @@ JS
             )
         ]
     );
-}
-?>
+    ?>
 
 <?php endif; ?>
 <?= $form->fieldSetEnd(); ?>

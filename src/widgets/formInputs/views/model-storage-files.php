@@ -99,11 +99,10 @@ JS
                                         <img src="<?= \Yii::$app->imaging->getImagingUrl($imageFile->src,
                                             new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
                                     </a>
-                                <?php else {
-    : ?>
+                                <?php else
+                                    : ?>
                                     <?= $imageFile->name ? $imageFile->name : $imageFile->original_name;
-}
-?>
+                                    ?>
                                 <?php endif; ?>
 
                                 <div class="sx-controlls">
@@ -125,11 +124,10 @@ JS
                                     }
                                     ?>
                                 </div>
-                            <?php else {
-    : ?>
+                            <?php else
+                                : ?>
                                 <?= $widget->renderItem($imageFile);
-}
-?>
+                                ?>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>

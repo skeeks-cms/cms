@@ -85,11 +85,10 @@ JS
         <?php endforeach; ?>
     <?php endif; ?>
 
-<?php else {
+<?php else
     : ?>
     <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
 <?php endif;
-}
 ?>
 
 

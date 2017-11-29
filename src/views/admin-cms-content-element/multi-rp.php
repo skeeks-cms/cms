@@ -91,8 +91,8 @@ JS
                                 ]
                             );
                             ?>
-                        <?php else {
-    : ?>
+                        <?php else
+                            : ?>
                             <?
                             echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
                                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
@@ -101,25 +101,22 @@ JS
                                     'multiple' => true
                                 ]
                             );
-}
                             ?>
                         <?php endif; ?>
-                    <?php else {
-    : ?>
+                    <?php else
+                        : ?>
                         <?= $property->renderActiveForm($form);
-}
-?>
+                        ?>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
             <?= $form->buttonsStandart($model, ['save']); ?>
             <?php $form::end(); ?>
-        <?php else {
-    : ?>
+        <?php else
+            : ?>
             Not found properties
         <?php endif;
-}
-?>
+        ?>
     <?php endif; ?>
 </div>
 

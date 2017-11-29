@@ -6,11 +6,10 @@
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Sections')); ?>
 <?php if ($contentModel->root_tree_id) : ?>
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
-<?php else {
+<?php else
     : ?>
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all();
-}
-?>
+    ?>
 <?php endif; ?>
 
 <?php /* if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : */ ?><!--

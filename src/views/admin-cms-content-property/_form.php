@@ -90,7 +90,7 @@ JS
 
     <?php /*= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); */ ?>
 
-<?php else {
+<?php else
     : ?>
     <?php /*= $form->field($model, 'content_id')->label(\Yii::t('skeeks/cms','Content'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
@@ -109,8 +109,7 @@ JS
             'items' => \skeeks\cms\models\CmsContent::getDataForSelect()
         ]
     );
-}
-?>
+    ?>
 
 
 <?php endif; ?>
@@ -129,7 +128,7 @@ JS
             ]
         ); ?>
     </div>
-<?php else {
+<?php else
     : ?>
     <?= $form->field($model, 'cmsTrees')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
@@ -137,8 +136,8 @@ JS
             'multiple' => true,
         ]
     );
-}
-?>
+
+    ?>
 <?php endif; ?>
 
 <?= $form->fieldSetEnd(); ?>

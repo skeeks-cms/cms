@@ -30,12 +30,11 @@
                 onclick="sx.ComponentSettings.Remove.removeUsers(); return false;">
             <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'Reset settings for all users') ?>
         </button>
-    <?php else {
-    : ?>
+    <?php else
+        : ?>
         <small><?= \Yii::t('skeeks/cms', 'Neither user does not have personal settings for this component') ?></small>
     <?php endif;
-}
-?>
+    ?>
 </div>
 
 <?

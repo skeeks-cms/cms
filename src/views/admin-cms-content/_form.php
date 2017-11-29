@@ -22,13 +22,11 @@ $action = $controller->action;
 
 <?php if ($content_type = \Yii::$app->request->get('content_type')) : ?>
     <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
-<?php else {
-    : ?>
+<?php else : ?>
     <div style="display: none;">
         <?= $form->fieldSelect($model, 'content_type',
             \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name'));
-}
-?>
+        ?>
     </div>
 <?php endif; ?>
 

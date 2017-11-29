@@ -107,11 +107,10 @@ JS
                             ]);
                             ?>
                         </div>
-                    <?php else {
-    : ?>
+                    <?php else
+                        : ?>
                         <?= $widget->renderItem($imageFile);
-}
-?>
+                        ?>
                     <?php endif; ?>
 
                 </div>
