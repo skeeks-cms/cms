@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha13
+----------------
+ * Fixed
+ 
 5.0.0-alpha12
 ----------------
  * Fixed Class 'skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile' not found
