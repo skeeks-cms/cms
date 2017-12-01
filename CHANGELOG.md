@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-alpha15.pre
+----------------
+ * Fixed bug with saving multiple section selection.
+ 
 5.0.0-alpha14
 ----------------
  * defined('ENV') or define('ENV', YII_ENV);

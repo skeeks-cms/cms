@@ -107,6 +107,12 @@ class SelectTreeInputWidget extends InputWidget
         $items = $value;
         if ($value && is_string($value) || is_int($value)) {
             $items = [$value => $value];
+        } else if (is_array($value)) {
+            $newValue = [];
+            foreach ($value as $k => $v) {
+                $newValue[$v] = $v;
+            }
+            $items = $newValue;
         }
 
         if (!$items) {
