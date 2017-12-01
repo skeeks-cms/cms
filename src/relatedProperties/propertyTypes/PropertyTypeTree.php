@@ -128,4 +128,23 @@ class PropertyTypeTree extends PropertyType
 
         return $field;
     }
+    
+    /**
+     * @return string
+     */
+    public function getStringValue()
+    {
+        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+
+        if ($this->isMultiple) {
+            $data = ArrayHelper::map(CmsTree::find()->where(['id' => $value])->all(), 'id', 'name');
+            return implode(', ', $data);
+        } else {
+            if ($element = CmsTree::find()->where(['id' => $value])->one()) {
+                return $element->name;
+            }
+
+            return "";
+        }
+    }
 }
