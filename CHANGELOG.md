@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-alpha15
+5.0.0-beta
 ----------------
  * Fixed bug with saving multiple section selection.
  
