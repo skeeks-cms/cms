@@ -10,11 +10,9 @@ defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
 defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w'));
 
 //Standard loader
-require(__DIR__ . '/bootstrap.php');
+require_once(__DIR__ . '/bootstrap.php');
 
 \Yii::beginProfile('Load config app');
-
-defined('ENV') or define('ENV', YII_ENV);
 
 if (YII_ENV == 'dev') {
     \Yii::beginProfile('Rebuild config');

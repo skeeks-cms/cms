@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-beta2
+----------------
+ * Fixed
+ 
 5.0.0-beta
 ----------------
  * Fixed bug with saving multiple section selection.
