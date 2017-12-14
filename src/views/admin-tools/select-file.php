@@ -146,7 +146,20 @@ JS
         ],
 ]); ?>
 <p></p>
+
+<?php
+$searchModel = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsStorageFile::class);
+$dataProvider   = $search->search(\Yii::$app->request->queryParams);
+$searchModel    = $search->loadedModel;
+
+echo $this->render('@skeeks/cms/views/admin-storage-files/_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
+
 <?php $dataProvider->pagination->defaultPageSize = 10; ?>
+
+
 <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([
 
     'dataProvider' => $dataProvider,

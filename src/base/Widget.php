@@ -25,6 +25,11 @@ abstract class Widget extends Component implements ViewContextInterface
     use TWidget;
 
     /**
+     * @var array
+     */
+    public $contextData = [];
+
+    /**
      * @var string
      */
     protected $_token;

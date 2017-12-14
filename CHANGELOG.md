@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-beta4.pre
+----------------
+ * Add widget contextData
+ 
 5.0.0-beta3
 ----------------
  * Yii 2.0.13.1

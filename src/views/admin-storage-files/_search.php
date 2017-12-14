@@ -22,7 +22,7 @@ if ($filter->id) {
 }
 ?>
 <?php $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-    'action' => '/' . \Yii::$app->request->pathInfo,
+    'action' => \Yii::$app->request->absoluteUrl,
 ]); ?>
 
 <?= $form->field($searchModel, 'name')->setVisible(); ?>
