@@ -11,7 +11,7 @@
  */
 $config = [
     'bootstrap' => ['cms'],
-    
+
     'components' => [
 
         'errorHandler' => [
@@ -51,6 +51,26 @@ $config = [
 
         'breadcrumbs' => [
             'class' => '\skeeks\cms\components\Breadcrumbs',
+        ],
+
+        'upaBackend' => [
+            'menu' => [
+                'data' => [
+                    'personal' => [
+                        'name' => 'Личные данные',
+                        'items' => [
+                            [
+                                'name' => 'Личные данные',
+                                'url' => ['/cms/upa-personal/update'],
+                            ],
+                            [
+                                'name' => 'Смена пароля',
+                                'url' => ['/cms/upa-personal/change-password'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

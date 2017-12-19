@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-beta5.pre
+----------------
+ * Cms user personal area
+ 
 5.0.0-beta4
 ----------------
  * Fixed admin select files
