@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-beta4.pre
+5.0.0-beta4
 ----------------
  * Fixed admin select files
  * Add widget contextData
