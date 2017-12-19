@@ -100,6 +100,8 @@ use yii\helpers\Url;
  * @property Tree $prev
  * @property Tree $next
  * @property Tree $descendants
+ * 
+ * @depricated
  */
 class Tree extends Core
 {
