@@ -21,12 +21,23 @@ $action = $controller->action;
                 'multiple' => false
             ]
         ); ?>
-        <?= $form->field($model, 'username')->textInput(['maxlength' => 12])
-                ->hint('Уникальное имя пользователя. Используется для авторизации, для формирования ссылки на личный кабинет.'); ?>
+        <?= $form->field($model, 'username'); ?>
         <?= $form->field($model, 'first_name')->textInput(); ?>
         <?= $form->field($model, 'last_name')->textInput(); ?>
         <?= $form->field($model, 'patronymic')->textInput(); ?>
         <?= $form->field($model, 'email')->textInput(); ?>
+        <?
+        \skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
+        $id = \yii\helpers\Html::getInputId($model, 'phone');
+        $this->registerJs(<<<JS
+$("#{$id}").mask("+7 999 999-99-99");
+JS
+        );
+        ?>
+
+        <?= $form->field($model, 'phone')->textInput([
+            'placeholder' => '+7 903 722-28-73'
+        ]); ?>
 
     <?= $form->buttonsCreateOrUpdate($model); ?>
     <?= $form->errorSummary($model); ?>

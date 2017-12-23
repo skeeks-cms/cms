@@ -33,6 +33,7 @@ return
         "Selection in the dialog box" => "Выбор в диалоговом окне",
         "Form element type" => "Тип элемента формы",
         "Root partition" => "Корневой раздел",
+        "Change password" => "Смена пароля",
 
         "Only shown in sections" => "Показывается только в разделах",
         "Always shown" => "Показывается всегда",
