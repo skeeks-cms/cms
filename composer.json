@@ -56,6 +56,7 @@
         "giggsey/libphonenumber-for-php": "~8.8.5",
         "paulzi/yii2-auto-tree": "~1.0.4",
         "paulzi/yii2-adjacency-list": "~2.0.4",
+        "paulzi/yii2-nested-sets": "~1.0.6",
         "paulzi/yii2-materialized-path": "~2.0.8",
         "bower-asset/fancybox": "^3.1",
         "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
