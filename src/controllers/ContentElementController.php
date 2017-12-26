@@ -114,19 +114,21 @@ class ContentElementController extends Controller
         $tree = $contentElement->cmsTree;
 
 
+        //TODO: Может быть не сбрасывать GET параметры
         if (Url::isRelative($contentElement->url)) {
-            if ($contentElement->url != \Yii::$app->request->url) {
+            
+            if ($contentElement->url != "/" . \Yii::$app->request->pathInfo) {
                 $url = $contentElement->url;
                 \Yii::$app->response->redirect($url, 301);
             }
         } else {
 
             if ($urlData = parse_url($contentElement->url)) {
-                $contentUrl = \Yii::$app->request->url;
+                //$contentUrl = \Yii::$app->request->url;
                 /*if (\Yii::$app->homeUrl != '/') {
                     $contentUrl = "/" . StringHelper::substr(\Yii::$app->request->url, StringHelper::strlen(\Yii::$app->homeUrl), StringHelper::strlen(\Yii::$app->request->url));
                 }*/
-                if (ArrayHelper::getValue($urlData, 'path') != $contentUrl) {
+                if (ArrayHelper::getValue($urlData, 'path') != "/" . \Yii::$app->request->pathInfo) {
                     $url = $contentElement->url;
                     \Yii::$app->response->redirect($url, 301);
                 }
