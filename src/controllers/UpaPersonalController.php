@@ -12,9 +12,12 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\models\CmsUser;
+use skeeks\yii2\form\fields\PasswordField;
+use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -27,7 +30,7 @@ class UpaPersonalController extends BackendModelController
 
     public function init()
     {
-        $this->name = "Личные настройки";
+        $this->name = ['skeeks/cms', 'Personal data'];
         $this->modelClassName = \Yii::$app->user->identityClass;
         $this->modelShowAttribute = 'displayName';
         parent::init();
@@ -46,6 +49,7 @@ class UpaPersonalController extends BackendModelController
         return ArrayHelper::merge(parent::actions(), [
                 "update" => [
                     'class' => BackendModelUpdateAction::class,
+                    'name' => ['skeeks/cms', 'Personal data'],
                     'fields' => [
                         'image_id' => [
                             'class' => WidgetField::class,
@@ -65,20 +69,31 @@ class UpaPersonalController extends BackendModelController
                 ],
                 "change-password" => [
                     'class' => BackendModelUpdateAction::class,
-                    'name' => \Yii::t('skeeks/cms', 'Change password'),
+                    'name' => ['skeeks/cms', 'Change password'],
+                    'icon' => 'fa fa-key',
                     'defaultView' => 'change-password',
                     'on initFormModels' => function(Event $e) {
                         $model = $e->sender->model;
                         $dm = new DynamicModel(['pass', 'pass2']);
-                        $dm->addRule(['pass'], 'integer');
+                        $dm->addRule(['pass', 'pass2'], 'string', ['min' => 6]);
+                        $dm->addRule(['pass', 'pass2'], 'required');
+                        $dm->addRule(['pass', 'pass2'], function($attribute) use ($dm) {
+                            if ($dm->pass != $dm->pass2) {
+                                $dm->addError($attribute, \Yii::t('skeeks/cms', 'New passwords do not match'));
+                                return false;
+                            }
+                        });
                         $e->sender->formModels['dm'] = $dm;
                     },
                     'fields' => [
                         'dm.pass' => [
-                            'label' => 'test',
-                            'hint' => 'test 1'
+                            'class' => PasswordField::class,
+                            'label' => ['skeeks/cms', 'New password'],
                         ],
-                        'dm.pass2',
+                        'dm.pass2' =>  [
+                            'class' => PasswordField::class,
+                            'label' => ['skeeks/cms', 'New password (again)'],
+                        ],
                     ]
                 ],
             ]

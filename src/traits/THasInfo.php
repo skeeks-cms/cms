@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\traits;
 
+use yii\helpers\ArrayHelper;
+
 /**
  * @property $name;
  * @property $icon;
@@ -32,12 +34,22 @@ trait THasInfo
     }
 
     /**
-     * @param $name
+     * @param string|array $name
      * @return $this
      */
     public function setName($name)
     {
-        $this->_name = $name;
+        if (is_array($name)) {
+            $this->_name = \Yii::t(
+                ArrayHelper::getValue($name, 0),
+                ArrayHelper::getValue($name, 1, ''),
+                ArrayHelper::getValue($name, 2, []),
+                ArrayHelper::getValue($name, 3)
+            );
+        } else if (is_string($name)) {
+            $this->_name = $name;
+        }
+        
         return $this;
     }
 

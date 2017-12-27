@@ -57,15 +57,16 @@ $config = [
             'menu' => [
                 'data' => [
                     'personal' => [
-                        'name' => 'Личные данные',
+                        'name' => ['skeeks/cms', 'Personal data'],
                         'items' => [
                             [
-                                'name' => 'Личные данные',
+                                'name' => ['skeeks/cms', 'Personal data'],
                                 'url' => ['/cms/upa-personal/update'],
                             ],
                             [
-                                'name' => 'Смена пароля',
+                                'name' => ['skeeks/cms', 'Change password'],
                                 'url' => ['/cms/upa-personal/change-password'],
+                                'icon' => 'fa fa-key',
                             ],
                         ],
                     ],

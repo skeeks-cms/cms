@@ -33,7 +33,10 @@ return
         "Selection in the dialog box" => "Выбор в диалоговом окне",
         "Form element type" => "Тип элемента формы",
         "Root partition" => "Корневой раздел",
+        "Personal data" => "Личные данные",
         "Change password" => "Смена пароля",
+        "New password" => "Новый пароль",
+        "New password (again)" => "Новый пароль (еще раз)",
 
         "Only shown in sections" => "Показывается только в разделах",
         "Always shown" => "Показывается всегда",
@@ -175,7 +178,6 @@ return
 
         "Username or Email" => "Логин или Email",
         "Remember me" => "Запомнить меня",
-        "New Password" => "Новый пароль",
         "New Password Confirm" => "Подтверждение пароля",
         "New passwords do not match" => "Новые пароли не совпадают",
         "User not found" => "Пользователь не найден",
@@ -239,7 +241,6 @@ return
         "Watch" => "Смотреть",
         "Lock Mode" => "Режим блокировки",
         "Password recovery" => "Восстановление пароля",
-        "New password" => "Новый пароль для",
         "New password sent to your e-mail" => "Новый пароль отправлен на ваш e-mail",
         "Link outdated, try to request a password recovery again." => "Ссылка устарела, попробуйте запросить восстановление пароля еще раз.",
         "Failed log in" => "Не получилось авторизоваться",
