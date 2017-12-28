@@ -101,6 +101,13 @@ class CmsLang extends Core
         ]);
     }
 
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'active' => \Yii::t('skeeks/cms', 'On the site must be included at least one language'),
+        ]);
+    }
+
 
     /**
      * @inheritdoc

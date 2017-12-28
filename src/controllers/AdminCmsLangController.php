@@ -77,9 +77,9 @@ class AdminCmsLangController extends AdminModelEditorController
                 'update' => [
                     'fields' => $fields
                 ],
-                /*'create' => [
+                'create' => [
                     'fields' => $fields
-                ]*/
+                ]
             ]
         );
 
