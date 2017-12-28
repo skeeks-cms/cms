@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\models\CmsUser;
+use skeeks\yii2\form\Field;
 use skeeks\yii2\form\fields\PasswordField;
 use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
@@ -64,7 +65,23 @@ class UpaPersonalController extends BackendModelController
                         'last_name',
                         'patronymic',
                         'email',
-                        'phone',
+                        'phone' => [
+                            'elementOptions' => [
+                                'placeholder' => '+7 903 722-28-73'
+                            ],
+                            'on beforeRender' => function(Event $e) {
+                                /**
+                                 * @var $field Field
+                                 */
+                                $field = $e->sender;
+                                \skeeks\cms\admin\assets\JqueryMaskInputAsset::register(\Yii::$app->view);
+                                $id = \yii\helpers\Html::getInputId($field->model, $field->attribute);
+                                \Yii::$app->view->registerJs(<<<JS
+                        $("#{$id}").mask("+7 999 999-99-99");
+JS
+        );
+                            }
+                        ],
                     ]
                 ],
                 "change-password" => [
