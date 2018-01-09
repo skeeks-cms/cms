@@ -229,6 +229,10 @@ class RelatedPropertiesModel extends DynamicModel
                 $productPropertyValue->value = (string)$value;
                 $productPropertyValue->value_enum = $value;
                 $productPropertyValue->value_num = $value;
+                $productPropertyValue->value_bool = (bool)$value;
+                $productPropertyValue->value_num2 = $value;
+                $productPropertyValue->value_int2 = $value;
+                $productPropertyValue->value_string = (string)$value;
             } else {
                 $className = $element->relatedElementPropertyClassName;
 

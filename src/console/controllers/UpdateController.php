@@ -12,6 +12,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentProperty2content;
 use skeeks\cms\models\CmsSearchPhrase;
@@ -78,5 +79,38 @@ class UpdateController extends Controller
                 $this->stdout("\t NOT updated name: {$cmsUser->id}\n", Console::FG_RED);
             }
         }
+    }
+
+
+    /**
+     *
+     */
+    public function actionContentPropertyResave()
+    {
+        ini_set("memory_limit", "1G");
+
+        if (!$count = CmsContentElement::find()->count()) {
+            $this->stdout("Content elements not found!\n", Console::BOLD);
+            return;
+        }
+
+        $this->stdout("Content elements found: {$count}\n", Console::BOLD);
+
+        /**
+         * @var $element CmsContentElement
+         */
+        foreach (CmsContentElement::find()
+                     //->orderBy(['id' => SORT_ASC])
+                     ->each(10) as $element) {
+            $this->stdout("\t Element: {$element->id}", Console::FG_YELLOW);
+
+            if ($element->relatedPropertiesModel->save()) {
+                $this->stdout(" - saved\n", Console::FG_GREEN);
+            } else {
+                $this->stdout(" - NOT saved\n", Console::FG_RED);
+            }
+        }
+
+
     }
 }

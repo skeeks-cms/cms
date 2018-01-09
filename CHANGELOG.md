@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.0-beta5.pre
 ----------------
+ * Fixed save element properties
  * Content elements redirrect is fixed
  * Cms user personal area
  
