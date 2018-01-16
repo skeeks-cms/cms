@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-beta5.pre
+5.0.0-beta5
 ----------------
  * Fixed save element properties
  * Content elements redirrect is fixed
