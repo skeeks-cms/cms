@@ -4,7 +4,7 @@
     "keywords": ["framework", "cms", "skeeks", "sx", "skeeks cms", "app", "yii2", "extension"],
     "homepage": "https://cms.skeeks.com",
     "type": "yii2-extension",
-    "license": "GPL-3.0+",
+    "license": "BSD-3-Clause",
     "support": {
         "source": "https://github.com/skeeks-cms/cms",
         "issues": "https://github.com/skeeks-cms/cms/issues",
