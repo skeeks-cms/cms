@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.0-beta6.pre
+----------------
+ * Fixed migration
+ 
 5.0.0-beta5
 ----------------
  * Fixed save element properties

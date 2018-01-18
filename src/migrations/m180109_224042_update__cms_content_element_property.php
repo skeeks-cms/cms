@@ -19,11 +19,19 @@ class m180109_224042_update__cms_content_element_property extends Migration
 {
     public function safeUp()
     {
-        $this->update('{{%cms_content_element_property}}', [
-            'value_enum' => new \yii\db\Expression('value'),
-            'value_num' => new \yii\db\Expression('value'),
-            'value_string' => new \yii\db\Expression('value'),
-        ]);
+        if ($this->db->driverName === 'pgsql') {
+            $this->update('{{%cms_content_element_property}}', [
+                'value_enum' => new \yii\db\Expression('value::INTEGER'),
+                'value_num' => new \yii\db\Expression('value::FLOAT'),
+                'value_string' => new \yii\db\Expression('value::TEXT'),
+            ]);
+        } else {
+            $this->update('{{%cms_content_element_property}}', [
+                'value_enum' => new \yii\db\Expression('value'),
+                'value_num' => new \yii\db\Expression('value'),
+                'value_string' => new \yii\db\Expression('value'),
+            ]);
+        }
     }
 
     public function down()
