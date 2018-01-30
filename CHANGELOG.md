@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.0.0-beta6.pre
+5.0.0
 ----------------
  * Fixed migration
  
