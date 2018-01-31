@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.1.pre
+----------------
+ * Ckeditor select files
+ 
 5.0.0
 ----------------
  * Fixed migration

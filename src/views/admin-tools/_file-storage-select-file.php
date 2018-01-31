@@ -23,7 +23,10 @@ $dataProvider->sort->defaultOrder = [
 ];
 
 ?>
-<?= \skeeks\cms\widgets\StorageFileManager::widget([
+<?
+$id = $pjax->id;
+
+echo \skeeks\cms\widgets\StorageFileManager::widget([
     'clientOptions' =>
         [
             'completeUploadFile' => new \yii\web\JsExpression(<<<JS
@@ -31,7 +34,7 @@ $dataProvider->sort->defaultOrder = [
                 {
                     _.delay(function()
                     {
-                        $.pjax.reload('#sx-storage-files', {});
+                        $.pjax.reload('#{$id}', {});
                     }, 500)
 
                 }
