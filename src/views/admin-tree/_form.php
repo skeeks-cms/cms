@@ -100,6 +100,11 @@ JS
                 ->hint(\Yii::t('skeeks/cms', 'Not displayed on the site')) ?>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <?= $form->field($model, 'name_full')->textInput(['maxlength' => 255]) ?>
+        </div>
+    </div>
 
 <?= $form->field($model, 'code')->textInput(['maxlength' => 255])
     ->hint(\Yii::t('skeeks/cms',
