@@ -63,6 +63,7 @@ use yii\helpers\Url;
  * @property integer $redirect_tree_id
  * @property integer $redirect_code
  * @property string $name_hidden
+ * @property string $name_full
  * @property string $view_file
  *
  * ***
@@ -299,6 +300,7 @@ class Tree extends Core
             'redirect_tree_id' => Yii::t('skeeks/cms', 'Redirect Section'),
             'redirect_code' => Yii::t('skeeks/cms', 'Redirect Code'),
             'name_hidden' => Yii::t('skeeks/cms', 'Hidden Name'),
+            'name_full' => Yii::t('skeeks/cms', 'Заголовок страницы(H1)'),
             'view_file' => Yii::t('skeeks/cms', 'Template'),
         ]);
     }
@@ -316,6 +318,7 @@ class Tree extends Core
             [['redirect_code'], 'in', 'range' => [301, 302]],
             [['redirect'], 'string'],
             [['name_hidden'], 'string'],
+            [['name_full'], 'string'],
             [['priority', 'tree_type_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
