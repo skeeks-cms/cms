@@ -3,6 +3,7 @@ CHANGELOG
 
 5.1.0.pre
 ----------------
+ * Update yiisoft/yii2: 2.0.14.0
  * Image and files sort
  * Ckeditor select files
  
