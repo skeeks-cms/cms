@@ -548,7 +548,9 @@ class CmsContentElement extends RelatedElementModel
     public function getImages()
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
-            ->via('cmsContentElementImages');
+            ->via('cmsContentElementImages')
+            ->orderBy(['priority' => SORT_ASC])
+            ;
     }
 
     /**
@@ -557,7 +559,9 @@ class CmsContentElement extends RelatedElementModel
     public function getFiles()
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
-            ->via('cmsContentElementFiles');
+            ->via('cmsContentElementFiles')
+            ->orderBy(['priority' => SORT_ASC])
+            ;
     }
 
     /**

@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-5.0.1.pre
+5.1.0.pre
 ----------------
+ * Image and files sort
  * Ckeditor select files
  
 5.0.0

@@ -79,12 +79,15 @@ class HasStorageFileMulti extends Behavior
 
             $oldFiles = $this->owner->{$relation};
             $oldIds = [];
+            $oldIdsStatic = [];
 
             if ($oldFiles) {
                 $oldIds = ArrayHelper::map($oldFiles, 'id', 'id');
+                $oldIdsStatic = ArrayHelper::map($oldFiles, 'id', 'id');
             }
 
             $files = [];
+
             if ($this->owner->{$fieldCode} && is_array($this->owner->{$fieldCode})) {
                 foreach ($this->owner->{$fieldCode} as $fileId) {
                     if (is_string($fileId) && ((string)(int)$fileId != (string)$fileId)) {
@@ -117,6 +120,23 @@ class HasStorageFileMulti extends Behavior
                 }
 
                 $this->owner->{$fieldCode} = $files;
+            }
+
+            if ($oldIdsStatic && $this->owner->{$fieldCode}) {
+                if (implode(',', $oldIdsStatic) != implode(',', $this->owner->{$fieldCode})) {
+                    $count = 100;
+                    //$this->owner->unlinkAll($relation, true);
+                    foreach ($this->owner->{$fieldCode} as $id) {
+                        /**
+                         * @var CmsStorageFile $file
+                         */
+                        $file = CmsStorageFile::findOne($id);
+                        $file->priority = $count;
+                        $file->save();
+
+                        $count = $count + 100;
+                    }
+                }
             }
 
             /**

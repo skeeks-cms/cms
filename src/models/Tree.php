@@ -571,7 +571,9 @@ class Tree extends Core
     public function getImages()
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
-            ->via('cmsTreeImages');
+            ->via('cmsTreeImages')
+            ->orderBy(['priority' => SORT_ASC])
+            ;
     }
 
     /**
@@ -580,7 +582,9 @@ class Tree extends Core
     public function getFiles()
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
-            ->via('cmsTreeFiles');
+            ->via('cmsTreeFiles')
+            ->orderBy(['priority' => SORT_ASC])
+            ;
     }
 
 

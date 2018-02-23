@@ -36,6 +36,7 @@ use Yii;
  * @property string $description_full
  * @property integer $image_height
  * @property integer $image_width
+ * @property integer $priority
  *
  * @property string $fileName
  * @property string $src
@@ -60,7 +61,7 @@ class StorageFile extends Core
     {
         return array_merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width'],
+                ['created_by', 'priority', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width'],
                 'integer'
             ],
             [['description_short', 'description_full'], 'string'],
