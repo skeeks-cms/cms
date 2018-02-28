@@ -28,7 +28,7 @@
         "php": ">=5.6.0",
         "yiisoft/yii2": "2.0.13.1",
         "yiisoft/yii2-jui": "2.0.6",
-        "yiisoft/yii2-bootstrap": "2.0.7",
+        "yiisoft/yii2-bootstrap": "~2.0.7 || dev-master || 2.1.x-dev",
         "skeeks/cms-backend": "~1.1.1 || dev-master",
         "skeeks/cms-backend-admin": "~1.1.0 || dev-master",
         "skeeks/cms-admin": "~2.0.2 || dev-master",
