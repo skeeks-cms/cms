@@ -24,6 +24,23 @@ if ($model->isNewRecord) {
         $model->parent_content_element_id = $parent_content_element_id;
     }
 }
+else {
+    $treeModel = \skeeks\cms\models\Tree::findOne($model->tree_id); ?>
+
+    <div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="pull-left">
+                    <a href='<?=$treeModel->url;?>' target='_blank'><?=$treeModel->name;?></a>
+                    /
+                    <a href='<?=$model->url;?>' target='_blank'><?=$model->name;?></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+<?
+}
 ?>
 
 <?php $form = $action->beginActiveForm([

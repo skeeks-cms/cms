@@ -7,6 +7,8 @@
 <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
+<?= $form->field($model, 'name_full')->textInput(['maxlength' => 255]) ?>
+
 
 
 <?php if ($contentModel->root_tree_id) : ?>
