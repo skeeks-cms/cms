@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.2.pre
+----------------
+ * Link on page with item 
+ 
 5.0.1
 ----------------
  * Image and files sort
