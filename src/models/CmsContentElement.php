@@ -28,63 +28,63 @@ use yii\helpers\Url;
 /**
  * This is the model class for table "{{%cms_content_element}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $published_at
- * @property integer $published_to
- * @property integer $priority
- * @property string $active
- * @property string $name
- * @property string $code
- * @property string $description_short
- * @property string $description_full
- * @property integer $content_id
- * @property integer $image_id
- * @property integer $image_full_id
- * @property integer $tree_id
- * @property integer $show_counter
- * @property integer $show_counter_start
- * @property string $meta_title
- * @property string $meta_description
- * @property string $meta_keywords
+ * @property integer                     $id
+ * @property integer                     $created_by
+ * @property integer                     $updated_by
+ * @property integer                     $created_at
+ * @property integer                     $updated_at
+ * @property integer                     $published_at
+ * @property integer                     $published_to
+ * @property integer                     $priority
+ * @property string                      $active
+ * @property string                      $name
+ * @property string                      $code
+ * @property string                      $description_short
+ * @property string                      $description_full
+ * @property integer                     $content_id
+ * @property integer                     $image_id
+ * @property integer                     $image_full_id
+ * @property integer                     $tree_id
+ * @property integer                     $show_counter
+ * @property integer                     $show_counter_start
+ * @property string                      $meta_title
+ * @property string                      $meta_description
+ * @property string                      $meta_keywords
  *
- * @property integer $parent_content_element_id version > 2.4.8
+ * @property integer                     $parent_content_element_id version > 2.4.8
  *
  *
- * @property string $permissionName
+ * @property string                      $permissionName
  *
- * @property string $description_short_type
- * @property string $description_full_type
+ * @property string                      $description_short_type
+ * @property string                      $description_full_type
  *
- * @property string $absoluteUrl
- * @property string $url
+ * @property string                      $absoluteUrl
+ * @property string                      $url
  *
- * @property CmsContent $cmsContent
- * @property Tree $cmsTree
+ * @property CmsContent                  $cmsContent
+ * @property Tree                        $cmsTree
  * @property CmsContentElementProperty[] $relatedElementProperties
- * @property CmsContentProperty[] $relatedProperties
- * @property CmsContentElementTree[] $cmsContentElementTrees
+ * @property CmsContentProperty[]        $relatedProperties
+ * @property CmsContentElementTree[]     $cmsContentElementTrees
  * @property CmsContentElementProperty[] $cmsContentElementProperties
- * @property CmsContentProperty[] $cmsContentProperties
+ * @property CmsContentProperty[]        $cmsContentProperties
  *
- * @property CmsStorageFile $image
- * @property CmsStorageFile $fullImage
+ * @property CmsStorageFile              $image
+ * @property CmsStorageFile              $fullImage
  *
- * @property CmsContentElementFile[] $cmsContentElementFiles
- * @property CmsContentElementImage[] $cmsContentElementImages
+ * @property CmsContentElementFile[]     $cmsContentElementFiles
+ * @property CmsContentElementImage[]    $cmsContentElementImages
  *
- * @property CmsStorageFile[] $files
- * @property CmsStorageFile[] $images
+ * @property CmsStorageFile[]            $files
+ * @property CmsStorageFile[]            $images
  *
  * @version > 2.4.8
- * @property CmsContentElement $parentContentElement
- * @property CmsContentElement[] $childrenContentElements
+ * @property CmsContentElement           $parentContentElement
+ * @property CmsContentElement[]         $childrenContentElements
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
- * @property CmsUser[] $usersToFavorites
+ * @property CmsUser[]                   $usersToFavorites
  *
  */
 class CmsContentElement extends RelatedElementModel
@@ -93,6 +93,8 @@ class CmsContentElement extends RelatedElementModel
     use HasTreesTrait;
     use HasUrlTrait;
 
+    protected $_image_ids = null;
+    protected $_file_ids = null;
     /**
      * @inheritdoc
      */
@@ -100,7 +102,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return '{{%cms_content_element}}';
     }
-
     public function init()
     {
         parent::init();
@@ -108,7 +109,6 @@ class CmsContentElement extends RelatedElementModel
         $this->on(self::EVENT_BEFORE_DELETE, [$this, '_beforeDeleteE']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, '_afterDeleteE']);
     }
-
     public function _beforeDeleteE($e)
     {
         //TODO: Upgrade this
@@ -118,14 +118,12 @@ class CmsContentElement extends RelatedElementModel
             }
         }
     }
-
     public function _afterDeleteE($e)
     {
         if ($permission = \Yii::$app->authManager->getPermission($this->permissionName)) {
             \Yii::$app->authManager->remove($permission);
         }
     }
-
     /**
      * @return array
      */
@@ -134,31 +132,31 @@ class CmsContentElement extends RelatedElementModel
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
 
-            HasStorageFile::className() =>
+            HasStorageFile::className()      =>
                 [
-                    'class' => HasStorageFile::className(),
-                    'fields' => ['image_id', 'image_full_id']
+                    'class'  => HasStorageFile::className(),
+                    'fields' => ['image_id', 'image_full_id'],
                 ],
             HasStorageFileMulti::className() =>
                 [
-                    'class' => HasStorageFileMulti::className(),
+                    'class'     => HasStorageFileMulti::className(),
                     'relations' => [
                         [
                             'relation' => 'images',
-                            'property' => 'imageIds'
+                            'property' => 'imageIds',
                         ],
                         [
                             'relation' => 'files',
-                            'property' => 'fileIds'
+                            'property' => 'fileIds',
                         ],
-                    ]
+                    ],
                 ],
 
             HasRelatedProperties::className() =>
                 [
-                    'class' => HasRelatedProperties::className(),
+                    'class'                           => HasRelatedProperties::className(),
                     'relatedElementPropertyClassName' => CmsContentElementProperty::className(),
-                    'relatedPropertyClassName' => CmsContentProperty::className(),
+                    'relatedPropertyClassName'        => CmsContentProperty::className(),
                 ],
 
             HasTrees::className() =>
@@ -168,55 +166,52 @@ class CmsContentElement extends RelatedElementModel
 
             YaSlugBehavior::class =>
                 [
-                    'class' => YaSlugBehavior::class,
-                    'attribute' => 'name',
+                    'class'         => YaSlugBehavior::class,
+                    'attribute'     => 'name',
                     'slugAttribute' => 'code',
-                    'maxLength' => \Yii::$app->cms->element_max_code_length,
-                ]
+                    'maxLength'     => \Yii::$app->cms->element_max_code_length,
+                ],
         ]);
     }
-
-
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'created_by' => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'published_at' => Yii::t('skeeks/cms', 'Published At'),
-            'published_to' => Yii::t('skeeks/cms', 'Published To'),
-            'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
-            'name' => Yii::t('skeeks/cms', 'Name'),
-            'code' => Yii::t('skeeks/cms', 'Code'),
-            'description_short' => Yii::t('skeeks/cms', 'Description Short'),
-            'description_full' => Yii::t('skeeks/cms', 'Description Full'),
-            'content_id' => Yii::t('skeeks/cms', 'Content'),
-            'tree_id' => Yii::t('skeeks/cms', 'The main section'),
-            'show_counter' => Yii::t('skeeks/cms', 'Show Counter'),
-            'show_counter_start' => Yii::t('skeeks/cms', 'Show Counter Start'),
-            'meta_title' => Yii::t('skeeks/cms', 'Meta Title'),
-            'meta_keywords' => Yii::t('skeeks/cms', 'Meta Keywords'),
-            'meta_description' => Yii::t('skeeks/cms', 'Meta Description'),
+            'id'                     => Yii::t('skeeks/cms', 'ID'),
+            'created_by'             => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'             => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'             => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'             => Yii::t('skeeks/cms', 'Updated At'),
+            'published_at'           => Yii::t('skeeks/cms', 'Published At'),
+            'published_to'           => Yii::t('skeeks/cms', 'Published To'),
+            'priority'               => Yii::t('skeeks/cms', 'Priority'),
+            'active'                 => Yii::t('skeeks/cms', 'Active'),
+            'name'                   => Yii::t('skeeks/cms', 'Name'),
+            'code'                   => Yii::t('skeeks/cms', 'Code'),
+            'description_short'      => Yii::t('skeeks/cms', 'Description Short'),
+            'description_full'       => Yii::t('skeeks/cms', 'Description Full'),
+            'content_id'             => Yii::t('skeeks/cms', 'Content'),
+            'tree_id'                => Yii::t('skeeks/cms', 'The main section'),
+            'show_counter'           => Yii::t('skeeks/cms', 'Show Counter'),
+            'show_counter_start'     => Yii::t('skeeks/cms', 'Show Counter Start'),
+            'meta_title'             => Yii::t('skeeks/cms', 'Meta Title'),
+            'meta_keywords'          => Yii::t('skeeks/cms', 'Meta Keywords'),
+            'meta_description'       => Yii::t('skeeks/cms', 'Meta Description'),
             'description_short_type' => Yii::t('skeeks/cms', 'Description Short Type'),
-            'description_full_type' => Yii::t('skeeks/cms', 'Description Full Type'),
-            'image_id' => Yii::t('skeeks/cms', 'Main Image (announcement)'),
-            'image_full_id' => Yii::t('skeeks/cms', 'Main Image'),
+            'description_full_type'  => Yii::t('skeeks/cms', 'Description Full Type'),
+            'image_id'               => Yii::t('skeeks/cms', 'Main Image (announcement)'),
+            'image_full_id'          => Yii::t('skeeks/cms', 'Main Image'),
 
-            'imageIds' => Yii::t('skeeks/cms', 'Images'),
-            'fileIds' => Yii::t('skeeks/cms', 'Files'),
-            'images' => Yii::t('skeeks/cms', 'Images'),
-            'files' => Yii::t('skeeks/cms', 'Files'),
-            'treeIds' => Yii::t('skeeks/cms', 'Additional sections'),
+            'imageIds'                  => Yii::t('skeeks/cms', 'Images'),
+            'fileIds'                   => Yii::t('skeeks/cms', 'Files'),
+            'images'                    => Yii::t('skeeks/cms', 'Images'),
+            'files'                     => Yii::t('skeeks/cms', 'Files'),
+            'treeIds'                   => Yii::t('skeeks/cms', 'Additional sections'),
             'parent_content_element_id' => Yii::t('skeeks/cms', 'Parent element'),
         ]);
     }
-
     /**
      * @inheritdoc
      */
@@ -226,7 +221,6 @@ class CmsContentElement extends RelatedElementModel
             'treeIds' => Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.'),
         ]);
     }
-
     /**
      * @inheritdoc
      */
@@ -245,9 +239,9 @@ class CmsContentElement extends RelatedElementModel
                     'content_id',
                     'tree_id',
                     'show_counter',
-                    'show_counter_start'
+                    'show_counter_start',
                 ],
-                'integer'
+                'integer',
             ],
             [['name'], 'required'],
             [['description_short', 'description_full'], 'string'],
@@ -257,13 +251,13 @@ class CmsContentElement extends RelatedElementModel
                 ['content_id', 'code'],
                 'unique',
                 'targetAttribute' => ['content_id', 'code'],
-                'message' => \Yii::t('skeeks/cms', 'For the content of this code is already in use.')
+                'message'         => \Yii::t('skeeks/cms', 'For the content of this code is already in use.'),
             ],
             [
                 ['tree_id', 'code'],
                 'unique',
                 'targetAttribute' => ['tree_id', 'code'],
-                'message' => \Yii::t('skeeks/cms', 'For this section of the code is already in use.')
+                'message'         => \Yii::t('skeeks/cms', 'For this section of the code is already in use.'),
             ],
             [['treeIds'], 'safe'],
             ['priority', 'default', 'value' => 500],
@@ -278,11 +272,11 @@ class CmsContentElement extends RelatedElementModel
             [
                 'tree_id',
                 'default',
-                'value' => function() {
+                'value' => function () {
                     if ($this->cmsContent->defaultTree) {
                         return $this->cmsContent->defaultTree->id;
                     }
-                }
+                },
             ],
 
             [['image_id', 'image_full_id'], 'safe'],
@@ -290,29 +284,29 @@ class CmsContentElement extends RelatedElementModel
                 ['image_id', 'image_full_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles' => 1,
-                'maxSize' => 1024 * 1024 * 10,
-                'minSize' => 1024,
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles'    => 1,
+                'maxSize'     => 1024 * 1024 * 10,
+                'minSize'     => 1024,
             ],
             [['imageIds', 'fileIds'], 'safe'],
             [
                 ['imageIds'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles' => 40,
-                'maxSize' => 1024 * 1024 * 10,
-                'minSize' => 1024,
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles'    => 40,
+                'maxSize'     => 1024 * 1024 * 10,
+                'minSize'     => 1024,
             ],
             [
                 ['fileIds'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 //'extensions'    => [''],
-                'maxFiles' => 40,
-                'maxSize' => 1024 * 1024 * 50,
-                'minSize' => 1024,
+                'maxFiles'    => 40,
+                'maxSize'     => 1024 * 1024 * 50,
+                'minSize'     => 1024,
             ],
 
 
@@ -321,7 +315,7 @@ class CmsContentElement extends RelatedElementModel
             [
                 'parent_content_element_id',
                 'required',
-                'when' => function(CmsContentElement $model) {
+                'when'       => function (CmsContentElement $model) {
 
                     if ($model->cmsContent && $model->cmsContent->parentContent) {
                         return (bool)($model->cmsContent->parent_content_is_required == "Y");
@@ -331,12 +325,11 @@ class CmsContentElement extends RelatedElementModel
                 },
                 'whenClient' => "function (attribute, value) {
                 return $('#cmscontent-parent_content_is_required').val() == 'Y';
-            }"
-            ]
+            }",
+            ],
 
         ]);
     }
-
     /**
      * Валидация родительского элемента
      *
@@ -362,8 +355,6 @@ class CmsContentElement extends RelatedElementModel
             }
         }
     }
-
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -371,7 +362,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasOne(CmsContent::className(), ['id' => 'content_id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -379,7 +369,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
     }
-
     /**
      * Все возможные свойства связанные с моделью
      * @return \yii\db\ActiveQuery
@@ -404,7 +393,6 @@ class CmsContentElement extends RelatedElementModel
             ->all()
         ;*/
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -412,7 +400,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(CmsContentElementTree::className(), ['element_id' => 'id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -420,7 +407,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(CmsContentElementProperty::className(), ['element_id' => 'id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -429,7 +415,13 @@ class CmsContentElement extends RelatedElementModel
         return $this->hasMany(CmsContentProperty::className(), ['id' => 'property_id'])
             ->via('cmsContentElementProperties');
     }
-
+    /**
+     * @return string
+     */
+    public function getAbsoluteUrl($scheme = false, $params = [])
+    {
+        return $this->getUrl(true, $params);
+    }
     /**
      * @return string
      */
@@ -443,16 +435,6 @@ class CmsContentElement extends RelatedElementModel
 
         return Url::to($params, $scheme);
     }
-
-    /**
-     * @return string
-     */
-    public function getAbsoluteUrl($scheme = false, $params = [])
-    {
-        return $this->getUrl(true, $params);
-    }
-
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -460,7 +442,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasOne(StorageFile::className(), ['id' => 'image_id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -468,8 +449,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasOne(StorageFile::className(), ['id' => 'image_full_id']);
     }
-
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -477,7 +456,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(CmsContentElementFile::className(), ['content_element_id' => 'id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -485,19 +463,6 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(CmsContentElementImage::className(), ['content_element_id' => 'id']);
     }
-
-
-    protected $_image_ids = null;
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function setImageIds($ids)
-    {
-        $this->_image_ids = $ids;
-        return $this;
-    }
-
     /**
      * @return array
      */
@@ -513,18 +478,14 @@ class CmsContentElement extends RelatedElementModel
 
         return [];
     }
-
-    protected $_file_ids = null;
-
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function setFileIds($ids)
+    public function setImageIds($ids)
     {
-        $this->_file_ids = $ids;
+        $this->_image_ids = $ids;
         return $this;
     }
-
     /**
      * @return array
      */
@@ -540,8 +501,14 @@ class CmsContentElement extends RelatedElementModel
 
         return [];
     }
-
-
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function setFileIds($ids)
+    {
+        $this->_file_ids = $ids;
+        return $this;
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -549,8 +516,7 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
             ->via('cmsContentElementImages')
-            ->orderBy(['priority' => SORT_ASC])
-            ;
+            ->orderBy(['priority' => SORT_ASC]);
     }
 
     /**
@@ -560,8 +526,7 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
             ->via('cmsContentElementFiles')
-            ->orderBy(['priority' => SORT_ASC])
-            ;
+            ->orderBy(['priority' => SORT_ASC]);
     }
 
     /**
@@ -569,7 +534,7 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getPermissionName()
     {
-        return 'cms/cms-content-element__' . $this->id;
+        return 'cms/cms-content-element__'.$this->id;
     }
 
 
@@ -610,4 +575,70 @@ class CmsContentElement extends RelatedElementModel
         return $this->hasMany(CmsUser::className(), ['id' => 'cms_user_id'])
             ->via('cmsContentElement2cmsUsers');
     }
+
+
+    /**
+     * @return CmsContentElement|static
+     */
+    public function copy()
+    {
+        $newImage = null;
+        $newImage2 = null;
+
+        try {
+            $transaction = \Yii::$app->db->beginTransaction();
+
+            $data = $this->toArray();
+
+            ArrayHelper::remove($data, 'id');
+            ArrayHelper::remove($data, 'created_at');
+            ArrayHelper::remove($data, 'created_by');
+            ArrayHelper::remove($data, 'updated_at');
+            ArrayHelper::remove($data, 'updated_by');
+            ArrayHelper::remove($data, 'image_id');
+            ArrayHelper::remove($data, 'image_full_id');
+            ArrayHelper::remove($data, 'code');
+
+            $newModel = new static($data);
+            $newModel->name = $newModel->name;
+            if ($newModel->save()) {
+
+                /**
+                 * @var $newModel CmsContentElement
+                 */
+                if ($this->image) {
+                    $newImage = $this->image->copy();
+                    $newModel->link('image', $newImage);
+                }
+
+                if ($this->fullImage) {
+                    $newImage2 = $this->fullImage->copy();
+                    $newModel->link('fullImage', $newImage2);
+                }
+            }
+
+            if ($rp = $this->relatedPropertiesModel) {
+                $rp->relatedElementModel = $newModel;
+                $rp->save();
+            }
+
+            $transaction->commit();
+
+            return $newModel;
+
+        } catch (\Exception $e) {
+
+            if ($newImage) {
+                $newImage->delete();
+            }
+            if ($newImage2) {
+                $newImage2->delete();
+            }
+            \Yii::$app->db->rollBack();
+            throw $e;
+        }
+    }
 }
+
+
+

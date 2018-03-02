@@ -23,7 +23,6 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\yii2\form\fields\BoolField;
-use skeeks\yii2\form\fields\PasswordField;
 use yii\base\DynamicModel;
 use yii\base\Event;
 use yii\base\Exception;
@@ -249,12 +248,13 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'class'    => BackendModelUpdateAction::class,
                     "callback" => [$this, 'update'],
                 ],
+
                 "copy"   => [
-                    'class' => BackendModelUpdateAction::class,
-                    "name"  => \Yii::t('skeeks/cms', 'Copy'),
-                    "icon"  => "fas fa-copy",
-                    "preContent"  => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
-                    "successMessage"  => "Элемент успешно скопирован",
+                    'class'          => BackendModelUpdateAction::class,
+                    "name"           => \Yii::t('skeeks/cms', 'Copy'),
+                    "icon"           => "fas fa-copy",
+                    "preContent"     => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
+                    "successMessage" => "Элемент успешно скопирован",
 
                     'on initFormModels' => function (Event $e) {
                         $model = $e->sender->model;
@@ -267,7 +267,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                         $e->sender->formModels['dm'] = $dm;
                     },
 
-                    'on beforeSave'   => function (Event $e) {
+                    'on beforeSave' => function (Event $e) {
                         /**
                          * @var $action BackendModelUpdateAction;
                          */
@@ -275,22 +275,9 @@ class AdminCmsContentElementController extends AdminModelEditorController
                         $action->isSaveFormModels = false;
                         $dm = ArrayHelper::getValue($action->formModels, 'dm');
 
-                        $data = $action->model->toArray();
+                        $newModel = $action->model->copy();
 
-                        ArrayHelper::remove($data, 'id');
-                        ArrayHelper::remove($data, 'created_at');
-                        ArrayHelper::remove($data, 'created_by');
-                        ArrayHelper::remove($data, 'updated_at');
-                        ArrayHelper::remove($data, 'updated_by');
-                        ArrayHelper::remove($data, 'code');
-
-                        $model = $action->model;
-                        $r = new \ReflectionClass($model);
-
-                        $class = $r->name;
-                        $newModel = new $class($data);
-                        $newModel->name = $newModel->name . " [copy]";
-                        if ($newModel->save()) {
+                        if ($newModel) {
                             $action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
                         } else {
                             throw new Exception(print_r($newModel->errors, true));
@@ -300,11 +287,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                     'fields' => function () {
                         return [
-                            'dm.is_copy_images'  => [
+                            'dm.is_copy_images' => [
                                 'class' => BoolField::class,
                                 'label' => ['skeeks/cms', 'Copy images?'],
                             ],
-                            'dm.is_copy_files' => [
+                            'dm.is_copy_files'  => [
                                 'class' => BoolField::class,
                                 'label' => ['skeeks/cms', 'Copy files?'],
                             ],

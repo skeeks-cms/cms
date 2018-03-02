@@ -148,6 +148,10 @@ class AdminTreeController extends AdminModelEditorController
                         $childrents = [$model->id];
                     }
 
+                    if ($model->pid) {
+                        $childrents[] = $model->pid;
+                    }
+
 
                     if (!$model->isRoot()) {
                         return [

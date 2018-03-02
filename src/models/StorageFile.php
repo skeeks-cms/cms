@@ -247,6 +247,24 @@ class StorageFile extends Core
     {
         return $this->cluster->getRootSrc($this->cluster_file);
     }
+
+    /**
+     * @return StorageFile
+     */
+    public function copy()
+    {
+        $newFile = \Yii::$app->storage->upload($this->absoluteSrc);
+
+        $newFile->name = $this->name;
+        $newFile->description_full = $this->description_full;
+        $newFile->description_short = $this->description_short;
+        $newFile->name_to_save = $this->name_to_save;
+        $newFile->original_name = $this->original_name;
+        $newFile->priority = $this->priority;
+        $newFile->save();
+
+        return $newFile;
+    }
 }
 
 
