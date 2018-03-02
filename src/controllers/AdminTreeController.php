@@ -13,27 +13,22 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
-use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
+use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
+use skeeks\yii2\form\fields\WidgetField;
 use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
-use yii\behaviors\AttributeBehavior;
-use yii\behaviors\TimestampBehavior;
+use yii\base\DynamicModel;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\web\Cookie;
 
 /**
  * @property Tree $model
@@ -57,31 +52,125 @@ class AdminTreeController extends AdminModelEditorController
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
-            'index' =>
-                [
-                    'class' => AdminAction::className(),
-                    'name' => \Yii::t('skeeks/cms', 'Tree'),
-                    'callback' => [$this, 'indexAction']
-                ],
+            'index' => [
+                'class'    => AdminAction::className(),
+                'name'     => \Yii::t('skeeks/cms', 'Tree'),
+                'callback' => [$this, 'indexAction'],
+            ],
 
-            'list' =>
-                [
-                    'class' => ModelEditorGridAction::className(),
-                    'name' => \Yii::t('skeeks/cms', 'List'),
-                    "icon" => "glyphicon glyphicon-th-list",
-                    "priority" => 10,
-                ],
+            'list' => [
+                'class'    => ModelEditorGridAction::className(),
+                'name'     => \Yii::t('skeeks/cms', 'List'),
+                "icon"     => "glyphicon glyphicon-th-list",
+                "priority" => 10,
+            ],
 
-            'create' =>
-                [
-                    'visible' => false
-                ],
+            'create' => [
+                'visible' => false,
+            ],
 
-            "update" =>
-                [
-                    'class' => BackendModelUpdateAction::className(),
-                    "callback" => [$this, 'update'],
-                ],
+            "update" => [
+                'class'    => BackendModelUpdateAction::className(),
+                "callback" => [$this, 'update'],
+            ],
+
+            "move" => [
+                'class'          => BackendModelUpdateAction::class,
+                "name"           => \Yii::t('skeeks/cms', 'Move'),
+                "icon"           => "fas fa-expand-arrows-alt",
+                "preContent"     => "Механизм перемещения раздела. Укажите новый родительский раздел. <p><b>Внимание!</b> перемещение раздела, повлияет на изменение адресов всех дочерних разделов.</p>",
+                "successMessage" => "Раздел успешно перемещен",
+
+                'on initFormModels' => function (Event $e) {
+                    $model = $e->sender->model;
+                    $dm = new DynamicModel(['pid']);
+                    $dm->addRule(['pid'], 'integer');
+
+                    $dm->addRule(['pid'], function ($attribute) use ($dm, $model) {
+                        if ($dm->pid == $model->id) {
+                            $dm->addError($attribute, \Yii::t('skeeks/cms', 'Нельзя переместить в этот раздел.'));
+                            return false;
+                        }
+
+                        $newParent = CmsTree::findOne($dm->pid);
+                        if ($newParent->getChildren()->andWhere(['code' => $model->code])->one()) {
+                            $dm->addError($attribute, \Yii::t('skeeks/cms', 'Нельзя переместить в этот раздел, потому что в этом разделе есть подразделы с кодом: '.$model->code));
+                            return false;
+                        }
+
+                    });
+
+
+                    $e->sender->formModels['dm'] = $dm;
+                },
+
+                'on beforeSave' => function (Event $e) {
+                    /**
+                     * @var $action BackendModelUpdateAction;
+                     * @var $model CmsTree;
+                     */
+                    $action = $e->sender;
+                    $action->isSaveFormModels = false;
+                    $dm = ArrayHelper::getValue($action->formModels, 'dm');
+
+                    /*$newParent = $this->getParent()->one();
+                    if ($newParent->getChildren()->andWhere(['code' => $this->code])->one()) {
+                        throe
+                    }*/
+
+                    $model = $action->model;
+                    if ($dm->pid != $model->pid) {
+                        $parent = CmsTree::findOne($dm->pid);
+
+                        $model->appendTo($parent);
+                    }
+
+                    if ($model->save()) {
+                        //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                    } else {
+                        throw new Exception(print_r($model->errors, true));
+                    }
+
+                },
+
+                'fields' => function ($action) {
+                    /**
+                     * @var $action BackendModelUpdateAction;
+                     * @var $model CmsTree;
+                     */
+                    $model = $action->model;
+                    $childrents = $model->children;
+                    if ($childrents) {
+                        $childrents = ArrayHelper::map($childrents, 'id', 'id');
+                        $childrents = array_keys($childrents);
+                        $childrents[] = $model->id;
+                    } else {
+                        $childrents = [$model->id];
+                    }
+
+
+                    if (!$model->isRoot()) {
+                        return [
+                            'dm.pid' => [
+                                'class'       => WidgetField::class,
+                                'widgetClass' => SelectTreeInputWidget::class,
+                                'widgetConfig' => [
+                                    'isAllowNodeSelectCallback' => function($tree) use ($model, $childrents) {
+                                        if (in_array($tree->id, $childrents)) {
+                                            return false;
+                                        }
+
+                                        return true;
+                                    }
+                                ],
+                                //'widgetClass' => SelectModelDialogTreeWidget::class,
+                                'label'       => ['skeeks/cms', 'Новый родительский раздел'],
+                            ],
+                        ];
+                    }
+
+                },
+            ],
 
 
         ]);
@@ -110,7 +199,7 @@ class AdminTreeController extends AdminModelEditorController
             $relatedModel->load(\Yii::$app->request->post());
             return \yii\widgets\ActiveForm::validateMultiple([
                 $model,
-                $relatedModel
+                $relatedModel,
             ]);
         }
 
@@ -142,8 +231,8 @@ class AdminTreeController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
-            'relatedModel' => $relatedModel
+            'model'        => $model,
+            'relatedModel' => $relatedModel,
         ]);
     }
 
@@ -151,14 +240,14 @@ class AdminTreeController extends AdminModelEditorController
     public function indexAction()
     {
         if ($root_id = \Yii::$app->request->get('root_id')) {
-            $query = CmsTree::find()->where([CmsTree::tableName() . '.id' => $root_id]);
+            $query = CmsTree::find()->where([CmsTree::tableName().'.id' => $root_id]);
         } else {
             $query = CmsTree::findRoots();
         }
 
         $models = $query
             ->joinWith('cmsSiteRelation')
-            ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])
+            ->orderBy([CmsSite::tableName().".priority" => SORT_ASC])
             ->all();
 
         return $this->render($this->action->id, ['models' => $models]);
@@ -194,12 +283,11 @@ class AdminTreeController extends AdminModelEditorController
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             try {
-                if ($parent && $parent->processAddNode($childTree)) {
+                if ($parent && $childTree->appendTo($parent)->save()) {
                     $response['success'] = true;
                 }
             } catch (\Exception $e) {
-                $response['success'] = false;
-                $response['message'] = $e->getMessage();
+                throw $e;
             }
 
 
@@ -221,9 +309,9 @@ class AdminTreeController extends AdminModelEditorController
             return $this->render('new-children', [
                 'model' => new Tree(),
 
-                'searchModel' => $searchModel,
+                'searchModel'  => $searchModel,
                 'dataProvider' => $dataProvider,
-                'controller' => $controller,
+                'controller'   => $controller,
             ]);
         }
     }
@@ -242,7 +330,7 @@ class AdminTreeController extends AdminModelEditorController
     {
         $response =
             [
-                'success' => false
+                'success' => false,
             ];
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

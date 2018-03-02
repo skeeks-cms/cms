@@ -22,10 +22,14 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\PasswordField;
 use yii\base\DynamicModel;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Application;
 
 /**
@@ -232,52 +236,81 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $actions = ArrayHelper::merge(parent::actions(),
             [
 
-                "index" =>
-                    [
-                        'modelSearchClassName' => CmsContentElementSearch::class,
-                    ],
+                "index" => [
+                    'modelSearchClassName' => CmsContentElementSearch::class,
+                ],
 
-                "create" =>
-                    [
-                        'class'    => BackendModelCreateAction::class,
-                        "callback" => [$this, 'create'],
-                    ],
+                "create" => [
+                    'class'    => BackendModelCreateAction::class,
+                    "callback" => [$this, 'create'],
+                ],
 
-                "update" =>
-                    [
-                        'class'    => BackendModelUpdateAction::class,
-                        "callback" => [$this, 'update'],
-                    ],
-                "copy"   =>
-                    [
-                        'class'    => BackendModelUpdateAction::class,
-                        "name"     => \Yii::t('skeeks/cms', 'Copy'),
-                        "icon"     => "fas fa-copy",
+                "update" => [
+                    'class'    => BackendModelUpdateAction::class,
+                    "callback" => [$this, 'update'],
+                ],
+                "copy"   => [
+                    'class' => BackendModelUpdateAction::class,
+                    "name"  => \Yii::t('skeeks/cms', 'Copy'),
+                    "icon"  => "fas fa-copy",
+                    "preContent"  => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
+                    "successMessage"  => "Элемент успешно скопирован",
 
-                        /*'on initFormModels' => function(Event $e) {
-                            $model = $e->sender->model;
-                            $dm = new DynamicModel(['pass', 'pass2']);
-                            $dm->addRule(['pass', 'pass2'], 'string', ['min' => 6]);
-                            $dm->addRule(['pass', 'pass2'], 'required');
-                            $dm->addRule(['pass', 'pass2'], function($attribute) use ($dm) {
-                                if ($dm->pass != $dm->pass2) {
-                                    $dm->addError($attribute, \Yii::t('skeeks/cms', 'New passwords do not match'));
-                                    return false;
-                                }
-                            });
-                            $e->sender->formModels['dm'] = $dm;
-                        },
-                        'fields' => [
-                            'dm.pass' => [
-                                'class' => PasswordField::class,
-                                'label' => ['skeeks/cms', 'New password'],
+                    'on initFormModels' => function (Event $e) {
+                        $model = $e->sender->model;
+                        $dm = new DynamicModel(['is_copy_images', 'is_copy_files']);
+                        $dm->addRule(['is_copy_images', 'is_copy_files'], 'boolean');
+
+                        $dm->is_copy_images = true;
+                        $dm->is_copy_files = true;
+
+                        $e->sender->formModels['dm'] = $dm;
+                    },
+
+                    'on beforeSave'   => function (Event $e) {
+                        /**
+                         * @var $action BackendModelUpdateAction;
+                         */
+                        $action = $e->sender;
+                        $action->isSaveFormModels = false;
+                        $dm = ArrayHelper::getValue($action->formModels, 'dm');
+
+                        $data = $action->model->toArray();
+
+                        ArrayHelper::remove($data, 'id');
+                        ArrayHelper::remove($data, 'created_at');
+                        ArrayHelper::remove($data, 'created_by');
+                        ArrayHelper::remove($data, 'updated_at');
+                        ArrayHelper::remove($data, 'updated_by');
+                        ArrayHelper::remove($data, 'code');
+
+                        $model = $action->model;
+                        $r = new \ReflectionClass($model);
+
+                        $class = $r->name;
+                        $newModel = new $class($data);
+                        $newModel->name = $newModel->name . " [copy]";
+                        if ($newModel->save()) {
+                            $action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                        } else {
+                            throw new Exception(print_r($newModel->errors, true));
+                        }
+
+                    },
+
+                    'fields' => function () {
+                        return [
+                            'dm.is_copy_images'  => [
+                                'class' => BoolField::class,
+                                'label' => ['skeeks/cms', 'Copy images?'],
                             ],
-                            'dm.pass2' =>  [
-                                'class' => PasswordField::class,
-                                'label' => ['skeeks/cms', 'New password (again)'],
+                            'dm.is_copy_files' => [
+                                'class' => BoolField::class,
+                                'label' => ['skeeks/cms', 'Copy files?'],
                             ],
-                        ]*/
-                    ],
+                        ];
+                    },
+                ],
 
                 "activate-multi" =>
                     [

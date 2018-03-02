@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.2.pre
 ----------------
+ * Copy elements and move sections
  * "skeeks/yii2-form": "dev-master@dev"
  * Link on page with item 
  
