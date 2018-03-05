@@ -25,7 +25,8 @@ if ($model->isNewRecord) {
     }
 }
 else {
-    $treeModel = \skeeks\cms\models\Tree::findOne($model->tree_id); ?>
+    $treeModel = \skeeks\cms\models\Tree::findOne($model->tree_id);
+    if ($treeModel) : ?>
 
     <div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
         <div class="row">
@@ -39,6 +40,7 @@ else {
             </div>
         </div>
     </div>
+    <? endif; ?>
 <?
 }
 ?>
