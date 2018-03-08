@@ -9,11 +9,9 @@
 namespace skeeks\cms\cmsWidgets\text;
 
 use skeeks\cms\base\Widget;
-use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
-use yii\widgets\ActiveForm;
 
 /**
  * Class TextCmsWidget
@@ -21,38 +19,13 @@ use yii\widgets\ActiveForm;
  */
 class TextCmsWidget extends Widget
 {
+    public $text = '';
+    protected $_obContent = '';
     public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => 'Текст'
+            'name' => 'Текст',
         ]);
-    }
-
-    public $text = '';
-
-    protected $_obContent = '';
-
-    public function attributeLabels()
-    {
-        return array_merge(parent::attributeLabels(),
-            [
-                'text' => 'Текст'
-            ]);
-    }
-
-    public function rules()
-    {
-        return ArrayHelper::merge(parent::rules(),
-            [
-                ['text', 'string']
-            ]);
-    }
-
-    public function renderConfigForm(ActiveForm $form)
-    {
-        echo $form->field($this, 'text')->widget(
-            \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className()
-        );
     }
 
     public static function begin($config = [])
@@ -61,6 +34,33 @@ class TextCmsWidget extends Widget
 
         ob_start();
         ob_implicit_flush(false);
+    }
+
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'text' => 'Текст',
+        ]);
+    }
+
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            ['text', 'string'],
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigFormFields()
+    {
+        return [
+            'text' => [
+                'class'       => WidgetField::class,
+                'widgetClass' => ComboTextInputWidget::class,
+            ],
+        ];
     }
 
     public function run()

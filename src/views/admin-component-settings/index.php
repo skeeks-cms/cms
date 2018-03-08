@@ -11,7 +11,7 @@
 ?>
 
 <?= $this->render('_header', [
-    'component' => $component
+    'component' => $component,
 ]); ?>
 
 
@@ -31,8 +31,22 @@
 </div>
 
 <?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
-<?= $component->renderConfigForm($form); ?>
+
+<? if ($fields = $component->getConfigFormFields()) : ?>
+
+    <? echo (new \skeeks\yii2\form\FormFieldsBuilder([
+        'model'      => $component,
+        'activeForm' => $form,
+        'fields'     => $fields,
+    ]))->render(); ?>
+<? elseif ($formContent = $component->renderConfigForm($form)) : ?>
+    <?= $formContent; ?>
+<? else : ?>
+    Нет редактируемых настроек для данного компонента
+<? endif; ?>
+
 <?= $form->buttonsStandart($component); ?>
+
 <?php \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
 
 <?= $this->render('_footer'); ?>
