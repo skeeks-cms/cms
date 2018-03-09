@@ -9,6 +9,7 @@
 namespace skeeks\cms\base;
 
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\IHasConfig;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -38,7 +39,7 @@ use yii\widgets\ActiveForm;
  * Class Component
  * @package skeeks\cms\base
  */
-abstract class Component extends Model implements ConfigFormInterface
+abstract class Component extends Model implements ConfigFormInterface, IHasConfig
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;
@@ -129,12 +130,6 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     protected $_namespace = null;
     private $_settingsId;
-
-
-    public function getConfigFormFields() {
-        return [];
-    }
-
     /**
      * Populates an active record object using a row of data from the database/storage.
      *
@@ -161,7 +156,6 @@ abstract class Component extends Model implements ConfigFormInterface
         }
         $record->_oldAttributes = $record->toArray();
     }
-
     /**
      * Creates an active record instance.
      *
@@ -178,6 +172,17 @@ abstract class Component extends Model implements ConfigFormInterface
     public static function instantiate($row)
     {
         return new static;
+    }
+
+    public function getConfigFormFields()
+    {
+        return [];
+    }
+
+
+    public function getConfigFormModels()
+    {
+        return [];
     }
 
     public function init()
@@ -493,6 +498,26 @@ abstract class Component extends Model implements ConfigFormInterface
         return $settingsModel;
     }
 
+
+    /**
+     * @param array $data
+     * @param null  $formName
+     * @return bool
+     */
+    public function load($data, $formName = null)
+    {
+        $result = parent::load($data, $formName);
+
+        if ($models = $this->getConfigFormModels()) {
+            foreach ($models as $model) {
+                if ($model->load($data, $formName) === false) {
+                    $result = false;
+                }
+            }
+        }
+
+        return $result;
+    }
     /**
      * @param bool $runValidation
      * @param null $attributeNames
@@ -516,7 +541,16 @@ abstract class Component extends Model implements ConfigFormInterface
 
         $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
 
-        $modelSettings->value = $this->attributes;
+
+        $value = $this->attributes;
+
+        if ($models = $this->getConfigFormModels()) {
+            foreach ($models as $key => $model) {
+                $value[$key . "Array"] = $model->attributes;
+            }
+        }
+
+        $modelSettings->value = $value;
         $result = $modelSettings->save();
 
         $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
@@ -527,7 +561,25 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return $result;
     }
+    /**
+     * @param null $attributeNames
+     * @param bool $clearErrors
+     * @return bool
+     */
+    public function validate($attributeNames = null, $clearErrors = true)
+    {
+        $result = parent::validate($attributeNames, $clearErrors);
 
+        if ($models = $this->getConfigFormModels()) {
+            foreach ($models as $model) {
+                if ($model->validate($attributeNames, $clearErrors) === false) {
+                    $result = false;
+                }
+            }
+        }
+
+        return $result;
+    }
     /**
      * @param string $overrideName
      * @return CmsComponentSettings
@@ -659,11 +711,13 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         $attributes = [];
 
-        foreach ($this->callAttributes as $key => $value) {
+        $attributes = ArrayHelper::toArray($this->callAttributes);
+
+        /*foreach ($this->callAttributes as $key => $value) {
             if (!is_object($value)) {
                 $attributes[$key] = $value;
             }
-        }
+        }*/
 
         return [
             'attributes' => $attributes,

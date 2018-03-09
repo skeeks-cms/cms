@@ -32,9 +32,13 @@
 
 <?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
 
-<? if ($fields = $component->getConfigFormFields()) : ?>
+<?= $form->errorSummary(\yii\helpers\ArrayHelper::merge(
+        [$component], $component->getConfigFormModels()
+)); ?>
 
+<? if ($fields = $component->getConfigFormFields()) : ?>
     <? echo (new \skeeks\yii2\form\FormFieldsBuilder([
+        'models'     => $component->getConfigFormModels(),
         'model'      => $component,
         'activeForm' => $form,
         'fields'     => $fields,
@@ -46,6 +50,9 @@
 <? endif; ?>
 
 <?= $form->buttonsStandart($component); ?>
+<?= $form->errorSummary(\yii\helpers\ArrayHelper::merge(
+        [$component], $component->getConfigFormModels()
+)); ?>
 
 <?php \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
 

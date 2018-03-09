@@ -24,15 +24,4 @@ interface ConfigFormInterface
      * @return string the view path that may be prefixed to a relative view name.
      */
     public function renderConfigForm(ActiveForm $form);
-
-    /**
-     *
-     * <? echo (new \skeeks\yii2\form\FormFieldsBuilder([
-     *      //
-     *      'fields' => [],
-     * ]))->render(); ?>
-     *
-     * @return array
-     */
-    //public function getConfigFormFields();
 }
