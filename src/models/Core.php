@@ -122,6 +122,11 @@ abstract class Core extends ActiveRecord
      * @return string
      */
     public function __toString() {
+        return $this->asText();
+    }
+    
+    public function asText()
+    {
         $result = [];
         $result[] = "#" . $this->id;
 
@@ -131,12 +136,7 @@ abstract class Core extends ActiveRecord
             $result[] = $this->label;
         }
 
-        return implode("/", $result);
-    }
-    
-    public function asText()
-    {
-        return (string) $this;
+        return implode("#", $result);
     }
     
     public function asHtml()

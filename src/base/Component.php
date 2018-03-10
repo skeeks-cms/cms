@@ -54,11 +54,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     const EVENT_INIT = 'init';
 
     /**
-     * @event Event an event that is triggered when the record is initialized via [[init()]].
-     * @event Event an event that is triggered after a record is refreshed.
-     */
-    const EVENT_READY = 'ready';
-    /**
      * @event Event an event that is triggered after the record is created and populated with query result.
      */
     const EVENT_AFTER_FIND = 'afterFind';
@@ -208,11 +203,11 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         }
 
         $this->_initSettings();
+        $this->trigger(self::EVENT_INIT);
 
         \Yii::endProfile("Init: ".static::class);
 
-        $this->trigger(self::EVENT_INIT);
-        $this->trigger(self::EVENT_READY);
+
     }
 
     /**
@@ -267,7 +262,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     public function afterRefresh()
     {
         $this->trigger(self::EVENT_AFTER_REFRESH);
-        $this->trigger(self::EVENT_READY);
     }
 
     /**

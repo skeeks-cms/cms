@@ -32,6 +32,8 @@ use yii\helpers\Inflector;
  */
 class GridViewCmsWidget extends WidgetRenderable
 {
+    const EVENT_READY = 'ready';
+
     /**
      * @var
      */
@@ -124,6 +126,8 @@ class GridViewCmsWidget extends WidgetRenderable
         $gridConfig['dataProvider'] = $this->dataProvider;
 
         $this->gridConfig = $gridConfig;
+
+        $this->trigger(self::EVENT_READY);
     }
     /**
      * This function tries to guess the columns to show from the given data
@@ -201,18 +205,25 @@ class GridViewCmsWidget extends WidgetRenderable
     }
     protected function applyColumns()
     {
-
+        $result = [];
         //Есть логика включенных выключенных колонок
         if ($this->visibleColumns && $this->_resultColumns) {
-            foreach ($this->_resultColumns as $key => $config) {
-                if (in_array($key, $this->visibleColumns)) {
-                    $config['visible'] = true;
-                } else {
-                    $config['visible'] = false;
-                }
 
+            foreach ($this->visibleColumns as $key) {
+
+                $config = ArrayHelper::getValue($this->_resultColumns, $key);
+                $config['visible'] = true;
+                ArrayHelper::remove($this->_resultColumns, $key);
+                $result[$key] = $config;
+            }
+
+            foreach ($this->_resultColumns as $key => $config) {
+                $config['visible'] = false;
                 $this->_resultColumns[$key] = $config;
             }
+
+            $result = ArrayHelper::merge($result, $this->_resultColumns);
+            $this->_resultColumns = $result;
         }
 
         return $this;
