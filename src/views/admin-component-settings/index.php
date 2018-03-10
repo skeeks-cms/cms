@@ -37,7 +37,7 @@
 )); ?>
 
 <? if ($fields = $component->getConfigFormFields()) : ?>
-    <? echo (new \skeeks\yii2\form\FormFieldsBuilder([
+    <? echo (new \skeeks\yii2\form\FormBuilder([
         'models'     => $component->getConfigFormModels(),
         'model'      => $component,
         'activeForm' => $form,

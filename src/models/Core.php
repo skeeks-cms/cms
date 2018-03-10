@@ -26,8 +26,8 @@ use yii\db\ActiveRecord;
  * @property integer $created_at
  * @property integer $updated_at
  *
- * @property User $createdBy
- * @property User $updatedBy
+ * @property User    $createdBy
+ * @property User    $updatedBy
  *
  * Class Core
  * @package skeeks\cms\base\models
@@ -43,7 +43,7 @@ abstract class Core extends ActiveRecord
             BlameableBehavior::className() =>
                 [
                     'class' => BlameableBehavior::className(),
-                    'value' => function($event) {
+                    'value' => function ($event) {
                         if (\Yii::$app instanceof \yii\console\Application) {
                             return null;
                         } else {
@@ -64,8 +64,8 @@ abstract class Core extends ActiveRecord
             HasTableCache::className() =>
                 [
                     'class' => HasTableCache::className(),
-                    'cache' => \Yii::$app->cache
-                ]
+                    'cache' => \Yii::$app->cache,
+                ],
         ]);
     }
 
@@ -99,7 +99,7 @@ abstract class Core extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('skeeks/cms', 'ID'),
+            'id'         => Yii::t('skeeks/cms', 'ID'),
             'created_by' => Yii::t('skeeks/cms', 'Created By'),
             'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
             'created_at' => Yii::t('skeeks/cms', 'Created At'),
@@ -115,5 +115,32 @@ abstract class Core extends ActiveRecord
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'id'], 'integer'],
         ];
+    }
+
+
+    /**
+     * @return string
+     */
+    public function __toString() {
+        $result = [];
+        $result[] = "#" . $this->id;
+
+        if (isset($this->name) && is_string($this->name)) {
+            $result[] = $this->name;
+        } else if (isset($this->label) && is_string($this->label)) {
+            $result[] = $this->label;
+        }
+
+        return implode("/", $result);
+    }
+    
+    public function asText()
+    {
+        return (string) $this;
+    }
+    
+    public function asHtml()
+    {
+        return $this->asText();
     }
 }

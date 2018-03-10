@@ -52,6 +52,12 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
      * @event Event an event that is triggered when the record is initialized via [[init()]].
      */
     const EVENT_INIT = 'init';
+
+    /**
+     * @event Event an event that is triggered when the record is initialized via [[init()]].
+     * @event Event an event that is triggered after a record is refreshed.
+     */
+    const EVENT_READY = 'ready';
     /**
      * @event Event an event that is triggered after the record is created and populated with query result.
      */
@@ -206,6 +212,7 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         \Yii::endProfile("Init: ".static::class);
 
         $this->trigger(self::EVENT_INIT);
+        $this->trigger(self::EVENT_READY);
     }
 
     /**
@@ -218,7 +225,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
             $this->setAttributes($this->settings);
             $this->_oldAttributes = $this->toArray($this->attributes());
 
-        } catch (Exception $e) {
         } catch (\Exception $e) {
             \Yii::error(\Yii::t('skeeks/cms', '{cms} component error load defaul settings',
                     ['cms' => 'Cms']).': '.$e->getMessage());
@@ -255,9 +261,13 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         return true;
     }
 
+    /**
+     *
+     */
     public function afterRefresh()
     {
         $this->trigger(self::EVENT_AFTER_REFRESH);
+        $this->trigger(self::EVENT_READY);
     }
 
     /**
