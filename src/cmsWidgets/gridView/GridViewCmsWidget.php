@@ -64,6 +64,9 @@ class GridViewCmsWidget extends WidgetRenderable
      */
     public $columns = [];
 
+    /**
+     * @var array
+     */
     public $paginationConfigArray = [];
     /**
      * @var array результирующий массив конфига колонок
@@ -201,11 +204,13 @@ class GridViewCmsWidget extends WidgetRenderable
 
         $columns = ArrayHelper::merge((array)$autoColumns, (array)$columns);
         $this->_resultColumns = $columns;
+
         return $this;
     }
     protected function applyColumns()
     {
         $result = [];
+
         //Есть логика включенных выключенных колонок
         if ($this->visibleColumns && $this->_resultColumns) {
 
@@ -393,6 +398,7 @@ class GridViewCmsWidget extends WidgetRenderable
 
         return $result;
     }
+
     protected function _run()
     {
         $className = $this->gridClassName;

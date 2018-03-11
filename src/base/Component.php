@@ -27,6 +27,8 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
+ * @deprecated
+ *
  * @property array       namespace
  * @property array       settings
  * @property CmsSite     cmsSite
@@ -39,7 +41,7 @@ use yii\widgets\ActiveForm;
  * Class Component
  * @package skeeks\cms\base
  */
-abstract class Component extends Model implements ConfigFormInterface, IHasConfig
+abstract class Component extends Model implements ConfigFormInterface
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;
@@ -180,12 +182,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         return [];
     }
 
-
-    public function getConfigFormModels()
-    {
-        return [];
-    }
-
     public function init()
     {
         $this->_callAttributes = $this->attributes;
@@ -203,11 +199,10 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         }
 
         $this->_initSettings();
+
         $this->trigger(self::EVENT_INIT);
 
         \Yii::endProfile("Init: ".static::class);
-
-
     }
 
     /**
@@ -217,9 +212,9 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     protected function _initSettings()
     {
         try {
-            $this->setAttributes($this->settings);
-            $this->_oldAttributes = $this->toArray($this->attributes());
 
+            $this->setAttributes($this->settings);
+            $this->_oldAttributes = $this->toArray($this->safeAttributes());
         } catch (\Exception $e) {
             \Yii::error(\Yii::t('skeeks/cms', '{cms} component error load defaul settings',
                     ['cms' => 'Cms']).': '.$e->getMessage());
@@ -227,7 +222,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
 
         return $this;
     }
-
     /**
      * @return array
      */
@@ -245,7 +239,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
 
         return $names;
     }
-
     /**
      * @return bool
      */
@@ -255,7 +248,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         $this->afterRefresh();
         return true;
     }
-
     /**
      *
      */
@@ -263,7 +255,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     {
         $this->trigger(self::EVENT_AFTER_REFRESH);
     }
-
     /**
      * @return null|string
      */
@@ -271,7 +262,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     {
         return $this->_namespace;
     }
-
     /**
      * @param string $namespace
      * @return $this
@@ -281,7 +271,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         $this->_namespace = $namespace;
         return $this;
     }
-
     /**
      * @return null|string
      */
@@ -289,7 +278,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     {
         return $this->_override;
     }
-
     /**
      * @param string $override
      * @return $this
@@ -303,7 +291,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         $this->_override = $override;
         return $this;
     }
-
     /**
      * @return array
      */
@@ -315,13 +302,27 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
             self::OVERRIDE_USER,
         ];
     }
-
     /**
      * @return array
      */
     public function getOverridePath()
     {
         return (array)$this->_overridePath;
+    }
+    /**
+     * @param array $overridePath
+     * @return $this
+     */
+    public function setOverridePath($overridePath)
+    {
+        foreach ((array)$overridePath as $override) {
+            if (!in_array($override, static::getOverrides())) {
+                throw new Exception('Invalid override name');
+            }
+        }
+
+        $this->_overridePath = (array)$overridePath;
+        return $this;
     }
 
 
@@ -340,23 +341,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     /**
      * TODO: Revrite and check
      */
-
-    /**
-     * @param array $overridePath
-     * @return $this
-     */
-    public function setOverridePath($overridePath)
-    {
-        foreach ((array)$overridePath as $override) {
-            if (!in_array($override, static::getOverrides())) {
-                throw new Exception('Invalid override name');
-            }
-        }
-
-        $this->_overridePath = (array)$overridePath;
-        return $this;
-    }
-
     /**
      * @return array
      */
@@ -364,7 +348,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     {
         return $this->_callAttributes;
     }
-
     /**
      * @return null|CmsSite
      */
@@ -372,7 +355,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     {
         return $this->_cmsSite;
     }
-
     /**
      * @param CmsSite $cmsSite
      * @return $this
@@ -382,7 +364,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         $this->_cmsSite = $cmsSite;
         return $this;
     }
-
     /**
      * @return null|CmsUser
      */
@@ -390,7 +371,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
     {
         return $this->_cmsUser;
     }
-
     /**
      * @param CmsUser $cmsUser
      * @return $this
@@ -400,11 +380,9 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         $this->_cmsUser = $cmsUser;
         return $this;
     }
-
     public function renderConfigForm(ActiveForm $form)
     {
     }
-
     /**
      * Получение настроек согласно пути перекрытия настроек.
      * @return array
@@ -444,7 +422,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
 
         return $settingsValues;
     }
-
     /**
      * @return string
      */
@@ -458,7 +435,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
             $this->cmsSite ? (string)$this->cmsSite->id : '',
         ]);
     }
-
     /**
      * @param $overrideName
      * @return array
@@ -473,7 +449,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
 
         return [];
     }
-
     /**
      * @param $overrideName
      * @return null|CmsComponentSettings
@@ -501,8 +476,6 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
 
         return $settingsModel;
     }
-
-
     /**
      * @param array $data
      * @param null  $formName
@@ -521,6 +494,10 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
         }
 
         return $result;
+    }
+    public function getConfigFormModels()
+    {
+        return [];
     }
     /**
      * @param bool $runValidation
@@ -550,7 +527,7 @@ abstract class Component extends Model implements ConfigFormInterface, IHasConfi
 
         if ($models = $this->getConfigFormModels()) {
             foreach ($models as $key => $model) {
-                $value[$key . "Array"] = $model->attributes;
+                $value[$key."Array"] = $model->attributes;
             }
         }
 

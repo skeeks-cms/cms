@@ -8,21 +8,19 @@
 
 namespace skeeks\cms;
 
-use skeeks\yii2\form\FormFieldsBuilder;
-
 /**
- * 
+ *
  * echo (new \skeeks\yii2\form\FormFieldsBuilder([
  *      'model' => $this,
  *      'models' => $this->getConfigFormModels(),
  *      'fields' => $this->getConfigFormFields(),
  * ]))->render(); ?>
- * 
- * 
+ *
+ *
  * Interface IHasConfig
  * @package skeeks\cms
  */
-interface IHasConfig
+interface IConfig
 {
     /**
      * @see FormFieldsBuilder
