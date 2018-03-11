@@ -6,7 +6,7 @@
  * @date 11.03.2018
  */
 
-namespace skeeks\cms;
+namespace skeeks\cms\widgets;
 
 use skeeks\yii2\config\ConfigBehavior;
 use yii\base\Widget;
@@ -22,12 +22,30 @@ class TestWidget extends Widget
 
     public $config = [];
 
+    public function init()
+    {
+        parent::init();
+    }
+
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
+
             ConfigBehavior::class => ArrayHelper::merge([
                 'class' => ConfigBehavior::class,
+                'configModel' => [
+                    'fields' => [
+                        'test'
+                    ],
+                    'defineAttributes' => [
+                        'test' => '222'
+                    ],
+                    'rules' => [
+                        ['test', 'string']
+                    ]
+                ]
             ], (array) $this->config),
+
         ]);
     }
 
