@@ -9,6 +9,7 @@
 namespace skeeks\cms\helpers;
 
 use skeeks\cms\base\Component;
+use skeeks\yii2\config\ConfigModel;
 use yii\data\DataProviderInterface;
 
 /**
@@ -19,7 +20,7 @@ use yii\data\DataProviderInterface;
  * Class ShopProductFiltersWidget
  * @package skeeks\cms\helpers
  */
-class PaginationConfig extends Component
+class PaginationConfig extends ConfigModel
 {
     /**
      * @var string name of the parameter storing the current page index.
@@ -74,7 +75,7 @@ class PaginationConfig extends Component
     /**
      * @return array
      */
-    public function getConfigFormFields()
+    public function builderFields()
     {
         return [
             'defaultPageSize'  => [

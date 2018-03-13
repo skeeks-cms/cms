@@ -6,18 +6,17 @@
  * @date 25.05.2015
  */
 
-namespace skeeks\cms\cmsWidgets\gridView;
+namespace skeeks\cms\widgets;
 
-use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\helpers\PaginationConfig;
-use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\config\ConfigBehavior;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Model;
+use yii\base\Widget;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
 use yii\db\ActiveQueryInterface;
-use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 
@@ -30,71 +29,73 @@ use yii\helpers\Inflector;
  * Class ShopProductFiltersWidget
  * @package skeeks\cms\cmsWidgets\filters
  */
-class GridViewCmsWidget extends WidgetRenderable
+class FiltersWidget extends Widget
 {
-    const EVENT_READY = 'ready';
-
     /**
      * @var
      */
     public $modelClassName;
 
     /**
-     * @var array конфиг оригинального yii2 виджета
-     */
-    public $gridClassName;
-
-    /**
-     * @var array
-     */
-    public $gridConfig = [];
-
-    /**
      * @var array по умолчанию включенные колонки
      */
-    public $visibleColumns = [];
+    public $visibleFilters = [];
 
     /**
      * @var bool генерировать колонки по названию модели автоматически
      */
-    public $isEnabledAutoColumns = true;
-
-    /**
-     * @var array колонки сконфигурированные при вызове
-     */
-    public $columns = [];
+    public $isEnabledAutoFilters = true;
 
     /**
      * @var array
      */
-    public $paginationConfigArray = [];
+    public $config = [];
     /**
      * @var array результирующий массив конфига колонок
      */
-    protected $_resultColumns = [];
-    /**
-     * @var PaginationConfig
-     */
-    protected $_paginationConfig;
+    protected $_preInitFilters = [];
+
     /**
      * @var array автоматически созданные колонки
      */
-    protected $_autoColumns = [];
-    /**
-     * @var ActiveDataProvider
-     */
-    protected $_dataProvider = null;
-    /**
-     * @return PaginationConfig
-     */
-    public function getPaginationConfig()
-    {
-        if ($this->_paginationConfig === null) {
-            $this->_paginationConfig = new PaginationConfig();
-            $this->_paginationConfig->setAttributes($this->paginationConfigArray);
-        }
+    protected $_autoFilters = [];
 
-        return $this->_paginationConfig;
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            ConfigBehavior::class => ArrayHelper::merge([
+                'class'       => ConfigBehavior::class,
+                'configModel' => [
+                    'fields'           => [
+                        'visibleColumns' => [
+                            'class'           => SelectField::class,
+                            'multiple'        => true,
+                            'on beforeRender' => function ($e) {
+                                /**
+                                 * @var $gridView FiltersWidget
+                                 */
+                                $gridView = $e->sender->model->configBehavior->owner;
+                                /**
+                                 * @var $selectField SelectField
+                                 */
+                                $selectField = $e->sender;
+                                $selectField->items = $gridView->getColumnsKeyLabels();
+                            },
+                        ],
+                    ],
+                    'defineAttributes' => [
+                        'visibleFilters',
+                    ],
+                    'attributeLabels'  => [
+                        'visibleFilters' => 'Отображаемые фильтры',
+                    ],
+                    'rules'            => [
+                        ['visibleFilters', 'safe'],
+                    ],
+                ],
+            ],
+                (array)$this->config),
+        ]);
     }
 
     /**
@@ -102,18 +103,15 @@ class GridViewCmsWidget extends WidgetRenderable
      */
     public function init()
     {
-        //Определение класса виджета yii2
-        if (!$this->gridClassName) {
-            $this->gridClassName = GridView::class;
-        }
         //Создание датапровайдера исходя из настроек вызова виджета
-        $this->dataProvider;
-
+        if (!$this->dataProvider) {
+            $this->dataProvider = $this->_createDataProvider();
+        }
         //Автомтическое конфигурирование колонок
-        $this->guessColumns();
+        $this->_initAutoColumns();
 
         //Сбор результирующего конфига колонок
-        $this->initColumns();
+        $this->_preInitColumns();
 
         //Получение настроек из хранилища
         parent::init();
@@ -123,21 +121,39 @@ class GridViewCmsWidget extends WidgetRenderable
 
         $this->paginationConfig->initDataProvider($this->dataProvider);
 
-        //Конфигурирование настроек виджета
-        $gridConfig = (array)$this->gridConfig;
-        $gridConfig['columns'] = $this->_resultColumns;
-        $gridConfig['dataProvider'] = $this->dataProvider;
+        $this->trigger(self::EVENT_INIT);
 
-        $this->gridConfig = $gridConfig;
+    }
+    /**
+     * @return ActiveDataProvider
+     */
+    protected function _createDataProvider()
+    {
+        $modelClassName = $this->modelClassName;
 
-        $this->trigger(self::EVENT_READY);
+        if ($modelClassName) {
+            return new ActiveDataProvider([
+                'query' => $modelClassName::find(),
+            ]);
+        } else {
+            return new ArrayDataProvider([
+                'allModels' => [],
+            ]);
+        }
+
     }
     /**
      * This function tries to guess the columns to show from the given data
      * if [[columns]] are not explicitly specified.
      */
-    protected function guessColumns()
+    protected function _initAutoColumns()
     {
+
+        //Если автоопределение колонок не включено
+        if (!$this->isEnabledAutoColumns) {
+            return $this;
+        }
+
         $dataProvider = clone $this->dataProvider;
         $models = $dataProvider->getModels();
 
@@ -165,20 +181,11 @@ class GridViewCmsWidget extends WidgetRenderable
     /**
      * @return array
      */
-    public function initColumns()
+    protected function _preInitColumns()
     {
         $result = [];
         $autoColumns = $this->_autoColumns;
-        $columns = ArrayHelper::merge(
-            (array)ArrayHelper::getValue($this->gridConfig, 'columns', []),
-            $this->columns
-        );
-
-        //Если автоопределение колонок не включено
-        if (!$this->isEnabledAutoColumns) {
-            $this->_resultColumns = $columns;
-            return $this;
-        }
+        $columns = $this->columns;
 
         if ($columns) {
             foreach ($columns as $key => $value) {
@@ -203,120 +210,39 @@ class GridViewCmsWidget extends WidgetRenderable
         }
 
         $columns = ArrayHelper::merge((array)$autoColumns, (array)$columns);
-        $this->_resultColumns = $columns;
+
+        foreach ($columns as $key => $config) {
+            $config['visible'] = true;
+            $columns[$key] = $config;
+        }
+
+        $this->_preInitColumns = $columns;
+        $this->columns = $this->_preInitColumns;
 
         return $this;
     }
     protected function applyColumns()
     {
         $result = [];
-
         //Есть логика включенных выключенных колонок
-        if ($this->visibleColumns && $this->_resultColumns) {
+        if ($this->visibleColumns && $this->columns) {
 
             foreach ($this->visibleColumns as $key) {
-
-                $config = ArrayHelper::getValue($this->_resultColumns, $key);
-                $config['visible'] = true;
-                ArrayHelper::remove($this->_resultColumns, $key);
-                $result[$key] = $config;
+                $result[$key] = ArrayHelper::getValue($this->columns, $key);
             }
 
-            foreach ($this->_resultColumns as $key => $config) {
+            /*foreach ($this->_resultColumns as $key => $config) {
                 $config['visible'] = false;
                 $this->_resultColumns[$key] = $config;
-            }
+            }*/
 
-            $result = ArrayHelper::merge($result, $this->_resultColumns);
-            $this->_resultColumns = $result;
+            /*$result = ArrayHelper::merge($result, $this->_resultColumns);
+            $this->_resultColumns = $result;*/
+            $this->columns = $result;
         }
+
 
         return $this;
-    }
-    /**
-     * @return DataProviderInterface
-     */
-    public function getDataProvider()
-    {
-        if ($this->_dataProvider === null) {
-            $this->_dataProvider = $this->_createDataProvider();
-        }
-
-        return $this->_dataProvider;
-    }
-    /**
-     * @return ActiveDataProvider
-     */
-    protected function _createDataProvider()
-    {
-        $modelClassName = $this->modelClassName;
-
-        if ($modelClassName) {
-            return new ActiveDataProvider([
-                'query' => $modelClassName::find(),
-            ]);
-        } else {
-            return new ArrayDataProvider([
-                'allModels' => [],
-            ]);
-        }
-
-    }
-    public function rules()
-    {
-        return [
-            ['visibleColumns', 'safe'],
-            ['paginationConfigArray', 'safe'],
-        ];
-    }
-    public function attributeLabels()
-    {
-        return [
-            'visibleColumns' => 'Включенные колонки',
-        ];
-    }
-    public function getConfigFormModels()
-    {
-        return [
-            'paginationConfig' => $this->paginationConfig,
-        ];
-    }
-    /**
-     * @return array
-     */
-    public function getConfigFormFields()
-    {
-        return [
-            'main'             => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/cms', 'Main'),
-                'fields' => [
-                    'visibleColumns' => [
-                        'class'           => SelectField::class,
-                        'multiple'        => true,
-                        'on beforeRender' => function ($e) {
-                            /**
-                             * @var $selectField SelectField
-                             */
-                            $selectField = $e->sender;
-
-                            if (\Yii::$app->controller && isset(\Yii::$app->controller->callableData) && \Yii::$app->controller->callableData
-                                && is_array(\Yii::$app->controller->callableData)
-                            ) {
-                                $resultColumns = ArrayHelper::getValue(\Yii::$app->controller->callableData, 'resultColumns');
-                                $selectField->items = $resultColumns;
-                            }
-                        },
-                    ],
-                ],
-            ],
-            'paginationConfig' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/cms', 'Pagination'),
-                'fields' => $this->paginationConfig->getConfigFormFields(),
-                'model'  => $this->paginationConfig,
-            ],
-        ];
     }
     /**
      * @return array
@@ -334,7 +260,7 @@ class GridViewCmsWidget extends WidgetRenderable
     {
         $result = [];
 
-        foreach ($this->_resultColumns as $code => $column) {
+        foreach ($this->_preInitColumns as $code => $column) {
             $attribute = '';
             $label = '';
 
@@ -390,18 +316,12 @@ class GridViewCmsWidget extends WidgetRenderable
     {
         $result = [];
 
-        foreach ($this->_resultColumns as $key => $column) {
+        foreach ($this->_preInitColumns as $key => $column) {
             if (ArrayHelper::getValue($column, 'visible')) {
                 $result[] = $key;
             }
         }
 
         return $result;
-    }
-
-    protected function _run()
-    {
-        $className = $this->gridClassName;
-        echo $className::widget($this->gridConfig);
     }
 }

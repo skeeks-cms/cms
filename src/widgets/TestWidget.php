@@ -9,6 +9,7 @@
 namespace skeeks\cms\widgets;
 
 use skeeks\yii2\config\ConfigBehavior;
+use skeeks\yii2\config\ConfigTrait;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 
@@ -18,7 +19,9 @@ use yii\helpers\ArrayHelper;
  */
 class TestWidget extends Widget
 {
-    public $test = '';
+    use ConfigTrait;
+
+    public $test = '22';
 
     public $config = [];
 
@@ -38,7 +41,13 @@ class TestWidget extends Widget
                         'test'
                     ],
                     'defineAttributes' => [
-                        'test' => '222'
+                        'test',
+                    ],
+                    'attributeLabels' => [
+                        'test' => '111',
+                    ],
+                    'attributeHints' => [
+                        'test' => '111',
                     ],
                     'rules' => [
                         ['test', 'string']
