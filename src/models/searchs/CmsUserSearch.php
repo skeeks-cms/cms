@@ -169,7 +169,9 @@ class CmsUserSearch extends CmsUser
         if ($this->q) {
             $query->andFilterWhere([
                 'or',
-                ['like', $this->tableName() . '.name', $this->q],
+                ['like', $this->tableName() . '.first_name', $this->q],
+                ['like', $this->tableName() . '.last_name', $this->q],
+                ['like', $this->tableName() . '.patronymic', $this->q],
                 ['like', $this->tableName() . '.email', $this->q],
                 ['like', $this->tableName() . '.phone', $this->q],
                 ['like', $this->tableName() . '.username', $this->q],
