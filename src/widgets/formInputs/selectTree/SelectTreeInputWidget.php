@@ -110,7 +110,11 @@ class SelectTreeInputWidget extends InputWidget
         } else if (is_array($value)) {
             $newValue = [];
             foreach ($value as $k => $v) {
-                $newValue[$v] = $v;
+                if ($v instanceof CmsTree) {
+                    $newValue[$v->id] = $v->id;
+                } else {
+                    $newValue[$v] = $v;
+                }
             }
             $items = $newValue;
         }
