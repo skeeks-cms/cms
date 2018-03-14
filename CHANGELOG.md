@@ -7,6 +7,16 @@ CHANGELOG
  * Widget and component settings to use skeeks/yii2-form
  * Change config form interface
 
+
+
+
+
+
+5.0.4
+----------------
+ * Cms user default username limi(1)
+ * Fixed admin select tree
+ 
 5.0.3
 ----------------
  * Fixed admin user search
