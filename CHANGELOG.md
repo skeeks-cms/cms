@@ -3,6 +3,7 @@ CHANGELOG
 
 5.0.4
 ----------------
+ * Cms user default username limi(1)
  * Fixed admin select tree
  
 5.0.3

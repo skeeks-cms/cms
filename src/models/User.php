@@ -229,7 +229,7 @@ class User
                 ['username'],
                 'default',
                 'value' => function(self $model) {
-                    $userLast = static::find()->orderBy("id DESC")->one();
+                    $userLast = static::find()->orderBy("id DESC")->limit(1)->one();
                     return "id" . ($userLast->id + 1);
                 }
             ],
