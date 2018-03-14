@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.0.4
+----------------
+ * Fixed admin select tree
+ 
 5.0.3
 ----------------
  * Fixed admin user search
