@@ -103,7 +103,7 @@ class GridView extends \yii\grid\GridView
                             'model'  => $this->paginationConfig,
                         ],
                     ],
-                    'defineAttributes' => [
+                    'attributeDefines' => [
                         'visibleColumns',
                     ],
                     'attributeLabels'  => [
@@ -205,9 +205,6 @@ class GridView extends \yii\grid\GridView
         $this->applyColumns();
 
         $this->paginationConfig->initDataProvider($this->dataProvider);
-
-        $this->trigger(self::EVENT_INIT);
-
     }
     /**
      * @return ActiveDataProvider
