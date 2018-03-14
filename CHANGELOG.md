@@ -1,6 +1,12 @@
 CHANGELOG
 ==============
 
+5.1.0.pre
+----------------
+ * Removed skeeks\cms\Exception
+ * Widget and component settings to use skeeks/yii2-form
+ * Change config form interface
+
 5.0.3
 ----------------
  * Fixed admin user search

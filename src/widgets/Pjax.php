@@ -56,7 +56,7 @@ class Pjax extends \yii\widgets\Pjax
             $this->getView()->registerJs(<<<JS
                 (function(sx, $, _)
                 {
-                    var blockerPanel = new sx.classes.Blocker('.sx-panel');
+                    var blockerPanel = new sx.classes.Blocker('#{$this->id}');
 
                     $(document).on('pjax:send', function(e)
                     {

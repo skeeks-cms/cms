@@ -18,6 +18,7 @@ use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -102,6 +103,27 @@ JS
                         });
                         $e->sender->formModels['dm'] = $dm;
                     },
+
+                    'on beforeSave' => function (Event $e) {
+                        /**
+                         * @var $action BackendModelUpdateAction;
+                         * @var $model CmsUser;
+                         */
+                        $action = $e->sender;
+                        $model = $action->model;
+                        $action->isSaveFormModels = false;
+                        $dm = ArrayHelper::getValue($action->formModels, 'dm');
+
+                        $model->setPassword($dm->pass);
+
+                        if ($model->save()) {
+                            //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                        } else {
+                            throw new Exception(print_r($model->errors, true));
+                        }
+
+                    },
+
                     'fields' => [
                         'dm.pass' => [
                             'class' => PasswordField::class,

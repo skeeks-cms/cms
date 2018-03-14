@@ -58,10 +58,12 @@ $config = [
                 'data' => [
                     'personal' => [
                         'name' => ['skeeks/cms', 'Personal data'],
+                        'icon' => 'fa fa-user',
                         'items' => [
                             [
                                 'name' => ['skeeks/cms', 'Personal data'],
                                 'url' => ['/cms/upa-personal/update'],
+                                'icon' => 'fa fa-user',
                             ],
                             [
                                 'name' => ['skeeks/cms', 'Change password'],
