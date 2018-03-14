@@ -44,7 +44,9 @@
     'size' => 1
 ]); ?>
 
-<?= $form->field($searchModel, 'name') ?>
+<?= $form->field($searchModel, 'first_name') ?>
+<?= $form->field($searchModel, 'last_name') ?>
+<?= $form->field($searchModel, 'patronymic') ?>
 <?= $form->field($searchModel, 'username') ?>
 <?= $form->field($searchModel, 'email') ?>
 <?= $form->field($searchModel, 'phone') ?>

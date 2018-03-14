@@ -1,7 +1,11 @@
 CHANGELOG
 ==============
 
-5.0.2.pre
+5.0.3
+----------------
+ * Fixed admin user search
+ 
+5.0.2
 ----------------
  * Copy elements and move sections
  * "skeeks/yii2-form": "dev-master@dev"
