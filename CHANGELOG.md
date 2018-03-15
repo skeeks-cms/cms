@@ -14,7 +14,8 @@ CHANGELOG
 
 5.0.4
 ----------------
- * Cms user default username limi(1)
+ * Change children elements logic
+ * Cms user default username limit(1)
  * Fixed admin select tree
  
 5.0.3
