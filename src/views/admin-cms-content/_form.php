@@ -80,7 +80,7 @@ $action = $controller->action;
         <?= $form->fieldSelect($model, 'parent_content_id', \skeeks\cms\models\CmsContent::getDataForSelect(true,
             function(\yii\db\ActiveQuery $activeQuery) use ($model) {
                 if (!$model->isNewRecord) {
-                    $activeQuery->andWhere(['!=', 'id', $model->id]);
+                    //$activeQuery->andWhere(['!=', 'id', $model->id]);
                 }
             }),
             [
