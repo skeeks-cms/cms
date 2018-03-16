@@ -17,6 +17,9 @@ use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\SelectField;
 use yii\caching\TagDependency;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -94,12 +97,77 @@ class SitesCmsWidget extends WidgetRenderable
             ]);
     }
 
-    public function renderConfigForm(ActiveForm $form)
+
+    /**
+     * @return array
+     */
+    public function getConfigFormFields()
     {
-        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
-            'form' => $form,
-            'model' => $this
-        ], $this);
+        return [
+            'template' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Template'),
+                'fields' => [
+                    'viewFile',
+                ],
+            ],
+
+            'filtration' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Filtration'),
+                'fields' => [
+                    'active' => [
+                        'class'      => BoolField::class,
+                        'trueValue'  => 'Y',
+                        'falseValue' => 'N',
+                    ],
+                ],
+            ],
+
+            'sort'       => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Sorting'),
+                'fields' => [
+                    'orderBy' => [
+                        'class' => SelectField::class,
+                        'items' => (new \skeeks\cms\models\Tree())->attributeLabels(),
+                    ],
+                    'order'   => [
+                        'class' => SelectField::class,
+                        'items' => [
+                            SORT_ASC  => \Yii::t('skeeks/cms', 'ASC (from lowest to highest)'),
+                            SORT_DESC => \Yii::t('skeeks/cms', 'DESC (from highest to lowest)'),
+                        ],
+                    ],
+                ],
+            ],
+
+            'additionally'       => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Additionally'),
+                'fields' => [
+                    'label'
+                ],
+            ],
+
+            'cache'       => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Cache settings'),
+                'fields' => [
+                    'enabledRunCache' => [
+                        'class' => BoolField::class,
+                        'trueValue'  => 'Y',
+                        'falseValue' => 'N',
+                        'allowNull' => false,
+                    ],
+                    'runCacheDuration' => [
+                        'elementOptions' => [
+                            'type' => 'number',
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**

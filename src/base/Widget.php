@@ -39,82 +39,9 @@ abstract class Widget extends Component implements ViewContextInterface
      * @var bool
      */
     protected $_isBegin = false;
-
-
-    public function init()
-    {
-        $this->_token = \Yii::t('skeeks/cms', 'Widget') . ': ' . $this->id;
-
-        \Yii::beginProfile("Cms Widget: " . $this->_token);
-        parent::init();
-        \Yii::endProfile("Cms Widget: " . $this->_token);
-    }
-
-
-    /**
-     * Если включена дебаг мод, будет напечатан первый тег
-     * @return string
-     */
-    public function _begin()
-    {
-        //Запускается 1 раз
-        if ($this->_isBegin === true) {
-            return "";
-        }
-        $this->_isBegin = true;
-
-        \Yii::$app->cmsToolbar->initEnabled();
-        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled) {
-            $id = 'sx-infoblock-' . $this->id;
-
-            return Html::beginTag('div',
-                [
-                    'class' => 'skeeks-cms-toolbar-edit-view-block',
-                    'id' => $id,
-                    'title' => \Yii::t('skeeks/cms', "Double-click on the block will open the settings manager"),
-                    'data' =>
-                        [
-                            'id' => $this->id,
-                            'config-url' => $this->getCallableEditUrl()
-                        ]
-                ]);
-        }
-
-        return "";
-    }
-
-    /**
-     * В режиме редактирования, будет добавлен закрывающий тег + зарегистрированные данные для js
-     * @return string
-     */
-    public function _end()
-    {
-        $result = "";
-
-        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled) {
-            $id = 'sx-infoblock-' . $this->id;
-
-            $this->view->registerJs(<<<JS
-new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
-JS
-            );
-            $callableData = $this->callableData;
-
-            $callableDataInput = Html::textarea('callableData', base64_encode(serialize($callableData)), [
-                'id' => $this->callableId,
-                'style' => 'display: none;'
-            ]);
-
-            $result = $callableDataInput;
-            $result .= Html::endTag('div');
-        }
-
-        return $result;
-    }
-
     /**
      * @param string $namespace Unique code, which is attached to the settings in the database
-     * @param array $config Standard widget settings
+     * @param array  $config Standard widget settings
      *
      * @return static
      */
@@ -123,7 +50,6 @@ JS
         $config = ArrayHelper::merge(['namespace' => $namespace], $config);
         return static::begin($config);
     }
-
     /**
      * Begins a widget.
      * This method creates an instance of the calling class. It will apply the configuration
@@ -142,7 +68,37 @@ JS
 
         return $widget;
     }
+    /**
+     * Если включена дебаг мод, будет напечатан первый тег
+     * @return string
+     */
+    public function _begin()
+    {
+        //Запускается 1 раз
+        if ($this->_isBegin === true) {
+            return "";
+        }
+        $this->_isBegin = true;
 
+        \Yii::$app->cmsToolbar->initEnabled();
+        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled) {
+            $id = 'sx-infoblock-'.$this->id;
+
+            return Html::beginTag('div',
+                [
+                    'class' => 'skeeks-cms-toolbar-edit-view-block',
+                    'id'    => $id,
+                    'title' => \Yii::t('skeeks/cms', "Double-click on the block will open the settings manager"),
+                    'data'  =>
+                        [
+                            'id'         => $this->id,
+                            'config-url' => $this->getCallableEditUrl(),
+                        ],
+                ]);
+        }
+
+        return "";
+    }
     /**
      * Ends a widget.
      * Note that the rendering result of the widget is directly echoed out.
@@ -168,6 +124,13 @@ JS
         }
     }
 
+    public function init()
+    {
+        $this->_token = \Yii::t('skeeks/cms', 'Widget').': '.$this->id;
+        \Yii::beginProfile("Cms Widget: ".$this->_token);
+        parent::init();
+        \Yii::endProfile("Cms Widget: ".$this->_token);
+    }
     /**
      * @return string
      */
@@ -175,17 +138,17 @@ JS
     {
         if (YII_ENV == 'prod') {
             try {
-                \Yii::beginProfile("Run: " . $this->_token);
+                \Yii::beginProfile("Run: ".$this->_token);
                 $content = $this->_run();
-                \Yii::endProfile("Run: " . $this->_token);
+                \Yii::endProfile("Run: ".$this->_token);
             } catch (\Exception $e) {
                 $content = \Yii::t('skeeks/cms', 'Error widget {class}',
-                        ['class' => $this->className()]) . " (" . $this->descriptor->name . "): " . $e->getMessage();
+                        ['class' => $this->className()])." (".$this->descriptor->name."): ".$e->getMessage();
             }
         } else {
-            \Yii::beginProfile("Run: " . $this->_token);
+            \Yii::beginProfile("Run: ".$this->_token);
             $content = $this->_run();
-            \Yii::endProfile("Run: " . $this->_token);
+            \Yii::endProfile("Run: ".$this->_token);
         }
 
         if ($this->_isBegin) {
@@ -198,12 +161,39 @@ JS
 
         return $result;
     }
-
     /**
      * @return string
      */
     protected function _run()
     {
         return '';
+    }
+    /**
+     * В режиме редактирования, будет добавлен закрывающий тег + зарегистрированные данные для js
+     * @return string
+     */
+    public function _end()
+    {
+        $result = "";
+
+        if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y && \Yii::$app->cmsToolbar->enabled) {
+            $id = 'sx-infoblock-'.$this->id;
+
+            $this->view->registerJs(<<<JS
+new sx.classes.toolbar.EditViewBlock({'id' : '{$id}'});
+JS
+            );
+            $callableData = $this->callableData;
+
+            $callableDataInput = Html::textarea('callableData', base64_encode(serialize($callableData)), [
+                'id'    => $this->callableId,
+                'style' => 'display: none;',
+            ]);
+
+            $result = $callableDataInput;
+            $result .= Html::endTag('div');
+        }
+
+        return $result;
     }
 }

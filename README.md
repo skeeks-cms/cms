@@ -72,7 +72,6 @@ ___
 ___
 [![SkeekS CMS admin panel](https://cms.skeeks.com/uploads/all/35/b4/b6/35b4b6e7c1edf46b320002d61ffad411.png)](https://cms.skeeks.com/uploads/all/35/b4/b6/35b4b6e7c1edf46b320002d61ffad411.png)
 
-
 ___
 
 > [![skeeks!](https://skeeks.com/img/logo/logo-no-title-80px.png)](https://skeeks.com)  

@@ -8,17 +8,20 @@
 
 namespace skeeks\cms\cmsWidgets\treeMenu;
 
-use skeeks\cms\models\CmsSite;
-use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Tree;
+use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\FieldSetEnd;
+use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
@@ -101,31 +104,28 @@ class TreeMenuCmsWidget extends WidgetRenderable
      * @var ActiveQuery
      */
     public $activeQuery = null;
-
+    public $text = '';
     public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => 'Меню разделов'
+            'name' => 'Меню разделов',
         ]);
     }
-
-    public $text = '';
-
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
             [
-                'treePid' => \Yii::t('skeeks/cms', 'The parent section'),
-                'active' => \Yii::t('skeeks/cms', 'Activity'),
-                'level' => \Yii::t('skeeks/cms', 'The nesting level'),
-                'label' => \Yii::t('skeeks/cms', 'Header'),
-                'site_codes' => \Yii::t('skeeks/cms', 'Linking to sites'),
-                'orderBy' => \Yii::t('skeeks/cms', 'Sorting'),
-                'order' => \Yii::t('skeeks/cms', 'Sorting direction'),
+                'treePid'            => \Yii::t('skeeks/cms', 'The parent section'),
+                'active'             => \Yii::t('skeeks/cms', 'Activity'),
+                'level'              => \Yii::t('skeeks/cms', 'The nesting level'),
+                'label'              => \Yii::t('skeeks/cms', 'Header'),
+                'site_codes'         => \Yii::t('skeeks/cms', 'Linking to sites'),
+                'orderBy'            => \Yii::t('skeeks/cms', 'Sorting'),
+                'order'              => \Yii::t('skeeks/cms', 'Sorting direction'),
                 'enabledCurrentSite' => \Yii::t('skeeks/cms', 'Consider the current site'),
-                'enabledRunCache' => \Yii::t('skeeks/cms', 'Enable caching'),
-                'runCacheDuration' => \Yii::t('skeeks/cms', 'Cache lifetime'),
-                'tree_type_ids' => \Yii::t('skeeks/cms', 'Section types'),
+                'enabledRunCache'    => \Yii::t('skeeks/cms', 'Enable caching'),
+                'runCacheDuration'   => \Yii::t('skeeks/cms', 'Cache lifetime'),
+                'tree_type_ids'      => \Yii::t('skeeks/cms', 'Section types'),
             ]);
     }
 
@@ -135,7 +135,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
             [
                 'enabledCurrentSite' => \Yii::t('skeeks/cms',
                     'If you select "yes", then the sample section, add the filter condition, sections of the site, which is called the widget'),
-                'level' => \Yii::t('skeeks/cms',
+                'level'              => \Yii::t('skeeks/cms',
                     'Adds the sample sections, the condition of nesting choice. 0 - will not use this condition at all.'),
             ]);
     }
@@ -153,13 +153,105 @@ class TreeMenuCmsWidget extends WidgetRenderable
             ]);
     }
 
-    public function renderConfigForm(ActiveForm $form)
+    /**
+     * @return array
+     */
+    public function getConfigFormFields()
     {
-        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
-            'form' => $form,
-            'model' => $this
-        ], $this);
+        return [
+            'template' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Template'),
+                'fields' => [
+                    'viewFile',
+                ],
+            ],
+
+            'filtration' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Filtration'),
+                'fields' => [
+                    'enabledCurrentSite' => [
+                        'class'      => BoolField::class,
+                        'trueValue'  => 'Y',
+                        'falseValue' => 'N',
+                    ],
+                    'active'             => [
+                        'class'      => BoolField::class,
+                        'trueValue'  => 'Y',
+                        'falseValue' => 'N',
+                    ],
+                    'tree_type_ids'      => [
+                        'class'    => SelectField::class,
+                        'items'    => \yii\helpers\ArrayHelper::map(
+                            \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
+                        ),
+                        'multiple' => true,
+                    ],
+                    'level'              => [
+                        'elementOptions' => [
+                            'type' => 'number',
+                        ],
+                    ],
+                    'site_codes'         => [
+                        'class'    => SelectField::class,
+                        'items'    => \yii\helpers\ArrayHelper::map(
+                            \skeeks\cms\models\CmsSite::find()->active()->all(),
+                            'code',
+                            'name'
+                        ),
+                        'multiple' => true,
+                    ],
+                    'treePid'            => [
+                        'class'       => WidgetField::class,
+                        'widgetClass' => SelectTreeInputWidget::class,
+                    ],
+                ],
+            ],
+            'sort'       => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Sorting'),
+                'fields' => [
+                    'orderBy' => [
+                        'class' => SelectField::class,
+                        'items' => (new \skeeks\cms\models\Tree())->attributeLabels(),
+                    ],
+                    'order'   => [
+                        'class' => SelectField::class,
+                        'items' => [
+                            SORT_ASC  => \Yii::t('skeeks/cms', 'ASC (from lowest to highest)'),
+                            SORT_DESC => \Yii::t('skeeks/cms', 'DESC (from highest to lowest)'),
+                        ],
+                    ],
+                ],
+            ],
+            'additionally'       => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Additionally'),
+                'fields' => [
+                    'label'
+                ],
+            ],
+            'cache'       => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Cache settings'),
+                'fields' => [
+                    'enabledRunCache' => [
+                        'class' => BoolField::class,
+                        'trueValue'  => 'Y',
+                        'falseValue' => 'N',
+                        'allowNull' => false,
+                    ],
+                    'runCacheDuration' => [
+                        'elementOptions' => [
+                            'type' => 'number',
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
+
 
     public function init()
     {
@@ -223,12 +315,12 @@ class TreeMenuCmsWidget extends WidgetRenderable
 
     protected function _run()
     {
-        $key = $this->getCacheKey() . 'run';
+        $key = $this->getCacheKey().'run';
 
         $dependency = new TagDependency([
             'tags' =>
                 [
-                    $this->className() . (string)$this->namespace,
+                    $this->className().(string)$this->namespace,
                     (new Tree())->getTableCacheTag(),
                 ],
         ]);

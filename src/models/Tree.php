@@ -26,6 +26,7 @@ use skeeks\yii2\slug\SlugRuleProvider;
 use skeeks\yii2\yaslug\YaSlugHelper;
 use Yii;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
@@ -204,6 +205,7 @@ class Tree extends Core
 
     public function _updateCode(Event $event)
     {
+        $parent = $this->getParent()->one();
         //У корневой ноды всегда нет кода
         if ($this->isRoot()) {
             $this->code = null;
@@ -216,36 +218,19 @@ class Tree extends Core
             $this->dir = $this->code;
 
             if ($this->level > 1) {
-                $this->dir = $this->parent->dir . "/" . $this->code;
+                $parent = $this->getParent()->one();
+                $this->dir = $parent->dir . "/" . $this->code;
             }
         }
 
-
         //site code
-        if ($this->parent) {
-            $this->cms_site_id = $this->parent->cms_site_id;
+        if ($parent) {
+            $this->cms_site_id = $parent->cms_site_id;
         } elseif (!$this->cms_site_id) {
             if ($site = \Yii::$app->currentSite->site) {
                 $this->cms_site_id = $site->code;
             }
         }
-
-        //tree type
-        if (!$this->tree_type_id) {
-            if ($this->parent && $this->parent->treeType) {
-                if ($this->parent->treeType->defaultChildrenTreeType) {
-                    $this->tree_type_id = $this->parent->treeType->defaultChildrenTreeType->id;
-                } else {
-                    $this->tree_type_id = $this->parent->tree_type_id;
-                }
-            } else {
-
-                if ($treeType = CmsTreeType::find()->orderBy(['priority' => SORT_ASC])->one()) {
-                    $this->tree_type_id = $treeType->id;
-                }
-            }
-        }
-
     }
 
     /**
@@ -257,6 +242,11 @@ class Tree extends Core
         if ($event->changedAttributes) {
             //Если изменилось название seo_page_name
             if (isset($event->changedAttributes['code'])) {
+
+                $event->sender->processNormalize();
+            }
+            //Если изменилось название seo_page_name
+            if (isset($event->changedAttributes['pid'])) {
                 $event->sender->processNormalize();
             }
         }
@@ -383,6 +373,26 @@ class Tree extends Core
                     }
 
                     return 'root';
+                }
+            ],
+
+            [
+                ['tree_type_id'],
+                'default',
+                'value' => function(self $model) {
+
+                    if ($this->parent && $this->parent->treeType) {
+                        if ($this->parent->treeType->defaultChildrenTreeType) {
+                            return $this->parent->treeType->defaultChildrenTreeType->id;
+                        } else {
+                            return $this->parent->tree_type_id;
+                        }
+                    } else {
+
+                        if ($treeType = CmsTreeType::find()->orderBy(['priority' => SORT_ASC])->one()) {
+                            return $treeType->id;
+                        }
+                    }
                 }
             ],
 
@@ -573,7 +583,9 @@ class Tree extends Core
     public function getImages()
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
-            ->via('cmsTreeImages');
+            ->via('cmsTreeImages')
+            ->orderBy(['priority' => SORT_ASC])
+            ;
     }
 
     /**
@@ -582,7 +594,9 @@ class Tree extends Core
     public function getFiles()
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
-            ->via('cmsTreeFiles');
+            ->via('cmsTreeFiles')
+            ->orderBy(['priority' => SORT_ASC])
+            ;
     }
 
 
@@ -707,45 +721,24 @@ class Tree extends Core
             $this->setAttribute('dir', $this->code);
 
             if ($this->level > 1) {
-                $this->setAttribute('dir', $this->parent->dir . "/" . $this->code);
+                $parent = $this->getParent()->one();
+                $this->setAttribute('dir', $parent->dir . "/" . $this->code);
             }
 
-            $this->save(false);
+            if (!$this->save()) {
+                throw new Exception('Not update dir');
+            }
         }
 
 
         //Берем детей на один уровень ниже
-        if ($this->children) {
-            foreach ($this->children as $childModel) {
+        $childrens = $this->getChildren()->all();
+        if ($childrens) {
+            foreach ($childrens as $childModel) {
                 $childModel->processNormalize();
             }
         }
 
-        return $this;
-    }
-
-
-    /**
-     * TODO: is deprecated
-     * @param Tree $target | Новая нода, будет вставлена в текущую
-     * @return $this
-     */
-    public function processCreateNode(Tree $target)
-    {
-        return $this->processAddNode($target);
-    }
-
-
-    /**
-     * TODO: is deprecated
-     *
-     * @param Tree $target | Новая нода, будет вставлена в текущую
-     * @return $this
-     * @deprecated
-     */
-    public function processAddNode(Tree $target)
-    {
-        $target->appendTo($this)->save();
         return $this;
     }
 

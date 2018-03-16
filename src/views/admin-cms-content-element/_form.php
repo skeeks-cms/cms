@@ -1,9 +1,7 @@
 <?php
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-use skeeks\cms\models\Tree;
-use skeeks\cms\modules\admin\widgets\Pjax;
+use yii\helpers\Html;
 
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
@@ -44,10 +42,23 @@ else {
 <?
 }
 ?>
+<? if (!$model->isNewRecord) : ?>
+    <div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <a href='<?= $model->url; ?>' target='_blank' class="btn btn-default btn-sm" title="<?= \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i class="glyphicon glyphicon-arrow-right"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+<? endif; ?>
+
 
 <?php $form = $action->beginActiveForm([
-    'id' => 'sx-dynamic-form',
-    'enableAjaxValidation' => false,
+    'id'                     => 'sx-dynamic-form',
+    'enableAjaxValidation'   => false,
     'enableClientValidation' => false,
 ]); ?>
 <?php $this->registerJs(<<<JS
@@ -107,45 +118,45 @@ JS
 </div>
 
 <?= $this->render('_form-main', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('_form-announce', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('_form-detail', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('_form-sections', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('_form-seo', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('_form-images', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('_form-additionaly', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 
@@ -155,9 +166,9 @@ JS
     <?php if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Access')); ?>
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-            'permissionName' => $model->permissionName,
-            'permissionDescription' => 'Доступ к этому элементу: ' . $model->name,
-            'label' => 'Доступ к этому элементу',
+            'permissionName'        => $model->permissionName,
+            'permissionDescription' => 'Доступ к этому элементу: '.$model->name,
+            'label'                 => 'Доступ к этому элементу',
         ]); ?>
         <?= $form->fieldSetEnd() ?>
     <?php endif; ?>
@@ -179,31 +190,31 @@ JS
             <?= \yii\bootstrap\Alert::widget([
                 'options' =>
                     [
-                        'class' => 'alert-warning'
+                        'class' => 'alert-warning',
                     ],
-                'body' => \Yii::t('skeeks/cms', 'Management will be available after saving')
+                'body'    => \Yii::t('skeeks/cms', 'Management will be available after saving'),
             ]); ?>
         <?php else
             : ?>
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                'label' => $childContent->name,
-                'namespace' => md5($model->className() . $childContent->id),
+                'label'       => $childContent->name,
+                'namespace'   => md5($model->className().$childContent->id),
                 'parentModel' => $model,
-                'relation' => [
-                    'content_id' => $childContent->id,
-                    'parent_content_element_id' => $model->id
+                'relation'    => [
+                    'content_id'                => $childContent->id,
+                    'parent_content_element_id' => $model->id,
                 ],
 
                 'sort' => [
                     'defaultOrder' =>
                         [
-                            'priority' => 'published_at'
-                        ]
+                            'priority' => 'published_at',
+                        ],
                 ],
 
                 'controllerRoute' => 'cms/admin-cms-content-element',
                 'gridViewOptions' => [
-                    'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent)
+                    'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
                 ],
             ]);
             ?>

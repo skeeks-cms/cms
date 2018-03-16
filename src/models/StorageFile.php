@@ -36,6 +36,7 @@ use Yii;
  * @property string $description_full
  * @property integer $image_height
  * @property integer $image_width
+ * @property integer $priority
  *
  * @property string $fileName
  * @property string $src
@@ -60,7 +61,7 @@ class StorageFile extends Core
     {
         return array_merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width'],
+                ['created_by', 'priority', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width'],
                 'integer'
             ],
             [['description_short', 'description_full'], 'string'],
@@ -245,6 +246,24 @@ class StorageFile extends Core
     public function getRootSrc()
     {
         return $this->cluster->getRootSrc($this->cluster_file);
+    }
+
+    /**
+     * @return StorageFile
+     */
+    public function copy()
+    {
+        $newFile = \Yii::$app->storage->upload($this->absoluteSrc);
+
+        $newFile->name = $this->name;
+        $newFile->description_full = $this->description_full;
+        $newFile->description_short = $this->description_short;
+        $newFile->name_to_save = $this->name_to_save;
+        $newFile->original_name = $this->original_name;
+        $newFile->priority = $this->priority;
+        $newFile->save();
+
+        return $newFile;
     }
 }
 

@@ -9,6 +9,8 @@
 namespace skeeks\cms\base;
 
 /**
+ * @deprecated
+ *
  * Class AssetBundle
  * @package skeeks\cms\base
  */

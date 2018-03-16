@@ -9,6 +9,7 @@
 namespace skeeks\cms\base;
 
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\IHasConfig;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -26,14 +27,16 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * @property array namespace
- * @property array settings
- * @property CmsSite cmsSite
- * @property CmsUser cmsUser
+ * @deprecated
  *
- * @property array callAttributes
+ * @property array       namespace
+ * @property array       settings
+ * @property CmsSite     cmsSite
+ * @property CmsUser     cmsUser
+ *
+ * @property array       callAttributes
  * @property string|null override
- * @property array overridePath
+ * @property array       overridePath
  *
  * Class Component
  * @package skeeks\cms\base
@@ -51,6 +54,7 @@ abstract class Component extends Model implements ConfigFormInterface
      * @event Event an event that is triggered when the record is initialized via [[init()]].
      */
     const EVENT_INIT = 'init';
+
     /**
      * @event Event an event that is triggered after the record is created and populated with query result.
      */
@@ -129,7 +133,6 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     protected $_namespace = null;
     private $_settingsId;
-
     /**
      * Populates an active record object using a row of data from the database/storage.
      *
@@ -142,7 +145,7 @@ abstract class Component extends Model implements ConfigFormInterface
      *
      * @param BaseActiveRecord $record the record to be populated. In most cases this will be an instance
      * created by [[instantiate()]] beforehand.
-     * @param array $row attribute values (name => value)
+     * @param array            $row attribute values (name => value)
      */
     public static function populateRecord($record, $row)
     {
@@ -156,7 +159,6 @@ abstract class Component extends Model implements ConfigFormInterface
         }
         $record->_oldAttributes = $record->toArray();
     }
-
     /**
      * Creates an active record instance.
      *
@@ -175,11 +177,16 @@ abstract class Component extends Model implements ConfigFormInterface
         return new static;
     }
 
+    public function getConfigFormFields()
+    {
+        return [];
+    }
+
     public function init()
     {
         $this->_callAttributes = $this->attributes;
 
-        \Yii::beginProfile("Init: " . static::class);
+        \Yii::beginProfile("Init: ".static::class);
 
         if (!\Yii::$app instanceof Application) {
             if ($this->cmsSite === null && isset(\Yii::$app->currentSite) && \Yii::$app->currentSite->site) {
@@ -193,9 +200,9 @@ abstract class Component extends Model implements ConfigFormInterface
 
         $this->_initSettings();
 
-        \Yii::endProfile("Init: " . static::class);
-
         $this->trigger(self::EVENT_INIT);
+
+        \Yii::endProfile("Init: ".static::class);
     }
 
     /**
@@ -205,18 +212,16 @@ abstract class Component extends Model implements ConfigFormInterface
     protected function _initSettings()
     {
         try {
-            $this->setAttributes($this->settings);
-            $this->_oldAttributes = $this->toArray($this->attributes());
 
-        } catch (Exception $e) {
+            $this->setAttributes($this->settings);
+            $this->_oldAttributes = $this->toArray($this->safeAttributes());
         } catch (\Exception $e) {
             \Yii::error(\Yii::t('skeeks/cms', '{cms} component error load defaul settings',
-                    ['cms' => 'Cms']) . ': ' . $e->getMessage());
+                    ['cms' => 'Cms']).': '.$e->getMessage());
         }
 
         return $this;
     }
-
     /**
      * @return array
      */
@@ -234,7 +239,6 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return $names;
     }
-
     /**
      * @return bool
      */
@@ -244,12 +248,13 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->afterRefresh();
         return true;
     }
-
+    /**
+     *
+     */
     public function afterRefresh()
     {
         $this->trigger(self::EVENT_AFTER_REFRESH);
     }
-
     /**
      * @return null|string
      */
@@ -257,7 +262,6 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         return $this->_namespace;
     }
-
     /**
      * @param string $namespace
      * @return $this
@@ -267,7 +271,6 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->_namespace = $namespace;
         return $this;
     }
-
     /**
      * @return null|string
      */
@@ -275,7 +278,6 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         return $this->_override;
     }
-
     /**
      * @param string $override
      * @return $this
@@ -289,7 +291,6 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->_override = $override;
         return $this;
     }
-
     /**
      * @return array
      */
@@ -301,13 +302,27 @@ abstract class Component extends Model implements ConfigFormInterface
             self::OVERRIDE_USER,
         ];
     }
-
     /**
      * @return array
      */
     public function getOverridePath()
     {
         return (array)$this->_overridePath;
+    }
+    /**
+     * @param array $overridePath
+     * @return $this
+     */
+    public function setOverridePath($overridePath)
+    {
+        foreach ((array)$overridePath as $override) {
+            if (!in_array($override, static::getOverrides())) {
+                throw new Exception('Invalid override name');
+            }
+        }
+
+        $this->_overridePath = (array)$overridePath;
+        return $this;
     }
 
 
@@ -326,23 +341,6 @@ abstract class Component extends Model implements ConfigFormInterface
     /**
      * TODO: Revrite and check
      */
-
-    /**
-     * @param array $overridePath
-     * @return $this
-     */
-    public function setOverridePath($overridePath)
-    {
-        foreach ((array)$overridePath as $override) {
-            if (!in_array($override, static::getOverrides())) {
-                throw new Exception('Invalid override name');
-            }
-        }
-
-        $this->_overridePath = (array)$overridePath;
-        return $this;
-    }
-
     /**
      * @return array
      */
@@ -350,7 +348,6 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         return $this->_callAttributes;
     }
-
     /**
      * @return null|CmsSite
      */
@@ -358,7 +355,6 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         return $this->_cmsSite;
     }
-
     /**
      * @param CmsSite $cmsSite
      * @return $this
@@ -368,7 +364,6 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->_cmsSite = $cmsSite;
         return $this;
     }
-
     /**
      * @return null|CmsUser
      */
@@ -376,7 +371,6 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         return $this->_cmsUser;
     }
-
     /**
      * @param CmsUser $cmsUser
      * @return $this
@@ -386,11 +380,9 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->_cmsUser = $cmsUser;
         return $this;
     }
-
     public function renderConfigForm(ActiveForm $form)
     {
     }
-
     /**
      * Получение настроек согласно пути перекрытия настроек.
      * @return array
@@ -430,7 +422,6 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return $settingsValues;
     }
-
     /**
      * @return string
      */
@@ -444,7 +435,6 @@ abstract class Component extends Model implements ConfigFormInterface
             $this->cmsSite ? (string)$this->cmsSite->id : '',
         ]);
     }
-
     /**
      * @param $overrideName
      * @return array
@@ -459,7 +449,6 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return [];
     }
-
     /**
      * @param $overrideName
      * @return null|CmsComponentSettings
@@ -487,7 +476,29 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return $settingsModel;
     }
+    /**
+     * @param array $data
+     * @param null  $formName
+     * @return bool
+     */
+    public function load($data, $formName = null)
+    {
+        $result = parent::load($data, $formName);
 
+        if ($models = $this->getConfigFormModels()) {
+            foreach ($models as $model) {
+                if ($model->load($data, $formName) === false) {
+                    $result = false;
+                }
+            }
+        }
+
+        return $result;
+    }
+    public function getConfigFormModels()
+    {
+        return [];
+    }
     /**
      * @param bool $runValidation
      * @param null $attributeNames
@@ -511,7 +522,16 @@ abstract class Component extends Model implements ConfigFormInterface
 
         $this->trigger(self::EVENT_BEFORE_UPDATE, new ModelEvent());
 
-        $modelSettings->value = $this->attributes;
+
+        $value = $this->attributes;
+
+        if ($models = $this->getConfigFormModels()) {
+            foreach ($models as $key => $model) {
+                $value[$key."Array"] = $model->attributes;
+            }
+        }
+
+        $modelSettings->value = $value;
         $result = $modelSettings->save();
 
         $this->trigger(self::EVENT_AFTER_UPDATE, new AfterSaveEvent([
@@ -522,7 +542,25 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return $result;
     }
+    /**
+     * @param null $attributeNames
+     * @param bool $clearErrors
+     * @return bool
+     */
+    public function validate($attributeNames = null, $clearErrors = true)
+    {
+        $result = parent::validate($attributeNames, $clearErrors);
 
+        if ($models = $this->getConfigFormModels()) {
+            foreach ($models as $model) {
+                if ($model->validate($attributeNames, $clearErrors) === false) {
+                    $result = false;
+                }
+            }
+        }
+
+        return $result;
+    }
     /**
      * @param string $overrideName
      * @return CmsComponentSettings
@@ -533,7 +571,7 @@ abstract class Component extends Model implements ConfigFormInterface
         $overrideName = (string)$overrideName;
 
         $settingsModel = new CmsComponentSettings([
-            'component' => static::class
+            'component' => static::class,
         ]);
 
         if ($this->namespace) {
@@ -588,7 +626,8 @@ abstract class Component extends Model implements ConfigFormInterface
         } else {
             foreach ($this->toArray() as $name => $value) {
                 if (isset($names[$name]) && (!array_key_exists($name,
-                            $this->_oldAttributes) || $value !== $this->_oldAttributes[$name])) {
+                            $this->_oldAttributes) || $value !== $this->_oldAttributes[$name])
+                ) {
                     $attributes[$name] = $value;
                 }
             }
@@ -602,7 +641,7 @@ abstract class Component extends Model implements ConfigFormInterface
     public function invalidateCache()
     {
         TagDependency::invalidate(\Yii::$app->cache, [
-            static::class
+            static::class,
         ]);
 
         return $this;
@@ -624,7 +663,7 @@ abstract class Component extends Model implements ConfigFormInterface
         return \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/index'])
             ->merge([
                 'componentClassName' => $this->className(),
-                'attributes' => $attributes,
+                'attributes'         => $attributes,
                 'componentNamespace' => $this->namespace,
             ])
             ->enableEmptyLayout()
@@ -640,7 +679,7 @@ abstract class Component extends Model implements ConfigFormInterface
             ->merge([
                 'componentClassName' => $this->className(),
                 'componentNamespace' => $this->namespace,
-                'callableId' => $this->callableId,
+                'callableId'         => $this->callableId,
             ])
             ->enableEmptyLayout()
             ->url;
@@ -653,11 +692,13 @@ abstract class Component extends Model implements ConfigFormInterface
     {
         $attributes = [];
 
-        foreach ($this->callAttributes as $key => $value) {
+        $attributes = ArrayHelper::toArray($this->callAttributes);
+
+        /*foreach ($this->callAttributes as $key => $value) {
             if (!is_object($value)) {
                 $attributes[$key] = $value;
             }
-        }
+        }*/
 
         return [
             'attributes' => $attributes,
@@ -669,7 +710,7 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function getCallableId()
     {
-        return $this->settingsId . '-callable';
+        return $this->settingsId.'-callable';
     }
 
     /**
@@ -680,7 +721,7 @@ abstract class Component extends Model implements ConfigFormInterface
     public function getSettingsId($autoGenerate = true)
     {
         if ($autoGenerate && $this->_settingsId === null) {
-            $this->_settingsId = static::$autoSettingsIdPrefix . static::$counterSettings++;
+            $this->_settingsId = static::$autoSettingsIdPrefix.static::$counterSettings++;
         }
 
         return $this->_settingsId;
@@ -755,7 +796,7 @@ abstract class Component extends Model implements ConfigFormInterface
     /**
      * Sets the named attribute value.
      * @param string $name the attribute name
-     * @param mixed $value the attribute value.
+     * @param mixed  $value the attribute value.
      * @throws InvalidParamException if the named attribute does not exist.
      * @see hasAttribute()
      */
@@ -764,7 +805,7 @@ abstract class Component extends Model implements ConfigFormInterface
         if (isset($this->{$name})) {
             $this->{$name} = $value;
         } else {
-            throw new InvalidParamException(get_class($this) . ' has no attribute named "' . $name . '".');
+            throw new InvalidParamException(get_class($this).' has no attribute named "'.$name.'".');
         }
     }
 
@@ -805,7 +846,7 @@ abstract class Component extends Model implements ConfigFormInterface
     /**
      * Sets the old value of the named attribute.
      * @param string $name the attribute name
-     * @param mixed $value the old attribute value.
+     * @param mixed  $value the old attribute value.
      * @throws InvalidParamException if the named attribute does not exist.
      * @see hasAttribute()
      */
@@ -814,7 +855,7 @@ abstract class Component extends Model implements ConfigFormInterface
         if (isset($this->_oldAttributes[$name]) || $this->hasAttribute($name)) {
             $this->_oldAttributes[$name] = $value;
         } else {
-            throw new InvalidParamException(get_class($this) . ' has no attribute named "' . $name . '".');
+            throw new InvalidParamException(get_class($this).' has no attribute named "'.$name.'".');
         }
     }
 
@@ -832,7 +873,7 @@ abstract class Component extends Model implements ConfigFormInterface
     /**
      * Returns a value indicating whether the named attribute has been changed.
      * @param string $name the name of the attribute.
-     * @param bool $identical whether the comparison of new and old value is made for
+     * @param bool   $identical whether the comparison of new and old value is made for
      * identical values using `===`, defaults to `true`. Otherwise `==` is used for comparison.
      * This parameter is available since version 2.0.4.
      * @return bool whether the attribute has been changed
@@ -968,7 +1009,7 @@ abstract class Component extends Model implements ConfigFormInterface
      * or an [[EVENT_AFTER_UPDATE]] event if `$insert` is `false`. The event class used is [[AfterSaveEvent]].
      * When overriding this method, make sure you call the parent implementation so that
      * the event is triggered.
-     * @param bool $insert whether this method called while inserting a record.
+     * @param bool  $insert whether this method called while inserting a record.
      * If `false`, it means the method is called while updating a record.
      * @param array $changedAttributes The old values of attributes that had changed and were saved.
      * You can use this parameter to take action based on the changes made for example send an email

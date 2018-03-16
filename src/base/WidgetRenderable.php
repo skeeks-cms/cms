@@ -23,10 +23,9 @@ class WidgetRenderable extends Widget
 
     public function attributeLabels()
     {
-        return array_merge(parent::attributeLabels(),
-            [
-                'viewFile' => \Yii::t('skeeks/cms', 'File-template'),
-            ]);
+        return array_merge(parent::attributeLabels(), [
+            'viewFile' => \Yii::t('skeeks/cms', 'File-template'),
+        ]);
     }
 
     public function rules()
@@ -41,7 +40,7 @@ class WidgetRenderable extends Widget
     {
         if ($this->viewFile) {
             return $this->render($this->viewFile, [
-                'widget' => $this
+                'widget' => $this,
             ]);
         } else {
             return \Yii::t('skeeks/cms', "Template not found");
