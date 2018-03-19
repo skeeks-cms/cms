@@ -33,6 +33,11 @@ use yii\widgets\ActiveForm;
 class FiltersWidget extends Widget
 {
     /**
+     * @var string
+     */
+    public $viewFile = 'filters';
+
+    /**
      * @var ActiveDataProvider
      */
     public $dataProvider;
@@ -144,19 +149,7 @@ class FiltersWidget extends Widget
 
     public function run()
     {
-        $activeFormClassName = ArrayHelper::getValue($this->activeForm, 'class', ActiveForm::class);
-        ArrayHelper::remove($this->activeForm, 'class');
-
-        $form = $activeFormClassName::begin((array) $this->activeForm);
-
-        echo (new \skeeks\yii2\form\Builder([
-            'models'     => $this->filtersModel->builderModels(),
-            'model'      => $this->filtersModel,
-            'activeForm' => $form,
-            'fields'     => $this->filtersModel->builderFields(),
-        ]))->render();
-
-        $activeFormClassName::end();
+        return $this->render($this->viewFile);
     }
 
 
