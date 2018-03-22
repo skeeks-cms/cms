@@ -19,38 +19,42 @@ trait ActiveFormAjaxSubmitTrait
         $afterValidateCallback = $this->afterValidateCallback;
         if ($afterValidateCallback) {
             $this->view->registerJs(<<<JS
+                    
+                $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
+                    return false;
+                });
 
-                    $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
+                $('#{$this->id}').on('ajaxComplete', function (event, jqXHR, textStatus) {
+                    if (jqXHR.status == 403)
+                    {
+                        sx.notify.error(jqXHR.responseJSON.message);
+                    }
+                    if (jqXHR.status == 404)
+                    {
+                        sx.notify.error(jqXHR.responseJSON.message);
+                    }
+                });
+
+                $('#{$this->id}').on('afterValidate', function (event, messages) {
+
+                    if (event.result === false)
+                    {
+                        sx.notify.error('Проверьте заполненные поля в форме');
                         return false;
-                    });
+                    }
 
-                    $('#{$this->id}').on('ajaxComplete', function (event, jqXHR, textStatus) {
-                        if (jqXHR.status == 403)
-                        {
-                            sx.notify.error(jqXHR.responseJSON.message);
-                        }
-                    });
-
-                    $('#{$this->id}').on('afterValidate', function (event, messages) {
-
-                        if (event.result === false)
-                        {
-                            sx.notify.error('Проверьте заполненные поля в форме');
-                            return false;
-                        }
-
-                        var Jform = $(this);
-                        var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
+                    var Jform = $(this);
+                    var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
 
 
-                        var callback = $afterValidateCallback;
+                    var callback = $afterValidateCallback;
 
-                        callback(Jform, ajax);
+                    callback(Jform, ajax);
 
-                        ajax.execute();
+                    ajax.execute();
 
-                        return false;
-                    });
+                    return false;
+                });
 
 JS
             );
@@ -59,33 +63,31 @@ JS
         } else {
             $this->view->registerJs(<<<JS
 
-                    $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
+                $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
+                    return false;
+                });
+
+
+                $('#{$this->id}').on('afterValidate', function (event, messages) {
+
+                    if (event.result === false)
+                    {
+                        sx.notify.error('Проверьте заполненные поля в форме');
                         return false;
+                    }
+
+                    var Jform = $(this);
+                    var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
+
+                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                        'blockerSelector' : '#' + $(this).attr('id'),
+                        'enableBlocker' : true,
                     });
 
+                    ajax.execute();
 
-
-
-                    $('#{$this->id}').on('afterValidate', function (event, messages) {
-
-                        if (event.result === false)
-                        {
-                            sx.notify.error('Проверьте заполненные поля в форме');
-                            return false;
-                        }
-
-                        var Jform = $(this);
-                        var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
-
-                        var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                            'blockerSelector' : '#' + $(this).attr('id'),
-                            'enableBlocker' : true,
-                        });
-
-                        ajax.execute();
-
-                        return false;
-                    });
+                    return false;
+                });
 
 JS
             );
