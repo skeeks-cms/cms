@@ -54,7 +54,7 @@ class GridView extends \yii\grid\GridView
     /**
      * @var array
      */
-    public $config = [];
+    public $configBehavior = [];
     /**
      * @var array результирующий массив конфига колонок
      */
@@ -86,16 +86,20 @@ class GridView extends \yii\grid\GridView
                                         /**
                                          * @var $gridView GridView
                                          */
-                                        $gridView = $e->sender->model->configBehavior->owner;
+                                        //$gridView = $e->sender->model->configBehavior->owner;
                                         /**
                                          * @var $selectField SelectField
                                          */
                                         $selectField = $e->sender;
-                                        $selectField->items = $gridView->getColumnsKeyLabels();
+                                        $selectField->items = ArrayHelper::getValue(
+                                            \Yii::$app->controller->getCallableData(),
+                                            'availableColumns'
+                                        );
                                     },
                                 ],
                             ],
                         ],
+                        'caption',
                         'paginationConfig' => [
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Pagination'),
@@ -105,16 +109,18 @@ class GridView extends \yii\grid\GridView
                     ],
                     'attributeDefines' => [
                         'visibleColumns',
+                        'caption',
                     ],
                     'attributeLabels'  => [
                         'visibleColumns' => 'Отображаемые колонки',
+                        'caption' => 'Заголовок таблицы',
                     ],
                     'rules'            => [
                         ['visibleColumns', 'safe'],
+                        ['caption', 'string'],
                     ],
                 ],
-            ],
-                (array)$this->config),
+            ], (array) $this->configBehavior),
         ]);
     }
 
@@ -353,5 +359,18 @@ class GridView extends \yii\grid\GridView
         }
 
         return $result;
+    }
+
+
+    /**
+     * Данные необходимые для редактирования компонента, при открытии нового окна
+     * @return array
+     */
+    public function getEditData()
+    {
+        return [
+            'callAttributes' => $this->callAttributes,
+            'availableColumns' => $this->getColumnsKeyLabels(),
+        ];
     }
 }
