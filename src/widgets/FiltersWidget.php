@@ -50,7 +50,7 @@ class FiltersWidget extends Widget
     /**
      * @var array
      */
-    public $config = [];
+    public $configBehaviorData = [];
 
     /**
      * @var bool генерировать фильтры автоматически
@@ -102,8 +102,7 @@ class FiltersWidget extends Widget
                         ['visibleFilters', 'safe'],
                     ],
                 ],
-            ],
-                (array)$this->config),
+            ], (array)$this->configBehaviorData),
         ]);
     }
 

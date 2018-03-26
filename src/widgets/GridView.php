@@ -10,8 +10,10 @@ namespace skeeks\cms\widgets;
 
 use skeeks\cms\helpers\PaginationConfig;
 use skeeks\yii2\config\ConfigBehavior;
+use skeeks\yii2\config\ConfigTrait;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -31,6 +33,8 @@ use yii\helpers\Inflector;
  */
 class GridView extends \yii\grid\GridView
 {
+    use ConfigTrait;
+
     /**
      * @var
      */
@@ -52,10 +56,6 @@ class GridView extends \yii\grid\GridView
     public $paginationConfigArray = [];
 
     /**
-     * @var array
-     */
-    public $configBehavior = [];
-    /**
      * @var array результирующий массив конфига колонок
      */
     protected $_preInitColumns = [];
@@ -68,6 +68,11 @@ class GridView extends \yii\grid\GridView
      */
     protected $_autoColumns = [];
 
+    /**
+     * @var array
+     */
+    public $configBehaviorData = [];
+
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
@@ -79,19 +84,25 @@ class GridView extends \yii\grid\GridView
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Main'),
                             'fields' => [
+                                'caption',
                                 'visibleColumns' => [
-                                    'class'           => SelectField::class,
-                                    'multiple'        => true,
+                                    'class'           => WidgetField::class,
+                                    'widgetClass'     => DualSelect::class,
+                                    'widgetConfig'    => [
+                                        'visibleLabel' => \Yii::t('skeeks/cms', 'Display columns'),
+                                        'hiddenLabel' => \Yii::t('skeeks/cms', 'Hidden columns'),
+                                    ],
+                                    //'multiple'        => true,
                                     'on beforeRender' => function ($e) {
                                         /**
                                          * @var $gridView GridView
                                          */
                                         //$gridView = $e->sender->model->configBehavior->owner;
                                         /**
-                                         * @var $selectField SelectField
+                                         * @var $widgetField WidgetField
                                          */
-                                        $selectField = $e->sender;
-                                        $selectField->items = ArrayHelper::getValue(
+                                        $widgetField = $e->sender;
+                                        $widgetField->widgetConfig['items'] = ArrayHelper::getValue(
                                             \Yii::$app->controller->getCallableData(),
                                             'availableColumns'
                                         );
@@ -99,7 +110,6 @@ class GridView extends \yii\grid\GridView
                                 ],
                             ],
                         ],
-                        'caption',
                         'paginationConfig' => [
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Pagination'),
@@ -116,11 +126,12 @@ class GridView extends \yii\grid\GridView
                         'caption' => 'Заголовок таблицы',
                     ],
                     'rules'            => [
+                        ['visibleColumns', 'required'],
                         ['visibleColumns', 'safe'],
                         ['caption', 'string'],
                     ],
                 ],
-            ], (array) $this->configBehavior),
+            ], (array) $this->configBehaviorData),
         ]);
     }
 
@@ -203,9 +214,11 @@ class GridView extends \yii\grid\GridView
 
         //Сбор результирующего конфига колонок
         $this->_preInitColumns();
-
         //Получение настроек из хранилища
+
+
         parent::init();
+
 
         //Применение включенных/выключенных колонок
         $this->applyColumns();

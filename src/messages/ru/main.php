@@ -95,6 +95,9 @@ return
         "City" => "Город",
         "Verification Code" => "Проверочный код",
 
+        "Display columns" => "Отображаемые колонки",
+        "Hidden columns" => "Скрытые колонки",
+
         "Type" => "Тип",
         "File Type" => "Тип файла",
         "File Size" => "Размер файла",

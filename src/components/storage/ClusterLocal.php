@@ -27,12 +27,19 @@ class ClusterLocal extends Cluster
         if (!$this->name) {
             $this->name = \Yii::t('skeeks/cms', "Local storage");
         }
+
         if (!$this->publicBaseUrl) {
             $this->publicBaseUrl = \Yii::getAlias("@web/uploads/all");
+        } else {
+            $this->publicBaseUrl = \Yii::getAlias($this->publicBaseUrl);
         }
+
         if (!$this->rootBasePath) {
             $this->rootBasePath = \Yii::getAlias("@frontend/web/uploads/all");
+        } else {
+            $this->rootBasePath = \Yii::getAlias($this->rootBasePath);
         }
+        
         parent::init();
     }
 

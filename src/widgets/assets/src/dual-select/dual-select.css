@@ -1,0 +1,59 @@
+.sx-dual-select-separator {
+    font-size: 3em;
+    color: #999;
+    margin-top: 50px;
+}
+
+
+.sx-sortable-list {
+    -moz-user-select:none;
+    padding:0;
+    border-radius:4px;
+    border:1px solid #ddd;
+    background-color: #fff;
+    max-height: 400px;
+    overflow: auto;
+    min-height: 400px;
+}
+
+
+.sx-sortable-list li{
+    border:1px solid #ddd;
+    list-style:none outside none;
+    margin:4px;
+    padding:8px;
+    cursor:normal
+}
+.cursor-move li{
+    cursor:move
+}
+.sx-sortable-list li.disabled{
+    cursor:not-allowed
+}
+.sx-sortable-list li:focus,.sx-sortable-list li:hover{
+    background-color:#eee
+}
+.sx-sortable-list.grid{
+    overflow:hidden
+}
+.sx-sortable-list.grid li{
+    float:left;
+    min-width:80px;
+    min-height:80px;
+    text-align:center
+}
+.sx-sortable-list .handle{
+    cursor:move
+}
+.sx-sortable-list.connected{
+    min-height:100px;
+    min-width:200px
+}
+.sx-sortable-list li.disabled{
+    opacity:.5
+}
+.sx-sortable-list li.sx-sortable-list-placeholder {
+    background:none repeat scroll 0 0 rgba(0,0,0,0);
+    border:1px dashed #CCC;
+    padding:16px
+}
