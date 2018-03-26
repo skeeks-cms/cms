@@ -3,6 +3,7 @@ CHANGELOG
 
 5.1.0.pre
 ----------------
+ * Fixed create new dir
  * ClusterLocal update set publicBaseUrl and rootBasePath
  * Removed skeeks\cms\Exception
  * Widget and component settings to use skeeks/yii2-form

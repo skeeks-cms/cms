@@ -13,6 +13,8 @@ namespace skeeks\cms\components\imaging;
 
 use Faker\Provider\File;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 
 /**
  * Class Filter
@@ -109,7 +111,7 @@ abstract class Filter extends Component
     {
         $newFile = new \skeeks\sx\File($this->_newRootFilePath);
 
-        if (!$newFile->getDir()->make()) {
+        if (!FileHelper::createDirectory($newFile->getDir()->getPath())) {
             throw new \ErrorException("Не удалось создать диррикторию для нового файла");
         }
 
