@@ -26,7 +26,7 @@
             this.jHidden.sortable({
                 //items: "li:not(.ui-state-disabled)"
                 connectWith: "." + this.get('id') + "-conncected",
-                dropOnEmpty: false,
+                /*dropOnEmpty: false,*/
                 out: function() {
                     self._update();
                 }
@@ -35,11 +35,14 @@
             this.jVisible.sortable({
                 /*cancel: ".ui-state-disabled",*/
                 connectWith: "." + this.get('id') + "-conncected",
-                dropOnEmpty: false,
+                /*dropOnEmpty: false,*/
                 out: function() {
                     self._update();
                 }
             });
+
+            this.jVisible.disableSelection();
+            this.jHidden.disableSelection();
         },
 
         _update: function () {

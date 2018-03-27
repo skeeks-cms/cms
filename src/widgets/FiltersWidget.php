@@ -11,9 +11,11 @@ namespace skeeks\cms\widgets;
 use skeeks\cms\helpers\PaginationConfig;
 use skeeks\cms\IHasModel;
 use skeeks\yii2\config\ConfigBehavior;
+use skeeks\yii2\config\ConfigTrait;
 use skeeks\yii2\config\DynamicConfigModel;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Model;
 use yii\base\Widget;
 use yii\data\ActiveDataProvider;
@@ -32,10 +34,12 @@ use yii\widgets\ActiveForm;
  */
 class FiltersWidget extends Widget
 {
+    use ConfigTrait;
+
     /**
      * @var string
      */
-    public $viewFile = 'filters';
+    public $viewFile = '@skeeks/cms/widgets/views/filters';
 
     /**
      * @var ActiveDataProvider
@@ -65,8 +69,13 @@ class FiltersWidget extends Widget
     /**
      * @var array
      */
+    public $wrapperOptions = [];
+
+    /**
+     * @var array
+     */
     public $activeForm = [
-        'class' => ActiveForm::class
+        //'class' => ActiveForm::class
     ];
 
     public function behaviors()
@@ -77,18 +86,18 @@ class FiltersWidget extends Widget
                 'configModel' => [
                     'fields'           => [
                         'visibleFilters' => [
-                            'class'           => SelectField::class,
-                            'multiple'        => true,
+                            'class'           => WidgetField::class,
+                            'widgetClass'     => DualSelect::class,
+                            'widgetConfig'    => [
+                                'visibleLabel' => \Yii::t('skeeks/cms', 'Display columns'),
+                                'hiddenLabel' => \Yii::t('skeeks/cms', 'Hidden columns'),
+                            ],
                             'on beforeRender' => function ($e) {
-                                /**
-                                 * @var $gridView FiltersWidget
-                                 */
-                                $gridView = $e->sender->model->configBehavior->owner;
-                                /**
-                                 * @var $selectField SelectField
-                                 */
-                                $selectField = $e->sender;
-                                $selectField->items = $gridView->getColumnsKeyLabels();
+                                $widgetField = $e->sender;
+                                $widgetField->widgetConfig['items'] = ArrayHelper::getValue(
+                                    \Yii::$app->controller->getCallableData(),
+                                    'availableColumns'
+                                );
                             },
                         ],
                     ],
@@ -148,6 +157,8 @@ class FiltersWidget extends Widget
 
     public function run()
     {
+        $this->wrapperOptions['id'] = $this->id;
+
         return $this->render($this->viewFile);
     }
 
@@ -188,6 +199,10 @@ class FiltersWidget extends Widget
     {
         //Если автоопределение колонок не включено
         if (!$this->isEnabledAutoFilters) {
+            return $this;
+        }
+
+        if (!$this->dataProvider) {
             return $this;
         }
 
@@ -248,4 +263,15 @@ class FiltersWidget extends Widget
     }
 
 
+    /**
+     * Данные необходимые для редактирования компонента, при открытии нового окна
+     * @return array
+     */
+    public function getEditData()
+    {
+        return [
+            'callAttributes' => $this->callAttributes,
+            'availableColumns' => $this->filtersModel->attributeLabels(),
+        ];
+    }
 }
