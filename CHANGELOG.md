@@ -3,6 +3,7 @@ CHANGELOG
 
 5.1.0.pre
 ----------------
+ * IHasInfo is deprecated
  * Fixed create new dir
  * ClusterLocal update set publicBaseUrl and rootBasePath
  * Removed skeeks\cms\Exception
