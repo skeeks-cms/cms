@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
+use skeeks\cms\backend\widgets\ModalPermissionWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
@@ -127,12 +128,15 @@ class PropertyTypeList extends PropertyType
                 if ($actionIndex) {
                     $pjax = \yii\widgets\Pjax::begin();
 
+                    echo "<div class='row'><div class='col-md-6'> ";
+
                     if ($actionCreate) {
                         $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
                             'property_id' => $this->property->id
                         ]);
 
-                        echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+
+                        echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
                             'actions' => ['create' => $actionCreate],
                             'clientOptions' => ['pjax-id' => $pjax->id],
                             'isOpenNewWindow' => true,
@@ -142,7 +146,19 @@ class PropertyTypeList extends PropertyType
                             'itemOptions' => ['class' => 'btn btn-default'],
                             'options' => ['class' => 'sx-controll-actions'],
                         ]);
+
                     }
+
+                    echo '</div><div class="col-md-6"><div class="pull-right">';
+                    if (\Yii::$app->user->can('rbac/admin-permission') && $controllerProperty instanceof \skeeks\cms\IHasPermissions)
+                    {
+                        echo ModalPermissionWidget::widget([
+                            'controller' => $controllerProperty
+                        ]);
+                    }
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
 
                     $query = \skeeks\cms\models\CmsContentPropertyEnum::find()->orderBy(['priority' => SORT_ASC]);
                     $query->andWhere(['property_id' => $this->property->id]);
