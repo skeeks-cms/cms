@@ -17,6 +17,7 @@ CHANGELOG
 
 5.0.4
 ----------------
+ * Fixed create admin tree type
  * Change children elements logic
  * Cms user default username limit(1)
  * Fixed admin select tree
