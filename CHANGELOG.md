@@ -3,6 +3,9 @@ CHANGELOG
 
 5.0.4
 ----------------
+ * New cms option isRedirrectNotFoundHttpException 
+    * true - 404 -> 302 redirrect on main site page
+    * false - 404 -> render template
  * Fixed create admin tree type
  * Change children elements logic
  * Cms user default username limit(1)

@@ -126,6 +126,12 @@ class Cms extends \skeeks\cms\base\Component
     public $element_max_code_length = 128;
 
     /**
+     * Do redirects to the home page of the site in the case of 404 errors?
+     * @var bool
+     */
+    public $isRedirrectNotFoundHttpException = true;
+
+    /**
      * Схема временных папок
      * Чистятся в момент нажатия на кнопку чистки временных файлов
      *
