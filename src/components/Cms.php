@@ -109,7 +109,7 @@ class Cms extends \skeeks\cms\base\Component
      * Do redirects to the home page of the site in the case of 404 errors?
      * @var bool
      */
-    public $isRedirrectNotFoundHttpException = true;
+    public $isRedirectNotFoundHttpException = true;
 
     /**
      * Схема временных папок

@@ -37,8 +37,9 @@ class ErrorAction extends \yii\web\ErrorAction
             return '';
         }
 
-        if (\Yii::$app->cms->isRedirrectNotFoundHttpException && $exception instanceof NotFoundHttpException) {
+        if (\Yii::$app->cms->isRedirectNotFoundHttpException && $exception instanceof NotFoundHttpException) {
             \Yii::$app->response->redirect(Url::home());
+            \Yii::$app->response->getHeaders()->setDefault('X-CMS-REDIRECT', "isRedirectNotFoundHttpException=true");
             \Yii::$app->end();
             return;
         }
