@@ -3,7 +3,7 @@ CHANGELOG
 
 5.0.4
 ----------------
- * New cms option isRedirrectNotFoundHttpException 
+ * New cms option isRedirectNotFoundHttpException 
     * true - 404 -> 302 redirrect on main site page
     * false - 404 -> render template
  * Fixed create admin tree type
