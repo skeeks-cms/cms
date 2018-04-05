@@ -16,6 +16,8 @@ use Yii;
 use yii\base\Exception;
 use yii\base\UserException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -33,6 +35,12 @@ class ErrorAction extends \yii\web\ErrorAction
     {
         if (($exception = Yii::$app->getErrorHandler()->exception) === null) {
             return '';
+        }
+
+        if (\Yii::$app->cms->isRedirrectNotFoundHttpException && $exception instanceof NotFoundHttpException) {
+            \Yii::$app->response->redirect(Url::home());
+            \Yii::$app->end();
+            return;
         }
 
         if ($exception instanceof \HttpException) {
