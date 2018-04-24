@@ -110,12 +110,12 @@ class GridView extends \yii\grid\GridView
                                 ],
                             ],
                         ],
-                        'paginationConfig' => [
+                        /*'paginationConfig' => [
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Pagination'),
                             'fields' => $this->paginationConfig->builderFields(),
                             'model'  => $this->paginationConfig,
-                        ],
+                        ],*/
                     ],
                     'attributeDefines' => [
                         'visibleColumns',

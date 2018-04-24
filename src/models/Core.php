@@ -124,7 +124,10 @@ abstract class Core extends ActiveRecord
     public function __toString() {
         return $this->asText();
     }
-    
+
+    /**
+     * @return string
+     */
     public function asText()
     {
         $result = [];
@@ -138,7 +141,10 @@ abstract class Core extends ActiveRecord
 
         return implode("#", $result);
     }
-    
+
+    /**
+     * @return string
+     */
     public function asHtml()
     {
         return $this->asText();
