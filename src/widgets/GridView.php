@@ -18,8 +18,10 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
+use yii\db\ActiveQuery;
 use yii\db\ActiveQueryInterface;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\Inflector;
 
 /**
@@ -114,12 +116,13 @@ class GridView extends \yii\grid\GridView
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Pagination'),
                             'fields' => $this->paginationConfig->builderFields(),
-                            'model'  => $this->paginationConfig,
+                            /*'model'  => $this->paginationConfig,
                         ],*/
                     ],
                     'attributeDefines' => [
                         'visibleColumns',
                         'caption',
+                        'paginationConfig',
                     ],
                     'attributeLabels'  => [
                         'visibleColumns' => 'Отображаемые колонки',
@@ -128,6 +131,7 @@ class GridView extends \yii\grid\GridView
                     'rules'            => [
                         ['visibleColumns', 'required'],
                         ['visibleColumns', 'safe'],
+                        ['paginationConfig', 'safe'],
                         ['caption', 'string'],
                     ],
                 ],
@@ -216,14 +220,20 @@ class GridView extends \yii\grid\GridView
         $this->_preInitColumns();
         //Получение настроек из хранилища
 
-
         parent::init();
-
 
         //Применение включенных/выключенных колонок
         $this->applyColumns();
 
         $this->paginationConfig->initDataProvider($this->dataProvider);
+
+        //Если удалили колонки
+        foreach ($this->columns as $key => $column)
+        {
+            if (!is_object($column)) {
+                unset($this->columns[$key]);
+            }
+        }
     }
     /**
      * @return ActiveDataProvider
@@ -258,21 +268,58 @@ class GridView extends \yii\grid\GridView
         $dataProvider = clone $this->dataProvider;
         $models = $dataProvider->getModels();
 
+        /**
+         * @var $model ActiveQuery
+         */
         $model = reset($models);
         if (is_array($model) || is_object($model)) {
             foreach ($model as $name => $value) {
                 if ($value === null || is_scalar($value) || is_callable([$value, '__toString'])) {
-                    $this->_autoColumns[(string)$name] = [
-                        'attribute' => $name,
-                        'format'    => 'raw',
-                        'value'     => function ($model, $key, $index) use ($name) {
-                            if (is_array($model->{$name})) {
-                                return implode(",", $model->{$name});
-                            } else {
-                                return $model->{$name};
-                            }
-                        },
-                    ];
+
+                    $key = $name;
+                    if (!empty($key) && strcasecmp($key, 'id')) {
+                        if (substr_compare($key, 'id', -2, 2, true) === 0) {
+                            $key = rtrim(substr($key, 0, -2), '_');
+                        } elseif (substr_compare($key, 'id', 0, 2, true) === 0) {
+                            $key = ltrim(substr($key, 2, strlen($key)), '_');
+                        }
+                    }
+
+                    $keyMany = Inflector::pluralize($key);
+
+                    $keyName = lcfirst(Inflector::id2camel($key, '_'));
+                    $keyManyName = lcfirst(Inflector::id2camel($keyMany, '_'));
+
+                    if ($model->hasProperty($keyName)) {
+                        $this->_autoColumns[(string)$name] = [
+                            'attribute' => $name,
+                            'format'    => 'raw',
+                            'value'     => function ($model, $key, $index) use ($name, $keyName) {
+                                return $model->{$keyName};
+                            },
+                        ];
+                    } else if ($model->hasProperty(lcfirst($keyManyName))) {
+                        $this->_autoColumns[(string)$name] = [
+                            'attribute' => $name,
+                            'format'    => 'raw',
+                            'value'     => function ($model, $key, $index) use ($name, $keyManyName) {
+                                return count($model->{$keyManyName});
+                            },
+                        ];
+                    } else {
+                        $this->_autoColumns[(string)$name] = [
+                            'attribute' => $name,
+                            'format'    => 'raw',
+                            'value'     => function ($model, $key, $index) use ($name) {
+                                if (is_array($model->{$name})) {
+                                    return implode(",", $model->{$name});
+                                } else {
+                                    return $model->{$name};
+                                }
+                            },
+                        ];
+                    }
+
                 }
             }
         }
