@@ -149,4 +149,16 @@ abstract class Core extends ActiveRecord
     {
         return $this->asText();
     }
+
+    /**
+     * @var array
+     */
+    public $raw_row = [];
+
+    /** @inheritdoc */
+    public static function populateRecord($record, $row) {
+        /** @var static $record */
+        $record->raw_row = $row;
+        return parent::populateRecord($record, $row);
+    }
 }
