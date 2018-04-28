@@ -42,9 +42,11 @@ JS
     <div class="col-sm-4 col-sm-offset-1">
         <?= $widget->renderHtml($widget->hiddenLabel); ?>
         <ul class="sx-sortable-hidden sx-sortable-list cursor-move <?= $widget->id; ?>-conncected">
-            <? foreach ($hidden as $value => $label) : ?>
-                <?= $widget->renderItem($value, $label); ?>
-            <? endforeach; ?>
+            <? if ($hidden): ?>
+                <? foreach ($hidden as $value => $label) : ?>
+                    <?= $widget->renderItem($value, $label); ?>
+                <? endforeach; ?>
+            <? endif; ?>
         </ul>
     </div>
     <div class="col-sm-2 text-center">

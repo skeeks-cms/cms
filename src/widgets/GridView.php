@@ -243,9 +243,11 @@ class GridView extends \yii\grid\GridView
         $modelClassName = $this->modelClassName;
 
         if ($modelClassName) {
+
             return new ActiveDataProvider([
                 'query' => $modelClassName::find(),
             ]);
+
         } else {
             return new ArrayDataProvider([
                 'allModels' => [],
