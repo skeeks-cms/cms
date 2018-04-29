@@ -128,6 +128,22 @@ abstract class Core extends ActiveRecord
     /**
      * @return string
      */
+    public function getAsText()
+    {
+        return $this->asText();
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsHtml()
+    {
+        return $this->asHtml();
+    }
+
+    /**
+     * @return string
+     */
     public function asText()
     {
         $result = [];
