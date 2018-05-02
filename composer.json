@@ -49,6 +49,7 @@
         "skeeks/yii2-ya-slug": "~1.0.0",
         "skeeks/yii2-form": "dev-master@dev",
         "skeeks/yii2-config": "dev-master@dev",
+        "skeeks/yii2-jquery-contextmenu": "dev-master@dev",
         "skeeks/cms-user-personal-area": "dev-master@dev",
         "kartik-v/yii2-datecontrol": "~1.9.6",
         "kartik-v/yii2-widget-datepicker": "~1.4.3",
