@@ -72,6 +72,7 @@ Directories
 - `@npm` - vendor directory that contains `npm packages <https://www.npmjs.org/>`_.
 - `@web` - base URL of currently running web application.
 - `@webroot` - web root directory of currently running web application.
+- `@root` - корневая директория проекта
 
 Алиасы специфичные для ваших проектов, можно прописать в общем конфиге проекта, следующим образом:
 
@@ -206,6 +207,9 @@ Directories
 
     composer du --verbose
 
+.. attention::
+
+    Не забывайте обновлять файл конфигураций во время разработки!
 
 Автоматическая конфигурация приложения + автообновление конфигураций
 --------------------------------------------------------------------
