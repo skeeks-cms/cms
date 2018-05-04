@@ -84,6 +84,15 @@
             "console": [
                 "src/config/common.php",
                 "src/config/console.php"
+            ],
+
+            "skeeks-cms-web": [
+                "src/config/common.php",
+                "src/config/web.php"
+            ],
+            "skeeks-cms-console": [
+                "src/config/common.php",
+                "src/config/console.php"
             ]
         }
     }
