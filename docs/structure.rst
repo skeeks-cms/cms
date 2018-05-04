@@ -238,12 +238,14 @@ Directories
 Варианты определения константы ENV
 ----------------------------------
 
-Определение через .htaccess
+Определение через .htaccess ``/frontend/web/index.php``:
 
 
 .. code-block:: bash
 
     SetEnv ENV dev
+
+``/frontend/web/index.php``:
 
 .. code-block:: php
 
@@ -256,7 +258,7 @@ Directories
     require(ROOT_DIR . '/vendor/skeeks/cms/app-web.php');
 
 
-Определение окружения для определенного ip адреса
+Определение окружения для определенного ip адреса ``/frontend/web/index.php``:
 
 .. code-block:: php
 
@@ -268,3 +270,6 @@ Directories
     define("ROOT_DIR", dirname(dirname(__DIR__)));
     require(ROOT_DIR . '/vendor/skeeks/cms/app-web.php');
 
+
+Таким образом любой разработчик имеет возможность иметь собственную конфигурацию, а проект единую кодовую базу.
+Так же любое установленное расширение, которое предоставляет конфигурацию по текущим правилам, сразу приносит настройку в проект.
