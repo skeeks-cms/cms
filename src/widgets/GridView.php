@@ -359,11 +359,29 @@ class GridView extends \yii\grid\GridView
             }
         }
 
+        $columnsTmp = (array)$columns;
         $columns = ArrayHelper::merge((array)$autoColumns, (array)$columns);
 
         foreach ($columns as $key => $config) {
             $config['visible'] = true;
             $columns[$key] = $config;
+        }
+
+        $resultColumns = [];
+
+        if ($columnsTmp) {
+            foreach ($columnsTmp as $key => $column)
+            {
+                if (isset($columns[$key])) {
+                    $resultColumns[$key] = $columns[$key];
+                    unset($columns[$key]);
+                }
+            }
+        }
+
+        if ($resultColumns) {
+            $resultColumns = ArrayHelper::merge((array) $resultColumns, (array) $columns);
+            $columns = $resultColumns;
         }
 
         $this->_preInitColumns = $columns;
