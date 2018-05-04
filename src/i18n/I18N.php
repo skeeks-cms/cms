@@ -21,11 +21,11 @@ class I18N extends \yii\i18n\I18N
      */
     public function init()
     {
-        if (!isset($this->translations['*'])) {
+        /*if (!isset($this->translations['*'])) {
             $this->translations['*'] = [
                 'class' => 'yii\i18n\PhpMessageSource'
             ];
-        }
+        }*/
 
         parent::init();
     }
