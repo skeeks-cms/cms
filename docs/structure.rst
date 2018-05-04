@@ -245,6 +245,9 @@ Directories
 Варианты определения константы ENV
 ----------------------------------
 
+.htaccess
+~~~~~~~~~
+
 Определение через .htaccess ``/frontend/web/index.php``:
 
 
@@ -264,6 +267,9 @@ Directories
     define("ROOT_DIR", dirname(dirname(__DIR__)));
     require(ROOT_DIR . '/vendor/skeeks/cms/app-web.php');
 
+
+ip адрес
+~~~~~~~~
 
 Определение окружения для определенного ip адреса ``/frontend/web/index.php``:
 
