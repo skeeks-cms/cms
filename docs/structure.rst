@@ -5,6 +5,8 @@ Structure
 Directories
 -----------
 
+Стандартная структура проекта выглядит следующим образом (корневая директория проекта):
+
 .. code-block:: bash
 
         common              содержит общие файлы всех приложений
@@ -30,27 +32,39 @@ Directories
             web/                 публичная директория (файлы js, css, img...)
                 assets/          временные js, css, файлы
             widgets/             классы виджетов приложения
+
         frontend2           приложение 2
         //    ... полностью повторяет структуру предыдущего приложения...
+        frontend3           приложение 3
+        //    ... полностью повторяет структуру предыдущего приложения...
+
         vendor/                  используемые дополнительные библиотеки в проекте
         tests                    contains various tests for the advanced application
             codeception/         contains tests developed with Codeception PHP Testing Framework
 
 
-The root directory contains the following subdirectories:
+Стандартный проект содержит следющие папки в корневой директории проекта:
 
-- **common** - files common to all applications.
-- **console** - console application.
-- **frontend** - frontend web application.
+- **common** - файлы общие для всех приложений.
+- **console** - консольное приложение.
+- **frontend** - frontend приложение.
 
-Predefined path aliases
------------------------
 
-- `@yii` - framework directory.
-- `@app` - base path of currently running application.
-- `@common` - common directory.
-- `@frontend` - frontend web application directory.
-- `@console` - console directory.
+Глобальные константы
+--------------------
+* ``ROOT_DIR`` — путь до корневой директории проекта
+* ``ENV`` — названия окружения (от окружения будет зависеть, то какие настройки будут подключены)
+
+Предопределенные псевдонимы путей
+---------------------------------
+
+Подробнее про псевдонимы `https://www.yiiframework.com/doc/guide/2.0/en/concept-aliases<https://www.yiiframework.com/doc/guide/2.0/en/concept-aliases>`_
+
+- `@yii` - фремворк директория.
+- `@app` - базовый путь текущего запущеного приложения.
+- `@common` - файлы общие для всех приложений.
+- `@frontend` - frontend приложение.
+- `@console` - console приложение.
 - `@runtime` - runtime directory of currently running web application.
 - `@vendor` - Composer vendor directory.
 - `@bower` - vendor directory that contains the `bower packages <http://bower.io/>`_.
@@ -58,48 +72,98 @@ Predefined path aliases
 - `@web` - base URL of currently running web application.
 - `@webroot` - web root directory of currently running web application.
 
-The aliases specific to the directory structure of the advanced application
-(`@common`,  `@frontend` and `@console`) are defined in `common/config/bootstrap.php`.
+Алиасы специфичные для ваших проектов, можно прописать в общем конфиге проекта, следующим образом:
+
+.. code-block:: php
+
+    'aliases'    => [
+        'frontend2'     => '@root/frontend2',
+        'frontend3'     => '@root/frontend3',
+    ],
 
 
-Applications
-------------
-There are two applications in advanced template: frontend and console. Frontend is typically what is presented to end user, the project itself. Console is typically used for cron jobs and low-level server management. Also it's used during application deployment and handles migrations and assets.
+Приложения
+----------
+По умолчанию в проекте есть два приложения: frontend и console. Frontend обычно представляет то, что представлено конечному пользователю, собственно сам сайт.
 
-There's also a common directory that contains files used by more than one application. For example, User model.
+Консоль обычно используется для заданий cron и управления серверами низкого уровня. Также он используется во время развертывания приложений и обрабатывает миграции и т.д.
 
-Frontend and backend are both web applications and both contain the web directory. That's the webroot you should point your web server to.
+Существует также общий каталог, содержащий файлы, используемые более чем одним приложением. Например, модель пользователя.
 
-Each application has its own namespace and alias corresponding to its name. Same applies to the common directory.
+Каждое приложение имеет собственное пространство имен и псевдоним, соответствующий его имени. То же самое относится к общему каталогу.
 
 
-Configuration and environments
-------------------------------
-There are multiple problems with a typical approach to configuration:
 
-* Each team member has its own configuration options. Committing such config will affect other team members.
-* Production database password and API keys should not end up in the repository.
-* There are multiple server environments: development, testing, production. Each should have its own configuration.
-* Defining all configuration options for each case is very repetitive and takes too much time to maintain.
+Простейшая конфигурация приложения
+----------------------------------
 
-In order to solve these issues Yii introduces a simple environments concept. Each environment is represented by a set of files under the environments directory.
+В файле `/frontend/web/index.php` определяется путь слияния кофигурационных файлов проекта.
 
-By default there are two environments: dev and prod. First is for development. It has all the developer tools and debug turned on. Second is for server deployments. It has debug and developer tools turned off.
+В простейшем виде можно сконфигурировать приложение стандартным способом, вот так может выглядить файл `/frontend/web/index.php`:
 
-In order to avoid duplication configurations are overriding each other. For example, the frontend reads configuration in the following order:
 
-* ``@skeeks/cms/config/main.php``
-* Все компонент подключенные компоненты yii2 у которых есть ``config/main.php``
-* ``common/config/main.php``
-* ``common/config/env/{your-env}/main.php``
-* ``frontend/config/main.php``
-* ``frontend/config/env/{your-env}/main.php``
+.. code-block:: php
 
-Parameters are read in the following order:
+    define("ENV", 'prod');
+    define("ROOT_DIR", dirname(dirname(__DIR__)));
 
-* ``common/config/params.php``
-* ``common/config/env/{your-env}/params.php``
-* ``frontend/config/params.php``
-* ``frontend/config/env/{your-env}/params.php``
+    require_once(ROOT_DIR . '/vendor/skeeks/cms/bootstrap.php');
 
-The later config file overrides the former.
+    $config = \yii\helpers\ArrayHelper::merge([]
+        , require(__DIR__ . '/../../common/config/main.php')
+        , require(__DIR__ . '/../../frontend/config/main.php')
+    );
+
+    $application = new \yii\web\Application($config);
+    $application->run();
+
+В этом случае, как и в любом yii2 проекте, необходимо полность сконфигурировать приложение самостоятельно.
+
+
+Автоматическая конфигурация приложения
+--------------------------------------
+
+Слиянием файлов конфигураций занимается специальный composer-plugin `cms-composer <https://github.com/skeeks-cms/cms-composer>`_. Подробнее можно прочитать тут: `https://habr.com/post/329286/ <https://habr.com/post/329286/>`_
+
+Идея в том, что любое расширение yii2 (модуль, компонент, пакет), может пердоставить собственные настройки, которые автоматически подключатся к проекту.
+
+Слиянием файлов конфигураций занимается `composer` по команде или после обновления зависимостей.
+
+Пути слияния прописываются в `composer.json` проекта, по умолчанию следующим образом:
+
+
+.. code-block:: json
+
+    {
+        "extra": {
+            "config-plugin": {
+                "web": [
+                    "common/config/main.php",
+                    "common/config/db.php",
+                    "frontend/config/main.php"
+                ],
+                "web-dev": [
+                    "$web",
+                    "?frontend/config/env/dev/main.php"
+                ],
+                "web-prod": [
+                    "$web",
+                    "?frontend/config/env/prod/main.php"
+                ],
+                "console": [
+                    "common/config/main.php",
+                    "common/config/db.php",
+                    "console/config/main.php"
+                ],
+                "console-dev": [
+                    "$console",
+                    "?console/config/env/dev/main.php"
+                ],
+                "console-prod": [
+                    "$console",
+                    "?console/config/env/prod/main.php"
+                ]
+            }
+        }
+    }
+
