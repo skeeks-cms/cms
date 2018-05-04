@@ -101,7 +101,6 @@ Directories
 
 В простейшем виде можно сконфигурировать приложение стандартным способом, вот так может выглядить файл `/frontend/web/index.php`:
 
-
 .. code-block:: php
 
     define("ENV", 'prod');
@@ -167,3 +166,41 @@ Directories
         }
     }
 
+
+А файл `/frontend/web/index.php`:
+
+.. code-block:: php
+
+    define("ENV", 'prod');
+    define("ROOT_DIR", dirname(dirname(__DIR__)));
+
+    require(ROOT_DIR . '/vendor/skeeks/cms/app-web.php');
+
+Или так `/frontend/web/index.php`:
+
+.. code-block:: php
+
+    define("ENV", 'prod');
+    define("ROOT_DIR", dirname(dirname(__DIR__)));
+
+    //Стандартная загрузка yii2 + всего необходимого для skeeks cms
+    require(ROOT_DIR . '/vendor/skeeks/cms/bootstrap.php');
+
+    //Если включен dev режим работы с сайтом, то сляния настроек будет происходить при выполнении каждого сценария
+    if (YII_ENV == 'dev') {
+        \Yii::beginProfile('Rebuild config');
+        error_reporting(E_ALL);
+        ini_set('display_errors', 'On');
+        \skeeks\cms\composer\config\Builder::rebuild();
+        \Yii::endProfile('Rebuild config');
+    }
+
+    //Подключение стандартного слитого файла конфигураций для текущего окружения
+    $configFile = \skeeks\cms\composer\config\Builder::path('web-' . ENV);
+    if (!file_exists($configFile)) {
+        $configFile = \skeeks\cms\composer\config\Builder::path('web');
+    }
+    $config = (array)require $configFile;
+
+    $application = new yii\web\Application($config);
+    $application->run();
