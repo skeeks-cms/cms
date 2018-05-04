@@ -58,7 +58,7 @@ Directories
 Предопределенные псевдонимы путей
 ---------------------------------
 
-Подробнее про псевдонимы `https://www.yiiframework.com/doc/guide/2.0/en/concept-aliases<https://www.yiiframework.com/doc/guide/2.0/en/concept-aliases>`_
+Подробнее про псевдонимы `https://www.yiiframework.com/doc/guide/2.0/en/concept-aliases <https://www.yiiframework.com/doc/guide/2.0/en/concept-aliases>`_
 
 - `@yii` - фремворк директория.
 - `@app` - базовый путь текущего запущеного приложения.
@@ -97,9 +97,9 @@ Directories
 Простейшая конфигурация приложения
 ----------------------------------
 
-В файле `/frontend/web/index.php` определяется путь слияния кофигурационных файлов проекта.
+В файле ``/frontend/web/index.php`` определяется путь слияния кофигурационных файлов проекта.
 
-В простейшем виде можно сконфигурировать приложение стандартным способом, вот так может выглядить файл `/frontend/web/index.php`:
+В простейшем виде можно сконфигурировать приложение стандартным способом, вот так может выглядить файл ``/frontend/web/index.php``:
 
 .. code-block:: php
 
@@ -136,6 +136,7 @@ Directories
     {
         "extra": {
             "config-plugin": {
+                //Каждый из установленных расширений в проекте, уже предоставил конфиги для соответсвующих секций
                 "web": [
                     "common/config/main.php",
                     "common/config/db.php",
@@ -167,7 +168,8 @@ Directories
     }
 
 
-А файл `/frontend/web/index.php`:
+
+А файл ``/frontend/web/index.php``:
 
 .. code-block:: php
 
@@ -176,18 +178,45 @@ Directories
 
     require(ROOT_DIR . '/vendor/skeeks/cms/app-web.php');
 
-Или так `/frontend/web/index.php`:
+
+В приведенной конфигурации проекта, если определить константу ``ENV`` как ``prod``
+
+То в web приложении результирующая конфигурация будет состоять из:
+
+.. code-block:: json
+
+    "web-prod": [
+        "$web", //сюда попадут все конфиги расширений + "common/config/main.php" + "common/config/db.php" + "frontend/config/main.php"
+        "?frontend/config/env/prod/main.php"
+    ],
+
+
+Для того чтобы перекомпилировать конфигурацию приложения, необходимо выполнить команду:
+
+.. code-block:: bash
+
+    composer du
+
+Для того чтобы посмотреть пути наследования конфигураций:
+
+.. code-block:: bash
+
+    composer du --verbose
+
+
+Автоматическая конфигурация приложения + автообновление конфигураций
+--------------------------------------------------------------------
 
 .. code-block:: php
 
-    define("ENV", 'prod');
+    define("ENV", 'dev');
     define("ROOT_DIR", dirname(dirname(__DIR__)));
 
     //Стандартная загрузка yii2 + всего необходимого для skeeks cms
     require(ROOT_DIR . '/vendor/skeeks/cms/bootstrap.php');
 
     //Если включен dev режим работы с сайтом, то сляния настроек будет происходить при выполнении каждого сценария
-    if (YII_ENV == 'dev') {
+    if (ENV == 'dev') {
         \Yii::beginProfile('Rebuild config');
         error_reporting(E_ALL);
         ini_set('display_errors', 'On');
@@ -204,3 +233,38 @@ Directories
 
     $application = new yii\web\Application($config);
     $application->run();
+
+
+Варианты определения константы ENV
+----------------------------------
+
+Определение через .htaccess
+
+
+.. code-block:: bash
+
+    SetEnv ENV dev
+
+.. code-block:: php
+
+    $env = getenv('ENV');
+    if (!empty($env)) {
+        defined('ENV') or define('ENV', $env);
+    }
+
+    define("ROOT_DIR", dirname(dirname(__DIR__)));
+    require(ROOT_DIR . '/vendor/skeeks/cms/app-web.php');
+
+
+Определение окружения для определенного ip адреса
+
+.. code-block:: php
+
+    $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "";
+    if (in_array($ip, ['31.148.139...'])) {
+        defined('ENV') or define('ENV', 'dev');
+    }
+
+    define("ROOT_DIR", dirname(dirname(__DIR__)));
+    require(ROOT_DIR . '/vendor/skeeks/cms/app-web.php');
+
