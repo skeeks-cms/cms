@@ -7,11 +7,9 @@ Requirements
 
 Software
 ~~~~~~~~
-* apache
-* mod_rewrite apache module
-* php >= 5.5
+* apache (mod_rewrite) or php-fpm
+* php >= 7.0
 * DB mysql ~ 5.5
-* SSH access
 
 Php modules
 ~~~~~~~~~~~
@@ -32,6 +30,14 @@ Php modules
 Php settings
 ~~~~~~~~~~~~
 * short_open_tag on
+
+.. attention::
+
+    Важно не забудьте проверить эту настройку!
+
+Прочее
+~~~~~~
+* SSH доступ
 
 .. _installation:
 
