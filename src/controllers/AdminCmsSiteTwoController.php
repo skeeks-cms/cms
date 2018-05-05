@@ -10,9 +10,14 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\components\Cms;
+use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
+use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
+use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -37,32 +42,95 @@ class AdminCmsSiteTwoController extends BackendModelStandartController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                "def-multi" =>
-                    [
-                        'class'        => AdminMultiModelEditAction::className(),
-                        "name"         => "По умолчанию",
-                        //"icon"              => "glyphicon glyphicon-trash",
-                        "eachCallback" => [$this, 'eachMultiDef'],
-                        "priority"     => 0,
+        $bool = [
+            'isAllowChangeMode' => false,
+            'field'             => [
+                'class' => SelectField::class,
+                'items' => [
+                    'Y' => \Yii::t('yii', 'Yes'),
+                    'N' => \Yii::t('yii', 'No'),
+                ],
+            ],
+        ];
+        return ArrayHelper::merge(parent::actions(), [
+
+                'index' => [
+                    "filters" => [
+                        'visibleFilters' => [
+                            'id',
+                            'name',
+                        ],
+
+                        'filtersModel' => [
+                            'fields' => [
+                                'name'   => [
+                                    'isAllowChangeMode' => false,
+                                ],
+                                'code'   => [
+                                    'isAllowChangeMode' => false,
+                                ],
+                                'active' => $bool,
+                                'def'    => $bool,
+                                'image_id'    => [
+                                    'isAllowChangeMode' => true,
+                                    'modes' => [
+                                        FilterModeNotEmpty::class,
+                                        FilterModeEmpty::class
+                                    ]
+                                ]
+                            ],
+                        ],
                     ],
 
-                "activate-multi" =>
-                    [
-                        'class'        => AdminMultiModelEditAction::className(),
-                        "name"         => "Активировать",
-                        //"icon"              => "glyphicon glyphicon-trash",
-                        "eachCallback" => [$this, 'eachMultiActivate'],
+                    "grid" => [
+                        'visibleColumns' => [
+                            'checkbox',
+                            'actions',
+                            'id',
+                            'image_id',
+                            'server_name',
+                            'def',
+                            'active',
+                            'priority',
+                            'code',
+                            'name',
+                        ],
+                        'columns'        => [
+                            'active' => [
+                                'class' => BooleanColumn::class,
+                            ],
+                            'def'    => [
+                                'class' => BooleanColumn::class,
+                            ],
+                            'image_id'    => [
+                                'class' => ImageColumn2::class,
+                            ],
+                        ],
                     ],
+                ],
 
-                "inActivate-multi" =>
-                    [
-                        'class'        => AdminMultiModelEditAction::className(),
-                        "name"         => "Деактивировать",
-                        //"icon"              => "glyphicon glyphicon-trash",
-                        "eachCallback" => [$this, 'eachMultiInActivate'],
-                    ],
+
+                "def-multi" => [
+                    'class'        => AdminMultiModelEditAction::className(),
+                    "name"         => "По умолчанию",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiDef'],
+                    "priority"     => 0,
+                ],
+
+                "activate-multi" => [
+                    'class'        => AdminMultiModelEditAction::className(),
+                    "name"         => "Активировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiActivate'],
+                ],
+
+                "inActivate-multi" => [
+                    'class'        => AdminMultiModelEditAction::className(),
+                    "name"         => "Деактивировать",
+                    //"icon"              => "glyphicon glyphicon-trash",
+                    "eachCallback" => [$this, 'eachMultiInActivate'],
+                ],
             ]
         );
     }
