@@ -814,6 +814,7 @@ return
         "The last authorization (up from)" => "Время последней авторизации (от)",
         "The last authorization (up to)" => "Время последней авторизации (до)",
         "Site management" => "Управление сайтами",
+        "Managing domains" => "Управление доменами",
         "Before you delete this type of content you want to delete the contents invested in it" => "Перед удалением данного типа контента, необходимо удалить вложенные в него контенты",
 
         "User control properties" => "Управление свойствами пользователя",
