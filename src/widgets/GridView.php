@@ -14,6 +14,7 @@ use skeeks\yii2\config\ConfigTrait;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\base\Event;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -81,6 +82,11 @@ class GridView extends \yii\grid\GridView
             ConfigBehavior::class => ArrayHelper::merge([
                 'class'       => ConfigBehavior::class,
                 'configModel' => [
+                    /*'on load' => function(Event $event) {
+                        print_r($event->data);die;
+                        $this->paginationConfig->load($event->data);
+                        $this->paginationConfigArray = $this->paginationConfig->toArray();
+                    },*/
                     'fields'           => [
                         'main'             => [
                             'class'  => FieldSet::class,
@@ -112,17 +118,17 @@ class GridView extends \yii\grid\GridView
                                 ],
                             ],
                         ],
-                        /*'paginationConfig' => [
+                        'paginationConfig' => [
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Pagination'),
                             'fields' => $this->paginationConfig->builderFields(),
-                            /*'model'  => $this->paginationConfig,
-                        ],*/
+                            'model'  => $this->paginationConfig,
+                        ],
                     ],
                     'attributeDefines' => [
                         'visibleColumns',
                         'caption',
-                        'paginationConfig',
+                        'paginationConfigArray',
                     ],
                     'attributeLabels'  => [
                         'visibleColumns' => 'Отображаемые колонки',
@@ -131,7 +137,7 @@ class GridView extends \yii\grid\GridView
                     'rules'            => [
                         ['visibleColumns', 'required'],
                         ['visibleColumns', 'safe'],
-                        ['paginationConfig', 'safe'],
+                        ['paginationConfigArray', 'safe'],
                         ['caption', 'string'],
                     ],
                 ],
@@ -204,6 +210,9 @@ class GridView extends \yii\grid\GridView
 
         return $this->_paginationConfig;
     }
+
+
+
     /**
      *
      */
