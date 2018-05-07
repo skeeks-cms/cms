@@ -54,18 +54,9 @@ class GridView extends \yii\grid\GridView
     public $isEnabledAutoColumns = true;
 
     /**
-     * @var array
-     */
-    public $paginationConfigArray = [];
-
-    /**
      * @var array результирующий массив конфига колонок
      */
     protected $_preInitColumns = [];
-    /**
-     * @var PaginationConfig
-     */
-    protected $_paginationConfig;
     /**
      * @var array автоматически созданные колонки
      */
@@ -75,6 +66,36 @@ class GridView extends \yii\grid\GridView
      * @var array
      */
     public $configBehaviorData = [];
+
+
+
+    /**
+     * @var string name of the parameter storing the current page index.
+     * @see params
+     */
+    public $pageParam = 'page';
+    /**
+     * @var string name of the parameter storing the page size.
+     * @see params
+     */
+    public $pageSizeParam = 'per-page';
+
+    /**
+     * @var int the default page size. This property will be returned by [[pageSize]] when page size
+     * cannot be determined by [[pageSizeParam]] from [[params]].
+     */
+    public $defaultPageSize = 20;
+    /**
+     * @var array|false the page size limits. The first array element stands for the minimal page size, and the second
+     * the maximal page size. If this is false, it means [[pageSize]] should always return the value of [[defaultPageSize]].
+     */
+    public $pageSizeLimitMin = 1;
+
+    /**
+     * @var int
+     */
+    public $pageSizeLimitMax = 50;
+
 
     public function behaviors()
     {
@@ -121,24 +142,57 @@ class GridView extends \yii\grid\GridView
                         'paginationConfig' => [
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Pagination'),
-                            'fields' => $this->paginationConfig->builderFields(),
-                            'model'  => $this->paginationConfig,
+                            'fields' => [
+                                'defaultPageSize'  => [
+                                    'elementOptions' => [
+                                        'type' => 'number',
+                                    ],
+                                ],
+                                'pageSizeLimitMin' => [
+                                    'elementOptions' => [
+                                        'type' => 'number',
+                                    ],
+                                ],
+                                'pageSizeLimitMax' => [
+                                    'elementOptions' => [
+                                        'type' => 'number',
+                                    ],
+                                ],
+                                'pageParam',
+                                'pageSizeParam',
+                            ],
                         ],
                     ],
                     'attributeDefines' => [
                         'visibleColumns',
                         'caption',
-                        'paginationConfigArray',
+
+                        'pageParam',
+                        'defaultPageSize',
+                        'pageSizeLimitMin',
+                        'pageSizeLimitMax',
+                        'pageSizeParam',
                     ],
                     'attributeLabels'  => [
                         'visibleColumns' => 'Отображаемые колонки',
                         'caption' => 'Заголовок таблицы',
+
+                        'pageParam'        => \Yii::t('skeeks/cms', 'Parameter name pages, pagination'),
+                        'defaultPageSize'  => \Yii::t('skeeks/cms', 'Number of records on one page'),
+                        'pageSizeLimitMin' => \Yii::t('skeeks/cms', 'The minimum allowable value for pagination'),
+                        'pageSizeLimitMax' => \Yii::t('skeeks/cms', 'The maximum allowable value for pagination'),
+                        'pageSizeParam' => \Yii::t('skeeks/cms', 'pageSizeParam'),
                     ],
                     'rules'            => [
                         ['visibleColumns', 'required'],
                         ['visibleColumns', 'safe'],
-                        ['paginationConfigArray', 'safe'],
                         ['caption', 'string'],
+
+                        [['pageParam', 'pageSizeParam', 'defaultPageSize'], 'required'],
+                        [['pageParam', 'pageSizeParam'], 'string'],
+                        ['defaultPageSize', 'integer'],
+                        ['pageSizeLimitMin', 'integer'],
+                        ['pageSizeLimitMax', 'integer'],
                     ],
                 ],
             ], (array) $this->configBehaviorData),
@@ -198,10 +252,12 @@ class GridView extends \yii\grid\GridView
 
         return $result;
     }
+
+
     /**
      * @return PaginationConfig
      */
-    public function getPaginationConfig()
+    /*public function getPaginationConfig()
     {
         if ($this->_paginationConfig === null) {
             $this->_paginationConfig = new PaginationConfig();
@@ -209,7 +265,7 @@ class GridView extends \yii\grid\GridView
         }
 
         return $this->_paginationConfig;
-    }
+    }*/
 
 
 
@@ -234,7 +290,7 @@ class GridView extends \yii\grid\GridView
         //Применение включенных/выключенных колонок
         $this->applyColumns();
 
-        $this->paginationConfig->initDataProvider($this->dataProvider);
+        $this->_initPagination();
 
         //Если удалили колонки
         foreach ($this->columns as $key => $column)
@@ -244,6 +300,26 @@ class GridView extends \yii\grid\GridView
             }
         }
     }
+
+    /**
+     * @param DataProviderInterface $dataProvider
+     * @return $this
+     */
+    protected function _initPagination()
+    {
+        $dataProvider = $this->dataProvider;
+
+        $dataProvider->getPagination()->defaultPageSize = $this->defaultPageSize;
+        $dataProvider->getPagination()->pageParam = $this->pageParam;
+        $dataProvider->getPagination()->pageSizeParam = $this->pageSizeParam;
+        $dataProvider->getPagination()->pageSizeLimit = [
+            (int)$this->pageSizeLimitMin,
+            (int)$this->pageSizeLimitMax,
+        ];
+
+        return $this;
+    }
+
     /**
      * @return ActiveDataProvider
      */
