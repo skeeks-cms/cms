@@ -9,7 +9,10 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
+use skeeks\yii2\form\fields\HiddenField;
+use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -31,11 +34,6 @@ class AdminCmsSiteDomain2Controller extends BackendModelStandartController
      */
     public function actions()
     {
-        $updateFields = [
-            'domain',
-            'cms_site_id',
-        ];
-
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
                 "filters" => [
@@ -56,11 +54,41 @@ class AdminCmsSiteDomain2Controller extends BackendModelStandartController
                 ],
             ],
             "create" => [
-                'fields' => $updateFields,
+                'fields' => [$this, 'updateFields'],
             ],
             "update" => [
-                'fields' => $updateFields,
+                'fields' => [$this, 'updateFields'],
             ],
         ]);
+    }
+
+    public function updateFields($action)
+    {
+        /**
+         * @var $model CmsSiteDomain
+         */
+        $model = $action->model;
+
+        if ($code = \Yii::$app->request->get('cms_site_id'))
+        {
+            $model->cms_site_id = $code;
+            $field = [
+                'class' => HiddenField::class,
+                'label' => false
+            ];
+        } else {
+            $field = [
+                'class' => SelectField::class,
+                'items' => function() {
+                    return ArrayHelper::map(CmsSite::find()->all(), 'id', 'asText');
+                }
+            ];
+        }
+        $updateFields = [
+            'domain',
+            'cms_site_id' => $field
+        ];
+
+        return $updateFields;
     }
 }

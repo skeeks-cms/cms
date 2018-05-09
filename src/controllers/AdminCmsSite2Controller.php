@@ -24,6 +24,10 @@ use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\base\Event;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -88,6 +92,33 @@ class AdminCmsSite2Controller extends BackendModelStandartController
                 ],
 
                 "grid" => [
+                    'on init'       => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $dataProvider = $e->sender->dataProvider;
+
+                        $query->joinWith('cmsSiteDomains');
+                        $query->groupBy(CmsSite::tableName() . ".id");
+                        $query->select([
+                            CmsSite::tableName() . '.*',
+                            'countDomains' => new Expression("count(*)")
+                        ]);
+                    },
+
+                    'sortAttributes' => [
+                        'countDomains' => [
+                            'asc' => ['countDomains' => SORT_ASC],
+                            'desc' => ['countDomains' => SORT_DESC],
+                            'label' => 'Количество доменов',
+                            'default' => SORT_ASC
+                        ]
+                    ],
+                    'defaultOrder' => [
+                        'def' => SORT_DESC
+                    ],
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
@@ -99,6 +130,7 @@ class AdminCmsSite2Controller extends BackendModelStandartController
                         'priority',
                         'code',
                         'name',
+                        'countDomains',
                     ],
                     'columns'        => [
                         'active'   => [
@@ -109,6 +141,13 @@ class AdminCmsSite2Controller extends BackendModelStandartController
                         ],
                         'image_id' => [
                             'class' => ImageColumn2::class,
+                        ],
+                        'countDomains' => [
+                            'value' => function(CmsSite $cmsSite) {
+                                return $cmsSite->raw_row['countDomains'];
+                            },
+                            'attribute' => 'countDomains',
+                            'label' => 'Количество доменов'
                         ],
                     ],
                 ],
@@ -202,7 +241,7 @@ class AdminCmsSite2Controller extends BackendModelStandartController
                                 'cms_site_id' => 'id'
                             ],
 
-                            'controllerRoute' => '/cms/admin-cms-site-domain',
+                            'controllerRoute' => '/cms/admin-cms-site-domain-2',
                             'gridViewOptions' => [
                                 'columns' => [
                                     //['class' => 'yii\grid\SerialColumn'],

@@ -96,6 +96,15 @@ class GridView extends \yii\grid\GridView
      */
     public $pageSizeLimitMax = 50;
 
+    /**
+     * @var array
+     */
+    public $defaultOrder = [];
+    /**
+     * @var array
+     */
+    public $sortAttributes = [];
+
 
     public function behaviors()
     {
@@ -124,10 +133,6 @@ class GridView extends \yii\grid\GridView
                                     //'multiple'        => true,
                                     'on beforeRender' => function ($e) {
                                         /**
-                                         * @var $gridView GridView
-                                         */
-                                        //$gridView = $e->sender->model->configBehavior->owner;
-                                        /**
                                          * @var $widgetField WidgetField
                                          */
                                         $widgetField = $e->sender;
@@ -139,6 +144,26 @@ class GridView extends \yii\grid\GridView
                                 ],
                             ],
                         ],
+                        /*'sort' => [
+                            'class'  => FieldSet::class,
+                            'name'   => \Yii::t('skeeks/cms', 'Sorting'),
+                            'fields' => [
+                                'defaultOrder'  => [
+                                    'class'           => WidgetField::class,
+                                    'widgetClass'     => SortSelect::class,
+                                    'on beforeRender' => function ($e) {
+                                                                                /**
+                                         * @var $widgetField WidgetField
+                                        $widgetField = $e->sender;
+                                        $widgetField->widgetConfig['items'] = ArrayHelper::getValue(
+                                            \Yii::$app->controller->getCallableData(),
+                                            'sortAttributes'
+                                        );
+
+                                    },
+                                ],
+                            ],
+                        ],*/
                         'paginationConfig' => [
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Pagination'),
@@ -172,6 +197,8 @@ class GridView extends \yii\grid\GridView
                         'pageSizeLimitMin',
                         'pageSizeLimitMax',
                         'pageSizeParam',
+
+                        'defaultOrder',
                     ],
                     'attributeLabels'  => [
                         'visibleColumns' => 'Отображаемые колонки',
@@ -182,10 +209,13 @@ class GridView extends \yii\grid\GridView
                         'pageSizeLimitMin' => \Yii::t('skeeks/cms', 'The minimum allowable value for pagination'),
                         'pageSizeLimitMax' => \Yii::t('skeeks/cms', 'The maximum allowable value for pagination'),
                         'pageSizeParam' => \Yii::t('skeeks/cms', 'pageSizeParam'),
+
+                        'defaultOrder' => 'Сортировка',
                     ],
                     'rules'            => [
                         ['visibleColumns', 'required'],
                         ['visibleColumns', 'safe'],
+                        ['defaultOrder', 'safe'],
                         ['caption', 'string'],
 
                         [['pageParam', 'pageSizeParam', 'defaultPageSize'], 'required'],
@@ -288,9 +318,10 @@ class GridView extends \yii\grid\GridView
         parent::init();
 
         //Применение включенных/выключенных колонок
-        $this->applyColumns();
+        $this->_applyColumns();
 
         $this->_initPagination();
+        $this->_initSort();
 
         //Если удалили колонки
         foreach ($this->columns as $key => $column)
@@ -316,6 +347,20 @@ class GridView extends \yii\grid\GridView
             (int)$this->pageSizeLimitMin,
             (int)$this->pageSizeLimitMax,
         ];
+
+        return $this;
+    }
+
+    /**
+     * @param DataProviderInterface $dataProvider
+     * @return $this
+     */
+    protected function _initSort()
+    {
+        $dataProvider = $this->dataProvider;
+
+        $dataProvider->getSort()->attributes = ArrayHelper::merge($dataProvider->getSort()->attributes, $this->sortAttributes);
+        $dataProvider->getSort()->defaultOrder = $this->defaultOrder;
 
         return $this;
     }
@@ -474,7 +519,8 @@ class GridView extends \yii\grid\GridView
 
         return $this;
     }
-    protected function applyColumns()
+
+    protected function _applyColumns()
     {
         $result = [];
         //Есть логика включенных выключенных колонок
@@ -533,9 +579,18 @@ class GridView extends \yii\grid\GridView
      */
     public function getEditData()
     {
+        $sort = [];
+        if ($this->dataProvider->getSort()->attributes) {
+            foreach ($this->dataProvider->getSort()->attributes as $key => $value)
+            {
+                $sort[$key] = ArrayHelper::getValue($value, 'label');
+            }
+        }
+
         return [
             'callAttributes' => $this->callAttributes,
             'availableColumns' => $this->getColumnsKeyLabels(),
+            'sortAttributes' => $sort,
         ];
     }
 }
