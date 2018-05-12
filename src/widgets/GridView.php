@@ -406,7 +406,7 @@ class GridView extends \yii\grid\GridView
         $model = reset($models);
 
         if (!$model) {
-            if ($dataProvider->query && $dataProvider->query->modelClass) {
+            if ($dataProvider && isset($dataProvider->query) && $dataProvider->query->modelClass) {
                 $modelClass = $dataProvider->query->modelClass;
                 $model = new $modelClass();
             }
