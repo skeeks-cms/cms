@@ -404,6 +404,13 @@ class GridView extends \yii\grid\GridView
          * @var $model ActiveQuery
          */
         $model = reset($models);
+
+        if (!$model) {
+            $modelClass = $dataProvider->query->modelClass;
+            $model = new $modelClass();
+        }
+
+
         if (is_array($model) || is_object($model)) {
             foreach ($model as $name => $value) {
                 if ($value === null || is_scalar($value) || is_callable([$value, '__toString'])) {
