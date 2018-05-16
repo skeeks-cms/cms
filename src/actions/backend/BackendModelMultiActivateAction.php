@@ -14,6 +14,9 @@ use skeeks\cms\components\Cms;
  */
 class BackendModelMultiActivateAction extends BackendModelMultiAction {
 
+    public $attribute = 'active';
+    public $value = Cms::BOOL_Y;
+
     public function init()
     {
         if (!$this->icon)
@@ -36,7 +39,7 @@ class BackendModelMultiActivateAction extends BackendModelMultiAction {
     public function eachExecute($model)
     {
         try {
-            $model->active = Cms::BOOL_Y;
+            $model->{$this->attribute} = $this->value;
             return $model->save(false);
         } catch (\Exception $e) {
             return false;

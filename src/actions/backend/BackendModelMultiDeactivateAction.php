@@ -13,6 +13,9 @@ use skeeks\cms\components\Cms;
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 class BackendModelMultiDeactivateAction extends BackendModelMultiAction {
+    public $attribute = 'active';
+    public $value = Cms::BOOL_N;
+
     public function init()
     {
         if (!$this->icon)
@@ -35,7 +38,7 @@ class BackendModelMultiDeactivateAction extends BackendModelMultiAction {
     public function eachExecute($model)
     {
         try {
-            $model->active = Cms::BOOL_N;
+            $model->{$this->attribute} = $this->value;
             return $model->save(false);
         } catch (\Exception $e) {
             return false;
