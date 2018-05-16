@@ -23,8 +23,8 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $created_at
  * @property integer $updated_at
  *
- * @property CmsUser    $createdBy
- * @property CmsUser    $updatedBy
+ * @property CmsUser $createdBy
+ * @property CmsUser $updatedBy
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -55,32 +55,25 @@ class ActiveRecord extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            BlameableBehavior::className() =>
-                [
-                    'class' => BlameableBehavior::className(),
-                    'value' => function ($event) {
-                        if (\Yii::$app instanceof \yii\console\Application) {
-                            return null;
-                        } else {
-                            $user = Yii::$app->get('user', false);
-                            return $user && !$user->isGuest ? $user->id : null;
-                        }
-                    },
-                ],
-            TimestampBehavior::className() =>
-                [
-                    'class' => TimestampBehavior::className(),
-                    /*'value' => function()
-                    {
-                        return date('U');
-                    },*/
-                ],
+            BlameableBehavior::className() => [
+                'class' => BlameableBehavior::className(),
+                'value' => function ($event) {
+                    if (\Yii::$app instanceof \yii\console\Application) {
+                        return null;
+                    } else {
+                        $user = Yii::$app->get('user', false);
+                        return $user && !$user->isGuest ? $user->id : null;
+                    }
+                },
+            ],
+            TimestampBehavior::className() => [
+                'class' => TimestampBehavior::className(),
+            ],
 
-            HasTableCache::className() =>
-                [
-                    'class' => HasTableCache::className(),
-                    'cache' => \Yii::$app->cache,
-                ],
+            HasTableCache::className() => [
+                'class' => HasTableCache::className(),
+                'cache' => \Yii::$app->cache,
+            ],
         ]);
     }
     /**
