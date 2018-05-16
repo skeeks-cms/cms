@@ -116,8 +116,13 @@ class ContentElementController extends Controller
 
         //TODO: Может быть не сбрасывать GET параметры
         if (Url::isRelative($contentElement->url)) {
-            
-            if ($contentElement->url != "/" . \Yii::$app->request->pathInfo) {
+
+            $url = \Yii::$app->request->url;
+            if ($pos = strpos($url, '?')) {
+                $url = substr($url, 0, $pos);
+            }
+
+            if ($contentElement->url != $url) {
                 $url = $contentElement->url;
                 \Yii::$app->response->redirect($url, 301);
             }
