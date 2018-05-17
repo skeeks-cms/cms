@@ -36,6 +36,7 @@
         "skeeks/cms-marketplace": "~2.0.0 || dev-master@dev",
         "skeeks/cms-composer": "~1.0.0 || dev-master@dev",
         "skeeks/cms-toolbar": "~1.0.0 || dev-master@dev",
+        "skeeks/cms-query-filters": "~1.0.0 || dev-master@dev",
         "skeeks/cms-agent": "~2.0.0 || dev-master@dev",
         "skeeks/yii2-ajax-file-upload": "~1.0.0",
         "skeeks/yii2-imagine": "~2.0.1",
