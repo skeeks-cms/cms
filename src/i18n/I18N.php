@@ -21,7 +21,7 @@ class I18N extends \yii\i18n\I18N
      */
     public function init()
     {
-        if ($this->translations) {
+        /*if ($this->translations) {
             foreach ($this->translations as $key => $data)
             {
                 if (!isset($data['on missingTranslation'])) {
@@ -29,7 +29,7 @@ class I18N extends \yii\i18n\I18N
                     $this->translations[$key] = $data;
                 }
             }
-        }
+        }*/
 
         parent::init();
     }
