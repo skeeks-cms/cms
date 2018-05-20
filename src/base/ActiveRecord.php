@@ -11,6 +11,7 @@ namespace skeeks\cms\base;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\query\CmsActiveQuery;
+use skeeks\cms\traits\TActiveRecord;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -30,6 +31,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class ActiveRecord extends \yii\db\ActiveRecord
 {
+    use TActiveRecord;
+    
     /**
      * @var array
      */
@@ -111,49 +114,5 @@ class ActiveRecord extends \yii\db\ActiveRecord
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'id'], 'integer'],
         ];
-    }
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->asText();
-    }
-    /**
-     * @return string
-     */
-    public function asText()
-    {
-        $result = [];
-        $result[] = "#".$this->id;
-
-        if (isset($this->name) && is_string($this->name)) {
-            $result[] = $this->name;
-        } else if (isset($this->label) && is_string($this->label)) {
-            $result[] = $this->label;
-        }
-
-        return implode("#", $result);
-    }
-    /**
-     * @return string
-     */
-    public function getAsText()
-    {
-        return $this->asText();
-    }
-    /**
-     * @return string
-     */
-    public function getAsHtml()
-    {
-        return $this->asHtml();
-    }
-    /**
-     * @return string
-     */
-    public function asHtml()
-    {
-        return $this->asText();
     }
 }
