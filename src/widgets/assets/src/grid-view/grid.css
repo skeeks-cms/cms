@@ -1,0 +1,73 @@
+.sx-grid-view {
+
+}
+    .sx-grid-view .sx-table-wrapper {
+        overflow: auto;
+    }
+
+    .sx-grid-view .sx-before-table {
+        white-space: nowrap;
+        height: 42px;
+        box-shadow: inset 0 1px 0 #fff/*, inset 0 0 2px -1px rgba(232,19,64, 1)*/;
+        background: rgba(221, 229, 231, 0.47);
+        border-radius: 4px 4px 0px 0px;
+        border-top: 1px solid #adbdca;
+        border-right: 1px solid #adbdca;
+        border-left: 1px solid #adbdca;
+        padding: 5px;
+        border-color: #d6dfe1 #ced7d8 #969d9e #bec7c8;
+    }
+
+    .sx-grid-view .sx-after-table {
+        height: 42px;
+        box-shadow: inset 0 1px 0 #fff/*, inset 0 0 2px -1px rgba(232,19,64, 1)*/;
+        background: rgba(221, 229, 231, 0.47);
+        border-radius: 0px 0px 4px 4px;
+        border-bottom: 1px solid #adbdca;
+        border-right: 1px solid #adbdca;
+        border-left: 1px solid #adbdca;
+        padding: 5px;
+        border-color: #d6dfe1 #ced7d8 #969d9e #bec7c8;
+    }
+
+    .sx-grid-view .pagination {
+        margin-top: 15px;
+        margin-right: 15px;
+        margin-bottom: 15px;
+    }
+
+    .sx-grid-view .summary {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+
+    .sx-grid-view .sx-per-page {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        height: 31px;
+    }
+
+        .sx-grid-view .sx-per-page select{
+            height: 31px;
+            min-width: 44px;
+        }
+
+        .sx-grid-view .sx-per-page .per-page-label{
+            margin-right: 5px;
+        }
+
+.has-sx-grid-view-full {
+    overflow: hidden;
+}
+
+.sx-grid-view-full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: white;
+}
