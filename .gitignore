@@ -1,3 +1,4 @@
 # Created by .gitignore support plugin (hsz.mobi)
 /docs/_build
-.idea
+.idea*
+.idea/*
