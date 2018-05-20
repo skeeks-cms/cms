@@ -241,12 +241,6 @@ return
                         ],
 
                         [
-                            "label" => \Yii::t('skeeks/cms', "User properties"),
-                            "url"   => ["cms/admin-cms-user-universal-property"],
-                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
-                        ],
-
-                        [
                             "label" => \Yii::t('skeeks/cms', 'The base of {email} addresses', ['email' => 'email']),
                             "url"   => ["cms/admin-user-email"],
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/email-2.png'],
@@ -344,6 +338,28 @@ return
                                 ],
                             ], contentEditMenu()),
                         ],
+
+
+                        [
+                            "label" => \Yii::t('skeeks/cms', "User settings"),
+                            "url"   => ["cms/admin-cms-user-universal-property"],
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
+                            "items" =>
+                            [
+                                [
+                                    "label" => \Yii::t('skeeks/cms', "User properties"),
+                                    "url"   => ["cms/admin-cms-user-universal-property"],
+                                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
+                                ],
+
+                                [
+                                    "label" => \Yii::t('skeeks/cms', "Options"),
+                                    "url"   => ["cms/admin-cms-user-universal-property-enum"],
+                                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
+                                ]
+                            ]
+                        ],
+
 
                         [
                             "label" => \Yii::t('skeeks/cms', "Module settings"),

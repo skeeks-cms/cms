@@ -8,19 +8,17 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\models\CmsUserUniversalProperty;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class AdminCmsTreeTypePropertyController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
+class AdminCmsUserUniversalPropertyController extends BackendModelStandartController
 {
     public $notSubmitParam = 'sx-not-submit';
 
@@ -28,7 +26,7 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/cms', 'User control properties');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = CmsUserUniversalProperty::className();
+        $this->modelClassName = CmsUserUniversalProperty::class;
 
         parent::init();
 
@@ -39,20 +37,44 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
-            [
+        return ArrayHelper::merge(parent::actions(), [
 
-                'create' =>
-                    [
-                        'callback' => [$this, 'create'],
+            'index' => [
+                'filters' => [
+                    'visibleFilters' => [
+                        'name',
                     ],
+                ],
 
-                'update' =>
-                    [
-                        'callback' => [$this, 'update'],
+                'grid'    => [
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        'id',
+                        'name',
+                        'code',
+                        'priority',
+                        'hint',
+                        'active',
                     ],
-            ]
-        );
+                    'columns' => [
+                        'active' => [
+                            'class' => BooleanColumn::class,
+                            'trueValue' => "Y",
+                            'falseValue' => "N",
+                        ]
+                    ]
+                ],
+            ],
+
+            'create' => [
+                'callback' => [$this, 'create'],
+            ],
+
+            'update' => [
+                'callback' => [$this, 'update'],
+            ],
+        ]);
     }
 
 
@@ -81,7 +103,8 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
                 $handler->load(\Yii::$app->request->post());
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handler->validate()) {
+                    && $model->validate() && $handler->validate()
+                ) {
                     $model->save();
 
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
@@ -98,7 +121,7 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }
@@ -128,7 +151,8 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
                     $handler->load(\Yii::$app->request->post());
 
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handler->validate()) {
+                        && $model->validate() && $handler->validate()
+                    ) {
                         $model->save();
 
                         \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
@@ -149,7 +173,7 @@ class AdminCmsUserUniversalPropertyController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }

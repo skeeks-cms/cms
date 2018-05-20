@@ -1,32 +1,54 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
- * @date 17.05.2015
  */
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\models\CmsTreeTypePropertyEnum;
-use skeeks\cms\models\CmsUserUniversalProperty;
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserUniversalPropertyEnum;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use yii\helpers\ArrayHelper;
 
 /**
- * Class AdminCmsUserUniversalPropertyEnumController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminCmsUserUniversalPropertyEnumController extends AdminModelEditorController
+class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartController
 {
     public function init()
     {
         $this->name = "Управление значениями свойств пользователя";
         $this->modelShowAttribute = "value";
-        $this->modelClassName = CmsUserUniversalPropertyEnum::className();
+        $this->modelClassName = CmsUserUniversalPropertyEnum::class;
 
         parent::init();
+    }
 
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(), [
+            'index' => [
+                'filters' => [
+                    'visibleFilters' => [
+                        'value',
+                        'property_id'
+                    ]
+                ],
+                'grid' => [
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        'id',
+                        'property_id',
+                        'value',
+                        'code',
+                        'priority',
+                    ]
+                ]
+            ]
+        ]);
     }
 
 }
