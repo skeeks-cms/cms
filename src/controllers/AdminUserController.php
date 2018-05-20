@@ -134,6 +134,12 @@ class AdminUserController extends BackendModelStandartController
                         'logged_at'  => SORT_DESC,
                         'created_at' => SORT_DESC,
                     ],
+                    'dialogCallbackData' => function(CmsUser $model) {
+                        return \yii\helpers\ArrayHelper::merge($model->toArray(), [
+                            'image' => $model->image ? $model->image->src : "",
+                            'displayName' => $model->displayName
+                        ]);
+                    },
                     'visibleColumns' => [
                         'checkbox',
                         'actions',

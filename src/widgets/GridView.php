@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\widgets;
 
+use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\helpers\PaginationConfig;
 use skeeks\yii2\config\ConfigBehavior;
 use skeeks\yii2\config\ConfigTrait;
@@ -313,8 +314,9 @@ class GridView extends \yii\grid\GridView
 
         //Сбор результирующего конфига колонок
         $this->_preInitColumns();
-        //Получение настроек из хранилища
 
+        $this->_initDialogCallbackData();
+        //Получение настроек из хранилища
         parent::init();
 
         //Применение включенных/выключенных колонок
@@ -331,6 +333,64 @@ class GridView extends \yii\grid\GridView
             }
         }
     }
+
+
+    protected function _initDialogCallbackData() {
+
+        if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
+            $this->view->registerJs(<<<JS
+(function(sx, $, _)
+{
+    sx.classes.SelectCmsElement = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            $('table tr').on('dblclick', function()
+            {
+                $(".sx-row-action", $(this)).click();
+            });
+        },
+
+        submit: function(data)
+        {
+            if (window.opener)
+            {
+                if (window.opener.sx)
+                {
+                    window.opener.sx.EventManager.trigger('{$callbackEventName}', data);
+                    return this;
+                }
+            } else if (window.parent)
+            {
+                if (window.parent.sx)
+                {
+                    window.parent.sx.EventManager.trigger('{$callbackEventName}', data);
+                    return this;
+                }
+            }
+
+            return this;
+        }
+    });
+
+    sx.SelectCmsElement = new sx.classes.SelectCmsElement();
+
+})(sx, sx.$, sx._);
+JS
+            );
+
+            $this->columns = ArrayHelper::merge([
+
+                'sx-choose' => $this->getDialogCallbackDataColumn(),
+
+            ], $this->columns);
+
+            if ($this->visibleColumns) {
+                $this->visibleColumns = ArrayHelper::merge(['sx-choose'], $this->visibleColumns);
+            }
+        }
+    }
+
 
     /**
      * @param DataProviderInterface $dataProvider
@@ -602,4 +662,49 @@ class GridView extends \yii\grid\GridView
             'sortAttributes' => $sort,
         ];
     }
+
+
+
+
+
+    protected $_dialogCallbackDataColumn = null;
+
+    /**
+     * @var null
+     */
+    public $dialogCallbackData = null;
+
+    public function setdialogCallbackDataColumn($column)
+    {
+        $this->_dialogCallbackDataColumn = $column;
+        return $this;
+    }
+
+    public function getDialogCallbackDataColumn()
+    {
+        if ($this->_dialogCallbackDataColumn === null) {
+            $this->_dialogCallbackDataColumn = [
+                'class' => \yii\grid\DataColumn::className(),
+                'value' => function ($model) {
+                    $data = $model->toArray();
+
+                    if ($this->dialogCallbackData && is_callable($this->dialogCallbackData)) {
+                        $callback = $this->dialogCallbackData;
+                        $data = $callback($model);
+                    }
+
+                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
+                            'Choose'), '#', [
+                        'class' => 'btn btn-primary sx-row-action',
+                        'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($data) . '); return false;',
+                        'data-pjax' => 0
+                    ]);
+                },
+                'label' => '',
+                'format' => 'raw'
+            ];
+        }
+        return $this->_dialogCallbackDataColumn;
+    }
+
 }
