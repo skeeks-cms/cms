@@ -10,6 +10,7 @@ namespace skeeks\cms\widgets;
 
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\helpers\PaginationConfig;
+use skeeks\cms\widgets\assets\GridViewAsset;
 use skeeks\yii2\config\ConfigBehavior;
 use skeeks\yii2\config\ConfigTrait;
 use skeeks\yii2\form\fields\FieldSet;
@@ -334,6 +335,11 @@ class GridView extends \yii\grid\GridView
         }
     }
 
+    public function run()
+    {
+        GridViewAsset::register($this->view);
+        return parent::run();
+    }
 
     protected function _initDialogCallbackData() {
 
