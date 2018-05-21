@@ -3,6 +3,8 @@ CHANGELOG
 
 5.1.0.pre
 ----------------
+ * Update skeeks/yii2-sx 1.4.0
+ * Update yii2 2.0.15
  * IHasInfo is deprecated
  * Fixed create new dir
  * ClusterLocal update set publicBaseUrl and rootBasePath
