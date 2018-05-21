@@ -38,11 +38,11 @@
         "skeeks/cms-backend-admin": "^1.1.3 || dev-master@dev",
         "skeeks/cms-admin": "^2.0.5 || dev-master@dev",
         "skeeks/cms-user-personal-area": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/cms-query-filters": "^0.1.0 || ^1.0.0 || dev-master@dev",
 
         "skeeks/cms-rbac": "^2.2.0 || dev-master@dev",
         "skeeks/cms-marketplace": "^2.0.1 || dev-master@dev",
         "skeeks/cms-toolbar": "^1.0.0 || dev-master@dev",
-        "skeeks/cms-query-filters": "dev-master@dev",
         "skeeks/cms-agent": "^2.0.0 || dev-master@dev",
         "skeeks/yii2-ajax-file-upload": "^1.0.0",
         "skeeks/yii2-imagine": "^2.0.1",
