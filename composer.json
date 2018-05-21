@@ -34,10 +34,11 @@
         "skeeks/cms-composer": "^1.0.0 || dev-master@dev",
         "skeeks/yii2-config": "^0.1.0 || ^1.0.0 || dev-master@dev",
         "skeeks/yii2-form": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/cms-backend": "^1.1.7 || dev-master@dev",
+        "skeeks/cms-backend-admin": "^1.1.3 || dev-master@dev",
+        "skeeks/cms-admin": "^2.0.5 || dev-master@dev",
+        "skeeks/cms-user-personal-area": "^0.1.0 || ^1.0.0 || dev-master@dev",
 
-        "skeeks/cms-backend": "^1.1.1 || dev-master@dev",
-        "skeeks/cms-backend-admin": "^1.1.0 || dev-master@dev",
-        "skeeks/cms-admin": "^2.0.2 || dev-master@dev",
         "skeeks/cms-rbac": "^2.2.0 || dev-master@dev",
         "skeeks/cms-marketplace": "^2.0.1 || dev-master@dev",
         "skeeks/cms-toolbar": "^1.0.0 || dev-master@dev",
@@ -55,7 +56,7 @@
         "skeeks/yii2-ya-slug": "^1.0.0",
 
         "skeeks/yii2-jquery-contextmenu": "dev-master@dev",
-        "skeeks/cms-user-personal-area": "dev-master@dev",
+
 
         "kartik-v/yii2-datecontrol": "~1.9.6",
         "kartik-v/yii2-widget-datepicker": "~1.4.3",
