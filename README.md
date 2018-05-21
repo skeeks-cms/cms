@@ -7,9 +7,7 @@ SkeekS CMS - modern generic content management system based on yii2 php framewor
 
 [![Latest Stable Version](https://poser.pugx.org/skeeks/cms/v/stable.png)](https://packagist.org/packages/skeeks/cms)
 [![Total Downloads](https://poser.pugx.org/skeeks/cms/downloads.png)](https://packagist.org/packages/skeeks/cms)
-[![Reference Status](https://www.versioneye.com/php/skeeks:cms/reference_badge.svg)](https://www.versioneye.com/php/skeeks:cms/references)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/skeeks-cms/cms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/skeeks-cms/cms/?branch=master)
-[![Dependency Status](https://www.versioneye.com/php/skeeks:cms/dev-master/badge.png)](https://www.versioneye.com/php/skeeks:cms/dev-master)
 
 
 Links
