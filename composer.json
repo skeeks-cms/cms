@@ -32,6 +32,8 @@
         "yiisoft/yii2-bootstrap": "~2.0.7 || dev-master@dev || 2.1.x-dev",
 
         "skeeks/cms-composer": "^1.0.0 || dev-master@dev",
+        "skeeks/yii2-config": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/yii2-form": "^0.1.0 || ^1.0.0 || dev-master@dev",
 
         "skeeks/cms-backend": "^1.1.1 || dev-master@dev",
         "skeeks/cms-backend-admin": "^1.1.0 || dev-master@dev",
@@ -51,11 +53,9 @@
         "skeeks/yii2-widget-codemirror": "^1.0.3",
         "skeeks/yii2-slug-behavior": "^1.0.0",
         "skeeks/yii2-ya-slug": "^1.0.0",
-        "skeeks/yii2-form": "dev-master@dev",
-        "skeeks/yii2-config": "dev-master@dev",
+
         "skeeks/yii2-jquery-contextmenu": "dev-master@dev",
         "skeeks/cms-user-personal-area": "dev-master@dev",
-
 
         "kartik-v/yii2-datecontrol": "~1.9.6",
         "kartik-v/yii2-widget-datepicker": "~1.4.3",
