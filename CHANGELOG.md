@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.1.0.pre
+5.1.0
 ----------------
  * Update skeeks/yii2-sx 1.4.0
  * Update yii2 2.0.15
@@ -11,10 +11,6 @@ CHANGELOG
  * Removed skeeks\cms\Exception
  * Widget and component settings to use skeeks/yii2-form
  * Change config form interface
-
-
-
-
 
 
 5.0.4
