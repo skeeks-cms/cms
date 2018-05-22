@@ -103,6 +103,13 @@ Navigate to the folder where are your projects (such as **/var/www/sites/**).
 
 Edit the file to access the database, it is located at **common/config/db.php**
 
+Update configs:
+
+.. code-block:: bash
+
+    COMPOSER_HOME=.composer php composer.phar self-update && COMPOSER_HOME=.composer php composer.phar du
+
+
 4. Installation of migrations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
