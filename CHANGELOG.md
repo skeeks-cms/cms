@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.1.1
+----------------
+ * Fixed RelationalBehavior
+ 
 5.1.0
 ----------------
  * Update skeeks/yii2-sx 1.4.0

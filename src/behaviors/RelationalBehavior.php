@@ -61,6 +61,11 @@ class RelationalBehavior extends Behavior
 
     public function __set($name, $value)
     {
+        if ($value == '') {
+            $this->owner->populateRelation($name, []);
+            return;
+        }
+
         if (is_array($value) && count($value) > 0 && !($value[0] instanceof Object) ||
             !is_array($value) && !($value instanceof Object)
         ) {
