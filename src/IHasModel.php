@@ -30,6 +30,6 @@ interface IHasModel
      * @param Model|ActiveRecord|Component|Object $model
      * @return mixed
      */
-    public function setModel(BaseObject $model);
+    public function setModel($model);
 
 }

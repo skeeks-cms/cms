@@ -16,6 +16,7 @@ use skeeks\yii2\config\ConfigTrait;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\base\Component;
 use yii\base\Event;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -310,6 +311,11 @@ class GridView extends \yii\grid\GridView
         if (!$this->dataProvider) {
             $this->dataProvider = $this->_createDataProvider();
         }
+
+        if (is_callable($this->dataProvider)) {
+            $callable = $this->dataProvider;
+            $this->dataProvider = call_user_func($callable, $this);
+        }
         //Автомтическое конфигурирование колонок
         $this->_initAutoColumns();
 
@@ -497,7 +503,7 @@ JS
                     $keyName = lcfirst(Inflector::id2camel($key, '_'));
                     $keyManyName = lcfirst(Inflector::id2camel($keyMany, '_'));
 
-                    if ($model->hasProperty($keyName)) {
+                    if ($model instanceof Component && $model->hasProperty($keyName)) {
                         $this->_autoColumns[(string)$name] = [
                             'attribute' => $name,
                             'format'    => 'raw',
@@ -505,7 +511,7 @@ JS
                                 return $model->{$keyName};
                             },
                         ];
-                    } else if ($model->hasProperty(lcfirst($keyManyName))) {
+                    } else if ($model instanceof Component && $model->hasProperty(lcfirst($keyManyName))) {
                         $this->_autoColumns[(string)$name] = [
                             'attribute' => $name,
                             'format'    => 'raw',
@@ -518,10 +524,16 @@ JS
                             'attribute' => $name,
                             'format'    => 'raw',
                             'value'     => function ($model, $key, $index) use ($name) {
-                                if (is_array($model->{$name})) {
-                                    return implode(",", $model->{$name});
+                                if (is_array($model)) {
+                                    $v = $model[$name];
                                 } else {
-                                    return $model->{$name};
+                                    $v = $model->{$name};
+                                }
+
+                                if (is_array($v)) {
+                                    return implode(",", $v);
+                                } else {
+                                    return $v;
                                 }
                             },
                         ];
