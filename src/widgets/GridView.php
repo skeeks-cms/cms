@@ -9,6 +9,7 @@
 namespace skeeks\cms\widgets;
 
 use skeeks\cms\backend\helpers\BackendUrlHelper;
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\helpers\PaginationConfig;
 use skeeks\cms\widgets\assets\GridViewAsset;
 use skeeks\yii2\config\ConfigBehavior;
@@ -692,7 +693,7 @@ JS
      */
     public $dialogCallbackData = null;
 
-    public function setdialogCallbackDataColumn($column)
+    public function setDialogCallbackDataColumn($column)
     {
         $this->_dialogCallbackDataColumn = $column;
         return $this;
@@ -709,6 +710,13 @@ JS
                     if ($this->dialogCallbackData && is_callable($this->dialogCallbackData)) {
                         $callback = $this->dialogCallbackData;
                         $data = $callback($model);
+                    } else {
+                        if ($model instanceof ActiveRecord) {
+                            $data = ArrayHelper::merge($model->toArray(), [
+                                'asText' => $model->asText
+                            ]);
+                        }
+
                     }
 
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
