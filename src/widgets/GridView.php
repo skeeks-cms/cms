@@ -25,6 +25,7 @@ use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
 use yii\db\ActiveQueryInterface;
+use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Inflector;
@@ -342,8 +343,59 @@ class GridView extends \yii\grid\GridView
         }
     }
 
+    public $exportParam = '_sx-export';
+
     public function run()
     {
+        if (\Yii::$app->request->get($this->exportParam) == $this->id) {
+
+            ob_clean();
+
+            $out = fopen('php://output', 'w');
+
+            foreach ($this->columns as $column) {
+                /* @var $column DataColumn */
+                $cells[] = iconv("UTF-8", "windows-1251", strip_tags($column->renderHeaderCell()));
+            }
+
+            fputcsv($out, $cells, ";");
+
+            if (isset($this->dataProvider->query)) {
+                foreach ($this->dataProvider->query->each(10) as $key => $model)
+                {
+                    $cells = [];
+
+                    foreach ($this->columns as $column) {
+                        $cells[] = iconv("UTF-8", "windows-1251", strip_tags( $column->renderDataCell($model, $key, $key) ));
+                    }
+
+                    fputcsv($out, $cells, ";");
+                }
+            }
+
+
+            fclose($out);
+            $filename = "export.csv";
+            header( 'Content-Type: text/csv' );
+
+            // disable caching
+            $now = gmdate("D, d M Y H:i:s");
+            header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+            header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+            header("Last-Modified: {$now} GMT");
+
+            // force download
+            header("Content-Type: application/force-download");
+            header("Content-Type: application/octet-stream");
+            header("Content-Type: application/download");
+
+            header("Content-Transfer-Encoding: binary");
+            header( 'Content-Disposition: attachment;filename='.$filename);
+
+            \Yii::$app->end();
+        }
+
+
         GridViewAsset::register($this->view);
         return parent::run();
     }

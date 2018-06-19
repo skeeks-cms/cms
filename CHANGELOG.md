@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.1.2
+----------------
+ * Grid CSV export
+ 
 5.1.1
 ----------------
  * Fixed RelationalBehavior
