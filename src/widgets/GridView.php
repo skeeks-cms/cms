@@ -15,10 +15,8 @@ use skeeks\cms\widgets\assets\GridViewAsset;
 use skeeks\yii2\config\ConfigBehavior;
 use skeeks\yii2\config\ConfigTrait;
 use skeeks\yii2\form\fields\FieldSet;
-use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Component;
-use yii\base\Event;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -27,7 +25,6 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveQueryInterface;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\helpers\Inflector;
 
 /**
@@ -71,7 +68,6 @@ class GridView extends \yii\grid\GridView
      * @var array
      */
     public $configBehaviorData = [];
-
 
 
     /**
@@ -133,7 +129,7 @@ class GridView extends \yii\grid\GridView
                                     'widgetClass'     => DualSelect::class,
                                     'widgetConfig'    => [
                                         'visibleLabel' => \Yii::t('skeeks/cms', 'Display columns'),
-                                        'hiddenLabel' => \Yii::t('skeeks/cms', 'Hidden columns'),
+                                        'hiddenLabel'  => \Yii::t('skeeks/cms', 'Hidden columns'),
                                     ],
                                     //'multiple'        => true,
                                     'on beforeRender' => function ($e) {
@@ -207,13 +203,13 @@ class GridView extends \yii\grid\GridView
                     ],
                     'attributeLabels'  => [
                         'visibleColumns' => 'Отображаемые колонки',
-                        'caption' => 'Заголовок таблицы',
+                        'caption'        => 'Заголовок таблицы',
 
                         'pageParam'        => \Yii::t('skeeks/cms', 'Parameter name pages, pagination'),
                         'defaultPageSize'  => \Yii::t('skeeks/cms', 'Number of records on one page'),
                         'pageSizeLimitMin' => \Yii::t('skeeks/cms', 'The minimum allowable value for pagination'),
                         'pageSizeLimitMax' => \Yii::t('skeeks/cms', 'The maximum allowable value for pagination'),
-                        'pageSizeParam' => \Yii::t('skeeks/cms', 'pageSizeParam'),
+                        'pageSizeParam'    => \Yii::t('skeeks/cms', 'pageSizeParam'),
 
                         'defaultOrder' => 'Сортировка',
                     ],
@@ -230,7 +226,7 @@ class GridView extends \yii\grid\GridView
                         ['pageSizeLimitMax', 'integer'],
                     ],
                 ],
-            ], (array) $this->configBehaviorData),
+            ], (array)$this->configBehaviorData),
         ]);
     }
 
@@ -303,7 +299,6 @@ class GridView extends \yii\grid\GridView
     }*/
 
 
-
     /**
      *
      */
@@ -335,8 +330,7 @@ class GridView extends \yii\grid\GridView
         $this->_initSort();
 
         //Если удалили колонки
-        foreach ($this->columns as $key => $column)
-        {
+        foreach ($this->columns as $key => $column) {
             if (!is_object($column)) {
                 unset($this->columns[$key]);
             }
@@ -361,12 +355,11 @@ class GridView extends \yii\grid\GridView
             fputcsv($out, $cells, ";");
 
             if (isset($this->dataProvider->query)) {
-                foreach ($this->dataProvider->query->each(10) as $key => $model)
-                {
+                foreach ($this->dataProvider->query->each(10) as $key => $model) {
                     $cells = [];
 
                     foreach ($this->columns as $column) {
-                        $cells[] = iconv("UTF-8", "windows-1251", strip_tags( $column->renderDataCell($model, $key, $key) ));
+                        $cells[] = iconv("UTF-8", "windows-1251", strip_tags($column->renderDataCell($model, $key, $key)));
                     }
 
                     fputcsv($out, $cells, ";");
@@ -376,7 +369,7 @@ class GridView extends \yii\grid\GridView
 
             fclose($out);
             $filename = "export.csv";
-            header( 'Content-Type: text/csv' );
+            header('Content-Type: text/csv');
 
             // disable caching
             $now = gmdate("D, d M Y H:i:s");
@@ -390,7 +383,7 @@ class GridView extends \yii\grid\GridView
             header("Content-Type: application/download");
 
             header("Content-Transfer-Encoding: binary");
-            header( 'Content-Disposition: attachment;filename='.$filename);
+            header('Content-Disposition: attachment;filename='.$filename);
 
             \Yii::$app->end();
         }
@@ -400,7 +393,8 @@ class GridView extends \yii\grid\GridView
         return parent::run();
     }
 
-    protected function _initDialogCallbackData() {
+    protected function _initDialogCallbackData()
+    {
 
         if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
             $this->view->registerJs(<<<JS
@@ -640,8 +634,7 @@ JS
         $resultColumns = [];
 
         if ($columnsTmp) {
-            foreach ($columnsTmp as $key => $column)
-            {
+            foreach ($columnsTmp as $key => $column) {
                 if (isset($columns[$key])) {
                     $resultColumns[$key] = $columns[$key];
                     unset($columns[$key]);
@@ -650,7 +643,7 @@ JS
         }
 
         if ($resultColumns) {
-            $resultColumns = ArrayHelper::merge((array) $resultColumns, (array) $columns);
+            $resultColumns = ArrayHelper::merge((array)$resultColumns, (array)$columns);
             $columns = $resultColumns;
         }
 
@@ -679,7 +672,6 @@ JS
             $this->_resultColumns = $result;*/
             $this->columns = $result;
         }
-
 
 
         return $this;
@@ -721,21 +713,17 @@ JS
     {
         $sort = [];
         if ($this->dataProvider->getSort()->attributes) {
-            foreach ($this->dataProvider->getSort()->attributes as $key => $value)
-            {
+            foreach ($this->dataProvider->getSort()->attributes as $key => $value) {
                 $sort[$key] = ArrayHelper::getValue($value, 'label');
             }
         }
 
         return [
-            'callAttributes' => $this->callAttributes,
+            'callAttributes'   => $this->callAttributes,
             'availableColumns' => $this->getColumnsKeyLabels(),
-            'sortAttributes' => $sort,
+            'sortAttributes'   => $sort,
         ];
     }
-
-
-
 
 
     protected $_dialogCallbackDataColumn = null;
@@ -755,8 +743,8 @@ JS
     {
         if ($this->_dialogCallbackDataColumn === null) {
             $this->_dialogCallbackDataColumn = [
-                'class' => \yii\grid\DataColumn::className(),
-                'value' => function ($model) {
+                'class'  => \yii\grid\DataColumn::className(),
+                'value'  => function ($model) {
                     $data = $model->toArray();
 
                     if ($this->dialogCallbackData && is_callable($this->dialogCallbackData)) {
@@ -765,21 +753,21 @@ JS
                     } else {
                         if ($model instanceof ActiveRecord) {
                             $data = ArrayHelper::merge($model->toArray(), [
-                                'asText' => $model->asText
+                                'asText' => $model->asText,
                             ]);
                         }
 
                     }
 
-                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
+                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms',
                             'Choose'), '#', [
-                        'class' => 'btn btn-primary sx-row-action',
-                        'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($data) . '); return false;',
-                        'data-pjax' => 0
+                        'class'     => 'btn btn-primary sx-row-action',
+                        'onclick'   => 'sx.SelectCmsElement.submit('.\yii\helpers\Json::encode($data).'); return false;',
+                        'data-pjax' => 0,
                     ]);
                 },
-                'label' => '',
-                'format' => 'raw'
+                'label'  => '',
+                'format' => 'raw',
             ];
         }
         return $this->_dialogCallbackDataColumn;
