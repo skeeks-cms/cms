@@ -338,6 +338,7 @@ class GridView extends \yii\grid\GridView
     }
 
     public $exportParam = '_sx-export';
+    public $exportFileName = 'export';
 
     public function run()
     {
@@ -368,7 +369,7 @@ class GridView extends \yii\grid\GridView
 
 
             fclose($out);
-            $filename = "export.csv";
+            $filename = $this->exportFileName . ".csv";
             header('Content-Type: text/csv');
 
             // disable caching
