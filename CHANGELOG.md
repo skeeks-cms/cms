@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
-
+ 
+5.1.3
+----------------
+ * Related properties model lazy load
+ 
 5.1.2
 ----------------
  * Grid CSV export
