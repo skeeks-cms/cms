@@ -83,15 +83,23 @@ class RelatedPropertiesModel extends DynamicModel
         //}
     }
 
-    /*public function toArray(array $fields = [], array $expand = [], $recursive = true)
+    /**
+     * @param array $fields
+     * @param array $expand
+     * @param bool  $recursive
+     * @return array
+     */
+    public function toArray(array $fields = [], array $expand = [], $recursive = true)
     {
         $result = parent::toArray($fields, $expand, $recursive);
 
-            print_r($result);
-            die;
+        if (!$result) {
+            $this->initAllProperties();
+            return parent::toArray($fields, $expand, $recursive);
+        }
 
         return $result;
-    }*/
+    }
 
     /**
      * @param RelatedPropertyModel $property
