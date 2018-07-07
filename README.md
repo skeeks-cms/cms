@@ -5,8 +5,8 @@ SkeekS CMS (Yii2)
 
 SkeekS CMS - modern generic content management system based on yii2 php framework.
 
-[![Latest Stable Version](https://poser.pugx.org/skeeks/cms/v/stable.png)](https://packagist.org/packages/skeeks/cms)
-[![Total Downloads](https://poser.pugx.org/skeeks/cms/downloads.png)](https://packagist.org/packages/skeeks/cms)
+[![Latest Stable Version](https://img.shields.io/packagist/v/skeeks/cms.svg)](https://packagist.org/packages/skeeks/cms)
+[![Total Downloads](https://img.shields.io/packagist/dt/skeeks/cms.svg)](https://packagist.org/packages/skeeks/cms)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/skeeks-cms/cms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/skeeks-cms/cms/?branch=master)
 
 
