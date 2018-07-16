@@ -114,7 +114,7 @@ FAQ
     });
     
 Как вызвать событие в момент окончания работы pjax-скрипта с определенным id?
---------------------------
+-----------------------------------------------------------------------------
 
 Для того, чтобы изменить вызвать событие в момент окончания работы pjax-скрипта, можно добавить код javascript:
 
@@ -159,6 +159,67 @@ FAQ
        :width: 300 px
        :align: center
        :alt: SkeekS CMS
+
+
+Как подключить свой jquery в сайтовой части?
+--------------------------------------------
+
+Одним из вариантов может быть следующий пример:
+
+В конфиг файле проекта ``@frontend/config/main.php`` добавить:
+
+.. code-block:: php
+
+    'components' =>
+    [
+        'view'    => [
+            'on beforeRender' => function () {
+                if (!\skeeks\cms\backend\BackendComponent::getCurrent()) {
+                    \Yii::$app->assetManager->bundles['yii\web\JqueryAsset'] = [
+                        'class' => '\frontend\assets\YourJqueryAsset',
+                    ];
+                }
+            },
+        ],
+    ]
+
+``frontend\assets\YourJqueryAsset`` :
+
+.. code-block:: php
+
+    namespace frontend\assets;
+
+    /**
+     * @author Semenov Alexander <semenov@skeeks.com>
+     */
+    class DigiproJsPluginsAsset extends DigiproAsset
+    {
+        public $sourcePath = '@webroot/';
+        public $css = [];
+
+        public $js = [
+            'jquery-version.min.js',
+        ];
+
+        public $depends = [];
+    }
+
+Как задать основной хост проекта?
+---------------------------------
+
+.. code-block:: php
+
+    'components' =>
+    [
+        'seo' => [
+            'canUrl' => [
+                'host' => 'main-host.com',
+                'scheme' => 'https'
+            ]
+        ],
+    ]
+
+
 
 
 Перенос проекта на другой хостинг

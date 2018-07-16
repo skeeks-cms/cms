@@ -253,7 +253,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'class'          => BackendModelUpdateAction::class,
                     "name"           => \Yii::t('skeeks/cms', 'Copy'),
                     "icon"           => "fas fa-copy",
-                    "preContent"     => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
+                    "beforeContent"     => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
                     "successMessage" => "Элемент успешно скопирован",
 
                     'on initFormModels' => function (Event $e) {

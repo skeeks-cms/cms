@@ -9,12 +9,9 @@
 namespace skeeks\cms;
 
 /**
- * @property string $name;
- * @property string $icon;
- * @property string $image;
+ * @deprecated
  *
- * Interface IHasInfo
- * @package skeeks\cms
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 interface IHasInfo
 {

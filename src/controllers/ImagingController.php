@@ -14,17 +14,9 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\imaging\Filter;
 use skeeks\cms\Exception;
-use skeeks\sx\Dir;
 use skeeks\sx\File;
-use Yii;
-use skeeks\cms\models\StorageFile;
-use skeeks\cms\models\searchs\StorageFile as StorageFileSearch;
-use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
-use skeeks\imagine\Image;
 
 
 /**
@@ -51,7 +43,7 @@ class ImagingController extends Controller
         $extension = Imaging::getExtension($newFileSrc);
 
         if (!$extension) {
-            throw new \yii\base\Exception("Extension not found: " . $newFileSrc);
+            throw new \yii\base\Exception("Extension not found: ".$newFileSrc);
         }
 
 
@@ -61,30 +53,31 @@ class ImagingController extends Controller
 
 
         $newFile = File::object($newFileSrc);
-        $strposFilter = strpos($newFileSrc, "/" . Imaging::THUMBNAIL_PREFIX);
+        $strposFilter = strpos($newFileSrc, "/".Imaging::THUMBNAIL_PREFIX);
         if (!$strposFilter) {
-            throw new NotFoundHttpException("This is not a filter thumbnail: " . $newFileSrc);
+            throw new NotFoundHttpException("This is not a filter thumbnail: ".$newFileSrc);
         }
 
-        $originalFileSrc = substr($newFileSrc, 0, $strposFilter) . "." . $newFile->getExtension();
+        $originalFileSrc = substr($newFileSrc, 0, $strposFilter).".".$newFile->getExtension();
 
+        //TODO: hardcode delete it in the future
         $webRoot = \Yii::getAlias('@webroot');
 
-        $originalFileRoot = $webRoot . DIRECTORY_SEPARATOR . $originalFileSrc;
-        $newFileRoot = $webRoot . DIRECTORY_SEPARATOR . $newFileSrc;
-        $newFileRootDefault = $webRoot . DIRECTORY_SEPARATOR . str_replace($newFile->getBaseName(),
-                Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $extension, $newFileSrc);
+        $originalFileRoot = $webRoot.DIRECTORY_SEPARATOR.$originalFileSrc;
+        $newFileRoot = $webRoot.DIRECTORY_SEPARATOR.$newFileSrc;
+        $newFileRootDefault = $webRoot.DIRECTORY_SEPARATOR.str_replace($newFile->getBaseName(),
+                Imaging::DEFAULT_THUMBNAIL_FILENAME.".".$extension, $newFileSrc);
 
         $originalFile = new File($originalFileRoot);
 
         if (!$originalFile->isExist()) {
-            throw new NotFoundHttpException("The original file is not found: " . $newFileSrc);
+            throw new NotFoundHttpException("The original file is not found: ".$newFileSrc);
         }
 
         //Проверено наличие оригинального файла, есть пути к оригиналу, и результирующему файлу.
         //Отслось собрать фильтр, и проверить наличие параметров. А так же проверить разрешены ли эти параметры, для этого в строке есть захэшированный ключь
 
-        $filterSting = substr($newFileSrc, ($strposFilter + strlen(DIRECTORY_SEPARATOR . Imaging::THUMBNAIL_PREFIX)),
+        $filterSting = substr($newFileSrc, ($strposFilter + strlen(DIRECTORY_SEPARATOR.Imaging::THUMBNAIL_PREFIX)),
             strlen($newFileSrc));
         $filterCode = explode("/", $filterSting);
         $filterCode = $filterCode[0]; //Код фильтра
@@ -93,12 +86,12 @@ class ImagingController extends Controller
         if ($params = \Yii::$app->request->get()) {
             $pramsCheckArray = explode(DIRECTORY_SEPARATOR, $filterSting);
             if (count($pramsCheckArray) < 3) {
-                throw new \yii\base\Exception("the control line not found: " . $newFileSrc);
+                throw new \yii\base\Exception("the control line not found: ".$newFileSrc);
             }
 
             $string = $imaging->getParamsCheckString($params);
             if ($pramsCheckArray[1] != $string) {
-                throw new \yii\base\Exception("Parameters invalid: " . $newFileSrc);
+                throw new \yii\base\Exception("Parameters invalid: ".$newFileSrc);
             }
         }
 
@@ -106,7 +99,7 @@ class ImagingController extends Controller
 
 
         if (!class_exists($filterClass)) {
-            throw new \ErrorException("Filter class is not created: " . $newFileSrc);
+            throw new \ErrorException("Filter class is not created: ".$newFileSrc);
         }
 
         /**
@@ -114,7 +107,7 @@ class ImagingController extends Controller
          */
         $filter = new $filterClass((array)$params);
         if (!is_subclass_of($filter, Filter::className())) {
-            throw new NotFoundHttpException("No child filter class: " . $newFileSrc);
+            throw new NotFoundHttpException("No child filter class: ".$newFileSrc);
         }
 
         try {
@@ -135,7 +128,7 @@ class ImagingController extends Controller
                 }
             }
 
-            $url = \Yii::$app->request->getUrl() . ($params ?
+            $url = \Yii::$app->request->getUrl().($params ?
                     ""//"?" . http_build_query($params) . '&sx-refresh'
                     : '?sx-refresh');
 

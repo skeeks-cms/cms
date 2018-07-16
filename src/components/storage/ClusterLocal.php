@@ -1,46 +1,45 @@
 <?php
 /**
- * Storage
- *
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 17.10.2014
- * @since 1.0.0
  */
 
 namespace skeeks\cms\components\storage;
 
-use Yii;
-
-use \skeeks\sx\File;
-use \skeeks\sx\Dir;
+use skeeks\sx\Dir;
+use skeeks\sx\File;
 
 /**
- * Class Storage
- * @package common\components\Storage
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class ClusterLocal extends Cluster
 {
+    /**
+     * @var bool
+     */
+    public $publicBaseUrlIsAbsolute = false;
     public function init()
     {
         if (!$this->name) {
             $this->name = \Yii::t('skeeks/cms', "Local storage");
         }
+
         if (!$this->publicBaseUrl) {
             $this->publicBaseUrl = \Yii::getAlias("@web/uploads/all");
+        } else {
+            $this->publicBaseUrl = \Yii::getAlias($this->publicBaseUrl);
         }
+
         if (!$this->rootBasePath) {
             $this->rootBasePath = \Yii::getAlias("@frontend/web/uploads/all");
+        } else {
+            $this->rootBasePath = \Yii::getAlias($this->rootBasePath);
         }
+        
         parent::init();
     }
-
-    /**
-     * @var bool
-     */
-    public $publicBaseUrlIsAbsolute = false;
-
     /**
      * Добавление файла в кластер
      *
@@ -58,11 +57,11 @@ class ClusterLocal extends Cluster
         $clusterFileSrc = $clusterFileName;
 
         if ($localPath) {
-            $clusterFileSrc = $localPath . DIRECTORY_SEPARATOR . $clusterFileSrc;
+            $clusterFileSrc = $localPath.DIRECTORY_SEPARATOR.$clusterFileSrc;
         }
 
         try {
-            $dir = new Dir($dir . DIRECTORY_SEPARATOR . $localPath);
+            $dir = new Dir($dir.DIRECTORY_SEPARATOR.$localPath);
             $resultFile = $dir->newFile($clusterFileName);
             $tmpFile->move($resultFile);
 
@@ -120,10 +119,21 @@ class ClusterLocal extends Cluster
         if ($this->publicBaseUrlIsAbsolute) {
             return $this->getPublicSrc($clusterFileUniqSrc);
         } else {
-            return \Yii::$app->urlManager->hostInfo . $this->getPublicSrc($clusterFileUniqSrc);
+            return \Yii::$app->urlManager->hostInfo.$this->getPublicSrc($clusterFileUniqSrc);
         }
     }
+    /**
+     * Свободное место на сервере
+     * @return float
+     */
+    public function getFreeSpace()
+    {
+        if ($this->existsRootPath()) {
+            return (float)disk_free_space($this->rootBasePath);
+        }
 
+        return (float)0;
+    }
     /**
      * @return bool
      */
@@ -141,20 +151,6 @@ class ClusterLocal extends Cluster
 
         return false;
     }
-
-    /**
-     * Свободное место на сервере
-     * @return float
-     */
-    public function getFreeSpace()
-    {
-        if ($this->existsRootPath()) {
-            return (float)disk_free_space($this->rootBasePath);
-        }
-
-        return (float)0;
-    }
-
     /**
      * Всего столько места.
      * @return float

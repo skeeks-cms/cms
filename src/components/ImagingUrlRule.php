@@ -67,7 +67,7 @@ class ImagingUrlRule
         if (!in_array(StringHelper::strtolower($extension), (array)\Yii::$app->imaging->extensions)) {
             return false;
         }
-
+        
         return ['cms/imaging/process', $params];
     }
 }

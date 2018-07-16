@@ -26,40 +26,48 @@
     "prefer-stable": true,
     "require": {
         "php": ">=5.6.0",
-        "yiisoft/yii2": "2.0.13.1",
+
+        "yiisoft/yii2": "2.0.13.1 || 2.0.15.1 || dev-master@dev",
         "yiisoft/yii2-jui": "2.0.6",
-        "yiisoft/yii2-bootstrap": "~2.0.7 || dev-master || 2.1.x-dev",
-        "skeeks/cms-backend": "~1.1.1 || dev-master",
-        "skeeks/cms-backend-admin": "~1.1.0 || dev-master",
-        "skeeks/cms-admin": "~2.0.2 || dev-master",
-        "skeeks/cms-rbac": "~2.2.0 || dev-master",
-        "skeeks/cms-marketplace": "~2.0.0 || dev-master",
-        "skeeks/cms-composer": "~1.0.0 || dev-master",
-        "skeeks/cms-toolbar": "~1.0.0 || dev-master",
-        "skeeks/cms-agent": "~2.0.0 || dev-master",
-        "skeeks/yii2-ajax-file-upload": "~1.0.0",
-        "skeeks/yii2-imagine": "~2.0.1",
-        "skeeks/yii2-sx": "~1.3.0",
-        "skeeks/yii2-ckeditor": "~1.1.0",
-        "skeeks/yii2-widget-simpleajaxuploader": "~1.1.0",
-        "skeeks/yii2-widget-chosen": "~1.2.0",
-        "skeeks/yii2-widget-highcharts": "~1.0.3",
-        "skeeks/yii2-widget-codemirror": "~1.0.3",
-        "skeeks/yii2-slug-behavior": "~1.0.0",
-        "skeeks/yii2-ya-slug": "~1.0.0",
-        "skeeks/yii2-form": "dev-master",
-        "skeeks/yii2-config": "dev-master",
-        "skeeks/cms-user-personal-area": "dev-master@dev",
+        "yiisoft/yii2-bootstrap": "~2.0.7 || dev-master@dev || 2.1.x-dev",
+
+        "skeeks/cms-composer": "^1.0.0 || dev-master@dev",
+        "skeeks/yii2-config": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/yii2-form": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/cms-backend": "^1.1.7 || dev-master@dev",
+        "skeeks/cms-backend-admin": "^1.1.3 || dev-master@dev",
+        "skeeks/cms-admin": "^2.0.5 || dev-master@dev",
+        "skeeks/cms-user-personal-area": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/cms-query-filters": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/yii2-jquery-contextmenu": "^0.1.0 || ^1.0.0 || dev-master@dev",
+        "skeeks/cms-rbac": "^2.2.0 || dev-master@dev",
+        "skeeks/cms-marketplace": "^2.0.1 || dev-master@dev",
+        "skeeks/cms-toolbar": "^1.0.0 || dev-master@dev",
+        "skeeks/cms-agent": "^2.0.0 || dev-master@dev",
+        "skeeks/yii2-ajax-file-upload": "^1.0.0",
+        "skeeks/yii2-imagine": "^2.0.1",
+        "skeeks/yii2-sx": "^1.4.0 || dev-master@dev",
+        "skeeks/yii2-ckeditor": "^1.1.0",
+        "skeeks/yii2-widget-simpleajaxuploader": "^1.1.0",
+        "skeeks/yii2-widget-chosen": "^1.2.0",
+        "skeeks/yii2-widget-highcharts": "^1.0.3",
+        "skeeks/yii2-widget-codemirror": "^1.0.3",
+        "skeeks/yii2-slug-behavior": "^1.0.0",
+        "skeeks/yii2-ya-slug": "^1.0.0",
+
         "kartik-v/yii2-datecontrol": "~1.9.6",
         "kartik-v/yii2-widget-datepicker": "~1.4.3",
         "kartik-v/yii2-widget-datetimepicker": "~1.4.4",
         "kartik-v/yii2-widget-colorinput": "~1.0.3",
+
         "mihaildev/yii2-elfinder": "1.1.3",
         "giggsey/libphonenumber-for-php": "~8.8.5",
+
         "paulzi/yii2-auto-tree": "~1.0.4",
         "paulzi/yii2-adjacency-list": "~2.0.4",
         "paulzi/yii2-nested-sets": "~1.0.6",
         "paulzi/yii2-materialized-path": "~2.0.8",
+
         "bower-asset/fancybox": "^3.1",
         "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
     },
@@ -81,6 +89,15 @@
                 "src/config/web.php"
             ],
             "console": [
+                "src/config/common.php",
+                "src/config/console.php"
+            ],
+
+            "skeeks-cms-web": [
+                "src/config/common.php",
+                "src/config/web.php"
+            ],
+            "skeeks-cms-console": [
                 "src/config/common.php",
                 "src/config/console.php"
             ]

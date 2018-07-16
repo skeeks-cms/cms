@@ -19,7 +19,7 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
     'p.name' => [
         'asc' => ['p.name' => SORT_ASC],
         'desc' => ['p.name' => SORT_DESC],
-        'label' => \Yii::t('skeeks/shop/app', 'Property'),
+        'label' => \Yii::t('skeeks/cms', 'Property'),
         'default' => SORT_ASC
     ]
 ]);
