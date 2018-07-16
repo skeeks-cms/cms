@@ -11,12 +11,11 @@ namespace skeeks\cms\traits;
 use yii\helpers\ArrayHelper;
 
 /**
+ * @deprecated
+ *
  * @property $name;
  * @property $icon;
  * @property $image;
- *
- * Class THasInfo
- * @package skeeks\cms\traits
  */
 trait THasInfo
 {

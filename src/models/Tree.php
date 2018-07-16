@@ -231,6 +231,21 @@ class Tree extends Core
                 $this->cms_site_id = $site->code;
             }
         }
+        //tree type
+        if (!$this->tree_type_id) {
+            if ($this->parent && $this->parent->treeType) {
+                if ($this->parent->treeType->defaultChildrenTreeType) {
+                    $this->tree_type_id = $this->parent->treeType->defaultChildrenTreeType->id;
+                } else {
+                    $this->tree_type_id = $this->parent->tree_type_id;
+                }
+            } else {
+
+                if ($treeType = CmsTreeType::find()->orderBy(['priority' => SORT_ASC])->one()) {
+                    $this->tree_type_id = $treeType->id;
+                }
+            }
+        }
     }
 
     /**
@@ -373,26 +388,6 @@ class Tree extends Core
                     }
 
                     return 'root';
-                }
-            ],
-
-            [
-                ['tree_type_id'],
-                'default',
-                'value' => function(self $model) {
-
-                    if ($this->parent && $this->parent->treeType) {
-                        if ($this->parent->treeType->defaultChildrenTreeType) {
-                            return $this->parent->treeType->defaultChildrenTreeType->id;
-                        } else {
-                            return $this->parent->tree_type_id;
-                        }
-                    } else {
-
-                        if ($treeType = CmsTreeType::find()->orderBy(['priority' => SORT_ASC])->one()) {
-                            return $treeType->id;
-                        }
-                    }
                 }
             ],
 

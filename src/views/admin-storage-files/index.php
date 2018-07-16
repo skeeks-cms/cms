@@ -99,13 +99,13 @@ JS
 
         [
             'attribute' => 'mime_type',
-            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->groupBy(['mime_type'])->all(),
+            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->select(['mime_type'])->groupBy(['mime_type'])->all(),
                 'mime_type', 'mime_type'),
         ],
 
         [
             'attribute' => 'extension',
-            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->groupBy(['extension'])->all(),
+            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\StorageFile::find()->select(['extension'])->groupBy(['extension'])->all(),
                 'extension', 'extension'),
         ],
 

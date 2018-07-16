@@ -16,6 +16,8 @@ use Yii;
 use yii\base\Exception;
 use yii\base\UserException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**

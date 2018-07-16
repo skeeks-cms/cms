@@ -78,7 +78,7 @@ class AdminTreeController extends AdminModelEditorController
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Move'),
                 "icon"           => "fas fa-expand-arrows-alt",
-                "preContent"     => "Механизм перемещения раздела. Укажите новый родительский раздел. <p><b>Внимание!</b> перемещение раздела, повлияет на изменение адресов всех дочерних разделов.</p>",
+                "beforeContent"     => "Механизм перемещения раздела. Укажите новый родительский раздел. <p><b>Внимание!</b> перемещение раздела, повлияет на изменение адресов всех дочерних разделов.</p>",
                 "successMessage" => "Раздел успешно перемещен",
 
                 'on initFormModels' => function (Event $e) {

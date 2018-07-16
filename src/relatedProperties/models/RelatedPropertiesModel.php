@@ -46,57 +46,124 @@ class RelatedPropertiesModel extends DynamicModel
      */
     private $_propertyValues = [];
 
-    public function init()
-    {
-        parent::init();
 
+
+    public function setAttributes($values, $safeOnly = true)
+    {
+        foreach ($values as $code => $value)
+        {
+            $this->hasAttribute($code);
+        }
+
+        parent::setAttributes($values, $safeOnly);
+    }
+
+    protected function _defineByProperty($property) {
+
+        //if ($property = $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $code])->one()) {
+
+            /**
+             * @var $property RelatedPropertyModel
+             */
+            $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null);
+
+            $property->relatedPropertiesModel = $this;
+            $property->addRules();
+
+            $this->{$property->code} = $property->defaultValue;
+
+            $this->_properties[$property->code] = $property;
+
+            $this->_attributeLabels[$property->code] = $property->name;
+            $this->_attributeHints[$property->code] = $property->hint;
+
+
+            //$propertyValues = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
+
+        //}
+    }
+
+    /**
+     * @param array $fields
+     * @param array $expand
+     * @param bool  $recursive
+     * @return array
+     */
+    public function toArray(array $fields = [], array $expand = [], $recursive = true)
+    {
+        $result = parent::toArray($fields, $expand, $recursive);
+
+        if (!$result) {
+            $this->initAllProperties();
+            return parent::toArray($fields, $expand, $recursive);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param RelatedPropertyModel $property
+     * @param array $relatedElementProperties
+     */
+    protected function _initPropertyValue($property, $relatedElementProperties = []) {
+        $code = $property->code;
+        if ($property->handler->isMultiple) {
+            $values = [];
+            $valuesModels = [];
+
+            foreach ($relatedElementProperties as $propertyElementVal) {
+                if ($propertyElementVal->property_id == $property->id) {
+                    $values[$propertyElementVal->id] = $propertyElementVal->value;
+                    $valuesModels[$propertyElementVal->id] = $propertyElementVal;
+                }
+            }
+
+            $values = $property->handler->initValue($values);
+
+            $this->setAttribute($code, $values);
+            $this->_propertyValues[$code] = $valuesModels;
+        } else {
+            $value = null;
+            $valueModel = null;
+
+            foreach ($relatedElementProperties as $propertyElementVal) {
+                if ($propertyElementVal->property_id == $property->id) {
+                    $value = $propertyElementVal->value;
+                    $valueModel = $propertyElementVal;
+                    break;
+                }
+            }
+
+            $value = $property->handler->initValue($value);
+
+            $this->setAttribute($code, $value);
+            $this->_propertyValues[$code] = $valueModel;
+        }
+    }
+
+    public function initAllProperties()
+    {
         if ($this->relatedElementModel->relatedProperties) {
             foreach ($this->relatedElementModel->relatedProperties as $property) {
-                $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null);
-
-                $property->relatedPropertiesModel = $this;
-                $property->addRules();
-
-                $this->_properties[$property->code] = $property;
+                $this->_defineByProperty($property);
             }
         }
 
         if ($relatedElementProperties = $this->relatedElementModel->relatedElementProperties) {
             foreach ($this->_properties as $code => $property) {
-                if ($property->handler->isMultiple) {
-                    $values = [];
-                    $valuesModels = [];
-
-                    foreach ($relatedElementProperties as $propertyElementVal) {
-                        if ($propertyElementVal->property_id == $property->id) {
-                            $values[$propertyElementVal->id] = $propertyElementVal->value;
-                            $valuesModels[$propertyElementVal->id] = $propertyElementVal;
-                        }
-                    }
-
-                    $values = $property->handler->initValue($values);
-
-                    $this->setAttribute($code, $values);
-                    $this->_propertyValues[$code] = $valuesModels;
-                } else {
-                    $value = null;
-                    $valueModel = null;
-
-                    foreach ($relatedElementProperties as $propertyElementVal) {
-                        if ($propertyElementVal->property_id == $property->id) {
-                            $value = $propertyElementVal->value;
-                            $valueModel = $propertyElementVal;
-                            break;
-                        }
-                    }
-
-                    $value = $property->handler->initValue($value);
-
-                    $this->setAttribute($code, $value);
-                    $this->_propertyValues[$code] = $valueModel;
-                }
+                $this->_initPropertyValue($property, $relatedElementProperties);
             }
         }
+    }
+
+    public function init()
+    {
+        \Yii::beginProfile('init RP');
+
+        parent::init();
+        //$this->_initAllProperties();
+
+        \Yii::endProfile('init RP');
     }
 
 
@@ -297,32 +364,39 @@ class RelatedPropertiesModel extends DynamicModel
         return $this;
     }
 
+    protected $_attributeLabels = [];
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
-        $result = [];
+        return $this->_attributeLabels;
+
+        /*$result = [];
 
         foreach ($this->relatedElementModel->relatedProperties as $property) {
             $result[$property->code] = $property->name;
         }
 
-        return $result;
+        return $result;*/
     }
+
+    protected $_attributeHints = [];
 
     /**
      * @return array
      */
     public function attributeHints()
     {
-        $result = [];
+        return $this->_attributeHints;
+
+        /*$result = [];
 
         foreach ($this->relatedElementModel->relatedProperties as $property) {
             $result[$property->code] = $property->hint;
         }
 
-        return $result;
+        return $result;*/
     }
 
     /**
@@ -364,6 +438,7 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getRelatedProperty($name)
     {
+        $this->hasAttribute($name);
         return ArrayHelper::getValue($this->_properties, $name);
     }
 
@@ -373,9 +448,28 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getRelatedElementProperties($name)
     {
+        $this->hasAttribute($name);
         return ArrayHelper::getValue($this->_propertyValues, $name);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __get($name)
+    {
+        $this->hasAttribute($name);
+        return parent::__get($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __set($name, $value)
+    {
+        $this->hasAttribute($name);
+        return parent::__set($name, $value);
+    }
 
     /**
      * Returns a value indicating whether the model has an attribute with the specified name.
@@ -384,7 +478,21 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function hasAttribute($name)
     {
-        return in_array($name, $this->attributes());
+        if (in_array($name, $this->attributes())) {
+            return true;
+        }
+
+        if ($property = $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $name])->one()) {
+            $this->_defineByProperty($property);
+            $pv = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
+            $this->_initPropertyValue($property, (array) $pv);
+        }
+
+        if (in_array($name, $this->attributes())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

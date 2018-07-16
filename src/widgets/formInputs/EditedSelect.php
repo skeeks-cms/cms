@@ -20,6 +20,7 @@ use yii\widgets\InputWidget;
 use Yii;
 
 /**
+ * @deprecated
  * Class EditedSelect
  * @package skeeks\cms\widgets\formInputs
  */

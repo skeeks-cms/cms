@@ -8,28 +8,24 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\components\Cms;
+use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
+use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\models\CmsLang;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\yii2\form\fields\BoolField;
-use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class AdminCmsLangController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminCmsLangController extends AdminModelEditorController
+class AdminCmsLangController extends BackendModelStandartController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public function init()
     {
-        $this->name = \Yii::t('skeeks/cms', 'Management of languages');
+        $this->name = \Yii::t('skeeks/cms', "Management of languages");
         $this->modelShowAttribute = "name";
         $this->modelClassName = CmsLang::class;
 
@@ -41,48 +37,76 @@ class AdminCmsLangController extends AdminModelEditorController
      */
     public function actions()
     {
-        $fields = [
+        return ArrayHelper::merge(parent::actions(), [
+            'index'  => [
+                "filters" => [
+                    'visibleFilters' => [
+                        'id',
+                        'name',
+                    ],
+                ],
+                'grid'    => [
+                    'defaultOrder' => [
+                        'active' => SORT_DESC,
+                        'priority' => SORT_ASC,
+                    ],
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        'id',
+                        'image_id',
+                        'name',
+                        'code',
+                        'active',
+                        'priority',
+                    ],
+                    'columns'        => [
+                        'active'   => [
+                            'class' => BooleanColumn::class,
+                        ],
+                        'image_id' => [
+                            'class' => ImageColumn2::class,
+                        ],
+                    ],
+                ],
+            ],
+            "create" => [
+                'fields' => [$this, 'updateFields'],
+            ],
+            "update" => [
+                'fields' => [$this, 'updateFields'],
+            ],
+
+            "activate-multi" => [
+                'class' => BackendModelMultiActivateAction::class,
+            ],
+
+            "deactivate-multi" => [
+                'class' => BackendModelMultiDeactivateAction::class,
+            ],
+        ]);
+    }
+
+    public function updateFields($action)
+    {
+        return [
             'image_id' => [
-                'class' => WidgetField::class,
-                'widgetClass' => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                'class'        => WidgetField::class,
+                'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
                 'widgetConfig' => [
-                    'accept' => 'image/*',
-                    'multiple' => false
-                ]
+                    'accept'   => 'image/*',
+                    'multiple' => false,
+                ],
             ],
             'code',
-            'active' => [
-                'class' => BoolField::class,
-                'trueValue' => "Y",
+            'active'   => [
+                'class'      => BoolField::class,
+                'trueValue'  => "Y",
                 'falseValue' => "N",
             ],
             'name',
             'description',
             'priority',
         ];
-        $actions = ArrayHelper::merge(parent::actions(), [
-                "activate-multi" => [
-                    'class' => AdminMultiModelEditAction::className(),
-                    "name" => \Yii::t('skeeks/cms', 'Activate'),
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback" => [$this, 'eachMultiActivate'],
-                ],
-
-                "inActivate-multi" => [
-                    'class' => AdminMultiModelEditAction::className(),
-                    "name" => \Yii::t('skeeks/cms', 'Deactivate'),
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback" => [$this, 'eachMultiInActivate'],
-                ],
-                'update' => [
-                    'fields' => $fields
-                ],
-                'create' => [
-                    'fields' => $fields
-                ]
-            ]
-        );
-
-        return $actions;
     }
 }

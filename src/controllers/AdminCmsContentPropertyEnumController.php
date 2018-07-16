@@ -1,25 +1,21 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
- * @date 17.05.2015
  */
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\backend\actions\BackendModelAction;
-use skeeks\cms\backend\BackendAction;
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsContentPropertyEnum;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class AdminCmsContentPropertyEnumController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminCmsContentPropertyEnumController extends AdminModelEditorController
+class AdminCmsContentPropertyEnumController extends BackendModelStandartController
 {
     public function init()
     {
@@ -30,18 +26,28 @@ class AdminCmsContentPropertyEnumController extends AdminModelEditorController
         parent::init();
     }
 
-    /**
-     * @inheritdoc
-     */
-    /*public function actions()
+    public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
-        [
-            'bind' =>
-            [
-                'class' => BackendAction::class,
-                'name' => 'Привязать'
-            ]
+        return ArrayHelper::merge(parent::actions(), [
+            'index' => [
+                'filters' => [
+                    'visibleFilters' => [
+                        'value',
+                        'property_id',
+                    ],
+                ],
+                'grid'    => [
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        'id',
+                        'property_id',
+                        'value',
+                        'code',
+                        'priority',
+                    ],
+                ],
+            ],
         ]);
-    }*/
+    }
 }
