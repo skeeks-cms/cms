@@ -189,6 +189,7 @@ class CmsContentElement extends RelatedElementModel
             'priority'               => Yii::t('skeeks/cms', 'Priority'),
             'active'                 => Yii::t('skeeks/cms', 'Active'),
             'name'                   => Yii::t('skeeks/cms', 'Name'),
+            'name_full'              => Yii::t('skeeks/cms', 'Заголовок страницы(H1)'),
             'code'                   => Yii::t('skeeks/cms', 'Code'),
             'description_short'      => Yii::t('skeeks/cms', 'Description Short'),
             'description_full'       => Yii::t('skeeks/cms', 'Description Full'),
@@ -246,7 +247,7 @@ class CmsContentElement extends RelatedElementModel
             [['name'], 'required'],
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
-            [['name', 'code'], 'string', 'max' => 255],
+            [['name', 'name_full', 'code'], 'string', 'max' => 255],
             [
                 ['content_id', 'code'],
                 'unique',
