@@ -42,7 +42,11 @@ class ActiveRecord extends \yii\db\ActiveRecord
      */
     public static function find()
     {
-        return new CmsActiveQuery(get_called_class());
+        if (self::getTableSchema()->getColumn('is_active')) {
+            return new CmsActiveQuery(get_called_class(), ['is_active' => true]);
+        }
+
+        return new CmsActiveQuery(get_called_class(), ['is_active' => false]);
     }
 
     /** @inheritdoc */
