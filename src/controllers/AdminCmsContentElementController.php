@@ -22,6 +22,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\yii2\form\fields\BoolField;
 use yii\base\DynamicModel;
 use yii\base\Event;
@@ -43,7 +44,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public $notSubmitParam = 'sx-not-submit';
 
-    public $modelClassName = CmsContentElement::class;
+    public $modelClassName = ShopCmsContentElement::class;
     public $modelShowAttribute = "name";
     /**
      * @var CmsContent

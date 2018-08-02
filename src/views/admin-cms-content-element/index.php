@@ -24,29 +24,28 @@ if ($content_id = \Yii::$app->request->get('content_id')) {
 <?php $pjax = \yii\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
+    'searchModel'  => $searchModel,
     'dataProvider' => $dataProvider,
-    'content_id' => $content_id,
-    'cmsContent' => $cmsContent,
+    'content_id'   => $content_id,
+    'cmsContent'   => $cmsContent,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'autoColumns' => false,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'autoColumns'     => false,
+    'pjax'            => $pjax,
     'adminController' => $controller,
-    'chooseCallback' => function($model) {
+    'chooseCallback'  => function ($model) {
         return \yii\helpers\ArrayHelper::merge($model->toArray(), [
-            'url' => $model->url,
-            'image' => $model->image ? $model->image->src : ""
+            'url'   => $model->url,
+            'image' => $model->image ? $model->image->src : "",
         ]);
     },
-    'settingsData' =>
-        [
-            'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
-        ],
-    'columns' => \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider)
+    'settingsData'    => [
+        'namespace' => \Yii::$app->controller->action->getUniqueId().$content_id,
+    ],
+    'columns'         => \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider),
 ]); ?>
 
 <?php \yii\widgets\Pjax::end(); ?>
@@ -59,7 +58,7 @@ if ($content_id = \Yii::$app->request->get('content_id')) {
 Изменить свойства и права доступа к информационному блоку вы можете в <?= \yii\helpers\Html::a('Настройках контента',
     \skeeks\cms\helpers\UrlHelper::construct([
         '/cms/admin-cms-content/update',
-        'pk' => $content_id
+        'pk' => $content_id,
     ])->enableAdmin()->toString()); ?>.
 <?php \yii\bootstrap\Alert::end(); ?>
 
