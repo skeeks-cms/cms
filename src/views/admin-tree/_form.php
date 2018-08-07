@@ -10,6 +10,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 /* @var $model \skeeks\cms\models\CmsLang */
+/* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 $controller = $this->context;
 $action = $controller->action;
 
@@ -167,6 +168,7 @@ JS
     </div>
 
 
+<?php $relatedModel->initAllProperties(); ?>
 <?php if ($relatedModel->properties) : ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
