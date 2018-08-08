@@ -11,6 +11,8 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
+use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
@@ -22,10 +24,12 @@ use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
+use yii\helpers\UnsetArrayValue;
 use yii\web\Application;
 
 /**
@@ -76,6 +80,42 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 ],
                                 'defaultMode' => FilterModeEq::ID,
                                 'isAllowChangeMode' => false,
+                            ],
+
+                            'created_by'       => [
+                                /*'class' => WidgetField::class,
+                                'widgetClass' => SelectModelDialogUserWidget::class,*/
+                                'isAllowChangeMode' => false,
+                                'field'             => [
+                                    'class'       => WidgetField::class,
+                                    'widgetClass' => SelectModelDialogUserWidget::class,
+                                    'items'       => new UnsetArrayValue(),
+                                    'multiple'    => new UnsetArrayValue(),
+                                ],
+                            ],
+
+                            'updated_by'       => [
+                                /*'class' => WidgetField::class,
+                                'widgetClass' => SelectModelDialogUserWidget::class,*/
+                                'isAllowChangeMode' => false,
+                                'field'             => [
+                                    'class'       => WidgetField::class,
+                                    'widgetClass' => SelectModelDialogUserWidget::class,
+                                    'items'       => new UnsetArrayValue(),
+                                    'multiple'    => new UnsetArrayValue(),
+                                ],
+                            ],
+
+                            'tree_id'       => [
+                                /*'class' => WidgetField::class,
+                                'widgetClass' => SelectModelDialogUserWidget::class,*/
+                                'isAllowChangeMode' => false,
+                                'field'             => [
+                                    'class'       => WidgetField::class,
+                                    'widgetClass' => SelectModelDialogTreeWidget::class,
+                                    //'items'       => new UnsetArrayValue(),
+                                    //'multiple'    => new UnsetArrayValue(),
+                                ],
                             ],
                         ],
                     ],
