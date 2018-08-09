@@ -618,6 +618,7 @@ class CmsContentElement extends RelatedElementModel
             }
 
             if ($rp = $this->relatedPropertiesModel) {
+                $this->relatedPropertiesModel->initAllProperties();
                 $rp->relatedElementModel = $newModel;
                 $rp->save();
             }

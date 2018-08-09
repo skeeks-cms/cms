@@ -10,6 +10,9 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendGridModelAction;
+use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
@@ -20,16 +23,24 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\IHasUrl;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiDialogModelEditAction;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\base\DynamicModel;
 use yii\base\Event;
+use yii\base\Exception;
+use yii\bootstrap\Alert;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
+use yii\helpers\Url;
 use yii\web\Application;
 
 /**
@@ -62,27 +73,50 @@ class AdminCmsContentElementController extends BackendModelStandartController
     public function actions()
     {
         $result = ArrayHelper::merge(parent::actions(), [
-            'index'  => [
+            'index'            => [
+                'configKey'      => $this->uniqueId."-".$this->content->id,
+                'on afterRender' => [$this, 'contentEdit'],
+                //'url' => [$this->uniqueId, 'content_id' => $this->content->id],
+                'on init'        => function ($e) {
+                    $action = $e->sender;
+                    /**
+                     * @var BackendGridModelAction $action
+                     */
+                    $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                },
+
                 "filters" => [
                     'visibleFilters' => [
+                        'q',
                         'id',
-                        'name',
+                        //'name',
                         'active',
                     ],
                     'filtersModel'   => [
+
+                        'rules' => [
+                            ['q', 'safe'],
+                            ['has_image', 'safe'],
+                        ],
+
+                        'attributeDefines' => [
+                            'q',
+                            'has_image',
+                        ],
+
                         'fields' => [
 
                             'active' => [
-                                'field' => [
+                                'field'             => [
                                     'class'      => BoolField::class,
                                     'trueValue'  => 'Y',
                                     'falseValue' => 'N',
                                 ],
-                                'defaultMode' => FilterModeEq::ID,
+                                'defaultMode'       => FilterModeEq::ID,
                                 'isAllowChangeMode' => false,
                             ],
 
-                            'created_by'       => [
+                            'created_by' => [
                                 /*'class' => WidgetField::class,
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
                                 'isAllowChangeMode' => false,
@@ -94,7 +128,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 ],
                             ],
 
-                            'updated_by'       => [
+                            'updated_by' => [
                                 /*'class' => WidgetField::class,
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
                                 'isAllowChangeMode' => false,
@@ -106,7 +140,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 ],
                             ],
 
-                            'tree_id'       => [
+                            'tree_id' => [
                                 /*'class' => WidgetField::class,
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
                                 'isAllowChangeMode' => false,
@@ -116,6 +150,76 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     //'items'       => new UnsetArrayValue(),
                                     //'multiple'    => new UnsetArrayValue(),
                                 ],
+                            ],
+
+                            'q' => [
+                                'label'          => 'Поиск',
+                                'elementOptions' => [
+                                    'placeholder' => 'Поиск (название, описание)',
+                                ],
+                                'on apply'       => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        $query->andWhere([
+                                            'or',
+                                            ['like', CmsContentElement::tableName().'.name', $e->field->value],
+                                            ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
+                                            ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
+                                        ]);
+                                    }
+                                },
+                            ],
+
+                            'has_image' => [
+                                'class'      => BoolField::class,
+                                'falseValue' => 'n',
+                                'label'      => 'Наличие изображения',
+                                'on apply'   => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        if ($e->field->value == '1') {
+                                            $query->andWhere(
+                                                ['IS NOT', CmsContentElement::tableName().'.image_id', null]
+                                            );
+                                        } else if ($e->field->value == 'n') {
+                                            $query->andWhere(
+                                                [CmsContentElement::tableName().'.image_id' => null]
+                                            );
+                                        }
+                                    }
+                                },
+                            ],
+
+                            'has_full_image' => [
+                                'class'      => BoolField::class,
+                                'falseValue' => 'n',
+                                'label'      => 'Наличие подробного изображения',
+                                'on apply'   => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        if ($e->field->value == '1') {
+                                            $query->andWhere(
+                                                ['IS NOT', CmsContentElement::tableName().'.image_full_id', null]
+                                            );
+                                        } else if ($e->field->value == 'n') {
+                                            $query->andWhere(
+                                                [CmsContentElement::tableName().'.image_full_id' => null]
+                                            );
+                                        }
+                                    }
+                                },
                             ],
                         ],
                     ],
@@ -131,9 +235,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         }
                     },
                     'defaultOrder'   => [
-                        'active' => SORT_DESC,
+                        'active'   => SORT_DESC,
                         'priority' => SORT_ASC,
-                        'id' => SORT_DESC,
+                        'id'       => SORT_DESC,
                     ],
                     'visibleColumns' => [
                         'checkbox',
@@ -155,7 +259,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         'view',
                     ],
                     'columns'        => [
-                        'test'       => [
+                        'test'         => [
                             'label' => "test",
                             'value' => 1,
                         ],
@@ -176,7 +280,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         ],
 
                         'tree_id' => [
-                            'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
+                            'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
                                 if (!$model->cmsTree) {
                                     return null;
                                 }
@@ -195,20 +299,20 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 $path = implode(" / ", $path);
                                 return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
                             },
-                            'format'    => 'raw',
+                            'format' => 'raw',
                         ],
 
                         'view' => [
-                            'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
+                            'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
                                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl,
-                                [
-                                    'target'    => '_blank',
-                                    'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                                    'data-pjax' => '0',
-                                    'class'     => 'btn btn-default btn-sm',
-                                ]);
+                                    [
+                                        'target'    => '_blank',
+                                        'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                                        'data-pjax' => '0',
+                                        'class'     => 'btn btn-default btn-sm',
+                                    ]);
                             },
-                            'format'    => 'raw',
+                            'format' => 'raw',
                             'label'  => "Смотреть",
                         ],
 
@@ -234,28 +338,140 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         ],
 
 
-
                     ],
                 ],
             ],
-            "create" => [
+            "create"           => [
                 "callback" => [$this, 'create'],
             ],
-            "update" => [
+            "update"           => [
                 "callback" => [$this, 'update'],
             ],
-
-            "activate-multi" => [
+            "activate-multi"   => [
                 'class' => BackendModelMultiActivateAction::class,
-            ],
+                'on init'        => function ($e) {
+                    $action = $e->sender;
+                    /**
+                     * @var BackendGridModelAction $action
+                     */
+                    $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                },
 
+            ],
             "deactivate-multi" => [
                 'class' => BackendModelMultiDeactivateAction::class,
+                'on init'        => function ($e) {
+                    $action = $e->sender;
+                    /**
+                     * @var BackendGridModelAction $action
+                     */
+                    $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                },
+
             ],
+
+
+            "copy" => [
+                'class'          => BackendModelUpdateAction::class,
+                "name"           => \Yii::t('skeeks/cms', 'Copy'),
+                "icon"           => "fas fa-copy",
+                "beforeContent"  => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
+                "successMessage" => "Элемент успешно скопирован",
+
+                'on initFormModels' => function (Event $e) {
+                    $model = $e->sender->model;
+                    $dm = new DynamicModel(['is_copy_images', 'is_copy_files']);
+                    $dm->addRule(['is_copy_images', 'is_copy_files'], 'boolean');
+
+                    $dm->is_copy_images = true;
+                    $dm->is_copy_files = true;
+
+                    $e->sender->formModels['dm'] = $dm;
+                },
+
+                'on beforeSave' => function (Event $e) {
+                    /**
+                     * @var $action BackendModelUpdateAction;
+                     */
+                    $action = $e->sender;
+                    $action->isSaveFormModels = false;
+                    $dm = ArrayHelper::getValue($action->formModels, 'dm');
+
+                    $newModel = $action->model->copy();
+
+                    if ($newModel) {
+                        $action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                    } else {
+                        throw new Exception(print_r($newModel->errors, true));
+                    }
+
+                },
+
+                'fields' => function () {
+                    return [
+                        'dm.is_copy_images' => [
+                            'class' => BoolField::class,
+                            'label' => ['skeeks/cms', 'Copy images?'],
+                        ],
+                        'dm.is_copy_files'  => [
+                            'class' => BoolField::class,
+                            'label' => ['skeeks/cms', 'Copy files?'],
+                        ],
+                    ];
+                },
+            ],
+
+
+            "change-tree-multi" => [
+                'class'        => BackendModelMultiDialogEditAction::class,
+                "name"         => \Yii::t('skeeks/cms', 'The main section'),
+                "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
+                "eachCallback" => [$this, 'eachMultiChangeTree'],
+                'on init'        => function ($e) {
+                    $action = $e->sender;
+                    /**
+                     * @var BackendGridModelAction $action
+                     */
+                    $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                },
+            ],
+
+            "change-trees-multi" => [
+                'class'        => BackendModelMultiDialogEditAction::class,
+                "name"         => \Yii::t('skeeks/cms', 'Related topics'),
+                "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/change-trees-form",
+                "eachCallback" => [$this, 'eachMultiChangeTrees'],
+                'on init'        => function ($e) {
+                    $action = $e->sender;
+                    /**
+                     * @var BackendGridModelAction $action
+                     */
+                    $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                },
+            ],
+
+            "rp" => [
+                'class'        => BackendModelMultiDialogEditAction::class,
+                "name"         => \Yii::t('skeeks/cms', 'Properties'),
+                "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/multi-rp",
+                "eachCallback" => [$this, 'eachRelatedProperties'],
+                'on init'        => function ($e) {
+                    $action = $e->sender;
+                    /**
+                     * @var BackendGridModelAction $action
+                     */
+                    $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                },
+            ],
+
         ]);
 
         //Дополнительные свойства
         $model = null;
+        $autoFilters = [];
+        $autoRules = [];
+        $autoLabels = [];
+
         $autoColumns = [];
 
         if ($this->content) {
@@ -276,9 +492,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
 
                 $autoColumns["property{$property->id}"] = [
                     //'attribute' => $name,
-                    'label' => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name) . " [свойство]",
+                    'label'  => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
                     'format' => 'raw',
-                    'value' => function ($model, $key, $index) use ($name, $relatedPropertiesModel) {
+                    'value'  => function ($model, $key, $index) use ($name, $relatedPropertiesModel) {
                         /**
                          * @var $model \skeeks\cms\models\CmsContentElement
                          */
@@ -290,6 +506,162 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         }
                     },
                 ];
+
+                $autoRules[] = ["property{$property->id}", "safe"];
+                $autoLabels["property{$property->id}"] = \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]";
+
+
+                if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
+                    $autoFilters["property{$property->id}"] = [
+                        'class'    => TextField::class,
+                        'label'    => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'on apply' => function (QueryFiltersEvent $e) use ($property) {
+                            /**
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->dataProvider->query;
+
+
+                            if ($e->field->value) {
+                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                    ->where([
+                                        "property_id" => $property->id,
+                                    ])
+                                    ->andWhere([
+                                        'like',
+                                        'value',
+                                        $e->field->value,
+                                    ]);
+
+                                $query->andWhere([
+                                    CmsContentElement::tableName().".id" => $query1,
+                                ]);
+                            }
+                        },
+                    ];
+                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL) {
+
+                    $autoFilters["property{$property->id}"] = [
+                        'class'    => BoolField::class,
+                        'label'    => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'on apply' => function (QueryFiltersEvent $e) use ($property) {
+                            /**
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->dataProvider->query;
+
+
+                            if ($e->field->value) {
+                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                    ->where([
+                                        "value_bool"  => $e->field->value,
+                                        "property_id" => $property->id,
+                                    ]);
+
+                                $query->andWhere([
+                                    CmsContentElement::tableName().".id" => $query1,
+                                ]);
+                            }
+                        },
+                    ];
+
+                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) {
+
+
+                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
+
+                    $autoFilters["property{$property->id}"] = [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
+                        'widgetConfig' => [
+                            'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
+                            'dialogRoute'    => [
+                                '/cms/admin-cms-content-property-enum',
+                                'CmsContentPropertyEnum' => [
+                                    'property_id' => $property->id,
+                                ],
+                            ],
+                        ],
+                        'label'        => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'on apply'     => function (QueryFiltersEvent $e) use ($property) {
+                            /**
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->dataProvider->query;
+
+
+                            if ($e->field->value) {
+                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                    ->where([
+                                        "value_enum"  => $e->field->value,
+                                        "property_id" => $property->id,
+                                    ]);
+
+                                $query->andWhere([
+                                    CmsContentElement::tableName().".id" => $query1,
+                                ]);
+                            }
+                        },
+                    ];
+
+                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
+                    $propertyType = $property->handler;
+                    $autoFilters["property{$property->id}"] = [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+                        'widgetConfig' => [
+                            'content_id' => $propertyType->content_id,
+                        ],
+                        'label'        => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'on apply'     => function (QueryFiltersEvent $e) use ($property) {
+                            /**
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->dataProvider->query;
+
+
+                            if ($e->field->value) {
+                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                    ->where([
+                                        "value_enum"  => $e->field->value,
+                                        "property_id" => $property->id,
+                                    ]);
+
+                                $query->andWhere([
+                                    CmsContentElement::tableName().".id" => $query1,
+                                ]);
+                            }
+                        },
+                    ];
+                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_TREE) {
+                    $propertyType = $property->handler;
+                    $autoFilters["property{$property->id}"] = [
+                        'class'       => WidgetField::class,
+                        'widgetClass' => \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class,
+                        'label'       => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'on apply'    => function (QueryFiltersEvent $e) use ($property) {
+                            /**
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->dataProvider->query;
+
+
+                            if ($e->field->value) {
+                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                    ->where([
+                                        "value_enum"  => $e->field->value,
+                                        "property_id" => $property->id,
+                                    ]);
+
+                                $query->andWhere([
+                                    CmsContentElement::tableName().".id" => $query1,
+                                ]);
+                            }
+                        },
+                    ];
+                }
+
+
             }
         }
 
@@ -297,9 +669,38 @@ class AdminCmsContentElementController extends BackendModelStandartController
             $result['index']['grid']['columns'] = ArrayHelper::merge($result['index']['grid']['columns'], $autoColumns);
         }
 
+        if ($autoRules) {
+            $result['index']['filters']['filtersModel']['rules'] = ArrayHelper::merge((array)$result['index']['filters']['filtersModel']['rules'], $autoRules);
+        }
+
+        if ($autoFilters) {
+            $result['index']['filters']['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'fields']), $autoFilters);
+            $result['index']['filters']['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeDefines']), array_keys($autoFilters));
+            $result['index']['filters']['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeLabels']), $autoLabels);
+        }
+
         return $result;
     }
 
+    public function contentEdit(Event $e)
+    {
+        $href = \yii\helpers\Html::a('Настройках контента',
+            \skeeks\cms\helpers\UrlHelper::construct([
+                '/cms/admin-cms-content/update',
+                'pk' => $this->content->id,
+            ])->enableAdmin()->toString());
+
+        $e->data = Alert::widget([
+            'options' => [
+                'class' => 'alert-info',
+            ],
+
+            'body' => <<<HTML
+    Изменить свойства и права доступа к информационному блоку вы можете в {$href}
+HTML
+            ,
+        ]);
+    }
 
     public function create($adminAction)
     {
