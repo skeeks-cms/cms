@@ -80,9 +80,10 @@ class AdminCmsContentElementController extends BackendModelStandartController
                 'on init'        => function ($e) {
                     $action = $e->sender;
                     /**
-                     * @var BackendGridModelAction $action
+                     * @var $action BackendGridModelAction
                      */
                     $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                    $this->initGridData($action, $this->content);
                 },
 
                 "filters" => [
@@ -467,6 +468,16 @@ class AdminCmsContentElementController extends BackendModelStandartController
         ]);
 
         //Дополнительные свойства
+        return $result;
+    }
+
+
+    public function initGridData($action, $content)
+    {
+        /**
+         * @var $action BackendGridModelAction
+         */
+
         $model = null;
         $autoFilters = [];
         $autoRules = [];
@@ -474,9 +485,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
 
         $autoColumns = [];
 
-        if ($this->content) {
+        if ($content) {
             $model = new CmsContentElement([
-                'content_id' => $this->content->id,
+                'content_id' => $content->id,
             ]);
         }
 
@@ -666,20 +677,26 @@ class AdminCmsContentElementController extends BackendModelStandartController
         }
 
         if ($autoColumns) {
-            $result['index']['grid']['columns'] = ArrayHelper::merge($result['index']['grid']['columns'], $autoColumns);
+            //$result['index']['grid']['columns'] = ArrayHelper::merge($result['index']['grid']['columns'], $autoColumns);
+            $action->grid['columns'] = ArrayHelper::merge($action->grid['columns'], $autoColumns);
         }
 
         if ($autoRules) {
-            $result['index']['filters']['filtersModel']['rules'] = ArrayHelper::merge((array)$result['index']['filters']['filtersModel']['rules'], $autoRules);
+            //$result['index']['filters']['filtersModel']['rules'] = ArrayHelper::merge((array)$result['index']['filters']['filtersModel']['rules'], $autoRules);
+            $action->filters['filtersModel']['rules'] = ArrayHelper::merge($action->filters['filtersModel']['rules'], $autoRules);
         }
 
         if ($autoFilters) {
-            $result['index']['filters']['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'fields']), $autoFilters);
-            $result['index']['filters']['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeDefines']), array_keys($autoFilters));
-            $result['index']['filters']['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeLabels']), $autoLabels);
+            //$result['index']['filters']['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'fields']), $autoFilters);
+            //$result['index']['filters']['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeDefines']), array_keys($autoFilters));
+            //$result['index']['filters']['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeLabels']), $autoLabels);
+
+            $action->filters['filtersModel']['fields'] = ArrayHelper::merge($action->filters['filtersModel']['fields'], $autoFilters);
+            $action->filters['filtersModel']['attributeDefines'] = ArrayHelper::merge($action->filters['filtersModel']['attributeDefines'], array_keys($autoFilters));
+            $action->filters['filtersModel']['attributeLabels'] = ArrayHelper::merge(ArrayHelper::getValue($action->filters, ['filtersModel', 'attributeLabels']), $autoLabels);
         }
 
-        return $result;
+        return $this;
     }
 
     public function contentEdit(Event $e)
