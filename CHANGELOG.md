@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
  
+5.2.0
+----------------
+ * Updated
+ 
 5.1.4
 ----------------
  * Related properties model lazy load fixed
