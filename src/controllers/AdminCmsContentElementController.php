@@ -75,7 +75,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
     {
         $result = ArrayHelper::merge(parent::actions(), [
             'index'            => [
-                'configKey'      => $this->uniqueId."-".$this->content->id,
+                'configKey'      => $this->uniqueId."-". ($this->content ? $this->content->id : ""),
                 'on afterRender' => [$this, 'contentEdit'],
                 //'url' => [$this->uniqueId, 'content_id' => $this->content->id],
                 'on init'        => function ($e) {

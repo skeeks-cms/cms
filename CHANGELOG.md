@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
  
+5.2.1
+----------------
+ * Fixed admin cms content elements
+ 
 5.2.0
 ----------------
  * Updated
