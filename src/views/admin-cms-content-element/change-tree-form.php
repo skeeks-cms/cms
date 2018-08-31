@@ -7,22 +7,13 @@
  */
 $model = new \skeeks\cms\models\CmsContentElement();
 ?>
-<?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
-
-<?php /*= $form->field($model, 'tree_id')->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
-    ); */ ?>
+<?php $form = \yii\bootstrap\ActiveForm::begin(); ?>
 
 <?= $form->field($model, 'tree_id')->widget(
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
 ); ?>
-
-<?php /*= $form->fieldSelect($model, 'tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions());*/ ?>
-<?= $form->buttonsStandart($model, ['save']); ?>
-
-<?php \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
-
-
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+<?php \yii\bootstrap\ActiveForm::end(); ?>
 <?php \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-warning',

@@ -62,6 +62,7 @@ JS
 
         <?php if ($element && $element->relatedPropertiesModel) : ?>
 
+            <? $element->relatedPropertiesModel->initAllProperties(); ?>
             <?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
                 'options' => [
                     'class' => 'sx-form',

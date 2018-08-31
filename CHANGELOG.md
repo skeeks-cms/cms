@@ -1,6 +1,14 @@
 CHANGELOG
 ==============
  
+5.2.1
+----------------
+ * Fixed admin cms content elements
+ 
+5.2.0
+----------------
+ * Updated
+ 
 5.1.4
 ----------------
  * Related properties model lazy load fixed
