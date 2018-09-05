@@ -19,6 +19,7 @@ use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
+use skeeks\cms\rbac\models\CmsAuthAssignment;
 use skeeks\cms\validators\PhoneValidator;
 use Yii;
 use yii\base\Exception;
@@ -72,10 +73,10 @@ use yii\web\IdentityInterface;
  * @property []   $roleNames
  *
  * @property string $displayName
- * @property string $profileUrl
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
  * @property CmsContentElement[] $favoriteCmsContentElements
+ * @property CmsAuthAssignment[] $cmsAuthAssignments
  *
  */
 class User
@@ -158,19 +159,19 @@ class User
     {
         return array_merge(parent::behaviors(), [
 
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
 
-            HasStorageFile::className() =>
+            HasStorageFile::class =>
                 [
-                    'class' => HasStorageFile::className(),
+                    'class' => HasStorageFile::class,
                     'fields' => ['image_id']
                 ],
 
-            HasRelatedProperties::className() =>
+            HasRelatedProperties::class =>
                 [
-                    'class' => HasRelatedProperties::className(),
-                    'relatedElementPropertyClassName' => CmsUserProperty::className(),
-                    'relatedPropertyClassName' => CmsUserUniversalProperty::className(),
+                    'class' => HasRelatedProperties::class,
+                    'relatedElementPropertyClassName' => CmsUserProperty::class,
+                    'relatedPropertyClassName' => CmsUserUniversalProperty::class,
                 ],
 
         ]);
@@ -208,7 +209,7 @@ class User
             [['auth_key'], 'string', 'max' => 32],
 
             [['phone'], 'string', 'max' => 64],
-            [['phone'], PhoneValidator::className()],
+            [['phone'], PhoneValidator::class],
             [['phone'], 'unique'],
             [['phone', 'email'], 'default', 'value' => null],
 
@@ -219,7 +220,7 @@ class User
             //[['username'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 25],
             [['username'], 'unique'],
-            [['username'], \skeeks\cms\validators\LoginValidator::className()],
+            [['username'], \skeeks\cms\validators\LoginValidator::class],
 
             [['logged_at'], 'integer'],
             [['last_activity_at'], 'integer'],
@@ -373,7 +374,7 @@ class User
      */
     public function getImage()
     {
-        return $this->hasOne(StorageFile::className(), ['id' => 'image_id']);
+        return $this->hasOne(StorageFile::class, ['id' => 'image_id']);
     }
 
 
@@ -382,7 +383,7 @@ class User
      */
     public function getStorageFiles()
     {
-        return $this->hasMany(StorageFile::className(), ['created_by' => 'id']);
+        return $this->hasMany(StorageFile::class, ['created_by' => 'id']);
     }
 
 
@@ -391,7 +392,7 @@ class User
      */
     public function getUserAuthClients()
     {
-        return $this->hasMany(UserAuthClient::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserAuthClient::class, ['user_id' => 'id']);
     }
 
     /**
@@ -440,12 +441,14 @@ class User
     {
         $data = [];
 
-        if ($this->first_name) {
-            $data[] = $this->first_name;
-        }
         if ($this->last_name) {
             $data[] = $this->last_name;
         }
+
+        if ($this->first_name) {
+            $data[] = $this->first_name;
+        }
+
         if ($this->patronymic) {
             $data[] = $this->patronymic;
         }
@@ -687,7 +690,7 @@ class User
      */
     public function getCmsUserAuthClients()
     {
-        return $this->hasMany(UserAuthClient::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserAuthClient::class, ['user_id' => 'id']);
     }
 
     /**
@@ -695,7 +698,7 @@ class User
      */
     public function getCmsUserEmails()
     {
-        return $this->hasMany(CmsUserEmail::className(), ['user_id' => 'id']);
+        return $this->hasMany(CmsUserEmail::class, ['user_id' => 'id']);
     }
 
     /**
@@ -703,7 +706,14 @@ class User
      */
     public function getCmsUserPhones()
     {
-        return $this->hasMany(CmsUserPhone::className(), ['user_id' => 'id']);
+        return $this->hasMany(CmsUserPhone::class, ['user_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsAuthAssignments()
+    {
+        return $this->hasMany(CmsAuthAssignment::class, ['user_id' => 'id']);
     }
 
     /**
@@ -747,7 +757,7 @@ class User
      */
     public function getCmsContentElement2cmsUsers()
     {
-        return $this->hasMany(CmsContentElement2cmsUser::className(), ['cms_user_id' => 'id']);
+        return $this->hasMany(CmsContentElement2cmsUser::class, ['cms_user_id' => 'id']);
     }
 
     /**
@@ -755,7 +765,7 @@ class User
      */
     public function getFavoriteCmsContentElements()
     {
-        return $this->hasMany(CmsContentElement::className(), ['id' => 'cms_content_element_id'])
+        return $this->hasMany(CmsContentElement::class, ['id' => 'cms_content_element_id'])
             ->via('cmsContentElement2cmsUsers');
     }
 

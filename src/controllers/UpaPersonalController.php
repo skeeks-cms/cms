@@ -50,6 +50,7 @@ class UpaPersonalController extends BackendModelController
     {
         return ArrayHelper::merge(parent::actions(), [
                 "update" => [
+                    'buttons' => ['save'],
                     'class' => BackendModelUpdateAction::class,
                     'name' => ['skeeks/cms', 'Personal data'],
                     'fields' => [
@@ -62,8 +63,8 @@ class UpaPersonalController extends BackendModelController
                             ]
                         ],
                         'username',
-                        'first_name',
                         'last_name',
+                        'first_name',
                         'patronymic',
                         'email',
                         'phone' => [
@@ -86,6 +87,7 @@ JS
                     ]
                 ],
                 "change-password" => [
+                    'buttons' => ['save'],
                     'class' => BackendModelUpdateAction::class,
                     'name' => ['skeeks/cms', 'Change password'],
                     'icon' => 'fa fa-key',

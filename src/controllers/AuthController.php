@@ -255,15 +255,29 @@ class AuthController extends Controller
         }
         //Запрос ajax post
         if ($rr->isRequestAjaxPost()) {
-            if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup()) {
-                $rr->success = true;
-                $rr->message = 'Для дальнейших действий, проверьте вашу почту.';
 
-                return $rr;
+            $t = \Yii::$app->db->beginTransaction();
 
-            } else {
-                $rr->message = 'Не удалось зарегистрироваться';
+            try {
+
+                if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup()) {
+
+                    $t->commit();
+
+                    $rr->success = true;
+                    $rr->message = 'Для дальнейших действий, проверьте вашу почту.';
+
+                    return $rr;
+
+                } else {
+                    $rr->message = 'Не удалось зарегистрироваться';
+                }
+
+            } catch (\Exception $e) {
+                $t->rollBack();
+                throw $e;
             }
+
 
             return (array)$rr;
 
