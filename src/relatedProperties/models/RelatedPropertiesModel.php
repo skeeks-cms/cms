@@ -269,6 +269,9 @@ class RelatedPropertiesModel extends DynamicModel
 
             if ($values) {
                 foreach ($values as $key => $value) {
+                    if(empty($value)) {
+                        continue;
+                    }
                     $className = $element->relatedElementPropertyClassName;
                     $productPropertyValue = new $className([
                         'element_id' => $element->id,
@@ -316,8 +319,12 @@ class RelatedPropertiesModel extends DynamicModel
                 ]);
             }
 
-            if (!$productPropertyValue->save()) {
-                throw new Exception("{$property->code} not save. " . Json::encode($productPropertyValue->errors));
+            if(empty($value)){
+                $productPropertyValue->delete();
+            }else {
+                if (!$productPropertyValue->save()) {
+                    throw new Exception("{$property->code} not save. " . Json::encode($productPropertyValue->errors));
+                }
             }
         }
 
