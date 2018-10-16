@@ -1,0 +1,79 @@
+.sx-table-wrapper table.sx-table
+{
+    border:none;
+    border:1px solid #e2e2e2;
+    border-spacing:0;
+    width:100%;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+    table.sx-table>thead:first-child>tr:first-child>th
+    {
+        border-color:#d6dfe1 #ced7d8 #ced7d8 #ced7d8;
+        padding: 10px;
+    }
+    table.sx-table thead tr th
+    {
+        background: #aebbc0;
+        background-image: -webkit-linear-gradient(top, #eff3f4, #e2e2e2);
+        background-image: linear-gradient(to bottom, #eff3f4, #e2e2e2);
+        border:1px solid;
+        border-color:#d9e0e4 #89979d #919b9d #ebeef0;
+        font-weight:bold;
+        /*color: #ffffff;*/
+        height:21px;
+        vertical-align:middle;
+        /*text-shadow: 1px 1px 5px rgba(0, 0, 0, 1)*/
+        color: #0e0e0e;
+        text-shadow: 0 1px rgba(255,255,255,0.7);
+    }
+
+    table.sx-table thead tr th a
+    {
+        color: #0e0e0e;
+        text-shadow: 0 1px rgba(255,255,255,0.7);
+        border-bottom: 1px solid;
+    }
+    table.sx-table thead tr th a:hover
+    {
+        text-decoration: none;
+    }
+
+    table.sx-table thead tr th a.asc,
+    table.sx-table thead tr th a.desc {
+        color: red;
+    }
+    table.sx-table thead tr th a.asc:after {
+        content: ' ↑';
+        margin-top: -1px;
+        position: absolute;
+        margin-left: 3px;
+    }
+    table.sx-table thead tr th a.desc:after {
+        content: ' ↓';
+        margin-top: -1px;
+        position: absolute;
+        margin-left: 3px;
+    }
+
+        table.sx-table a.sx-fancybox img
+        {
+            border: 2px solid silver;
+        }
+
+        table.sx-table a.sx-fancybox img:hover
+        {
+            border: 2px solid #5dc3e7;
+            box-shadow: 1px 1px 14px rgba(32, 168, 216, 0.69);
+        }
+
+    table.sx-table > tbody > tr:hover > td, table.sx-table>tbody>tr:nth-of-type(odd):hover>td
+    {
+        background-color: rgba(93, 195, 231, 0.15);
+    }
+
+    table.sx-table > tbody > tr.sx-active td
+    {
+        background-color: #e2e7cb;
+    }

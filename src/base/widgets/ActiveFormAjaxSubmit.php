@@ -40,11 +40,7 @@ use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
 class ActiveFormAjaxSubmit extends ActiveForm
 {
     use ActiveFormAjaxSubmitTrait;
-    public $afterValidateCallback = "";
 
-    public function __construct($config = [])
-    {
-        $this->enableAjaxValidation = true;
-        parent::__construct($config);
-    }
+    public $afterValidateCallback = "";
+    public $enableAjaxValidation = true;
 }

@@ -7,11 +7,9 @@ Requirements
 
 Software
 ~~~~~~~~
-* apache
-* mod_rewrite apache module
-* php >= 5.5
+* apache (mod_rewrite) or php-fpm
+* php >= 7.0
 * DB mysql ~ 5.5
-* SSH access
 
 Php modules
 ~~~~~~~~~~~
@@ -32,6 +30,14 @@ Php modules
 Php settings
 ~~~~~~~~~~~~
 * short_open_tag on
+
+.. attention::
+
+    Важно не забудьте проверить эту настройку!
+
+Прочее
+~~~~~~
+* SSH доступ
 
 .. _installation:
 
@@ -96,6 +102,13 @@ Navigate to the folder where are your projects (such as **/var/www/sites/**).
 
 
 Edit the file to access the database, it is located at **common/config/db.php**
+
+Update configs:
+
+.. code-block:: bash
+
+    COMPOSER_HOME=.composer php composer.phar self-update && COMPOSER_HOME=.composer php composer.phar du
+
 
 4. Installation of migrations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

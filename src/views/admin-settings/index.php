@@ -9,7 +9,7 @@
  * @var $component \skeeks\cms\base\Component
  */
 /* @var $this yii\web\View */
-
+$r = new ReflectionClass($component);
 ?>
 
 <?php /* \skeeks\cms\modules\admin\widgets\Pjax::begin([
@@ -17,12 +17,13 @@
 ]) */ ?>
 <form id="selector-component" action="" method="get" data-pjax>
     <label><?= \Yii::t('skeeks/cms', 'Component settings') ?></label>
+
     <?=
     \skeeks\widget\chosen\Chosen::widget([
         'name' => 'component',
         'items' => $loadedForSelect,
         'allowDeselect' => false,
-        'value' => $component->className()
+        'value' => $r->getName()
     ])
     ?>
     <?php if (\Yii::$app->admin->isEmptyLayout()) : ?>

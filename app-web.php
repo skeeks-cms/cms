@@ -1,10 +1,16 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link https://skeeks.com/
- * @copyright (c) 2010 SkeekS
- * @date 10.11.2017
  */
+
+$env = getenv('ENV');
+if (!empty($env)) {
+    defined('ENV') or define('ENV', $env);
+}
+
 require_once(__DIR__ . '/bootstrap.php');
 
 \Yii::beginProfile('Load config app');

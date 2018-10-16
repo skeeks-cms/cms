@@ -1,5 +1,45 @@
 CHANGELOG
 ==============
+ 
+5.2.1.1
+----------------
+ * Update
+ 
+5.2.1
+----------------
+ * Fixed admin cms content elements
+ 
+5.2.0
+----------------
+ * Updated
+ 
+5.1.4
+----------------
+ * Related properties model lazy load fixed
+ 
+5.1.3
+----------------
+ * Related properties model lazy load
+ 
+5.1.2
+----------------
+ * Grid CSV export
+ 
+5.1.1
+----------------
+ * Fixed RelationalBehavior
+ 
+5.1.0
+----------------
+ * Update skeeks/yii2-sx 1.4.0
+ * Update yii2 2.0.15
+ * IHasInfo is deprecated
+ * Fixed create new dir
+ * ClusterLocal update set publicBaseUrl and rootBasePath
+ * Removed skeeks\cms\Exception
+ * Widget and component settings to use skeeks/yii2-form
+ * Change config form interface
+
 
 5.0.4
 ----------------

@@ -11,43 +11,39 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
+use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\DateTimeColumnData;
+use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
-use skeeks\cms\models\searchs\CmsUserSearch;
-use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\ActiveForm;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\SelectField;
 use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
-use yii\base\ActionEvent;
-use yii\base\Model;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\rbac\Item;
 use yii\web\Response;
 
 /**
- * Class AdminUserController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminUserController extends AdminModelEditorController
+class AdminUserController extends BackendModelStandartController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public function init()
     {
         $this->name = "Управление пользователями";
         $this->modelShowAttribute = "username";
-        $this->modelClassName = User::className();
+        $this->modelClassName = CmsUser::class;
 
         parent::init();
     }
@@ -56,53 +52,171 @@ class AdminUserController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(), [
 
-            "index" =>
-                [
-                    'modelSearchClassName' => CmsUserSearch::className()
+            "index" => [
+                "filters" => [
+                    "visibleFilters" => [
+                        'q',
+                        'active',
+                        'role',
+                    ],
+
+                    "filtersModel" => [
+                        'rules'            => [
+                            ['q', 'safe'],
+                            ['role', 'safe'],
+                        ],
+                        'attributeDefines' => [
+                            'q',
+                            'role',
+                        ],
+
+                        'fields' => [
+
+                            'active' => [
+                                'field'             => [
+                                    'class'      => BoolField::class,
+                                    'trueValue'  => "Y",
+                                    'falseValue' => "N",
+                                ],
+                                "isAllowChangeMode" => false,
+                                "defaultMode"       => FilterModeEq::ID,
+                            ],
+
+                            'role' => [
+                                'class'    => SelectField::class,
+                                'multiple' => true,
+                                'label'    => \Yii::t('skeeks/cms', 'Roles'),
+                                'items'    => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'),
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+                                    if ($e->field->value) {
+                                        $query->innerJoin('auth_assignment', 'auth_assignment.user_id = cms_user.id');
+                                        $query->andFilterWhere([
+                                            'auth_assignment.item_name' => $e->field->value,
+                                        ]);
+                                    }
+
+                                },
+                            ],
+
+                            'q' => [
+                                'label'          => 'Поиск',
+                                'elementOptions' => [
+                                    'placeholder' => 'Поиск (ФИО, Email, Телефон)',
+                                ],
+                                'on apply'       => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        $query->andWhere([
+                                            'or',
+                                            ['like', CmsUser::tableName().'.first_name', $e->field->value],
+                                            ['like', CmsUser::tableName().'.last_name', $e->field->value],
+                                            ['like', CmsUser::tableName().'.patronymic', $e->field->value],
+                                            ['like', CmsUser::tableName().'.email', $e->field->value],
+                                            ['like', CmsUser::tableName().'.phone', $e->field->value],
+                                        ]);
+                                    }
+                                },
+                            ],
+                        ],
+                    ],
                 ],
 
-            'create' =>
-                [
-                    "callback" => [$this, 'create'],
+                'grid' => [
+                    'defaultOrder'   => [
+                        'logged_at'  => SORT_DESC,
+                        'created_at' => SORT_DESC,
+                    ],
+                    'dialogCallbackData' => function(CmsUser $model) {
+                        return \yii\helpers\ArrayHelper::merge($model->toArray(), [
+                            'image' => $model->image ? $model->image->src : "",
+                            'displayName' => $model->displayName
+                        ]);
+                    },
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        'id',
+                        'image_id',
+                        'displayName',
+                        'created_at',
+                        'logged_at',
+                        'role',
+                        'active',
+                    ],
+                    'columns'        => [
+                        'displayName' => [
+                            'label'  => 'Данные пользователя',
+                            'format' => 'raw',
+                            'value'  => function (CmsUser $cmsUser) {
+                                $data[] = $cmsUser->username;
+                                if ($cmsUser->displayName && $cmsUser->displayName != $cmsUser->username) {
+                                    $data[] = $cmsUser->displayName;
+                                }
+                                if ($cmsUser->phone) {
+                                    $data[] = $cmsUser->phone;
+                                }
+                                if ($cmsUser->email) {
+                                    $data[] = $cmsUser->email;
+                                }
+
+                                return implode("<br />", $data);
+                            },
+                        ],
+                        'created_at'  => [
+                            'class' => DateTimeColumnData::class,
+                        ],
+                        'logged_at'   => [
+                            'class' => DateTimeColumnData::class,
+                        ],
+                        'image_id'    => [
+                            'class' => ImageColumn2::class,
+                        ],
+                        'active'      => [
+                            'class' => BooleanColumn::class,
+                        ],
+                        'role'        => [
+                            'value'  => function (CmsUser $cmsUser) {
+                                $result = [];
+
+                                if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
+                                    foreach ($roles as $role) {
+                                        $result[] = $role->description." ({$role->name})";
+                                    }
+                                }
+
+                                return implode(', ', $result);
+                            },
+                            'format' => 'html',
+                            'label'  => \Yii::t('skeeks/cms', 'Roles'),
+                        ],
+                    ],
                 ],
+            ],
 
-            'update' =>
-                [
-                    "callback" => [$this, 'update'],
-                ],
+            'create' => [
+                "callback" => [$this, 'create'],
+            ],
 
-            /*'change-password' =>
-            [
-                "class"     => AdminOneModelEditAction::className(),
-                "name"      => "Изменение пароля",
-                "icon"      => "glyphicon glyphicon-cog",
-                "callback"  => [$this, "actionChangePassword"],
-            ],*/
-
-            /*'permission' =>
-            [
-                "class"     => AdminOneModelEditAction::className(),
-                "name"      => "Привилегии",
-                "icon"      => "glyphicon glyphicon-exclamation-sign",
-                "callback"  => [$this, "actionPermission"],
-            ],*/
+            'update' => [
+                "callback" => [$this, 'update'],
+            ],
 
 
-            "activate-multi" =>
-                [
-                    'class' => AdminMultiModelEditAction::className(),
-                    "name" => "Активировать",
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback" => [$this, 'eachMultiActivate'],
-                ],
+            "activate-multi" => [
+                'class' => BackendModelMultiActivateAction::class,
+            ],
 
-            "inActivate-multi" =>
-                [
-                    'class' => AdminMultiModelEditAction::className(),
-                    "name" => "Деактивировать",
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback" => [$this, 'eachMultiInActivate'],
-                ]
+            "deactivate-multi" => [
+                'class' => BackendModelMultiDeactivateAction::class,
+            ],
         ]);
 
 
@@ -120,7 +234,7 @@ class AdminUserController extends AdminModelEditorController
         $relatedModel->loadDefaultValues();
 
         $passwordChange = new PasswordChangeForm([
-            'user' => $model
+            'user' => $model,
         ]);
 
         $rr = new RequestResponse();
@@ -133,7 +247,7 @@ class AdminUserController extends AdminModelEditorController
             return \yii\widgets\ActiveForm::validateMultiple([
                 $model,
                 $relatedModel,
-                $passwordChange
+                $passwordChange,
             ]);
         }
 
@@ -166,8 +280,8 @@ class AdminUserController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
-            'relatedModel' => $relatedModel,
+            'model'          => $model,
+            'relatedModel'   => $relatedModel,
             'passwordChange' => $passwordChange,
         ]);
     }
@@ -181,7 +295,7 @@ class AdminUserController extends AdminModelEditorController
         $model = $this->model;
         $relatedModel = $model->relatedPropertiesModel;
         $passwordChange = new PasswordChangeForm([
-            'user' => $model
+            'user' => $model,
         ]);
 
         $rr = new RequestResponse();
@@ -194,7 +308,7 @@ class AdminUserController extends AdminModelEditorController
             return \yii\widgets\ActiveForm::validateMultiple([
                 $model,
                 $relatedModel,
-                $passwordChange
+                $passwordChange,
             ]);
         }
 
@@ -226,8 +340,8 @@ class AdminUserController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
-            'relatedModel' => $relatedModel,
+            'model'          => $model,
+            'relatedModel'   => $relatedModel,
             'passwordChange' => $passwordChange,
         ]);
     }
@@ -243,7 +357,7 @@ class AdminUserController extends AdminModelEditorController
         $model = $this->model;
 
         $modelForm = new PasswordChangeForm([
-            'user' => $model
+            'user' => $model,
         ]);
 
         $rr = new RequestResponse();
@@ -291,10 +405,10 @@ class AdminUserController extends AdminModelEditorController
         }
 
         return $this->render('permission', [
-            'model' => $model,
-            'avaliable' => $avaliable,
-            'assigned' => $assigned,
-            'idField' => 'id',
+            'model'         => $model,
+            'avaliable'     => $avaliable,
+            'assigned'      => $assigned,
+            'idField'       => 'id',
             'usernameField' => 'username',
         ]);
     }
@@ -303,7 +417,7 @@ class AdminUserController extends AdminModelEditorController
     /**
      * Assign or revoke assignment to user
      * @param  integer $id
-     * @param  string $action
+     * @param  string  $action
      * @return mixed
      */
     public function actionAssign($id, $action)
@@ -338,15 +452,15 @@ class AdminUserController extends AdminModelEditorController
         return [
             $this->actionRoleSearch($id, 'avaliable', $post['search_av']),
             $this->actionRoleSearch($id, 'assigned', $post['search_asgn']),
-            $error
+            $error,
         ];
     }
 
     /**
      * Search roles of user
      * @param  integer $id
-     * @param  string $target
-     * @param  string $term
+     * @param  string  $target
+     * @param  string  $term
      * @return string
      */
     public function actionRoleSearch($id, $target, $term = '')

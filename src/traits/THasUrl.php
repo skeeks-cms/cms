@@ -42,6 +42,9 @@ trait THasUrl
      */
     public function setUrl($url)
     {
+        if (!is_array($url)) {
+            \Yii::warning('bad url ' . $url, 'adminUrl');
+        }
         $this->_url = $url;
         return $this;
     }

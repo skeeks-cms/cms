@@ -101,6 +101,22 @@ class BooleanColumn extends DataColumn
     {
         $value = parent::getDataCellValue($model, $key, $index);
 
+        if (is_integer($value)) {
+            if ($value == 0) {
+                return $this->falseIcon;
+            } else {
+                return $this->trueIcon;
+            }
+        }
+
+        if (is_string($value)) {
+            if ($value == "N") {
+                return $this->falseIcon;
+            } else {
+                return $this->trueIcon;
+            }
+        }
+
         if ($this->trueValue !== true) {
             if ($value == $this->falseValue) {
                 return $this->falseIcon;
@@ -111,7 +127,7 @@ class BooleanColumn extends DataColumn
             if ($value !== null) {
                 return $value ? $this->trueIcon : $this->falseIcon;
             }
-            return $this->showNullAsFalse ? $this->falseIcon : $value;
+            return $value . ($this->showNullAsFalse ? $this->falseIcon : $value);
         }
 
     }

@@ -108,7 +108,7 @@ class AdminComponentSettingsController extends AdminController
 
         if (\Yii::$app->request->get('attributes') && !$settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one()) {
             $attributes = \Yii::$app->request->get('attributes');
-            $component->attributes = $attributes;
+            $component->setAttributes($attributes);
         } else {
             $component->overridePath = [Component::OVERRIDE_DEFAULT];
             $component->refresh();
@@ -156,16 +156,20 @@ class AdminComponentSettingsController extends AdminController
 
         if ($attibutes && !\skeeks\cms\models\CmsComponentSettings::findByComponent($component)->one()) {
             $attributes = $attibutes;
-            $component->attributes = $attributes;
+            $component->setAttributes($attributes);
         } else {
             $component->overridePath = [Component::OVERRIDE_DEFAULT];
             $component->refresh();
         }
 
 
+
         $rr = new RequestResponse();
         if (\Yii::$app->request->isAjax && \Yii::$app->request->isPost && !\Yii::$app->request->isPjax) {
-            return $rr->ajaxValidateForm($component);
+            $component->load(\Yii::$app->request->post());
+            return ActiveForm::validateMultiple(ArrayHelper::merge(
+                [$component], $component->getConfigFormModels()
+            ));
         }
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
