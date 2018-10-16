@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
  
+5.2.2.pre
+----------------
+ * Fixed https://github.com/skeeks-cms/cms/pull/118
+ 
 5.2.1.1
 ----------------
  * Update
