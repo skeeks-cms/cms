@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
  
-5.2.3.pre
+5.2.3
 ----------------
  * Fixed component settings form
  * Update email templates
