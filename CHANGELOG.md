@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
  
+5.2.3.1
+----------------
+  * Fixed
+  
 5.2.3
 ----------------
  * Fixed component settings form
