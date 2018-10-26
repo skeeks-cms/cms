@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
  
+5.2.3.pre
+----------------
+ * Fixed component settings form
+ * Update email templates
+ 
 5.2.2
 ----------------
  * Fixed https://github.com/skeeks-cms/cms/pull/118

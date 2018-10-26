@@ -7,9 +7,9 @@ use skeeks\cms\mail\helpers\Html;
 /* @var $resetLink */
 ?>
 
-<?= Html::beginTag('h1'); ?>
-    Регистрация на сайте <?= \Yii::$app->cms->appName ?>
-<?= Html::endTag('h1'); ?>
+<?/*= Html::beginTag('h1'); */?><!--
+    Регистрация на сайте <?/*= \Yii::$app->cms->appName */?>
+--><?/*= Html::endTag('h1'); */?>
 
 <?= Html::beginTag('p'); ?>
     Здравствуйте!<br><br>Вы успешно зарегистрированны на сайте <?= Html::a(\Yii::$app->name,
@@ -19,9 +19,11 @@ use skeeks\cms\mail\helpers\Html;
 <?= Html::beginTag('p'); ?>
     Для авторизации на сайте используйте следующие данные:
     <br>
+    <br>
     <b>Email: </b><?= $user->email; ?><br>
     <b>Пароль: </b><?= $password; ?><br>
-<?= Html::a("Ссылка на авторизацию", \skeeks\cms\helpers\UrlHelper::construct('cms/auth/login')
+<br>
+<?= Html::a("Войти в кабинет", \skeeks\cms\helpers\UrlHelper::construct('cms/auth/login')
     /*->setRef(
         \skeeks\cms\helpers\UrlHelper::construct('/cms/profile')->enableAbsolute()->toString()
     )*/
