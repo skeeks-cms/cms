@@ -187,7 +187,7 @@ JS
             <li role="presentation"
                 class="<?= in_array(\Yii::$app->controller->action->id, ['remove']) ? "active" : "" ?>"><a
                         href="<?= \yii\helpers\Url::to('remove') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
-                    <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'Remove{s}Recovery',
+                    <i class="fa fa-times"></i> <?= \Yii::t('skeeks/cms', 'Remove{s}Recovery',
                         ['s' => '/']) ?></a>
             </li>
 

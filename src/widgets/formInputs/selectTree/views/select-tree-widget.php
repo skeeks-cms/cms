@@ -21,7 +21,7 @@ $widget = $this->context;
                         <a href="<?= $tree->url; ?>" target="_blank" data-pjax="0">
                             <?= $widget->getNodeName($tree); ?>
                         </a>
-                        <a href="#" class="sx-close-btn pull-right"><i class="glyphicon glyphicon-remove"></i></a>
+                        <a href="#" class="sx-close-btn pull-right"><i class="fa fa-times"></i></a>
                     </li>
                 <?php endforeach; ?>
             <?php endif; ?>

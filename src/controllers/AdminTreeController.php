@@ -61,7 +61,7 @@ class AdminTreeController extends AdminModelEditorController
             'list' => [
                 'class'    => ModelEditorGridAction::className(),
                 'name'     => \Yii::t('skeeks/cms', 'List'),
-                "icon"     => "glyphicon glyphicon-th-list",
+                "icon"     => "fa fa-list",
                 "priority" => 10,
             ],
 
