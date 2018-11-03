@@ -62,7 +62,7 @@ class UpaPersonalController extends BackendModelController
                                 'multiple' => false
                             ]
                         ],
-                        'username',
+                        /*'username',*/
                         'last_name',
                         'first_name',
                         'patronymic',
