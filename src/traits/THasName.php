@@ -23,7 +23,7 @@ trait THasName
     protected $_name = '';
 
     /**
-     * @return string
+     * @return string|bool
      */
     public function getName()
     {
@@ -31,7 +31,7 @@ trait THasName
     }
 
     /**
-     * @param string|array $name
+     * @param string|array|bool $name
      * @return $this
      */
     public function setName($name)
@@ -45,6 +45,10 @@ trait THasName
             );
         } else if (is_string($name)) {
             $this->_name = $name;
+        } else if (is_bool($name)) {
+            $this->_name = $name;
+        } else if (is_null($name)) {
+            $this->_name = false;
         }
 
         return $this;
