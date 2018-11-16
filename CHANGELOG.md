@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
  
+5.2.5.pre
+-----------------
+ * On CmsUser model new method findByAuthAssignments()
+ 
 5.2.4
 -----------------
  * Update icons to fontawesome for bootstrap4

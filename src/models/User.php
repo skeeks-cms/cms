@@ -526,6 +526,15 @@ class User
     }
 
     /**
+     * @param string|array $assignments
+     * @return \skeeks\cms\query\CmsActiveQuery
+     */
+    public static function findByAuthAssignments($assignments) {
+        return static::find()->joinWith('cmsAuthAssignments as cmsAuthAssignments')
+            ->where(['cmsAuthAssignments.item_name' => $assignments]);
+    }
+
+    /**
      * Finds user by password reset token
      *
      * @param string $token password reset token
