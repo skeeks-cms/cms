@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
  
-5.2.5.pre
+5.2.5
 -----------------
  * On CmsUser model new method findByAuthAssignments()
  
