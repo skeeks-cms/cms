@@ -86,7 +86,7 @@ class BooleanColumn extends DataColumn
             $this->filter = [$this->trueValue => $this->trueLabel, $this->falseValue => $this->falseLabel];
         }
         if (empty($this->trueIcon)) {
-            $this->trueIcon = '<span class="glyphicon glyphicon-ok text-success" title="' . $this->trueLabel . '"></span>';
+            $this->trueIcon = '<span class="fa fa-check text-success" title="' . $this->trueLabel . '"></span>';
         }
         if (empty($this->falseIcon)) {
             $this->falseIcon = '<span class="fa fa-times text-danger" title="' . $this->falseLabel . '"></span>';

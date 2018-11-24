@@ -3,6 +3,7 @@ CHANGELOG
  
 5.2.5
 -----------------
+ * Fixed PHP Fatal error:  Cannot use yii\base\Object as Object because 'Object' is a special class name in /.../vendor/skeeks/cms/src/behaviors/RelationalBehavior.php on line 15
  * On CmsUser model new method findByAuthAssignments()
  
 5.2.4
