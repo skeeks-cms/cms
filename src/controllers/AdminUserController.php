@@ -42,7 +42,7 @@ class AdminUserController extends BackendModelStandartController
     public function init()
     {
         $this->name = "Управление пользователями";
-        $this->modelShowAttribute = "username";
+        $this->modelShowAttribute = "displayName";
         $this->modelClassName = CmsUser::class;
 
         parent::init();

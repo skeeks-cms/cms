@@ -70,7 +70,7 @@ class PasswordChangeForm extends Model
     public function attributeLabels()
     {
         return [
-            'new_password' => \Yii::t('skeeks/cms', 'New Password'),
+            'new_password' => \Yii::t('skeeks/cms', 'New password'),
             'new_password_confirm' => \Yii::t('skeeks/cms', 'New Password Confirm'),
         ];
     }
