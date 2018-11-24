@@ -32,7 +32,7 @@ use yii\behaviors\TimestampBehavior;
 class ActiveRecord extends \yii\db\ActiveRecord
 {
     use TActiveRecord;
-    
+
     /**
      * @var array
      */
@@ -61,9 +61,16 @@ class ActiveRecord extends \yii\db\ActiveRecord
      */
     public function behaviors()
     {
-        return array_merge(parent::behaviors(), [
-            BlameableBehavior::className() => [
-                'class' => BlameableBehavior::className(),
+        $result = array_merge(parent::behaviors(), [
+            HasTableCache::class => [
+                'class' => HasTableCache::class,
+                'cache' => \Yii::$app->cache,
+            ],
+        ]);
+
+        if (self::getTableSchema()->getColumn('created_by') && self::getTableSchema()->getColumn('updated_by')) {
+            $result[BlameableBehavior::class] = [
+                'class' => BlameableBehavior::class,
                 'value' => function ($event) {
                     if (\Yii::$app instanceof \yii\console\Application) {
                         return null;
@@ -72,16 +79,16 @@ class ActiveRecord extends \yii\db\ActiveRecord
                         return $user && !$user->isGuest ? $user->id : null;
                     }
                 },
-            ],
-            TimestampBehavior::className() => [
-                'class' => TimestampBehavior::className(),
-            ],
+            ];
+        }
 
-            HasTableCache::className() => [
-                'class' => HasTableCache::className(),
-                'cache' => \Yii::$app->cache,
-            ],
-        ]);
+        if (self::getTableSchema()->getColumn('created_at') && self::getTableSchema()->getColumn('updated_at')) {
+            $result[TimestampBehavior::class] = [
+                'class' => TimestampBehavior::class,
+            ];
+        }
+
+        return $result;
     }
     /**
      * @return \yii\db\ActiveQuery
