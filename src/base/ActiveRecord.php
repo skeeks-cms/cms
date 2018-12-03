@@ -13,6 +13,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\traits\TActiveRecord;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 
@@ -68,24 +69,29 @@ class ActiveRecord extends \yii\db\ActiveRecord
             ],
         ]);
 
-        if (self::getTableSchema()->getColumn('created_by') && self::getTableSchema()->getColumn('updated_by')) {
-            $result[BlameableBehavior::class] = [
-                'class' => BlameableBehavior::class,
-                'value' => function ($event) {
-                    if (\Yii::$app instanceof \yii\console\Application) {
-                        return null;
-                    } else {
-                        $user = Yii::$app->get('user', false);
-                        return $user && !$user->isGuest ? $user->id : null;
-                    }
-                },
-            ];
-        }
+        try {
+            if (self::getTableSchema()->getColumn('created_by') && self::getTableSchema()->getColumn('updated_by')) {
+                $result[BlameableBehavior::class] = [
+                    'class' => BlameableBehavior::class,
+                    'value' => function ($event) {
+                        if (\Yii::$app instanceof \yii\console\Application) {
+                            return null;
+                        } else {
+                            $user = Yii::$app->get('user', false);
+                            return $user && !$user->isGuest ? $user->id : null;
+                        }
+                    },
+                ];
+            }
 
-        if (self::getTableSchema()->getColumn('created_at') && self::getTableSchema()->getColumn('updated_at')) {
-            $result[TimestampBehavior::class] = [
-                'class' => TimestampBehavior::class,
-            ];
+            if (self::getTableSchema()->getColumn('created_at') && self::getTableSchema()->getColumn('updated_at')) {
+                $result[TimestampBehavior::class] = [
+                    'class' => TimestampBehavior::class,
+                ];
+            }
+
+        } catch (InvalidConfigException $e) {
+
         }
 
         return $result;
