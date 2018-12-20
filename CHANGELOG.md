@@ -1,7 +1,10 @@
 CHANGELOG
 ==============
 
-
+5.2.8.pre
+-----------------
+ * New UserOnlineWidget
+ 
 5.2.7
 -----------------
  * Fixed table exist

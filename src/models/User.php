@@ -73,6 +73,7 @@ use yii\web\IdentityInterface;
  * @property []   $roleNames
  *
  * @property string $displayName
+ * @property string $isOnline Пользователь онлайн?
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
  * @property CmsContentElement[] $favoriteCmsContentElements
@@ -778,4 +779,20 @@ class User
             ->via('cmsContentElement2cmsUsers');
     }
 
+
+    /**
+     * Пользователь онлайн?
+     * @return bool
+     */
+    public function getIsOnline()
+    {
+        $time = \Yii::$app->formatter->asTimestamp(time()) - $this->last_activity_at;
+        if ($time <= \Yii::$app->cms->userOnlineTime)
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 }
