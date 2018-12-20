@@ -58,16 +58,19 @@ class AdminUserController extends BackendModelStandartController
                         'q',
                         'active',
                         'role',
+                        'isOnline',
                     ],
 
                     "filtersModel" => [
                         'rules'            => [
                             ['q', 'safe'],
+                            ['isOnline', 'safe'],
                             ['role', 'safe'],
                         ],
                         'attributeDefines' => [
                             'q',
                             'role',
+                            'isOnline',
                         ],
 
                         'fields' => [
@@ -97,6 +100,36 @@ class AdminUserController extends BackendModelStandartController
                                         $query->andFilterWhere([
                                             'auth_assignment.item_name' => $e->field->value,
                                         ]);
+                                    }
+
+                                },
+                            ],
+                            'isOnline' => [
+                                'class'    => SelectField::class,
+                                'multiple' => false,
+                                'label'    => 'Онлайн/Оффлайн',
+                                'items'    => [
+                                    1 => \Yii::t('skeeks/cms', 'Online'),
+                                    2 => \Yii::t('skeeks/cms', 'Offline'),
+                                ],
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+                                    if ($e->field->value) {
+
+                                        if ($e->field->value == 1) {
+                                            $query->andFilterWhere([
+                                                '>=', 'last_activity_at', time() - \Yii::$app->cms->userOnlineTime
+                                            ]);
+                                        } elseif ($e->field->value == 2) {
+                                            $query->andFilterWhere([
+                                                '<', 'last_activity_at', time() - \Yii::$app->cms->userOnlineTime
+                                            ]);
+                                        }
+
+
                                     }
 
                                 },
