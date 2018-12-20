@@ -3,6 +3,7 @@ CHANGELOG
 
 5.2.8.pre
 -----------------
+ * New UserOnlineTriggerWidget
  * New UserOnlineWidget
  
 5.2.7
