@@ -39,12 +39,14 @@ class UserOnlineWidget extends Widget
         if ($user->isOnline) {
             $options = ArrayHelper::merge($this->options, [
                 'title' => \Yii::t('skeeks/cms', 'Online'),
+                'data-toggle' => 'tooltip',
             ]);
 
             $online = \yii\helpers\Html::img(UserOnlineWidgetAsset::getAssetUrl('icons/round_green.gif'), $options);
         } else {
             $options = ArrayHelper::merge($this->options, [
                 'title' => \Yii::t('skeeks/cms', 'Offline'),
+                'data-toggle' => 'tooltip',
             ]);
 
             $online = \yii\helpers\Html::img(UserOnlineWidgetAsset::getAssetUrl('icons/round_red.gif'), $options);
