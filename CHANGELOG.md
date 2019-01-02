@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.2.8.pre
+5.2.9
 -----------------
  * New UserOnlineTriggerWidget
  * New UserOnlineWidget
