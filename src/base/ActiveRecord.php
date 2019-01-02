@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\base;
 
+use common\models\User;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\query\CmsActiveQuery;
@@ -25,8 +26,8 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $created_at
  * @property integer $updated_at
  *
- * @property CmsUser $createdBy
- * @property CmsUser $updatedBy
+ * @property CmsUser|User $createdBy
+ * @property CmsUser|User $updatedBy
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
