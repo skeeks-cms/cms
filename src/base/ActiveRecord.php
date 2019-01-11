@@ -129,8 +129,32 @@ class ActiveRecord extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+        $result = [];
+
+
+        if (self::getTableSchema()->getColumn('created_by')) {
+            $result[] = ['created_by', 'integer'];
+        }
+        if (self::getTableSchema()->getColumn('updated_by')) {
+            $result[] = ['updated_by', 'integer'];
+        }
+        if (self::getTableSchema()->getColumn('created_at')) {
+            $result[] = ['created_at', 'integer'];
+        }
+        if (self::getTableSchema()->getColumn('updated_at')) {
+            $result[] = ['updated_at', 'integer'];
+        }
+
+        return $result;
+       /*
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'id'], 'integer'],
-        ];
+            [[
+                'created_by',
+                'updated_by',
+                'created_at',
+                'updated_at',
+                'id'
+            ], 'integer'],
+        ];*/
     }
 }
