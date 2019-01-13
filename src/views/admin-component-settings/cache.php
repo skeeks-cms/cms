@@ -18,7 +18,7 @@
 <div class="sx-box sx-mb-10 sx-p-10">
     <p><?= \Yii::t('skeeks/cms', 'To improve performance, configure each component of the site is cached.') ?></p>
     <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Cache.clearAll(); return false;">
-        <i class="glyphicon glyphicon-remove"></i> Сбросить кэш для всех
+        <i class="fa fa-times"></i> Сбросить кэш для всех
     </button>
 </div>
 

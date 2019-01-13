@@ -91,13 +91,13 @@ if ($additionalName) {
     <div class="pull-left sx-controll-act">
         <a href="#" class="btn-tree-node-controll btn btn-default btn-sm add-tree-child"
            title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>" data-id="<?= $model->id; ?>"><span
-                    class="glyphicon glyphicon-plus"></span></a>
+                    class="fa fa-plus"></span></a>
     </div>
     <div class="pull-left sx-controll-act">
         <a href="<?= $model->absoluteUrl; ?>" target="_blank"
            class="btn-tree-node-controll btn btn-default btn-sm show-at-site"
            title="<?= \Yii::t('skeeks/cms', "Show at site"); ?>">
-            <span class="glyphicon glyphicon-eye-open"></span>
+            <span class="fa fa-eye"></span>
         </a>
     </div>
     <?php if ($model->level > 0) : ?>

@@ -21,7 +21,7 @@
     <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentUser($component, $user)->one()) : ?>
         <button type="submit" class="btn btn-danger btn-xs"
                 onclick="sx.ComponentSettings.Remove.removeByUser('<?= $user->id; ?>'); return false;">
-            <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'Reset settings for this user') ?>
+            <i class="fa fa-times"></i> <?= \Yii::t('skeeks/cms', 'Reset settings for this user') ?>
         </button>
         <small><?= \Yii::t('skeeks/cms',
                 'The settings for this component are stored in the database. This option will erase them from the database, but the component, restore the default values. As they have in the code the developer.') ?></small>

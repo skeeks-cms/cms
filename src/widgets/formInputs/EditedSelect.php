@@ -82,8 +82,8 @@ class EditedSelect extends Chosen
         $create_w = \Yii::t('skeeks/cms', 'Create');
         $edit_w = \Yii::t('skeeks/cms', 'Edit');
         echo <<<HTML
-            <a href="{$createUrl}" class="btn btn-default sx-btn-create sx-btn-controll" ><span class="glyphicon glyphicon-plus"></span> {$create_w}</a>
-            <a href="{$updateUrl}" class="btn btn-default sx-btn-update sx-btn-controll" ><span class="glyphicon glyphicon-pencil"></span> {$edit_w}</a>
+            <a href="{$createUrl}" class="btn btn-default sx-btn-create sx-btn-controll" ><span class="fa fa-plus"></span> {$create_w}</a>
+            <a href="{$updateUrl}" class="btn btn-default sx-btn-update sx-btn-controll" ><span class="fa fa-edit"></span> {$edit_w}</a>
 HTML;
 
 

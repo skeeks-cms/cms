@@ -116,7 +116,7 @@ Update configs:
 .. code-block:: bash
 
     #Installation of ready-dump
-    php yii dbDumper/mysql/restore
+    php yii migrate -t=migration_install -p=backup/migrations
 
 
 5. Configuring the server

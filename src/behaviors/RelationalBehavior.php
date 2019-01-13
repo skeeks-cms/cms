@@ -12,7 +12,7 @@ namespace skeeks\cms\behaviors;
 
 use yii\base\Behavior;
 use yii\base\ErrorException;
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -66,8 +66,8 @@ class RelationalBehavior extends Behavior
             return;
         }
 
-        if (is_array($value) && count($value) > 0 && !($value[0] instanceof Object) ||
-            !is_array($value) && !($value instanceof Object)
+        if (is_array($value) && count($value) > 0 && !($value[0] instanceof BaseObject) ||
+            !is_array($value) && !($value instanceof BaseObject)
         ) {
             $getter = 'get' . $name;
             /** @var ActiveQuery $query */

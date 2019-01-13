@@ -21,7 +21,7 @@
         <p><b><?= \Yii::t('skeeks/cms', 'Total found') ?>:</b> <?= $settingsAllCount; ?></p>
         <button type="submit" class="btn btn-danger btn-xs"
                 onclick="sx.ComponentSettings.Remove.removeAll(); return false;">
-            <i class="glyphicon glyphicon-remove"></i> <?= \Yii::t('skeeks/cms', 'reset all settings') ?>
+            <i class="fa fa-times"></i> <?= \Yii::t('skeeks/cms', 'reset all settings') ?>
         </button>
     <?php else
         : ?>

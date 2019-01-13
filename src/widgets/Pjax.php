@@ -60,17 +60,25 @@ class Pjax extends \yii\widgets\Pjax
 
                     $(document).on('pjax:send', function(e)
                     {
-                        blockerPanel = new sx.classes.Blocker($(e.target));
-                        blockerPanel.block();
+                        if ('{$this->id}' == e.target.id) {
+                            blockerPanel = new sx.classes.Blocker($(e.target));
+                            blockerPanel.block();
+                        }
+                        
                     });
 
                     $(document).on('pjax:complete', function(e) {
-                        blockerPanel.unblock();
+                        if ('{$this->id}' == e.target.id) {
+                            blockerPanel.unblock();
+                        }
                     });
 
                     $(document).on('pjax:error', function(e, data) {
-                        {$errorNotify}
-                        blockerPanel.unblock();
+                        if ('{$this->id}' == e.target.id) {
+                            {$errorNotify}
+                            blockerPanel.unblock();
+                            e.preventDefault();
+                        }
                     });
 
                 })(sx, sx.$, sx._);
@@ -86,17 +94,27 @@ JS
 
                     $(document).on('pjax:send', function(e)
                     {
-                        var blockerPanel = new sx.classes.Blocker($("{$this->blockContainer}"));
-                        blockerPanel.block();
+                        if ('{$this->id}' == e.target.id) {
+                            var blockerPanel = new sx.classes.Blocker($("{$this->blockContainer}"));
+                            blockerPanel.block();
+                        }
+                        
                     });
 
                     $(document).on('pjax:complete', function(e) {
-                        blockerPanel.unblock();
+                        if ('{$this->id}' == e.target.id) {
+                            blockerPanel.unblock();
+                        }  
+                        
                     });
 
                     $(document).on('pjax:error', function(e, data) {
-                        {$errorNotify}
-                        blockerPanel.unblock();
+                        if ('{$this->id}' == e.target.id) {
+                            {$errorNotify}
+                            blockerPanel.unblock();
+                            e.preventDefault();
+                        }
+                        
                     });
 
                 })(sx, sx.$, sx._);

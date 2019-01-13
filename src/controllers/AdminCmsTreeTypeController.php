@@ -44,7 +44,7 @@ class AdminCmsTreeTypeController extends AdminModelEditorController
                     [
                         'class' => AdminMultiModelEditAction::className(),
                         "name" => "Активировать",
-                        //"icon"              => "glyphicon glyphicon-trash",
+                        //"icon"              => "fa fa-trash",
                         "eachCallback" => [$this, 'eachMultiActivate'],
                     ],
 
@@ -52,7 +52,7 @@ class AdminCmsTreeTypeController extends AdminModelEditorController
                     [
                         'class' => AdminMultiModelEditAction::className(),
                         "name" => "Деактивировать",
-                        //"icon"              => "glyphicon glyphicon-trash",
+                        //"icon"              => "fa fa-trash",
                         "eachCallback" => [$this, 'eachMultiInActivate'],
                     ]
             ]

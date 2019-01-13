@@ -105,6 +105,13 @@ class Cms extends \skeeks\cms\base\Component
      * @var int
      */
     public $element_max_code_length = 128;
+
+    /**
+     * Время последней активности когда считается что пользователь онлайн
+     * @var int
+     */
+    public $userOnlineTime              = 60; //1 минута
+
     /**
      * Схема временных папок
      * Чистятся в момент нажатия на кнопку чистки временных файлов

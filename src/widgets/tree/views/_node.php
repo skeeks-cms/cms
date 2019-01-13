@@ -27,7 +27,7 @@ $widget = $this->context;
                 : ?>
                 <a href="<?= $widget->getOpenCloseLink($model);
                 ?>" class="btn btn-sm btn-default">
-                    <span class="glyphicon glyphicon-plus" title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"></span>
+                    <span class="fa fa-plus" title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"></span>
                 </a>
             <?php endif; ?>
         </div>

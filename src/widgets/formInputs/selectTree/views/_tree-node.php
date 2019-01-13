@@ -22,7 +22,7 @@ $selectTreeInputWidget = \yii\helpers\ArrayHelper::getValue($widget->contextData
 <!--<div class="sx-controll-node row">
     <div class="pull-left sx-controll-act">
         <a href="<?php /*= $model->absoluteUrl; */ ?>" target="_blank" class="btn-tree-node-controll btn btn-default btn-sm show-at-site" title="<?php /*= \Yii::t('skeeks/cms',"Show at site"); */ ?>">
-            <span class="glyphicon glyphicon-eye-open"></span>
+            <span class="fa fa-eye"></span>
         </a>
     </div>
 </div>-->
