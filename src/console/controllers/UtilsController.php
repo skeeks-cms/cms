@@ -67,8 +67,10 @@ class UtilsController extends Controller
         /**
          * @var $files StorageFile[]
          */
+        ini_set('memory_limit', '2048M');
+
         if ($files = StorageFile::find()->count()) {
-            foreach (StorageFile::find()->orderBy(['id' => SORT_ASC])->each(10) as $file) {
+            foreach (StorageFile::find()->orderBy(['id' => SORT_ASC])->each(100) as $file) {
                 $this->stdout("{$file->id}");
                 if ($file->deleteTmpDir()) {
                     $this->stdout(" - true\n", Console::FG_GREEN);
