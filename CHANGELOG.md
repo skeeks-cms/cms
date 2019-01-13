@@ -1,5 +1,43 @@
 CHANGELOG
 ==============
+
+5.2.8
+-----------------
+ * New UserOnlineTriggerWidget
+ * New UserOnlineWidget
+ 
+5.2.7
+-----------------
+ * Fixed table exist
+ 
+5.2.6
+-----------------
+ * Fixed PHP Fatal error:  Cannot use yii\base\Object as Object because 'Object' is a special class name in /.../vendor/skeeks/cms/src/behaviors/RelationalBehavior.php on line 15
+ 
+5.2.5
+-----------------
+ * On CmsUser model new method findByAuthAssignments()
+ 
+5.2.4
+-----------------
+ * Update icons to fontawesome for bootstrap4
+ 
+5.2.3.1
+----------------
+  * Fixed
+  
+5.2.3
+----------------
+ * Fixed component settings form
+ * Update email templates
+ 
+5.2.2
+----------------
+ * Fixed https://github.com/skeeks-cms/cms/pull/118
+ 
+5.2.1.1
+----------------
+ * Update
  
 5.2.1
 ----------------

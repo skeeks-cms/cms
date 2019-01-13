@@ -212,7 +212,7 @@ JS
                         ],
                 ],
 
-                'controllerRoute' => 'cms/admin-cms-content-element',
+                'controllerRoute' => '/cms/admin-cms-content-element',
                 'gridViewOptions' => [
                     'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
                 ],

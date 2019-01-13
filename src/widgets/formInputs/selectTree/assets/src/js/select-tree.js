@@ -34,7 +34,7 @@
 
             var jLi = $('<li>', {'data-id': id})
                 .append($("<a>", {'target': '_blank', 'href': url}).text(name))
-                .append($("<a>", {'href': '#', 'class': 'sx-close-btn pull-right'}).append('<i class="glyphicon glyphicon-remove"></i>'))
+                .append($("<a>", {'href': '#', 'class': 'sx-close-btn pull-right'}).append('<i class="fa fa-times"></i>'))
             ;
 
             jWrapper.append(jLi);

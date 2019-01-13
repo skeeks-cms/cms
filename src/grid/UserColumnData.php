@@ -77,7 +77,7 @@ CSS
                     'width' => 25,
                     'style' => 'margin-right: 5px;'
                 ]) . $user->getDisplayName() . "
-                <div class='sx-user-preview-controll'>" . Html::a("<i class='glyphicon glyphicon-pencil' title='Редактировать'></i>",
+                <div class='sx-user-preview-controll'>" . Html::a("<i class='fa fa-edit' title='Редактировать'></i>",
                     UrlHelper::construct(['/cms/admin-user/update', 'pk' => $user->id])->enableAdmin()->toString(),
                     [
                         'class' => 'btn btn-xs btn-default',

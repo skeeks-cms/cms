@@ -9,6 +9,9 @@ return
         "Loading" => "Загрузка",
         "Users" => "Пользователи",
 
+        "Online" => "Онлайн",
+        "Offline" => "Оффлайн",
+
         "Cleaning temporarily downloaded files" => "Чистка временно загружаемых файлов",
         "Clearing the cache" => "Очистка кэша",
         "First name" => "Имя",

@@ -708,7 +708,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                 'pk' => $this->content->id,
             ])->enableAdmin()->toString());
 
-        $e->data = Alert::widget([
+        $e->content = Alert::widget([
             'options' => [
                 'class' => 'alert-info',
             ],

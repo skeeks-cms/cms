@@ -29,7 +29,7 @@ use yii\helpers\Inflector;
 
 /**
  * @property string                $modelClassName; название класса модели с которой идет работа
- * @property DataProviderInterface $dataProvider; готовый датапровайдер с учетом настроек виджета
+ * @property DataProviderInterface|ActiveDataProvider $dataProvider; готовый датапровайдер с учетом настроек виджета
  * @property array                 $resultColumns; готовый конфиг для построения колонок
  * @property PaginationConfig      $paginationConfig;
  *

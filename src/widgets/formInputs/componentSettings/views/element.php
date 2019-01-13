@@ -17,7 +17,7 @@ $clientOptions = \yii\helpers\Json::encode($options);
         <?= $element; ?>
     </div>
     <a href="#" class="<?= $widget->buttonClasses; ?>">
-        <i class="glyphicon glyphicon-cog"></i> <?= $widget->buttonText; ?>
+        <i class="fa fa-cog"></i> <?= $widget->buttonText; ?>
     </a>
 </div>
 

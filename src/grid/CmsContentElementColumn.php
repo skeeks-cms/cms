@@ -43,7 +43,7 @@ class CmsContentElementColumn extends DataColumn
                         'data-pjax' => 0,
                         'title' => 'Посмотреть на сайте (откроется в новом окне)',
                     ]) . " " .
-                    Html::a('<span class="glyphicon glyphicon-pencil"></span>',
+                    Html::a('<span class="fa fa-edit"></span>',
                         UrlHelper::construct('/cms/admin-cms-content-element/update', [
                             'content_id' => $element->content_id,
                             'pk' => $element->id,
