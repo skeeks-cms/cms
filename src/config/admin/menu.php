@@ -84,9 +84,9 @@ function dashboardsMenu()
             $itemData = [
                 'label'          => $dashboard->name,
                 "img"            => ['\skeeks\cms\assets\CmsAsset', 'images/icons/dashboard.png'],
-                'url'            => ["admin/index/dashboard", "pk" => $dashboard->id],
+                'url'            => ["admin/admin-index/dashboard", "pk" => $dashboard->id],
                 "activeCallback" => function ($adminMenuItem) {
-                    return (bool)(\Yii::$app->controller->action->uniqueId == 'admin/index/dashboard' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
+                    return (bool)(\Yii::$app->controller->action->uniqueId == 'admin/admin-index/dashboard' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
                             'pk') == \Yii::$app->request->get('pk'));
                 },
             ];
@@ -96,7 +96,7 @@ function dashboardsMenu()
     } else {
         $result[] = [
             "label" => \Yii::t('skeeks/cms', "Рабочий стол 1"),
-            "url"   => ["admin/index"],
+            "url"   => ["admin/admin-index"],
             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/dashboard.png'],
         ];
     }
