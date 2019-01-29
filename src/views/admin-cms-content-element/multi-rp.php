@@ -60,9 +60,13 @@ JS
         <?php $element = $content->createElement(); ?>
         <?php $element->loadDefaultValues(); ?>
 
-        <?php if ($element && $element->relatedPropertiesModel) : ?>
+        <?
+            $rpm = $element->relatedPropertiesModel;
+        ?>
 
-            <? $element->relatedPropertiesModel->initAllProperties(); ?>
+        <?php if ($element && $rpm) : ?>
+
+            <? $rpm->initAllProperties(); ?>
             <?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
                 'options' => [
                     'class' => 'sx-form',
@@ -74,18 +78,19 @@ JS
                 'options' => [
                     'class' => 'sx-select'
                 ],
-                'items' => $element->relatedPropertiesModel->attributeLabels()
+                'items' => $rpm->attributeLabels()
             ]); ?>
 
             <?= \yii\helpers\Html::hiddenInput('content_id', $content->id); ?>
 
-            <?php foreach ($element->relatedPropertiesModel->properties as $property) : ?>
+
+            <?php foreach ($rpm->getProperties() as $property) : ?>
                 <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
                     <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
 
                         <?php if ($property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
                             <?
-                            echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
+                            echo $form->field($rpm, $property->code)->widget(
                                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
                                 [
                                     'content_id' => $property->handler->content_id
@@ -95,7 +100,7 @@ JS
                         <?php else
                             : ?>
                             <?
-                            echo $form->field($element->relatedPropertiesModel, $property->code)->widget(
+                            echo $form->field($rpm, $property->code)->widget(
                                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
                                 [
                                     'content_id' => $property->handler->content_id,
