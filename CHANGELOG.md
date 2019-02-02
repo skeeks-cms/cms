@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.2.9
+-----------------
+ * yii2 v2.0.16
+ 
 5.2.8
 -----------------
  * New UserOnlineTriggerWidget
