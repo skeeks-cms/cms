@@ -97,7 +97,7 @@ JS
 
     public function run()
     {
-        parent::run();
         $this->registerJs();
+        return parent::run();
     }
 }
