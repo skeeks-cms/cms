@@ -64,7 +64,16 @@ class AdminCmsContentElementController extends BackendModelStandartController
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', 'Elements');
+
+        if ($this->content) {
+            if ($this->permissionName === null) {
+                $this->permissionName = $this->uniqueId . "__" . $this->content->id;
+            }
+        }
+
         parent::init();
+
+
     }
 
     /**
@@ -952,19 +961,7 @@ HTML
             return false;
         }
     }
-    /**
-     * @return string
-     */
-    public function getPermissionName()
-    {
-        $unique = parent::getPermissionName();
 
-        if ($this->content) {
-            $unique = $unique."__".$this->content->id;
-        }
-
-        return $unique;
-    }
     /**
      * @return CmsContent|static
      */

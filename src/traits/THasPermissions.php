@@ -73,13 +73,17 @@ trait THasPermissions
         return $this;
     }
 
+
+
     /**
      * @var string
+     * @deprecated
      */
     protected $_permissionName = null;
 
     /**
      * @return string
+     * @deprecated
      */
     public function getPermissionName()
     {
@@ -89,12 +93,14 @@ trait THasPermissions
     /**
      * @param string|null $permissionName
      * @return $this
+     * @deprecated
      */
     public function setPermissionName($permissionName = null)
     {
         $this->_permissionName = $permissionName;
         return $this;
     }
+
 
     /**
      * @return bool
