@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.2.11.pre
+-----------------
+ * skeeks\cms\models\Tree - new method getActiveChildren();
+ 
 5.2.10
 -----------------
  * Fixed rbac

@@ -97,6 +97,7 @@ use yii\helpers\Url;
  * @property Tree $parent
  * @property Tree[] $parents
  * @property Tree[] $children
+ * @property Tree[] $activeChildren
  * @property Tree $root
  * @property Tree $prev
  * @property Tree $next
@@ -767,6 +768,14 @@ class Tree extends Core
         $paths[] = $this->name;
 
         return implode($glue, $paths);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getActiveChildren()
+    {
+        return $this->getChildren()->active();
     }
 }
 
