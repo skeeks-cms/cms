@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.2.11.pre
+5.2.11
 -----------------
  * skeeks\cms\models\Tree - new method getActiveChildren();
  
