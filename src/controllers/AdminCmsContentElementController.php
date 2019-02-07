@@ -38,6 +38,7 @@ use yii\base\Exception;
 use yii\bootstrap\Alert;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;

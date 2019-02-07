@@ -226,6 +226,7 @@ class RelatedPropertiesModel extends DynamicModel
 
         $hasErrors = false;
 
+        //TODO:Добавить транзакцию
         try {
             foreach ($this->_properties as $property) {
                 $this->_saveRelatedPropertyValue($property);
@@ -259,7 +260,7 @@ class RelatedPropertiesModel extends DynamicModel
     public function beforeSave($insert)
     {
         $event = new ModelEvent();
-        $this->trigger($insert ? ActiveRecord::EVENT_AFTER_INSERT : ActiveRecord::EVENT_AFTER_UPDATE, $event);
+        $this->trigger($insert ? ActiveRecord::EVENT_BEFORE_INSERT : ActiveRecord::EVENT_BEFORE_UPDATE, $event);
 
         return $event->isValid;
     }
