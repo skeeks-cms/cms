@@ -290,6 +290,12 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function delete()
     {
+        $this->initAllProperties();
+
+        if (!$this->beforeDelete()) {
+            return false;
+        }
+
         try {
             foreach ($this->_properties as $property) {
                 $this->_deleteRelatedPropertyValue($property);
@@ -299,7 +305,29 @@ class RelatedPropertiesModel extends DynamicModel
             return false;
         }
 
+        $this->_oldAttributes = null;
+        $this->afterDelete();
+
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function beforeDelete()
+    {
+        $event = new ModelEvent();
+        $this->trigger(ActiveRecord::EVENT_BEFORE_DELETE, $event);
+
+        return $event->isValid;
+    }
+
+    /**
+     *
+     */
+    public function afterDelete()
+    {
+        $this->trigger(ActiveRecord::EVENT_AFTER_DELETE);
     }
 
 

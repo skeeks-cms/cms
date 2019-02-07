@@ -3,6 +3,7 @@ CHANGELOG
 
 5.3.0.pre
 -----------------
+ * HasStorageFileMulti::relations — change default data!
  * Added ability to use files in advanced properties 
  * Updated additional properties mechanism 
 

@@ -31,10 +31,10 @@ class HasStorageFileMulti extends Behavior
      * @var array
      */
     public $relations = [
-        [
+        /*[
             'relation' => 'images',
             'property' => 'imageIds',
-        ],
+        ],*/
     ];
 
     public $fields = [
@@ -262,17 +262,33 @@ class HasStorageFileMulti extends Behavior
         }
 
 
-        foreach ($this->relations as $data) {
-            $fieldName = ArrayHelper::getValue($data, 'property');
+        if ($this->relations) {
+            foreach ($this->relations as $data) {
+                $fieldName = ArrayHelper::getValue($data, 'property');
 
-            if ($fileIds = $this->owner->{$fieldName}) {
-                if ($storageFiles = CmsStorageFile::find()->where(['id' => $fileIds])->all()) {
-                    foreach ($storageFiles as $file) {
-                        $file->delete();
+                if ($fileIds = $this->owner->{$fieldName}) {
+                    if ($storageFiles = CmsStorageFile::find()->where(['id' => $fileIds])->all()) {
+                        foreach ($storageFiles as $file) {
+                            $file->delete();
+                        }
+
                     }
-
                 }
             }
         }
+
+        if ($this->fields) {
+            foreach ($this->fields as $fieldName) {
+
+                if ($fileIds = $this->owner->{$fieldName}) {
+                    if ($storageFiles = CmsStorageFile::find()->where(['id' => $fileIds])->all()) {
+                        foreach ($storageFiles as $file) {
+                            $file->delete();
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
