@@ -360,7 +360,7 @@ class GridView extends \yii\grid\GridView
                     $cells = [];
 
                     foreach ($this->columns as $column) {
-                        $cells[] = iconv("UTF-8", "windows-1251", strip_tags($column->renderDataCell($model, $key, $key)));
+                        $cells[] = iconv("UTF-8", "windows-1251//IGNORE", strip_tags($column->renderDataCell($model, $key, $key)));
                     }
 
                     fputcsv($out, $cells, ";");
