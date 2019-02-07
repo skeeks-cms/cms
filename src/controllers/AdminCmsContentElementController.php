@@ -853,7 +853,7 @@ HTML
                     }
 
                     $model->refresh();
-
+                    $relatedModel = $model->relatedPropertiesModel;
                 }
             }
 
