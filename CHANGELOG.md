@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+5.3.0.pre
+-----------------
+ * Added ability to use files in advanced properties 
+ * Updated additional properties mechanism 
+
 5.2.11
 -----------------
  * skeeks\cms\models\Tree - new method getActiveChildren();
