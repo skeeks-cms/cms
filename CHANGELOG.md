@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.3.0.pre
+5.3.0
 -----------------
  * RelatedPropertiesModel::getAttributeAsHtml($name) is new method
  * RelatedPropertiesModel::getAttributeAsText($name) is new method
