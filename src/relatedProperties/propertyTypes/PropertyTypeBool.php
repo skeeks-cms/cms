@@ -136,7 +136,7 @@ class PropertyTypeBool extends PropertyType
     /**
      * @return string
      */
-    public function getStringValue()
+    public function getAsText()
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
         return (string)\Yii::$app->formatter->asBoolean($value);

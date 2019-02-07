@@ -534,12 +534,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         /**
                          * @var $model \skeeks\cms\models\CmsContentElement
                          */
-                        $value = $model->relatedPropertiesModel->getSmartAttribute($name);
-                        if (is_array($value)) {
+                        return $model->relatedPropertiesModel->getAttributeAsHtml($name);
+                        /*if (is_array($value)) {
                             return implode(",", $value);
                         } else {
                             return $value;
-                        }
+                        }*/
                     },
                 ];
 

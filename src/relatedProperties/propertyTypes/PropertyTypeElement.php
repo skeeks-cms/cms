@@ -208,7 +208,7 @@ class PropertyTypeElement extends PropertyType
     /**
      * @return string
      */
-    public function getStringValue()
+    public function getAsText()
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
 

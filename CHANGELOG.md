@@ -3,6 +3,12 @@ CHANGELOG
 
 5.3.0.pre
 -----------------
+ * RelatedPropertiesModel::getAttributeAsHtml($name) is new method
+ * RelatedPropertiesModel::getAttributeAsText($name) is new method
+ * RelatedPropertiesModel::getSmartAttribute($name) is depricated!
+ * PropertyType::getAsHtml() is new method
+ * PropertyType::getAsText() is new method
+ * PropertyType::getStringValue() is depricated!
  * HasStorageFileMulti::relations — change default data!
  * Added ability to use files in advanced properties 
  * Updated additional properties mechanism 

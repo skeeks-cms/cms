@@ -25,7 +25,9 @@ use yii\widgets\ActiveForm;
 /**
  * @property bool $isMultiple
  * @property mixed $defaultValue
- * @property string $stringValue
+ *
+ * @property string $asText
+ * @property string $asHtml
  *
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
@@ -119,6 +121,7 @@ abstract class PropertyType extends Model implements ConfigFormInterface
 
     /**
      * @return string
+     * @depricated
      */
     public function getStringValue()
     {
@@ -129,6 +132,22 @@ abstract class PropertyType extends Model implements ConfigFormInterface
         } else {
             return (string)$value;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsText()
+    {
+        return $this->stringValue;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsHtml()
+    {
+        return $this->asText;
     }
 
     /**

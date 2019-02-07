@@ -753,16 +753,41 @@ class RelatedPropertiesModel extends DynamicModel
     }
 
 
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getAttributeAsText($name)
+    {
+        $property = $this->getRelatedProperty($name);
 
+        if (!$property) {
+            return '';
+        }
 
-
-
-
+        return $property->handler->asText;
+    }
 
 
     /**
      * @param $name
      * @return string
+     */
+    public function getAttributeAsHtml($name)
+    {
+        $property = $this->getRelatedProperty($name);
+
+        if (!$property) {
+            return '';
+        }
+
+        return $property->handler->asHtml;
+    }
+
+    /**
+     * @param $name
+     * @return string
+     * @deprecated
      */
     public function getSmartAttribute($name)
     {
@@ -772,7 +797,7 @@ class RelatedPropertiesModel extends DynamicModel
             return '';
         }
 
-        return $property->handler->stringValue;
+        return $property->handler->asHtml;
     }
 
     /**

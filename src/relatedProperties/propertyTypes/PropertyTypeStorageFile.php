@@ -10,9 +10,11 @@ namespace skeeks\cms\relatedProperties\propertyTypes;
 
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
+use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /**
@@ -168,6 +170,72 @@ class PropertyTypeStorageFile extends PropertyType
         return $field;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getAsText()
+    {
+        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+
+        if ($this->isMultiple) {
+            /**
+             * @var CmsStorageFile $file
+             */
+            $files = CmsStorageFile::find()->where(['id' => $value])->all();
+            if ($files) {
+                return implode(", ", (array) ArrayHelper::map($files, "id", "original_name"));
+            }
+
+        } else {
+            /**
+             * @var CmsStorageFile $file
+             */
+            $file = CmsStorageFile::findOne($value);
+            if ($file) {
+                return $file->original_name;
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsHtml()
+    {
+        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+
+        if ($this->isMultiple) {
+            /**
+             * @var CmsStorageFile $file
+             */
+            $files = CmsStorageFile::find()->where(['id' => $value])->all();
+            if ($files) {
+                return implode(", ", (array) ArrayHelper::map($files, "id", function($file) {
+                    return Html::a($file->original_name, $file->absoluteSrc, [
+                        'data-pjax' => 0,
+                        'target' => "_blank"
+                    ]);
+                }));
+            }
+
+        } else {
+            /**
+             * @var CmsStorageFile $file
+             */
+            $file = CmsStorageFile::findOne($value);
+            if ($file) {
+                return Html::a($file->original_name, $file->absoluteSrc, [
+                    'data-pjax' => 0,
+                    'target' => "_blank"
+                ]);
+            }
+        }
+
+        return "";
+    }
 
     /**
      * @param mixed $value
