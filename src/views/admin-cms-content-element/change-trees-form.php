@@ -31,7 +31,7 @@ $model = new \skeeks\cms\models\CmsContentElement();
 <?php \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 
 
-<?php \yii\bootstrap\Alert::begin([
+<?php $alert = \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-info',
         'style' => 'margin-top: 20px;',
@@ -39,4 +39,4 @@ $model = new \skeeks\cms\models\CmsContentElement();
 ]) ?>
     <p><?= \Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.') ?></p>
     <p><?= \Yii::t('skeeks/cms', 'This does not affect the final address of the page, and hence safe.') ?></p>
-<?php \yii\bootstrap\Alert::end(); ?>
+<?php $alert::end(); ?>

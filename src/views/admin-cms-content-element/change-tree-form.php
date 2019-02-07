@@ -13,8 +13,9 @@ $model = new \skeeks\cms\models\CmsContentElement();
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
 ); ?>
     <button type="submit" class="btn btn-primary">Сохранить</button>
-<?php \yii\bootstrap\ActiveForm::end(); ?>
-<?php \yii\bootstrap\Alert::begin([
+<?php $form::end(); ?>
+
+<?php $alert = \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-warning',
         'style' => 'margin-top: 20px;',
@@ -23,4 +24,4 @@ $model = new \skeeks\cms\models\CmsContentElement();
     <p><?= \Yii::t('skeeks/cms', 'Attention! For checked items will be given a new primary section.') ?></p>
     <p><?= \Yii::t('skeeks/cms',
             'This will alter the page record, and it will cease to be available at the old address.') ?></p>
-<?php \yii\bootstrap\Alert::end(); ?>
+<?php $alert::end(); ?>
