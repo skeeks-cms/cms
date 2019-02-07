@@ -132,45 +132,40 @@ class CmsContentElement extends RelatedElementModel
         return array_merge(parent::behaviors(), [
             TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
 
-            HasStorageFile::className()      =>
-                [
-                    'class'  => HasStorageFile::className(),
-                    'fields' => ['image_id', 'image_full_id'],
-                ],
-            HasStorageFileMulti::className() =>
-                [
-                    'class'     => HasStorageFileMulti::className(),
-                    'relations' => [
-                        [
-                            'relation' => 'images',
-                            'property' => 'imageIds',
-                        ],
-                        [
-                            'relation' => 'files',
-                            'property' => 'fileIds',
-                        ],
+            HasStorageFile::className()      => [
+                'class'  => HasStorageFile::className(),
+                'fields' => ['image_id', 'image_full_id'],
+            ],
+            HasStorageFileMulti::className() => [
+                'class'     => HasStorageFileMulti::className(),
+                'relations' => [
+                    [
+                        'relation' => 'images',
+                        'property' => 'imageIds',
+                    ],
+                    [
+                        'relation' => 'files',
+                        'property' => 'fileIds',
                     ],
                 ],
+            ],
 
-            HasRelatedProperties::className() =>
-                [
-                    'class'                           => HasRelatedProperties::className(),
-                    'relatedElementPropertyClassName' => CmsContentElementProperty::className(),
-                    'relatedPropertyClassName'        => CmsContentProperty::className(),
-                ],
+            HasRelatedProperties::className() => [
+                'class'                           => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName' => CmsContentElementProperty::className(),
+                'relatedPropertyClassName'        => CmsContentProperty::className(),
+            ],
 
-            HasTrees::className() =>
-                [
-                    'class' => HasTrees::className(),
-                ],
+            HasTrees::className() => [
+                'class' => HasTrees::className(),
+            ],
 
-            YaSlugBehavior::class =>
-                [
-                    'class'         => YaSlugBehavior::class,
-                    'attribute'     => 'name',
-                    'slugAttribute' => 'code',
-                    'maxLength'     => \Yii::$app->cms->element_max_code_length,
-                ],
+            YaSlugBehavior::class => [
+                'class'         => YaSlugBehavior::class,
+                'attribute'     => 'name',
+                'slugAttribute' => 'code',
+                'maxLength'     => \Yii::$app->cms->element_max_code_length,
+            ],
         ]);
     }
     /**

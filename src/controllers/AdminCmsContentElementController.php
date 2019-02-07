@@ -38,6 +38,7 @@ use yii\base\Exception;
 use yii\bootstrap\Alert;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
@@ -533,12 +534,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         /**
                          * @var $model \skeeks\cms\models\CmsContentElement
                          */
-                        $value = $model->relatedPropertiesModel->getSmartAttribute($name);
-                        if (is_array($value)) {
+                        return $model->relatedPropertiesModel->getAttributeAsHtml($name);
+                        /*if (is_array($value)) {
                             return implode(",", $value);
                         } else {
                             return $value;
-                        }
+                        }*/
                     },
                 ];
 
@@ -853,7 +854,7 @@ HTML
                     }
 
                     $model->refresh();
-
+                    $relatedModel = $model->relatedPropertiesModel;
                 }
             }
 

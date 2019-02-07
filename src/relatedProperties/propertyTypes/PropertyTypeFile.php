@@ -17,7 +17,6 @@ use skeeks\cms\relatedProperties\PropertyType;
 class PropertyTypeFile extends PropertyType
 {
     public $code = self::CODE_FILE;
-    public $name = "";
 
     public function init()
     {

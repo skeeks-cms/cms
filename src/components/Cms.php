@@ -110,7 +110,7 @@ class Cms extends \skeeks\cms\base\Component
      * Время последней активности когда считается что пользователь онлайн
      * @var int
      */
-    public $userOnlineTime              = 60; //1 минута
+    public $userOnlineTime = 60; //1 минута
 
     /**
      * Схема временных папок
@@ -191,52 +191,40 @@ class Cms extends \skeeks\cms\base\Component
 
         } else {
             $this->relatedHandlers = ArrayHelper::merge([
-                PropertyTypeText::className()   =>
-                    [
-                        'class' => PropertyTypeText::className(),
-                    ],
-                PropertyTypeNumber::className() =>
-                    [
-                        'class' => PropertyTypeNumber::className(),
-                    ],
-                PropertyTypeBool::className()   =>
-                    [
-                        'class' => PropertyTypeBool::className(),
-                    ],
-                PropertyTypeList::className()   =>
-                    [
-                        'class' => PropertyTypeList::className(),
-                    ],
+                PropertyTypeText::className()   => [
+                    'class' => PropertyTypeText::className(),
+                ],
+                PropertyTypeNumber::className() => [
+                    'class' => PropertyTypeNumber::className(),
+                ],
+                PropertyTypeBool::className()   => [
+                    'class' => PropertyTypeBool::className(),
+                ],
+                PropertyTypeList::className()   => [
+                    'class' => PropertyTypeList::className(),
+                ],
 
-                PropertyTypeTree::className()    =>
-                    [
-                        'class' => PropertyTypeTree::className(),
-                    ],
-                PropertyTypeElement::className() =>
-                    [
-                        'class' => PropertyTypeElement::className(),
-                    ],
-                /*PropertyTypeStorageFile::className() =>
-                    [
-                        'class' => PropertyTypeStorageFile::className()
-                    ],*/
-
-                UserPropertyTypeDate::className()       =>
-                    [
-                        'class' => UserPropertyTypeDate::className(),
-                    ],
-                UserPropertyTypeComboText::className()  =>
-                    [
-                        'class' => UserPropertyTypeComboText::className(),
-                    ],
-                UserPropertyTypeColor::className()      =>
-                    [
-                        'class' => UserPropertyTypeColor::className(),
-                    ],
-                UserPropertyTypeSelectFile::className() =>
-                    [
-                        'class' => UserPropertyTypeSelectFile::className(),
-                    ],
+                PropertyTypeTree::className()        => [
+                    'class' => PropertyTypeTree::className(),
+                ],
+                PropertyTypeElement::className()     => [
+                    'class' => PropertyTypeElement::className(),
+                ],
+                PropertyTypeStorageFile::className() => [
+                    'class' => PropertyTypeStorageFile::className(),
+                ],
+                UserPropertyTypeDate::className()       => [
+                    'class' => UserPropertyTypeDate::className(),
+                ],
+                UserPropertyTypeComboText::className()  => [
+                    'class' => UserPropertyTypeComboText::className(),
+                ],
+                UserPropertyTypeColor::className()      => [
+                    'class' => UserPropertyTypeColor::className(),
+                ],
+                UserPropertyTypeSelectFile::className() => [
+                    'class' => UserPropertyTypeSelectFile::className(),
+                ],
 
             ], $this->relatedHandlers);
 
@@ -508,7 +496,7 @@ class Cms extends \skeeks\cms\base\Component
         if ($this->relatedHandlers) {
             foreach ($this->relatedHandlers as $id => $handler) {
                 if ($handler instanceof PropertyTypeBool || $handler instanceof PropertyTypeText || $handler instanceof PropertyTypeNumber || $handler instanceof PropertyTypeList
-                    || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement
+                    || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement|| $handler instanceof PropertyTypeStorageFile
                 ) {
                     $baseTypes[$handler->id] = $handler->name;
                 } else {

@@ -50,6 +50,9 @@ class HasStorageFile extends Behavior
      */
     protected $_removeFiles = [];
 
+    /**
+     * @return array
+     */
     public function events()
     {
         return [

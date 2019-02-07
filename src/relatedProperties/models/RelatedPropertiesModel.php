@@ -19,6 +19,9 @@ use yii\base\DynamicModel;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\base\ModelEvent;
+use yii\db\ActiveRecord;
+use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseHtml;
 use yii\helpers\Json;
@@ -47,11 +50,28 @@ class RelatedPropertiesModel extends DynamicModel
     private $_propertyValues = [];
 
 
+    /**
+     * @var array|null old attribute values indexed by attribute names.
+     * This is `null` if the record [[isNewRecord|is new]].
+     */
+    private $_oldAttributes;
 
+
+
+    protected $_attributeHints = [];
+
+    protected $_attributeLabels = [];
+
+
+
+    /**
+     * Инициализация аттрибута
+     * @param array $values
+     * @param bool  $safeOnly
+     */
     public function setAttributes($values, $safeOnly = true)
     {
-        foreach ($values as $code => $value)
-        {
+        foreach ($values as $code => $value) {
             $this->hasAttribute($code);
         }
 
@@ -60,27 +80,20 @@ class RelatedPropertiesModel extends DynamicModel
 
     protected function _defineByProperty($property) {
 
-        //if ($property = $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $code])->one()) {
+        /**
+         * @var $property RelatedPropertyModel
+         */
+        $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null);
 
-            /**
-             * @var $property RelatedPropertyModel
-             */
-            $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null);
+        $property->relatedPropertiesModel = $this;
+        $property->addRules();
 
-            $property->relatedPropertiesModel = $this;
-            $property->addRules();
+        $this->{$property->code} = $property->defaultValue;
 
-            $this->{$property->code} = $property->defaultValue;
+        $this->_properties[$property->code] = $property;
 
-            $this->_properties[$property->code] = $property;
-
-            $this->_attributeLabels[$property->code] = $property->name;
-            $this->_attributeHints[$property->code] = $property->hint;
-
-
-            //$propertyValues = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
-
-        //}
+        $this->_attributeLabels[$property->code] = $property->name;
+        $this->_attributeHints[$property->code] = $property->hint;
     }
 
     /**
@@ -121,6 +134,7 @@ class RelatedPropertiesModel extends DynamicModel
             $values = $property->handler->initValue($values);
 
             $this->setAttribute($code, $values);
+            $this->_oldAttributes[$code] = $values;
             $this->_propertyValues[$code] = $valuesModels;
         } else {
             $value = null;
@@ -137,10 +151,14 @@ class RelatedPropertiesModel extends DynamicModel
             $value = $property->handler->initValue($value);
 
             $this->setAttribute($code, $value);
+            $this->_oldAttributes[$code] = $value;
             $this->_propertyValues[$code] = $valueModel;
         }
     }
 
+    /**
+     *
+     */
     public function initAllProperties()
     {
         if ($this->relatedElementModel->relatedProperties) {
@@ -196,8 +214,19 @@ class RelatedPropertiesModel extends DynamicModel
             return false;
         }
 
+        if (!$this->beforeSave(false)) {
+            return false;
+        }
+
+        $values = $this->getDirtyAttributes($attributeNames);
+        if (empty($values)) {
+            $this->afterSave(false, $values);
+            return 0;
+        }
+
         $hasErrors = false;
 
+        //TODO:Добавить транзакцию
         try {
             foreach ($this->_properties as $property) {
                 $this->_saveRelatedPropertyValue($property);
@@ -212,8 +241,41 @@ class RelatedPropertiesModel extends DynamicModel
             return false;
         }
 
+        $changedAttributes = [];
+        foreach ($values as $name => $value) {
+            $changedAttributes[$name] = isset($this->_oldAttributes[$name]) ? $this->_oldAttributes[$name] : null;
+            $this->_oldAttributes[$name] = $value;
+        }
+
+        $this->afterSave(false, $changedAttributes);
+
         return true;
     }
+
+
+    /**
+     * @param $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        $event = new ModelEvent();
+        $this->trigger($insert ? ActiveRecord::EVENT_BEFORE_INSERT : ActiveRecord::EVENT_BEFORE_UPDATE, $event);
+
+        return $event->isValid;
+    }
+
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        $this->trigger($insert ? ActiveRecord::EVENT_AFTER_INSERT : ActiveRecord::EVENT_AFTER_UPDATE, new AfterSaveEvent([
+            'changedAttributes' => $changedAttributes,
+        ]));
+    }
+
 
     /**
      * @return RelatedPropertyModel[]
@@ -228,6 +290,12 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function delete()
     {
+        $this->initAllProperties();
+
+        if (!$this->beforeDelete()) {
+            return false;
+        }
+
         try {
             foreach ($this->_properties as $property) {
                 $this->_deleteRelatedPropertyValue($property);
@@ -237,7 +305,29 @@ class RelatedPropertiesModel extends DynamicModel
             return false;
         }
 
+        $this->_oldAttributes = null;
+        $this->afterDelete();
+
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function beforeDelete()
+    {
+        $event = new ModelEvent();
+        $this->trigger(ActiveRecord::EVENT_BEFORE_DELETE, $event);
+
+        return $event->isValid;
+    }
+
+    /**
+     *
+     */
+    public function afterDelete()
+    {
+        $this->trigger(ActiveRecord::EVENT_AFTER_DELETE);
     }
 
 
@@ -371,24 +461,13 @@ class RelatedPropertiesModel extends DynamicModel
         return $this;
     }
 
-    protected $_attributeLabels = [];
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return $this->_attributeLabels;
-
-        /*$result = [];
-
-        foreach ($this->relatedElementModel->relatedProperties as $property) {
-            $result[$property->code] = $property->name;
-        }
-
-        return $result;*/
     }
-
-    protected $_attributeHints = [];
 
     /**
      * @return array
@@ -396,14 +475,6 @@ class RelatedPropertiesModel extends DynamicModel
     public function attributeHints()
     {
         return $this->_attributeHints;
-
-        /*$result = [];
-
-        foreach ($this->relatedElementModel->relatedProperties as $property) {
-            $result[$property->code] = $property->hint;
-        }
-
-        return $result;*/
     }
 
     /**
@@ -460,6 +531,11 @@ class RelatedPropertiesModel extends DynamicModel
     }
 
 
+
+
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -477,6 +553,14 @@ class RelatedPropertiesModel extends DynamicModel
         $this->hasAttribute($name);
         return parent::__set($name, $value);
     }
+
+
+
+
+
+
+
+
 
     /**
      * Returns a value indicating whether the model has an attribute with the specified name.
@@ -536,9 +620,174 @@ class RelatedPropertiesModel extends DynamicModel
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Returns the old attribute values.
+     * @return array the old attribute values (name-value pairs)
+     */
+    public function getOldAttributes()
+    {
+        return $this->_oldAttributes === null ? [] : $this->_oldAttributes;
+    }
+
+    /**
+     * Sets the old attribute values.
+     * All existing old attribute values will be discarded.
+     * @param array|null $values old attribute values to be set.
+     * If set to `null` this record is considered to be [[isNewRecord|new]].
+     */
+    public function setOldAttributes($values)
+    {
+        $this->_oldAttributes = $values;
+    }
+
+    /**
+     * Returns the old value of the named attribute.
+     * If this record is the result of a query and the attribute is not loaded,
+     * `null` will be returned.
+     * @param string $name the attribute name
+     * @return mixed the old attribute value. `null` if the attribute is not loaded before
+     * or does not exist.
+     * @see hasAttribute()
+     */
+    public function getOldAttribute($name)
+    {
+        return isset($this->_oldAttributes[$name]) ? $this->_oldAttributes[$name] : null;
+    }
+
+    /**
+     * Sets the old value of the named attribute.
+     * @param string $name the attribute name
+     * @param mixed $value the old attribute value.
+     * @throws InvalidArgumentException if the named attribute does not exist.
+     * @see hasAttribute()
+     */
+    public function setOldAttribute($name, $value)
+    {
+        if (isset($this->_oldAttributes[$name]) || $this->hasAttribute($name)) {
+            $this->_oldAttributes[$name] = $value;
+        } else {
+            throw new InvalidArgumentException(get_class($this) . ' has no attribute named "' . $name . '".');
+        }
+    }
+
+    /**
+     * Marks an attribute dirty.
+     * This method may be called to force updating a record when calling [[update()]],
+     * even if there is no change being made to the record.
+     * @param string $name the attribute name
+     */
+    public function markAttributeDirty($name)
+    {
+        unset($this->_oldAttributes[$name]);
+    }
+
+    /**
+     * Returns a value indicating whether the named attribute has been changed.
+     * @param string $name the name of the attribute.
+     * @param bool $identical whether the comparison of new and old value is made for
+     * identical values using `===`, defaults to `true`. Otherwise `==` is used for comparison.
+     * This parameter is available since version 2.0.4.
+     * @return bool whether the attribute has been changed
+     */
+    public function isAttributeChanged($name, $identical = true)
+    {
+        if ($this->hasAttribute($name) && isset($this->_oldAttributes[$name])) {
+            if ($identical) {
+                return $this->getAttribute($name) !== $this->_oldAttributes[$name];
+            }
+
+            return $this->getAttribute($name) != $this->_oldAttributes[$name];
+        }
+
+        return $this->hasAttribute($name) || isset($this->_oldAttributes[$name]);
+    }
+
+    /**
+     * Returns the attribute values that have been modified since they are loaded or saved most recently.
+     *
+     * The comparison of new and old values is made for identical values using `===`.
+     *
+     * @param string[]|null $names the names of the attributes whose values may be returned if they are
+     * changed recently. If null, [[attributes()]] will be used.
+     * @return array the changed attribute values (name-value pairs)
+     */
+    public function getDirtyAttributes($names = null)
+    {
+        if ($names === null) {
+            $names = $this->attributes();
+        }
+        $names = array_flip($names);
+        $attributes = [];
+        if ($this->_oldAttributes === null) {
+            foreach ($this->attributes as $name => $value) {
+                if (isset($names[$name])) {
+                    $attributes[$name] = $value;
+                }
+            }
+        } else {
+            foreach ($this->attributes as $name => $value) {
+                if (isset($names[$name]) && (!array_key_exists($name, $this->_oldAttributes) || $value !== $this->_oldAttributes[$name])) {
+                    $attributes[$name] = $value;
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
+
     /**
      * @param $name
      * @return string
+     */
+    public function getAttributeAsText($name)
+    {
+        $property = $this->getRelatedProperty($name);
+
+        if (!$property) {
+            return '';
+        }
+
+        return $property->handler->asText;
+    }
+
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getAttributeAsHtml($name)
+    {
+        $property = $this->getRelatedProperty($name);
+
+        if (!$property) {
+            return '';
+        }
+
+        return $property->handler->asHtml;
+    }
+
+    /**
+     * @param $name
+     * @return string
+     * @deprecated
      */
     public function getSmartAttribute($name)
     {
@@ -548,7 +797,7 @@ class RelatedPropertiesModel extends DynamicModel
             return '';
         }
 
-        return $property->handler->stringValue;
+        return $property->handler->asHtml;
     }
 
     /**
