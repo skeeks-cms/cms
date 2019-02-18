@@ -167,7 +167,7 @@ class AdminUserController extends BackendModelStandartController
                         'logged_at'  => SORT_DESC,
                         'created_at' => SORT_DESC,
                     ],
-                    'dialogCallbackData' => function(CmsUser $model) {
+                    'dialogCallbackData' => function($model) {
                         return \yii\helpers\ArrayHelper::merge($model->toArray(), [
                             'image' => $model->image ? $model->image->src : "",
                             'displayName' => $model->displayName
@@ -188,7 +188,7 @@ class AdminUserController extends BackendModelStandartController
                         'displayName' => [
                             'label'  => 'Данные пользователя',
                             'format' => 'raw',
-                            'value'  => function (CmsUser $cmsUser) {
+                            'value'  => function ($cmsUser) {
                                 $data[] = $cmsUser->username;
                                 if ($cmsUser->displayName && $cmsUser->displayName != $cmsUser->username) {
                                     $data[] = $cmsUser->displayName;
@@ -219,7 +219,7 @@ class AdminUserController extends BackendModelStandartController
                             'class' => BooleanColumn::class,
                         ],
                         'role'        => [
-                            'value'  => function (CmsUser $cmsUser) {
+                            'value'  => function ($cmsUser) {
                                 $result = [];
 
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
