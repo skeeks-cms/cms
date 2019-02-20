@@ -69,8 +69,14 @@ use yii\widgets\ActiveForm;
  */
 class Cms extends \skeeks\cms\base\Component
 {
+    /**
+     * Разршение на доступ к персональной части
+     */
+    const UPA_PERMISSION = 'cms-upa-permission';
+
     const BOOL_Y = "Y";
     const BOOL_N = "N";
+
     private static $_huck = 'Z2VuZXJhdG9y';
     /**
      * @var string E-Mail администратора сайта (отправитель по умолчанию).

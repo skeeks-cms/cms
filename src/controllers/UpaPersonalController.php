@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelController;
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsUser;
 use skeeks\yii2\form\Field;
 use skeeks\yii2\form\fields\PasswordField;
@@ -35,6 +36,11 @@ class UpaPersonalController extends BackendModelController
         $this->name = ['skeeks/cms', 'Personal data'];
         $this->modelClassName = \Yii::$app->user->identityClass;
         $this->modelShowAttribute = 'displayName';
+
+        $this->permissionNames = [
+            Cms::UPA_PERMISSION => 'Доступ к персональной части',
+        ];
+
         parent::init();
     }
 
@@ -48,7 +54,7 @@ class UpaPersonalController extends BackendModelController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(), [
+        $actions = ArrayHelper::merge(parent::actions(), [
                 "update" => [
                     'buttons' => ['save'],
                     'class' => BackendModelUpdateAction::class,
@@ -139,5 +145,12 @@ JS
                 ],
             ]
         );
+
+
+        foreach ($actions as $key => $action) {
+            $actions[$key]['accessCallback'] = true;
+        }
+
+        return $actions;
     }
 }
