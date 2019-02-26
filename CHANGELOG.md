@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-5.3.1.pre
+5.3.1
 -----------------
+ * Fixed password change
  * Upa permission added
  
 5.3.0

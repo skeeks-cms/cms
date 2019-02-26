@@ -221,7 +221,7 @@ class RelatedPropertiesModel extends DynamicModel
         $values = $this->getDirtyAttributes($attributeNames);
         if (empty($values)) {
             $this->afterSave(false, $values);
-            return 0;
+            return true;
         }
 
         $hasErrors = false;

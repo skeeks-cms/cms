@@ -30,6 +30,7 @@ use skeeks\cms\rbac\CmsManager;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
 
@@ -116,36 +117,45 @@ class AdminProfileController extends BackendModelController
             $relatedModel->load(\Yii::$app->request->post());
             $passwordChange->load(\Yii::$app->request->post());
 
-            if ($model->save() && $relatedModel->save()) {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
+            try {
 
-                if ($passwordChange->new_password) {
-                    if (!$passwordChange->changePassword()) {
-                        \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
+
+                if ($model->load(\Yii::$app->request->post()) && $model->save()) {
+
+
+                    if ($relatedModel->load(\Yii::$app->request->post())) {
+                        if (!$relatedModel->save()) {
+                            throw new Exception("Не удалось сохранить дополнительные свойства: " . print_r($relatedModel->errors, true));
+                        }
                     }
-                }
 
-                if (\Yii::$app->request->post('submit-btn') == 'apply') {
+                    if ($passwordChange->load(\Yii::$app->request->post()) && $passwordChange->new_password) {
+                        if (!$passwordChange->changePassword()) {
+                            throw new Exception("Пароль не изменен");
+                        }
+
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Пароль успешно обновлен'));
+                    }
+
+
+                    if (\Yii::$app->request->post('submit-btn') == 'apply') {
+
+                    } else {
+                        return $this->redirect(
+                            $this->url
+                        );
+                    }
+
+                    $model->refresh();
+
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Данные обновлены'));
 
                 } else {
-                    return $this->redirect(
-                        $this->url
-                    );
+                    throw new Exception("Не удалось сохранить дополнительные свойства: " . print_r($model->errors, true));
                 }
 
-                $model->refresh();
-
-            } else {
-                $errors = [];
-
-                if ($model->getErrors()) {
-                    foreach ($model->getErrors() as $error) {
-                        $errors[] = implode(', ', $error);
-                    }
-                }
-
-                \Yii::$app->getSession()->setFlash('error',
-                    \Yii::t('skeeks/cms', 'Could not save') . ". " . implode($errors));
+            } catch (\Exception $e) {
+                \Yii::$app->getSession()->setFlash('error', $e->getMessage());
             }
         }
 
