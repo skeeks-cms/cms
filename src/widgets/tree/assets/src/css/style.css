@@ -114,7 +114,7 @@
             color: #000000;
             background: white;
             padding: 2px 4px;
-            margin-top: 2px;
+            border: 1px solid #e6ecec;
         }
 
 .btn-tree-node-controll

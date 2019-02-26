@@ -21,7 +21,7 @@ $widget = $this->context;
         <div class="sx-node-open-close">
             <?php if ($widget->isOpenNode($model)) : ?>
                 <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
-                    <span class="glyphicon glyphicon-minus" title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"></span>
+                    <span class="fa fa-minus" title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"></span>
                 </a>
             <?php else
                 : ?>
