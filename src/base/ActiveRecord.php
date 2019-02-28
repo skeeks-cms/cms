@@ -21,10 +21,10 @@ use yii\behaviors\TimestampBehavior;
 /**
  * @method string getTableCacheTag()
  *
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
+ * @property integer      $created_by
+ * @property integer      $updated_by
+ * @property integer      $created_at
+ * @property integer      $updated_at
  *
  * @property CmsUser|User $createdBy
  * @property CmsUser|User $updatedBy
@@ -39,12 +39,21 @@ class ActiveRecord extends \yii\db\ActiveRecord
      * @var array
      */
     public $raw_row = [];
+
+    static public function safeGetTableSchema()
+    {
+        try {
+            return self::getTableSchema();
+        } catch (\Exception $exceptione) {
+            return false;
+        }
+    }
     /**
      * @return CmsActiveQuery
      */
     public static function find()
     {
-        if (self::getTableSchema()->getColumn('is_active')) {
+        if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('is_active')) {
             return new CmsActiveQuery(get_called_class(), ['is_active' => true]);
         }
 
@@ -71,7 +80,7 @@ class ActiveRecord extends \yii\db\ActiveRecord
         ]);
 
         try {
-            if (self::getTableSchema()->getColumn('created_by') && self::getTableSchema()->getColumn('updated_by')) {
+            if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_by') && self::safeGetTableSchema()->getColumn('updated_by')) {
                 $result[BlameableBehavior::class] = [
                     'class' => BlameableBehavior::class,
                     'value' => function ($event) {
@@ -85,9 +94,28 @@ class ActiveRecord extends \yii\db\ActiveRecord
                 ];
             }
 
-            if (self::getTableSchema()->getColumn('created_at') && self::getTableSchema()->getColumn('updated_at')) {
+            if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_at') && self::safeGetTableSchema()->getColumn('updated_at')) {
                 $result[TimestampBehavior::class] = [
                     'class' => TimestampBehavior::class,
+                    /*'value' => function () {
+                        return date('U');
+                    },*/
+                ];
+            } elseif (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_at')) {
+                $result[TimestampBehavior::class] = [
+                    'class'      => TimestampBehavior::class,
+                    'attributes' => [
+                        ActiveRecord::EVENT_BEFORE_INSERT => ['created_at'],
+                        ActiveRecord::EVENT_BEFORE_UPDATE => [],
+                    ],
+                ];
+            } elseif (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('updated_at')) {
+                $result[TimestampBehavior::class] = [
+                    'class'      => TimestampBehavior::class,
+                    'attributes' => [
+                        ActiveRecord::EVENT_BEFORE_INSERT => ['updated_at'],
+                        ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                    ],
                 ];
             }
 
@@ -132,29 +160,29 @@ class ActiveRecord extends \yii\db\ActiveRecord
         $result = [];
 
 
-        if (self::getTableSchema()->getColumn('created_by')) {
+        if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_by')) {
             $result[] = ['created_by', 'integer'];
         }
-        if (self::getTableSchema()->getColumn('updated_by')) {
+        if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('updated_by')) {
             $result[] = ['updated_by', 'integer'];
         }
-        if (self::getTableSchema()->getColumn('created_at')) {
+        if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_at')) {
             $result[] = ['created_at', 'integer'];
         }
-        if (self::getTableSchema()->getColumn('updated_at')) {
+        if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('updated_at')) {
             $result[] = ['updated_at', 'integer'];
         }
 
         return $result;
-       /*
-        return [
-            [[
-                'created_by',
-                'updated_by',
-                'created_at',
-                'updated_at',
-                'id'
-            ], 'integer'],
-        ];*/
+        /*
+         return [
+             [[
+                 'created_by',
+                 'updated_by',
+                 'created_at',
+                 'updated_at',
+                 'id'
+             ], 'integer'],
+         ];*/
     }
 }

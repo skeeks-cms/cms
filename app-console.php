@@ -26,7 +26,6 @@ if (!file_exists($configFile)) {
 }
 
 $config = (array)require $configFile;
-
 \Yii::endProfile('Load config app');
 
 $application = new yii\console\Application($config);
