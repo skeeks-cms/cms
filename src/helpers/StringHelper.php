@@ -80,6 +80,18 @@ class StringHelper
 
     /**
      * @param $string
+     * @return string
+     */
+    public static function lcfirst($string)
+    {
+        $str = $string;
+        $encoding = \Yii::$app->charset;
+        return mb_substr(mb_strtolower($str, $encoding), 0, 1, $encoding) . mb_substr($str, 1, mb_strlen($str) - 1,
+                $encoding);
+    }
+
+    /**
+     * @param $string
      * @return int
      */
     public static function strlen($string)
