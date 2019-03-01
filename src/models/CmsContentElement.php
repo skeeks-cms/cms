@@ -205,6 +205,7 @@ class CmsContentElement extends RelatedElementModel
             'files'                     => Yii::t('skeeks/cms', 'Files'),
             'treeIds'                   => Yii::t('skeeks/cms', 'Additional sections'),
             'parent_content_element_id' => Yii::t('skeeks/cms', 'Parent element'),
+            'show_counter'              => Yii::t('skeeks/cms', 'Number of views'),
         ]);
     }
     /**
