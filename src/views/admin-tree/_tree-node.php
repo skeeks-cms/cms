@@ -104,7 +104,7 @@ if ($additionalName) {
         <div class="pull-left sx-controll-act">
             <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-tree-move"
                title="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>">
-                <span class="glyphicon glyphicon-move"></span>
+                <span class="fa fa-arrows"></span>
             </a>
         </div>
     <?php endif; ?>
