@@ -40,8 +40,12 @@
 .sx-tree ul li.sx-tree-node .row .sx-controll-node .btn
 {
     height: 22px;
+    border-color: #afafaf;
 }
 
+.sx-tree .dropdown-menu {
+    padding: 10px;
+}
 
 .sx-tree ul li.sx-tree-node .row:hover .sx-controll-node
 {
