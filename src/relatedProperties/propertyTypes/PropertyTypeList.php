@@ -9,9 +9,6 @@
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
 use skeeks\cms\backend\widgets\ModalPermissionWidget;
-use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
-use skeeks\cms\components\Cms;
-use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
@@ -24,6 +21,7 @@ use yii\widgets\ActiveForm;
 class PropertyTypeList extends PropertyType
 {
     public $enumRoute = 'cms/admin-cms-content-property-enum';
+    public $enumClass = '\skeeks\cms\models\CmsContentPropertyEnum';
 
     public $code = self::CODE_LIST;
     public $name = "";
@@ -42,13 +40,13 @@ class PropertyTypeList extends PropertyType
     public static function fieldElements()
     {
         return [
-            self::FIELD_ELEMENT_SELECT => \Yii::t('skeeks/cms', 'Combobox') . ' (select)',
-            self::FIELD_ELEMENT_SELECT_MULTI => \Yii::t('skeeks/cms', 'Combobox') . ' (select multiple)',
-            self::FIELD_ELEMENT_RADIO_LIST => \Yii::t('skeeks/cms', 'Radio Buttons (selecting one value)'),
-            self::FIELD_ELEMENT_CHECKBOX_LIST => \Yii::t('skeeks/cms', 'Checkbox List'),
-            self::FIELD_ELEMENT_LISTBOX => \Yii::t('skeeks/cms', 'ListBox'),
-            self::FIELD_ELEMENT_LISTBOX_MULTI => \Yii::t('skeeks/cms', 'ListBox Multi'),
-            self::FIELD_ELEMENT_SELECT_DIALOG => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
+            self::FIELD_ELEMENT_SELECT                 => \Yii::t('skeeks/cms', 'Combobox').' (select)',
+            self::FIELD_ELEMENT_SELECT_MULTI           => \Yii::t('skeeks/cms', 'Combobox').' (select multiple)',
+            self::FIELD_ELEMENT_RADIO_LIST             => \Yii::t('skeeks/cms', 'Radio Buttons (selecting one value)'),
+            self::FIELD_ELEMENT_CHECKBOX_LIST          => \Yii::t('skeeks/cms', 'Checkbox List'),
+            self::FIELD_ELEMENT_LISTBOX                => \Yii::t('skeeks/cms', 'ListBox'),
+            self::FIELD_ELEMENT_LISTBOX_MULTI          => \Yii::t('skeeks/cms', 'ListBox Multi'),
+            self::FIELD_ELEMENT_SELECT_DIALOG          => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
             self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE => \Yii::t('skeeks/cms',
                 'Selection widget in the dialog box (multiple choice)'),
 
@@ -75,7 +73,7 @@ class PropertyTypeList extends PropertyType
             self::FIELD_ELEMENT_SELECT_MULTI,
             self::FIELD_ELEMENT_CHECKBOX_LIST,
             self::FIELD_ELEMENT_LISTBOX_MULTI,
-            self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE
+            self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE,
         ])) {
             return true;
         }
@@ -120,9 +118,9 @@ class PropertyTypeList extends PropertyType
             if ($this->property->isNewRecord) {
                 echo Alert::widget([
                     'options' => [
-                        'class' => 'alert-info'
+                        'class' => 'alert-info',
                     ],
-                    'body' => \Yii::t('skeeks/cms', 'To start setting up options, save this property.')
+                    'body'    => \Yii::t('skeeks/cms', 'To start setting up options, save this property.'),
                 ]);
             } else {
                 if ($actionIndex) {
@@ -132,77 +130,76 @@ class PropertyTypeList extends PropertyType
 
                     if ($actionCreate) {
                         $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                            'property_id' => $this->property->id
+                            'property_id' => $this->property->id,
                         ]);
 
 
                         echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-                            'actions' => ['create' => $actionCreate],
-                            'clientOptions' => ['pjax-id' => $pjax->id],
+                            'actions'         => ['create' => $actionCreate],
+                            'clientOptions'   => ['pjax-id' => $pjax->id],
                             'isOpenNewWindow' => true,
-                            'tag' => 'div',
-                            'itemWrapperTag' => 'span',
-                            'itemTag' => 'button',
-                            'itemOptions' => ['class' => 'btn btn-default'],
-                            'options' => ['class' => 'sx-controll-actions'],
+                            'tag'             => 'div',
+                            'itemWrapperTag'  => 'span',
+                            'itemTag'         => 'button',
+                            'itemOptions'     => ['class' => 'btn btn-default'],
+                            'options'         => ['class' => 'sx-controll-actions'],
                         ]);
 
                     }
 
                     echo '</div><div class="col-md-6"><div class="pull-right">';
-                    if (\Yii::$app->user->can('rbac/admin-permission') && $controllerProperty instanceof \skeeks\cms\IHasPermissions)
-                    {
+                    if (\Yii::$app->user->can('rbac/admin-permission') && $controllerProperty instanceof \skeeks\cms\IHasPermissions) {
                         echo ModalPermissionWidget::widget([
-                            'controller' => $controllerProperty
+                            'controller' => $controllerProperty,
                         ]);
                     }
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
 
-                    $query = \skeeks\cms\models\CmsContentPropertyEnum::find()->orderBy(['priority' => SORT_ASC]);
+                    $enumClass = $this->enumClass;
+                    $query = $enumClass::find()->orderBy(['priority' => SORT_ASC]);
                     $query->andWhere(['property_id' => $this->property->id]);
 
                     echo \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-                        'dataProvider' => new \yii\data\ActiveDataProvider([
-                            'query' => $query
+                        'dataProvider'    => new \yii\data\ActiveDataProvider([
+                            'query' => $query,
                         ]),
-                        'settingsData' =>
-                            [
-                                'namespace' => \Yii::$app->controller->uniqueId . "__" . $this->property->id
-                            ],
+                        'settingsData'    => [
+                            'namespace' => \Yii::$app->controller->uniqueId."__".$this->property->id,
+                        ],
                         'adminController' => $controllerProperty,
                         'isOpenNewWindow' => true,
                         //'filterModel'       => $searchModel,
-                        'autoColumns' => false,
-                        'pjax' => $pjax,
-                        'columns' => [
+                        'autoColumns'     => false,
+                        'pjax'            => $pjax,
+                        'columns'         => [
                             [
-                                'attribute' => 'id',
-                                'enableSorting' => false
+                                'attribute'     => 'id',
+                                'enableSorting' => false,
                             ],
 
                             [
-                                'attribute' => 'code',
-                                'enableSorting' => false
+                                'attribute'     => 'code',
+                                'enableSorting' => false,
                             ],
 
                             [
-                                'attribute' => 'value',
-                                'enableSorting' => false
+                                'attribute'     => 'value',
+                                'enableSorting' => false,
                             ],
 
                             [
-                                'attribute' => 'priority',
-                                'enableSorting' => false
+                                'attribute'     => 'priority',
+                                'enableSorting' => false,
                             ],
 
                             [
-                                'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                                'attribute' => 'def',
-                                'enableSorting' => false
+                                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                                'attribute'     => 'def',
+                                'enableSorting' => false,
                             ],
-                        ]
+                        ],
                     ]);
 
                     \yii\widgets\Pjax::end();
@@ -289,8 +286,8 @@ class PropertyTypeList extends PropertyType
                         if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX_MULTI) {
                             $field = parent::renderForActiveForm();
                             $field->listBox(ArrayHelper::map($this->property->enums, 'id', 'value'), [
-                                'size' => 5,
-                                'multiple' => 'multiple'
+                                'size'     => 5,
+                                'multiple' => 'multiple',
                             ]);
                         } else {
                             if ($this->fieldElement == self::FIELD_ELEMENT_LISTBOX) {
@@ -305,11 +302,11 @@ class PropertyTypeList extends PropertyType
                                         \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
                                         [
                                             'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
-                                            'dialogRoute' => [
+                                            'dialogRoute'    => [
                                                 '/cms/admin-cms-content-property-enum',
                                                 'CmsContentPropertyEnum' => [
-                                                    'property_id' => $this->property->id
-                                                ]
+                                                    'property_id' => $this->property->id,
+                                                ],
                                             ],
                                         ]
                                     );
@@ -320,13 +317,13 @@ class PropertyTypeList extends PropertyType
                                             \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
                                             [
                                                 'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
-                                                'dialogRoute' => [
+                                                'dialogRoute'    => [
                                                     '/cms/admin-cms-content-property-enum',
                                                     'CmsContentPropertyEnum' => [
-                                                        'property_id' => $this->property->id
-                                                    ]
+                                                        'property_id' => $this->property->id,
+                                                    ],
                                                 ],
-                                                'multiple' => true
+                                                'multiple'       => true,
                                             ]
                                         );
                                     } else {
