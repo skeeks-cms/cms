@@ -48,12 +48,14 @@ class Module extends \kartik\datecontrol\Module
         \kartik\datecontrol\Module::FORMAT_DATE     => [
             'pluginOptions' => [
                 'autoclose' => true,
+                'todayBtn' => true,
             ],
         ],
         // example
         \kartik\datecontrol\Module::FORMAT_DATETIME => [
             'pluginOptions' => [
                 'autoclose' => true,
+                'todayBtn' => true,
             ],
         ],
         // setup if needed
@@ -74,7 +76,6 @@ class Module extends \kartik\datecontrol\Module
         ],
 
         \kartik\datecontrol\Module::FORMAT_DATETIME => [
-            //'class' => '\yii\jui\DatePicker', // example
             'class'   => '\kartik\datetime\DateTimePicker',
             'options' => [
                 'dateFormat' => 'php:d-F-Y H:i:s',
