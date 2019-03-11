@@ -21,6 +21,8 @@ class TextCmsWidget extends Widget
 {
     public $text = '';
     protected $_obContent = '';
+    protected $_is_begin = false;
+
     public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
@@ -30,7 +32,8 @@ class TextCmsWidget extends Widget
 
     public static function begin($config = [])
     {
-        parent::begin($config);
+        $widget = parent::begin($config);
+        $widget->_is_begin = true;
 
         ob_start();
         ob_implicit_flush(false);
@@ -65,14 +68,14 @@ class TextCmsWidget extends Widget
 
     public function run()
     {
-        if ($this->_isBegin) {
+        if ($this->_is_begin) {
             $this->_obContent = ob_get_clean();
             if (!$this->text) {
                 $this->text = $this->_obContent;
             }
         }
 
-        return parent::run();
+        return $this->text;
     }
 
     /**
@@ -86,10 +89,4 @@ class TextCmsWidget extends Widget
         }
         return $attributes;
     }
-
-    protected function _run()
-    {
-        return $this->text;
-    }
-
 }

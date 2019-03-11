@@ -514,7 +514,8 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         return $treeIds;
     }
-    protected function _run()
+
+    public function run()
     {
         $cacheKey = $this->getCacheKey().'run';
 
@@ -528,7 +529,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         $result = \Yii::$app->cache->get($cacheKey);
         if ($result === false || $this->enabledRunCache == Cms::BOOL_N) {
-            $result = parent::_run();
+            $result = parent::run();
 
             \Yii::$app->cache->set($cacheKey, $result, (int)$this->runCacheDuration, $dependency);
         }

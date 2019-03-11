@@ -313,7 +313,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
         return $this;
     }
 
-    protected function _run()
+    public function run()
     {
         $key = $this->getCacheKey().'run';
 
@@ -327,7 +327,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
 
         $result = \Yii::$app->cache->get($key);
         if ($result === false || $this->enabledRunCache == Cms::BOOL_N) {
-            $result = parent::_run();
+            $result = parent::run();
             \Yii::$app->cache->set($key, $result, (int)$this->runCacheDuration, $dependency);
         }
 

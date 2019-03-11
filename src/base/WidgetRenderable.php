@@ -30,13 +30,12 @@ class WidgetRenderable extends Widget
 
     public function rules()
     {
-        return ArrayHelper::merge(parent::rules(),
-            [
-                [['viewFile'], 'string'],
-            ]);
+        return ArrayHelper::merge(parent::rules(), [
+            [['viewFile'], 'string'],
+        ]);
     }
 
-    protected function _run()
+    public function run()
     {
         if ($this->viewFile) {
             return $this->render($this->viewFile, [

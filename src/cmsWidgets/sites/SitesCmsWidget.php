@@ -176,7 +176,7 @@ class SitesCmsWidget extends WidgetRenderable
     public $activeQuery = null;
 
 
-    protected function _run()
+    public function run()
     {
         $key = $this->getCacheKey() . 'run';
 
@@ -208,7 +208,7 @@ class SitesCmsWidget extends WidgetRenderable
                 $this->activeQuery->orderBy([$this->orderBy => (int)$this->order]);
             }
 
-            $result = parent::_run();
+            $result = parent::run();
 
             \Yii::$app->cache->set($key, $result, (int)$this->runCacheDuration, $dependency);
         }

@@ -10,6 +10,8 @@ namespace skeeks\cms\traits;
 
 use ReflectionClass;
 use Yii;
+use yii\base\Widget;
+use yii\base\WidgetEvent;
 
 /**
  * Оригинальный yii\base\Widget
@@ -43,15 +45,18 @@ trait TWidget
      * Begins a widget.
      * This method creates an instance of the calling class. It will apply the configuration
      * to the created instance. A matching [[end()]] call should be called later.
+     * As some widgets may use output buffering, the [[end()]] call should be made in the same view
+     * to avoid breaking the nesting of output buffers.
      * @param array $config name-value pairs that will be used to initialize the object properties
      * @return static the newly created widget instance
+     * @see end()
      */
     public static function begin($config = [])
     {
         $config['class'] = get_called_class();
         /* @var $widget Widget */
         $widget = Yii::createObject($config);
-        static::$stack[] = $widget;
+        self::$stack[] = $widget;
 
         return $widget;
     }
@@ -61,22 +66,27 @@ trait TWidget
      * Note that the rendering result of the widget is directly echoed out.
      * @return static the widget instance that is ended.
      * @throws InvalidCallException if [[begin()]] and [[end()]] calls are not properly nested
+     * @see begin()
      */
     public static function end()
     {
-        if (!empty(static::$stack)) {
-            $widget = array_pop(static::$stack);
+        if (!empty(self::$stack)) {
+            $widget = array_pop(self::$stack);
             if (get_class($widget) === get_called_class()) {
-                echo $widget->run();
+                /* @var $widget Widget */
+                if ($widget->beforeRun()) {
+                    $result = $widget->run();
+                    $result = $widget->afterRun($result);
+                    echo $result;
+                }
+
                 return $widget;
-            } else {
-                throw new InvalidCallException(\Yii::t('skeeks/cms', '"Expecting end() of {widget}, found {class}',
-                    ['widget' => get_class($widget), 'class' => get_called_class()]));
             }
-        } else {
-            throw new InvalidCallException(\Yii::t('skeeks/cms',
-                "Unexpected {class}::end() call. A matching begin() is not found.", ['class' => get_called_class()]));
+
+            throw new InvalidCallException('Expecting end() of ' . get_class($widget) . ', found ' . get_called_class());
         }
+
+        throw new InvalidCallException('Unexpected ' . get_called_class() . '::end() call. A matching begin() is not found.');
     }
 
     /**
@@ -84,15 +94,28 @@ trait TWidget
      * The widget rendering result is returned by this method.
      * @param array $config name-value pairs that will be used to initialize the object properties
      * @return string the rendering result of the widget.
+     * @throws \Exception
      */
     public static function widget($config = [])
     {
         ob_start();
         ob_implicit_flush(false);
-        /* @var $widget Widget */
-        $config['class'] = get_called_class();
-        $widget = Yii::createObject($config);
-        $out = $widget->run();
+        try {
+            /* @var $widget Widget */
+            $config['class'] = get_called_class();
+            $widget = Yii::createObject($config);
+            $out = '';
+            if ($widget->beforeRun()) {
+                $result = $widget->run();
+                $out = $widget->afterRun($result);
+            }
+        } catch (\Exception $e) {
+            // close the output buffer opened above if it has not been closed already
+            if (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+            throw $e;
+        }
 
         return ob_get_clean() . $out;
     }
@@ -107,7 +130,7 @@ trait TWidget
     public function getId($autoGenerate = true)
     {
         if ($autoGenerate && $this->_id === null) {
-            $this->_id = static::$autoIdPrefix . static::$counter++;
+            $this->_id = static::$autoIdPrefix.static::$counter++;
         }
 
         return $this->_id;
@@ -172,7 +195,7 @@ trait TWidget
      * If the view name does not contain a file extension, it will use the default one `.php`.
      *
      * @param string $view the view name.
-     * @param array $params the parameters (name-value pairs) that should be made available in the view.
+     * @param array  $params the parameters (name-value pairs) that should be made available in the view.
      * @return string the rendering result.
      * @throws InvalidParamException if the view file does not exist.
      */
@@ -184,7 +207,7 @@ trait TWidget
     /**
      * Renders a view file.
      * @param string $file the view file to be rendered. This can be either a file path or a path alias.
-     * @param array $params the parameters (name-value pairs) that should be made available in the view.
+     * @param array  $params the parameters (name-value pairs) that should be made available in the view.
      * @return string the rendering result.
      * @throws InvalidParamException if the view file does not exist.
      */
@@ -202,6 +225,67 @@ trait TWidget
     {
         $class = new ReflectionClass($this);
 
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views';
+        return dirname($class->getFileName()).DIRECTORY_SEPARATOR.'views';
+    }
+
+
+    /**
+     * This method is invoked right before the widget is executed.
+     *
+     * The method will trigger the [[EVENT_BEFORE_RUN]] event. The return value of the method
+     * will determine whether the widget should continue to run.
+     *
+     * When overriding this method, make sure you call the parent implementation like the following:
+     *
+     * ```php
+     * public function beforeRun()
+     * {
+     *     if (!parent::beforeRun()) {
+     *         return false;
+     *     }
+     *
+     *     // your custom code here
+     *
+     *     return true; // or false to not run the widget
+     * }
+     * ```
+     *
+     * @return bool whether the widget should continue to be executed.
+     * @since 2.0.11
+     */
+    public function beforeRun()
+    {
+        $event = new WidgetEvent();
+        $this->trigger(Widget::EVENT_BEFORE_RUN, $event);
+        return $event->isValid;
+    }
+
+    /**
+     * This method is invoked right after a widget is executed.
+     *
+     * The method will trigger the [[EVENT_AFTER_RUN]] event. The return value of the method
+     * will be used as the widget return value.
+     *
+     * If you override this method, your code should look like the following:
+     *
+     * ```php
+     * public function afterRun($result)
+     * {
+     *     $result = parent::afterRun($result);
+     *     // your custom code here
+     *     return $result;
+     * }
+     * ```
+     *
+     * @param mixed $result the widget return result.
+     * @return mixed the processed widget result.
+     * @since 2.0.11
+     */
+    public function afterRun($result)
+    {
+        $event = new WidgetEvent();
+        $event->result = $result;
+        $this->trigger(Widget::EVENT_AFTER_RUN, $event);
+        return $event->result;
     }
 }
