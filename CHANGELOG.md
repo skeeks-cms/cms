@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.4.0.pre
+5.4.0
 -----------------
  * Update cms widgets
  
