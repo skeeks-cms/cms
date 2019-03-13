@@ -20,10 +20,10 @@ $r = new ReflectionClass($component);
 
     <?=
     \skeeks\widget\chosen\Chosen::widget([
-        'name' => 'component',
-        'items' => $loadedForSelect,
+        'name'          => 'component',
+        'items'         => $loadedForSelect,
         'allowDeselect' => false,
-        'value' => $r->getName()
+        'value'         => $r->getName(),
     ])
     ?>
     <?php if (\Yii::$app->admin->isEmptyLayout()) : ?>
@@ -33,9 +33,22 @@ $r = new ReflectionClass($component);
     <?php endif; ?>
 </form>
 <hr/>
-<iframe data-src="<?= $component->getEditUrl(); ?>" width="100%;" height="200px;" id="sx-test">
 
-</iframe>
+<? if (method_exists($component, 'getEditUrl')) : ?>
+    <iframe data-src="<?= $component->getEditUrl(); ?>" width="100%;" height="200px;" id="sx-test"></iframe>
+<? else : ?>
+    <?
+    $url = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/index'])
+            ->merge([
+                'componentClassName' => $component->className(),
+                'attributes'         => $component->callAttributes,
+            ])
+            ->enableEmptyLayout()
+            ->url
+    ?>
+    <iframe data-src="<?= $url; ?>" width="100%;" height="200px;" id="sx-test"></iframe>
+<? endif; ?>
+
 
 <?
 $this->registerJs(<<<JS

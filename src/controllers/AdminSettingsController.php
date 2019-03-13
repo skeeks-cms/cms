@@ -12,6 +12,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
+use skeeks\yii2\config\ConfigBehavior;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
@@ -30,15 +31,13 @@ class AdminSettingsController extends AdminController
 
     public function actions()
     {
-        return
-            [
-                "index" =>
-                    [
-                        "class" => AdminAction::className(),
-                        "name" => "Настройки",
-                        "callback" => [$this, 'actionIndex'],
-                    ],
-            ];
+        return [
+            "index" => [
+                "class"    => AdminAction::className(),
+                "name"     => "Настройки",
+                "callback" => [$this, 'actionIndex'],
+            ],
+        ];
     }
 
     public function actionIndex()
@@ -58,7 +57,9 @@ class AdminSettingsController extends AdminController
                 } else {
                     $loadedForSelect[$loadedComponent->className()] = $loadedComponent->className();
                 }
-
+            } elseif ($loadedComponent instanceof \yii\base\Component && $loadedComponent->getBehavior(ConfigBehavior::class)) {
+                $loadedComponents[$loadedComponent->className()] = $loadedComponent;
+                $loadedForSelect[$loadedComponent->className()] = $id;
             }
         }
 
@@ -99,8 +100,8 @@ class AdminSettingsController extends AdminController
 
         return $this->render('index', [
             'loadedComponents' => $loadedComponents,
-            'loadedForSelect' => $loadedForSelect,
-            'component' => $component
+            'loadedForSelect'  => $loadedForSelect,
+            'component'        => $component,
         ]);
     }
 
