@@ -234,6 +234,155 @@ FAQ
     ]
 
 
+Как добавить нестандартный фильтр в BackendModelStandartController?
+---------------------------------
+
+Часто требуется создать фильтры не по полям из указанной модели, а по полям из других моеделей, связанных с указанной.
+Пример для поля поиск:
+
+.. code-block:: php
+    'filtersModel' => [
+        'rules'            => [
+            ['q' 'safe'],
+        ],
+        'attributeDefines' => [
+            'q'
+        ],
+        'fields' => [
+            'q' => [
+                'label'          => 'Поиск',
+                'elementOptions' => [
+                    'placeholder' => 'Поиск (Email, Название)',
+                ],
+                'on apply'       => function (QueryFiltersEvent $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if ($e->field->value) {
+                        $query->andWhere([
+                            'or',
+                            ['like', Model::tableName().'.name', $e->field->value],
+                            ['like', Model::tableName().'.email', $e->field->value],
+                        ]);
+                    }
+
+                },
+            ],
+        ],
+    ]
+По определению новое поле будет создано как текстовое. Чтобы изменить отображение поля, необходимо происвоить полю нужный класс.
+Пример для поля с селектом по разным условиям:
+
+.. code-block:: php
+    'filtersModel' => [
+        'rules'            => [
+            ['custom_condition', 'safe'],
+        ],
+        'attributeDefines' => [
+            'custom_condition'
+        ],
+        'fields' => [
+            'custom_condition' => [
+                'class' => SelectField::class,
+                'label'          => 'Произвольное условие',
+                'items' =>  function()
+                {
+                    return  [
+                        '--' => '--',
+                        'condition' => 'Условие 1',
+                        'condition2' => 'Условие 2',
+
+                    ];
+                },
+
+                'on apply'       => function (QueryFiltersEvent $e) {
+                    /**
+                     * @var $query ActiveQuery
+                    **/
+                    $query = $e->dataProvider->query;
+
+                        if ($e->field->value == 'condition') {
+                            $query->andWhere(['IS NOT', Model::tableName().'.someCol', NULL]);
+
+                        }
+                        if ($e->field->value == 'condition2') {
+                            $query->andWhere(['IS', Model::tableName().'.someCol', NULL]);
+
+                        }
+
+                },
+            ],
+        ],
+    ]
+
+Пример для поля с возможностью выбора вариантов условия из встроенного фильтра FilterMode
+
+.. code-block:: php
+    'filtersModel' => [
+        'rules'            => [
+            ['custom_condition', 'safe'],
+        ],
+        'attributeDefines' => [
+            'custom_condition'
+        ],
+        'fields' => [
+            'custom_condition' => [
+                'class' => FilterField::class,
+                'label'          => 'Поиск',
+                'filterAttribute' => 'nameCol',
+                'modes' => [
+                    FilterModeEq::class,
+                    FilterModeLike::class,
+                    FilterModeNe::class,
+                    FilterModeEmpty::class,
+                    FilterModeNotEmpty::class
+                ],
+            ],
+        ],
+    ]
+
+Пример для поля с возможностью выбора вариантов условия из встроенного фильтра FilterMode с изменением текстового поля на селект с укзанными вариантами:
+
+.. code-block:: php
+    'filtersModel' => [
+        'rules'            => [
+            ['custom_condition', 'safe'],
+        ],
+        'attributeDefines' => [
+            'custom_condition'
+        ],
+        'fields' => [
+            'custom_condition' => [
+                'class' => FilterField::class,
+                'label'          => 'Поиск',
+                'filterAttribute' => 'nameCol',
+                'modes' => [
+                    FilterModeEq::class,
+                    FilterModeLike::class,
+                    FilterModeNe::class,
+                    FilterModeEmpty::class,
+                    FilterModeNotEmpty::class
+                ],
+                'field' => [
+                    'class' => SelectField::class,
+                    'items' => function() {
+                        return  [
+                            '--' => '--',
+                            'condition' => 'Условие 1',
+                            'condition2' => 'Условие 2',
+                        ];
+                    }
+                ],
+            ],
+        ],
+    ]
+
+В каждом случае обязательно указать название нового поля в rules и attributeDefines.
+Для FilterMode в filterAttribute обязательно указать связующее с моделью поле.
+В modes перечисляются возможные варианты условий.
+ВАЖНО! В поле items необходимо использовать function(), тогда отрабатывать функция будет только при отображениее фильтра. Это позволит съэкономить память и ресурсы сервера.
 
 
 Перенос проекта на другой хостинг
