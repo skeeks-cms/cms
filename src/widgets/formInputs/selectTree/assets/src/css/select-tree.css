@@ -1,6 +1,6 @@
 .sx-widget-element
 {
-    display: none;
+    display: none !important;
 }
 
 .sx-selected

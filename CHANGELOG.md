@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.1.1.pre
+-----------------
+ * Fixed display none important
+ 
 5.5.1
 -----------------
  * Dependency update
