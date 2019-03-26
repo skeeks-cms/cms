@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-5.5.1.1.pre
+5.5.2.pre
 -----------------
+ * Update elfinder
  * Fixed display none important
  
 5.5.1
