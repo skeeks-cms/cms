@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.5.2.pre
+5.5.2
 -----------------
  * Update "giggsey/libphonenumber-for-php": "8.8.11 || ^8.10.8"
  * Update elfinder

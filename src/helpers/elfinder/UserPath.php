@@ -11,7 +11,7 @@ namespace skeeks\cms\helpers\elfinder;
 use skeeks\cms\rbac\CmsManager;
 use Yii;
 
-class UserPath extends \mihaildev\elfinder\UserPath
+class UserPath extends \mihaildev\elfinder\volume\UserPath
 {
     public function isAvailable()
     {
