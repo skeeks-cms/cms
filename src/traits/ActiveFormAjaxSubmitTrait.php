@@ -35,9 +35,9 @@ trait ActiveFormAjaxSubmitTrait
                     }
                 });
 
-                $('#{$this->id}').on('afterValidate', function (event, messages) {
+                $('#{$this->id}').on('afterValidate', function (event, messages, errorAttributes) {
 
-                    if (event.result === false)
+                    if (_.size(errorAttributes) > 0)
                     {
                         sx.notify.error('Проверьте заполненные поля в форме');
                         return false;
@@ -68,9 +68,13 @@ JS
                 });
 
 
-                $('#{$this->id}').on('afterValidate', function (event, messages) {
+                $('#{$this->id}').on('beforeValidate', function (event, messages, deferreds) {
+                    
+                });
+                
+                $('#{$this->id}').on('afterValidate', function (event, messages, errorAttributes) {
 
-                    if (event.result === false)
+                    if (_.size(errorAttributes) > 0)
                     {
                         sx.notify.error('Проверьте заполненные поля в форме');
                         return false;
