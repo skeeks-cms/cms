@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.2.1
+-----------------
+ * Fixed edit blocks
+ 
 5.5.2
 -----------------
  * Update "giggsey/libphonenumber-for-php": "8.8.11 || ^8.10.8"

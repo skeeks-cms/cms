@@ -26,10 +26,10 @@ $this->registerJs(<<<JS
 
             this.callableData = '';
 
-            if (window.opener && window.opener.sx)
+            if (window.opener && (typeof window.opener.sx === 'object')
             {
                 this.callableData = window.opener.sx.$("#" + this.get('callableId')).val();
-            } else if (window.parent)
+            } else if (window.parent  && (typeof window.parent.sx === 'object')
             {
                 this.callableData = window.parent.sx.$("#" + this.get('callableId')).val();
             }
