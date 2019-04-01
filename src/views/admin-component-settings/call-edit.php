@@ -26,19 +26,12 @@ $this->registerJs(<<<JS
 
             this.callableData = '';
 
-            if (window.opener)
+            if (window.opener && window.opener.sx)
             {
-                if (window.opener)
-                {
-                    this.callableData = window.opener.sx.$("#" + this.get('callableId')).val();
-                }
+                this.callableData = window.opener.sx.$("#" + this.get('callableId')).val();
             } else if (window.parent)
             {
-
-                if (window.parent)
-                {
-                    this.callableData = window.parent.sx.$("#" + this.get('callableId')).val();
-                }
+                this.callableData = window.parent.sx.$("#" + this.get('callableId')).val();
             }
 
             this.AjaxQuery = sx.ajax.preparePostQuery(this.get('saveCallabaleBackend'), {
