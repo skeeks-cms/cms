@@ -832,6 +832,7 @@ return
         'Selection widget in the dialog box (multiple choice)' => 'Виджет выбора в диалоговом окне (множественный выбор)',
 
         //TreeMenuWidget
+        'More' => 'Подробнее',
         'The parent section' => 'Родительский раздел',
         'The nesting level' => 'Уровень вложенности',
         'Header' => 'Заголовок',
