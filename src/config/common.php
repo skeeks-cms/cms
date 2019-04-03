@@ -17,8 +17,15 @@ return [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
     ],
-    
+
+    'timeZone' => 'UTC',
+
     'components' => [
+        'formatter' => [
+            'defaultTimeZone' => 'UTC',
+            'timeZone'        => 'Europe/Moscow',
+        ],
+
         'db' => [
             'class' => 'yii\db\Connection',
             //'dsn' => 'mysql:host=mysql.skeeks.com;dbname=s2_vz1005_demo-cms',
