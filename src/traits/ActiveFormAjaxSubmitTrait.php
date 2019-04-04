@@ -24,6 +24,13 @@ trait ActiveFormAjaxSubmitTrait
                     return false;
                 });
 
+                $('#{$this->id}').on('submit', function (event, attribute, message) {
+                    return false;
+                });
+
+                $('#{$this->id}').on('beforeValidate', function (event, messages, deferreds) {
+                });
+
                 $('#{$this->id}').on('ajaxComplete', function (event, jqXHR, textStatus) {
                     if (jqXHR.status == 403)
                     {
@@ -68,8 +75,11 @@ JS
                 });
 
 
+                $('#{$this->id}').on('submit', function (event, attribute, message) {
+                    return false;
+                });
+
                 $('#{$this->id}').on('beforeValidate', function (event, messages, deferreds) {
-                    
                 });
                 
                 $('#{$this->id}').on('afterValidate', function (event, messages, errorAttributes) {
