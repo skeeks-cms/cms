@@ -420,12 +420,12 @@ class Tree extends Core
     public function getUrl($scheme = false, $params = [])
     {
         if ($params) {
-            $params = ArrayHelper::merge(['/cms/tree/view', 'model' => $this], $params);
+            $params = ArrayHelper::merge(['/cms/tree/view', 'id' => $this->id], $params);
         } else {
-            $params = ['/cms/tree/view', 'model' => $this];
+            $params = ['/cms/tree/view', 'id' => $this->id];
         }
 
-        return Url::to(['/cms/tree/view', 'model' => $this], $scheme);
+        return Url::to(['/cms/tree/view', 'id' => $this->id], $scheme);
     }
 
     /**

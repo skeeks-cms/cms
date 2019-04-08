@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.3.pre
+-----------------
+ * Removed I18N 
+ 
 5.5.2.1
 -----------------
  * Fixed edit blocks

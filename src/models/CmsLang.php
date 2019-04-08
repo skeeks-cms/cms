@@ -31,6 +31,8 @@ use yii\helpers\ArrayHelper;
  * @property string $description
  * @property integer $image_id
  *
+ * @property bool $is_default
+ *
  * @property CmsSite[] $cmsSites
  * @property CmsStorageFile $image
  */
@@ -162,5 +164,13 @@ class CmsLang extends Core
     public function getImage()
     {
         return $this->hasOne(CmsStorageFile::className(), ['id' => 'image_id']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIs_default()
+    {
+        return (bool) ($this->def == 'Y');
     }
 }

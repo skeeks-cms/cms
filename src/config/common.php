@@ -67,7 +67,6 @@ return [
         ],
 
         'i18n' => [
-            'class' => 'skeeks\cms\i18n\I18N',
             'translations' => [
                 'skeeks/cms' => [
                     'class' => 'yii\i18n\PhpMessageSource',
