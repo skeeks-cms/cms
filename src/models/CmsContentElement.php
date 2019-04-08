@@ -9,6 +9,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\components\urlRules\UrlRuleContentElement;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -423,10 +424,11 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getUrl($scheme = false, $params = [])
     {
+        UrlRuleContentElement::$models[$this->id] = $this;
         if ($params) {
-            $params = ArrayHelper::merge(['/cms/content-element/view', 'model' => $this], $params);
+            $params = ArrayHelper::merge(['/cms/content-element/view', 'id' => $this->id], $params);
         } else {
-            $params = ['/cms/content-element/view', 'model' => $this];
+            $params = ['/cms/content-element/view', 'id' => $this->id];
         }
 
         return Url::to($params, $scheme);

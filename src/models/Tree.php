@@ -15,6 +15,7 @@ use paulzi\adjacencyList\AdjacencyListBehavior;
 use paulzi\autotree\AutoTreeTrait;
 use paulzi\materializedPath\MaterializedPathBehavior;
 use skeeks\cms\components\Cms;
+use skeeks\cms\components\urlRules\UrlRuleTree;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
@@ -419,6 +420,8 @@ class Tree extends Core
      */
     public function getUrl($scheme = false, $params = [])
     {
+        UrlRuleTree::$models[$this->id] = $this;
+
         if ($params) {
             $params = ArrayHelper::merge(['/cms/tree/view', 'id' => $this->id], $params);
         } else {
