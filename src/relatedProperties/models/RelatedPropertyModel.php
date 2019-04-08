@@ -138,7 +138,7 @@ abstract class RelatedPropertyModel extends Core
             [
                 ['code'],
                 function($attribute) {
-                    if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9]{1,255}$/',
+                    if (!preg_match('/^[a-zA-Z]{1}[_a-zA-Z0-9]{1,255}$/',
                         $this->$attribute)) {
                                             //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
                     {

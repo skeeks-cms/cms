@@ -3,6 +3,7 @@ CHANGELOG
 
 5.5.3.pre
 -----------------
+ * Валидация code RelatedProperty теперь допускает "_" 
  * Removed I18N 
  
 5.5.2.1
