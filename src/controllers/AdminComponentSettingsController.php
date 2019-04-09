@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\THasActiveForm;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
@@ -30,6 +31,7 @@ use yii\widgets\ActiveForm;
  */
 class AdminComponentSettingsController extends AdminController
 {
+    use THasActiveForm;
     /**
      * @return string
      */
@@ -173,17 +175,23 @@ class AdminComponentSettingsController extends AdminController
         }
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
-            if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
-                $component->override = Component::OVERRIDE_DEFAULT;
-                if ($component->save()) {
-                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+
+            if (!\Yii::$app->request->post($this->reloadFormParam)) {
+                if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
+                    $component->override = Component::OVERRIDE_DEFAULT;
+                    if ($component->save()) {
+                        \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                    } else {
+                        \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                    }
+
                 } else {
                     \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                 }
-
             } else {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                $component->load(\Yii::$app->request->post());
             }
+
         }
 
         return $this->render($this->action->id, [
@@ -220,17 +228,21 @@ class AdminComponentSettingsController extends AdminController
 
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
-            if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
-                $component->override = Component::OVERRIDE_SITE;
-                $component->cmsSite = $site;
-                if ($component->save()) {
-                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            if (!\Yii::$app->request->post($this->reloadFormParam)) {
+                if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
+                    $component->override = Component::OVERRIDE_SITE;
+                    $component->cmsSite = $site;
+                    if ($component->save()) {
+                        \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                    } else {
+                        \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                    }
+
                 } else {
                     \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                 }
-
             } else {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                $component->load(\Yii::$app->request->post());
             }
         }
 
@@ -265,17 +277,21 @@ class AdminComponentSettingsController extends AdminController
         }
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
-            if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
-                $component->override = Component::OVERRIDE_USER;
-                $component->cmsUser = $user;
-                if ($component->save()) {
-                    \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            if (!\Yii::$app->request->post($this->reloadFormParam)) {
+                if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
+                    $component->override = Component::OVERRIDE_USER;
+                    $component->cmsUser = $user;
+                    if ($component->save()) {
+                        \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+                    } else {
+                        \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                    }
+
                 } else {
                     \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
                 }
-
             } else {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                $component->load(\Yii::$app->request->post());
             }
         }
 

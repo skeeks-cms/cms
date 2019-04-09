@@ -9,6 +9,7 @@
  * @var $site \skeeks\cms\models\CmsSite
  */
 /* @var $this yii\web\View */
+$controller = $this->context;
 ?>
 
 <?= $this->render('_header', [
@@ -33,7 +34,50 @@
 </div>
 
 
-<?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin(); ?>
+<?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin([
+    'enableAjaxValidation' => false,
+    'enableClientValidation' => false,
+]); ?>
+
+<?php $this->registerJs(<<<JS
+
+(function(sx, $, _)
+{
+    sx.classes.DynamicForm = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            $("[" + this.get('formreload') + "=true]").on('change', function()
+            {
+                self.update();
+            });
+        },
+
+        update: function()
+        {
+            var self = this;
+            
+            _.delay(function()
+            {
+                var jForm = $("#" + self.get('id'));
+                jForm.append($('<input>', {'type': 'hidden', 'name' : self.get('nosubmit'), 'value': 'true'}));
+                jForm.submit();
+            }, 200);
+        }
+    });
+
+    sx.DynamicForm = new sx.classes.DynamicForm({
+        'id' : '{$form->id}',
+        'formreload' : '{$controller->reloadFieldParam}',
+        'nosubmit' : '{$controller->reloadFormParam}',
+    });
+})(sx, sx.$, sx._);
+
+
+JS
+); ?>
 
 <?= $form->errorSummary(\yii\helpers\ArrayHelper::merge(
         [$component], $component->getConfigFormModels()
