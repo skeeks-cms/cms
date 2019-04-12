@@ -94,6 +94,8 @@ class CmsLang extends Core
             ['priority', 'default', 'value' => 500],
             [['image_id'], 'safe'],
 
+            [['is_active'], 'boolean'],
+
             [
                 ['image_id'],
                 \skeeks\cms\validators\FileValidator::class,
