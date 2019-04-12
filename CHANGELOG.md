@@ -1,6 +1,13 @@
 CHANGELOG
 ==============
 
+5.5.4.pre
+-----------------
+ * CmsLang removed def
+ * CmsLang removed active
+ * CmsLang added boolean is_default
+ * CmsLang added boolean is_active
+ 
 5.5.3
 -----------------
  * В настройках компонентов, можно использовать сложные формы с логикой 'elementOptions' => [ 'data' => [ 'form-reload' => 'true', ], ],
