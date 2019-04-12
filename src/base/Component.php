@@ -431,6 +431,7 @@ abstract class Component extends Model implements ConfigFormInterface
             \Yii::getAlias('@webroot'),
             static::class,
             $this->namespace,
+            \Yii::$app->language,
             $this->cmsUser ? (string)$this->cmsUser->id : '',
             $this->cmsSite ? (string)$this->cmsSite->id : '',
         ]);

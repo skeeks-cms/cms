@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.4.2
+-----------------
+ * Component cache key dependency lang 
+ 
 5.5.4.1
 -----------------
  * CmsLang removed is_default
