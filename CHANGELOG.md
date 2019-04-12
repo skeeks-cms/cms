@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.5.4.pre
+5.5.4
 -----------------
  * CmsLang removed def
  * CmsLang removed active
