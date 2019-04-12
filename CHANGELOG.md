@@ -3,6 +3,7 @@ CHANGELOG
 
 5.5.4.2
 -----------------
+ * Fixed CmsContentElement redirect
  * Fixed CmsLang is_active
  * Component cache key dependency lang
  
