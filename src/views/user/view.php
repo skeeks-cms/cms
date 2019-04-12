@@ -17,7 +17,8 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 /* @var $personal bool */
-
+$controller = $this->context;
+$model = $controller->user;
 $this->title = $model->getDisplayName();
 \Yii::$app->breadcrumbs->createBase()->append($this->title);
 ?>
