@@ -24,7 +24,6 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property boolean $is_active
- * @property boolean $is_default
  * @property integer $priority
  * @property string $code
  * @property string $name
@@ -44,14 +43,6 @@ class CmsLang extends Core
         return '{{%cms_lang}}';
     }
 
-    public function init()
-    {
-        parent::init();
-
-        $this->on(BaseActiveRecord::EVENT_BEFORE_INSERT, [$this, 'afterBeforeChecks']);
-        $this->on(BaseActiveRecord::EVENT_BEFORE_UPDATE, [$this, 'afterBeforeChecks']);
-    }
-
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
@@ -64,17 +55,6 @@ class CmsLang extends Core
         ]);
     }
 
-    /**
-     * @param Event $e
-     * @throws Exception
-     */
-    public function afterBeforeChecks(Event $e)
-    {
-        //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->is_default) {
-            static::updateAll(['is_default' => false]);
-        }
-    }
 
     /**
      * @inheritdoc
@@ -83,7 +63,6 @@ class CmsLang extends Core
     {
         return array_merge(parent::attributeLabels(), [
             'is_active' => Yii::t('skeeks/cms', 'Active'),
-            'is_default' => Yii::t('skeeks/cms', 'Default'),
             'priority' => Yii::t('skeeks/cms', 'Priority'),
             'code' => Yii::t('skeeks/cms', 'Code'),
             'name' => Yii::t('skeeks/cms', 'Name'),
@@ -114,12 +93,6 @@ class CmsLang extends Core
             [['code'], 'unique'],
             ['priority', 'default', 'value' => 500],
             [['image_id'], 'safe'],
-
-            ['is_default', 'default', 'value' => false],
-            ['is_default', 'boolean'],
-            
-            ['is_active', 'default', 'value' => true],
-            ['is_default', 'boolean'],
 
             [
                 ['image_id'],
@@ -165,7 +138,7 @@ class CmsLang extends Core
      */
     public function getDef()
     {
-        return $this->is_default ? "Y" : "N";
+        return \Yii::$app->cms->languageCode == $this->code ? "Y" : "N";
     }
 
     /**

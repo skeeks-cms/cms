@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.4.1
+-----------------
+ * CmsLang removed is_default
+ 
 5.5.4
 -----------------
  * CmsLang removed def
