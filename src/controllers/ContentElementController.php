@@ -133,13 +133,9 @@ class ContentElementController extends Controller
                 if ($pos = strpos($url, '?')) {
                     $url = substr($url, 0, $pos);
                 }
+                $requestUrlData = parse_url($url);
 
-                //$contentUrl = \Yii::$app->request->url;
-                /*if (\Yii::$app->homeUrl != '/') {
-                    $contentUrl = "/" . StringHelper::substr(\Yii::$app->request->url, StringHelper::strlen(\Yii::$app->homeUrl), StringHelper::strlen(\Yii::$app->request->url));
-                }*/
-                //if (ArrayHelper::getValue($urlData, 'path') != "/" . \Yii::$app->request->pathInfo) {
-                if (ArrayHelper::getValue($urlData, 'path') != $url) {
+                if (ArrayHelper::getValue($urlData, 'path') != ArrayHelper::getValue($requestUrlData, 'path')) {
                     $url = $contentElement->getUrl(true);
                     \Yii::$app->response->redirect($url, 301);
                 }
