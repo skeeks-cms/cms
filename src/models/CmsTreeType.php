@@ -119,9 +119,12 @@ class CmsTreeType extends Core
      */
     public function getCmsTreeTypeProperties()
     {
+        /*$query = CmsTreeTypeProperty::find()->joinWith('cmsTreeTypeProperty2types as cmsTreeTypeProperty2types')->andWhere(['cmsTreeTypeProperty2types.cms_tree_type_id' => $this->id]);
+        $query->multiple = true;
+        return $query;*/
+
         return $this->hasMany(CmsTreeTypeProperty::className(),
-            ['id' => 'cms_tree_type_property_id'])->viaTable('cms_tree_type_property2type',
-            ['cms_tree_type_id' => 'id']);
+            ['id' => 'cms_tree_type_property_id'])->via('cmsTreeTypeProperty2types');
 
         //return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);;
     }

@@ -489,6 +489,7 @@ class Tree extends Core
     }
 
 
+    static protected $_treeTypes = [];
     /**
      * Все возможные свойства связанные с моделью
      *
@@ -496,9 +497,15 @@ class Tree extends Core
      */
     public function getRelatedProperties()
     {
-        /*return $this->hasMany(CmsTreeTypeProperty::className(), ['tree_type_id' => 'id'])
-                    ->via('treeType')->orderBy(['priority' => SORT_ASC]);*/
-        return $this->treeType->getCmsTreeTypeProperties();
+        //return $this->treeType->getCmsTreeTypeProperties();
+        if (isset(self::$_treeTypes[$this->tree_type_id])) {
+            $treeType = self::$_treeTypes[$this->tree_type_id];
+        } else {
+            self::$_treeTypes[$this->tree_type_id] = $this->treeType;
+            $treeType = self::$_treeTypes[$this->tree_type_id];
+        }
+        //return $this->treeType->getCmsTreeTypeProperties();
+        return $treeType->getCmsTreeTypeProperties();
     }
 
 

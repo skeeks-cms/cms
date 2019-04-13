@@ -366,13 +366,26 @@ class CmsContentElement extends RelatedElementModel
     {
         return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
     }
+
+    static public $_contents = [];
     /**
      * Все возможные свойства связанные с моделью
      * @return \yii\db\ActiveQuery
      */
     public function getRelatedProperties()
     {
-        return $this->cmsContent->getCmsContentProperties();
+
+        //return $this->treeType->getCmsTreeTypeProperties();
+        if (isset(self::$_contents[$this->content_id])) {
+            $cmsContent = self::$_contents[$this->content_id];
+        } else {
+            self::$_contents[$this->content_id] = $this->cmsContent;
+            $cmsContent = self::$_contents[$this->content_id];
+        }
+        return $cmsContent->getCmsContentProperties();
+        //return $this->cmsContent->getCmsContentProperties();
+
+        //return $this->cmsContent->getCmsContentProperties();
 
         /*$query = $this->cmsContent->getCmsContentProperties();
         $query->joinWith('cmsContentProperty2trees as map2trees')

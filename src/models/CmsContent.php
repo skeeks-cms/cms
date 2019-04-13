@@ -275,7 +275,8 @@ class CmsContent extends Core
     {
         return $this->hasMany(CmsContentProperty::className(),
             ['id' => 'cms_content_property_id'])
-            ->viaTable('cms_content_property2content', ['cms_content_id' => 'id'])
+            ->via('cmsContentProperty2contents')
+            //->viaTable('cms_content_property2content', ['cms_content_id' => 'id'])
             ->orderBy('priority')
             ;
     }

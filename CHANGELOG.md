@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.5.pre
+-----------------
+ * Optimisations query RP
+
 5.5.4.2
 -----------------
  * Fixed CmsContentElement redirect
