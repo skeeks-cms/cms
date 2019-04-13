@@ -8,22 +8,16 @@
 
 namespace skeeks\cms\relatedProperties\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
-use skeeks\cms\models\behaviors\Implode;
-use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\base\DynamicModel;
 use yii\base\Exception;
-use yii\base\InvalidConfigException;
-use yii\base\Model;
 use yii\base\ModelEvent;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
-use yii\helpers\BaseHtml;
 use yii\helpers\Json;
 
 /**
@@ -57,11 +51,9 @@ class RelatedPropertiesModel extends DynamicModel
     private $_oldAttributes;
 
 
-
     protected $_attributeHints = [];
 
     protected $_attributeLabels = [];
-
 
 
     /**
@@ -78,7 +70,8 @@ class RelatedPropertiesModel extends DynamicModel
         parent::setAttributes($values, $safeOnly);
     }
 
-    protected function _defineByProperty($property) {
+    protected function _defineByProperty($property)
+    {
 
         /**
          * @var $property RelatedPropertyModel
@@ -116,9 +109,10 @@ class RelatedPropertiesModel extends DynamicModel
 
     /**
      * @param RelatedPropertyModel $property
-     * @param array $relatedElementProperties
+     * @param array                $relatedElementProperties
      */
-    protected function _initPropertyValue($property, $relatedElementProperties = []) {
+    protected function _initPropertyValue($property, $relatedElementProperties = [])
+    {
         $code = $property->code;
         if ($property->handler->isMultiple) {
             $values = [];
@@ -203,7 +197,7 @@ class RelatedPropertiesModel extends DynamicModel
      * @param boolean $runValidation whether to perform validation (calling [[validate()]])
      * before saving the record. Defaults to `true`. If the validation fails, the record
      * will not be saved to the database and this method will return `false`.
-     * @param array $attributeNames list of attribute names that need to be saved. Defaults to null,
+     * @param array   $attributeNames list of attribute names that need to be saved. Defaults to null,
      * meaning all attributes that are loaded from DB will be saved.
      * @return boolean whether the saving succeeded (i.e. no validation errors occurred).
      */
@@ -333,7 +327,7 @@ class RelatedPropertiesModel extends DynamicModel
 
     /**
      * @param RelatedPropertyModel $property
-     * @param $value
+     * @param                      $value
      * @return $this
      * @throws \Exception
      */
@@ -343,7 +337,7 @@ class RelatedPropertiesModel extends DynamicModel
         $element = $this->relatedElementModel;
 
         if ($element->isNewRecord) {
-            throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
+            throw new Exception("Additional property \"".$property->code."\" can not be saved until the stored parent model");
         }
 
         if ($property->handler->isMultiple) {
@@ -359,19 +353,19 @@ class RelatedPropertiesModel extends DynamicModel
 
             if ($values) {
                 foreach ($values as $key => $value) {
-                    if(empty($value)) {
+                    if (empty($value)) {
                         continue;
                     }
                     $className = $element->relatedElementPropertyClassName;
                     $productPropertyValue = new $className([
-                        'element_id' => $element->id,
-                        'property_id' => $property->id,
-                        'value' => (string)$value,
-                        'value_enum' => $value,
-                        'value_num' => $value,
-                        'value_bool' => (bool)$value,
-                        'value_num2' => $value,
-                        'value_int2' => $value,
+                        'element_id'   => $element->id,
+                        'property_id'  => $property->id,
+                        'value'        => (string)$value,
+                        'value_enum'   => $value,
+                        'value_num'    => $value,
+                        'value_bool'   => (bool)$value,
+                        'value_num2'   => $value,
+                        'value_int2'   => $value,
                         'value_string' => (string)$value,
                     ]);
 
@@ -397,23 +391,23 @@ class RelatedPropertiesModel extends DynamicModel
                 $className = $element->relatedElementPropertyClassName;
 
                 $productPropertyValue = new $className([
-                    'element_id' => $element->id,
-                    'property_id' => $property->id,
-                    'value' => (string)$value,
-                    'value_enum' => $value,
-                    'value_num' => $value,
-                    'value_bool' => (bool)$value,
-                    'value_num2' => $value,
-                    'value_int2' => $value,
+                    'element_id'   => $element->id,
+                    'property_id'  => $property->id,
+                    'value'        => (string)$value,
+                    'value_enum'   => $value,
+                    'value_num'    => $value,
+                    'value_bool'   => (bool)$value,
+                    'value_num2'   => $value,
+                    'value_int2'   => $value,
                     'value_string' => (string)$value,
                 ]);
             }
 
-            if(empty($value)){
+            if (empty($value)) {
                 $productPropertyValue->delete();
-            }else {
+            } else {
                 if (!$productPropertyValue->save()) {
-                    throw new Exception("{$property->code} not save. " . Json::encode($productPropertyValue->errors));
+                    throw new Exception("{$property->code} not save. ".Json::encode($productPropertyValue->errors));
                 }
             }
         }
@@ -424,7 +418,7 @@ class RelatedPropertiesModel extends DynamicModel
 
     /**
      * @param RelatedPropertyModel $property
-     * @param $value
+     * @param                      $value
      * @return $this
      * @throws \Exception
      */
@@ -433,7 +427,7 @@ class RelatedPropertiesModel extends DynamicModel
         $element = $this->relatedElementModel;
 
         if ($element->isNewRecord) {
-            throw new Exception("Additional property \"" . $property->code . "\" can not be saved until the stored parent model");
+            throw new Exception("Additional property \"".$property->code."\" can not be saved until the stored parent model");
         }
 
 
@@ -531,11 +525,6 @@ class RelatedPropertiesModel extends DynamicModel
     }
 
 
-
-
-
-
-
     /**
      * {@inheritdoc}
      */
@@ -555,13 +544,6 @@ class RelatedPropertiesModel extends DynamicModel
     }
 
 
-
-
-
-
-
-
-
     /**
      * Returns a value indicating whether the model has an attribute with the specified name.
      * @param string $name the name of the attribute
@@ -573,10 +555,26 @@ class RelatedPropertiesModel extends DynamicModel
             return true;
         }
 
-        if ($property = $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $name])->one()) {
+        //TODO: Подумать, возможно getTableCacheTag нужно делать у какого то другого метода. Например у элементов контент это cmsContent как только изменились данные в таблице cmsContent тогда обновляется кэш.
+        $dependency = new TagDependency([
+            'tags' => [
+                $this->relatedElementModel->getTableCacheTag(),
+            ],
+        ]);
+        $property = $this->relatedElementModel::getDb()->cache(function ($db) use ($name) {
+            return $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $name])->one();
+        }, null, $dependency);
+
+        if ($property) {
             $this->_defineByProperty($property);
-            $pv = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
-            $this->_initPropertyValue($property, (array) $pv);
+
+            $pv = $this->relatedElementModel::getDb()->cache(function ($db) use ($property) {
+                return $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
+            }, null, $dependency);
+
+            //$pv = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
+
+            $this->_initPropertyValue($property, (array)$pv);
         }
 
         if (in_array($name, $this->attributes())) {
@@ -606,7 +604,7 @@ class RelatedPropertiesModel extends DynamicModel
     /**
      * Sets the named attribute value.
      * @param string $name the attribute name
-     * @param mixed $value the attribute value.
+     * @param mixed  $value the attribute value.
      * @throws InvalidParamException if the named attribute does not exist.
      * @see hasAttribute()
      */
@@ -615,26 +613,10 @@ class RelatedPropertiesModel extends DynamicModel
         if ($this->hasAttribute($name)) {
             $this->$name = $value;
         } else {
-            throw new InvalidParamException(get_class($this) . ' ' . \Yii::t('skeeks/cms',
+            throw new InvalidParamException(get_class($this).' '.\Yii::t('skeeks/cms',
                     'has no attribute named "{name}".', ['name' => $name]));
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -674,7 +656,7 @@ class RelatedPropertiesModel extends DynamicModel
     /**
      * Sets the old value of the named attribute.
      * @param string $name the attribute name
-     * @param mixed $value the old attribute value.
+     * @param mixed  $value the old attribute value.
      * @throws InvalidArgumentException if the named attribute does not exist.
      * @see hasAttribute()
      */
@@ -683,7 +665,7 @@ class RelatedPropertiesModel extends DynamicModel
         if (isset($this->_oldAttributes[$name]) || $this->hasAttribute($name)) {
             $this->_oldAttributes[$name] = $value;
         } else {
-            throw new InvalidArgumentException(get_class($this) . ' has no attribute named "' . $name . '".');
+            throw new InvalidArgumentException(get_class($this).' has no attribute named "'.$name.'".');
         }
     }
 
@@ -701,7 +683,7 @@ class RelatedPropertiesModel extends DynamicModel
     /**
      * Returns a value indicating whether the named attribute has been changed.
      * @param string $name the name of the attribute.
-     * @param bool $identical whether the comparison of new and old value is made for
+     * @param bool   $identical whether the comparison of new and old value is made for
      * identical values using `===`, defaults to `true`. Otherwise `==` is used for comparison.
      * This parameter is available since version 2.0.4.
      * @return bool whether the attribute has been changed
