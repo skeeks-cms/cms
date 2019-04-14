@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-5.5.5.pre
+5.5.5
 -----------------
  * Optimisations query RP
 
