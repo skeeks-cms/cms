@@ -555,22 +555,26 @@ class RelatedPropertiesModel extends DynamicModel
             return true;
         }
 
+        $repClass = $this->relatedElementModel->relatedElementPropertyClassName;
+        $rpClass = $this->relatedElementModel->relatedPropertyClassName;
         //TODO: Подумать, возможно getTableCacheTag нужно делать у какого то другого метода. Например у элементов контент это cmsContent как только изменились данные в таблице cmsContent тогда обновляется кэш.
         $dependency = new TagDependency([
             'tags' => [
                 $this->relatedElementModel->getTableCacheTag(),
+                (new $rpClass())->getTableCacheTag(),
+                (new $repClass())->getTableCacheTag(),
             ],
         ]);
         $property = $this->relatedElementModel::getDb()->cache(function ($db) use ($name) {
             return $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $name])->one();
-        }, null, $dependency);
+        }, 3600*24, $dependency);
 
         if ($property) {
             $this->_defineByProperty($property);
 
             $pv = $this->relatedElementModel::getDb()->cache(function ($db) use ($property) {
                 return $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
-            }, null, $dependency);
+            }, 3600*24, $dependency);
 
             //$pv = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
 

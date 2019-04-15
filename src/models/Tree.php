@@ -504,6 +504,9 @@ class Tree extends Core
             self::$_treeTypes[$this->tree_type_id] = $this->treeType;
             $treeType = self::$_treeTypes[$this->tree_type_id];
         }
+        if (!$treeType) {
+            return CmsTreeTypeProperty::find()->where(['id' => null]);
+        }
         //return $this->treeType->getCmsTreeTypeProperties();
         return $treeType->getCmsTreeTypeProperties();
     }
