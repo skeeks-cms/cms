@@ -103,7 +103,7 @@ class CmsLang extends Core
                 'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
                 'maxFiles' => 1,
                 'maxSize' => 1024 * 1024 * 2,
-                'minSize' => 1024,
+                'minSize' => 100,
             ],
         ]);
     }
