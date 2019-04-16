@@ -71,7 +71,7 @@ class HasJsonFieldsBehavior extends Behavior
 
                     } catch (\Exception $e) {
                         $r = new \ReflectionClass($this->owner);
-                        \Yii::warning("Json::decode error — {$e->getMessage()} value for decode={$this->owner->{$fielName}} model={$r->getName()} modeldata=" . print_r($this->owner->toArray()), self::class);
+                        \Yii::warning("Json::decode error — {$e->getMessage()} value for decode={$this->owner->{$fielName}} model={$r->getName()} modeldata=" . print_r($this->owner->toArray(), true), self::class);
                         $this->owner->{$fielName} = [];
                     }
 
