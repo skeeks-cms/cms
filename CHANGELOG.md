@@ -3,6 +3,7 @@ CHANGELOG
 
 5.5.5
 -----------------
+ * Update ajax submit forms
  * Optimisations query RP
 
 5.5.4.2

@@ -41,6 +41,5 @@ class ActiveFormAjaxSubmit extends ActiveForm
 {
     use ActiveFormAjaxSubmitTrait;
 
-    public $afterValidateCallback = "";
     public $enableAjaxValidation = true;
 }

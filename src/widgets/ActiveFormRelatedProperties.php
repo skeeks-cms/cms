@@ -23,7 +23,6 @@ class ActiveFormRelatedProperties extends ActiveForm
 {
     use AdminActiveFormTrait;
     use ActiveFormAjaxSubmitTrait;
-    public $afterValidateCallback = "";
 
     /**
      * @var Model
