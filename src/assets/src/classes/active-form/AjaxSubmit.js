@@ -77,8 +77,8 @@
 
 
             this.on('error', function (e, data) {
-                console.log('error');
-                console.log(data);
+                /*console.log('error');
+                console.log(data);*/
             });
 
             this.on('start', function () {
