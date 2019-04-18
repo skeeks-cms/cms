@@ -223,18 +223,13 @@ Quick start
 
 .. code-block:: php
 
-    <?php $form = ActiveForm::begin([
+    <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                     'action' => UrlHelper::construct('cms/auth/register-by-email')->toString(),
                     'validationUrl' => UrlHelper::construct('cms/auth/register-by-email')->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME)->toString(),
-                    'afterValidateCallback' => <<<JS
-        function(jForm, ajaxQuery)
+                    'clientCallback' => <<<JS
+        function(ActiveFormAjaxSubmit)
         {
-            var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
-                'blockerSelector' : '#' + jForm.attr('id'),
-                'enableBlocker' : true,
-            });
-
-            handler.bind('success', function()
+            ActiveFormAjaxSubmit.on('success', function()
             {
                 _.delay(function()
                 {
@@ -251,7 +246,7 @@ Quick start
             <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> Зарегистрироваться", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
 
-    <?php ActiveForm::end(); ?>
+    <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
 
 
 

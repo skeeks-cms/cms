@@ -3,6 +3,8 @@
  * @copyright Copyright (c) 2010 SkeekS
  * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
+ *     
+ * @see https://cms.skeeks.com/blog/410-kak-otpravit-formu-v-yii2-i-skeeks-cms-cherez-ajax
  */
 
 (function (sx, $, _) {
@@ -10,6 +12,8 @@
     sx.createNamespace('classes.activeForm', sx);
 
     /**
+     * @see https://cms.skeeks.com/blog/410-kak-otpravit-formu-v-yii2-i-skeeks-cms-cherez-ajax
+     *
      * @event start начало отправки формы
      * @event stop завершение отправки формы
      *

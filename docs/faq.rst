@@ -234,6 +234,39 @@ FAQ
     ]
 
 
+Как отправить форму через ajax
+------------------------------
+
+.. code-block:: php
+
+    <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                    'action' => Url::to('/module/controller/action'),
+                    'validationUrl' => Url::to('/module/controller/validate-action'),
+                    'clientCallback' => <<<JS
+        function(ActiveFormAjaxSubmit)
+        {
+            ActiveFormAjaxSubmit.on('error', function(e, data)
+            {
+                alert(data.message);
+            });
+
+            ActiveFormAjaxSubmit.on('success', function(e, data)
+            {
+                alert("Успешно отправлена");
+            });
+        }
+    JS
+
+                ]); ?>
+        <?= $form->field($model, 'email') ?>
+
+        <div class="form-group">
+            <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> Зарегистрироваться", ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+        </div>
+
+    <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+
 Как добавить нестандартный фильтр в BackendModelStandartController?
 -------------------------------------------------------------------
 
