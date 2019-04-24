@@ -142,6 +142,8 @@
 
             this.jForm.on('submit', function (event, attribute, message) {
                 //console.log('submit');
+                
+                self.AjaxQuery.setUrl(self.jForm.attr('action'))
 
                 if (self.IsSubmitProcess === false) {
                     self.IsSubmitProcess = true;
