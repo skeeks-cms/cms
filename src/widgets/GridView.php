@@ -480,6 +480,17 @@ JS
         $dataProvider = $this->dataProvider;
 
         $dataProvider->getSort()->attributes = ArrayHelper::merge($dataProvider->getSort()->attributes, $this->sortAttributes);
+
+        //Бывает ситуация когда сохранили настройки сортировки а потом удалил поля и забыз и как таковых атрибутов для сортировки уже нет
+        if ($this->defaultOrder && is_array($this->defaultOrder)) {
+            foreach ($this->defaultOrder as $key => $value)
+            {
+                if (!in_array($key, (array) $dataProvider->getSort()->attributes)) {
+                    unset($this->defaultOrder[$key]);
+                }
+            }
+        }
+
         $dataProvider->getSort()->defaultOrder = $this->defaultOrder;
 
         return $this;
