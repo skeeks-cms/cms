@@ -485,7 +485,7 @@ JS
         if ($this->defaultOrder && is_array($this->defaultOrder)) {
             foreach ($this->defaultOrder as $key => $value)
             {
-                if (!in_array($key, (array) $dataProvider->getSort()->attributes)) {
+                if (!isset($dataProvider->getSort()->attributes[$key])) {
                     unset($this->defaultOrder[$key]);
                 }
             }
