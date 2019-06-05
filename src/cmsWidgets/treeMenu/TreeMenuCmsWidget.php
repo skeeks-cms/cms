@@ -12,6 +12,7 @@ use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
 use skeeks\yii2\form\fields\BoolField;
@@ -36,6 +37,11 @@ class TreeMenuCmsWidget extends WidgetRenderable
      * @var null
      */
     public $treePid = null;
+
+    /**
+     * @var null
+     */
+    public $treeParentCode = null;
 
     /**
      * Выбор только активных пунктов
@@ -270,6 +276,11 @@ class TreeMenuCmsWidget extends WidgetRenderable
 
         if ($this->treePid) {
             $this->activeQuery->andWhere(['pid' => $this->treePid]);
+        } elseif ($this->treeParentCode) {
+            $tree = CmsTree::find()->where(['code' => $this->treeParentCode])->one();
+            if ($tree) {
+                $this->activeQuery->andWhere(['pid' => $tree->id]);
+            }
         }
 
         if ($this->level) {
