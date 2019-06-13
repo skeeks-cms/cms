@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.7
+-----------------
+ * Delete child elements updated
+ 
 5.5.5
 -----------------
  * Update ajax submit forms

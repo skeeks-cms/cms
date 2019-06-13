@@ -23,6 +23,7 @@ use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
@@ -110,13 +111,29 @@ class CmsContentElement extends RelatedElementModel
         $this->on(self::EVENT_BEFORE_DELETE, [$this, '_beforeDeleteE']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, '_afterDeleteE']);
     }
+
     public function _beforeDeleteE($e)
     {
-        //TODO: Upgrade this
+        //Если есть дочерние элементы
         if ($this->childrenContentElements) {
-            foreach ($this->childrenContentElements as $childrenElement) {
-                $childrenElement->delete();
+            //Удалить все дочерние элементы
+            if ($this->cmsContent->parent_content_on_delete == CmsContent::CASCADE) {
+                foreach ($this->childrenContentElements as $childrenElement) {
+                    $childrenElement->delete();
+                }
             }
+
+            if ($this->cmsContent->parent_content_on_delete == CmsContent::RESTRICT) {
+                throw new Exception("Для начала необходимо удалить вложенные элементы");
+            }
+
+            if ($this->cmsContent->parent_content_on_delete == CmsContent::SET_NULL) {
+                foreach ($this->childrenContentElements as $childrenElement) {
+                    $childrenElement->parent_content_element_id = null;
+                    $childrenElement->save();
+                }
+            }
+
         }
     }
     public function _afterDeleteE($e)
