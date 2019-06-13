@@ -34,6 +34,7 @@ use yii\helpers\ArrayHelper;
  * @property string $name_one
  * @property integer $default_tree_id
  * @property string $is_allow_change_tree
+ * @property integer $is_count_views
  * @property integer $root_tree_id
  * @property string $view_file
  * @property string $access_check_element
@@ -112,6 +113,7 @@ class CmsContent extends Core
 
             'default_tree_id' => Yii::t('skeeks/cms', 'Default Section'),
             'is_allow_change_tree' => Yii::t('skeeks/cms', 'Is Allow Change Default Section'),
+            'is_count_views' => Yii::t('skeeks/cms', 'Считать количество просмотров?'),
             'root_tree_id' => Yii::t('skeeks/cms', 'Root Section'),
             'view_file' => Yii::t('skeeks/cms', 'Template'),
 
@@ -135,7 +137,7 @@ class CmsContent extends Core
     {
         return array_merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id'],
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id', 'is_count_views'],
                 'integer'
             ],
             [['name', 'content_type'], 'required'],

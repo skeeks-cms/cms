@@ -267,6 +267,7 @@ $action = $controller->action;
     'content' => \Yii::t('skeeks/cms', 'Additionally')
 ]); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'is_count_views')->checkbox(); ?>
 <?php /*= $form->fieldRadioListBoolean($model, 'index_for_search'); */ ?>
 
 <?= $form->fieldSetEnd(); ?>

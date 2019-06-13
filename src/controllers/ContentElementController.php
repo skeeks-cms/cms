@@ -162,6 +162,15 @@ class ContentElementController extends Controller
             } else {
                 $viewFile = $cmsContent->code;
             }
+
+            /**
+             * У этого контента нужно считать количество просмотров
+             */
+            if ($cmsContent->is_count_views) {
+                $model = $this->model;
+                $model->show_counter = $model->show_counter + 1;
+                $model->update(false, ['show_counter']);
+            }
         }
 
         $this->_initStandartMetaData();
