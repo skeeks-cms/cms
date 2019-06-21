@@ -124,7 +124,6 @@ class AdminCmsSiteController extends BackendModelStandartController
                         'actions',
                         'id',
                         'image_id',
-                        'server_name',
                         'def',
                         'active',
                         'priority',
@@ -219,7 +218,6 @@ class AdminCmsSiteController extends BackendModelStandartController
                     'description' => [
                         'class' => TextareaField::class,
                     ],
-                    'server_name',
                     'priority',
                 ],
             ],
@@ -246,6 +244,18 @@ class AdminCmsSiteController extends BackendModelStandartController
                                 'columns' => [
                                     //['class' => 'yii\grid\SerialColumn'],
                                     'domain',
+                                    'is_main' => [
+                                        'class' => BooleanColumn::class,
+                                        'attribute' => 'is_main',
+                                        'trueValue' => 1,
+                                        'falseValue' => 0,
+                                    ],
+                                    'is_https' => [
+                                        'class' => BooleanColumn::class,
+                                        'attribute' => 'is_https',
+                                        'trueValue' => 1,
+                                        'falseValue' => 0,
+                                    ],
                                 ],
                             ],
                         ])

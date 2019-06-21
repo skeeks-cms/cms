@@ -58,7 +58,7 @@ class UrlRuleTree
                     $url = trim($tree->redirect, '/');
 
                     if ($tree->site) {
-                        if ($tree->site->server_name) {
+                        if ($tree->site->cmsSiteMainDomain) {
                             return $tree->site->url . '/' . $url;
                         } else {
                             return $url;
@@ -109,7 +109,7 @@ class UrlRuleTree
             //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
             if ($tree->site) {
                 //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
-                if ($tree->site->server_name) {
+                if ($tree->site->cmsSiteMainDomain) {
                     return $tree->site->url . '/' . $url;
                 }
             }

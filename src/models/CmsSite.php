@@ -39,6 +39,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsTree $rootCmsTree
  * @property CmsLang $cmsLang
  * @property CmsSiteDomain[] $cmsSiteDomains
+ * @property CmsSiteDomain $cmsSiteMainDomain
  * @property CmsTree[] $cmsTrees
  * @property CmsStorageFile $image
  */
@@ -168,7 +169,6 @@ class CmsSite extends Core
             'priority' => Yii::t('skeeks/cms', 'Priority'),
             'code' => Yii::t('skeeks/cms', 'Code'),
             'name' => Yii::t('skeeks/cms', 'Name'),
-            'server_name' => Yii::t('skeeks/cms', 'Server Name'),
             'description' => Yii::t('skeeks/cms', 'Description'),
             'image_id' => Yii::t('skeeks/cms', 'Image'),
         ]);
@@ -185,10 +185,9 @@ class CmsSite extends Core
             [['code', 'name'], 'required'],
             [['active', 'def'], 'string', 'max' => 1],
             [['code'], 'string', 'max' => 15],
-            [['name', 'server_name', 'description'], 'string', 'max' => 255],
+            [['name', 'description'], 'string', 'max' => 255],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
-            [['server_name'], 'validateServerName'],
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             ['def', 'default', 'value' => Cms::BOOL_N],
@@ -215,14 +214,6 @@ class CmsSite extends Core
         }
     }
 
-    public function validateServerName($attribute)
-    {
-        if (!preg_match('/^[а-яa-z0-9.-]{2,255}$/', $this->$attribute)) {
-            $this->addError($attribute,
-                \Yii::t('skeeks/cms', 'Use only lowercase letters and numbers. Example {site} (2-255 characters)',
-                    ['site' => 'site.ru']));
-        }
-    }
 
     static public $sites = [];
 
@@ -261,6 +252,16 @@ class CmsSite extends Core
     {
         return $this->hasMany(CmsSiteDomain::class, ['cms_site_id' => 'id']);
     }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSiteMainDomain()
+    {
+        $query = $this->getCmsSiteDomains()->andWhere(['is_main' => 1]);
+        $query->multiple = false;
+        return $query;
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -276,8 +277,8 @@ class CmsSite extends Core
      */
     public function getUrl()
     {
-        if ($this->server_name) {
-            return '//' . $this->server_name;
+        if ($this->cmsSiteMainDomain) {
+            return (($this->cmsSiteMainDomain->is_https ? "https:" : "http:") . "//" . $this->cmsSiteMainDomain->domain);
         }
 
         return \Yii::$app->urlManager->hostInfo;
@@ -298,5 +299,4 @@ class CmsSite extends Core
     {
         return $this->hasOne(CmsStorageFile::className(), ['id' => 'image_id']);
     }
-
 }
