@@ -29,6 +29,7 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -127,9 +128,9 @@ class AdminCmsSiteController extends BackendModelStandartController
                         'def',
                         'active',
                         'priority',
-                        'code',
                         'name',
                         'countDomains',
+                        'domains',
                     ],
                     'columns'        => [
                         'active'   => [
@@ -147,6 +148,21 @@ class AdminCmsSiteController extends BackendModelStandartController
                             },
                             'attribute' => 'countDomains',
                             'label' => 'Количество доменов'
+                        ],
+                        'domains' => [
+                            'value' => function(CmsSite $cmsSite) {
+                                $result = ArrayHelper::map($cmsSite->cmsSiteDomains, "id", function($domain) {
+                                    return Html::a($domain->domain, $domain->url, [
+                                        'target' => '_blank',
+                                        'data-pjax' => 0
+                                    ]);
+                                });
+
+                                return implode("<br />", $result);
+                            },
+                            'attribute' => 'countDomains',
+                            'format' => 'raw',
+                            'label' => 'Домены'
                         ],
                     ],
                 ],

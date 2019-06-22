@@ -20,13 +20,14 @@ use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\i18n\I18N;
+use skeeks\cms\models\CmsSite;
 
 /**
  * @property Storage $storage
  * @property Cms $cms
  * @property Imaging $imaging
  * @property Breadcrumbs $breadcrumbs
- * @property CurrentSite $currentSite
+ * @property CmsSite $currentSite
  * @property ConsoleComponent $console
  * @property I18N $i18n
  *

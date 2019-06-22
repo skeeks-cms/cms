@@ -27,6 +27,7 @@ use yii\helpers\ArrayHelper;
  * @property boolean $is_https работает по https?
  * @property boolean $is_main основной домен для сайта?
  *
+ * @property string $url
  * @property CmsSite $cmsSite
  */
 class CmsSiteDomain extends Core
@@ -123,5 +124,13 @@ class CmsSiteDomain extends Core
     public function getCmsSite()
     {
         return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return ($this->is_https ? "https://" : "http://") . $this->domain;
     }
 }
