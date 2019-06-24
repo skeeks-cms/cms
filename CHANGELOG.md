@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+5.5.8
+-----------------
+ * Add main domain
+ 
 5.5.7
 -----------------
  * Cms content element is_count_views
