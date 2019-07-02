@@ -7,7 +7,7 @@
  */
 $model = new \skeeks\cms\models\CmsContentElement();
 ?>
-<?php $form = \yii\bootstrap\ActiveForm::begin(); ?>
+<?php $form = \yii\widgets\ActiveForm::begin(); ?>
 
 <?= $form->field($model, 'tree_id')->widget(
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class

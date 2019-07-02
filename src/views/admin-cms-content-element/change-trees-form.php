@@ -7,7 +7,9 @@
  */
 $model = new \skeeks\cms\models\CmsContentElement();
 ?>
-<?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
+<?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
+        'usePjax' => false
+]); ?>
 
 <?php /*= $form->field($model, 'treeIds')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
