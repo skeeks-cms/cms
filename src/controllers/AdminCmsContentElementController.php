@@ -41,6 +41,7 @@ use yii\bootstrap\Alert;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -900,20 +901,24 @@ HTML
      */
     public function eachMultiChangeTree($model, $action)
     {
-        try {
+        //try {
             $formData = [];
             parse_str(\Yii::$app->request->post('formData'), $formData);
             $tmpModel = new CmsContentElement();
             $tmpModel->load($formData);
             if ($tmpModel->tree_id && $tmpModel->tree_id != $model->tree_id) {
                 $model->tree_id = $tmpModel->tree_id;
-                return $model->save(false);
+                if (!$model->save(false)) {
+                    throw new Exception("Не сохранилось: " . print_r($model->errors, true));
+                }
+            } else {
+                throw new Exception('Раздел не изменился');
             }
 
-            return false;
-        } catch (\Exception $e) {
-            return false;
-        }
+            return true;
+        //} catch (\Exception $e) {
+        //    return false;
+        //}
     }
     public function eachRelatedProperties($model, $action)
     {
