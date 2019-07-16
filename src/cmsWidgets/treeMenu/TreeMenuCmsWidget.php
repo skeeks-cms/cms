@@ -75,6 +75,12 @@ class TreeMenuCmsWidget extends WidgetRenderable
     public $order = SORT_ASC;
 
     /**
+     * Установить лимит
+     * @var int
+     */
+    public $limit = false;
+
+    /**
      * Добавить условие выборки разделов, только текущего сайта
      * @var string
      */
@@ -132,6 +138,8 @@ class TreeMenuCmsWidget extends WidgetRenderable
                 'enabledRunCache'    => \Yii::t('skeeks/cms', 'Enable caching'),
                 'runCacheDuration'   => \Yii::t('skeeks/cms', 'Cache lifetime'),
                 'tree_type_ids'      => \Yii::t('skeeks/cms', 'Section types'),
+                'limit'              => \Yii::t('skeeks/cms', 'The maximum number of entries in the sample ({limit})',
+                                                            ['limit' => 'limit']),
             ]);
     }
 
@@ -152,7 +160,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
             [
                 ['text', 'string'],
                 [['viewFile', 'label', 'active', 'orderBy', 'enabledCurrentSite', 'enabledRunCache'], 'string'],
-                [['treePid', 'level', 'runCacheDuration'], 'integer'],
+                [['treePid', 'level', 'runCacheDuration', 'limit'], 'integer'],
                 [['order'], 'integer'],
                 [['site_codes'], 'safe'],
                 [['tree_type_ids'], 'safe'],
@@ -229,6 +237,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                             SORT_DESC => \Yii::t('skeeks/cms', 'DESC (from highest to lowest)'),
                         ],
                     ],
+                    'limit'
                 ],
             ],
             'additionally'       => [
@@ -315,6 +324,10 @@ class TreeMenuCmsWidget extends WidgetRenderable
         if ($this->with) {
             $this->activeQuery->with($this->with);
         }
+        if ($this->limit) {
+            $this->activeQuery->limit($this->limit);
+        }
+
 
         if ($this->activeQueryCallback && is_callable($this->activeQueryCallback)) {
             $callback = $this->activeQueryCallback;
