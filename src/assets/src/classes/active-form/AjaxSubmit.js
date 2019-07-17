@@ -74,6 +74,11 @@
             });
 
             this.AjaxQueryHandler.on('error', function (e, data) {
+
+                if (data.data.validation) {
+                    self.jForm.yiiActiveForm('updateMessages', data.data.validation, true);
+                }
+
                 self.trigger('error', {
                     'message': data.message
                 });
@@ -126,7 +131,7 @@
                 if (_.size(errorAttributes) > 0) {
 
                     self.trigger('error', {
-                        'message': 'Проверьте заполненные поля в форме'
+                        'message': 'Проверьте заполненные поля в форме',
                     });
                     //sx.notify.error('Проверьте заполненные поля в форме');
                     self.trigger('stop');

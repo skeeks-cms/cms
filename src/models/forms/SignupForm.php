@@ -13,6 +13,7 @@ namespace skeeks\cms\models\forms;
 
 use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\models\User;
+use skeeks\cms\validators\PhoneValidator;
 use yii\base\Model;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -26,6 +27,7 @@ class SignupForm extends Model
 {
     const SCENARION_FULLINFO = 'fullInfo';
     const SCENARION_ONLYEMAIL = 'onlyEmail';
+    const SCENARION_SHORTINFO = 'shortInfo';
 
     public $username;
     public $email;
@@ -46,6 +48,12 @@ class SignupForm extends Model
             'username' => \Yii::t('skeeks/cms', 'Login'),
             'email' => \Yii::t('skeeks/cms', 'Email'),
             'password' => \Yii::t('skeeks/cms', 'Password'),
+            'first_name' => \Yii::t('skeeks/cms', 'First name'),
+            'last_name' => \Yii::t('skeeks/cms', 'Last name'),
+            'patronymic' => \Yii::t('skeeks/cms', 'Patronymic'),
+
+            'email' => Yii::t('skeeks/cms', 'Email'),
+            'phone' => Yii::t('skeeks/cms', 'Phone'),
         ];
     }
 
@@ -56,7 +64,20 @@ class SignupForm extends Model
         $scenarions[self::SCENARION_FULLINFO] = [
             'username',
             'email',
-            'password'
+            'password',
+
+            'first_name',
+            'last_name',
+            'patronymic',
+        ];
+
+        $scenarions[self::SCENARION_SHORTINFO] = [
+            'email',
+            'password',
+            'phone',
+            'first_name',
+            'last_name',
+            'patronymic',
         ];
 
         $scenarions[self::SCENARION_ONLYEMAIL] = [
@@ -105,8 +126,8 @@ class SignupForm extends Model
 
             [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::class],
-            [['phone'], 'unique'],
-            [['phone', 'email'], 'default', 'value' => null],
+            [['phone'], 'unique', 'targetClass' => \Yii::$app->user->identityClass],
+            [['phone'], 'default', 'value' => null],
         ];
     }
 
@@ -127,6 +148,23 @@ class SignupForm extends Model
             if ($this->scenario == self::SCENARION_FULLINFO) {
                 $user->username = $this->username;
                 $user->email = $this->email;
+                $user->last_name = $this->last_name;
+                $user->first_name = $this->first_name;
+                $user->patronymic = $this->patronymic;
+                $user->phone = $this->phone;
+                $user->setPassword($this->password);
+                $user->generateAuthKey();
+                $user->save();
+
+                return $user;
+
+            } elseif ($this->scenario == self::SCENARION_SHORTINFO) {
+                $user->generateUsername();
+                $user->email = $this->email;
+                $user->last_name = $this->last_name;
+                $user->first_name = $this->first_name;
+                $user->patronymic = $this->patronymic;
+                $user->phone = $this->phone;
                 $user->setPassword($this->password);
                 $user->generateAuthKey();
                 $user->save();

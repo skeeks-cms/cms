@@ -101,4 +101,30 @@ class RequestResponse extends Model
     {
         return Json::encode($this->toArray());
     }
+
+    /**
+     * @param $model
+     * @return $this
+     */
+    public function addModelErrors($model)
+    {
+        $models = [];
+        if (is_array($model)) {
+            $models = $model;
+        } else {
+            $models = [$model];
+        }
+
+        $result = [];
+
+        foreach ($models as $m)
+        {
+            foreach ($m->getErrors() as $attribute => $errors) {
+                $result[\yii\helpers\Html::getInputId($m, $attribute)] = $errors;
+            }
+        }
+
+        $this->data['validation'] = $result;
+        return $this;
+    }
 }
