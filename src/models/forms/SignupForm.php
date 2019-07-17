@@ -31,6 +31,12 @@ class SignupForm extends Model
     public $email;
     public $password;
 
+    public $first_name;
+    public $last_name;
+    public $patronymic;
+    public $phone;
+
+
     /**
      * @return array
      */
@@ -90,6 +96,17 @@ class SignupForm extends Model
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
+
+            [
+                ['first_name', 'last_name', 'patronymic'],
+                'string',
+                'max' => 255
+            ],
+
+            [['phone'], 'string', 'max' => 64],
+            [['phone'], PhoneValidator::class],
+            [['phone'], 'unique'],
+            [['phone', 'email'], 'default', 'value' => null],
         ];
     }
 
