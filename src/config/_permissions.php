@@ -106,10 +106,13 @@ return [
             'description' => ['skeeks/cms', 'Registered user'],
 
             //Есть доступ к системе администрирования
-            'permissions' => [
-                \skeeks\cms\components\Cms::UPA_PERMISSION,
-                \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-            ],
+            'child' => [
+                'permissions' => [
+                    \skeeks\cms\components\Cms::UPA_PERMISSION,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                ],
+            ]
+
         ],
 
         [

@@ -38,9 +38,9 @@ class UpaPersonalController extends BackendModelController
         $this->modelShowAttribute = 'displayName';
 
         $this->permissionNames = [
-            Cms::UPA_PERMISSION => 'Доступ к персональной части',
+            Cms::UPA_PERMISSION => 'Доступ к персональной части'
         ];
-
+        
         parent::init();
     }
 
