@@ -75,7 +75,7 @@
 
             this.AjaxQueryHandler.on('error', function (e, data) {
 
-                if (data.data.validation) {
+                if (data.data && data.data.validation) {
                     self.jForm.yiiActiveForm('updateMessages', data.data.validation, true);
                 }
 
@@ -123,6 +123,7 @@
                 //console.log('afterValidate');
 
                 self.trigger('afterValidate', {
+                    'activeFormAjaxSubmit': self,
                     'messages': messages,
                     'errorAttributes': errorAttributes,
                     'event': event,

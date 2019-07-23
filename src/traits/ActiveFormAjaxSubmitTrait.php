@@ -47,9 +47,10 @@ JS
         }
         elseif ($afterValidateCallback) {
             $this->view->registerJs(<<<JS
-            sx.ActiveForm.on('afterValidate', function() {
+            sx.ActiveForm.on('afterValidate', function(e, data) {
                 var callback = $afterValidateCallback;
-                callback(sx.ActiveForm.jForm, sx.ActiveForm.AjaxQuery);
+                var ActiveForm = data.activeFormAjaxSubmit;
+                callback(ActiveForm.jForm, ActiveForm.AjaxQuery);
             });
 JS
     );
