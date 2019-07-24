@@ -11,6 +11,22 @@ namespace skeeks\cms\traits;
 use skeeks\cms\assets\ActiveFormAjaxSubmitAsset;
 
 /**
+ *
+ * <? $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'clientCallback' => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+        ActiveFormAjaxSubmit.on('success', function(e, response) {
+            $("#sx-result").empty();
+
+            if (response.data.html) {
+                $("#sx-result").append(response.data.html);
+            }
+        });
+    }
+JS
+)
+]); ?>
+ *
  * Trait ActiveFormAjaxSubmitTrait
  * @package skeeks\cms\traits
  */
@@ -55,105 +71,6 @@ JS
 JS
     );
         }
-
-
-        /*$afterValidateCallback = $this->afterValidateCallback;
-        if ($afterValidateCallback) {
-            $this->view->registerJs(<<<JS
-            
-                    
-                $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
-                    console.log('beforeSubmit');
-                    return false;
-                });
-
-                $('#{$this->id}').on('submit', function (event, attribute, message) {
-                    console.log('submit');
-                    return false;
-                });
-
-                $('#{$this->id}').on('beforeValidate', function (event, messages, deferreds) {
-                    console.log('beforeValidate');
-                });
-
-                $('#{$this->id}').on('ajaxComplete', function (event, jqXHR, textStatus) {
-                    if (jqXHR.status == 403)
-                    {
-                        sx.notify.error(jqXHR.responseJSON.message);
-                    }
-                    if (jqXHR.status == 404)
-                    {
-                        sx.notify.error(jqXHR.responseJSON.message);
-                    }
-                });
-
-                $('#{$this->id}').on('afterValidate', function (event, messages, errorAttributes) {
-
-                    console.log('afterValidate');
-                    
-                    if (_.size(errorAttributes) > 0)
-                    {
-                        sx.notify.error('Проверьте заполненные поля в форме');
-                        return false;
-                    }
-
-                    var Jform = $(this);
-                    var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
-
-
-                    var callback = $afterValidateCallback;
-
-                    callback(Jform, ajax);
-
-                    ajax.execute();
-
-                    return false;
-                });
-
-JS
-            );
-
-
-        } else {
-            $this->view->registerJs(<<<JS
-
-                $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
-                    return false;
-                });
-
-
-                $('#{$this->id}').on('submit', function (event, attribute, message) {
-                    return false;
-                });
-
-                $('#{$this->id}').on('beforeValidate', function (event, messages, deferreds) {
-                });
-                
-                $('#{$this->id}').on('afterValidate', function (event, messages, errorAttributes) {
-
-                    if (_.size(errorAttributes) > 0)
-                    {
-                        sx.notify.error('Проверьте заполненные поля в форме');
-                        return false;
-                    }
-
-                    var Jform = $(this);
-                    var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
-
-                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                        'blockerSelector' : '#' + $(this).attr('id'),
-                        'enableBlocker' : true,
-                    });
-
-                    ajax.execute();
-
-                    return false;
-                });
-
-JS
-            );
-        }*/
-
     }
 
     public function run()

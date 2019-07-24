@@ -11,31 +11,23 @@ namespace skeeks\cms\base\widgets;
 use skeeks\cms\traits\ActiveFormAjaxSubmitTrait;
 
 /**
+*
+<? $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'clientCallback' => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+        ActiveFormAjaxSubmit.on('success', function(e, response) {
+            $("#sx-result").empty();
+
+            if (response.data.html) {
+                $("#sx-result").append(response.data.html);
+            }
+        });
+    }
+JS
+)
+]); ?>
  *
- *
- * 'afterValidateCallback'     => new \yii\web\JsExpression(<<<JS
- * function(jForm, AjaxQuery)
- * {
- * var Handler = new sx.classes.AjaxHandlerStandartRespose(AjaxQuery);
- * var Blocker = new sx.classes.AjaxHandlerBlocker(AjaxQuery, {
- * 'wrapper' : jForm.closest('.modal-content')
- * });
- *
- * Handler.bind('success', function()
- * {
- * _.delay(function()
- * {
- * window.location.reload();
- * }, 1000);
- * });
- * }
- * JS
- * )
- * JS
- * )
- *
- * Class ActiveFormAjaxSubmit
- * @package skeeks\cms\base\widgets
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class ActiveFormAjaxSubmit extends ActiveForm
 {
