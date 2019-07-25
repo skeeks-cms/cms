@@ -64,7 +64,7 @@ class ContentElementController extends Controller
                             [
                                 'allow' => true,
                                 'matchCallback' => function($rule, $action) {
-                                    if ($this->model->cmsContent && $this->model->cmsContent->access_check_element == 'Y') {
+                                    if ($this->model && $this->model->cmsContent && $this->model->cmsContent->access_check_element == 'Y') {
                                         //Если такая привилегия заведена, нужно ее проверять.
                                         if ($permission = \Yii::$app->authManager->getPermission($this->model->permissionName)) {
                                             if (!\Yii::$app->user->can($permission->name)) {
