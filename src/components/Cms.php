@@ -345,6 +345,7 @@ class Cms extends \skeeks\cms\base\Component
                 'fields' => [
                     'registerRoles' => [
                         'class' => SelectField::class,
+                        'multiple' => true,
                         'items' => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'),
                     ],
                 ],

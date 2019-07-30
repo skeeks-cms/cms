@@ -130,9 +130,14 @@ class User
             foreach ((array)$this->_roleNames as $roleName) {
                 if ($role = \Yii::$app->authManager->getRole($roleName)) {
                     try {
+                        //todo: добавить проверку
                         \Yii::$app->authManager->assign($role, $this->id);
                     } catch (\Exception $e) {
+                        \Yii::error("Ошибка назначения роли: " . $e->getMessage(), self::class);
+                        //throw $e;
                     }
+                } else {
+                    \Yii::warning("Роль {$roleName} не зарегистрированна в системе", self::class);
                 }
             }
         }
