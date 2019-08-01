@@ -9,18 +9,15 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsUser;
 use skeeks\yii2\form\Field;
 use skeeks\yii2\form\fields\PasswordField;
-use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
 use yii\base\Exception;
-use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -38,9 +35,9 @@ class UpaPersonalController extends BackendModelController
         $this->modelShowAttribute = 'displayName';
 
         $this->permissionNames = [
-            Cms::UPA_PERMISSION => 'Доступ к персональной части'
+            Cms::UPA_PERMISSION => 'Доступ к персональной части',
         ];
-        
+
         parent::init();
     }
 
@@ -55,55 +52,24 @@ class UpaPersonalController extends BackendModelController
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
-                "update" => [
+                "update"          => [
                     'buttons' => ['save'],
-                    'class' => BackendModelUpdateAction::class,
-                    'name' => ['skeeks/cms', 'Personal data'],
-                    'fields' => [
-                        'image_id' => [
-                            'class' => WidgetField::class,
-                            'widgetClass' => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
-                            'widgetConfig' => [
-                                'accept' => 'image/*',
-                                'multiple' => false
-                            ]
-                        ],
-                        /*'username',*/
-                        'last_name',
-                        'first_name',
-                        'patronymic',
-                        'email',
-                        'phone' => [
-                            'elementOptions' => [
-                                'placeholder' => '+7 903 722-28-73'
-                            ],
-                            'on beforeRender' => function(Event $e) {
-                                /**
-                                 * @var $field Field
-                                 */
-                                $field = $e->sender;
-                                \skeeks\cms\admin\assets\JqueryMaskInputAsset::register(\Yii::$app->view);
-                                $id = \yii\helpers\Html::getInputId($field->model, $field->attribute);
-                                \Yii::$app->view->registerJs(<<<JS
-                        $("#{$id}").mask("+7 999 999-99-99");
-JS
-        );
-                            }
-                        ],
-                    ]
+                    'class'   => BackendModelUpdateAction::class,
+                    'name'    => ['skeeks/cms', 'Personal data'],
+                    'fields'  => [$this, 'updateFields'],
                 ],
                 "change-password" => [
-                    'buttons' => ['save'],
-                    'class' => BackendModelUpdateAction::class,
-                    'name' => ['skeeks/cms', 'Change password'],
-                    'icon' => 'fa fa-key',
-                    'defaultView' => 'change-password',
-                    'on initFormModels' => function(Event $e) {
+                    'buttons'           => ['save'],
+                    'class'             => BackendModelUpdateAction::class,
+                    'name'              => ['skeeks/cms', 'Change password'],
+                    'icon'              => 'fa fa-key',
+                    'defaultView'       => 'change-password',
+                    'on initFormModels' => function (Event $e) {
                         $model = $e->sender->model;
                         $dm = new DynamicModel(['pass', 'pass2']);
                         $dm->addRule(['pass', 'pass2'], 'string', ['min' => 6]);
                         $dm->addRule(['pass', 'pass2'], 'required');
-                        $dm->addRule(['pass', 'pass2'], function($attribute) use ($dm) {
+                        $dm->addRule(['pass', 'pass2'], function ($attribute) use ($dm) {
                             if ($dm->pass != $dm->pass2) {
                                 $dm->addError($attribute, \Yii::t('skeeks/cms', 'New passwords do not match'));
                                 return false;
@@ -133,15 +99,15 @@ JS
                     },
 
                     'fields' => [
-                        'dm.pass' => [
+                        'dm.pass'  => [
                             'class' => PasswordField::class,
                             'label' => ['skeeks/cms', 'New password'],
                         ],
-                        'dm.pass2' =>  [
+                        'dm.pass2' => [
                             'class' => PasswordField::class,
                             'label' => ['skeeks/cms', 'New password (again)'],
                         ],
-                    ]
+                    ],
                 ],
             ]
         );
@@ -152,5 +118,42 @@ JS
         }
 
         return $actions;
+    }
+
+    
+    public function updateFields()
+    {
+        return [
+            'image_id' => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                'widgetConfig' => [
+                    'accept'   => 'image/*',
+                    'multiple' => false,
+                ],
+            ],
+            /*'username',*/
+            'last_name',
+            'first_name',
+            'patronymic',
+            'email',
+            'phone'    => [
+                'elementOptions'  => [
+                    'placeholder' => '+7 903 722-28-73',
+                ],
+                'on beforeRender' => function (Event $e) {
+                    /**
+                     * @var $field Field
+                     */
+                    $field = $e->sender;
+                    \skeeks\cms\admin\assets\JqueryMaskInputAsset::register(\Yii::$app->view);
+                    $id = \yii\helpers\Html::getInputId($field->model, $field->attribute);
+                    \Yii::$app->view->registerJs(<<<JS
+                        $("#{$id}").mask("+7 999 999-99-99");
+JS
+                    );
+                },
+            ],
+        ];
     }
 }
