@@ -532,6 +532,19 @@ abstract class Component extends Model implements ConfigFormInterface
             }
         }
 
+        if ($value && $attributeNames) {
+            foreach ($value as $key => $val)
+            {
+                if (!in_array($key, $attributeNames)) {
+                    unset($value[$key]);
+                }
+            }
+        }
+
+        if ($modelSettings->value && is_array($modelSettings->value) && $value && is_array($value)) {
+            $modelSettings->value = ArrayHelper::merge($modelSettings->value, $value);
+        }
+
         $modelSettings->value = $value;
         $result = $modelSettings->save();
 
