@@ -13,6 +13,7 @@ namespace skeeks\cms\components\storage;
 
 use skeeks\cms\models\StorageFile;
 use Yii;
+use yii\base\Exception;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
