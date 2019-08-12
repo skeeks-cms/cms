@@ -95,7 +95,7 @@ class Storage extends Component
                     curl_close($curl_session);
 
                     if (!$file_content) {
-                        throw new Exception("Не удалось скачать файл");
+                        throw new Exception("Не удалось скачать файл: {$file}");
                     }
 
                     $extension = pathinfo($file, PATHINFO_EXTENSION);
