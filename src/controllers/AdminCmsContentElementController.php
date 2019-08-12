@@ -392,6 +392,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
 
 
             "copy" => [
+                'priority' => 200,
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Copy'),
                 "icon"           => "fas fa-copy",
