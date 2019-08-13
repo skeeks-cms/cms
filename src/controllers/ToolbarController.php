@@ -44,7 +44,7 @@ class ToolbarController extends Controller
 
             if (\Yii::$app->cmsToolbar->editWidgets == Cms::BOOL_Y) {
                 $component = clone \Yii::$app->cmsToolbar;
-                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->setCmsUser(\Yii::$app->user->identity)->setOverride(Component::OVERRIDE_USER);
                 $component->editWidgets = Cms::BOOL_N;
 
                 if (!$component->save(true, ['editWidgets'])) {
@@ -54,7 +54,7 @@ class ToolbarController extends Controller
                 }
             } else {
                 $component = clone \Yii::$app->cmsToolbar;
-                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->setCmsUser(\Yii::$app->user->identity)->setOverride(Component::OVERRIDE_USER);
                 $component->editWidgets = Cms::BOOL_Y;
 
                 if (!$component->save(true, ['editWidgets'])) {
@@ -63,6 +63,8 @@ class ToolbarController extends Controller
                     return $rr;
                 }
             }
+            
+            \Yii::$app->cmsToolbar->invalidateCache();
 
             return $rr;
         }
@@ -77,7 +79,7 @@ class ToolbarController extends Controller
 
             if (\Yii::$app->cmsToolbar->editViewFiles == Cms::BOOL_Y) {
                 $component = clone \Yii::$app->cmsToolbar;
-                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->setCmsUser(\Yii::$app->user->identity)->setOverride(Component::OVERRIDE_USER);
                 $component->editViewFiles = Cms::BOOL_N;
 
                 if (!$component->save(true, ['editViewFiles'])) {
@@ -87,7 +89,7 @@ class ToolbarController extends Controller
                 }
             } else {
                 $component = clone \Yii::$app->cmsToolbar;
-                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->setCmsUser(\Yii::$app->user->identity)->setOverride(Component::OVERRIDE_USER);
                 $component->editViewFiles = Cms::BOOL_Y;
 
                 if (!$component->save(true, ['editViewFiles'])) {
@@ -96,7 +98,9 @@ class ToolbarController extends Controller
                     return $rr;
                 }
             }
-
+            
+            \Yii::$app->cmsToolbar->invalidateCache();
+            
             return $rr;
         }
     }
@@ -108,7 +112,7 @@ class ToolbarController extends Controller
 
             if (\Yii::$app->request->post('isOpen') == "true") {
                 $component = clone \Yii::$app->cmsToolbar;
-                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->setCmsUser(\Yii::$app->user->identity)->setOverride(Component::OVERRIDE_USER);
                 $component->isOpen = Cms::BOOL_Y;
 
                 if (!$component->save(true, ['isOpen'])) {
@@ -121,7 +125,7 @@ class ToolbarController extends Controller
                 $rr->success = true;
             } else {
                 $component = clone \Yii::$app->cmsToolbar;
-                $component->setCmsUser(\Yii::$app->user)->setOverride(Component::OVERRIDE_USER);
+                $component->setCmsUser(\Yii::$app->user->identity)->setOverride(Component::OVERRIDE_USER);
                 $component->isOpen = Cms::BOOL_N;
 
                 if (!$component->save(true, ['isOpen'])) {
@@ -134,7 +138,7 @@ class ToolbarController extends Controller
                 $rr->message = 'Сохранено';
                 $rr->success = true;
             }
-
+            
             return $rr;
         }
     }
