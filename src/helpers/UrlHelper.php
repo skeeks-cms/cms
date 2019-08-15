@@ -190,7 +190,7 @@ class UrlHelper
     public function setCurrentRef()
     {
         if (!$this->getRef()) {
-            return $this->setRef(\Yii::$app->request->getUrl());
+            return $this->setRef(Url::current());
         }
 
         return $this;
@@ -227,6 +227,7 @@ class UrlHelper
      */
     public function createUrl()
     {
+        return Url::to($this->toArray());
         return \Yii::$app->urlManager->createUrl($this->toArray());
     }
 
@@ -235,6 +236,7 @@ class UrlHelper
      */
     public function createAbsoluteUrl()
     {
+        //return Url::to($this->toArray(), true);
         return \Yii::$app->urlManager->createAbsoluteUrl($this->toArray());
     }
 

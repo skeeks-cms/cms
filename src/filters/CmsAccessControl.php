@@ -10,6 +10,7 @@ namespace skeeks\cms\filters;
 
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use yii\helpers\Url;
 use yii\web\ForbiddenHttpException;
 use yii\web\User;
 
@@ -31,14 +32,15 @@ class CmsAccessControl extends \yii\filters\AccessControl
         $rr = new RequestResponse();
 
         if ($user->getIsGuest()) {
-            $authUrl = UrlHelper::construct(["/cms/auth/login"])->setCurrentRef()->createUrl();
+            $authUrl = UrlHelper::construct(["/cms/auth/login"])->setCurrentRef()->createAbsoluteUrl();
 
             if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
                 \Yii::$app->getResponse()->redirect($authUrl);
                 $rr->redirect = $authUrl;
                 return (array)$rr;
             } else {
-                \Yii::$app->getResponse()->redirect($authUrl);
+                \Yii::$app->response->redirect($authUrl);
+                \Yii::$app->end();
             }
 
         } else {
