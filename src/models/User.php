@@ -647,10 +647,10 @@ class User
             $userName = \skeeks\cms\helpers\StringHelper::substr($this->email, 0, strpos() );
         }*/
 
-        $userLast = static::find()->orderBy("id DESC")->one();
+        $userLast = static::find()->orderBy("id DESC")->limit(1)->one();
         $this->username = "id" . ($userLast->id + 1);
 
-        if (static::find()->where(['username' => $this->username])->one()) {
+        if (static::find()->where(['username' => $this->username])->limit(1)->one()) {
             $this->username = $this->username . "_" . \skeeks\cms\helpers\StringHelper::substr(md5(time()), 0, 6);
         }
 

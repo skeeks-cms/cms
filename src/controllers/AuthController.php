@@ -14,27 +14,20 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\actions\LogoutAction;
 use skeeks\cms\base\Controller;
-use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\AjaxRequestResponse;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsUserEmail;
-use skeeks\cms\models\forms\LoginForm;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
 use skeeks\cms\models\forms\SignupForm;
-use skeeks\cms\models\User;
+use skeeks\cms\models\UserAuthClient;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
-use skeeks\cms\models\UserAuthClient;
+use Yii;
 use yii\authclient\BaseOAuth;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
-use yii\helpers\Url;
 use yii\web\Response;
-use yii\widgets\ActiveForm;
-use \Yii;
 
 /**
  * Class AuthController
@@ -49,25 +42,25 @@ class AuthController extends Controller
                 'access' =>
                     [
                         'class' => \yii\filters\AccessControl::className(),
-                        'only' => ['logout', 'login'],
+                        'only'  => ['logout', 'login'],
                         'rules' => [
                             [
                                 'actions' => [
                                     'login',
                                 ],
-                                'allow' => true,
-                                'roles' => ['?'],
+                                'allow'   => true,
+                                'roles'   => ['?'],
                             ],
                             [
                                 'actions' => ['logout'],
-                                'allow' => true,
-                                'roles' => ['@'],
+                                'allow'   => true,
+                                'roles'   => ['@'],
                             ],
                         ],
                     ],
 
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class'   => VerbFilter::className(),
                     'actions' => [
                         'logout' => ['post'],
                     ],
@@ -155,7 +148,7 @@ class AuthController extends Controller
                 if ($ref = UrlHelper::getCurrent()->getRef()) {
                     $rr->redirect = $ref;
                 } else {
-                    $rr->redirect = Yii::$app->getUser()->getReturnUrl(); ;
+                    $rr->redirect = Yii::$app->getUser()->getReturnUrl();;
                 }
             } else {
                 $rr->message = 'Не удалось авторизоваться';
@@ -256,28 +249,36 @@ class AuthController extends Controller
         //Запрос ajax post
         if ($rr->isRequestAjaxPost()) {
 
-            $t = \Yii::$app->db->beginTransaction();
+            if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
 
-            try {
 
-                if ($model->load(\Yii::$app->request->post()) && $registeredUser = $model->signup()) {
+                $t = \Yii::$app->db->beginTransaction();
 
-                    $t->commit();
+                try {
 
-                    $rr->success = true;
-                    $rr->message = 'Для дальнейших действий, проверьте вашу почту.';
+                    $registeredUser = $model->signup();
+                    if ($registeredUser) {
 
-                    return $rr;
+                        $t->commit();
 
-                } else {
-                    $rr->message = 'Не удалось зарегистрироваться';
+                        $rr->success = true;
+                        $rr->message = 'Для дальнейших действий, проверьте вашу почту.';
+
+                        return $rr;
+
+                    } else {
+                        $rr->success = false;
+                        $rr->message = 'Не удалось зарегистрироваться';
+                    }
+
+                } catch (\Exception $e) {
+                    $t->rollBack();
+                    throw $e;
                 }
-
-            } catch (\Exception $e) {
-                $t->rollBack();
-                throw $e;
+            } else {
+                $rr->success = false;
+                $rr->message = 'Не удалось зарегистрироваться';
             }
-
 
             return (array)$rr;
 
@@ -312,17 +313,17 @@ class AuthController extends Controller
                     [
                         '@app/mail' =>
                             [
-                                '@skeeks/cms/mail-templates'
-                            ]
+                                '@skeeks/cms/mail-templates',
+                            ],
                     ]);
 
                 \Yii::$app->mailer->compose('@app/mail/new-password', [
-                    'user' => $user,
-                    'password' => $password
+                    'user'     => $user,
+                    'password' => $password,
                 ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($user->email)
-                    ->setSubject('Новый пароль для ' . \Yii::$app->cms->appName)
+                    ->setSubject('Новый пароль для '.\Yii::$app->cms->appName)
                     ->send();
 
                 $rr->success = true;
