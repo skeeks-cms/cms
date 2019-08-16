@@ -227,7 +227,7 @@ class UrlHelper
      */
     public function createUrl()
     {
-        return Url::to($this->toArray());
+        //return Url::to($this->toArray());
         return \Yii::$app->urlManager->createUrl($this->toArray());
     }
 
