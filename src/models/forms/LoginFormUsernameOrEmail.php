@@ -38,8 +38,12 @@ class LoginFormUsernameOrEmail extends Model
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
+
+            ['identifier', 'validateEmailIsApproved'],
         ];
     }
+
+
 
     /**
      * @return array
@@ -53,6 +57,22 @@ class LoginFormUsernameOrEmail extends Model
         ];
     }
 
+    /**
+     * Validates the password.
+     * This method serves as the inline validation for password.
+     *
+     * @param string $attribute the attribute currently being validated
+     * @param array $params the additional name-value pairs given in the rule
+     */
+    public function validateEmailIsApproved($attribute, $params)
+    {
+        if (!$this->hasErrors()) {
+            $user = $this->getUser();
+            if (\Yii::$app->cms->auth_only_email_is_approved && !$user->email_is_approved) {
+                $this->addError($attribute, \Yii::t('skeeks/cms', 'Вам необходимо подтвердить ваш email. Для этого перейдите по ссылке из письма.'));
+            }
+        }
+    }
     /**
      * Validates the password.
      * This method serves as the inline validation for password.

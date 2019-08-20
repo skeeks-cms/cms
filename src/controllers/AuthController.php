@@ -17,6 +17,8 @@ use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\AjaxRequestResponse;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsUser;
+use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
 use skeeks\cms\models\forms\SignupForm;
@@ -42,15 +44,8 @@ class AuthController extends Controller
                 'access' =>
                     [
                         'class' => \yii\filters\AccessControl::className(),
-                        'only'  => ['logout', 'login'],
+                        'only'  => ['logout'],
                         'rules' => [
-                            [
-                                'actions' => [
-                                    'login',
-                                ],
-                                'allow'   => true,
-                                'roles'   => ['?'],
-                            ],
                             [
                                 'actions' => ['logout'],
                                 'allow'   => true,
@@ -334,6 +329,56 @@ class AuthController extends Controller
         }
 
         return $this->render('reset-password', (array)$rr);
+    }
+
+
+    /**
+     * @return string|Response
+     */
+    public function actionApproveEmail()
+    {
+        $rr = new RequestResponse();
+        $token = \Yii::$app->request->get('token');
+
+        if (!$token) {
+            return $this->goHome();
+        }
+
+        /**
+         * @var $cmsUserEmail CmsUserEmail
+         */
+        $cmsUserEmail = CmsUserEmail::find()->where(['approved_key' => $token])->one();
+
+        if ($cmsUserEmail) {
+            $cmsUserEmail->is_approved = 1;
+            $cmsUserEmail->approved_key_at = null;
+            $cmsUserEmail->approved_key = null;
+
+
+            if ($cmsUserEmail->save()) {
+
+                if ($cmsUserEmail->cmsUser->email == $cmsUserEmail->value) {
+                    $user = $cmsUserEmail->cmsUser;
+                    $user->email_is_approved = 1;
+                    if (!$user->save()) {
+                        print_r($user->errors);die;
+                    }
+                }
+
+                $rr->success = true;
+                $rr->message = 'Поздравляем! Ваш email успешно подтвержден и теперь вы можете авторизоваться на сайте.';
+
+            } else {
+                $rr->success = false;
+                $rr->message = 'Ошибка, скорее всего данная ссылка уже устарела';
+            }
+
+
+        } else {
+            $rr->message = 'Ошибка, скорее всего данная ссылка уже устарела';
+        }
+
+        return $this->render('approve-email', (array)$rr);
     }
 
 

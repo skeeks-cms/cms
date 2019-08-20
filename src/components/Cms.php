@@ -40,6 +40,7 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeColor;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeComboText;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
+use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
@@ -90,9 +91,21 @@ class Cms extends \skeeks\cms\base\Component
      * @var string Это изображение показывается в тех случаях, когда не найдено основное.
      */
     public $noImageUrl;
+
+    /**
+     * @var array
+     */
     public $registerRoles = [
         CmsManager::ROLE_USER,
     ];
+
+    /**
+     * Авторизация на сайте разрешена только с проверенными email
+     * @var bool
+     */
+    public $auth_only_email_is_approved = 0;
+
+
 
     //После регистрации пользователю будут присвоены эти роли
     /**
@@ -283,6 +296,7 @@ class Cms extends \skeeks\cms\base\Component
             [['registerRoles'], 'safe'],
             [['tree_max_code_length'], 'integer'],
             [['element_max_code_length'], 'integer'],
+            [['auth_only_email_is_approved'], 'integer'],
         ]);
     }
     public function attributeLabels()
@@ -295,6 +309,7 @@ class Cms extends \skeeks\cms\base\Component
             'registerRoles'           => 'При регистрации добавлять в группу',
             'tree_max_code_length'    => 'Максимальная длинна кода (url) разделов',
             'element_max_code_length' => 'Максимальная длинна кода (url) элементов',
+            'auth_only_email_is_approved' => 'Разрешить авторизацию на сайте только с подтвержденными email?',
         ]);
     }
     public function attributeHints()
@@ -303,6 +318,7 @@ class Cms extends \skeeks\cms\base\Component
             'adminEmail'    => 'E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.',
             'noImageUrl'    => 'Это изображение показывается в тех случаях, когда не найдено основное.',
             'registerRoles' => 'Так же после созданию пользователя, ему будут назначены, выбранные группы.',
+            'auth_only_email_is_approved' => 'Если эта опция включена то пользователь, который не подтвердил свой email не сможет авторизоваться на сайте.',
         ]);
     }
     /**
@@ -348,6 +364,10 @@ class Cms extends \skeeks\cms\base\Component
                         'multiple' => true,
                         'items' => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'),
                     ],
+                    'auth_only_email_is_approved' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false
+                    ]
                 ],
             ],
 
