@@ -41,6 +41,7 @@ use yii\bootstrap\Alert;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
@@ -281,6 +282,11 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         ],
                         'active'       => [
                             'class' => BooleanColumn::class,
+                        ],
+                        'name'       => [
+                            'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+                                return Html::a($model->name, "#", ['class' => 'sx-trigger-action']);
+                            }
                         ],
                         'image_id'     => [
                             'class' => ImageColumn2::class,
