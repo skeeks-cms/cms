@@ -14,11 +14,11 @@ class m191020_015515__alter_table__cms_user_email extends Migration
 
     public function safeUp()
     {
-        /*$this->dropForeignKey("cms_user_email_user_id", "{{%cms_user_email}}");
+        $this->dropForeignKey("cms_user_email_user_id", "{{%cms_user_email}}");
         $this->dropIndex("user_id", "{{%cms_user_email}}");
 
         $this->renameColumn("{{%cms_user_email}}", "user_id", "cms_user_id");
-        $this->createIndex("cms_user_id", "{{%cms_user_email}}", "cms_user_id");*/
+        $this->createIndex("cms_user_id", "{{%cms_user_email}}", "cms_user_id");
 
         $this->addForeignKey(
             "cms_user_email__cms_user_id", "{{%cms_user_email}}",
