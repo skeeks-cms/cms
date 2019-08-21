@@ -16,8 +16,18 @@ if (!$resetLink) {
 --><?/*= Html::endTag('h1'); */?>
 
 <?= Html::beginTag('p'); ?>
-Здравствуйте!<br><br>Для вашего email мы получили запрос на смену пароля на сайте <?= Html::a(\Yii::$app->name,
-    \yii\helpers\Url::home(true)) ?>.<br>
-<?= Html::a("Проследуйте по ссылке", $resetLink) ?> и мы вам пришлем новый пароль.
-<br><br><small>Если вы не запрашивали смену пароля, просто проигнорируйте это письмо.</small>
+Здравствуйте!
 <?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('p'); ?>
+Мы получили запрос на восстановление пароля для <?= $user->email; ?> для сайта <?= Html::a(\Yii::$app->name, \yii\helpers\Url::home(true)); ?>.
+<?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('p'); ?>
+Если Вы хотите восстановить пароль, кликните по ссылке: <?= Html::a($resetLink, $resetLink) ?>
+<?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('p'); ?>
+Если Вы НЕ запрашивали восстановление пароля, просто проигнорируйте это письмо.
+<?= Html::endTag('p'); ?>
+

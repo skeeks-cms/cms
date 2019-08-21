@@ -6,11 +6,15 @@ use yii\helpers\Html;
 /* @var $user common\models\User */
 ?>
 
-<h1 style="color:#1D5800;font-size:32px;font-weight:normal;margin-bottom:13px;margin-top:20px;">Новый пароль
-    на <?= \Yii::$app->cms->appName; ?></h1>
+<?= Html::beginTag('p'); ?>
+Здравствуйте!
+<?= Html::endTag('p'); ?>
 
-<p style="font:Arial,Helvetica,sans-serif;">
-    Здравствуйте!<br><br>Для авторизации на сайте <?= Html::a(\Yii::$app->cms->appName, \yii\helpers\Url::home(true)) ?>
-    используйте новый пароль.<br>
-    <b><?= $password ?></b>
-</p>
+<?= Html::beginTag('p'); ?>
+Используйте новый пароль <b><?= $password ?></b> для авторизации на сайте <?= Html::a(\Yii::$app->cms->appName, \yii\helpers\Url::home(true)) ?>.
+<?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('p'); ?>
+При необходимости Вы сможете изменить его в личном Кабинете.
+<?= Html::endTag('p'); ?>
+
