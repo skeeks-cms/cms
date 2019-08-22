@@ -663,7 +663,7 @@ class CmsContentElement extends RelatedElementModel
             if ($newImage2) {
                 $newImage2->delete();
             }
-            \Yii::$app->db->rollBack();
+            $transaction->rollBack();
             throw $e;
         }
     }
