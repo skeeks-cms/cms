@@ -57,7 +57,16 @@ $this->registerJs(<<<JS
                 }
             }
 
+            if (sx.Window.openerWidget()) {
+                sx.Window.openerWidgetTriggerEvent('selectFile', {
+                    'file': file
+                });
+                
+                return this;
+            }
+            
             sx.alert(file);
+            
             return this;
         }
     });
