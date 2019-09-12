@@ -19,6 +19,8 @@ use yii\db\ActiveRecord;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidParamException;
 
 /**
  * @property RelatedPropertyModel[] $properties
@@ -609,7 +611,7 @@ class RelatedPropertiesModel extends DynamicModel
      * Sets the named attribute value.
      * @param string $name the attribute name
      * @param mixed  $value the attribute value.
-     * @throws InvalidParamException if the named attribute does not exist.
+     * @throws InvalidArgumentException if the named attribute does not exist.
      * @see hasAttribute()
      */
     public function setAttribute($name, $value)
@@ -617,7 +619,7 @@ class RelatedPropertiesModel extends DynamicModel
         if ($this->hasAttribute($name)) {
             $this->$name = $value;
         } else {
-            throw new InvalidParamException(get_class($this).' '.\Yii::t('skeeks/cms',
+            throw new InvalidArgumentException(get_class($this).' '.\Yii::t('skeeks/cms',
                     'has no attribute named "{name}".', ['name' => $name]));
         }
     }
