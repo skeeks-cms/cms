@@ -202,7 +202,7 @@ class User
                 'skipOnEmpty' => false,
                 'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
                 'maxFiles' => 1,
-                'maxSize' => 1024 * 1024 * 1,
+                'maxSize' => 1024 * 1024 * 5,
                 'minSize' => 1024,
             ],
 
