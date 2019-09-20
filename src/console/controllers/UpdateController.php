@@ -39,6 +39,8 @@ class UpdateController extends Controller
      */
     public function actionUserNameToFirstName()
     {
+        ini_set("memory_limit", "1G");
+
         if (!CmsUser::find()->count()) {
             $this->stdout("Content not found!\n", Console::BOLD);
             return;
