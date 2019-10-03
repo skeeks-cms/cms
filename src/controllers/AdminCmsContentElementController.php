@@ -852,6 +852,9 @@ HTML
     }
     public function update($adminAction)
     {
+        $is_saved = false;
+        $redirect = "";
+
         /**
          * @var $model CmsContentElement
          */
@@ -882,11 +885,11 @@ HTML
                 if ($model->save() && $relatedModel->save()) {
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
+                    $is_saved = true;
+
                     if (\Yii::$app->request->post('submit-btn') == 'apply') {
                     } else {
-                        return $this->redirect(
-                            $this->url
-                        );
+                        $redirect = $this->url;
                     }
 
                     $model->refresh();
@@ -899,6 +902,9 @@ HTML
         return $this->render('_form', [
             'model'        => $model,
             'relatedModel' => $relatedModel,
+            'is_saved' => $is_saved,
+            'submitBtn' => \Yii::$app->request->post('submit-btn'),
+            'redirect' => $redirect,
         ]);
     }
     /**
