@@ -210,7 +210,6 @@ JS
 <?php endif; ?>
 
 
-
 <?= $form->buttonsStandart($model); ?>
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <?php ActiveForm::end(); ?>
