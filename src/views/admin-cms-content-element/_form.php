@@ -28,7 +28,9 @@ if ($model->isNewRecord) {
         <div class="row">
             <div class="col-md-12">
                 <div class="pull-right">
-                    <a href='<?= $model->url; ?>' target='_blank' class="btn btn-default btn-sm" title="<?= \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i class="glyphicon glyphicon-arrow-right"></i></a>
+                    <a href='<?= $model->url; ?>' target='_blank' class="btn btn-default btn-sm" title="<?= \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
                 </div>
 
             </div>

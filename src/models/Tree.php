@@ -66,6 +66,7 @@ use yii\helpers\Url;
  * @property integer $redirect_code
  * @property string $name_hidden
  * @property string $view_file
+ * @property string $seo_h1
  *
  * ***
  *
@@ -94,7 +95,8 @@ use yii\helpers\Url;
  * @property CmsContentProperty2tree[] $cmsContentProperty2trees
  * @property CmsContentProperty[] $cmsContentProperties
  *
- *
+ * @property string                      $seoName
+ * 
  * @property Tree $parent
  * @property Tree[] $parents
  * @property Tree[] $children
@@ -272,6 +274,16 @@ class Tree extends Core
     /**
      * @inheritdoc
      */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'seo_h1' => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.'
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
@@ -307,6 +319,7 @@ class Tree extends Core
             'redirect_code' => Yii::t('skeeks/cms', 'Redirect Code'),
             'name_hidden' => Yii::t('skeeks/cms', 'Hidden Name'),
             'view_file' => Yii::t('skeeks/cms', 'Template'),
+            'seo_h1' => Yii::t('skeeks/cms', 'SEO заголовок h1'),
         ]);
     }
 
@@ -326,6 +339,7 @@ class Tree extends Core
             [['priority', 'tree_type_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
+            [['seo_h1'], 'string', 'max' => 255],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
             [['cms_site_id'], 'integer'],
@@ -764,7 +778,7 @@ class Tree extends Core
      *
      * @return string
      */
-    public function getfullName($glue = " / ")
+    public function getFullName($glue = " / ")
     {
         $paths = [];
 
@@ -790,6 +804,22 @@ class Tree extends Core
     {
         return $this->getChildren()->active();
     }
+    
+    /**
+     * Полное название
+     * 
+     * @return string
+     */
+    public function getSeoName()
+    {
+        $result = "";
+        if ($this->seo_h1) {
+            return $this->seo_h1;
+        } else {
+            return $this->name;
+        }
+    }
+    
 }
 
 

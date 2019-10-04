@@ -52,6 +52,7 @@ use yii\helpers\Url;
  * @property string                      $meta_title
  * @property string                      $meta_description
  * @property string                      $meta_keywords
+ * @property string                      $seo_h1
  *
  * @property integer                     $parent_content_element_id version > 2.4.8
  *
@@ -87,6 +88,7 @@ use yii\helpers\Url;
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
  * @property CmsUser[]                   $usersToFavorites
+ * @property string                      $seoName
  *
  */
 class CmsContentElement extends RelatedElementModel
@@ -224,6 +226,7 @@ class CmsContentElement extends RelatedElementModel
             'treeIds'                   => Yii::t('skeeks/cms', 'Additional sections'),
             'parent_content_element_id' => Yii::t('skeeks/cms', 'Parent element'),
             'show_counter'              => Yii::t('skeeks/cms', 'Number of views'),
+            'seo_h1' => Yii::t('skeeks/cms', 'SEO заголовок h1'),
         ]);
     }
     /**
@@ -233,6 +236,7 @@ class CmsContentElement extends RelatedElementModel
     {
         return array_merge(parent::attributeHints(), [
             'treeIds' => Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.'),
+            'seo_h1' => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.'
         ]);
     }
     /**
@@ -261,6 +265,7 @@ class CmsContentElement extends RelatedElementModel
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
+            [['seo_h1'], 'string', 'max' => 255],
             [
                 ['content_id', 'code'],
                 'unique',
@@ -665,6 +670,21 @@ class CmsContentElement extends RelatedElementModel
             }
             $transaction->rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * Полное название
+     *
+     * @return string
+     */
+    public function getSeoName()
+    {
+        $result = "";
+        if ($this->seo_h1) {
+            return $this->seo_h1;
+        } else {
+            return $this->name;
         }
     }
 }

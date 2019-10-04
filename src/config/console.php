@@ -27,7 +27,16 @@ $config =
                 'baseUrl' => '',
                 //'hostInfo' => 'https://demo.ru'
             ]
+        ],
 
+        'controllerMap' => [
+            'migrate' => [
+                'class'         => 'yii\console\controllers\MigrateController',
+                'migrationPath' => [
+                    '@app/migrations',
+                    '@skeeks/cms/migrations',
+                ],
+            ],
         ]
     ];
 

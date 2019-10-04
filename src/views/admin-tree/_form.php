@@ -38,7 +38,10 @@ $action = $controller->action;
                     </a>
                 </div>
                 <div class="pull-right">
-
+                    <a href="<?= $model->url ?>" target="_blank" class="btn-xs btn btn-secondary btn-default"
+                       title="<?= Yii::t('skeeks/cms', 'Watch to site (opens new window)') ?>">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -258,6 +261,7 @@ JS
 <?= $form->fieldSetEnd() ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'SEO')); ?>
+<?= $form->field($model, 'seo_h1'); ?>
 <?= $form->field($model, 'meta_title')->textarea(); ?>
 <?= $form->field($model, 'meta_description')->textarea(); ?>
 <?= $form->field($model, 'meta_keywords')->textarea(); ?>
