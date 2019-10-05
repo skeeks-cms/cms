@@ -49,6 +49,10 @@ class UserColumnData extends DataColumn
      */
     protected function renderDataCellContent($model, $key, $index)
     {
+        /*if (!isset($model->{$this->attribute})){
+            return '';
+        }*/
+
         $userId = (int)$model->{$this->attribute};
         $user = User::findOne($userId);
 

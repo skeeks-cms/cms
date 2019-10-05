@@ -99,6 +99,9 @@ class BooleanColumn extends DataColumn
      */
     public function getDataCellValue($model, $key, $index)
     {
+        /*if (!isset($model->{$key})) {
+            return '';
+        }*/
         $value = parent::getDataCellValue($model, $key, $index);
 
         if (is_integer($value)) {

@@ -41,6 +41,7 @@
             var self = this;
 
             this.jForm = $("#" + this.id);
+            this.beforeSubmitProcess = false;
 
             this.AjaxQuery = sx.ajax.preparePostQuery(this.jForm.attr('action'));
 
@@ -92,10 +93,12 @@
 
             this.on('start', function () {
                 //console.log('start');
+                self.beforeSubmitProcess = true;
                 self.Blocker.block();
             });
 
             this.on('stop', function () {
+                self.beforeSubmitProcess = false;
                 self.Blocker.unblock();
                 self.InProgress = false;
                 self.IsSubmitProcess = false;
@@ -114,6 +117,11 @@
             });*/
 
             this.jForm.on('afterValidate', function (event, messages, errorAttributes) {
+
+                if (self.beforeSubmitProcess === false) {
+                    console.log('Это просто валидация, форму еще не отправляли');
+                    return false;
+                }
 
                 if (self.InProgress === true) {
                     console.log('Еще идет предыдущая отправка!');
