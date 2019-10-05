@@ -51,6 +51,7 @@ $r = new ReflectionClass($component);
 
 
 <?
+\skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
@@ -60,7 +61,7 @@ $this->registerJs(<<<JS
         {
             this.Iframe = new sx.classes.Iframe('sx-test', {
                 'autoHeight'        : true,
-                'heightSelector'    : '.sx-panel-content',
+                'heightSelector'    : 'body',
                 'minHeight'         : 800
             });
         },
