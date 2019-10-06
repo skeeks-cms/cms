@@ -73,6 +73,7 @@ use yii\web\IdentityInterface;
  * @property []   $roleNames
  *
  * @property string $displayName
+ * @property string $shortDisplayName
  * @property string $isOnline Пользователь онлайн?
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
@@ -798,6 +799,18 @@ class User
         } else
         {
             return false;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getShortDisplayName()
+    {
+        if ($this->last_name || $this->first_name) {
+            return implode(" ", [$this->last_name, $this->first_name]);
+        } else {
+            return $this->displayName;
         }
     }
 }
