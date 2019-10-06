@@ -65,11 +65,11 @@ CSS
         "viewNodeContentFile" => '@skeeks/cms/views/admin-tree/_tree-node',
 
         'pjaxClass' => \skeeks\cms\modules\admin\widgets\Pjax::class,
-        'pjaxOptions' =>
+        /*'pjaxOptions' =>
             [
                 'blockPjaxContainer' => false,
                 'blockContainer' => '.sx-panel',
-            ]
+            ]*/
     ]); ?>
     <?
     \yii\jui\Sortable::widget();

@@ -24,7 +24,6 @@ class AdminUserEmailController extends AdminModelEditorController
         $this->modelClassName = CmsUserEmail::className();
 
         parent::init();
-
     }
 
 }

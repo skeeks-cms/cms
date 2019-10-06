@@ -94,10 +94,10 @@ JS
         <div class="sx-upload-sources">
 
             <div class="btn-group">
-              <button type="button" id="source-simpleUpload-{$this->id}" class="btn btn-default source-simpleUpload">
-                  <i class="glyphicon glyphicon-download-alt"></i> {$str_upload}
+              <button type="button" id="source-simpleUpload-{$this->id}" class="btn btn-default btn-secondary source-simpleUpload">
+                  <i class="fas fa-download"></i> {$str_upload}
               </button>
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <button type="button" class="btn btn-default btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                 <span class="caret"></span>
                 <span class="sr-only">{$str_togg_drop}</span>
               </button>
