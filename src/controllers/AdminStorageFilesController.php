@@ -112,14 +112,16 @@ JS
                                          */
                                         $query = $e->dataProvider->query;
 
-                                        /*if ($e->field->value) {
+                                        if ($e->field->value) {
                                             $query->andWhere([
                                                 'or',
-                                                ['like', CmsContentElement::tableName().'.name', $e->field->value],
-                                                ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
-                                                ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
+                                                ['like', CmsStorageFile::tableName().'.name', $e->field->value],
+                                                ['like', CmsStorageFile::tableName().'.original_name', $e->field->value],
+                                                ['like', CmsStorageFile::tableName().'.name_to_save', $e->field->value],
+                                                ['like', CmsStorageFile::tableName().'.description_short', $e->field->value],
+                                                ['like', CmsStorageFile::tableName().'.description_full', $e->field->value],
                                             ]);
-                                        }*/
+                                        }
                                     },
                                 ],
 

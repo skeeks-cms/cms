@@ -40,12 +40,7 @@ echo $this->render('table', [
                 'edit') . "</a>)",
         \Yii::t('skeeks/cms', 'Environment ({yii_env})', ['yii_env' => 'YII_ENV']) => $application['env'],
         \Yii::t('skeeks/cms', 'Development mode ({yii_debug})',
-            ['yii_debug' => 'YII_DEBUG']) => $application['debug'] ? \Yii::t('skeeks/cms',
-            'Yes') : \Yii::t('skeeks/cms', 'No'),
-        \Yii::t('skeeks/cms',
-            "Checks environment variables") . ' (APP_ENV_GLOBAL_FILE)' => $autoEnvFile . " <a class='btn btn-xs btn-default' title='" . APP_ENV_GLOBAL_FILE . "'>i</a>"
-
-        ,
+            ['yii_debug' => 'YII_DEBUG']) => $application['debug'] ? \Yii::t('skeeks/cms', 'Yes') : \Yii::t('skeeks/cms', 'No'),
     ],
 ]);
 ?>

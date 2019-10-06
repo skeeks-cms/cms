@@ -326,12 +326,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
 
                         'view' => [
                             'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
-                                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl,
+                                return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $model->absoluteUrl,
                                     [
                                         'target'    => '_blank',
                                         'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
                                         'data-pjax' => '0',
-                                        'class'     => 'btn btn-default btn-sm',
+                                        'class'     => 'btn btn-sm',
                                     ]);
                             },
                             'format' => 'raw',
