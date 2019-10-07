@@ -17,6 +17,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
+use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
@@ -177,22 +178,20 @@ class AdminUserController extends BackendModelStandartController
                         'checkbox',
                         'actions',
                         'id',
-                        'image_id',
-                        'displayName',
+                        //'image_id',
+                        //'displayName',
                         'created_at',
                         'logged_at',
                         'role',
                         'active',
                     ],
                     'columns'        => [
-                        'displayName' => [
-                            'label'  => 'Данные пользователя',
+                        'id' => [
+                            //'label'  => 'Данные пользователя',
                             'format' => 'raw',
-                            'value'  => function ($cmsUser) {
-                                $data[] = $cmsUser->username;
-                                if ($cmsUser->displayName && $cmsUser->displayName != $cmsUser->username) {
-                                    $data[] = $cmsUser->displayName;
-                                }
+                            'value'  => function (CmsUser $cmsUser) {
+                                //$data[] = $cmsUser->asText;
+                                $data[] = Html::a($cmsUser->asText, "#");
                                 if ($cmsUser->phone) {
                                     $data[] = $cmsUser->phone;
                                 }
@@ -200,7 +199,17 @@ class AdminUserController extends BackendModelStandartController
                                     $data[] = $cmsUser->email;
                                 }
 
-                                return implode("<br />", $data);
+                                $info = implode("<br />", $data);
+
+                                return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
+                                                <div class='sx-trigger-action' style='width: 50px;'>
+                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
+                                                    <img src='". ($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc()) ."' style='max-width: 50px; border-radius: 50%;' />
+                                                </a>
+                                                </div>
+                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
+
+                                            ;
                             },
                         ],
                         'created_at'  => [
