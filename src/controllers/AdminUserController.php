@@ -25,6 +25,7 @@ use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\RbacModule;
 use skeeks\cms\widgets\ActiveForm;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
@@ -204,7 +205,8 @@ class AdminUserController extends BackendModelStandartController
                                     foreach ($roles as $role) {
                                         $rolesData[] = Html::tag('label', $role->description, [
                                             'title' => $role->name,
-                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5",
+                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5 " . ($role->name == 'root' ? 'u-label-danger' : ''),
+                                            'style' => "font-size: 11px;",
                                         ]);
                                     }
                                 }

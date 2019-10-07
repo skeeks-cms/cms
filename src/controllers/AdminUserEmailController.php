@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 
@@ -15,7 +16,7 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
  * Class AdminUserEmailController
  * @package skeeks\cms\controllers
  */
-class AdminUserEmailController extends AdminModelEditorController
+class AdminUserEmailController extends BackendModelStandartController
 {
     public function init()
     {
