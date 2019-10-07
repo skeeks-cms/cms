@@ -182,7 +182,7 @@ class AdminUserController extends BackendModelStandartController
                         //'displayName',
                         'created_at',
                         'logged_at',
-                        'role',
+                        //'role',
                         'active',
                     ],
                     'columns'        => [
@@ -198,6 +198,21 @@ class AdminUserController extends BackendModelStandartController
                                 if ($cmsUser->email) {
                                     $data[] = $cmsUser->email;
                                 }
+
+                                $rolesData = [];
+                                if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
+                                    foreach ($roles as $role) {
+                                        $rolesData[] = Html::tag('label', $role->description, [
+                                            'title' => $role->name,
+                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5",
+                                        ]);
+                                    }
+                                }
+
+                                if ($rolesData) {
+                                    $data[] = implode("", $rolesData);
+                                }
+
 
                                 $info = implode("<br />", $data);
 
