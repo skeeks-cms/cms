@@ -11,7 +11,7 @@
 $widget = $this->context;
 ?>
 <?= \yii\helpers\Html::beginTag('li', [
-    "class" => "sx-tree-node " . ($widget->isOpenNode($model) ? " open" : ""),
+    "class" => "sx-tree-node sx-tree-node-{$model->id} " . ($widget->isOpenNode($model) ? " open" : ""),
     "data-id" => $model->id,
     "title" => ""
 ]); ?>

@@ -78,8 +78,34 @@ if ($additionalName) {
     ?>
 
 
+    <div class="pull-left sx-controll-act">
 
-    <?= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+    <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-first-action-trigger"
+           data-id="<?= $model->id; ?>"
+
+    >
+        <span
+                    class="fa fa-edit"></span>
+    </a>
+
+    </div>
+
+    <div class="pull-left sx-controll-act">
+
+    <?php echo \skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget::widget([
+        'actions'             => $controller->modelActions,
+        'isOpenNewWindow'     => true,
+        'rightClickSelectors' => ['.sx-tree-node-' . $model->id],
+        'button'              => [
+            'class' => 'btn btn-xs btn-default sx-btn-caret-action',
+            'style' => '',
+            'tag'   => 'a',
+            'label' => '<i class="fa fa-caret-down"></i>',
+        ],
+    ]); ?>
+
+    </div>
+    <?/*= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
         "actions" => $controller->modelActions,
         "renderFirstAction" => true,
         "wrapperOptions" => ['class' => "dropdown pull-left"],
@@ -87,7 +113,7 @@ if ($additionalName) {
             [
                 'pjax-id' => $widget->pjax->id
             ]
-    ]); ?>
+    ]); */?>
     <div class="pull-left sx-controll-act">
         <a href="#" class="btn-tree-node-controll btn btn-default btn-sm add-tree-child"
            title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>" data-id="<?= $model->id; ?>"><span

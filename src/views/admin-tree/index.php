@@ -7,6 +7,21 @@
  */
 /* @var $this yii\web\View */
 
+$this->registerJs(<<<JS
+
+$("body").on("dblclick", ".sx-tree-node", function() {
+    $(".sx-first-action", $(this)).click();
+    return false;
+});
+
+$("body").on("click", ".sx-first-action-trigger", function() {
+    $(".sx-first-action", $(this).closest('.sx-tree-node')).click();
+    return false;
+});
+
+JS
+);
+
 $this->registerCss(<<<CSS
 
 .sx-tree ul li.sx-tree-node .row .sx-controll-node

@@ -15,38 +15,6 @@ $controller = $this->context;
 $action = $controller->action;
 
 ?>
-
-    <div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="pull-left">
-                    <?php if ($model->parents) : ?>
-                        <?php foreach ($model->parents as $tree) : ?>
-                            <a href="<?= $tree->url ?>" target="_blank"
-                               title="<?= \Yii::t('skeeks/cms', 'Watch to site (opens new window)') ?>">
-                                <?= $tree->name ?>
-                                <?php if ($tree->level == 0) : ?>
-                                    [<?= $tree->site->name; ?>]
-                                <?php endif; ?>
-                            </a>
-                            /
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                    <a href="<?= $model->url ?>" target="_blank"
-                       title="<?= Yii::t('skeeks/cms', 'Watch to site (opens new window)') ?>">
-                        <?= $model->name; ?>
-                    </a>
-                </div>
-                <div class="pull-right">
-                    <a href="<?= $model->url ?>" target="_blank" class="btn-xs btn btn-secondary btn-default"
-                       title="<?= Yii::t('skeeks/cms', 'Watch to site (opens new window)') ?>">
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
 <?php $form = $action->beginActiveForm([
     'id' => 'sx-dynamic-form',
     'enableAjaxValidation' => false,
