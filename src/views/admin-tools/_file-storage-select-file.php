@@ -49,10 +49,10 @@ $searchModel = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsStorageFile::
 $dataProvider   = $search->search(\Yii::$app->request->queryParams);
 $searchModel    = $search->loadedModel;
 
-echo $this->render('@skeeks/cms/views/admin-storage-files/_search', [
+/*echo $this->render('@skeeks/cms/views/admin-storage-files/_search', [
     'searchModel' => $searchModel,
     'dataProvider' => $dataProvider
-]); ?>
+]); */?>
 
 <?php $dataProvider->pagination->defaultPageSize = 10; ?>
 
