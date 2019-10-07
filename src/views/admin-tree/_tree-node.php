@@ -97,12 +97,12 @@ if ($additionalName) {
         <a href="<?= $model->absoluteUrl; ?>" target="_blank"
            class="btn-tree-node-controll btn btn-default btn-sm show-at-site"
            title="<?= \Yii::t('skeeks/cms', "Show at site"); ?>">
-            <span class="fa fa-eye"></span>
+            <span class="fas fa-external-link-alt"></span>
         </a>
     </div>
     <?php if ($model->level > 0) : ?>
         <div class="pull-left sx-controll-act">
-            <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-tree-move"
+            <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-tree-move" style="cursor: move;"
                title="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>">
                 <span class="fa fa-arrows"></span>
             </a>
