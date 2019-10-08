@@ -29,8 +29,7 @@ return [
             'name'        => \skeeks\cms\rbac\CmsManager::ROLE_ADMIN,
             'description' => ['skeeks/cms', 'Admin'],
 
-            'child' =>
-                [
+            'child' => [
                     //Обладает возможностями всех ролей
                     /*'roles' =>
                     [
@@ -40,15 +39,17 @@ return [
                     ],*/
 
                     //Есть доступ к системе администрирования
-                    'permissions' =>
-                        [
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+                    'permissions' => [
+                        \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
+                        \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
-                        ],
+                        \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                        \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+                        \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
+
+                        "cms/admin-cms-site",
+                        "cms/admin-cms-lang",
+                    ],
                 ],
         ],
 
@@ -56,8 +57,7 @@ return [
             'name'        => \skeeks\cms\rbac\CmsManager::ROLE_MANGER,
             'description' => ['skeeks/cms', 'Manager (access to the administration)'],
 
-            'child' =>
-                [
+            'child' => [
                     //Обладает возможностями всех ролей
                     /*'roles' =>
                     [
@@ -66,8 +66,7 @@ return [
                     ],*/
 
                     //Есть доступ к системе администрирования
-                    'permissions' =>
-                        [
+                    'permissions' => [
                             \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                             \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
@@ -81,8 +80,7 @@ return [
             'name'        => \skeeks\cms\rbac\CmsManager::ROLE_EDITOR,
             'description' => ['skeeks/cms', 'Editor (access to the administration)'],
 
-            'child' =>
-                [
+            'child' => [
                     //Обладает возможностями всех ролей
                     /*'roles' =>
                     [
@@ -90,8 +88,7 @@ return [
                     ],*/
 
                     //Есть доступ к системе администрирования
-                    'permissions' =>
-                        [
+                    'permissions' => [
                             \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
                             \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
@@ -106,12 +103,12 @@ return [
             'description' => ['skeeks/cms', 'Registered user'],
 
             //Есть доступ к системе администрирования
-            'child' => [
+            'child'       => [
                 'permissions' => [
                     \skeeks\cms\components\Cms::UPA_PERMISSION,
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
                 ],
-            ]
+            ],
 
         ],
 
@@ -170,6 +167,15 @@ return [
         [
             'name'        => \skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT,
             'description' => ['skeeks/cms', 'The ability to manage user groups'],
+        ],
+
+        [
+            'name'        => 'cms/admin-cms-site',
+            'description' => ['skeeks/cms', 'Управление сайтами'],
+        ],
+        [
+            'name'        => '"cms/admin-cms-lang',
+            'description' => ['skeeks/cms', 'Управление языками'],
         ],
     ],
 

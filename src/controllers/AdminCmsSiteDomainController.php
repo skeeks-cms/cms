@@ -28,6 +28,9 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
         $this->modelShowAttribute = "domain";
         $this->modelClassName = CmsSiteDomain::class;
 
+        $this->generateAccessActions = false;
+        $this->permissionName = 'cms/admin-cms-site';
+
         parent::init();
     }
 
@@ -84,6 +87,7 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
          * @var $model CmsSiteDomain
          */
         $model = $action->model;
+        $model->load(\Yii::$app->request->get());
 
         if ($code = \Yii::$app->request->get('cms_site_id'))
         {

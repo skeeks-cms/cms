@@ -29,6 +29,8 @@ class AdminCmsLangController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = CmsLang::class;
 
+        $this->generateAccessActions = false;
+
         parent::init();
     }
 

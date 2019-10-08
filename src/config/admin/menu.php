@@ -255,8 +255,7 @@ return
             ],
 
 
-        'settings' =>
-            [
+        'settings' => [
                 'priority' => 300,
                 'label'    => \Yii::t('skeeks/cms', 'Settings'),
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
@@ -268,7 +267,7 @@ return
                             "url"   => ["/cms/admin-cms-site"],
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
 
-                            'items' => [
+                            /*'items' => [
                                 [
                                     "label" => \Yii::t('skeeks/cms', 'Sites'),
                                     "url"   => ["/cms/admin-cms-site"],
@@ -279,7 +278,7 @@ return
                                     "url"   => ["/cms/admin-cms-site-domain"],
                                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
                                 ],
-                            ],
+                            ],*/
                         ],
 
 
