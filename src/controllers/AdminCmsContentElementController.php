@@ -845,6 +845,9 @@ HTML
 
     public function create($adminAction)
     {
+        $is_saved = false;
+        $redirect = "";
+
         $modelClassName = $this->modelClassName;
         $model = new $modelClassName;
 
@@ -883,6 +886,8 @@ HTML
                 if ($model->save() && $relatedModel->save()) {
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
+                    $is_saved = true;
+
                     if (\Yii::$app->request->post('submit-btn') == 'apply') {
                         $url = '';
                         $this->model = $model;
@@ -897,11 +902,9 @@ HTML
                             $url = $this->url;
                         }
 
-                        return $this->redirect($url);
+                        $redirect = $url;
                     } else {
-                        return $this->redirect(
-                            $this->url
-                        );
+                        $redirect = $this->url;
                     }
                 }
             }
@@ -911,6 +914,10 @@ HTML
         return $this->render('_form', [
             'model'        => $model,
             'relatedModel' => $relatedModel,
+
+            'is_saved' => $is_saved,
+            'submitBtn' => \Yii::$app->request->post('submit-btn'),
+            'redirect' => $redirect,
         ]);
     }
     public function update($adminAction)
