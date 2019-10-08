@@ -199,6 +199,9 @@ class AdminUserController extends BackendModelStandartController
                                 if ($cmsUser->email) {
                                     $data[] = $cmsUser->email;
                                 }
+                                if ($cmsUser->phone) {
+                                    $data[] = $cmsUser->phone;
+                                }
 
                                 $rolesData = [];
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
@@ -221,7 +224,7 @@ class AdminUserController extends BackendModelStandartController
                                 return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
                                                 <div class='sx-trigger-action' style='width: 50px;'>
                                                 <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='". ($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc()) ."' style='max-width: 50px; border-radius: 50%;' />
+                                                    <img src='". ($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc()) ."' style='max-width: 50px; width: 50px; height: 50px; border-radius: 50%;' />
                                                 </a>
                                                 </div>
                                                 <div style='margin-left: 5px;'>" . $info . "</div></div>";

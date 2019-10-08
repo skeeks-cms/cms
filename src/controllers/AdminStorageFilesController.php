@@ -28,6 +28,7 @@ use yii\base\Event;
 use yii\db\ActiveRecord;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\Response;
 
 /**
@@ -207,13 +208,23 @@ JS
                                         $result[] = $model->original_name;
                                     }
 
+                                    $result[] = Html::tag('label', $model->extension, [
+                                        'title' => $model->extension,
+                                        'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
+                                        'style' => "font-size: 11px;",
+                                    ]) . Html::tag('label', $model->mime_type, [
+                                        'title' => $model->mime_type,
+                                        'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
+                                        'style' => "font-size: 11px;",
+                                    ]);
+
                                     $info = implode("<br />", $result);
 
-                                    if ($model->isImage()) {
+                                    if ($model->isImage() && $model->size < 1024 * 1024 * 4) {
 
                                         $smallImage = \Yii::$app->imaging->getImagingUrl($model->src,
                                             new \skeeks\cms\components\imaging\filters\Thumbnail());
-                                        return "<div class='row no-gutters'>
+                                        return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
                                                 <div class='' style='width: 50px;'>
                                                 <a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms', 'Increase')."'>
                                                     <img src='".$smallImage."' style='max-width: 50px; border-radius: 50%;' />
@@ -223,9 +234,13 @@ JS
                                             ;
                                     }
 
-                                    return "<div class='row no-gutters'>
+                                    return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
                                                 <div class='' style='width: 50px;'><a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms', 'Increase')."'>" . \yii\helpers\Html::tag('span', $model->extension,
-                                        ['class' => 'label label-primary u-label u-label-primary', 'style' => 'font-size: 18px;'])
+                                        ['class' => 'label label-primary u-label u-label-primary', 'style' => 'font-size: 18px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    line-height: 38px;'])
                                         . "</a></div>
                                                 <div style='margin-left: 5px;'>" . $info . "</div></div>";
                                 },
