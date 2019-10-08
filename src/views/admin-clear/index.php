@@ -62,7 +62,7 @@ $this->registerJs(<<<JS
                 var ajax = sx.ajax.preparePostQuery(this.get("backend"));
 
                 new sx.classes.AjaxHandlerStandartRespose(ajax);
-                new sx.classes.AjaxHandlerNoLoader(ajax);
+                //new sx.classes.AjaxHandlerNoLoader(ajax);
 
                 new sx.classes.AjaxHandlerBlocker(ajax, {
                     'wrapper': '.sx-panel .panel-content'

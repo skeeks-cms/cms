@@ -30,27 +30,36 @@ return [
             'description' => ['skeeks/cms', 'Admin'],
 
             'child' => [
-                    //Обладает возможностями всех ролей
-                    /*'roles' =>
-                    [
-                        \skeeks\cms\rbac\CmsManager::ROLE_MANGER,
-                        \skeeks\cms\rbac\CmsManager::ROLE_EDITOR,
-                        \skeeks\cms\rbac\CmsManager::ROLE_USER,
-                    ],*/
+                //Есть доступ к системе администрирования
+                'permissions' => [
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
-                    //Есть доступ к системе администрирования
-                    'permissions' => [
-                        \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-                        \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
 
-                        \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                        \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
-                        \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
+                    "cms/admin-cms-site",
+                    "cms/admin-cms-lang",
 
-                        "cms/admin-cms-site",
-                        "cms/admin-cms-lang",
-                    ],
+                    "cms/admin-tree",
+                    "cms/admin-tree/new-children",
+                    "cms/admin-tree/update",
+                    "cms/admin-tree/delete",
+                    "cms/admin-tree/delete-multi",
+                    "cms/admin-tree/list",
+                    "cms/admin-tree/move",
+                    "cms/admin-tree/resort",
+
+                    "cms/admin-storage-files",
+                    "cms/admin-storage-files/upload",
+                    "cms/admin-storage-files/index",
+                    "cms/admin-storage-files/update",
+                    "cms/admin-storage-files/delete",
+                    "cms/admin-storage-files/download",
+                    "cms/admin-storage-files/delete-tmp-dir",
                 ],
+            ],
         ],
 
         [
@@ -58,22 +67,32 @@ return [
             'description' => ['skeeks/cms', 'Manager (access to the administration)'],
 
             'child' => [
-                    //Обладает возможностями всех ролей
-                    /*'roles' =>
-                    [
-                        \skeeks\cms\rbac\CmsManager::ROLE_EDITOR,
-                        \skeeks\cms\rbac\CmsManager::ROLE_USER,
-                    ],*/
 
-                    //Есть доступ к системе администрирования
-                    'permissions' => [
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
-                        ],
+                //Есть доступ к системе администрирования
+                'permissions' => [
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+
+                    "cms/admin-tree",
+                    "cms/admin-tree/new-children",
+                    "cms/admin-tree/update",
+                    "cms/admin-tree/move",
+                    "cms/admin-tree/resort",
+                    "cms/admin-tree/delete/own",
+
+                    "cms/admin-storage-files",
+                    "cms/admin-storage-files/upload",
+                    "cms/admin-storage-files/index",
+                    "cms/admin-storage-files/update",
+                    "cms/admin-storage-files/download",
+                    "cms/admin-storage-files/delete/own",
+                    "cms/admin-storage-files/delete-tmp-dir",
                 ],
+            ],
         ],
 
         [
@@ -81,21 +100,31 @@ return [
             'description' => ['skeeks/cms', 'Editor (access to the administration)'],
 
             'child' => [
-                    //Обладает возможностями всех ролей
-                    /*'roles' =>
-                    [
-                        \skeeks\cms\rbac\CmsManager::ROLE_USER,
-                    ],*/
 
-                    //Есть доступ к системе администрирования
-                    'permissions' => [
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
+                //Есть доступ к системе администрирования
+                'permissions' => [
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                            \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
-                        ],
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
+
+                    "cms/admin-tree",
+                    "cms/admin-tree/new-children",
+                    "cms/admin-tree/update/own",
+                    "cms/admin-tree/delete/own",
+                    "cms/admin-tree/move/own",
+
+
+                    "cms/admin-storage-files",
+                    "cms/admin-storage-files/upload",
+                    "cms/admin-storage-files/index/own",
+                    "cms/admin-storage-files/delete-tmp-dir/own",
+                    "cms/admin-storage-files/download/own",
+                    "cms/admin-storage-files/delete/own",
+                    "cms/admin-storage-files/update/own",
                 ],
+            ],
         ],
 
         [
@@ -174,8 +203,28 @@ return [
             'description' => ['skeeks/cms', 'Управление сайтами'],
         ],
         [
-            'name'        => '"cms/admin-cms-lang',
+            'name'        => 'cms/admin-cms-lang',
             'description' => ['skeeks/cms', 'Управление языками'],
+        ],
+        [
+            'name'        => 'cms/admin-storage-files',
+            'description' => ['skeeks/cms', 'Управление языками'],
+        ],
+        [
+            'name'        => 'cms/admin-storage-files/index',
+            'description' => ['skeeks/cms', 'Просмотр списка своих файлов'],
+        ],
+        [
+            'name'        => 'cms/admin-storage-files/index/own',
+            'description' => ['skeeks/cms', 'Просмотр списка своих файлов'],
+        ],
+        [
+            'name'        => 'cms/admin-tree/resort',
+            'description' => ['skeeks/cms', 'Сортировать подразделы'],
+        ],
+        [
+            'name'        => 'cms/admin-tree/new-children',
+            'description' => ['skeeks/cms', 'Создать подраздел'],
         ],
     ],
 

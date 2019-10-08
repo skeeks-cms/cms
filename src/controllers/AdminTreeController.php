@@ -12,6 +12,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
@@ -65,6 +66,7 @@ class AdminTreeController extends AdminModelEditorController
                 'class'    => AdminAction::className(),
                 'name'     => \Yii::t('skeeks/cms', 'Tree'),
                 'callback' => [$this, 'indexAction'],
+                'accessCallback' => true,
             ],
 
             'list' => [
@@ -76,6 +78,20 @@ class AdminTreeController extends AdminModelEditorController
 
             'create' => [
                 'visible' => false,
+            ],
+
+            'new-children' => [
+                'class' => BackendAction::class,
+                'isVisible' => false,
+                'name' => "Создать подраздел",
+                'callback' => [$this, 'actionNewChildren'],
+            ],
+
+            'resort' => [
+                'class' => BackendAction::class,
+                'isVisible' => false,
+                'name' => "Сортировать подразделы",
+                'callback' => [$this, 'actionResort'],
             ],
 
             "update" => [

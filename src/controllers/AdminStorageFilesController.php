@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\RequestResponse;
@@ -29,6 +30,7 @@ use yii\db\ActiveRecord;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\UnsetArrayValue;
 use yii\web\Response;
 
 /**
@@ -54,9 +56,9 @@ class AdminStorageFilesController extends BackendModelStandartController
                 'class'   => VerbFilter::className(),
                 'actions' => [
                     'upload'         => ['post'],
-                    'remote-upload'  => ['post'],
-                    'link-to-model'  => ['post'],
-                    'link-to-models' => ['post'],
+                    //'remote-upload'  => ['post'],
+                    /*'link-to-model'  => ['post'],
+                    'link-to-models' => ['post'],*/
                 ],
             ],
         ]);
@@ -67,7 +69,18 @@ class AdminStorageFilesController extends BackendModelStandartController
     {
         return ArrayHelper::merge(parent::actions(),
             [
+                'upload' => [
+                    'class' => BackendAction::class,
+                    'name' => "Загрузить файлы",
+                    'isVisible' => false,
+                    'priority' => 10,
+                    'callback' => [$this, 'actionUpload'],
+                ],
+
                 'index' => [
+                    'accessCallback' => function() {
+                        return (\Yii::$app->user->can("cms/admin-storage-files/index") || \Yii::$app->user->can("cms/admin-storage-files/index/own"));
+                    },
                     'on beforeRender' => function(Event $event) {
                         $event->content = \skeeks\cms\widgets\StorageFileManager::widget([
     'clientOptions' =>
@@ -131,6 +144,11 @@ JS
                     ],
                     'grid'    => [
                         'on init'        => function (Event $event) {
+
+                            if (!\Yii::$app->user->can("cms/admin-storage-files/index") && \Yii::$app->user->can("cms/admin-storage-files/index/own")) {
+                                $query = $event->sender->dataProvider->query;
+                                $query->andWhere(['created_by' => \Yii::$app->user->identity->id]);
+                            }
                             /*/**
                              * @var $query ActiveQuery
                             $query = $event->sender->dataProvider->query;
@@ -260,6 +278,8 @@ JS
                     ],
                 ],
 
+
+
                 'delete-tmp-dir' =>
                     [
                         'priority' => 200,
@@ -281,10 +301,7 @@ JS
                         "callback" => [$this, 'actionDownload'],
                     ],
 
-                'create' =>
-                    [
-                        'isVisible' => false,
-                    ],
+                'create' => new UnsetArrayValue(),
             ]);
     }
 
@@ -377,7 +394,7 @@ JS
         return $response;
     }
 
-    public function actionRemoteUpload()
+    public function _actionRemoteUpload()
     {
         $response =
             [
@@ -418,7 +435,7 @@ JS
      * @see skeeks\cms\widgets\formInputs\StorageImage
      * @return RequestResponse
      */
-    public function actionLinkToModel()
+    public function _actionLinkToModel()
     {
         $rr = new RequestResponse();
 
@@ -486,7 +503,7 @@ JS
      * @see skeeks\cms\widgets\formInputs\StorageImage
      * @return RequestResponse
      */
-    public function actionLinkToModels()
+    public function _actionLinkToModels()
     {
         $rr = new RequestResponse();
 

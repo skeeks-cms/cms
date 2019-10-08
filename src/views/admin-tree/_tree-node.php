@@ -78,34 +78,36 @@ if ($additionalName) {
     ?>
 
 
-    <div class="pull-left sx-controll-act">
+    <?php if (\Yii::$app->user->can('cms/admin-tree/update', ['model' => $model])) : ?>
+        <div class="pull-left sx-controll-act">
 
-    <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-first-action-trigger"
-           data-id="<?= $model->id; ?>"
+            <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-first-action-trigger"
+               data-id="<?= $model->id; ?>"
 
-    >
+            >
         <span
-                    class="fa fa-edit"></span>
-    </a>
+                class="fa fa-edit"></span>
+            </a>
 
-    </div>
+        </div>
+    <?php endif; ?>
 
     <div class="pull-left sx-controll-act">
 
-    <?php echo \skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget::widget([
-        'actions'             => $controller->modelActions,
-        'isOpenNewWindow'     => true,
-        'rightClickSelectors' => ['.sx-tree-node-' . $model->id],
-        'button'              => [
-            'class' => 'btn btn-xs btn-default sx-btn-caret-action',
-            'style' => '',
-            'tag'   => 'a',
-            'label' => '<i class="fa fa-caret-down"></i>',
-        ],
-    ]); ?>
+        <?php echo \skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget::widget([
+            'actions'             => $controller->modelActions,
+            'isOpenNewWindow'     => true,
+            'rightClickSelectors' => ['.sx-tree-node-'.$model->id],
+            'button'              => [
+                'class' => 'btn btn-xs btn-default sx-btn-caret-action',
+                'style' => '',
+                'tag'   => 'a',
+                'label' => '<i class="fa fa-caret-down"></i>',
+            ],
+        ]); ?>
 
     </div>
-    <?/*= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+    <? /*= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
         "actions" => $controller->modelActions,
         "renderFirstAction" => true,
         "wrapperOptions" => ['class' => "dropdown pull-left"],
@@ -113,12 +115,14 @@ if ($additionalName) {
             [
                 'pjax-id' => $widget->pjax->id
             ]
-    ]); */?>
-    <div class="pull-left sx-controll-act">
-        <a href="#" class="btn-tree-node-controll btn btn-default btn-sm add-tree-child"
-           title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>" data-id="<?= $model->id; ?>"><span
-                    class="fa fa-plus"></span></a>
-    </div>
+    ]); */ ?>
+    <?php if (\Yii::$app->user->can('cms/admin-tree/new-children')) : ?>
+        <div class="pull-left sx-controll-act">
+            <a href="#" class="btn-tree-node-controll btn btn-default btn-sm add-tree-child"
+               title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>" data-id="<?= $model->id; ?>"><span
+                        class="fa fa-plus"></span></a>
+        </div>
+    <?php endif; ?>
     <div class="pull-left sx-controll-act">
         <a href="<?= $model->absoluteUrl; ?>" target="_blank"
            class="btn-tree-node-controll btn btn-default btn-sm show-at-site"
@@ -126,7 +130,7 @@ if ($additionalName) {
             <span class="fas fa-external-link-alt"></span>
         </a>
     </div>
-    <?php if ($model->level > 0) : ?>
+    <?php if ($model->level > 0 && \Yii::$app->user->can('cms/admin-tree/resort')) : ?>
         <div class="pull-left sx-controll-act">
             <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-tree-move" style="cursor: move;"
                title="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>">
@@ -182,17 +186,17 @@ JS
         );
 
         $data = \yii\helpers\ArrayHelper::merge($model->toArray(), [
-            'url' => $model->url,
-            'image' => $model->image ? $model->image->src : '',
-            'fullName' => $model->fullName
+            'url'      => $model->url,
+            'image'    => $model->image ? $model->image->src : '',
+            'fullName' => $model->fullName,
         ]);
 
-        echo \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('skeeks/cms',
+        echo \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms',
                 'Choose'), '#', [
-            'class' => 'btn btn-primary btn-xs sx-controll-act',
-            'style' => 'float: left;',
-            'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode($data) . '); return false;',
-            'data-pjax' => 0
+            'class'     => 'btn btn-primary btn-xs sx-controll-act',
+            'style'     => 'float: left;',
+            'onclick'   => 'sx.SelectCmsElement.submit('.\yii\helpers\Json::encode($data).'); return false;',
+            'data-pjax' => 0,
         ]);
         ?>
     <?php endif; ?>

@@ -146,7 +146,7 @@ CSS
                                 }
                             );
 
-                            new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+                            //new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
                             new sx.classes.AjaxHandlerNotify(ajax, {
                                 'error': "Изменения не сохранились",
                                 'success': "Изменения сохранены",
@@ -187,7 +187,7 @@ CSS
                                         }
                                 );
 
-                                new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+                                //new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
 
                                 new sx.classes.AjaxHandlerNotify(ajax, {
                                     'error': "Не удалось добавить новый раздел",
