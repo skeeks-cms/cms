@@ -92,21 +92,22 @@ if ($additionalName) {
         </div>
     <?php endif; ?>
 
-    <div class="pull-left sx-controll-act">
+    <?php $widget = \skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget::begin([
+        'actions'             => $controller->modelActions,
+        'isOpenNewWindow'     => true,
+        'rightClickSelectors' => ['.sx-tree-node-'.$model->id],
+        'button'              => [
+            'class' => 'btn btn-xs btn-default sx-btn-caret-action',
+            'style' => '',
+            'tag'   => 'a',
+            'label' => '<i class="fa fa-caret-down"></i>',
+        ],
+    ]); ?>
 
-        <?php echo \skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget::widget([
-            'actions'             => $controller->modelActions,
-            'isOpenNewWindow'     => true,
-            'rightClickSelectors' => ['.sx-tree-node-'.$model->id],
-            'button'              => [
-                'class' => 'btn btn-xs btn-default sx-btn-caret-action',
-                'style' => '',
-                'tag'   => 'a',
-                'label' => '<i class="fa fa-caret-down"></i>',
-            ],
-        ]); ?>
-
+    <div class="pull-left sx-controll-act" style="<?php echo $widget->actions ? "" : "display: none;"; ?>">
+        <?php $widget::end(); ?>
     </div>
+
     <? /*= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
         "actions" => $controller->modelActions,
         "renderFirstAction" => true,
