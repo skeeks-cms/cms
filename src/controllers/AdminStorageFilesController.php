@@ -227,7 +227,7 @@ JS
                                         return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
                                                 <div class='' style='width: 50px;'>
                                                 <a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms', 'Increase')."'>
-                                                    <img src='".$smallImage."' style='max-width: 50px; border-radius: 50%;' />
+                                                    <img src='".$smallImage."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a></div>
                                                 <div style='margin-left: 5px;'>" . $info . "</div></div>";
 

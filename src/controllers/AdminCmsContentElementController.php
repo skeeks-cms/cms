@@ -19,6 +19,7 @@ use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
+use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\IHasUrl;
 use skeeks\cms\models\CmsContent;
@@ -259,14 +260,14 @@ class AdminCmsContentElementController extends BackendModelStandartController
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
-                        'id',
+                        'custom',
 
-                        'image_id',
-                        'name',
+                        //'image_id',
+                        //'name',
 
-                        'tree_id',
-                        'additionalSections',
-                        'published_at',
+                        //'tree_id',
+                        //'additionalSections',
+                        //'published_at',
                         'priority',
 
                         'created_by',
@@ -281,11 +282,61 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             'value' => 1,
                         ],
                         'active'       => [
-                            'class' => BooleanColumn::class,
-                        ],
-                        'name'       => [
+                            //'class' => BooleanColumn::class,
+                            'format' => 'raw',
                             'value' => function (\skeeks\cms\models\CmsContentElement $model) {
-                                return Html::a($model->name, "#", ['class' => 'sx-trigger-action']);
+                                if ($model->active == "Y") {
+                                    $time = \Yii::$app->formatter->asRelativeTime($model->published_at);
+                                    $dateTime = \Yii::$app->formatter->asDatetime($model->published_at);
+                                    return <<<HTML
+<span class="fa fa-check text-success" title=""></span> <small title="{$dateTime}">{$time}</small>
+HTML;
+
+                                } else {
+                                    return <<<HTML
+<span class="fa fa-times text-danger" title=""></span>
+HTML;
+                                }
+                            }
+                        ],
+                        'custom'       => [
+                            'attribute' => 'id',
+                            'format' => 'raw',
+                            'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+
+                                $data = [];
+                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+
+                                if ($model->tree_id) {
+                                    $data[] = Html::a($model->cmsTree->fullName, $model->cmsTree->url, [
+                                        'data-pjax' => '0',
+                                        'target' => '_blank',
+                                        'style' => 'color: #333; max-width: 200px;'
+                                    ]);
+                                }
+
+                                if ($model->cmsTrees) {
+                                    foreach ($model->cmsTrees as $cmsTree)
+                                    {
+                                        $data[] = Html::a($cmsTree->fullName, $cmsTree->url, [
+                                            'data-pjax' => '0',
+                                            'target' => '_blank',
+                                            'style' => 'color: #333; max-width: 200px; '
+                                        ]);
+                                    }
+                                }
+
+                                $info = implode("<br />", $data);
+
+                                return "<div class='row no-gutters'>
+                                                <div class='sx-trigger-action' style='width: 50px;'>
+                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
+                                                    <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                </a>
+                                                </div>
+                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
+
+                                            ;
                             }
                         ],
                         'image_id'     => [
