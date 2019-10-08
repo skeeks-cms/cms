@@ -76,6 +76,18 @@ class AdminCmsContentElementController extends BackendModelStandartController
             }
         }
 
+        $this->modelHeader = function () {
+            /**
+             * @var $model CmsContentElement
+             */
+            $model = $this->model;
+            return Html::tag('h1', $model->name . Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
+                'target' => "_blank",
+                'class' => "g-ml-20",
+                'title' => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+            ]));
+        };
+
         parent::init();
 
 

@@ -23,20 +23,7 @@ if ($model->isNewRecord) {
     }
 }
 ?>
-<? if (!$model->isNewRecord) : ?>
-    <div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="pull-right">
-                    <a href='<?= $model->url; ?>' target='_blank' class="btn btn-default btn-sm" title="<?= \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>">
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
 
-            </div>
-        </div>
-    </div>
-<? endif; ?>
 
 
 <?php $form = $action->beginActiveForm([
