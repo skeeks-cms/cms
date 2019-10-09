@@ -111,10 +111,22 @@ class User
     {
         parent::init();
 
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_cmsCheckBeforeSave"]);
+
         $this->on(self::EVENT_AFTER_INSERT, [$this, "_cmsAfterSave"]);
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "_cmsAfterSave"]);
 
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
+    }
+
+    public function _cmsCheckBeforeSave($e) {
+        if (!\Yii::$app->user && !\Yii::$app->user->identity) {
+            return true;
+        }
+
+        if ($this->active == "N" && $this->id == \Yii::$app->user->identity->id) {
+            throw new Exception(\Yii::t('skeeks/cms', 'Нельзя деактивировать себя'));
+        }
     }
 
     public function _cmsAfterSave($e)

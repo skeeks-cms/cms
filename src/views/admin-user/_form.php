@@ -25,9 +25,9 @@ $action = $controller->action;
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'General information')) ?>
 
-
+<?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
 <?= $form->fieldRadioListBoolean($model, 'active'); ?>
-
+<?php endif; ?>
 <?= $form->field($model, 'gender')->radioList([
     'men' => \Yii::t('skeeks/cms', 'Male'),
     'women' => \Yii::t('skeeks/cms', 'Female'),
@@ -51,7 +51,7 @@ $action = $controller->action;
 <div class="row">
     <div class="col-md-5">
         <?= $form->field($model, 'email')->textInput(); ?>
-        <?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+        <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
             <?= $form->field($model, 'email_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
         <?php endif; ?>
     </div>
@@ -68,7 +68,7 @@ JS
         <?= $form->field($model, 'phone')->textInput([
             'placeholder' => '+7 903 722-28-73'
         ]); ?>
-        <?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+        <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
             <?= $form->field($model, 'phone_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
         <?php endif; ?>
     </div>
@@ -94,7 +94,7 @@ JS
 
 <?= $form->fieldSetEnd(); ?>
 
-<?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT)) : ?>
+<?php if (\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model])) : ?>
     <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Groups')) ?>
 
     <?php $this->registerCss(<<<CSS
@@ -105,7 +105,7 @@ JS
 CSS
     ) ?>
     <?= $form->field($model, 'roleNames')->checkboxList(
-        \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'), [
+        \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getAvailableRoles(), 'name', 'description'), [
             'class' => 'sx-checkbox'
         ]
     ); ?>

@@ -56,8 +56,19 @@ return [
                     "cms/admin-storage-files/index",
                     "cms/admin-storage-files/update",
                     "cms/admin-storage-files/delete",
+                    "cms/admin-storage-files/delete-mult",
                     "cms/admin-storage-files/download",
                     "cms/admin-storage-files/delete-tmp-dir",
+
+
+                    "cms/admin-user",
+                    "cms/admin-user/create",
+                    "cms/admin-user/update",
+                    "cms/admin-user/update-advanced",
+                    "cms/admin-user/delete",
+                    "cms/admin-user/delete-multi",
+                    "cms/admin-user/activate-multi",
+                    "cms/admin-user/deactivate-multi",
                 ],
             ],
         ],
@@ -154,6 +165,11 @@ return [
 
     'permissions' => [
         [
+            'name'        =>\skeeks\cms\rbac\CmsManager::PERMISSION_ROOT_ACCESS,
+            'description' => ['skeeks/cms', 'Возможности суперадминистратора'],
+        ],
+
+        [
             'name'        => \skeeks\cms\components\Cms::UPA_PERMISSION,
             'description' => ['skeeks/cms', 'Доступ к персональной части'],
         ],
@@ -193,10 +209,6 @@ return [
             'description' => ['skeeks/cms', 'Access to edit dashboards'],
         ],
 
-        [
-            'name'        => \skeeks\cms\rbac\CmsManager::PERMISSION_USER_FULL_EDIT,
-            'description' => ['skeeks/cms', 'The ability to manage user groups'],
-        ],
 
         [
             'name'        => 'cms/admin-cms-site',
@@ -226,6 +238,47 @@ return [
             'name'        => 'cms/admin-tree/new-children',
             'description' => ['skeeks/cms', 'Создать подраздел'],
         ],
+
+
+
+        //Управление пользователями
+        [
+            'name'        => 'cms/admin-user',
+            'description' => ['skeeks/cms', 'Управление пользователями'],
+        ],
+
+        [
+            'name'        => 'cms/admin-user/update',
+            'description' => ['skeeks/cms', 'Редактирование данных пользователя'],
+        ],
+
+        [
+            'name'        => 'cms/admin-user/create',
+            'description' => ['skeeks/cms', 'Создать пользователя'],
+        ],
+
+        [
+            'name'        => 'cms/admin-user/update-advanced',
+            'description' => ['skeeks/cms', 'Расширенное редактирование данных пользователя'],
+        ],
+
+        [
+            'name'        => 'cms/admin-user/delete',
+            'description' => ['skeeks/cms', 'Удаление пользователя'],
+        ],
+
+        /*[
+            'name'        => 'cms/admin-user/update/not-root',
+            'description' => ['skeeks/crm', 'Редактирование данных доступного пользователя'],
+            'child' => [
+                'permissions' => [
+                    'cms/admin-user/update',
+                ],
+            ],
+            'ruleName' => \skeeks\cms\rbac\rules\CmsUserNotRootRule::class
+        ],*/
+
+
     ],
 
 
