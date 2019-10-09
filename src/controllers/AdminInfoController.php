@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\admin\AdminController;
 use skeeks\cms\backend\BackendAction;
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Search;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -26,14 +27,14 @@ use yii\helpers\Url;
 use Yii;
 
 /**
- * Class InfoController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminInfoController extends AdminController
+class AdminInfoController extends BackendController
 {
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Information about the system");
+        $this->generateAccessActions = false;
 
         parent::init();
     }

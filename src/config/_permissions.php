@@ -40,6 +40,7 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
 
                     "cms/admin-settings",
+                    "cms/admin-info",
 
                     "cms/admin-cms-site",
                     "cms/admin-cms-lang",
