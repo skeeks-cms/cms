@@ -32,7 +32,7 @@ $autoEnvFile .= "<a class='btn btn-xs btn-primary' href='" . \skeeks\cms\helpers
 <?php
 echo $this->render('table', [
     'values' => [
-        'SkeekS CMS' => \Yii::$app->cms->descriptor->version,
+        'SkeekS CMS' => \Yii::$app->cms->version,
 
         \Yii::t('skeeks/cms', '{yii} Version', ['yii' => 'Yii']) => $application['yii'],
         \Yii::t('skeeks/cms',

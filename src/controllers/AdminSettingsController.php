@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -21,11 +22,13 @@ use yii\widgets\ActiveForm;
  * Class AdminSettingsController
  * @package skeeks\cms\controllers
  */
-class AdminSettingsController extends AdminController
+class AdminSettingsController extends BackendController
 {
     public function init()
     {
         $this->name = "Управление настройками";
+        $this->generateAccessActions = false;
+        //$this->permissionName = "cms/admin-settings";
         parent::init();
     }
 

@@ -9,6 +9,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\THasActiveForm;
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
@@ -29,20 +30,15 @@ use yii\widgets\ActiveForm;
  * Class AdminComponentSettingsController
  * @package skeeks\cms\controllers
  */
-class AdminComponentSettingsController extends AdminController
+class AdminComponentSettingsController extends BackendController
 {
     use THasActiveForm;
-    /**
-     * @return string
-     */
-    public function getPermissionName()
-    {
-        return "cms/admin-settings";
-    }
 
     public function init()
     {
         $this->name = "Управление настройками компонентов";
+        $this->generateAccessActions = false;
+        $this->permissionName = "cms/admin-settings";
         parent::init();
     }
 

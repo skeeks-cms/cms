@@ -19,6 +19,7 @@ use skeeks\cms\base\ComponentDescriptor;
  */
 trait HasComponentDescriptorTrait
 {
+
     /**
      * @var ComponentDescriptor
      */
@@ -33,49 +34,11 @@ trait HasComponentDescriptorTrait
      */
     public static function descriptorConfig()
     {
-        return
-            [
-                "version" => "1.0.0",
-
-                "name" => "Skeeks CMS",
-                "description" => "",
-                "keywords" => "skeeks, cms",
-
-                "homepage" => "https://cms.skeeks.com/",
-                "license" => "BSD-3-Clause",
-
-                "support" =>
-                    [
-                        "issues" => "https://www.skeeks.com/",
-                        "wiki" => "https://cms.skeeks.com/docs/",
-                        "source" => "https://github.com/skeeks-cms/cms"
-                    ],
-
-                "companies" =>
-                    [
-                        [
-                            "name" => "SkeekS",
-                            "emails" => ["info@skeeks.com", "support@skeeks.com"],
-                            "phones" => ["+7 (495) 722-28-73"],
-                            "sites" => ["skeeks.com"]
-                        ]
-                    ],
-
-                "authors" =>
-                    [
-                        [
-                            "name" => "Semenov Alexander",
-                            "emails" => ["semenov@skeeks.com"],
-                            "phones" => ["+7 (495) 722-28-73"]
-                        ],
-
-                        [
-                            "name" => "Semenov Alexander",
-                            "emails" => ["semenov@skeeks.com"],
-                            "phones" => ["+7 (495) 722-28-73"]
-                        ],
-                    ],
-            ];
+        return [
+            "name"        => "Skeeks CMS",
+            "description" => "",
+            "keywords"    => "skeeks, cms",
+        ];
     }
 
     /**

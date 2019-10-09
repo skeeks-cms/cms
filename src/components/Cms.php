@@ -60,6 +60,10 @@ use yii\widgets\ActiveForm;
  *
  * @property CmsLang[]                        $languages
  *
+ * @property string                           $version
+ * @property string                           $homePage
+ * @property string                           $cmsName
+ *
  * @property \skeeks\cms\modules\admin\Module $moduleAdmin
  * @property \skeeks\cms\Module               $moduleCms
  * @property CmsLang                          $cmsLanguage
@@ -156,15 +160,8 @@ class Cms extends \skeeks\cms\base\Component
      */
     protected $_tree = null;
     private $_relatedHandlers = [];
-    /**
-     * @return array
-     */
-    public static function descriptorConfig()
-    {
-        return array_merge(parent::descriptorConfig(), [
-            "version" => ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version'),
-        ]);
-    }
+
+
     public function renderConfigForm(ActiveForm $form)
     {
         echo \Yii::$app->view->renderFile(__DIR__.'/cms/_form.php', [
@@ -255,7 +252,7 @@ class Cms extends \skeeks\cms\base\Component
             \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function (Event $e) {
                 if (!\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
                     \Yii::$app->response->getHeaders()->setDefault('X-Powered-CMS',
-                        $this->descriptor->name." {$this->descriptor->homepage}");
+                        $this->cmsName." {$this->homePage}");
 
                     /**
                      * @var $view View
@@ -264,7 +261,7 @@ class Cms extends \skeeks\cms\base\Component
                     if (!isset($view->metaTags[self::$_huck])) {
                         $view->registerMetaTag([
                             "name"    => base64_decode(self::$_huck),
-                            "content" => $this->descriptor->name." — {$this->descriptor->homepage}",
+                            "content" => $this->cmsName." — {$this->homePage}",
                         ], self::$_huck);
                     }
 
@@ -592,5 +589,29 @@ class Cms extends \skeeks\cms\base\Component
     public function hasRelatedHandler($id)
     {
         return array_key_exists($id, $this->_relatedHandlers);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return (string) ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version');
+    }
+
+    /**
+     * @return string
+     */
+    public function getHomePage()
+    {
+        return "https://cms.skeeks.com";
+    }
+    /**
+     * @return string
+     */
+    public function getCmsName()
+    {
+        return "SkeekS CMS";
     }
 }
