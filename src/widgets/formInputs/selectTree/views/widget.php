@@ -52,9 +52,11 @@ $this->registerJs(<<<JS
 
             var self = this;
 
+            console.log(this.get('idSmartFrame'));
+            
             this.Iframe = new sx.classes.Iframe(this.get('idSmartFrame'), {
                 'autoHeight'        : true,
-                'heightSelector'    : '.sx-panel-content'
+                'heightSelector'    : 'main'
             });
 
             this.Iframe.onSxReady(function()

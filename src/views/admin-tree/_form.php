@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 $controller = $this->context;
 $action = $controller->action;
-
+\skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
 ?>
 <?php $form = $action->beginActiveForm([
     'id' => 'sx-dynamic-form',
@@ -54,6 +54,34 @@ $action = $controller->action;
 
 JS
 ); ?>
+
+
+<? if ($is_saved && @$is_create) : ?>
+    <?php $this->registerJs(<<<JS
+    sx.Window.openerWidgetTriggerEvent('model-create', {
+        'submitBtn' : '{$submitBtn}'
+    });
+JS
+    ); ?>
+
+<? elseif ($is_saved) : ?>
+    <?php $this->registerJs(<<<JS
+sx.Window.openerWidgetTriggerEvent('model-update', {
+        'submitBtn' : '{$submitBtn}'
+    });
+JS
+    ); ?>
+<? endif; ?>
+
+<? if (@$redirect) : ?>
+    <?php $this->registerJs(<<<JS
+window.location.href = '{$redirect}';
+console.log('window.location.href');
+console.log('{$redirect}');
+JS
+    ); ?>
+<? endif; ?>
+
 <?php echo $form->errorSummary([$model, $model->relatedPropertiesModel]); ?>
 
 
