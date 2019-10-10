@@ -154,12 +154,15 @@ JS
             </div>
             <div class="col-md-7">
                 <?= $form->field($model, 'redirect_tree_id')->widget(
+                    \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+                ) ?>
+                <?/*= $form->field($model, 'redirect_tree_id')->widget(
                     \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
                     [
                         "attributeSingle" => "redirect_tree_id",
                         "mode" => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_SINGLE
                     ]
-                ) ?>
+                ) */?>
             </div>
         </div>
 
