@@ -15,7 +15,7 @@
 ]); ?>
 
 
-<div class="sx-box sx-mb-10 sx-p-10">
+<div class="sx-box g-mb-10 g-pa-10">
     <p><?= \Yii::t('skeeks/cms',
             'This component may have personal preferences for each user. And it works differently depending on which of the sites is displayed.') ?></p>
     <p><?= \Yii::t('skeeks/cms',

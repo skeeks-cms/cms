@@ -157,37 +157,42 @@ JS
     <hr />-->
 <div class="row">
     <div class="col-lg-2">
-        <ul class="nav nav-pills nav-stacked">
+        <ul class="nav flex-column nav-pills">
             <li role="presentation"
-                class="<?= in_array(\Yii::$app->controller->action->id, ['index']) ? "active" : "" ?>"><a
+                class="nav-item">
+                <a class="nav-link <?= in_array(\Yii::$app->controller->action->id, ['index']) ? "active" : "" ?>"
                         href="<?= \yii\helpers\Url::to('index') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
-                    <i class="glyphicon glyphicon-asterisk"></i> <?= \Yii::t('skeeks/cms', 'The default settings') ?>
+                    <i class="fas fa-asterisk"></i> <?= \Yii::t('skeeks/cms', 'The default settings') ?>
                 </a></li>
 
             <?php if (\skeeks\cms\models\CmsSite::find()->active()->count() > 1) : ?>
                 <li role="presentation"
-                    class="<?= in_array(\Yii::$app->controller->action->id, ['sites', 'site']) ? "active" : "" ?>"><a
+                    class="nav-item">
+                    <a class="nav-link <?= in_array(\Yii::$app->controller->action->id, ['sites', 'site']) ? "active" : "" ?>"
                             href="<?= \yii\helpers\Url::to('sites') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
-                        <i class="glyphicon glyphicon-globe"></i> <?= \Yii::t('skeeks/cms', 'Sites settings') ?>
+                        <i class="fas fa-globe"></i> <?= \Yii::t('skeeks/cms', 'Sites settings') ?>
                     </a></li>
             <?php endif; ?>
 
             <li role="presentation"
-                class="<?= in_array(\Yii::$app->controller->action->id, ['users', 'user']) ? "active" : "" ?>"><a
+                class="nav-item">
+                <a class="nav-link <?= in_array(\Yii::$app->controller->action->id, ['users', 'user']) ? "active" : "" ?>"
                         href="<?= \yii\helpers\Url::to('users') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
-                    <i class="glyphicon glyphicon-user"></i> <?= \Yii::t('skeeks/cms', 'Users settings') ?>
+                    <i class="fas fa-user"></i> <?= \Yii::t('skeeks/cms', 'Users settings') ?>
                 </a></li>
             <!--<li role="presentation" class="<?php /*= \Yii::$app->controller->action->id == 'langs' ? "active" : ""*/ ?>"><a href="#">Настройки языков</a></li>-->
             <!--<li role="presentation"><a href="#">Настройки языков</a></li>-->
-            <li class="divider"></li>
+            <li class="nav-item divider"></li>
             <li role="presentation"
-                class="<?= in_array(\Yii::$app->controller->action->id, ['cache']) ? "active" : "" ?>"><a
+                class="nav-item">
+                <a class="nav-link <?= in_array(\Yii::$app->controller->action->id, ['cache']) ? "active" : "" ?>"
                         href="<?= \yii\helpers\Url::to('cache') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
-                    <i class="glyphicon glyphicon-retweet"></i> <?= \Yii::t('skeeks/cms', 'Clearing cache') ?></a>
+                    <i class="fas fa-sync"></i> <?= \Yii::t('skeeks/cms', 'Clearing cache') ?></a>
             </li>
 
             <li role="presentation"
-                class="<?= in_array(\Yii::$app->controller->action->id, ['remove']) ? "active" : "" ?>"><a
+                class="nav-item">
+                <a class="nav-link <?= in_array(\Yii::$app->controller->action->id, ['remove']) ? "active" : "" ?>"
                         href="<?= \yii\helpers\Url::to('remove') . "?" . http_build_query(\Yii::$app->request->get()); ?>">
                     <i class="fa fa-times"></i> <?= \Yii::t('skeeks/cms', 'Remove{s}Recovery',
                         ['s' => '/']) ?></a>

@@ -12,7 +12,7 @@ $data = \yii\helpers\Json::encode([
 ])
 ?>
 
-    <div class="sx-box sx-p-10 sx-bg-primary">
+    <div class="sx-box g-pa-10 sx-bg-primary">
         <?= \yii\helpers\Html::a(\Yii::t('skeeks/cms', 'Delete temporary files'), $url, [
             'class' => 'btn btn-primary',
             'onclick' => 'new sx.classes.Clear(' . $data . '); return false;'

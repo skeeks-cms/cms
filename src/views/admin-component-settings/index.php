@@ -17,7 +17,13 @@ $controller = $this->context;
 ]); ?>
 
 
-<div class="sx-box sx-mb-10 sx-p-10">
+<div class="sx-box g-mb-10">
+    <? $alert = \yii\bootstrap\Alert::begin([
+        'options' => [
+            'class' => 'alert-default'
+        ],
+        'closeButton' => false,
+    ]); ?>
     <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentDefault($component)->one()) : ?>
         <button type="submit" class="btn btn-danger btn-xs"
                 onclick="sx.ComponentSettings.Remove.removeDefault(); return false;">
@@ -30,6 +36,7 @@ $controller = $this->context;
         <small><?= \Yii::t('skeeks/cms', 'These settings not yet saved in the database') ?></small>
     <?php endif;
     ?>
+    <? $alert::end(); ?>
 </div>
 
 <?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin([

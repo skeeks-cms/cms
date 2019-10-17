@@ -18,7 +18,13 @@ $controller = $this->context;
 
 
 <h2><?= \Yii::t('skeeks/cms', 'Settings for the site') ?>: <?= $site->name; ?> (<?= $site->code; ?>)</h2>
-<div class="sx-box sx-mb-10 sx-p-10">
+<div class="sx-box g-mb-10">
+    <? $alert = \yii\bootstrap\Alert::begin([
+        'options' => [
+            'class' => 'alert-default'
+        ],
+        'closeButton' => false,
+    ]); ?>
     <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentSite($component, $site)->one()) : ?>
         <button type="submit" class="btn btn-danger btn-xs"
                 onclick="sx.ComponentSettings.Remove.removeBySite('<?= $site->code; ?>'); return false;">
@@ -31,6 +37,7 @@ $controller = $this->context;
         <small><?= \Yii::t('skeeks/cms', 'These settings not yet saved in the database') ?></small>
     <?php endif;
     ?>
+    <? $alert::end(); ?>
 </div>
 
 

@@ -15,12 +15,17 @@
 ]); ?>
 
 
-<div class="sx-box sx-mb-10 sx-p-10">
+<? $alert = \yii\bootstrap\Alert::begin([
+    'options' => [
+        'class' => 'alert-default'
+    ],
+    'closeButton' => false,
+]); ?>
     <p><?= \Yii::t('skeeks/cms', 'To improve performance, configure each component of the site is cached.') ?></p>
     <button type="submit" class="btn btn-danger btn-xs" onclick="sx.ComponentSettings.Cache.clearAll(); return false;">
         <i class="fa fa-times"></i> Сбросить кэш для всех
     </button>
-</div>
+<? $alert::end(); ?>
 
 <?= $this->render('_footer'); ?>
 
