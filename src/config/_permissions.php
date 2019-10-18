@@ -76,6 +76,10 @@ return [
                     "cms/admin-storage",
                     "cms/admin-cms-tree-type",
                     "cms/admin-cms-tree-type-property",
+                    "cms/admin-cms-tree-type-property-enum",
+
+                    "cms/admin-cms-user-universal-property",
+                    "cms/admin-cms-user-universal-property-enum",
                 ],
             ],
         ],

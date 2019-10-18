@@ -28,6 +28,8 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
         $this->modelShowAttribute = "name";
         $this->modelClassName = CmsUserUniversalProperty::class;
 
+        $this->generateAccessActions = false;
+
         parent::init();
 
     }

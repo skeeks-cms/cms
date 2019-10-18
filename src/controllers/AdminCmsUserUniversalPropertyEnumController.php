@@ -23,6 +23,8 @@ class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartCo
         $this->modelShowAttribute = "value";
         $this->modelClassName = CmsUserUniversalPropertyEnum::class;
 
+        $this->generateAccessActions = false;
+
         parent::init();
     }
 
