@@ -12,9 +12,8 @@
         <div class="row">
             <div class="col-md-12">
                 <h3><b><?= $count + 1; ?>. <?= $cluster->name; ?></b></h3>
-                <hr/>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <p><b><?= \Yii::t('skeeks/cms', 'Public file path') ?>: </b> <?= $cluster->publicBaseUrl; ?></p>
                 <p><b><?= \Yii::t('skeeks/cms', 'The folder on the server') ?>: </b> <?= $cluster->rootBasePath; ?></p>
 
@@ -33,24 +32,8 @@
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
-            <div class="col-md-5">
-                <ul class="statistics">
-                    <li>
-                        <i class="icon-pie-chart"></i>
-                        <div class="number"><?= round($cluster->getFreeSpacePct()); ?>%</div>
-                        <div class="title"><?= \Yii::t('skeeks/cms', 'Free place') ?></div>
-                        <div class="progress thin">
-                            <div class="progress-bar progress-bar-success" role="progressbar"
-                                 aria-valuenow="<?= $cluster->getFreeSpacePct(); ?>" aria-valuemin="0"
-                                 aria-valuemax="100" style="width: <?= $cluster->getFreeSpacePct(); ?>%">
-                                <span class="sr-only"><?= round($cluster->getFreeSpacePct()); ?>
-                                    % Complete (success)</span>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-3">
+
+            <div class="col-md-6">
                 <?
 
                 $baseOptions =
@@ -80,8 +63,8 @@
                                 'name' => '%',
                                 'data' =>
                                     [
-                                        [\Yii::t('skeeks/cms', 'Free'), round($cluster->getFreeSpacePct())],
-                                        [\Yii::t('skeeks/cms', 'Used'), round($cluster->getUsedSpacePct())],
+                                        [\Yii::t('skeeks/cms', 'Free') . " " . round($cluster->getFreeSpacePct()) . "%", round($cluster->getFreeSpacePct())],
+                                        [\Yii::t('skeeks/cms', 'Used') . " " . round($cluster->getUsedSpacePct()) . "%", round($cluster->getUsedSpacePct())],
                                     ]
 
                             ],

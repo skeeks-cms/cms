@@ -11,13 +11,8 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\models\searchs\Publication as PublicationSearch;
-use skeeks\cms\models\StorageFile;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
 
 /**
  * Class AdminStorageFilesController
@@ -28,20 +23,19 @@ class AdminStorageController extends AdminController
     public function init()
     {
         $this->name = "Управление серверами";
+        $this->generateAccessActions = false;
         parent::init();
     }
 
     public function actions()
     {
-        return
-            [
-                "index" =>
-                    [
-                        "class" => AdminAction::className(),
-                        "name" => "Управление серверами",
-                        "callback" => [$this, 'actionIndex'],
-                    ],
-            ];
+        return [
+            "index" => [
+                "class"    => AdminAction::className(),
+                "name"     => "Управление серверами",
+                "callback" => [$this, 'actionIndex'],
+            ],
+        ];
     }
 
     public function actionIndex()

@@ -51,7 +51,8 @@ class PropertyTypeTree extends PropertyType
         echo $activeForm->field($this, 'is_multiple')->checkbox(\Yii::$app->formatter->booleanFormat);
         echo $activeForm->fieldSelect($this, 'fieldElement', static::fieldElements());
         echo $activeForm->field($this, 'root_tree_id')->widget(
-            \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
+            ///\skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
+            SelectModelDialogTreeWidget::class
         );
     }
 

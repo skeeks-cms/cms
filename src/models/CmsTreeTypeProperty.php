@@ -113,4 +113,10 @@ class CmsTreeTypeProperty extends RelatedPropertyModel
             ],
         ]);
     }
+
+    public function asText()
+    {
+        $result = parent::asText();
+        return $result . " ($this->code)";
+    }
 }

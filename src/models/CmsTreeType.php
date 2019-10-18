@@ -71,6 +71,17 @@ class CmsTreeType extends Core
             'default_children_tree_type' => Yii::t('skeeks/cms', 'Type of child partitions by default'),
         ]);
     }
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'code' => \Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.'),
+            'view_file' => \Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.'),
+            'default_children_tree_type' => \Yii::t('skeeks/cms', 'If this parameter is not specified, the child partition is created of the same type as the current one.'),
+        ]);
+    }
 
     /**
      * @inheritdoc
@@ -153,4 +164,9 @@ class CmsTreeType extends Core
         return $this->hasMany(CmsTreeTypeProperty2type::className(), ['cms_tree_type_id' => 'id']);
     }
 
+    public function asText()
+    {
+        $result = parent::asText();
+        return $result . " ($this->code)";
+    }
 }

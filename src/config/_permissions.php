@@ -72,6 +72,10 @@ return [
                     "cms/admin-user/delete-multi",
                     "cms/admin-user/activate-multi",
                     "cms/admin-user/deactivate-multi",
+
+                    "cms/admin-storage",
+                    "cms/admin-cms-tree-type",
+                    "cms/admin-cms-tree-type-property",
                 ],
             ],
         ],
