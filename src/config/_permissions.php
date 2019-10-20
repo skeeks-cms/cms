@@ -78,6 +78,8 @@ return [
                     "cms/admin-cms-tree-type-property",
                     "cms/admin-cms-tree-type-property-enum",
 
+                    "cms/admin-cms-content-property",
+
                     "cms/admin-cms-user-universal-property",
                     "cms/admin-cms-user-universal-property-enum",
                 ],

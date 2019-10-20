@@ -125,4 +125,11 @@ class CmsContentProperty extends RelatedPropertyModel
         return $this->hasMany(CmsTree::className(), ['id' => 'cms_tree_id'])->viaTable('cms_content_property2tree',
             ['cms_content_property_id' => 'id']);
     }
+
+
+    public function asText()
+    {
+        $result = parent::asText();
+        return $result . " ($this->code)";
+    }
 }
