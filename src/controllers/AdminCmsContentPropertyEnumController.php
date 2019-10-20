@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -22,6 +23,8 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $this->name = \Yii::t('skeeks/cms', 'Managing property values');
         $this->modelShowAttribute = "value";
         $this->modelClassName = CmsContentPropertyEnum::class;
+
+        $this->generateAccessActions = false;
 
         parent::init();
     }
@@ -41,11 +44,22 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                         'checkbox',
                         'actions',
                         'id',
-                        'property_id',
                         'value',
+                        'property_id',
                         'code',
                         'priority',
                     ],
+                    'columns' => [
+                        'value' => [
+                            'attribute' => "value",
+                            'format'    => "raw",
+                            'value'     => function (CmsContentPropertyEnum $model) {
+                                return Html::a($model->value, "#", [
+                                    'class' => "sx-trigger-action",
+                                ]);
+                            },
+                        ],
+                    ]
                 ],
             ],
         ]);
