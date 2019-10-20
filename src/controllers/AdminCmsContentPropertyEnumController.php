@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -62,6 +63,37 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                     ]
                 ],
             ],
+            'create' => [
+                'fields' => [$this, 'updateFields'],
+            ],
+            'update' => [
+                'fields' => [$this, 'updateFields'],
+            ],
         ]);
+    }
+
+    public function updateFields($action)
+    {
+        /**
+         * @var $model CmsTreeTypeProperty
+         */
+        $model = $action->model;
+        //$model->load(\Yii::$app->request->get());
+
+        return [
+            'property_id' => [
+                'class' => SelectField::class,
+                'items' => function() {
+                    return \yii\helpers\ArrayHelper::map(
+                        \skeeks\cms\models\CmsContentProperty::find()->all(),
+                        "id",
+                        "name"
+                    );
+                }
+            ],
+            'value',
+            'code',
+            'priority',
+        ];
     }
 }

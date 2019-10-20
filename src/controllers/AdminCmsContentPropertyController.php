@@ -9,11 +9,16 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\yii2\form\Element;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
@@ -73,9 +78,9 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         'fields' => [
                             'component' => [
                                 //'label'    => \Yii::t('skeeks/cms', 'Content'),
-                                'field'    => [
+                                'field'             => [
                                     'class' => SelectField::class,
-                                    'items'    => function () {
+                                    'items' => function () {
                                         return \Yii::$app->cms->relatedHandlersDataForSelect;
                                     },
                                 ],
@@ -285,115 +290,132 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             ],
 
             'create' => [
-                'callback' => [$this, 'create'],
-            ],
+                'fields' => [$this, 'updateFields'],
 
-            'update' => [
-                'callback' => [$this, 'update'],
-            ],
-        ]);
-    }
+                'on beforeSave' => function (Event $e) {
+                    $model = $e->sender->model;
 
-
-    public function create()
-    {
-        $rr = new RequestResponse();
-
-        $modelClass = $this->modelClassName;
-        /**
-         * @var CmsContentProperty $model
-         */
-        $model = new $modelClass();
-        $model->loadDefaultValues();
-
-        if ($post = \Yii::$app->request->post()) {
-            $model->load($post);
-        }
-
-        $handler = $model->handler;
-
-        if ($handler) {
-            if ($post = \Yii::$app->request->post()) {
-                $handler->load($post);
-            }
-        }
-
-        if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
-                $model->component_settings = $handler->toArray();
-                $handler->load(\Yii::$app->request->post());
-
-                if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handler->validate()) {
-                    $model->save();
-
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
-
-                    return $this->redirect(
-                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                            ->toString()
-                    );
-                } else {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms', 'Could not save'));
-                }
-            }
-        }
-
-        return $this->render('_form', [
-            'model'   => $model,
-            'handler' => $handler,
-        ]);
-    }
-
-
-    public function update()
-    {
-        $rr = new RequestResponse();
-
-        $model = $this->model;
-
-        if ($post = \Yii::$app->request->post()) {
-            $model->load($post);
-        }
-
-        $handler = $model->handler;
-        if ($handler) {
-            if ($post = \Yii::$app->request->post()) {
-                $handler->load($post);
-            }
-        }
-
-        if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
-                if ($rr->isRequestPjaxPost()) {
-                    $model->component_settings = $handler->toArray();
-                    $handler->load(\Yii::$app->request->post());
-
-                    if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handler->validate()) {
-                        $model->save();
-
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Saved'));
-
-                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
-
-                        } else {
-                            return $this->redirect(
-                                $this->url
-                            );
+                    $handler = $model->handler;
+                    if ($handler) {
+                        if ($post = \Yii::$app->request->post()) {
+                            $handler->load($post);
                         }
-
-                        $model->refresh();
-
+                        $model->component_settings = $handler->toArray();
                     }
-                }
-            }
-        }
+                },
 
-        return $this->render('_form', [
-            'model'   => $model,
-            'handler' => $handler,
+            ],
+            'update' => [
+                'fields' => [$this, 'updateFields'],
+
+                'on beforeSave' => function (Event $e) {
+                    $model = $e->sender->model;
+
+
+                    $handler = $model->handler;
+                    if ($handler) {
+                        if ($post = \Yii::$app->request->post()) {
+                            $handler->load($post);
+                        }
+                        $model->component_settings = $handler->toArray();
+                    }
+
+                },
+            ],
         ]);
+    }
+
+
+    public function updateFields($action)
+    {
+        /**
+         * @var $model CmsTreeTypeProperty
+         */
+        $model = $action->model;
+        //$model->load(\Yii::$app->request->get());
+
+        return [
+            'main' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Basic settings'),
+                'fields' => [
+                    'is_required' => [
+                        'class'      => BoolField::class,
+                        'allowNull'  => false,
+                        'trueValue'  => "Y",
+                        'falseValue' => "N",
+                    ],
+                    'active'      => [
+                        'class'      => BoolField::class,
+                        'allowNull'  => false,
+                        'trueValue'  => "Y",
+                        'falseValue' => "N",
+                    ],
+                    'name',
+                    'code',
+                    'component'   => [
+                        'class'          => SelectField::class,
+                        'elementOptions' => [
+                            'data' => [
+                                'form-reload' => 'true',
+                            ],
+                        ],
+                        /*'options' => [
+                            'class' => 'teat'
+                        ],*/
+                        'items'          => function () {
+                            return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
+                        },
+                    ],
+                    [
+                        'class'           => HtmlBlock::class,
+                        'on beforeRender' => function (Event $e) use ($model) {
+                            /**
+                             * @var $formElement Element
+                             */
+                            $formElement = $e->sender;
+                            $formElement->activeForm;
+
+                            $handler = $model->handler;
+
+                            if ($handler) {
+                                if ($post = \Yii::$app->request->post()) {
+                                    $handler->load($post);
+                                }
+                                if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) {
+                                    $handler->enumRoute = 'cms/admin-cms-tree-type-property-enum';
+                                }
+                                $formElement->content = $handler->renderConfigForm($formElement->activeForm);
+                            }
+                        },
+                    ],
+                ],
+            ],
+
+            'captions' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Additionally'),
+                'fields' => [
+                    'hint',
+                    'priority',
+                    'cmsContents' => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => function () {
+                            return \yii\helpers\ArrayHelper::map(
+                                \skeeks\cms\models\CmsContent::find()->all(), 'id', 'name'
+                            );
+                        },
+                    ],
+                    'cmsTrees'    => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => SelectModelDialogTreeWidget::class,
+                        'widgetConfig' => [
+                            'multiple' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }
