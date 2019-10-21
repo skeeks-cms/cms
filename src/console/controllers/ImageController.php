@@ -65,12 +65,14 @@ class ImageController extends \yii\console\Controller
             $newSize = Image::getImagine()->open($fileRoot)->getSize();
             $storageFile->image_height = $newSize->getHeight();
             $storageFile->image_width = $newSize->getWidth();
-            $storageFile->size = filesize($fileRoot);
+
 
 
             clearstatcache();
             $fileSize = filesize($fileRoot);
             $this->stdout("\t\tnew: {$fileSize}\n");
+
+            $storageFile->size = $fileSize;
 
             if (!$storageFile->save()) {
                 throw new Exception("Не сохранились данные по новой картинке: " . print_r($storageFile->errors, true));
