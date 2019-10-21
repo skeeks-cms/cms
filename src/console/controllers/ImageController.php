@@ -75,7 +75,10 @@ class ImageController extends \yii\console\Controller
             $storageFile->size = $fileSize;
 
             if (!$storageFile->save()) {
-                throw new Exception("Не сохранились данные по новой картинке: " . print_r($storageFile->errors, true));
+                $error = "Не сохранились данные по новой картинке: " . print_r($storageFile->errors, true);
+                //throw new Exception("Не сохранились данные по новой картинке: " . print_r($storageFile->errors, true));
+                $this->stdout("\t\t{$error}\n");
+                continue;
             }
 
             $this->stdout("\t\tsaved\n");
