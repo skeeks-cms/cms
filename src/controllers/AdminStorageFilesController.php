@@ -23,10 +23,15 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\widgets\GridView;
 use Yii;
 use yii\base\ActionEvent;
 use yii\base\Event;
+use yii\base\WidgetEvent;
+use yii\bootstrap\Alert;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -129,6 +134,7 @@ JS
                                         if ($e->field->value) {
                                             $query->andWhere([
                                                 'or',
+                                                ['like', CmsStorageFile::tableName().'.id', $e->field->value],
                                                 ['like', CmsStorageFile::tableName().'.name', $e->field->value],
                                                 ['like', CmsStorageFile::tableName().'.original_name', $e->field->value],
                                                 ['like', CmsStorageFile::tableName().'.name_to_save', $e->field->value],
@@ -275,6 +281,35 @@ JS
 
 
                         ],
+
+                        'on afterRun' => function (WidgetEvent $event) {
+
+                        /**
+                         * @var $grid GridView
+                         * @var $query ActiveQuery
+                         */
+                        $grid = $event->sender;
+                        $query = clone $grid->dataProvider->query;
+
+                        $tableName = CmsStorageFile::tableName();
+                        $result = $query->select([$tableName . ".id", 'total_size' => new Expression("SUM({$tableName}.size)")])
+                            //->createCommand()->rawSql;
+                            ->asArray()->one();
+
+                        $total_size = ArrayHelper::getValue($result, 'total_size');
+                        $size = \Yii::$app->formatter->asShortSize($total_size);
+
+                        $event->result = Alert::widget([
+                            'options' => [
+                                'class' => 'alert alert-info',
+                            ],
+                            'body'    => <<<HTML
+<div class="g-font-weight-300">
+<span class="g-font-size-40">Всего: <span title="" style="">{$size}</span></span>
+</div>
+HTML
+                        ]);
+                    },
                     ],
                 ],
 
