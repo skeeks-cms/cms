@@ -9,7 +9,6 @@
 namespace skeeks\cms\console\controllers;
 
 use skeeks\cms\models\User;
-use skeeks\cms\modules\admin\components\UrlRule;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\rbac\AuthorRule;
 use Yii;
