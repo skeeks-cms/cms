@@ -56,7 +56,7 @@ class CheckboxColumn extends \yii\grid\CheckboxColumn
 
                     });
 
-                    $('.sx-grid-checkbox').on('click', function()
+                    $("body").on('click', '.sx-grid-checkbox', function()
                     {
                         if ( $(this).is(":checked") )
                         {
