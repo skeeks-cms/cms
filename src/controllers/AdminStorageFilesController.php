@@ -60,7 +60,7 @@ class AdminStorageFilesController extends BackendModelStandartController
             'verbs' => [
                 'class'   => VerbFilter::className(),
                 'actions' => [
-                    'upload'         => ['post'],
+                    'upload' => ['post'],
                     //'remote-upload'  => ['post'],
                     /*'link-to-model'  => ['post'],
                     'link-to-models' => ['post'],*/
@@ -75,35 +75,35 @@ class AdminStorageFilesController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(),
             [
                 'upload' => [
-                    'class' => BackendAction::class,
-                    'name' => "Загрузить файлы",
+                    'class'     => BackendAction::class,
+                    'name'      => "Загрузить файлы",
                     'isVisible' => false,
-                    'priority' => 10,
-                    'callback' => [$this, 'actionUpload'],
+                    'priority'  => 10,
+                    'callback'  => [$this, 'actionUpload'],
                 ],
 
                 'index' => [
-                    'accessCallback' => function() {
+                    'accessCallback'  => function () {
                         return (\Yii::$app->user->can("cms/admin-storage-files/index") || \Yii::$app->user->can("cms/admin-storage-files/index/own"));
                     },
-                    'on beforeRender' => function(Event $event) {
+                    'on beforeRender' => function (Event $event) {
                         $event->content = \skeeks\cms\widgets\StorageFileManager::widget([
-    'clientOptions' =>
-        [
-            'completeUploadFile' => new \yii\web\JsExpression(<<<JS
+                                'clientOptions' =>
+                                    [
+                                        'completeUploadFile' => new \yii\web\JsExpression(<<<JS
         function(data)
         {
             window.location.reload();
         }
 JS
-            )
-        ],
-]) . "<br />";
+                                        ),
+                                    ],
+                            ])."<br />";
                     },
-                    'on init' => function ($e) {
+                    'on init'         => function ($e) {
                         $action = $e->sender;
                     },
-                    "filters" => [
+                    "filters"         => [
                         'visibleFilters' => [
                             'q',
                             //'id',
@@ -148,7 +148,7 @@ JS
                             ],
                         ],
                     ],
-                    'grid'    => [
+                    'grid'            => [
                         'on init'        => function (Event $event) {
 
                             if (!\Yii::$app->user->can("cms/admin-storage-files/index") && \Yii::$app->user->can("cms/admin-storage-files/index/own")) {
@@ -225,22 +225,24 @@ JS
                                 'value'  => function (StorageFile $model) {
                                     $result = [];
 
+                                    if ($model->downloadName) {
+                                        $result[] = $model->downloadName;
+                                    }
+
                                     if ($model->name) {
                                         $result[] = $model->name;
                                     }
-                                    if ($model->original_name) {
-                                        $result[] = $model->original_name;
-                                    }
+
 
                                     $result[] = Html::tag('label', $model->extension, [
-                                        'title' => $model->extension,
-                                        'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
-                                        'style' => "font-size: 11px;",
-                                    ]) . Html::tag('label', $model->mime_type, [
-                                        'title' => $model->mime_type,
-                                        'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
-                                        'style' => "font-size: 11px;",
-                                    ]);
+                                            'title' => $model->extension,
+                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
+                                            'style' => "font-size: 11px;",
+                                        ]).Html::tag('label', $model->mime_type, [
+                                            'title' => $model->mime_type,
+                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
+                                            'style' => "font-size: 11px;",
+                                        ]);
 
                                     $info = implode("<br />", $result);
 
@@ -253,20 +255,22 @@ JS
                                                 <a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms', 'Increase')."'>
                                                     <img src='".$smallImage."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a></div>
-                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
-
-                                            ;
+                                                <div style='margin-left: 5px;'>".$info."</div></div>";;
                                     }
 
                                     return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
-                                                <div class='' style='width: 50px;'><a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms', 'Increase')."'>" . \yii\helpers\Html::tag('span', $model->extension,
-                                        ['class' => 'label label-primary u-label u-label-primary', 'style' => 'font-size: 18px;
+                                                <div class='' style='width: 50px;'><a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms',
+                                            'Increase')."'>".\yii\helpers\Html::tag('span', $model->extension,
+                                            [
+                                                'class' => 'label label-primary u-label u-label-primary',
+                                                'style' => 'font-size: 18px;
     border-radius: 50%;
     width: 50px;
     height: 50px;
-    line-height: 38px;'])
-                                        . "</a></div>
-                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
+    line-height: 38px;',
+                                            ])
+                                        ."</a></div>
+                                                <div style='margin-left: 5px;'>".$info."</div></div>";
                                 },
                                 'format' => 'raw',
                             ],
@@ -284,35 +288,35 @@ JS
 
                         'on afterRun' => function (WidgetEvent $event) {
 
-                        /**
-                         * @var $grid GridView
-                         * @var $query ActiveQuery
-                         */
-                        $grid = $event->sender;
-                        $query = clone $grid->dataProvider->query;
+                            /**
+                             * @var $grid GridView
+                             * @var $query ActiveQuery
+                             */
+                            $grid = $event->sender;
+                            $query = clone $grid->dataProvider->query;
 
-                        $tableName = CmsStorageFile::tableName();
-                        $result = $query->select([$tableName . ".id", 'total_size' => new Expression("SUM({$tableName}.size)")])
-                            //->createCommand()->rawSql;
-                            ->asArray()->one();
+                            $tableName = CmsStorageFile::tableName();
+                            $result = $query->select([$tableName.".id", 'total_size' => new Expression("SUM({$tableName}.size)")])
+                                //->createCommand()->rawSql;
+                                ->asArray()->one();
 
-                        $total_size = ArrayHelper::getValue($result, 'total_size');
-                        $size = \Yii::$app->formatter->asShortSize($total_size);
+                            $total_size = ArrayHelper::getValue($result, 'total_size');
+                            $size = \Yii::$app->formatter->asShortSize($total_size);
 
-                        $event->result = Alert::widget([
-                            'options' => [
-                                'class' => 'alert alert-info',
-                            ],
-                            'body'    => <<<HTML
+                            $event->result = Alert::widget([
+                                'options' => [
+                                    'class' => 'alert alert-info',
+                                ],
+                                'body'    => <<<HTML
 <div class="g-font-weight-300">
 <span class="g-font-size-40">Всего: <span title="" style="">{$size}</span></span>
 </div>
 HTML
-                        ]);
-                    },
+                                ,
+                            ]);
+                        },
                     ],
                 ],
-
 
 
                 'delete-tmp-dir' =>
@@ -353,7 +357,7 @@ HTML
 
 
         header('Content-type: '.$file->mime_type);
-        header('Content-Disposition: attachment; filename="'.$file->cluster_file.'"');
+        header('Content-Disposition: attachment; filename="'.$file->downloadName.'"');
         echo file_get_contents($file->cluster->getAbsoluteUrl($file->cluster_file));
         die;
 
@@ -381,15 +385,14 @@ HTML
 
     public function actionUpload()
     {
-        $response =
-            [
-                'success' => false,
-            ];
+        sleep(2);
+        $response = [
+            'success' => false,
+        ];
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $request = Yii::$app->getRequest();
-
 
         $dir = \skeeks\sx\Dir::runtimeTmp();
 
@@ -407,12 +410,10 @@ HTML
 
         } else {
 
-            $storageFile = Yii::$app->storage->upload($file, array_merge(
-                [
-                    "name"          => "",
-                    "original_name" => $originalName,
-                ]
-            ));
+            $storageFile = Yii::$app->storage->upload($file, array_merge([
+                "name"          => "",
+                "original_name" => $originalName,
+            ]));
 
 
             if ($request->get('modelData') && is_array($request->get('modelData'))) {
@@ -467,8 +468,8 @@ HTML
 
     /**
      * Прикрепить к моделе другой файл
-     * @see skeeks\cms\widgets\formInputs\StorageImage
      * @return RequestResponse
+     * @see skeeks\cms\widgets\formInputs\StorageImage
      */
     public function _actionLinkToModel()
     {
@@ -535,8 +536,8 @@ HTML
 
     /**
      * Прикрепить к моделе другой файл
-     * @see skeeks\cms\widgets\formInputs\StorageImage
      * @return RequestResponse
+     * @see skeeks\cms\widgets\formInputs\StorageImage
      */
     public function _actionLinkToModels()
     {

@@ -110,7 +110,7 @@ JS
 
         <div class="sx-progress-bar-file-{$this->id}" style="display: none;">
             <span style="vertical-align:middle;">{$str_up_f}: <span class="sx-uploaded-file-name"></span></span>
-            <div>
+            <div class="sx-progress-bar-wrapper">
                 <div class="progress progress-striped active">
                     <div class="progress-bar progress-bar-success"></div>
                 </div>
@@ -119,7 +119,7 @@ JS
 
         <div class="sx-progress-bar-{$this->id}" style="display: none;">
             <span style="vertical-align:middle;">{$str_up_fs} (<span class="sx-uploadedFiles"></span> / <span class="sx-allFiles"></span>)</span>
-            <div>
+            <div class="sx-progress-bar-wrapper">
                 <div class="progress progress-striped active">
                     <div class="progress-bar progress-bar-success"></div>
                 </div>

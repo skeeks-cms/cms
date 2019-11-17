@@ -41,6 +41,7 @@ use Yii;
  * @property string $fileName
  * @property string $src
  * @property string $absoluteSrc
+ * @property string $downloadName
  *
  * @property \skeeks\cms\components\storage\Cluster $cluster
  */
@@ -264,6 +265,21 @@ class StorageFile extends Core
         $newFile->save();
 
         return $newFile;
+    }
+
+
+    /**
+     * Название файла для сохранения
+     *
+     * @return string
+     */
+    public function getDownloadName()
+    {
+        if ($this->name_to_save) {
+            return $this->name_to_save . "." . $this->extension;
+        } else {
+            return $this->original_name;
+        }
     }
 }
 

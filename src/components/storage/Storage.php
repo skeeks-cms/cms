@@ -50,8 +50,8 @@ class Storage extends Component
      * Загрузить файл в хранилище, добавить в базу, вернуть модель StorageFile
      *
      * @param UploadedFile|string|File $file объект UploadedFile или File или rootPath до файла локально или http:// путь к файлу (TODO:: доделать)
-     * @param array $data данные для сохранения в базу
-     * @param null $clusterId идентификатор кластера по умолчанию будет выбран первый из конфигурации
+     * @param array                    $data данные для сохранения в базу
+     * @param null                     $clusterId идентификатор кластера по умолчанию будет выбран первый из конфигурации
      * @return StorageFile
      * @throws Exception
      */
@@ -124,7 +124,7 @@ class Storage extends Component
                         try {
                             $mimeType = FileHelper::getMimeType($tmpfile->getPath(), null, false);
                         } catch (InvalidConfigException $e) {
-                            throw new Exception("Не удалось пределить расширение файла: " . $e->getMessage());
+                            throw new Exception("Не удалось пределить расширение файла: ".$e->getMessage());
                         }
 
                         if (!$mimeType) {
@@ -156,33 +156,34 @@ class Storage extends Component
             }
         }
 
+        $newData = [];
 
         //$data["type"]       = $tmpfile->getType();
-        $data["mime_type"] = $tmpfile->getMimeType();
-        $data["size"] = $tmpfile->size()->getBytes();
-        $data["extension"] = $tmpfile->getExtension();
-        $data["original_name"] = $original_file_name;
+        $newData["mime_type"] = $tmpfile->getMimeType();
+        $newData["size"] = $tmpfile->size()->getBytes();
+        $newData["extension"] = $tmpfile->getExtension();
+        $newData["original_name"] = $original_file_name;
 
         //Елси это изображение
         if ($tmpfile->getType() == 'image') {
             if (extension_loaded('gd')) {
                 list($width, $height, $type, $attr) = getimagesize($tmpfile->toString());
-                $data["image_height"] = $height;
-                $data["image_width"] = $width;
+                $newData["image_height"] = $height;
+                $newData["image_width"] = $width;
             }
 
         }
 
         if ($cluster = $this->getCluster($clusterId)) {
             if ($newFileSrc = $cluster->upload($tmpfile)) {
-                $data = array_merge($data,
-                    [
-                        "cluster_id" => $cluster->id,
-                        "cluster_file" => $newFileSrc,
-                    ]);
+                $newData = array_merge($newData, [
+                    "cluster_id"   => $cluster->id,
+                    "cluster_file" => $newFileSrc,
+                ]);
             }
         }
 
+        $data = array_merge((array) $newData, (array) $data);
         $file = new StorageFile($data);
         $file->save(false);
 
