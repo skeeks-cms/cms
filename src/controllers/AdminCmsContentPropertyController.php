@@ -13,6 +13,7 @@ use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\yii2\form\Element;
@@ -178,11 +179,16 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         $query = $e->sender->dataProvider->query;
                         $dataProvider = $e->sender->dataProvider;
 
-                        $query->joinWith('elementProperties as elementProperties');
+                        //$query->joinWith('elementProperties as elementProperties');
+                        $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
+                            'property_id' => new Expression(CmsContentProperty::tableName().".id")
+                        ]);
+                            
                         $query->groupBy(CmsContentProperty::tableName().".id");
                         $query->select([
                             CmsContentProperty::tableName().'.*',
-                            'countElementProperties' => new Expression("count(*)"),
+                            //'countElementProperties' => new Expression("count(*)"),
+                            'countElementProperties' => $subQuery,
                         ]);
                     },
 
@@ -212,6 +218,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                         'active',
                         'priority',
+                        /*'countElementProperties',*/
                     ],
                     'columns'        => [
                         'custom'  => [
@@ -264,11 +271,11 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                             },
                         ],
 
-                        /*'countElementProperties' => [
+                        'countElementProperties' => [
                             'attribute' => 'countElementProperties',
                             'format'    => 'raw',
                             'label'     => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
-                            'value'     => function (CmsTreeTypeProperty $model) {
+                            'value'     => function (CmsContentProperty $model) {
                                 return Html::a($model->raw_row['countElementProperties'], [
                                     '/cms/admin-tree/list',
                                     'DynamicModel' => [
@@ -279,7 +286,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                                     'target'    => '_blank',
                                 ]);
                             },
-                        ],*/
+                        ],
 
                         'active' => [
                             'class' => BooleanColumn::class,
