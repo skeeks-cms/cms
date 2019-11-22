@@ -110,7 +110,6 @@ class Cms extends \skeeks\cms\base\Component
     public $auth_only_email_is_approved = 0;
 
 
-
     //После регистрации пользователю будут присвоены эти роли
     /**
      * @var string язык по умолчанию
@@ -202,47 +201,48 @@ class Cms extends \skeeks\cms\base\Component
             $this->languageCode = \Yii::$app->language;
         }
 
+        $this->relatedHandlers = ArrayHelper::merge([
+            PropertyTypeText::className()   => [
+                'class' => PropertyTypeText::className(),
+            ],
+            PropertyTypeNumber::className() => [
+                'class' => PropertyTypeNumber::className(),
+            ],
+            PropertyTypeBool::className()   => [
+                'class' => PropertyTypeBool::className(),
+            ],
+            PropertyTypeList::className()   => [
+                'class' => PropertyTypeList::className(),
+            ],
+
+            PropertyTypeTree::className()           => [
+                'class' => PropertyTypeTree::className(),
+            ],
+            PropertyTypeElement::className()        => [
+                'class' => PropertyTypeElement::className(),
+            ],
+            PropertyTypeStorageFile::className()    => [
+                'class' => PropertyTypeStorageFile::className(),
+            ],
+            UserPropertyTypeDate::className()       => [
+                'class' => UserPropertyTypeDate::className(),
+            ],
+            UserPropertyTypeComboText::className()  => [
+                'class' => UserPropertyTypeComboText::className(),
+            ],
+            UserPropertyTypeColor::className()      => [
+                'class' => UserPropertyTypeColor::className(),
+            ],
+            UserPropertyTypeSelectFile::className() => [
+                'class' => UserPropertyTypeSelectFile::className(),
+            ],
+
+        ], $this->relatedHandlers);
 
         if (\Yii::$app instanceof Application) {
 
         } else {
-            $this->relatedHandlers = ArrayHelper::merge([
-                PropertyTypeText::className()   => [
-                    'class' => PropertyTypeText::className(),
-                ],
-                PropertyTypeNumber::className() => [
-                    'class' => PropertyTypeNumber::className(),
-                ],
-                PropertyTypeBool::className()   => [
-                    'class' => PropertyTypeBool::className(),
-                ],
-                PropertyTypeList::className()   => [
-                    'class' => PropertyTypeList::className(),
-                ],
 
-                PropertyTypeTree::className()        => [
-                    'class' => PropertyTypeTree::className(),
-                ],
-                PropertyTypeElement::className()     => [
-                    'class' => PropertyTypeElement::className(),
-                ],
-                PropertyTypeStorageFile::className() => [
-                    'class' => PropertyTypeStorageFile::className(),
-                ],
-                UserPropertyTypeDate::className()       => [
-                    'class' => UserPropertyTypeDate::className(),
-                ],
-                UserPropertyTypeComboText::className()  => [
-                    'class' => UserPropertyTypeComboText::className(),
-                ],
-                UserPropertyTypeColor::className()      => [
-                    'class' => UserPropertyTypeColor::className(),
-                ],
-                UserPropertyTypeSelectFile::className() => [
-                    'class' => UserPropertyTypeSelectFile::className(),
-                ],
-
-            ], $this->relatedHandlers);
 
             //web init
             if (!$this->noImageUrl) {
@@ -299,22 +299,22 @@ class Cms extends \skeeks\cms\base\Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'adminEmail'              => 'Основной Email Администратора сайта',
-            'noImageUrl'              => 'Изображение заглушка',
-            'appName'                 => 'Название проекта',
-            'languageCode'            => 'Язык по умолчанию',
-            'registerRoles'           => 'При регистрации добавлять в группу',
-            'tree_max_code_length'    => 'Максимальная длинна кода (url) разделов',
-            'element_max_code_length' => 'Максимальная длинна кода (url) элементов',
+            'adminEmail'                  => 'Основной Email Администратора сайта',
+            'noImageUrl'                  => 'Изображение заглушка',
+            'appName'                     => 'Название проекта',
+            'languageCode'                => 'Язык по умолчанию',
+            'registerRoles'               => 'При регистрации добавлять в группу',
+            'tree_max_code_length'        => 'Максимальная длинна кода (url) разделов',
+            'element_max_code_length'     => 'Максимальная длинна кода (url) элементов',
             'auth_only_email_is_approved' => 'Разрешить авторизацию на сайте только с подтвержденными email?',
         ]);
     }
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'adminEmail'    => 'E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.',
-            'noImageUrl'    => 'Это изображение показывается в тех случаях, когда не найдено основное.',
-            'registerRoles' => 'Так же после созданию пользователя, ему будут назначены, выбранные группы.',
+            'adminEmail'                  => 'E-Mail администратора сайта. Этот email будет отображаться как отправитель, в отправленных письмах с сайта.',
+            'noImageUrl'                  => 'Это изображение показывается в тех случаях, когда не найдено основное.',
+            'registerRoles'               => 'Так же после созданию пользователя, ему будут назначены, выбранные группы.',
             'auth_only_email_is_approved' => 'Если эта опция включена то пользователь, который не подтвердил свой email не сможет авторизоваться на сайте.',
         ]);
     }
@@ -356,15 +356,15 @@ class Cms extends \skeeks\cms\base\Component
                 'class'  => FieldSet::class,
                 'name'   => 'Авторизация',
                 'fields' => [
-                    'registerRoles' => [
-                        'class' => SelectField::class,
+                    'registerRoles'               => [
+                        'class'    => SelectField::class,
                         'multiple' => true,
-                        'items' => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'),
+                        'items'    => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'),
                     ],
                     'auth_only_email_is_approved' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false
-                    ]
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
                 ],
             ],
 
@@ -520,7 +520,7 @@ class Cms extends \skeeks\cms\base\Component
         if ($this->relatedHandlers) {
             foreach ($this->relatedHandlers as $id => $handler) {
                 if ($handler instanceof PropertyTypeBool || $handler instanceof PropertyTypeText || $handler instanceof PropertyTypeNumber || $handler instanceof PropertyTypeList
-                    || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement|| $handler instanceof PropertyTypeStorageFile
+                    || $handler instanceof PropertyTypeFile || $handler instanceof PropertyTypeTree || $handler instanceof PropertyTypeElement || $handler instanceof PropertyTypeStorageFile
                 ) {
                     $baseTypes[$handler->id] = $handler->name;
                 } else {
@@ -597,7 +597,7 @@ class Cms extends \skeeks\cms\base\Component
      */
     public function getVersion()
     {
-        return (string) ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version');
+        return (string)ArrayHelper::getValue(\Yii::$app->extensions, 'skeeks/cms.version');
     }
 
     /**
