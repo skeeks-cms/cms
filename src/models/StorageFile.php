@@ -15,6 +15,7 @@ use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_storage_file}}".
@@ -219,6 +220,14 @@ class StorageFile extends Core
         return \Yii::$app->storage->getCluster($this->cluster_id);
     }
 
+    public function fields()
+    {
+        return ArrayHelper::merge(parent::fields(), [
+            'src', 
+            'absoluteSrc', 
+            'rootSrc', 
+        ]);
+    }
     /**
      * @return string
      */
