@@ -296,6 +296,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         'active'       => [
                             //'class' => BooleanColumn::class,
                             'format' => 'raw',
+                            'headerOptions' => [
+                                'style' => '100px',
+                            ],
+                            'contentOptions' => [
+                                'style' => '100px',
+                            ],
                             'value' => function (\skeeks\cms\models\CmsContentElement $model) {
                                 if ($model->active == "Y") {
                                     $time = \Yii::$app->formatter->asRelativeTime($model->published_at);
@@ -363,6 +369,14 @@ HTML;
                         'updated_at'   => [
                             'class' => DateTimeColumnData::class,
                         ],
+                        'priority'   => [
+                            'headerOptions' => [
+                                'style' => 'max-width: 100px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'max-width: 100px;',
+                            ],
+                        ],
 
                         'tree_id' => [
                             'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
@@ -398,7 +412,13 @@ HTML;
                                     ]);
                             },
                             'format' => 'raw',
-                            'label'  => "Смотреть",
+                            /*'label'  => "Смотреть",*/
+                            'headerOptions' => [
+                                'style' => 'max-width: 40px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'max-width: 40px;',
+                            ],
                         ],
 
                         'additionalSections' => [
