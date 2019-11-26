@@ -79,14 +79,21 @@ JS
 ?>
 <? echo
 \yii\bootstrap\Tabs::widget([
-    'items' => [
+    'itemOptions' => [
+        'class' => 'nav-item',
+    ],
+    'linkOptions' => [
+        'class' => 'nav-link',
+    ],
+    'items'       => [
         [
-            'label' => \Yii::t('skeeks/cms', 'File storage'),
+            'label'   => \Yii::t('skeeks/cms', 'File storage'),
             'content' => $this->render('_file-storage-select-file'),
-            'active' => true
+            'active'  => true,
+            'class' => 'active'
         ],
         [
-            'label' => \Yii::t('skeeks/cms', 'File manager'),
+            'label'   => \Yii::t('skeeks/cms', 'File manager'),
             'content' => $this->render('_file-manager-select-file'),
         ],
     ],
@@ -95,11 +102,11 @@ JS
 
 <!--
 <hr/>
-<?/*= \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#", [
+<? /*= \yii\helpers\Html::a("<i class='glyphicon glyphicon-question-sign'></i>", "#", [
     'class' => 'btn btn-default',
     'onclick' => "sx.dialog({'title' : '" . \Yii::t('skeeks/cms', 'Help') . "', 'content' : '#sx-help'}); return false;"
-]); */?>
+]); */ ?>
 <div style="display: none;" id="sx-help">
-    <?php /*\Yii::t('skeeks/cms', 'Help in the process of writing ...') */?>
+    <?php /*\Yii::t('skeeks/cms', 'Help in the process of writing ...') */ ?>
 </div>-->
 
