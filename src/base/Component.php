@@ -209,11 +209,11 @@ abstract class Component extends Model implements ConfigFormInterface
      * Загрузка настроек по умолчанию
      * @return $this
      */
-    protected function _initSettings()
+    protected function _initSettings($useCache = true)
     {
         try {
 
-            $this->setAttributes($this->settings);
+            $this->setAttributes($this->getSettings($useCache));
             $this->_oldAttributes = $this->toArray($this->safeAttributes());
         } catch (\Exception $e) {
             \Yii::error(\Yii::t('skeeks/cms', '{cms} component error load defaul settings',
@@ -244,7 +244,7 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function refresh()
     {
-        $this->_initSettings();
+        $this->_initSettings(false);
         $this->afterRefresh();
         return true;
     }
@@ -403,12 +403,26 @@ abstract class Component extends Model implements ConfigFormInterface
                 ],
         ]);
 
-        $settingsValues = \Yii::$app->cache->get($key);
+        $settingsValues = [];
 
-        if ($settingsValues === false && $useCache === true) {
+        if ($useCache === true) {
+            $settingsValues = \Yii::$app->cache->get($key);
 
-            $settingsValues = [];
+            if ($settingsValues === false) {
 
+                $settingsValues = [];
+
+                if ($this->overridePath) {
+                    foreach ($this->overridePath as $overrideName) {
+                        $settingsValues = ArrayHelper::merge($settingsValues,
+                            $this->fetchOverrideSettings($overrideName)
+                        );
+                    }
+                }
+
+                \Yii::$app->cache->set($key, $settingsValues, 0, $dependency);
+            }
+        } else {
             if ($this->overridePath) {
                 foreach ($this->overridePath as $overrideName) {
                     $settingsValues = ArrayHelper::merge($settingsValues,
@@ -416,9 +430,8 @@ abstract class Component extends Model implements ConfigFormInterface
                     );
                 }
             }
-
-            \Yii::$app->cache->set($key, $settingsValues, 0, $dependency);
         }
+
 
         return $settingsValues;
     }
