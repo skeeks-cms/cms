@@ -104,7 +104,7 @@ use yii\helpers\Url;
  * @property Tree $root
  * @property Tree $prev
  * @property Tree $next
- * @property Tree $descendants
+ * @property Tree[] $descendants
  * 
  * @depricated
  */
