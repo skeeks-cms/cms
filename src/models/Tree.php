@@ -67,6 +67,7 @@ use yii\helpers\Url;
  * @property string $name_hidden
  * @property string $view_file
  * @property string $seo_h1
+ * @property string|null $external_id
  *
  * ***
  *
@@ -277,7 +278,8 @@ class Tree extends Core
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'seo_h1' => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.'
+            'seo_h1' => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.',
+            'external_id' => 'Это поле чаще всего задействуют программисты, для интеграций со сторонними системами'
         ]);
     }
 
@@ -320,6 +322,7 @@ class Tree extends Core
             'name_hidden' => Yii::t('skeeks/cms', 'Hidden Name'),
             'view_file' => Yii::t('skeeks/cms', 'Template'),
             'seo_h1' => Yii::t('skeeks/cms', 'SEO заголовок h1'),
+            'external_id' => Yii::t('skeeks/cms', 'ID из внешней системы'),
         ]);
     }
 
@@ -340,6 +343,8 @@ class Tree extends Core
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
             [['seo_h1'], 'string', 'max' => 255],
+            [['external_id'], 'string', 'max' => 255],
+            [['external_id'], 'default', 'value' => null],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
             [['cms_site_id'], 'integer'],

@@ -324,6 +324,9 @@ class TreeMenuCmsWidget extends WidgetRenderable
         if ($this->with) {
             $this->activeQuery->with($this->with);
         }
+        if (!$this->limit) {
+            $this->limit = 200;
+        }
         if ($this->limit) {
             $this->activeQuery->limit($this->limit);
         }
