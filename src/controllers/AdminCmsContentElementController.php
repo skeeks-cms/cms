@@ -16,7 +16,6 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
-use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
@@ -43,7 +42,6 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -81,11 +79,11 @@ class AdminCmsContentElementController extends BackendModelStandartController
              * @var $model CmsContentElement
              */
             $model = $this->model;
-            return Html::tag('h1', $model->name . Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
-                'target' => "_blank",
-                'class' => "g-ml-20",
-                'title' => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-            ]));
+            return Html::tag('h1', $model->name.Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
+                    'target' => "_blank",
+                    'class'  => "g-ml-20",
+                    'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                ]));
         };
 
         parent::init();
@@ -295,14 +293,14 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         ],
                         'active'       => [
                             //'class' => BooleanColumn::class,
-                            'format' => 'raw',
-                            'headerOptions' => [
+                            'format'         => 'raw',
+                            'headerOptions'  => [
                                 'style' => '100px',
                             ],
                             'contentOptions' => [
                                 'style' => '100px',
                             ],
-                            'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+                            'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
                                 if ($model->active == "Y") {
                                     $time = \Yii::$app->formatter->asRelativeTime($model->published_at);
                                     $dateTime = \Yii::$app->formatter->asDatetime($model->published_at);
@@ -315,31 +313,36 @@ HTML;
 <span class="fa fa-times text-danger" title=""></span>
 HTML;
                                 }
-                            }
+                            },
                         ],
                         'custom'       => [
                             'attribute' => 'id',
-                            'format' => 'raw',
-                            'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+                            'format'    => 'raw',
+                            'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
 
                                 $data = [];
+                                /*$data[] = "<div class='sx-trigger-action' style='width: 50px; float: left;'>".Html::a(
+                                        Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
+                                            'style' => 'max-width: 50px; max-height: 50px; border-radius: 5px;',
+                                        ])
+                                        , "#", ['class' => 'sx-trigger-action', 'style' => 'width: 50px;'])."</div>";*/
+
                                 $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
 
                                 if ($model->tree_id) {
                                     $data[] = Html::a($model->cmsTree->fullName, $model->cmsTree->url, [
                                         'data-pjax' => '0',
-                                        'target' => '_blank',
-                                        'style' => 'color: #333; max-width: 200px;'
+                                        'target'    => '_blank',
+                                        'style'     => 'color: #333; max-width: 200px;',
                                     ]);
                                 }
 
                                 if ($model->cmsTrees) {
-                                    foreach ($model->cmsTrees as $cmsTree)
-                                    {
+                                    foreach ($model->cmsTrees as $cmsTree) {
                                         $data[] = Html::a($cmsTree->fullName, $cmsTree->url, [
                                             'data-pjax' => '0',
-                                            'target' => '_blank',
-                                            'style' => 'color: #333; max-width: 200px; '
+                                            'target'    => '_blank',
+                                            'style'     => 'color: #333; max-width: 200px; ',
                                         ]);
                                     }
                                 }
@@ -347,15 +350,13 @@ HTML;
                                 $info = implode("<br />", $data);
 
                                 return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                                </div>
-                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
-
-                                            ;
-                            }
+                                                <div style='margin-left: 5px;'>
+                                                <div class='sx-trigger-action' style='width: 50px; margin-right: 10px; float: left;'>
+                                                    <a href='#' style='text-decoration: none; border-bottom: 0;'>
+                                                        <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                    </a>
+                                                </div>".$info."</div></div>";;
+                            },
                         ],
                         'image_id'     => [
                             'class' => ImageColumn2::class,
@@ -369,8 +370,8 @@ HTML;
                         'updated_at'   => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'priority'   => [
-                            'headerOptions' => [
+                        'priority'     => [
+                            'headerOptions'  => [
                                 'style' => 'max-width: 100px;',
                             ],
                             'contentOptions' => [
@@ -402,7 +403,7 @@ HTML;
                         ],
 
                         'view' => [
-                            'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
+                            'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
                                 return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $model->absoluteUrl,
                                     [
                                         'target'    => '_blank',
@@ -411,9 +412,9 @@ HTML;
                                         'class'     => 'btn btn-sm',
                                     ]);
                             },
-                            'format' => 'raw',
+                            'format'         => 'raw',
                             /*'label'  => "Смотреть",*/
-                            'headerOptions' => [
+                            'headerOptions'  => [
                                 'style' => 'max-width: 40px;',
                             ],
                             'contentOptions' => [
@@ -481,7 +482,7 @@ HTML;
 
 
             "copy" => [
-                'priority' => 200,
+                'priority'       => 200,
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Copy'),
                 "icon"           => "fas fa-copy",
@@ -935,9 +936,9 @@ HTML
             'model'        => $model,
             'relatedModel' => $relatedModel,
 
-            'is_saved' => $is_saved,
+            'is_saved'  => $is_saved,
             'submitBtn' => \Yii::$app->request->post('submit-btn'),
-            'redirect' => $redirect,
+            'redirect'  => $redirect,
         ]);
     }
     public function update($adminAction)
@@ -992,9 +993,9 @@ HTML
         return $this->render('_form', [
             'model'        => $model,
             'relatedModel' => $relatedModel,
-            'is_saved' => $is_saved,
-            'submitBtn' => \Yii::$app->request->post('submit-btn'),
-            'redirect' => $redirect,
+            'is_saved'     => $is_saved,
+            'submitBtn'    => \Yii::$app->request->post('submit-btn'),
+            'redirect'     => $redirect,
         ]);
     }
     /**
@@ -1005,20 +1006,20 @@ HTML
     public function eachMultiChangeTree($model, $action)
     {
         //try {
-            $formData = [];
-            parse_str(\Yii::$app->request->post('formData'), $formData);
-            $tmpModel = new CmsContentElement();
-            $tmpModel->load($formData);
-            if ($tmpModel->tree_id && $tmpModel->tree_id != $model->tree_id) {
-                $model->tree_id = $tmpModel->tree_id;
-                if (!$model->save(false)) {
-                    throw new Exception("Не сохранилось: " . print_r($model->errors, true));
-                }
-            } else {
-                throw new Exception('Раздел не изменился');
+        $formData = [];
+        parse_str(\Yii::$app->request->post('formData'), $formData);
+        $tmpModel = new CmsContentElement();
+        $tmpModel->load($formData);
+        if ($tmpModel->tree_id && $tmpModel->tree_id != $model->tree_id) {
+            $model->tree_id = $tmpModel->tree_id;
+            if (!$model->save(false)) {
+                throw new Exception("Не сохранилось: ".print_r($model->errors, true));
             }
+        } else {
+            throw new Exception('Раздел не изменился');
+        }
 
-            return true;
+        return true;
         //} catch (\Exception $e) {
         //    return false;
         //}
