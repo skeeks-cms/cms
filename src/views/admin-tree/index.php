@@ -15,7 +15,8 @@ $("body").on("dblclick", ".sx-tree-node", function() {
 });
 
 $("body").on("click", ".sx-first-action-trigger", function() {
-    $(".sx-first-action", $(this).closest('.sx-tree-node')).click();
+    /*console.log($(".sx-first-action", $(this).closest('.sx-tree-node')));*/
+    $(".sx-first-action", $(this).closest('.sx-tree-node')).first().click();
     return false;
 });
 
