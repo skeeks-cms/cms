@@ -374,18 +374,29 @@ class PropertyTypeList extends PropertyType
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
 
         if ($this->isMultiple) {
-            if ($this->property->enums) {
+
+            $result = [];
+
+            $data = $this->property->getEnums()->andWhere(['id' => $value])->select(['code', 'value'])->limit(10)->asArray()->all();
+            if ($data) {
+                $result = ArrayHelper::map($data, 'code', 'value');
+            }
+            
+
+            return implode(", ", $result);
+            
+            //TODO: Вариант плох тем, что если опций очень много, то кончится память.
+            /*if ($this->property->enums) {
                 $result = [];
 
                 foreach ($this->property->enums as $enum) {
                     if (in_array($enum->id, $value)) {
                         $result[$enum->code] = $enum->value;
                     }
-
                 }
 
                 return implode(", ", $result);
-            }
+            }*/
         } else {
             if ($this->property->enums) {
                 $enums = (array)$this->property->enums;
