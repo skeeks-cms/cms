@@ -50,11 +50,14 @@ class CmsSiteDomain extends Core
 
     public function _checkIsMainDomain($e)
     {
-        $mainDomainForSite = $this->cmsSite->cmsSiteMainDomain;
-        if ($mainDomainForSite && $mainDomainForSite->id != $this->id) {
-            $mainDomainForSite->is_main = null;
-            $mainDomainForSite->save();
+        if ($this->is_main) {
+            $mainDomainForSite = $this->cmsSite->cmsSiteMainDomain;
+            if ($mainDomainForSite && $mainDomainForSite->id != $this->id) {
+                $mainDomainForSite->is_main = null;
+                $mainDomainForSite->save();
+            }
         }
+
     }
     /**
      * @inheritdoc

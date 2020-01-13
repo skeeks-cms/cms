@@ -239,7 +239,7 @@ return
                             'priority' => 0,
                         ],
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/cms', 'The base of {email} addresses', ['email' => 'email']),
                             "url"   => ["cms/admin-user-email"],
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/email-2.png'],
@@ -249,7 +249,7 @@ return
                             "label" => \Yii::t('skeeks/cms', "Base phones"),
                             "url"   => ["cms/admin-user-phone"],
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/phone.png'],
-                        ],
+                        ],*/
                     ],
             ],
 
