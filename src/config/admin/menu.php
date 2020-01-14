@@ -334,7 +334,13 @@ return
                                 'url'   => ["/cms/admin-cms-content-property-enum"],
                                 'label' => \Yii::t('skeeks/cms', "Options"),
                             ],
-                        ], contentEditMenu()),
+                            [
+                                'url'   => ["/cms/admin-cms-content-type"],
+                                'label' => \Yii::t('skeeks/cms', "Группы контента"),
+                                "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.tree.gif'],
+                            ],
+                        ], []),
+                        //contentEditMenu()
                     ],
 
 

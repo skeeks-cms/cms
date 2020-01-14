@@ -83,6 +83,9 @@ return [
 
                     "cms/admin-cms-user-universal-property",
                     "cms/admin-cms-user-universal-property-enum",
+                    
+                    "cms/admin-cms-content-type",
+                    "cms/admin-cms-content",
                 ],
             ],
         ],

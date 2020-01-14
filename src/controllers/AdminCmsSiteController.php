@@ -260,6 +260,7 @@ class AdminCmsSiteController extends BackendModelStandartController
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
                     ArrayHelper::removeValue($visibleColumns, 'cms_site_id');

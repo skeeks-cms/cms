@@ -11,23 +11,26 @@
 /* @var $model \skeeks\cms\models\CmsLang */
 $controller = $this->context;
 $action = $controller->action;
+
+$model->load(\Yii::$app->request->get());
 ?>
 <?php $form = $action->beginActiveForm(); ?>
+
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/cms', 'Main')
+    'content' => \Yii::t('skeeks/cms', 'Main'),
 ]); ?>
 
-<?php if ($content_type = \Yii::$app->request->get('content_type')) : ?>
-    <?= $form->field($model, 'content_type')->hiddenInput(['value' => $content_type])->label(false); ?>
-<?php else : ?>
+<?php if ($model->content_type) : ?>
     <div style="display: none;">
-        <?= $form->fieldSelect($model, 'content_type',
-            \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name'));
-        ?>
+        <?= $form->field($model, 'content_type')->hiddenInput()->label(false); ?>
     </div>
+<?php else : ?>
+    <?= $form->fieldSelect($model, 'content_type',
+        \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name'));
+    ?>
 <?php endif; ?>
 
 <?= $form->field($model, 'name')->textInput(); ?>
@@ -44,7 +47,7 @@ $action = $controller->action;
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/cms', 'Link to section')
+    'content' => \Yii::t('skeeks/cms', 'Link to section'),
 ]); ?>
 
 <div class="row">
@@ -72,19 +75,19 @@ $action = $controller->action;
         ])->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); */ ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/cms', 'Relationship to other content')
+    'content' => \Yii::t('skeeks/cms', 'Relationship to other content'),
 ]); ?>
 
 <div class="row">
     <div class="col-md-3">
         <?= $form->fieldSelect($model, 'parent_content_id', \skeeks\cms\models\CmsContent::getDataForSelect(true,
-            function(\yii\db\ActiveQuery $activeQuery) use ($model) {
+            function (\yii\db\ActiveQuery $activeQuery) use ($model) {
                 if (!$model->isNewRecord) {
                     //$activeQuery->andWhere(['!=', 'id', $model->id]);
                 }
             }),
             [
-                'allowDeselect' => true
+                'allowDeselect' => true,
             ]
         ); ?>
     </div>
@@ -103,7 +106,7 @@ $action = $controller->action;
     <?php foreach ($model->childrenContents as $contentChildren) : ?>
         <p><?= \yii\helpers\Html::a($contentChildren->name, \skeeks\cms\helpers\UrlHelper::construct([
                 '/cms/admin-cms-content/update',
-                'pk' => $contentChildren->id
+                'pk' => $contentChildren->id,
             ])->enableAdmin()->toString()) ?></p>
     <?php endforeach; ?>
 
@@ -114,29 +117,28 @@ $action = $controller->action;
 
 
 <?php if (!$model->isNewRecord) : ?>
-    <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : ?>
-        <?
+    <?php /*if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : */?><!--
+        <?/*
         /**
          * @var \skeeks\cms\backend\BackendAction $actionIndex
          * @var \skeeks\cms\backend\BackendAction $actionCreate
-         */
         $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
         $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
-        ?>
+        */?>
 
-        <?php if ($actionIndex) : ?>
-            <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Properties')) ?>
+        <?php /*if ($actionIndex) : */?>
+            <?/*= $form->fieldSet(\Yii::t('skeeks/cms', 'Properties')) */?>
 
-            <?php $pjax = \yii\widgets\Pjax::begin(); ?>
-            <?
+            <?php /*$pjax = \yii\widgets\Pjax::begin(); */?>
+            <?/*
             $query = \skeeks\cms\models\CmsContentProperty::find()->orderBy(['priority' => SORT_ASC]);
             $query->joinWith('cmsContentProperty2contents map');
             $query->andWhere(['map.cms_content_id' => $model->id]);
-            ?>
-            <?
+            */?>
+            <?/*
             if ($actionCreate) {
                 $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                    'content_id' => $model->id
+                    'content_id' => $model->id,
                 ]);
 
                 $actionCreate->name = \Yii::t("skeeks/cms", "Create");
@@ -144,67 +146,67 @@ $action = $controller->action;
                 /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
                     'actions' => ['create' => $actionCreate],
                     'isOpenNewWindow' => true
-                ]);*/
+                ]);
 
                 echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                    'actions' => ['create' => $actionCreate],
-                    'clientOptions' => ['pjax-id' => $pjax->id],
+                    'actions'         => ['create' => $actionCreate],
+                    'clientOptions'   => ['pjax-id' => $pjax->id],
                     'isOpenNewWindow' => true,
-                    'tag' => 'div',
-                    'itemWrapperTag' => 'span',
-                    'itemTag' => 'button',
-                    'itemOptions' => ['class' => 'btn btn-default'],
-                    'options' => ['class' => 'sx-controll-actions'],
+                    'tag'             => 'div',
+                    'itemWrapperTag'  => 'span',
+                    'itemTag'         => 'button',
+                    'itemOptions'     => ['class' => 'btn btn-default'],
+                    'options'         => ['class' => 'sx-controll-actions'],
                 ]);
             }
-            ?>
-            <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-                'dataProvider' => new \yii\data\ActiveDataProvider([
-                    'query' => $query
+            */?>
+            <?/*= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                'dataProvider'    => new \yii\data\ActiveDataProvider([
+                    'query' => $query,
                 ]),
-                'settingsData' =>
+                'settingsData'    =>
                     [
-                        'namespace' => \Yii::$app->controller->uniqueId . "__" . $model->id
+                        'namespace' => \Yii::$app->controller->uniqueId."__".$model->id,
                     ],
                 'adminController' => $controllerProperty,
                 'isOpenNewWindow' => true,
                 //'filterModel'       => $searchModel,
-                'autoColumns' => false,
-                'pjax' => $pjax,
-                'columns' =>
+                'autoColumns'     => false,
+                'pjax'            => $pjax,
+                'columns'         =>
                     [
                         'name',
 
                         [
-                            'label' => \Yii::t('skeeks/cms', 'Type'),
+                            'label'  => \Yii::t('skeeks/cms', 'Type'),
                             'format' => 'raw',
-                            'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                            'value'  => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                 return $cmsContentProperty->handler->name;
-                            }
+                            },
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/cms', 'Content'),
-                            'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                            'value' => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                 $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsContents, 'id',
                                     'name');
                                 return implode(', ', $contents);
-                            }
+                            },
                         ],
 
                         [
-                            'label' => \Yii::t('skeeks/cms', 'Sections'),
+                            'label'  => \Yii::t('skeeks/cms', 'Sections'),
                             'format' => 'raw',
-                            'value' => function(\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
+                            'value'  => function (\skeeks\cms\models\CmsContentProperty $cmsContentProperty) {
                                 if ($cmsContentProperty->cmsTrees) {
                                     $contents = \yii\helpers\ArrayHelper::map($cmsContentProperty->cmsTrees, 'id',
-                                        function($cmsTree) {
+                                        function ($cmsTree) {
                                             $path = [];
 
                                             if ($cmsTree->parents) {
                                                 foreach ($cmsTree->parents as $parent) {
                                                     if ($parent->isRoot()) {
-                                                        $path[] = "[" . $parent->site->name . "] " . $parent->name;
+                                                        $path[] = "[".$parent->site->name."] ".$parent->name;
                                                     } else {
                                                         $path[] = $parent->name;
                                                     }
@@ -216,27 +218,27 @@ $action = $controller->action;
                                         });
 
 
-                                    return '<b>' . \Yii::t('skeeks/cms',
-                                            'Only shown in sections') . ':</b><br />' . implode('<br />', $contents);
+                                    return '<b>'.\Yii::t('skeeks/cms',
+                                            'Only shown in sections').':</b><br />'.implode('<br />', $contents);
                                 } else {
-                                    return '<b>' . \Yii::t('skeeks/cms', 'Always shown') . '</b>';
+                                    return '<b>'.\Yii::t('skeeks/cms', 'Always shown').'</b>';
                                 }
-                            }
+                            },
                         ],
                         [
-                            'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute' => "active"
+                            'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                            'attribute' => "active",
                         ],
                         'code',
                         'priority',
-                    ]
-            ]); ?>
+                    ],
+            ]); */?>
 
-            <?php \yii\widgets\Pjax::end(); ?>
+            <?php /*\yii\widgets\Pjax::end(); */?>
 
-            <?= $form->fieldSetEnd(); ?>
-        <?php endif; ?>
-    <?php endif; ?>
+            <?/*= $form->fieldSetEnd(); */?>
+        <?php /*endif; */?>
+    --><?php /*endif; */?>
 
 
 
@@ -259,12 +261,12 @@ $action = $controller->action;
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/cms', 'Access')
+    'content' => \Yii::t('skeeks/cms', 'Access'),
 ]); ?>
 <?= $form->fieldRadioListBoolean($model, 'access_check_element'); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/cms', 'Additionally')
+    'content' => \Yii::t('skeeks/cms', 'Additionally'),
 ]); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>
 <?= $form->field($model, 'is_count_views')->checkbox(); ?>

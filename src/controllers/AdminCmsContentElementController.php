@@ -151,8 +151,8 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 'field'             => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
-                                    'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),
+                                    //'items'       => new UnsetArrayValue(),
+                                    //'multiple'    => new UnsetArrayValue(),
                                 ],
                             ],
 
@@ -163,8 +163,8 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 'field'             => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
-                                    'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),
+                                    /*'items'       => new UnsetArrayValue(),
+                                    'multiple'    => new UnsetArrayValue(),*/
                                 ],
                             ],
 

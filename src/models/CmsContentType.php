@@ -78,6 +78,13 @@ class CmsContentType extends Core
             'code' => Yii::t('skeeks/cms', 'Code'),
         ]);
     }
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'priority' => Yii::t('skeeks/cms', 'Влияет на расположение группы контента в списке'),
+            'code' => Yii::t('skeeks/cms', 'Это поле не обязательно к заполнению и будет сгенерировано автоматически если оставить его пустым'),
+        ]);
+    }
 
     /**
      * @inheritdoc
@@ -94,7 +101,7 @@ class CmsContentType extends Core
                 'code',
                 'default',
                 'value' => function($model, $attribute) {
-                    return "sx_auto_" . md5(rand(1, 10) . time());
+                    return "auto" . \Yii::$app->security->generateRandomString(10);
                 }
             ],
             [
@@ -114,6 +121,11 @@ class CmsContentType extends Core
     {
         return $this->hasMany(CmsContent::className(),
             ['content_type' => 'code'])->orderBy("priority ASC")->andWhere(['active' => Cms::BOOL_Y]);
+    }
+    
+    public function asText() {
+        $result = parent::asText();
+        return $result . " ($this->code)";
     }
 
 }

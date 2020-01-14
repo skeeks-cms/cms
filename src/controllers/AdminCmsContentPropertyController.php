@@ -339,7 +339,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
          * @var $model CmsTreeTypeProperty
          */
         $model = $action->model;
-        //$model->load(\Yii::$app->request->get());
+        $model->load(\Yii::$app->request->get());
 
         return [
             'main' => [
