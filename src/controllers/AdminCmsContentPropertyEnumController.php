@@ -80,6 +80,9 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $model = $action->model;
         //$model->load(\Yii::$app->request->get());
 
+        if ($property_id = \Yii::$app->request->get("property_id")) {
+            $model->property_id = $property_id;
+        }
         return [
             'property_id' => [
                 'class' => SelectField::class,

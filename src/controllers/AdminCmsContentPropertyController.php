@@ -390,7 +390,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                                     $handler->load($post);
                                 }
                                 if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) {
-                                    $handler->enumRoute = 'cms/admin-cms-tree-type-property-enum';
+                                    $handler->enumRoute = 'cms/admin-cms-content-property-enum';
                                 }
 
                                 echo \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]);
