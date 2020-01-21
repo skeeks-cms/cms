@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use yii\helpers\ArrayHelper;
@@ -94,12 +95,7 @@ class AdminCmsContentTypeController extends BackendModelStandartController
 
                         'custom'        => [
                             'attribute' => "name",
-                            'format'    => "raw",
-                            'value'     => function (CmsContentType $model) {
-                                return Html::a($model->asText, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);
-                            },
+                            'class' => DefaultActionColumn::class
                         ],
                         
                         'content'        => [
