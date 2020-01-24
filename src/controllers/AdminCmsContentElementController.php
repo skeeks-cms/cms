@@ -846,6 +846,10 @@ HTML;
 
     public function contentEdit(Event $e)
     {
+        if (!$this->content) {
+            return ;
+        }
+        
         $href = \yii\helpers\Html::a('Настройках контента',
             \skeeks\cms\helpers\UrlHelper::construct([
                 '/cms/admin-cms-content/update',

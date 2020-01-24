@@ -129,6 +129,7 @@ class AdminCmsContentController extends BackendModelStandartController
                      */
                     $action = $e->sender;
 
+                    $action->relatedIndexAction->controller->content = CmsContent::findOne(2);
                     $action->relatedIndexAction->grid['on init'] = function (Event $e) {
                         /**
                          * @var $query ActiveQuery
