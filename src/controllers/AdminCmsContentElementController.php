@@ -280,7 +280,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         //'published_at',
                         'priority',
 
-                        'created_by',
+                        //'created_by',
 
                         'active',
 
