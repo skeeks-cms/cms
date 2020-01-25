@@ -42,7 +42,6 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 use yii\web\Application;
 
@@ -79,7 +78,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
              * @var $model CmsContentElement
              */
             $model = $this->model;
-            return Html::tag('h1', $model->name.Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
+            return Html::tag('h1', $model->asText.Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
                     'target' => "_blank",
                     'class'  => "g-ml-20",
                     'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
@@ -295,10 +294,10 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             //'class' => BooleanColumn::class,
                             'format'         => 'raw',
                             'headerOptions'  => [
-                                'style' => '100px',
+                                'style' => 'max-width: 100px; width: 100px;',
                             ],
                             'contentOptions' => [
-                                'style' => '100px',
+                                'style' => 'max-width: 100px; width: 100px;',
                             ],
                             'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
                                 if ($model->active == "Y") {
@@ -327,21 +326,27 @@ HTML;
                                         ])
                                         , "#", ['class' => 'sx-trigger-action', 'style' => 'width: 50px;'])."</div>";*/
 
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = "<span style='max-width: 300px;'>".Html::a($model->asText, "#", [
+                                        'class' => 'sx-trigger-action',
+                                        'title' => $model->asText,
+                                        //'style' => 'white-space: nowrap; '
+                                    ])."</span>";
 
                                 if ($model->tree_id) {
-                                    $data[] = Html::a($model->cmsTree->fullName, $model->cmsTree->url, [
-                                        'data-pjax' => '0',
-                                        'target'    => '_blank',
-                                        'style'     => 'color: #333; max-width: 200px;',
-                                    ]);
+                                    $data[] = '<i class="far fa-folder"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
+                                            'data-pjax' => '0',
+                                            'target'    => '_blank',
+                                            'title'     => $model->cmsTree->fullName,
+                                            'style'     => 'color: #333; max-width: 200px;',
+                                        ]);
                                 }
 
                                 if ($model->cmsTrees) {
                                     foreach ($model->cmsTrees as $cmsTree) {
-                                        $data[] = Html::a($cmsTree->fullName, $cmsTree->url, [
+                                        $data[] = Html::a($cmsTree->name, $cmsTree->url, [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
+                                            'title'     => $cmsTree->fullName,
                                             'style'     => 'color: #333; max-width: 200px; ',
                                         ]);
                                     }
@@ -372,10 +377,10 @@ HTML;
                         ],
                         'priority'     => [
                             'headerOptions'  => [
-                                'style' => 'max-width: 100px;',
+                                'style' => 'max-width: 100px; width: 100px;',
                             ],
                             'contentOptions' => [
-                                'style' => 'max-width: 100px;',
+                                'style' => 'max-width: 100px; width: 100px;',
                             ],
                         ],
 
@@ -415,10 +420,10 @@ HTML;
                             'format'         => 'raw',
                             /*'label'  => "Смотреть",*/
                             'headerOptions'  => [
-                                'style' => 'max-width: 40px;',
+                                'style' => 'max-width: 40px; width: 40px;',
                             ],
                             'contentOptions' => [
-                                'style' => 'max-width: 40px;',
+                                'style' => 'max-width: 40px; width: 40px;',
                             ],
                         ],
 
@@ -847,9 +852,9 @@ HTML;
     public function contentEdit(Event $e)
     {
         if (!$this->content) {
-            return ;
+            return;
         }
-        
+
         $href = \yii\helpers\Html::a('Настройках контента',
             \skeeks\cms\helpers\UrlHelper::construct([
                 '/cms/admin-cms-content/update',
