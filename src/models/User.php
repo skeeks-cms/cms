@@ -474,6 +474,16 @@ class User
 
         return $data ? implode(" ", $data) : null;
     }
+    
+    
+    public function asText()
+    {
+        if ($this->name) {
+            return parent::asText();
+        }
+        
+        return parent::asText() . "{$this->username}";
+    }
 
 
     /**
