@@ -56,7 +56,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
     public $notSubmitParam = 'sx-not-submit';
 
     public $modelClassName = CmsContentElement::class;
-    public $modelShowAttribute = "name";
+    public $modelShowAttribute = "asText";
     /**
      * @var CmsContent
      */
