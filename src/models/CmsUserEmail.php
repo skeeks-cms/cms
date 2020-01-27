@@ -153,6 +153,7 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
 
         return \Yii::$app->mailer->compose('@app/mail/approve-email', [
             'approveUrl'     => $this->approveUrl,
+            'approveCode'     => $this->approved_key,
             'email' => $this->value,
         ])
             ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])

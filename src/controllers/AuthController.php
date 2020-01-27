@@ -17,7 +17,6 @@ use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\AjaxRequestResponse;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
@@ -26,7 +25,8 @@ use skeeks\cms\models\UserAuthClient;
 use skeeks\cms\modules\admin\controllers\helpers\ActionManager;
 use skeeks\cms\modules\admin\filters\AccessControl;
 use Yii;
-use yii\authclient\BaseOAuth;
+use yii\base\DynamicModel;
+use yii\base\Model;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -340,45 +340,59 @@ class AuthController extends Controller
         $rr = new RequestResponse();
         $token = \Yii::$app->request->get('token');
 
-        if (!$token) {
+        /*if (!$token) {
             return $this->goHome();
-        }
+        }*/
+        
+        $model = new DynamicModel(['code']);
+        $model->addRule('code', 'required');
 
-        /**
-         * @var $cmsUserEmail CmsUserEmail
-         */
-        $cmsUserEmail = CmsUserEmail::find()->where(['approved_key' => $token])->one();
+        if ($token) {
+            /**
+             * @var $cmsUserEmail CmsUserEmail
+             */
+            $cmsUserEmail = CmsUserEmail::find()->where(['approved_key' => $token])->one();
 
-        if ($cmsUserEmail) {
-            $cmsUserEmail->is_approved = 1;
-            $cmsUserEmail->approved_key_at = null;
-            $cmsUserEmail->approved_key = null;
+            if ($cmsUserEmail) {
+                $cmsUserEmail->is_approved = 1;
+                $cmsUserEmail->approved_key_at = null;
+                $cmsUserEmail->approved_key = null;
 
 
-            if ($cmsUserEmail->save()) {
+                if ($cmsUserEmail->save()) {
 
-                if ($cmsUserEmail->cmsUser->email == $cmsUserEmail->value) {
-                    $user = $cmsUserEmail->cmsUser;
-                    $user->email_is_approved = 1;
-                    if (!$user->save()) {
-                        print_r($user->errors);die;
+                    if ($cmsUserEmail->cmsUser->email == $cmsUserEmail->value) {
+                        $user = $cmsUserEmail->cmsUser;
+                        $user->email_is_approved = 1;
+                        if (!$user->save()) {
+                            print_r($user->errors);
+                            die;
+                        }
                     }
+                    
+                    \Yii::$app->user->login($cmsUserEmail->cmsUser);
+                    return $this->redirect(Yii::$app->getUser()->getReturnUrl());
+
+                    $rr->success = true;
+                    $rr->message = 'Поздравляем! Ваш email успешно подтвержден и теперь вы можете авторизоваться на сайте.';
+
+                } else {
+                    $rr->success = false;
+                    $rr->message = 'Проверочный код некорреткный.';
                 }
 
-                $rr->success = true;
-                $rr->message = 'Поздравляем! Ваш email успешно подтвержден и теперь вы можете авторизоваться на сайте.';
 
             } else {
-                $rr->success = false;
-                $rr->message = 'Ошибка, скорее всего данная ссылка уже устарела';
+                $rr->message = 'Проверочный код некорреткный.';
             }
-
-
         } else {
-            $rr->message = 'Ошибка, скорее всего данная ссылка уже устарела';
+            $rr->message = 'На Ваш электронный адрес отправлено письмо проверочным кодом.';
         }
 
-        return $this->render('approve-email', (array)$rr);
+
+        return $this->render('approve-email', ArrayHelper::merge((array)$rr, [
+            'model' => $model
+        ]));
     }
 
 
