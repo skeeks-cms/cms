@@ -109,6 +109,15 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $auth_only_email_is_approved = 0;
 
+    /**
+     * @var int
+     */
+    public $email_approved_key_length = 32;
+    /**
+     * @var int
+     */
+    public $approved_key_is_letter = 1;
+
 
     //После регистрации пользователю будут присвоены эти роли
     /**
@@ -294,6 +303,8 @@ class Cms extends \skeeks\cms\base\Component
             [['tree_max_code_length'], 'integer'],
             [['element_max_code_length'], 'integer'],
             [['auth_only_email_is_approved'], 'integer'],
+            [['email_approved_key_length'], 'integer'],
+            [['approved_key_is_letter'], 'integer'],
         ]);
     }
     public function attributeLabels()
@@ -307,6 +318,8 @@ class Cms extends \skeeks\cms\base\Component
             'tree_max_code_length'        => 'Максимальная длинна кода (url) разделов',
             'element_max_code_length'     => 'Максимальная длинна кода (url) элементов',
             'auth_only_email_is_approved' => 'Разрешить авторизацию на сайте только с подтвержденными email?',
+            'email_approved_key_length' => 'Длина проверочного кода',
+            'approved_key_is_letter' => 'Проверочный код содержит буквы?',
         ]);
     }
     public function attributeHints()
@@ -362,6 +375,11 @@ class Cms extends \skeeks\cms\base\Component
                         'items'    => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'),
                     ],
                     'auth_only_email_is_approved' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'email_approved_key_length',
+                    'approved_key_is_letter' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],

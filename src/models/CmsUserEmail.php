@@ -129,7 +129,14 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
 
     public function genereteApprovedKey()
     {
-        $this->approved_key = \Yii::$app->security->generateRandomString();
+        if (\Yii::$app->cms->approved_key_is_letter) {
+            $this->approved_key = \Yii::$app->security->generateRandomString((int) \Yii::$app->cms->email_approved_key_length);
+        } else {
+            $number = getrandmax() . getrandmax() . getrandmax();
+            $random = substr($number, 0, (int)\Yii::$app->cms->email_approved_key_length);
+            $this->approved_key = $random;
+        }
+        
         $this->approved_key_at = time();
 
         if (!$this->save()) {
