@@ -54,6 +54,8 @@ use yii\helpers\Url;
  * @property string                      $meta_keywords
  * @property string                      $seo_h1
  *
+ * @property bool                      $is_active
+ *
  * @property integer                     $parent_content_element_id version > 2.4.8
  *
  *
@@ -216,7 +218,7 @@ class CmsContentElement extends RelatedElementModel
             'meta_description'       => Yii::t('skeeks/cms', 'Meta Description'),
             'description_short_type' => Yii::t('skeeks/cms', 'Description Short Type'),
             'description_full_type'  => Yii::t('skeeks/cms', 'Description Full Type'),
-            'image_id'               => Yii::t('skeeks/cms', 'Main Image (announcement)'),
+            'image_id'               => Yii::t('skeeks/cms', 'Main Image'),
             'image_full_id'          => Yii::t('skeeks/cms', 'Main Image'),
 
             'imageIds'                  => Yii::t('skeeks/cms', 'Images'),
@@ -337,13 +339,13 @@ class CmsContentElement extends RelatedElementModel
                 'when'       => function (CmsContentElement $model) {
 
                     if ($model->cmsContent && $model->cmsContent->parentContent) {
-                        return (bool)($model->cmsContent->parent_content_is_required == "Y");
+                        return (bool)($model->cmsContent->is_parent_content_required);
                     }
 
                     return false;
                 },
                 'whenClient' => "function (attribute, value) {
-                return $('#cmscontent-parent_content_is_required').val() == 'Y';
+                return $('#cmscontent-is_parent_content_required').val() == '1';
             }",
             ],
 
@@ -686,6 +688,11 @@ class CmsContentElement extends RelatedElementModel
         } else {
             return $this->name;
         }
+    }
+
+    public function getIs_active()
+    {
+        return (bool) ($this->active == "Y");
     }
 }
 

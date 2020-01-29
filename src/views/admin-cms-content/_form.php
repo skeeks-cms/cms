@@ -32,7 +32,7 @@ $model->load(\Yii::$app->request->get());
         \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name'));
     ?>
 <?php endif; ?>
-
+<?= $form->field($model, 'is_active')->checkbox(); ?>
 <?= $form->field($model, 'name')->textInput(); ?>
 <?= $form->field($model, 'code')->textInput()
     ->hint(\Yii::t('skeeks/cms',
@@ -42,8 +42,9 @@ $model->load(\Yii::$app->request->get());
     ->hint(\Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
 
 
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
-<?= $form->fieldRadioListBoolean($model, 'visible'); ?>
+
+<?= $form->field($model, 'is_visible')->checkbox(); ?>
+<?= $form->field($model, 'is_have_page')->checkbox(); ?>
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -61,7 +62,7 @@ $model->load(\Yii::$app->request->get());
                 ]); */ ?>
     </div>
     <div class="col-md-6">
-        <?= $form->fieldRadioListBoolean($model, 'is_allow_change_tree'); ?>
+        <?= $form->field($model, 'is_allow_change_tree')->checkbox(); ?>
     </div>
 </div>
 
@@ -92,7 +93,7 @@ $model->load(\Yii::$app->request->get());
         ); ?>
     </div>
     <div class="col-md-3">
-        <?= $form->fieldRadioListBoolean($model, 'parent_content_is_required'); ?>
+        <?= $form->field($model, 'is_parent_content_required')->checkbox(); ?>
     </div>
     <div class="col-md-3">
         <?= $form->fieldSelect($model, 'parent_content_on_delete',
@@ -111,6 +112,7 @@ $model->load(\Yii::$app->request->get());
     <?php endforeach; ?>
 
 <?php endif; ?>
+
 
 
 <?= $form->fieldSetEnd(); ?>
@@ -263,7 +265,7 @@ $model->load(\Yii::$app->request->get());
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/cms', 'Access'),
 ]); ?>
-<?= $form->fieldRadioListBoolean($model, 'access_check_element'); ?>
+<?= $form->field($model, 'is_access_check_element')->checkbox(); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/cms', 'Additionally'),

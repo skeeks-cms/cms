@@ -409,13 +409,18 @@ HTML;
 
                         'view' => [
                             'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
-                                return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $model->absoluteUrl,
+                                if ($model->cmsContent->is_have_page) {
+                                    return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $model->absoluteUrl,
                                     [
                                         'target'    => '_blank',
                                         'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
                                         'data-pjax' => '0',
                                         'class'     => 'btn btn-sm',
                                     ]);
+                                } else {
+                                    return '';
+                                }
+
                             },
                             'format'         => 'raw',
                             /*'label'  => "Смотреть",*/

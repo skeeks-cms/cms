@@ -113,7 +113,7 @@ JS
     <?php endif; ?>
 
     <?php if ($contentModel && $contentModel->parentContent) : ?>
-        <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
+        <?= Html::activeHiddenInput($contentModel, 'is_parent_content_required'); ?>
     <?php endif; ?>
 </div>
 
@@ -123,13 +123,7 @@ JS
     'model'        => $model,
 ]); ?>
 
-<?= $this->render('_form-announce', [
-    'form'         => $form,
-    'contentModel' => $contentModel,
-    'model'        => $model,
-]); ?>
-
-<?= $this->render('_form-detail', [
+<?= $this->render('_form-description', [
     'form'         => $form,
     'contentModel' => $contentModel,
     'model'        => $model,
@@ -141,17 +135,20 @@ JS
     'model'        => $model,
 ]); ?>
 
-<?= $this->render('_form-seo', [
-    'form'         => $form,
-    'contentModel' => $contentModel,
-    'model'        => $model,
-]); ?>
+<? if ($contentModel->is_have_page) : ?>
+    <?= $this->render('_form-seo', [
+        'form'         => $form,
+        'contentModel' => $contentModel,
+        'model'        => $model,
+    ]); ?>
+<? endif; ?>
 
-<?= $this->render('_form-images', [
+
+<? /*= $this->render('_form-images', [
     'form'         => $form,
     'contentModel' => $contentModel,
     'model'        => $model,
-]); ?>
+]); */ ?>
 
 <?= $this->render('_form-additionaly', [
     'form'         => $form,
@@ -163,7 +160,7 @@ JS
 
 
 <?php if (!$model->isNewRecord) : ?>
-    <?php if ($model->cmsContent->access_check_element == "Y") : ?>
+    <?php if ($model->cmsContent->is_access_check_element) : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Access')); ?>
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
             'permissionName'        => $model->permissionName,

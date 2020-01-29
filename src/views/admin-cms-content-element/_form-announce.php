@@ -4,13 +4,13 @@
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement')); ?>
-<?= $form->field($model, 'image_id')->widget(
+<?/*= $form->field($model, 'image_id')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
     [
         'accept' => 'image/*',
         'multiple' => false
     ]
-); ?>
+); */?>
 <?= $form->field($model, 'description_short')->widget(
     \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
     [

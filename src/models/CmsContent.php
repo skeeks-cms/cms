@@ -17,13 +17,12 @@ use yii\helpers\ArrayHelper;
  * This is the model class for table "{{%cms_content}}".
  *
  * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
+ * @property integer|null $created_by
+ * @property integer|null $updated_by
+ * @property integer|null $created_at
+ * @property integer|null $updated_at
  * @property string $name
  * @property string $code
- * @property string $active
  * @property integer $priority
  * @property string $description
  * @property string $content_type
@@ -33,20 +32,22 @@ use yii\helpers\ArrayHelper;
  * @property string $name_meny
  * @property string $name_one
  * @property integer $default_tree_id
- * @property string $is_allow_change_tree
+ * @property integer $is_allow_change_tree
+ * @property integer $is_active
  * @property integer $is_count_views
  * @property integer $root_tree_id
  * @property string $view_file
- * @property string $access_check_element
+ * @property integer $is_access_check_element
  *
  * @property string $meta_title_template
  * @property string $meta_description_template
  * @property string $meta_keywords_template
  *
  * @property integer $parent_content_id
- * @property string $visible
+ * @property integer $is_visible
  * @property string $parent_content_on_delete
- * @property string $parent_content_is_required
+ * @property integer $is_parent_content_required
+ * @property integer $is_have_page
  *
  * ***
  *
@@ -101,7 +102,7 @@ class CmsContent extends Core
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
             'name' => Yii::t('skeeks/cms', 'Name'),
             'code' => Yii::t('skeeks/cms', 'Code'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
+            'is_active' => Yii::t('skeeks/cms', 'Active'),
             'priority' => Yii::t('skeeks/cms', 'Priority'),
             'description' => Yii::t('skeeks/cms', 'Description'),
             'content_type' => Yii::t('skeeks/cms', 'Content Type'),
@@ -121,12 +122,14 @@ class CmsContent extends Core
             'meta_description_template' => Yii::t('skeeks/cms', 'Шаблон META KEYWORDS'),
             'meta_keywords_template' => Yii::t('skeeks/cms', 'Шаблон META DESCRIPTION'),
 
-            'access_check_element' => Yii::t('skeeks/cms', 'Включить управление доступом к элементам'),
+            'is_access_check_element' => Yii::t('skeeks/cms', 'Включить управление доступом к элементам'),
             'parent_content_id' => Yii::t('skeeks/cms', 'Parent content'),
 
-            'visible' => Yii::t('skeeks/cms', 'Show in menu'),
+            'is_visible' => Yii::t('skeeks/cms', 'Show in menu'),
             'parent_content_on_delete' => Yii::t('skeeks/cms', 'At the time of removal of the parent element'),
-            'parent_content_is_required' => Yii::t('skeeks/cms', 'Parent element is required to be filled'),
+            'is_parent_content_required' => Yii::t('skeeks/cms', 'Parent element is required to be filled'),
+
+            'is_have_page' => Yii::t('skeeks/cms', 'У элементов есть страница на сайте.'),
         ]);
     }
 
@@ -137,9 +140,12 @@ class CmsContent extends Core
     {
         return array_merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id', 'is_count_views'],
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id', 'is_count_views', 'is_allow_change_tree', 'is_active'],
                 'integer'
             ],
+            [['is_visible'], 'integer'],
+            [['is_parent_content_required'], 'integer'],
+            [['is_have_page'], 'integer'],
             [['name', 'content_type'], 'required'],
             [['description'], 'string'],
             [['meta_title_template'], 'string'],
@@ -148,21 +154,22 @@ class CmsContent extends Core
             [['name', 'view_file'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],
-            [['access_check_element'], 'string'],
+            [['is_access_check_element'], 'integer'],
             [['code'], 'validateCode'],
-            [['active', 'index_for_search', 'tree_chooser', 'list_mode', 'is_allow_change_tree'], 'string', 'max' => 1],
+            [['index_for_search', 'tree_chooser', 'list_mode'], 'string', 'max' => 1],
             [['content_type'], 'string', 'max' => 32],
             [['name_meny', 'name_one'], 'string', 'max' => 100],
             ['priority', 'default', 'value' => 500],
-            ['active', 'default', 'value' => Cms::BOOL_Y],
-            ['is_allow_change_tree', 'default', 'value' => Cms::BOOL_Y],
-            ['access_check_element', 'default', 'value' => Cms::BOOL_N],
+            ['is_active', 'default', 'value' => 1],
+            ['is_allow_change_tree', 'default', 'value' => 1],
+            ['is_access_check_element', 'default', 'value' => 0],
             ['name_meny', 'default', 'value' => Yii::t('skeeks/cms', 'Elements')],
             ['name_one', 'default', 'value' => Yii::t('skeeks/cms', 'Element')],
 
 
-            ['visible', 'default', 'value' => Cms::BOOL_Y],
-            ['parent_content_is_required', 'default', 'value' => Cms::BOOL_Y],
+            ['is_visible', 'default', 'value' => 1],
+            ['is_have_page', 'default', 'value' => 1],
+            ['is_parent_content_required', 'default', 'value' => 0],
             ['parent_content_on_delete', 'default', 'value' => self::CASCADE],
 
             ['parent_content_id', 'integer'],

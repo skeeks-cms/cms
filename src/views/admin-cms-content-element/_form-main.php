@@ -4,34 +4,56 @@
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
+
+<div class="row">
+    <div class="col-md-2" style="<?= !$model->is_active ? "color: red;" : ""; ?>">
+        <?= $form->fieldRadioListBoolean($model, 'active', [], [
+            'data-form-reload' => 'true',
+        ]); ?>
+    </div>
+</div>
+
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
+<?= $form->field($model, 'image_id')->widget(
+    \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+    [
+        'accept'   => 'image/*',
+        'multiple' => false,
+    ]
+); ?>
 
+<?= $form->field($model, 'imageIds')->widget(
+    \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+    [
+        'accept'   => 'image/*',
+        'multiple' => true,
+    ]
+); ?>
 
 <?php if ($contentModel->root_tree_id) : ?>
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
 <?php else
     : ?>
-    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all();
+    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC])->all();
     ?>
 <?php endif; ?>
 
-<?php if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
+<?php if ($contentModel->is_allow_change_tree) : ?>
     <?php if ($rootTreeModels) : ?>
         <div class="row">
             <div class="col-lg-8 col-md-12 col-sm-12">
                 <?= $form->field($model, 'tree_id')->widget(
                     \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                     [
-                        'options' => [
-                            'data-form-reload' => 'true'
+                        'options'           => [
+                            'data-form-reload' => 'true',
                         ],
-                        'multiple' => false,
+                        'multiple'          => false,
                         'treeWidgetOptions' =>
                             [
-                                'models' => $rootTreeModels
-                            ]
+                                'models' => $rootTreeModels,
+                            ],
                     ]
                 ); ?>
             </div>
@@ -43,7 +65,7 @@
 
 $properties = $model->getRelatedProperties()
     ->joinWith('cmsContentProperty2trees as map2trees')
-    ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName() . ".id");
+    ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
 
 $treeIds = $model->treeIds;
 if ($model->tree_id) {
@@ -66,7 +88,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
 ?>
 <?php if ($properties) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/cms', 'Additional properties')
+        'content' => \Yii::t('skeeks/cms', 'Additional properties'),
     ]); ?>
 
     <?php foreach ($properties
@@ -94,7 +116,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                         <?
                         if ($actionCreate) {
                             $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                                'property_id' => $property->id
+                                'property_id' => $property->id,
                             ]);
 
                             $actionCreate->name = \Yii::t("skeeks/cms", "Create");
@@ -105,14 +127,14 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                             ]);*/
 
                             echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                                'actions' => ['create' => $actionCreate],
-                                'clientOptions' => ['pjax-id' => $pjax->id],
+                                'actions'         => ['create' => $actionCreate],
+                                'clientOptions'   => ['pjax-id' => $pjax->id],
                                 'isOpenNewWindow' => true,
-                                'tag' => 'div',
-                                'itemWrapperTag' => 'span',
-                                'itemTag' => 'button',
-                                'itemOptions' => ['class' => 'btn btn-default'],
-                                'options' => ['class' => 'sx-controll-actions'],
+                                'tag'             => 'div',
+                                'itemWrapperTag'  => 'span',
+                                'itemTag'         => 'button',
+                                'itemOptions'     => ['class' => 'btn btn-default'],
+                                'options'         => ['class' => 'sx-controll-actions'],
                             ]);
                         }
                         ?>
@@ -131,7 +153,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                 <div class="col-md-4">
                     <?php if (!in_array($property->handler->fieldElement, [
                         \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG,
-                        \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE
+                        \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE,
                     ])) : ?>
                         <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
                             <label>&nbsp;</label>
@@ -146,7 +168,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                             <?
                             if ($actionCreate) {
                                 $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                                    'content_id' => $property->handler->content_id
+                                    'content_id' => $property->handler->content_id,
                                 ]);
 
                                 $actionCreate->name = \Yii::t("skeeks/cms", "Create");
@@ -157,14 +179,14 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                                 ]);*/
 
                                 echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                                    'actions' => ['create' => $actionCreate],
-                                    'clientOptions' => ['pjax-id' => $pjax->id],
+                                    'actions'         => ['create' => $actionCreate],
+                                    'clientOptions'   => ['pjax-id' => $pjax->id],
                                     'isOpenNewWindow' => true,
-                                    'tag' => 'div',
-                                    'itemWrapperTag' => 'span',
-                                    'itemTag' => 'button',
-                                    'itemOptions' => ['class' => 'btn btn-default'],
-                                    'options' => ['class' => 'sx-controll-actions'],
+                                    'tag'             => 'div',
+                                    'itemWrapperTag'  => 'span',
+                                    'itemTag'         => 'button',
+                                    'itemOptions'     => ['class' => 'btn btn-default'],
+                                    'options'         => ['class' => 'sx-controll-actions'],
                                 ]);
                             }
                             ?>
@@ -185,7 +207,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
 <?php else
     : ?>
     <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
-    <?php
+<?php
 endif;
 ?>
 <?= $form->fieldSetEnd() ?>
