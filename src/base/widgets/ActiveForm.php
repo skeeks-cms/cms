@@ -17,14 +17,14 @@ use yii\helpers\Html;
 use yii\widgets\ActiveField;
 
 /**
- * @deprecated
- *
  * Class ActiveForm
  * @package skeeks\cms\modules\admin\widgets
  */
 class ActiveForm extends \yii\widgets\ActiveForm
 {
     /**
+     * @deprecated 
+     * 
      * @param $model
      * @param $attribute
      * @param array $items
@@ -41,6 +41,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
     }
 
     /**
+     * @deprecated
+     * 
      * @param $model
      * @param $attribute
      * @param array $items
@@ -58,6 +60,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
     }
 
     /**
+     * @deprecated
+     * 
      * @param $model
      * @param $attribute
      * @param array $config
@@ -78,6 +82,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
     }
 
     /**
+     * @deprecated
+     * 
      * @param $model
      * @param $attribute
      * @param $items
@@ -95,6 +101,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
     }
 
     /**
+     * @deprecated
+     * 
      * @param $model
      * @param $attribute
      * @param $items
