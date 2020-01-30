@@ -8,11 +8,11 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
+use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsTreeType;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -23,13 +23,10 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /**
- * Class AdminCmsTreeTypeController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminCmsTreeTypeController extends BackendModelStandartController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public function init()
     {
         $this->name = "Настройки разделов";
@@ -158,17 +155,11 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
             ],
 
             "activate-multi" => [
-                'class'        => AdminMultiModelEditAction::className(),
-                "name"         => "Активировать",
-                //"icon"              => "fa fa-trash",
-                "eachCallback" => [$this, 'eachMultiActivate'],
+                'class' => BackendModelMultiActivateAction::class,
             ],
 
             "inActivate-multi" => [
-                'class'        => AdminMultiModelEditAction::className(),
-                "name"         => "Деактивировать",
-                //"icon"              => "fa fa-trash",
-                "eachCallback" => [$this, 'eachMultiInActivate'],
+                'class' => BackendModelMultiDeactivateAction::class,
             ],
         ]);
     }
@@ -203,7 +194,7 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                 'name'   => \Yii::t('skeeks/cms', 'Captions'),
                 'fields' => [
                     'name_one',
-                    'name_meny'
+                    'name_meny',
                 ],
             ],
         ];
