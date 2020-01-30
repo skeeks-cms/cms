@@ -15,6 +15,10 @@
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => \Yii::t('skeeks/cms', 'Images'),
+]); ?>
+
 <?= $form->field($model, 'image_id')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
     [
