@@ -53,7 +53,7 @@ use yii\web\Application;
  */
 class AdminCmsContentElementController extends BackendModelStandartController
 {
-    public $notSubmitParam = 'sx-not-submit';
+    public $notSubmitParam = 'sx-reload-form';
 
     public $modelClassName = CmsContentElement::class;
     public $modelShowAttribute = "asText";

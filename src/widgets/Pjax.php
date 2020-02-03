@@ -73,8 +73,22 @@ class Pjax extends \yii\widgets\Pjax
             $errorNotify = "sx.notify.error('{$errorMessage}:<br />' + data.responseText);";
         }
         if ($this->isShowError) {
+
+            $this->view->registerCss(<<<CSS
+.pjax-errors {
+    background: #fee5e5;
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid #f86c6b;
+    border-radius: 2px;
+}
+.pjax-errors .red {
+    color: red;
+}
+CSS
+);
             $error = "
-            var msg = '{$errorMessage}:<br />' + data.responseText;
+            var msg = '<span class=\"red\">{$errorMessage}</span><br />' + data.responseText;
             var jPjax = $('#{$this->id}');
             if ($('.pjax-errors', jPjax).length) {
                 $('.pjax-errors', jPjax).empty().append(msg);
