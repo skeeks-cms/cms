@@ -183,7 +183,7 @@ allowedIPs
         <?= $form->field($model, 'is_active')->checkbox(); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->buttonsCreateOrUpdate($model); ?>
+    <?= $form->buttonsStandart($model); ?>
     <?php ActiveForm::end(); ?>
 
 

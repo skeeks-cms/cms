@@ -39,6 +39,6 @@ JS
             'placeholder' => '+7 903 722-28-73'
         ]); ?>
 
-    <?= $form->buttonsCreateOrUpdate($model); ?>
+    <?= $form->buttonsStandart($model); ?>
     <?= $form->errorSummary($model); ?>
 <?php $action->endActiveForm(); ?>

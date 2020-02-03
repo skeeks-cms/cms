@@ -26,6 +26,6 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
 <?= $form->field($model, 'value')->textInput(['maxlength' => 255]) ?>
 <?= $form->field($model, 'code')->textInput(['maxlength' => 32]) ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 
 <?php ActiveForm::end(); ?>

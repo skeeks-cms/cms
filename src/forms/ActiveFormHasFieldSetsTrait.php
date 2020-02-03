@@ -12,7 +12,7 @@ use skeeks\cms\widgets\forms\FieldSetWidget;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-trait AdtiveFormHasFieldSetsTrait
+trait ActiveFormHasFieldSetsTrait
 {
     /**
      * @var string
@@ -31,13 +31,4 @@ trait AdtiveFormHasFieldSetsTrait
         return $class::begin($widgetConfig);
 
     }
-
-    /**
-     * @return string
-     */
-    /*public function fieldSetEnd()
-    {
-        $class = $this->firldSetClass;
-        return $class::end();
-    }*/
 }

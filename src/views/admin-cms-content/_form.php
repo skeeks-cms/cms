@@ -276,5 +276,5 @@ $model->load(\Yii::$app->request->get());
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 <?php $action->endActiveForm(); ?>

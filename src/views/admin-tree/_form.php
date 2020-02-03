@@ -494,7 +494,7 @@ JS
     <?php /* endforeach; */ ?>
 --><?php /* endif; */ ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 
 <?php $this->registerJs(<<<JS
     (function(sx, $, _)

@@ -17,6 +17,6 @@ $action = $controller->action;
         <?= $form->field($model, 'new_password')->passwordInput() ?>
         <?= $form->field($model, 'new_password_confirm')->passwordInput() ?>
 
-    <?= $form->buttonsCreateOrUpdate($model); ?>
+    <?= $form->buttonsStandart($model); ?>
     <?= $form->errorSummary($model); ?>
 <?php $action->endActiveForm(); ?>
