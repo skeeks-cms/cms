@@ -9,9 +9,8 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\grid\BooleanColumn;
-use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\yii2\form\Element;
@@ -19,7 +18,6 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextField;
 use yii\base\Event;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -142,8 +140,8 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                             'format'    => "raw",
                             'value'     => function (CmsTreeTypeProperty $model) {
                                 return Html::a($model->asText, "#", [
-                                    'class' => "sx-trigger-action",
-                                ])."<br />".Html::tag('small', $model->handler->name);
+                                        'class' => "sx-trigger-action",
+                                    ])."<br />".Html::tag('small', $model->handler->name);
                             },
                         ],
 
@@ -158,7 +156,7 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
 
                         'countElementProperties' => [
                             'attribute' => 'countElementProperties',
-                            'format' => 'raw',
+                            'format'    => 'raw',
                             'label'     => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
                             'value'     => function (CmsTreeTypeProperty $model) {
                                 return Html::a($model->raw_row['countElementProperties'], [
@@ -184,6 +182,8 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
             'create' => [
                 'fields' => [$this, 'updateFields'],
 
+                //'activeFormClassName' => ActiveFormBackend::class,
+
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
 
@@ -194,7 +194,7 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                         }
                         $model->component_settings = $handler->toArray();
                     }
-                }
+                },
 
             ],
             'update' => [
@@ -212,7 +212,7 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                         $model->component_settings = $handler->toArray();
                     }
 
-                }
+                },
             ],
 
             /*'create' => [
@@ -224,7 +224,6 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
             ],*/
         ]);
     }
-
 
 
     public function updateFields($action)
@@ -240,13 +239,13 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Basic settings'),
                 'fields' => [
-                    'is_required'                     => [
+                    'is_required' => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
                         'trueValue'  => "Y",
                         'falseValue' => "N",
                     ],
-                    'active'                     => [
+                    'active'      => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
                         'trueValue'  => "Y",
@@ -254,23 +253,20 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                     ],
                     'name',
                     'code',
-                    'component' => [
-                        'class' => SelectField::class,
+                    'component'   => [
+                        'class'          => SelectField::class,
                         'elementOptions' => [
                             'data' => [
                                 'form-reload' => 'true',
                             ],
                         ],
-                        /*'options' => [
-                            'class' => 'teat'
-                        ],*/
-                        'items' => function () {
+                        'items'          => function () {
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
                         },
                     ],
                     [
-                        'class' => HtmlBlock::class,
-                        'on beforeRender' => function(Event $e) use ($model) {
+                        'class'           => HtmlBlock::class,
+                        'on beforeRender' => function (Event $e) use ($model) {
                             /**
                              * @var $formElement Element
                              */
@@ -289,8 +285,8 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                                 echo \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]);
                                 $formElement->content = $handler->renderConfigForm($formElement->activeForm);
                             }
-                        }
-                    ]
+                        },
+                    ],
                 ],
             ],
 
@@ -301,14 +297,14 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                     'hint',
                     'priority',
                     'cmsTreeTypes' => [
-                        'class' => SelectField::class,
+                        'class'    => SelectField::class,
                         'multiple' => true,
-                        'items' => function() {
+                        'items'    => function () {
                             return \yii\helpers\ArrayHelper::map(
                                 \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
                             );
-                        }
-                    ]
+                        },
+                    ],
                 ],
             ],
         ];
