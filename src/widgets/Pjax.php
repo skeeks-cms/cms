@@ -27,6 +27,11 @@ class Pjax extends \yii\widgets\Pjax
     public $isShowError = false;
 
     /**
+     * @var bool
+     */
+    public $isShowNotifyError = false;
+
+    /**
      * Block other container
      * @var string
      */
@@ -36,6 +41,21 @@ class Pjax extends \yii\widgets\Pjax
      * @var int
      */
     public $timeout = 30000;
+
+    /**
+     * @var string
+     */
+    public $clientCallbackSend = "";
+
+    /**
+     * @var string
+     */
+    public $clientCallbackComplete = "";
+
+    /**
+     * @var string
+     */
+    public $clientCallbackError = "";
 
 
     /**
@@ -48,8 +68,20 @@ class Pjax extends \yii\widgets\Pjax
         $errorMessage = \Yii::t('skeeks/admin', 'An unexpected error occurred. Refer to the developers.');
 
         $errorNotify = '';
+        $error = '';
+        if ($this->isShowNotifyError) {
+            $errorNotify = "sx.notify.error('{$errorMessage}:<br />' + data.responseText);";
+        }
         if ($this->isShowError) {
-            $errorNotify = "sx.notify.error('{$errorMessage}');";
+            $error = "
+            var msg = '{$errorMessage}:<br />' + data.responseText;
+            var jPjax = $('#{$this->id}');
+            if ($('.pjax-errors', jPjax).length) {
+                $('.pjax-errors', jPjax).empty().append(msg);
+            } else {
+                $('<div>', {'class' : 'pjax-errors'}).appendTo(jPjax).append(msg);
+            }
+            ";
         }
 
         if ($this->isBlock === true) {
@@ -76,6 +108,7 @@ class Pjax extends \yii\widgets\Pjax
                     $(document).on('pjax:error', function(e, data) {
                         if ('{$this->id}' == e.target.id) {
                             {$errorNotify}
+                            {$error}
                             blockerPanel.unblock();
                             e.preventDefault();
                         }
@@ -111,6 +144,7 @@ JS
                     $(document).on('pjax:error', function(e, data) {
                         if ('{$this->id}' == e.target.id) {
                             {$errorNotify}
+                            {$error}
                             blockerPanel.unblock();
                             e.preventDefault();
                         }
@@ -118,6 +152,24 @@ JS
                     });
 
                 })(sx, sx.$, sx._);
+JS
+            );
+        }
+
+
+        if ($this->clientCallbackSend) {
+
+            $clientCallbackSend = $this->clientCallbackSend;
+            $this->getView()->registerJs(<<<JS
+             
+                $(document).on('pjax:send', function(e, data)
+                {
+                    var success = {$clientCallbackSend};
+                    if ('{$this->id}' == e.target.id) {
+                        success(e, data);
+                    }
+                    
+                });
 JS
             );
         }

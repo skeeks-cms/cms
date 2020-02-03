@@ -1,6 +1,6 @@
 <?php
 
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
+//use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use yii\helpers\Html;
 
 /* @var $model \skeeks\cms\models\CmsContentElement */
@@ -228,4 +228,4 @@ JS
 
 <?= $form->buttonsStandart($model); ?>
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
-<?php ActiveForm::end(); ?>
+<?php $form::end(); ?>
