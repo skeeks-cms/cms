@@ -122,9 +122,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
                 "filters" => [
                     'visibleFilters' => [
                         'q',
-                        'id',
+                        //'id',
                         //'name',
-                        'active',
+                        //'active',
                     ],
                     'filtersModel'   => [
 
@@ -200,6 +200,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     if ($e->field->value) {
                                         $query->andWhere([
                                             'or',
+                                            ['like', CmsContentElement::tableName().'.id', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.name', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
@@ -464,6 +465,7 @@ HTML;
                     ],
                 ],
             ],
+            
             "create"           => [
                 "callback" => [$this, 'create'],
             ],
