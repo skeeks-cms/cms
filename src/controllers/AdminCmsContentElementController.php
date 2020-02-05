@@ -896,11 +896,7 @@ HTML
         $model = new $modelClassName;
 
         $model->loadDefaultValues();
-
-        if ($content_id = \Yii::$app->request->get("content_id")) {
-            $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id);
-            $model->content_id = $content_id;
-        }
+        $model->content_id = $this->content->id;
 
         $relatedModel = $model->relatedPropertiesModel;
         $relatedModel->loadDefaultValues();
