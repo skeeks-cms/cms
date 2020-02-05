@@ -16,7 +16,7 @@ $r = new ReflectionClass($component);
     'id' => 'widget-select-component'
 ]) */ ?>
 <form id="selector-component" action="" method="get" data-pjax>
-    <label><?= \Yii::t('skeeks/cms', 'Component settings') ?></label>
+    <!--<label><?/*= \Yii::t('skeeks/cms', 'Component settings') */?></label>-->
 
     <?=
     \skeeks\widget\chosen\Chosen::widget([
@@ -32,8 +32,8 @@ $r = new ReflectionClass($component);
                value="true"/>
     <?php endif; ?>
 </form>
-<hr/>
 
+<div class="row">
 <? if (method_exists($component, 'getEditUrl')) : ?>
     <iframe data-src="<?= $component->getEditUrl(); ?>" width="100%;" height="200px;" id="sx-test"></iframe>
 <? else : ?>
@@ -48,8 +48,7 @@ $r = new ReflectionClass($component);
     ?>
     <iframe data-src="<?= $url; ?>" width="100%;" height="200px;" id="sx-test"></iframe>
 <? endif; ?>
-
-
+</div>
 <?
 \skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
 $this->registerJs(<<<JS

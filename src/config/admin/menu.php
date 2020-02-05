@@ -287,6 +287,14 @@ return
                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],
                     ],
 
+
+                    [
+                        "label" => \Yii::t('skeeks/cms', "Components"),
+                        "url"       => ["cms/admin-settings"],
+                        "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
+                        /*'items' => componentsMenu(),*/
+                    ],
+
                     [
                         "label" => \Yii::t('skeeks/cms', "Server file storage"),
                         "url"   => ["cms/admin-storage/index"],
@@ -365,12 +373,7 @@ return
                     ],
 
 
-                    [
-                        "label" => \Yii::t('skeeks/cms', "Module settings"),
-                        //"url"       => ["cms/admin-settings"],
-                        "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
-                        'items' => componentsMenu(),
-                    ],
+
                 ],
         ],
 

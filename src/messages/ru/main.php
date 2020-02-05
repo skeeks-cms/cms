@@ -1,6 +1,7 @@
 <?php
 return
     [
+        "Components" => "Компоненты",
         "Meta Title" => "Заголовок (Meta title)",
         "Meta Keywords" => "Ключевые слова (Meta Keywords)",
         "Meta Description" => "Описание (Meta Description)",

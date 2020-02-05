@@ -15,11 +15,11 @@
 ]); ?>
 
 
-<div class="sx-box g-mb-10 g-pa-10">
-    <p><?= \Yii::t('skeeks/cms',
-            'This component may have personal preferences for each user. And it works differently depending on which of the sites is displayed.') ?></p>
-    <p><?= \Yii::t('skeeks/cms',
-            'In that case, if user not has personal settings will be used the default settings.') ?></p>
+<div class="alert-default alert">
+    <small><?= \Yii::t('skeeks/cms',
+            'This component may have personal preferences for each user. And it works differently depending on which of the sites is displayed.') ?></small><br />
+    <small><?= \Yii::t('skeeks/cms',
+            'In that case, if user not has personal settings will be used the default settings.') ?></small>
     <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponent($component)->andWhere([
         '>',
         'user_id',

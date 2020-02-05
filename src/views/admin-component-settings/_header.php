@@ -156,8 +156,9 @@ JS
 <!--<h1>Управление: <?php /*= $component->descriptor->name; */ ?></h1>
     <hr />-->
 <div class="row">
-    <div class="col-lg-2">
-        <ul class="nav flex-column nav-pills">
+    <div class="col-lg-12">
+        <!--<ul class="nav nav-tabs sx-nav-with-bg sx-mgr-6 sx-nav-model">-->
+        <ul class="nav u-nav-v7-1 u-nav-primary sx-main-page-nav">
             <li role="presentation"
                 class="nav-item">
                 <a class="nav-link <?= in_array(\Yii::$app->controller->action->id, ['index']) ? "active" : "" ?>"
@@ -200,4 +201,4 @@ JS
 
         </ul>
     </div>
-    <div class="col-lg-10">
+    <div class="col-lg-12">
