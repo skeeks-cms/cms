@@ -28,8 +28,6 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * @deprecated
- *
  * @property array       namespace
  * @property array       settings
  * @property CmsSite     cmsSite
