@@ -24,7 +24,7 @@ $r = new ReflectionClass($component);
         'items'         => $loadedForSelect,
         'allowDeselect' => false,
         'value'         => $r->getName(),
-    ])
+    ]);
     ?>
     <?php if (\Yii::$app->admin->isEmptyLayout()) : ?>
         <input type="hidden"
