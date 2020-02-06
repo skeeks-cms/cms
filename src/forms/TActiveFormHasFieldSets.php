@@ -12,7 +12,7 @@ use skeeks\cms\widgets\forms\FieldSetWidget;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-trait ActiveFormHasFieldSetsTrait
+trait TActiveFormHasFieldSets
 {
     /**
      * @var string

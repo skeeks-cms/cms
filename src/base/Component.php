@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\traits\HasComponentDbSettingsTrait;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
+use skeeks\cms\traits\TConfigForm;
 use yii\base\Exception;
 use yii\base\InvalidParamException;
 use yii\base\Model;
@@ -45,7 +46,7 @@ abstract class Component extends Model implements ConfigFormInterface
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;
-
+    use TConfigForm;
 
     const OVERRIDE_DEFAULT = 'default';
     const OVERRIDE_SITE = 'site';
@@ -175,11 +176,6 @@ abstract class Component extends Model implements ConfigFormInterface
     public static function instantiate($row)
     {
         return new static;
-    }
-
-    public function getConfigFormFields()
-    {
-        return [];
     }
 
     public function init()
@@ -380,9 +376,7 @@ abstract class Component extends Model implements ConfigFormInterface
         $this->_cmsUser = $cmsUser;
         return $this;
     }
-    public function renderConfigForm(ActiveForm $form)
-    {
-    }
+
     /**
      * Получение настроек согласно пути перекрытия настроек.
      * @return array
@@ -509,10 +503,7 @@ abstract class Component extends Model implements ConfigFormInterface
 
         return $result;
     }
-    public function getConfigFormModels()
-    {
-        return [];
-    }
+
     /**
      * @param bool $runValidation
      * @param null $attributeNames
@@ -1117,5 +1108,20 @@ abstract class Component extends Model implements ConfigFormInterface
         } else {
             unset($this->$offset);
         }
+    }
+
+
+
+
+    /**
+     * @return ActiveForm
+     */
+    public function beginConfigForm()
+    {
+        $this->_configActiveForm = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin([
+            'enableAjaxValidation'   => false,
+            'enableClientValidation' => false,
+        ]);
+        return $this->_configActiveForm;
     }
 }

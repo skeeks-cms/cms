@@ -15,7 +15,7 @@ use yii\helpers\ArrayHelper;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-trait ActiveFormHasPjaxTrait
+trait TActiveFormHasPjax
 {
     /**
      * @var bool
