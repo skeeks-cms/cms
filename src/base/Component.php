@@ -40,7 +40,8 @@ use yii\widgets\ActiveForm;
  * Class Component
  * @package skeeks\cms\base
  */
-abstract class Component extends Model implements ConfigFormInterface
+abstract class Component extends Model 
+    //implements ConfigFormInterface
 {
     //Можно задавать описание компонента.
     use HasComponentDescriptorTrait;

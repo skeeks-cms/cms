@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 
 /**
  *
- * Класс который умеет стоить форму для себя
+ * @deprecated 
  *
  * Interface ConfigFormInterface
  * @package yii\base

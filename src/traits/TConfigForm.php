@@ -38,11 +38,12 @@ trait TConfigForm
      * @param ActiveForm $form
      * @return string
      */
-    public function renderConfigForm(ActiveForm $form)
+    /*public function renderConfigForm(ActiveForm $form)
     {
         return $this->renderConfigFormFields($form);
-    }
+    }*/
 
+    public $configFormView = "";
     /**
      *
      * @param ActiveForm $form
@@ -50,7 +51,10 @@ trait TConfigForm
      */
     public function renderConfigFormFields(ActiveForm $form)
     {
-        return '';
+        return \Yii::$app->view->render($this->configFormView, [
+            'model' => $this,
+            'form' => $form,
+        ]);
     }
 
     /**
