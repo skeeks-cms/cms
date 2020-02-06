@@ -32,12 +32,12 @@ trait TActiveFormHasPjax
     public $pjaxClass = Pjax::class;
 
     /**
-     *
+     * @return $this
      */
     protected function _initPjax()
     {
         if ($this->usePjax === false) {
-            return;
+            return $this;
         }
 
         $this->options = ArrayHelper::merge($this->options, [
@@ -62,6 +62,8 @@ trait TActiveFormHasPjax
 
             return $event;
         });
+
+        return $this;
 
     }
 }
