@@ -17,7 +17,8 @@ trait TConfigForm
     /**
      * @var
      */
-    private $_configActiveForm;
+    protected $_configActiveForm;
+    
     /**
      * @return ActiveForm
      */

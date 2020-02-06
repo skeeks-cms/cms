@@ -17,8 +17,9 @@ use yii\helpers\Html;
 use yii\widgets\ActiveField;
 
 /**
- * Class ActiveForm
- * @package skeeks\cms\modules\admin\widgets
+ * @deprecated 
+ * 
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class ActiveForm extends \yii\widgets\ActiveForm
 {

@@ -5,11 +5,11 @@
  * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
  */
+/**
+ * @var $component \skeeks\cms\base\Component
+ */
 ?>
-<?php $form = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin([
-    'enableAjaxValidation'   => false,
-    'enableClientValidation' => false,
-]); ?>
+<?php $form = $component->beginConfigForm(); ?>
 
 <?= $form->errorSummary(\yii\helpers\ArrayHelper::merge(
     [$component], $component->getConfigFormModels()
@@ -23,7 +23,7 @@
         'fields'     => $fields,
     ]))->render(); ?>
 <? else : ?>
-    <? $formContent = $component->renderConfigForm($form); ?>
+    <? $formContent = $component->renderConfigFormFields($form); ?>
 <? endif; ?>
 
 <? if ($formContent) : ?>
@@ -39,4 +39,4 @@
     Нет редактируемых настроек для данного компонента
 <? endif; ?>
 
-<?php \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
+<?php $form::end(); ?>
