@@ -54,9 +54,10 @@ trait TActiveFormHasPjax
 
         $this->on(self::EVENT_AFTER_RUN, function (WidgetEvent $event) use ($pjaxClass) {
 
+            ob_start();
+            ob_implicit_flush(false);
             echo $event->result;
             $pjaxClass::end();
-
             $content = ob_get_clean();
             $event->result = $content;
 

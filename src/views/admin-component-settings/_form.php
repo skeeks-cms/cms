@@ -16,6 +16,7 @@
 )); ?>
 
 <? if ($fields = $component->getConfigFormFields()) : ?>
+
     <? $formContent = (new \skeeks\yii2\form\Builder([
         'models'     => $component->getConfigFormModels(),
         'model'      => $component,

@@ -14,28 +14,15 @@ use yii\widgets\ActiveForm;
  */
 trait TConfigForm
 {
-    /**
-     * @var
-     */
-    protected $_configActiveForm;
     
     /**
      * @return ActiveForm
      */
     public function beginConfigForm()
     {
-        $this->_configActiveForm = ActiveForm::begin();
-        return $this->_configActiveForm;
+        return ActiveForm::begin();
     }
 
-    /**
-     *
-     */
-    public function endConfigForm()
-    {
-        $configForm = $this->_configActiveForm;
-        $configForm::end();
-    }
 
     /**
      * @return array

@@ -1116,10 +1116,9 @@ abstract class Component extends Model implements ConfigFormInterface
      */
     public function beginConfigForm()
     {
-        $this->_configActiveForm = \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin([
+        return \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::begin([
             'enableAjaxValidation'   => false,
             'enableClientValidation' => false,
         ]);
-        return $this->_configActiveForm;
     }
 }
