@@ -33,8 +33,6 @@ use yii\helpers\Html;
  */
 class AdminCmsContentPropertyController extends BackendModelStandartController
 {
-    public $notSubmitParam = 'sx-not-submit';
-
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', 'Property management');

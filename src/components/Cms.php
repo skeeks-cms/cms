@@ -170,13 +170,13 @@ class Cms extends \skeeks\cms\base\Component
     private $_relatedHandlers = [];
 
 
-    public function renderConfigForm(ActiveForm $form)
+    /*public function renderConfigFormFields(ActiveForm $form)
     {
         echo \Yii::$app->view->renderFile(__DIR__.'/cms/_form.php', [
             'form'  => $form,
             'model' => $this,
         ], $this);
-    }
+    }*/
     /**
      * @return CmsSite
      */

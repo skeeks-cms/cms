@@ -32,17 +32,10 @@ trait TConfigForm
         return [];
     }
 
-    /**
-     * @depricated
-     *
-     * @param ActiveForm $form
-     * @return string
-     */
-    /*public function renderConfigForm(ActiveForm $form)
-    {
-        return $this->renderConfigFormFields($form);
-    }*/
 
+    /**
+     * @var string 
+     */
     public $configFormView = "";
     /**
      *
@@ -51,10 +44,21 @@ trait TConfigForm
      */
     public function renderConfigFormFields(ActiveForm $form)
     {
-        return \Yii::$app->view->render($this->configFormView, [
-            'model' => $this,
-            'form' => $form,
-        ]);
+        if ($fields = $this->getConfigFormFields()) {
+            $formContent = (new \skeeks\yii2\form\Builder([
+                'models'     => $this->getConfigFormModels(),
+                'model'      => $this,
+                'activeForm' => $form,
+                'fields'     => $fields,
+            ]))->render();
+        } else {
+            $formContent = \Yii::$app->view->render($this->configFormView, [
+                'model' => $this,
+                'form' => $form,
+            ]);
+        }
+        
+        return $formContent;
     }
 
     /**

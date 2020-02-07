@@ -15,19 +15,7 @@
     [$component], $component->getConfigFormModels()
 )); ?>
 
-<? if ($fields = $component->getConfigFormFields()) : ?>
-
-    <? $formContent = (new \skeeks\yii2\form\Builder([
-        'models'     => $component->getConfigFormModels(),
-        'model'      => $component,
-        'activeForm' => $form,
-        'fields'     => $fields,
-    ]))->render(); ?>
-<? else : ?>
-    <? $formContent = $component->renderConfigFormFields($form); ?>
-<? endif; ?>
-
-<? if ($formContent) : ?>
+<? if ($formContent = $component->renderConfigFormFields($form)) : ?>
     <?= $formContent; ?>
     <?= $form->buttonsStandart($component); ?>
     <?= $form->errorSummary(\yii\helpers\ArrayHelper::merge(

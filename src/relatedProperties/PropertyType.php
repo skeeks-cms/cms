@@ -32,7 +32,7 @@ use yii\widgets\ActiveForm;
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
  */
-abstract class PropertyType extends Model implements ConfigFormInterface
+abstract class PropertyType extends Model implements ICFor
 {
     /**
      * @var string

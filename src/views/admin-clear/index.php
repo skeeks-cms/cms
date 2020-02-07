@@ -8,46 +8,46 @@
 /* @var $this yii\web\View */
 $url = \yii\helpers\Url::to(['/cms/admin-clear/index']);
 $data = \yii\helpers\Json::encode([
-    'backend' => $url
-])
+    'backend' => $url,
+]);
 ?>
 
     <div class="sx-box g-pa-10 sx-bg-primary">
         <?= \yii\helpers\Html::a(\Yii::t('skeeks/cms', 'Delete temporary files'), $url, [
-            'class' => 'btn btn-primary',
-            'onclick' => 'new sx.classes.Clear(' . $data . '); return false;'
+            'class'   => 'btn btn-primary',
+            'onclick' => 'new sx.classes.Clear('.$data.'); return false;',
         ]); ?>
         <hr/>
 
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
             'dataProvider' => new \yii\data\ArrayDataProvider([
-                'allModels' => $clearDirs
+                'allModels' => $clearDirs,
             ]),
-            'columns' => [
+            'columns'      => [
                 ['class' => 'yii\grid\SerialColumn'],
                 'label',
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function($data) {
+                    'value' => function ($data) {
                         /**
                          * @var $dir \skeeks\sx\Dir
                          */
                         $dir = $data['dir'];
                         return $dir->getPath();
-                    }
+                    },
                 ],
 
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function($data) {
+                    'value' => function ($data) {
                         /**
                          * @var $dir \skeeks\sx\Dir
                          */
                         $dir = $data['dir'];
                         return $dir->getSize()->formatedShortSize();
-                    }
+                    },
                 ],
-            ]
+            ],
         ]);
         ?>
     </div>

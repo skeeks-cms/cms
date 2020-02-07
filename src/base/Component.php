@@ -10,6 +10,7 @@ namespace skeeks\cms\base;
 
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\IHasConfig;
+use skeeks\cms\IHasConfigForm;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -40,7 +41,7 @@ use yii\widgets\ActiveForm;
  * Class Component
  * @package skeeks\cms\base
  */
-abstract class Component extends Model 
+abstract class Component extends Model implements IHasConfigForm
     //implements ConfigFormInterface
 {
     //Можно задавать описание компонента.
