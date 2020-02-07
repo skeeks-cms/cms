@@ -28,9 +28,6 @@
 <? endif; ?>
 
 <? if ($formContent) : ?>
-    <?= $form->errorSummary(\yii\helpers\ArrayHelper::merge(
-        [$component], $component->getConfigFormModels()
-    )); ?>
     <?= $formContent; ?>
     <?= $form->buttonsStandart($component); ?>
     <?= $form->errorSummary(\yii\helpers\ArrayHelper::merge(

@@ -1,9 +1,9 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
- * @date 25.03.2015
  */
 
 namespace skeeks\cms\helpers;
@@ -14,8 +14,7 @@ use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 /**
- * Class AjaxRequestResponse
- * @package skeeks\cms\helpers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class RequestResponse extends Model
 {
@@ -117,8 +116,7 @@ class RequestResponse extends Model
 
         $result = [];
 
-        foreach ($models as $m)
-        {
+        foreach ($models as $m) {
             foreach ($m->getErrors() as $attribute => $errors) {
                 $result[\yii\helpers\Html::getInputId($m, $attribute)] = $errors;
             }
