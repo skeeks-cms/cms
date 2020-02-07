@@ -172,7 +172,7 @@ class AdminComponentSettingsController extends BackendController
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
 
-            if (!\Yii::$app->request->post($this->reloadFormParam)) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
                     $component->override = Component::OVERRIDE_DEFAULT;
                     if ($component->save()) {
@@ -224,7 +224,7 @@ class AdminComponentSettingsController extends BackendController
 
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
-            if (!\Yii::$app->request->post($this->reloadFormParam)) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
                     $component->override = Component::OVERRIDE_SITE;
                     $component->cmsSite = $site;
@@ -273,7 +273,7 @@ class AdminComponentSettingsController extends BackendController
         }
 
         if (\Yii::$app->request->isPost && \Yii::$app->request->isPjax) {
-            if (!\Yii::$app->request->post($this->reloadFormParam)) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
                     $component->override = Component::OVERRIDE_USER;
                     $component->cmsUser = $user;

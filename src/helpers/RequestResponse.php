@@ -19,6 +19,15 @@ use yii\widgets\ActiveForm;
 class RequestResponse extends Model
 {
     /**
+     *
+     */
+    const DYNAMIC_RELOAD_FIELD_ELEMENT = 'data-form-reload';
+
+    /**
+     *
+     */
+    const DYNAMIC_RELOAD_NOT_SUBMIT = 'sx-reload-form';
+    /**
      * Параметр, который говорит что запрос пришел на валидацию формы
      */
     const VALIDATION_AJAX_FORM_SYSTEM_NAME = 'sx-validation';

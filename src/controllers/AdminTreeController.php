@@ -1,16 +1,14 @@
 <?php
 /**
- * AdminTreeController
- *
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 04.11.2014
- * @since 1.0.0
  */
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\RequestResponse;
@@ -40,8 +38,6 @@ use yii\helpers\Url;
  */
 class AdminTreeController extends AdminModelEditorController
 {
-    public $notSubmitParam = 'sx-not-submit';
-
     public function init()
     {
         $this->name = "Дерево страниц";
@@ -210,7 +206,7 @@ class AdminTreeController extends AdminModelEditorController
     }
 
 
-    public function update($adminAction)
+    public function update(BackendModelUpdateAction $adminAction)
     {
         $is_saved = false;
         $redirect = "";
@@ -241,7 +237,7 @@ class AdminTreeController extends AdminModelEditorController
         }
 
         if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
 

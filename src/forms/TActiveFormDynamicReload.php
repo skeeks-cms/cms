@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\forms;
 
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\widgets\Pjax;
 use yii\base\WidgetEvent;
 use yii\helpers\ArrayHelper;
@@ -20,15 +21,15 @@ trait TActiveFormDynamicReload
     /**
      * @var string
      */
-    public $dynamicReloadFieldParam = "data-form-reload";
+    public $dynamicReloadFieldParam = RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT;
 
     /**
      * @var string
      */
-    public $dynamicReloadNotSubmit = "sx-reload-form";
+    public $dynamicReloadNotSubmit = RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT;
 
     /**
-     *
+     * @return $this
      */
     protected function _initDynamicReload()
     {

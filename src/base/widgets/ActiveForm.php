@@ -1,12 +1,9 @@
 <?php
 /**
- * ActiveForm
- *
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010-2014 SkeekS (Sx)
- * @date 11.11.2014
- * @since 1.0.0
  */
 
 namespace skeeks\cms\base\widgets;

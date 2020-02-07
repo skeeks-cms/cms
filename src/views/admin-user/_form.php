@@ -105,7 +105,7 @@ CSS
         \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getAvailableRoles(), 'name', 'description'), [
             'class' => 'sx-checkbox'
         ]
-    ); ?>
+    )->label(false); ?>
 
     <? $fieldSet::end(); ?>
 <?php endif; ?>
@@ -117,31 +117,6 @@ CSS
 
 <? $fieldSet::end(); ?>
 
-<?php /*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally'))*/ ?><!--
-    <?php /*= $form->field($model, 'city')->textInput(); */ ?>
-    <?php /*= $form->field($model, 'address')->textInput(); */ ?>
-    <?php /*= $form->field($model, 'info')->textarea(); */ ?>
-    <?php /*= $form->field($model, 'status_of_life')->textarea(); */ ?>
---><?php /*= $form->fieldSetEnd(); */ ?>
-
-<?php if (!$model->isNewRecord && class_exists('\skeeks\cms\authclient\models\UserAuthClient')) : ?>
-    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/authclient', 'Social profiles')) ?>
-    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label' => \Yii::t('skeeks/authclient', "Social profiles"),
-        'hint' => "",
-        'parentModel' => $model,
-        'relation' => [
-            'user_id' => 'id'
-        ],
-        'controllerRoute' => 'authclient/admin-user-auth-client',
-        'gridViewOptions' => [
-            'columns' => [
-                'displayName'
-            ],
-        ],
-    ]); ?>
-    <? $fieldSet::end(); ?>
-<?php endif; ?>
 
 <?= $form->buttonsStandart($model); ?>
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
