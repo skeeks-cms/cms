@@ -55,8 +55,14 @@ JS
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Basic settings')) ?>
 
-<?= $form->fieldRadioListBoolean($model, 'active') ?>
-<?= $form->fieldRadioListBoolean($model, 'is_required') ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
+<?= $form->field($model, 'is_required')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 <?= $form->field($model, 'code')->textInput() ?>
@@ -83,7 +89,7 @@ JS
 
 <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')) ?>
 <?= $form->field($model, 'hint')->textInput() ?>
-<?= $form->fieldInputInt($model, 'priority') ?>
+<?= $form->field($model, 'priority') ?>
 
 <?= $form->fieldSetEnd(); ?>
 

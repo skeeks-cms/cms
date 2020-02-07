@@ -7,8 +7,11 @@
 
 <div class="row">
     <div class="col-md-2" style="<?= !$model->is_active ? "color: red;" : ""; ?>">
-        <?= $form->fieldRadioListBoolean($model, 'active', [], [
+        <?= $form->field($model, 'active', [], [
             'data-form-reload' => 'true',
+        ])->checkbox([
+            'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+            'value'   => \skeeks\cms\components\Cms::BOOL_Y,
         ]); ?>
     </div>
 </div>

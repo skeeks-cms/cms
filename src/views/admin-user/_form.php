@@ -23,10 +23,10 @@ $action = $controller->action;
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'General information')) ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'General information')) ?>
 
 <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
+<?= $form->field($model, 'active')->listBox(\Yii::$app->cms->booleanFormat(), ['size' => 1]); ?>
 <?php endif; ?>
 <?= $form->field($model, 'gender')->radioList([
     'men' => \Yii::t('skeeks/cms', 'Male'),
@@ -48,15 +48,13 @@ $action = $controller->action;
 <?= $form->field($model, 'last_name')->textInput(); ?>
 <?= $form->field($model, 'patronymic')->textInput(); ?>
 
-<div class="row">
-    <div class="col-md-5">
-        <?= $form->field($model, 'email')->textInput(); ?>
+<?= $form->field($model, 'email')->textInput(); ?>
         <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
             <?= $form->field($model, 'email_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
         <?php endif; ?>
-    </div>
-    <div class="col-md-5">
-        <?
+
+
+<?
         \skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
         $id = \yii\helpers\Html::getInputId($model, 'phone');
         $this->registerJs(<<<JS
@@ -71,8 +69,7 @@ JS
         <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
             <?= $form->field($model, 'phone_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
         <?php endif; ?>
-    </div>
-</div>
+
 
 
 <?php if ($model->relatedProperties) : ?>
@@ -92,10 +89,10 @@ JS
 ?>
 
 
-<?= $form->fieldSetEnd(); ?>
+<? $fieldSet::end(); ?>
 
 <?php if (\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model])) : ?>
-    <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Groups')) ?>
+    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Groups')) ?>
 
     <?php $this->registerCss(<<<CSS
     .sx-checkbox label
@@ -110,15 +107,15 @@ CSS
         ]
     ); ?>
 
-    <?= $form->fieldSetEnd(); ?>
+    <? $fieldSet::end(); ?>
 <?php endif; ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Password')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Password')); ?>
 
 <?= $form->field($passwordChange, 'new_password')->passwordInput() ?>
 <?= $form->field($passwordChange, 'new_password_confirm')->passwordInput() ?>
 
-<?= $form->fieldSetEnd(); ?>
+<? $fieldSet::end(); ?>
 
 <?php /*= $form->fieldSet(\Yii::t('skeeks/cms','Additionally'))*/ ?><!--
     <?php /*= $form->field($model, 'city')->textInput(); */ ?>
@@ -128,7 +125,7 @@ CSS
 --><?php /*= $form->fieldSetEnd(); */ ?>
 
 <?php if (!$model->isNewRecord && class_exists('\skeeks\cms\authclient\models\UserAuthClient')) : ?>
-    <?= $form->fieldSet(\Yii::t('skeeks/authclient', 'Social profiles')) ?>
+    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/authclient', 'Social profiles')) ?>
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
         'label' => \Yii::t('skeeks/authclient', "Social profiles"),
         'hint' => "",
@@ -143,9 +140,9 @@ CSS
             ],
         ],
     ]); ?>
-    <?= $form->fieldSetEnd(); ?>
+    <? $fieldSet::end(); ?>
 <?php endif; ?>
 
 <?= $form->buttonsStandart($model); ?>
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
-<?php \skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab::end(); ?>
+<?php $form::end(); ?>

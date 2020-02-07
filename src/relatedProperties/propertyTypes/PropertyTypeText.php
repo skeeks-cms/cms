@@ -79,7 +79,7 @@ class PropertyTypeText extends PropertyType
     {
         echo $activeForm->fieldSelect($this, 'fieldElement',
             \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText::fieldElements());
-        echo $activeForm->fieldInputInt($this, 'rows');
+        echo $activeForm->field($this, 'rows');
         echo $activeForm->field($this, 'default_value');
     }
 

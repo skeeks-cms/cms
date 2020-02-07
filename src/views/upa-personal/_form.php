@@ -41,4 +41,4 @@ JS
 
     <?= $form->buttonsStandart($model); ?>
     <?= $form->errorSummary($model); ?>
-<?php $action->endActiveForm(); ?>
+<?php $form::end(); ?>

@@ -26,7 +26,7 @@ if ($model->isNewRecord) {
 
 
 
-<?php $form = $action->beginDynamicActiveForm([
+<?php $form = $action->beginActiveForm([
     'enableAjaxValidation'   => false,
     'enableClientValidation' => false,
 ]); ?>

@@ -15,13 +15,7 @@ $action = $controller->action;
 $model->load(\Yii::$app->request->get());
 ?>
 <?php $form = $action->beginActiveForm(); ?>
-
-
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
-
-<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/cms', 'Main'),
-]); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
 <?php if ($model->content_type) : ?>
     <div style="display: none;">
@@ -51,20 +45,11 @@ $model->load(\Yii::$app->request->get());
     'content' => \Yii::t('skeeks/cms', 'Link to section'),
 ]); ?>
 
-<div class="row">
-    <div class="col-md-6">
+<?= $form->field($model, 'default_tree_id')->widget(
+    \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+); ?>
 
-        <?= $form->field($model, 'default_tree_id')->widget(
-            \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
-        ); ?>
-        <?php /*= $form->fieldSelect($model, 'default_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
-                    'allowDeselect' => true
-                ]); */ ?>
-    </div>
-    <div class="col-md-6">
-        <?= $form->field($model, 'is_allow_change_tree')->checkbox(); ?>
-    </div>
-</div>
+<?= $form->field($model, 'is_allow_change_tree')->checkbox(); ?>
 
 
 <?= $form->field($model, 'root_tree_id')->widget(
@@ -79,9 +64,7 @@ $model->load(\Yii::$app->request->get());
     'content' => \Yii::t('skeeks/cms', 'Relationship to other content'),
 ]); ?>
 
-<div class="row">
-    <div class="col-md-3">
-        <?= $form->fieldSelect($model, 'parent_content_id', \skeeks\cms\models\CmsContent::getDataForSelect(true,
+<?= $form->fieldSelect($model, 'parent_content_id', \skeeks\cms\models\CmsContent::getDataForSelect(true,
             function (\yii\db\ActiveQuery $activeQuery) use ($model) {
                 if (!$model->isNewRecord) {
                     //$activeQuery->andWhere(['!=', 'id', $model->id]);
@@ -91,15 +74,12 @@ $model->load(\Yii::$app->request->get());
                 'allowDeselect' => true,
             ]
         ); ?>
-    </div>
-    <div class="col-md-3">
-        <?= $form->field($model, 'is_parent_content_required')->checkbox(); ?>
-    </div>
-    <div class="col-md-3">
-        <?= $form->fieldSelect($model, 'parent_content_on_delete',
+
+<?= $form->field($model, 'is_parent_content_required')->checkbox(); ?>
+
+<?= $form->fieldSelect($model, 'parent_content_on_delete',
             \skeeks\cms\models\CmsContent::getOnDeleteOptions()); ?>
-    </div>
-</div>
+
 
 
 <?php if ($model->childrenContents) : ?>
@@ -115,29 +95,29 @@ $model->load(\Yii::$app->request->get());
 
 
 
-<?= $form->fieldSetEnd(); ?>
+<? $fieldSet::end(); ?>
 
 
 <?php if (!$model->isNewRecord) : ?>
-    <?php /*if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : */?><!--
-        <?/*
+    <?php /*if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) : */ ?><!--
+        <? /*
         /**
          * @var \skeeks\cms\backend\BackendAction $actionIndex
          * @var \skeeks\cms\backend\BackendAction $actionCreate
         $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
         $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
-        */?>
+        */ ?>
 
-        <?php /*if ($actionIndex) : */?>
-            <?/*= $form->fieldSet(\Yii::t('skeeks/cms', 'Properties')) */?>
+        <?php /*if ($actionIndex) : */ ?>
+            <? /*= $form->fieldSet(\Yii::t('skeeks/cms', 'Properties')) */ ?>
 
-            <?php /*$pjax = \yii\widgets\Pjax::begin(); */?>
-            <?/*
+            <?php /*$pjax = \yii\widgets\Pjax::begin(); */ ?>
+            <? /*
             $query = \skeeks\cms\models\CmsContentProperty::find()->orderBy(['priority' => SORT_ASC]);
             $query->joinWith('cmsContentProperty2contents map');
             $query->andWhere(['map.cms_content_id' => $model->id]);
-            */?>
-            <?/*
+            */ ?>
+            <? /*
             if ($actionCreate) {
                 $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
                     'content_id' => $model->id,
@@ -161,8 +141,8 @@ $model->load(\Yii::$app->request->get());
                     'options'         => ['class' => 'sx-controll-actions'],
                 ]);
             }
-            */?>
-            <?/*= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+            */ ?>
+            <? /*= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
                 'dataProvider'    => new \yii\data\ActiveDataProvider([
                     'query' => $query,
                 ]),
@@ -234,33 +214,30 @@ $model->load(\Yii::$app->request->get());
                         'code',
                         'priority',
                     ],
-            ]); */?>
+            ]); */ ?>
 
-            <?php /*\yii\widgets\Pjax::end(); */?>
+            <?php /*\yii\widgets\Pjax::end(); */ ?>
 
-            <?/*= $form->fieldSetEnd(); */?>
-        <?php /*endif; */?>
-    --><?php /*endif; */?>
-
-
+            <? /*= $form->fieldSetEnd(); */ ?>
+        <?php /*endif; */ ?>
+    --><?php /*endif; */ ?>
 
 
-
-    <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Seo')); ?>
+    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Seo')); ?>
     <?= $form->field($model, 'meta_title_template')->textarea()->hint("Используйте конструкции вида {=model.name}"); ?>
     <?= $form->field($model, 'meta_description_template')->textarea(); ?>
     <?= $form->field($model, 'meta_keywords_template')->textarea(); ?>
-    <?= $form->fieldSetEnd(); ?>
+    <? $fieldSet::end(); ?>
 
 <?php endif; ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Captions')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Captions')); ?>
 <?= $form->field($model, 'name_one')->textInput(); ?>
 <?= $form->field($model, 'name_meny')->textInput(); ?>
-<?= $form->fieldSetEnd(); ?>
+<? $fieldSet::end(); ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/cms', 'Access'),
@@ -270,11 +247,11 @@ $model->load(\Yii::$app->request->get());
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/cms', 'Additionally'),
 ]); ?>
-<?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'priority'); ?>
 <?= $form->field($model, 'is_count_views')->checkbox(); ?>
 <?php /*= $form->fieldRadioListBoolean($model, 'index_for_search'); */ ?>
 
-<?= $form->fieldSetEnd(); ?>
+<? $fieldSet::end(); ?>
 
 <?= $form->buttonsStandart($model); ?>
-<?php $action->endActiveForm(); ?>
+<?php $form::end(); ?>

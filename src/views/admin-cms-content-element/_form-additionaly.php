@@ -27,7 +27,7 @@
     "This parameter affects the address of the page")); ?>
 <? endif; ?>
 
-<?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'priority'); ?>
 
 <?= $form->field($model, 'fileIds')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
