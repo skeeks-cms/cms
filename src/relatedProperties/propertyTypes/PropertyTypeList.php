@@ -102,9 +102,9 @@ class PropertyTypeList extends PropertyType
     /**
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
-        echo $activeForm->fieldSelect($this, 'fieldElement',
+        $result = $activeForm->fieldSelect($this, 'fieldElement',
             \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements());
 
         if ($controllerProperty = \Yii::$app->createController($this->enumRoute)[0]) {
@@ -116,7 +116,7 @@ class PropertyTypeList extends PropertyType
             $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
 
             if ($this->property->isNewRecord) {
-                echo Alert::widget([
+                $result .= Alert::widget([
                     'options' => [
                         'class' => 'alert-info',
                     ],
@@ -126,7 +126,7 @@ class PropertyTypeList extends PropertyType
                 if ($actionIndex) {
                     $pjax = \yii\widgets\Pjax::begin();
 
-                    echo "<div class='row'><div class='col-md-6'> ";
+                    $result .= "<div class='row'><div class='col-md-6'> ";
 
                     if ($actionCreate) {
                         $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
@@ -134,7 +134,7 @@ class PropertyTypeList extends PropertyType
                         ]);
 
 
-                        echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                        $result .= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
                             'actions'         => ['create' => $actionCreate],
                             'clientOptions'   => ['pjax-id' => $pjax->id],
                             'isOpenNewWindow' => true,
@@ -147,21 +147,21 @@ class PropertyTypeList extends PropertyType
 
                     }
 
-                    echo '</div><div class="col-md-6"><div class="pull-right">';
+                    $result .= '</div><div class="col-md-6"><div class="pull-right">';
                     if (\Yii::$app->user->can('rbac/admin-permission') && $controllerProperty instanceof \skeeks\cms\IHasPermissions) {
-                        echo ModalPermissionWidget::widget([
+                        $result .= ModalPermissionWidget::widget([
                             'controller' => $controllerProperty,
                         ]);
                     }
-                    echo '</div>';
-                    echo '</div>';
-                    echo '</div>';
+                    $result .= '</div>';
+                    $result .= '</div>';
+                    $result .= '</div>';
 
                     $enumClass = $this->enumClass;
                     $query = $enumClass::find()->orderBy(['priority' => SORT_ASC]);
                     $query->andWhere(['property_id' => $this->property->id]);
 
-                    echo \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+                    $result .= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
                         'dataProvider'    => new \yii\data\ActiveDataProvider([
                             'query' => $query,
                         ]),
@@ -207,6 +207,8 @@ class PropertyTypeList extends PropertyType
             }
 
         }
+
+        return $result;
 
         /*echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => \Yii::t('skeeks/cms',"Values for list"),

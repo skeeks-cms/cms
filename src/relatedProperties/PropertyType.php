@@ -13,9 +13,11 @@ namespace skeeks\cms\relatedProperties;
 use skeeks\cms\base\Component;
 use skeeks\cms\base\ConfigFormInterface;
 use skeeks\cms\components\Cms;
+use skeeks\cms\IHasConfigForm;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use skeeks\cms\traits\TConfigForm;
 use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -32,8 +34,10 @@ use yii\widgets\ActiveForm;
  * Class PropertyType
  * @package skeeks\cms\relatedProperties
  */
-abstract class PropertyType extends Model implements ICFor
+abstract class PropertyType extends Model implements IHasConfigForm
 {
+    use TConfigForm;
+
     /**
      * @var string
      */

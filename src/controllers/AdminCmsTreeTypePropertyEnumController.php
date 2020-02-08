@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
+use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -50,7 +51,7 @@ class AdminCmsTreeTypePropertyEnumController extends BackendModelStandartControl
                         'code',
                         'priority',
                     ],
-                    'columns' => [
+                    'columns'        => [
                         'value' => [
                             'attribute' => "value",
                             'format'    => "raw",
@@ -60,10 +61,37 @@ class AdminCmsTreeTypePropertyEnumController extends BackendModelStandartControl
                                 ]);
                             },
                         ],
-                    ]
+                    ],
                 ],
+            ],
+
+            'create' => [
+                'fields' => [$this, 'fields'],
+            ],
+            'update' => [
+                'fields' => [$this, 'fields'],
             ],
         ]);
     }
 
+    public function fields($action)
+    {
+        $model = $action->model;
+        if ($property_id = \Yii::$app->request->get('property_id')) {
+            $model->property_id = $property_id;
+        }
+        return [
+            'property_id' => [
+                'class' => SelectField::class,
+                'items' => \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\models\CmsTreeTypeProperty::find()->all(),
+                    "id",
+                    "name"
+                ),
+            ],
+            'value',
+            'code',
+            'priority',
+        ];
+    }
 }

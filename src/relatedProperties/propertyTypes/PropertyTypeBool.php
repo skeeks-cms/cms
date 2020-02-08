@@ -66,10 +66,11 @@ class PropertyTypeBool extends PropertyType
     /**
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
-        echo $activeForm->fieldSelect($this, 'fieldElement', self::fieldElements());
-        echo $activeForm->field($this, 'default_value')->radioList(\Yii::$app->formatter->booleanFormat);
+        $result = $activeForm->fieldSelect($this, 'fieldElement', self::fieldElements());
+        $result .= $activeForm->field($this, 'default_value')->radioList(\Yii::$app->formatter->booleanFormat);
+        return $result;
     }
 
     /**

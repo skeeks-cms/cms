@@ -50,14 +50,16 @@ class PropertyTypeStorageFile extends PropertyType
      *
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
-        echo $activeForm->field($this, 'is_multiple')->checkbox(\Yii::$app->formatter->booleanFormat);
-        echo $activeForm->field($this, 'accept');
-        echo $activeForm->field($this, 'allowExtensions');
-        echo $activeForm->field($this, 'minSize');
-        echo $activeForm->field($this, 'maxSize');
-        echo $activeForm->field($this, 'maxFiles');
+        $result = $activeForm->field($this, 'is_multiple')->checkbox(\Yii::$app->formatter->booleanFormat);
+        $result .= $activeForm->field($this, 'accept');
+        $result .= $activeForm->field($this, 'allowExtensions');
+        $result .= $activeForm->field($this, 'minSize');
+        $result .= $activeForm->field($this, 'maxSize');
+        $result .= $activeForm->field($this, 'maxFiles');
+
+        return $result;
     }
 
     public function attributeLabels()

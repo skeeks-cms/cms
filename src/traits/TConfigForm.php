@@ -44,6 +44,8 @@ trait TConfigForm
      */
     public function renderConfigFormFields(ActiveForm $form)
     {
+        $formContent = '';
+
         if ($fields = $this->getConfigFormFields()) {
             $formContent = (new \skeeks\yii2\form\Builder([
                 'models'     => $this->getConfigFormModels(),
@@ -52,10 +54,12 @@ trait TConfigForm
                 'fields'     => $fields,
             ]))->render();
         } else {
-            $formContent = \Yii::$app->view->render($this->configFormView, [
-                'model' => $this,
-                'form' => $form,
-            ]);
+            if ($this->configFormView) {
+                $formContent = \Yii::$app->view->render($this->configFormView, [
+                    'model' => $this,
+                    'form' => $form,
+                ]);
+            }
         }
         
         return $formContent;

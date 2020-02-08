@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserUniversalPropertyEnum;
+use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -49,8 +50,44 @@ class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartCo
                         'priority',
                     ]
                 ]
-            ]
+            ],
+
+            'create' => [
+                'fields' => [$this, 'updateFields'],
+            ],
+            'update' => [
+                'fields' => [$this, 'updateFields'],
+            ],
         ]);
+
+    }
+
+    public function updateFields($action)
+    {
+        /**
+         * @var $model CmsTreeTypeProperty
+         */
+        $model = $action->model;
+        //$model->load(\Yii::$app->request->get());
+
+        if ($property_id = \Yii::$app->request->get("property_id")) {
+            $model->property_id = $property_id;
+        }
+        return [
+            'property_id' => [
+                'class' => SelectField::class,
+                'items' => function() {
+                    return \yii\helpers\ArrayHelper::map(
+                        \skeeks\cms\models\CmsUserUniversalProperty::find()->all(),
+                        "id",
+                        "name"
+                    );
+                }
+            ],
+            'value',
+            'code',
+            'priority',
+        ];
     }
 
 }

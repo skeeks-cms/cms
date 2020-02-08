@@ -60,16 +60,6 @@ class UserPropertyTypeComboText extends PropertyType
     }
 
 
-    /**
-     * Файл с формой настроек, по умолчанию лежит в той же папке где и компонент.
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
-    {
-        $class = new \ReflectionClass($this->className());
-        return dirname($class->getFileName()) . DIRECTORY_SEPARATOR . 'views/_formUserPropertyTypeComboText.php';
-    }
 
     /**
      * @varsion > 3.0.2

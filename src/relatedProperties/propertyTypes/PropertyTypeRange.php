@@ -51,8 +51,9 @@ class PropertyTypeRange extends PropertyType
     /**
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
+        return '';
     }
 
     /**

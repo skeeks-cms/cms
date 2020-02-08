@@ -52,9 +52,9 @@ class PropertyTypeNumber extends PropertyType
     /**
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
-        echo $activeForm->field($this, 'default_value');
+        return $activeForm->field($this, 'default_value');
     }
 
 

@@ -178,11 +178,12 @@ class PropertyTypeElement extends PropertyType
     /**
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
-        echo $activeForm->fieldSelect($this, 'fieldElement',
+        $result = $activeForm->fieldSelect($this, 'fieldElement',
             \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::fieldElements());
-        echo $activeForm->fieldSelect($this, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect());
+        $result .= $activeForm->fieldSelect($this, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect());
+        return $result;
     }
 
     /**

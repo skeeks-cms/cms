@@ -84,9 +84,9 @@ class UserPropertyTypeDate extends PropertyType
     /**
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
-        echo $activeForm->field($this,
+        return $activeForm->field($this,
             'type')->radioList(\skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate::types());
     }
 

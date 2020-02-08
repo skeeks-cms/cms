@@ -75,12 +75,14 @@ class PropertyTypeText extends PropertyType
     /**
      * @return string
      */
-    public function renderConfigForm(ActiveForm $activeForm)
+    public function renderConfigFormFields(ActiveForm $activeForm)
     {
-        echo $activeForm->fieldSelect($this, 'fieldElement',
+        $result = $activeForm->fieldSelect($this, 'fieldElement',
             \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText::fieldElements());
-        echo $activeForm->field($this, 'rows');
-        echo $activeForm->field($this, 'default_value');
+        $result .= $activeForm->field($this, 'rows');
+        $result .= $activeForm->field($this, 'default_value');
+
+        return $result;
     }
 
     /**
