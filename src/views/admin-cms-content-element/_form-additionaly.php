@@ -3,7 +3,7 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
 
 <? if ($model->is_active) : ?>
     <div class="row">
@@ -44,4 +44,4 @@
         ]
     )->label($contentModel->parentContent->name_one) ?>
 <?php endif; ?>
-<?= $form->fieldSetEnd() ?>
+<? $fieldSet::end(); ?>

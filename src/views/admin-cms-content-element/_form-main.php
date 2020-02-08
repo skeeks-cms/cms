@@ -3,10 +3,10 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
 <div class="row">
-    <div class="col-md-2" style="<?= !$model->is_active ? "color: red;" : ""; ?>">
+    <div class="col" style="<?= !$model->is_active ? "color: red;" : ""; ?>">
         <?= $form->field($model, 'active', [], [
             'data-form-reload' => 'true',
         ])->checkbox([
@@ -217,4 +217,4 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
 <?php
 endif;
 ?>
-<?= $form->fieldSetEnd() ?>
+<? $fieldSet::end(); ?>

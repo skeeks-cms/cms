@@ -26,10 +26,7 @@ if ($model->isNewRecord) {
 
 
 
-<?php $form = $action->beginActiveForm([
-    'enableAjaxValidation'   => false,
-    'enableClientValidation' => false,
-]); ?>
+<?php $form = $action->beginActiveForm(); ?>
 
 
 <? if ($is_saved && @$is_create) : ?>
@@ -107,13 +104,6 @@ JS
     ]); ?>
 <? endif; ?>
 
-
-<? /*= $this->render('_form-images', [
-    'form'         => $form,
-    'contentModel' => $contentModel,
-    'model'        => $model,
-]); */ ?>
-
 <?= $this->render('_form-additionaly', [
     'form'         => $form,
     'contentModel' => $contentModel,
@@ -125,26 +115,26 @@ JS
 
 <?php if (!$model->isNewRecord) : ?>
     <?php if ($model->cmsContent->is_access_check_element) : ?>
-        <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Access')); ?>
+        <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Access')); ?>
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
             'permissionName'        => $model->permissionName,
             'permissionDescription' => 'Доступ к этому элементу: '.$model->name,
             'label'                 => 'Доступ к этому элементу',
         ]); ?>
-        <?= $form->fieldSetEnd() ?>
+        <? $fieldSet::end(); ?>
+
     <?php endif; ?>
 <?php endif; ?>
 
 <?php if ($model->cmsContent->childrenContents) : ?>
 
     <?
-
     /**
      * @var $content \skeeks\cms\models\CmsContent
      */
     ?>
     <?php foreach ($model->cmsContent->childrenContents as $childContent) : ?>
-        <?= $form->fieldSet($childContent->name); ?>
+        <? $fieldSet = $form->fieldSet($childContent->name); ?>
 
         <?php if ($model->isNewRecord) : ?>
 
@@ -185,7 +175,8 @@ JS
 
 
 
-        <?= $form->fieldSetEnd() ?>
+        <? $fieldSet::end(); ?>
+
     <?php endforeach; ?>
 <?php endif; ?>
 

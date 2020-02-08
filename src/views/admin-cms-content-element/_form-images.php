@@ -3,7 +3,7 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Images/Files')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Images/Files')); ?>
 
 <?/*= $form->field($model, 'imageIds')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
@@ -20,4 +20,4 @@
     ]
 ); */?>
 
-<?= $form->fieldSetEnd() ?>
+<? $fieldSet::end(); ?>

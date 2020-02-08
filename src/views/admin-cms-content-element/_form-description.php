@@ -3,7 +3,7 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
-<?= $form->fieldSet(\Yii::t('skeeks/cms', 'Description')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Description')); ?>
 
 <?= $form->field($model, 'description_short')->widget(
     \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
@@ -26,4 +26,4 @@
     ]);
 ?>
 
-<?= $form->fieldSetEnd() ?>
+<? $fieldSet::end(); ?>
