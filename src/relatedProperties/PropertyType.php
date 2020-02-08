@@ -10,23 +10,17 @@
 
 namespace skeeks\cms\relatedProperties;
 
-use skeeks\cms\base\Component;
-use skeeks\cms\base\ConfigFormInterface;
 use skeeks\cms\components\Cms;
 use skeeks\cms\IHasConfigForm;
-use skeeks\cms\relatedProperties\models\RelatedElementModel;
-use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\cms\traits\TConfigForm;
-use yii\base\DynamicModel;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
- * @property bool $isMultiple
- * @property mixed $defaultValue
+ * @property bool   $isMultiple
+ * @property mixed  $defaultValue
  *
  * @property string $asText
  * @property string $asHtml
@@ -233,8 +227,8 @@ abstract class PropertyType extends Model implements IHasConfigForm
     public $code;
 
     /**
-     * TODO: is deprecated @version > 3.0.2
-     * @return string
+     * TODO: is deprecated @return string
+     * @version > 3.0.2
      */
     public function getMultiple()
     {
