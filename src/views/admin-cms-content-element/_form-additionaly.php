@@ -6,25 +6,21 @@
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
 
 <? if ($model->is_active) : ?>
-    <div class="row">
-        <div class="col-md-3">
-            <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
-                //'displayFormat' => 'php:d-M-Y H:i:s',
-                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
-        </div>
-        <div class="col-md-3">
-            <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::classname(), [
-                //'displayFormat' => 'php:d-M-Y H:i:s',
-                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
-        </div>
-    </div>
+    <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'displayFormat' => 'php:d-M-Y H:i:s',
+        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+    ]); ?>
+
+    <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'displayFormat' => 'php:d-M-Y H:i:s',
+        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+    ]); ?>
+
 <? endif; ?>
 
 <? if ($contentModel->is_have_page) : ?>
-<?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms',
-    "This parameter affects the address of the page")); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms',
+        "This parameter affects the address of the page")); ?>
 <? endif; ?>
 
 <?= $form->field($model, 'priority'); ?>
