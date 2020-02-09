@@ -35,8 +35,6 @@
     --><?php /* endif; */ ?>
 
 <?php if ($rootTreeModels) : ?>
-    <div class="row">
-        <div class="col-lg-8 col-md-12 col-sm-12">
             <?= $form->field($model, 'treeIds')->widget(
                 \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                 [
@@ -49,9 +47,7 @@
                             'models' => $rootTreeModels
                         ]
                 ]
-            ); ?>
-        </div>
-    </div>
+            )->label(false); ?>
 <?php endif; ?>
 
 <? $fieldSet::end(); ?>

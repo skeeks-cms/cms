@@ -15,6 +15,6 @@
     \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
     [
         'modelAttributeSaveType' => 'description_short_type',
-    ]);
+    ])->label(false);
 ?>
 <? $fieldSet::end(); ?>

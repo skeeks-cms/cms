@@ -7,36 +7,17 @@
 
 <div class="row">
     <div class="col" style="<?= !$model->is_active ? "color: red;" : ""; ?>">
-        <?= $form->field($model, 'active', [], [
-            'data-form-reload' => 'true',
-        ])->checkbox([
-            'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-            'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+        <?= $form->field($model, 'active')->checkbox([
+            'uncheck'                                                         => \skeeks\cms\components\Cms::BOOL_N,
+            'value'                                                           => \skeeks\cms\components\Cms::BOOL_Y,
+            \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
         ]); ?>
     </div>
 </div>
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
-<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/cms', 'Images'),
-]); ?>
 
-<?= $form->field($model, 'image_id')->widget(
-    \skeeks\cms\widgets\AjaxFileUploadWidget::class,
-    [
-        'accept'   => 'image/*',
-        'multiple' => false,
-    ]
-); ?>
-
-<?= $form->field($model, 'imageIds')->widget(
-    \skeeks\cms\widgets\AjaxFileUploadWidget::class,
-    [
-        'accept'   => 'image/*',
-        'multiple' => true,
-    ]
-); ?>
 
 <?php if ($contentModel->root_tree_id) : ?>
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
@@ -49,7 +30,7 @@
 <?php if ($contentModel->is_allow_change_tree) : ?>
     <?php if ($rootTreeModels) : ?>
         <div class="row">
-            <div class="col-lg-8 col-md-12 col-sm-12">
+            <div class="col-md-12">
                 <?= $form->field($model, 'tree_id')->widget(
                     \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                     [
@@ -105,13 +86,9 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
 
             <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
             <div class="row">
-                <div class="col-md-8">
-                    <?= $property->renderActiveForm($form, $model) ?>
-                </div>
-                <div class="col-md-4">
-
+                <div class="col-md-12">
+                    <?= $property->renderActiveForm($form, $model); ?>
                     <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property-enum')[0]) : ?>
-                        <label>&nbsp;</label>
                         <?
                         /**
                          * @var \skeeks\cms\backend\BackendAction $actionIndex
@@ -146,7 +123,6 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                         }
                         ?>
                     <?php endif; ?>
-                    <!--<a href="#" style="border-bottom: 1px dashed">Добавить</a>-->
                 </div>
             </div>
             <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
@@ -154,16 +130,13 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
 
             <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <?= $property->renderActiveForm($form, $model) ?>
-                </div>
-                <div class="col-md-4">
                     <?php if (!in_array($property->handler->fieldElement, [
                         \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG,
                         \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE,
                     ])) : ?>
                         <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
-                            <label>&nbsp;</label>
                             <?
                             /**
                              * @var \skeeks\cms\backend\BackendAction $actionIndex
@@ -199,7 +172,6 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                             ?>
                         <?php endif; ?>
                     <?php endif; ?>
-                    <!--<a href="#" style="border-bottom: 1px dashed">Добавить</a>-->
                 </div>
             </div>
             <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>

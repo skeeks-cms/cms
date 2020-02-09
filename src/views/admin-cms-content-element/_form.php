@@ -84,7 +84,18 @@ JS
     'model'        => $model,
 ]); ?>
 
-<?= $this->render('_form-description', [
+<?= $this->render('_form-images', [
+    'form'         => $form,
+    'contentModel' => $contentModel,
+    'model'        => $model,
+]); ?>
+
+<?= $this->render('_form-announce', [
+    'form'         => $form,
+    'contentModel' => $contentModel,
+    'model'        => $model,
+]); ?>
+<?= $this->render('_form-detail', [
     'form'         => $form,
     'contentModel' => $contentModel,
     'model'        => $model,
