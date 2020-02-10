@@ -683,7 +683,7 @@ abstract class Component extends Model implements IHasConfigForm
         return \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/index'])
             ->merge([
                 'componentClassName' => $this->className(),
-                'attributes'         => $attributes,
+                //'attributes'         => $attributes,
                 'componentNamespace' => $this->namespace,
             ])
             ->enableEmptyLayout()
