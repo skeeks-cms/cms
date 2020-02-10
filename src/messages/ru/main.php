@@ -215,6 +215,7 @@ return
         "Sorting direction" => "Направление сортировки",
         "Display column" => "Отображаемые колонки",
 
+        "Admin panel" => "Админ панель",
         "Setting the admin panel" => "Настройки админ панели",
         "Additional css and js admin area" => "Дополнительные css и js админки",
         "Include stylized window confirmation (confirm)" => "Включить стилизованные окошки подтверждения (confirm)",

@@ -147,7 +147,7 @@ class Cms extends \skeeks\cms\base\Component
 
     static public function descriptorConfig()
     {
-        return ArrayHelper::merge(parent::descriptorConfig(), [
+        return array_merge(parent::descriptorConfig(), [
             //'name' => \Yii::t('skeeks/mail', 'Mailer'),
             'image' => [CmsAsset::class, 'img/box-en.svg'],
         ]);
