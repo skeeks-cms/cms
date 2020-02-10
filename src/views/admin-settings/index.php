@@ -12,7 +12,7 @@
 /* @var $this yii\web\View */
 
 $this->registerJs(<<<JS
-$("a", $(".sx-active-component")).click();
+$("a:first", $(".sx-active-component")).click();
 JS
 );
 
