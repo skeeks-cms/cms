@@ -7,85 +7,44 @@
  *
  * @var $loadedComponents
  * @var $component \skeeks\cms\base\Component
+ * @var $loadedComponents \skeeks\cms\base\Component[]
  */
 /* @var $this yii\web\View */
-$r = new ReflectionClass($component);
+
+$this->registerJs(<<<JS
+$("a", $(".sx-active-component")).click();
+JS
+);
+
 ?>
-
-<?php /* \skeeks\cms\modules\admin\widgets\Pjax::begin([
-    'id' => 'widget-select-component'
-]) */ ?>
-<form id="selector-component" action="" method="get" data-pjax>
-    <!--<label><?/*= \Yii::t('skeeks/cms', 'Component settings') */?></label>-->
-
-    <?=
-    \skeeks\widget\chosen\Chosen::widget([
-        'name'          => 'component',
-        'items'         => $loadedForSelect,
-        'allowDeselect' => false,
-        'value'         => $r->getName(),
-    ]);
-    ?>
-    <?php if (\Yii::$app->admin->isEmptyLayout()) : ?>
-        <input type="hidden"
-               name="<?= \skeeks\cms\backend\helpers\BackendUrlHelper::BACKEND_PARAM_NAME; ?>[<?= \skeeks\cms\backend\helpers\BackendUrlHelper::BACKEND_PARAM_NAME_EMPTY_LAYOUT; ?>]"
-               value="true"/>
-    <?php endif; ?>
-</form>
 
 <div class="row">
-<? if (method_exists($component, 'getEditUrl')) : ?>
-    <iframe data-src="<?= $component->getEditUrl(); ?>" width="100%;" height="200px;" id="sx-test"></iframe>
-<? else : ?>
-    <?
-    $url = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-component-settings/index'])
-            ->merge([
-                'componentClassName' => $component->className(),
-                'attributes'         => $component->callAttributes,
-            ])
-            ->enableEmptyLayout()
-            ->url
-    ?>
-    <iframe data-src="<?= $url; ?>" width="100%;" height="200px;" id="sx-test"></iframe>
-<? endif; ?>
+    <? foreach ($loadedComponents as $key => $loadedComponent) : ?>
+        <?
+        $url = (string)$loadedComponent->getEditUrl();
+
+        $actionData = new \yii\web\JsExpression(\yii\helpers\Json::encode([
+            "isOpenNewWindow" => true,
+            "url"             => $url,
+        ]));
+
+        ?>
+        <div class="col-lg-3 col-md-4 col-sm-6 <?= $component && $key == $component->className() ? "sx-active-component" : ""; ?>">
+            <div class="card g-pa-15 g-mb-30 g-bg-gray-light-v8">
+                <header class="g-mb-10 g-mt-10 text-center">
+                    <!--<a href="<? /*= $url; */ ?>" data-pjax="0" onclick='new sx.classes.backend.widgets.Action(<? /*= $actionData; */ ?>).go(); return false;'>
+                        <img class="img-fluid rounded-circle g-width-100 g-height-100 g-mb-14 g-mt-14"
+                             src=""
+                             alt="<? /*= $loadedComponent->descriptor->name; */ ?>">
+                    </a>-->
+
+                    <h3 class="g-font-weight-300 g-font-size-22 g-color-black g-mb-2" style="height: 90px;">
+                        <a href="<?= $url; ?>" data-pjax="0" onclick='new sx.classes.backend.widgets.Action(<?= $actionData; ?>).go(); return false;'>
+                            <?= $loadedComponent->descriptor->name; ?></a>
+                    </h3>
+                </header>
+            </div>
+        </div>
+    <? endforeach; ?>
 </div>
-<?
-\skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
-$this->registerJs(<<<JS
-(function(sx, $, _)
-{
-    sx.classes.SelectorComponent = sx.classes.Component.extend({
 
-        _init: function()
-        {
-            this.Iframe = new sx.classes.Iframe('sx-test', {
-                'autoHeight'        : true,
-                'heightSelector'    : 'body',
-                'minHeight'         : 800
-            });
-        },
-
-        _onDomReady: function()
-        {
-            $("#selector-component select").on('change', function()
-            {
-                $("#selector-component").submit();
-            });
-
-            _.delay(function()
-            {
-                $('#sx-test').attr('src', $('#sx-test').data('src'));
-            }, 200);
-        },
-
-        _onWindowReady: function()
-        {}
-    });
-
-    new sx.classes.SelectorComponent();
-})(sx, sx.$, sx._);
-JS
-)
-?>
-
-<?php /* \skeeks\cms\modules\admin\widgets\Pjax::end(); */ ?>

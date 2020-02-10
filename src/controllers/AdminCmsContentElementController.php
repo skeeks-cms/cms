@@ -869,11 +869,18 @@ HTML;
             return;
         }
 
-        $href = \yii\helpers\Html::a('Настройках контента',
-            \skeeks\cms\helpers\UrlHelper::construct([
-                '/cms/admin-cms-content/update',
-                'pk' => $this->content->id,
-            ])->enableAdmin()->toString());
+        $url = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                "/cms/admin-cms-content/update", "pk" => $this->content->id
+            ])->enableEmptyLayout()->enableNoActions()->url;
+        
+        $actionData = \yii\helpers\Json::encode([
+            "isOpenNewWindow" => true,
+            "url"             => $url,
+        ]);
+
+        $href = \yii\helpers\Html::a('Настройках контента', $url, [
+            'onclick' => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;"
+        ]);
 
         $e->content = Alert::widget([
             'options' => [
