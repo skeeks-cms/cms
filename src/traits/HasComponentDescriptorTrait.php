@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\traits;
 
+use skeeks\cms\assets\CmsAsset;
 use skeeks\cms\base\ComponentDescriptor;
 
 /**
@@ -36,6 +37,7 @@ trait HasComponentDescriptorTrait
     {
         return [
             "name"        => "Skeeks CMS",
+            "image"        => [CmsAsset::class, 'img/image-not-found.jpg'],
             "description" => "",
             "keywords"    => "skeeks, cms",
         ];

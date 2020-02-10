@@ -13,10 +13,12 @@ use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
+use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsLang;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -55,14 +57,34 @@ class AdminCmsLangController extends BackendModelStandartController
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
-                        'id',
-                        'image_id',
-                        'name',
+                        'custom',
                         'code',
                         'is_active',
                         'priority',
                     ],
                     'columns'        => [
+                        'custom'       => [
+                            'attribute' => 'name',
+                            'format' => 'raw',
+                            'value' => function (CmsLang $model) {
+
+                                $data = [];
+                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+
+                                $info = implode("<br />", $data);
+
+                                return "<div class='row no-gutters'>
+                                                <div class='sx-trigger-action' style='width: 50px;'>
+                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
+                                                    <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                </a>
+                                                </div>
+                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
+
+                                            ;
+                            }
+                        ],
+
                         'is_active'   => [
                             'class' => BooleanColumn::class,
                         ],
