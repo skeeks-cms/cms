@@ -377,6 +377,9 @@ HTML;
                         'published_at' => [
                             'class' => DateTimeColumnData::class,
                         ],
+                        'published_to' => [
+                            'class' => DateTimeColumnData::class,
+                        ],
                         'created_at'   => [
                             'class' => DateTimeColumnData::class,
                         ],
