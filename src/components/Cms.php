@@ -143,6 +143,16 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userOnlineTime = 60; //1 минута
 
+
+
+    static public function descriptorConfig()
+    {
+        return ArrayHelper::merge(parent::descriptorConfig(), [
+            //'name' => \Yii::t('skeeks/mail', 'Mailer'),
+            'image' => [CmsAsset::class, 'img/box-en.svg'],
+        ]);
+    }
+
     /**
      * Схема временных папок
      * Чистятся в момент нажатия на кнопку чистки временных файлов
