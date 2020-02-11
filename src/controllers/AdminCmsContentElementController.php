@@ -369,10 +369,22 @@ HTML;
                                                         <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                     </a>
                                                 </div>".$info."</div></div>";;
-                            },
+          ImportCsvHandler                  },
                         ],
                         'image_id'     => [
                             'class' => ImageColumn2::class,
+                        ],
+                        'image.src'     => [
+                            'label' => 'Ссылка на главное изображение',
+                            'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
+                                if ($model->image) {
+                                    return $model->image->absoluteSrc;
+                                } else {
+                                    return '';
+                                }
+
+                            },
+                            'format'         => 'raw',
                         ],
                         'published_at' => [
                             'class' => DateTimeColumnData::class,
