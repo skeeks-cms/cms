@@ -95,6 +95,7 @@ class AdminCmsContentTypeController extends BackendModelStandartController
 
                         'custom'        => [
                             'attribute' => "name",
+                            'viewAttribute' => "asText",
                             'class' => DefaultActionColumn::class
                         ],
                         
