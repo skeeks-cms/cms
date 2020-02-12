@@ -53,7 +53,6 @@ use yii\web\Application;
  */
 class AdminCmsContentElementController extends BackendModelStandartController
 {
-    public $notSubmitParam = 'sx-reload-form';
 
     public $modelClassName = CmsContentElement::class;
     public $modelShowAttribute = "asText";
@@ -941,7 +940,7 @@ HTML
         }
 
         if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
 
@@ -1010,7 +1009,7 @@ HTML
         }
 
         if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
 
