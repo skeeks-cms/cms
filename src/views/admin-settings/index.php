@@ -18,7 +18,7 @@ JS
 
 ?>
 
-<div class="row">ImportCsvHandler
+<div class="row">
     <? foreach ($loadedComponents as $key => $loadedComponent) : ?>
         <?
         $url = (string)$loadedComponent->getEditUrl();
