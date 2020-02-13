@@ -83,4 +83,11 @@ abstract class RelatedPropertyEnumModel extends Core
     /*{
         return $this->hasOne(CmsContentProperty::className(), ['id' => 'property_id']);
     }*/
+
+    public function asText()
+    {
+        $text = parent::asText();
+        $text .= $this->value;
+        return $text;
+    }
 }
