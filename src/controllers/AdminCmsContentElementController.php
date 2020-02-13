@@ -53,6 +53,8 @@ use yii\web\Application;
  */
 class AdminCmsContentElementController extends BackendModelStandartController
 {
+    
+    public $editForm = '_form';
 
     public $modelClassName = CmsContentElement::class;
     public $modelShowAttribute = "asText";
@@ -972,7 +974,7 @@ HTML
 
         }
 
-        return $this->render('_form', [
+        return $this->render($this->editForm, [
             'model'        => $model,
             'relatedModel' => $relatedModel,
 
@@ -1030,7 +1032,7 @@ HTML
 
         }
 
-        return $this->render('_form', [
+        return $this->render($this->editForm, [
             'model'        => $model,
             'relatedModel' => $relatedModel,
             'is_saved'     => $is_saved,
