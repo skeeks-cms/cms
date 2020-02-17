@@ -30,6 +30,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\shop\models\ShopProduct;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
@@ -266,9 +267,11 @@ class AdminCmsContentElementController extends BackendModelStandartController
                          * @var $query ActiveQuery
                          */
                         $query = $event->sender->dataProvider->query;
+
                         if ($this->content) {
                             $query->andWhere(['content_id' => $this->content->id]);
                         }
+                        
                     },
                     'defaultOrder'   => [
                         'active'   => SORT_DESC,
