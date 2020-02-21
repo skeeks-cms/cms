@@ -55,6 +55,7 @@ class AjaxFileUploadWidget extends \skeeks\yii2\ajaxfileupload\widgets\AjaxFileU
             'value' => $file->id,
             'state' => 'success',
             'size' => $file->size,
+            'sizeFormated' => \Yii::$app->formatter->asShortSize($file->size, 2),
             'type' => $file->mime_type,
             'src' => $file->src,
         ];
