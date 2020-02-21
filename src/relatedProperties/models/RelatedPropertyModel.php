@@ -181,10 +181,11 @@ abstract class RelatedPropertyModel extends Core
     abstract public function getEnums();
 
     /**
-     * @param ActiveForm $activeForm
-     * @param \skeeks\cms\relatedProperties\models\RelatedElementModel $model
-     * @return mixed
      * @deprecated
+     *
+     * @param ActiveForm $activeForm
+     * @param null       $model
+     * @return bool|\yii\widgets\ActiveField
      */
     public function renderActiveForm(ActiveForm $activeForm, $model = null)
     {

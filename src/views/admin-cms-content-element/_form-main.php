@@ -79,15 +79,15 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
         'content' => \Yii::t('skeeks/cms', 'Additional properties'),
     ]); ?>
 
-    <?php foreach ($properties
-
-                   as $property) : ?>
+    <?php foreach ($properties as $property) : ?>
         <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
 
             <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
             <div class="row">
                 <div class="col-md-12">
-                    <?= $property->renderActiveForm($form, $model); ?>
+                    <?
+                    $create = '';
+                    ?>
                     <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property-enum')[0]) : ?>
                         <?
                         /**
@@ -110,7 +110,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                                 'isOpenNewWindow' => true
                             ]);*/
 
-                            /*echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                            $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
                                 'actions'         => ['create' => $actionCreate],
                                 'clientOptions'   => ['pjax-id' => $pjax->id],
                                 'isOpenNewWindow' => true,
@@ -120,10 +120,16 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                                 'itemTag'         => 'button',
                                 'itemOptions'     => ['class' => 'btn btn-default'],
                                 'options'         => ['class' => 'sx-controll-actions'],
-                            ]);*/
+                            ]);
                         }
                         ?>
                     <?php endif; ?>
+
+                    <? $field = $property->renderActiveForm($form, $model);
+                    $field->template = '<div class="row"><div class="col-md-3 text-md-right">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3">' . $create . '</div></div>';
+                    echo $field;
+                    ?>
+
                 </div>
             </div>
             <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
@@ -132,7 +138,9 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
             <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
             <div class="row">
                 <div class="col-md-12">
-                    <?= $property->renderActiveForm($form, $model) ?>
+                    <?
+                    $create = '';
+                    ?>
                     <?php if (!in_array($property->handler->fieldElement, [
                         \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG,
                         \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE,
@@ -145,7 +153,6 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                              */
                             $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
                             ?>
-
                             <?
                             if ($actionCreate) {
                                 $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
@@ -159,11 +166,12 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                                     'isOpenNewWindow' => true
                                 ]);*/
 
-                                echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                                $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
                                     'actions'         => ['create' => $actionCreate],
                                     'clientOptions'   => ['pjax-id' => $pjax->id],
                                     'isOpenNewWindow' => true,
                                     'tag'             => 'div',
+                                    'minViewCount'    => 1,
                                     'itemWrapperTag'  => 'span',
                                     'itemTag'         => 'button',
                                     'itemOptions'     => ['class' => 'btn btn-default'],
@@ -172,6 +180,12 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                             }
                             ?>
                         <?php endif; ?>
+
+                        <? $field = $property->renderActiveForm($form, $model);
+                        $field->template = '<div class="row"><div class="col-md-3 text-md-right">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3">' . $create . '</div></div>';
+                        echo $field;
+                        ?>
+
                     <?php endif; ?>
                 </div>
             </div>
