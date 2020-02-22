@@ -28,6 +28,7 @@ trait TActiveFormHasFieldSets
     {
         $class = $this->firldSetClass;
         $widgetConfig['name'] = $name;
+        $widgetConfig['activeForm'] = $this;
         return $class::begin($widgetConfig);
 
     }

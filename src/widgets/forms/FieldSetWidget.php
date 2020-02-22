@@ -7,9 +7,12 @@
  */
 namespace skeeks\cms\widgets\forms;
 
+use skeeks\cms\widgets\assets\FieldSetAsset;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -21,6 +24,10 @@ class FieldSetWidget extends Widget {
      */
     public static $autoIdPrefix = 'field-set';
 
+    /**
+     * @var ActiveForm
+     */
+    public $activeForm = null;
     /**
      * @var
      */
@@ -40,6 +47,11 @@ class FieldSetWidget extends Widget {
     public $headerOptions = [];
 
     /**
+     * @var bool
+     */
+    public $isOpen = true;
+
+    /**
      * Initializes the widget.
      * This renders the form open tag.
      */
@@ -51,10 +63,24 @@ class FieldSetWidget extends Widget {
             $this->options['id'] = $this->getId();
         }
 
-        /*if (!$id = ArrayHelper::getValue($this->options, 'id')) {
-            $this->options['id']         = "sx-fieldset-id-" . md5($name);
-        }*/
+        $openedFromRequest = \Yii::$app->request->get($this->activeForm->id);
+        if ($openedFromRequest) {
+            if (!$this->isOpen && in_array($this->id, $openedFromRequest)) {
+                $this->isOpen = true;
+            }
+            
+            if ($this->isOpen && !in_array($this->id, $openedFromRequest)) {
+                $this->isOpen = false;
+            }
+        }
 
+        self::registerAssets($this->activeForm);
+        if (!$this->isOpen) {
+            Html::addCssClass($this->options, " sx-field-set-hidden");
+        }
+        if (!isset($this->options['id'])) {
+            $this->options['id'] = $this->id;
+        }
         Html::addCssClass($this->options, "sx-form-fieldset");
         Html::addCssClass($this->countentOptions, "sx-form-fieldset-content");
         Html::addCssClass($this->headerOptions, "sx-form-fieldset-title");
@@ -63,6 +89,23 @@ class FieldSetWidget extends Widget {
         ob_implicit_flush(false);
     }
 
+    static public $registerdForms = [];
+    
+    static public function registerAssets(ActiveForm $activeForm)
+    {
+        if (isset(self::$registerdForms[$activeForm->id])) {
+            return true;
+        }
+        self::$registerdForms[$activeForm->id] = true;
+        FieldSetAsset::register(\Yii::$app->view);
+        $jsData = Json::encode([
+            'form-id' => $activeForm->id
+        ]);
+        \Yii::$app->view->registerJs(<<<JS
+    new sx.classes.ActiveFormFieldSet({$jsData});
+JS
+        );
+    }
 
     /**
      * Runs the widget.

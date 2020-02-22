@@ -1,0 +1,11 @@
+form .sx-field-set-hidden .sx-form-fieldset-content {
+    display: none;
+}
+
+form .sx-form-fieldset-title {
+    cursor: pointer;
+}
+
+form .sx-field-set-hidden .sx-form-fieldset-title {
+    border-bottom: 1px solid #ddd;
+}

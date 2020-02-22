@@ -148,7 +148,7 @@ JS
 
 
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement'), ['isOpen' => false]); ?>
 
 <?= $form->field($model, 'image_id')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
@@ -194,7 +194,7 @@ JS
     </div>
 <? $fieldSet::end(); ?>
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'In detal')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'In detal'), ['isOpen' => false]); ?>
 
 <?= $form->field($model, 'image_full_id')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
@@ -216,7 +216,7 @@ JS
     </div>
 <? $fieldSet::end(); ?>
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'SEO')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'SEO'), ['isOpen' => false]); ?>
 <?= $form->field($model, 'seo_h1'); ?>
 <?= $form->field($model, 'meta_title')->textarea(); ?>
 <?= $form->field($model, 'meta_description')->textarea(); ?>
@@ -224,7 +224,7 @@ JS
 <? $fieldSet::end(); ?>
 
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Images/Files')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Images/Files'), ['isOpen' => false]); ?>
 
 <?= $form->field($model, 'imageIds')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,

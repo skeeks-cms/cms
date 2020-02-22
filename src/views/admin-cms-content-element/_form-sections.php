@@ -3,7 +3,7 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Sections')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Sections'), ['isOpen' => false]); ?>
 <?php if ($contentModel->root_tree_id) : ?>
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
 <?php else

@@ -3,7 +3,7 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally'), ['isOpen' => false]); ?>
 
 <? if ($model->is_active) : ?>
     <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
