@@ -33,22 +33,18 @@ class ContentElementController extends Controller
      */
     public $_model = false;
 
+    /**
+     * @var string
+     */
+    public $modelClassName = CmsContentElement::class;
+
+    /**
+     * @var string
+     */
+    public $editControllerRoute = "cms/admin-cms-content-element";
+
     public function init()
     {
-        if ($this->model && \Yii::$app->cmsToolbar) {
-            $controller = \Yii::$app->createController('cms/admin-cms-content-element')[0];
-            $adminControllerRoute = [
-                '/cms/admin-cms-content-element/update',
-                $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}
-            ];
-
-            $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
-                ->enableEmptyLayout()
-                ->url;
-
-            \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
-        }
-
         parent::init();
     }
 
@@ -95,11 +91,40 @@ class ContentElementController extends Controller
             return false;
         }
 
-        $this->_model = CmsContentElement::findOne(['id' => $id]);
+        $modelClassName = $this->modelClassName;
+        $this->_model = $modelClassName::findOne(['id' => $id]);
 
         return $this->_model;
     }
 
+    /**
+     * @param $model
+     * @return $this
+     */
+    public function setModel($model)
+    {
+        $this->_model = $model;
+        return $this;
+    }
+
+    public function beforeAction($action)
+    {
+        if ($this->model && \Yii::$app->cmsToolbar) {
+            $controller = \Yii::$app->createController($this->editControllerRoute)[0];
+            $adminControllerRoute = [
+                '/' . $this->editControllerRoute . '/update',
+                $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}
+            ];
+
+            $urlEditModel = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($adminControllerRoute)
+                ->enableEmptyLayout()
+                ->url;
+
+            \Yii::$app->cmsToolbar->editUrl = $urlEditModel;
+        }
+
+        return parent::beforeAction($action);
+    }
     /**
      * @return $this|string
      * @throws NotFoundHttpException
