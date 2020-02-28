@@ -225,14 +225,14 @@ class SelectTreeInputWidget extends InputWidget
                 'value' => $model->id,
                 'class' => 'sx-checkbox',
                 'disabled' => $disabled,
-                'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'style' => 'float: left; margin-left: 5px; margin-right: 5px; margin-top: 5px;',
             ]);
         } else {
             $controllElement = Html::radio($this->id . '-radio', false, [
                 'value' => $model->id,
                 'class' => 'sx-radio',
                 'disabled' => $disabled,
-                'style' => 'float: left; margin-left: 5px; margin-right: 5px;',
+                'style' => 'float: left; margin-left: 5px; margin-right: 5px; margin-top: 5px;',
             ]);
         }
 

@@ -110,6 +110,7 @@
         float: left;
         width: 23px;
         margin-left: -23px;
+        margin-top: -1px;
     }
 
         .sx-tree ul li.sx-tree-node .sx-node-open-close > a
