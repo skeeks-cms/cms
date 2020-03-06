@@ -126,7 +126,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                     <?php endif; ?>
 
                     <? $field = $property->renderActiveForm($form, $model);
-                    $field->template = '<div class="row"><div class="col-md-3 text-md-right">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3">' . $create . '</div></div>';
+                    $field->template = '<div class="row sx-inline-row"><div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3">' . $create . '</div></div>';
                     echo $field;
                     ?>
 
@@ -182,7 +182,7 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                         <?php endif; ?>
 
                         <? $field = $property->renderActiveForm($form, $model);
-                        $field->template = '<div class="row"><div class="col-md-3 text-md-right">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3">' . $create . '</div></div>';
+                        $field->template = '<div class="row sx-inline-row"><div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3">' . $create . '</div></div>';
                         echo $field;
                         ?>
 
