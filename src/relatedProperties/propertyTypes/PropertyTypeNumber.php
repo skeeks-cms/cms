@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
+use skeeks\cms\backend\widgets\forms\NumberInputWidget;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
@@ -65,7 +66,12 @@ class PropertyTypeNumber extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        $field->textInput();
+        //$field->textInput();
+        $field->widget(NumberInputWidget::class, [
+            'options' => [
+                'step' => '0.00000001'
+            ]
+        ]);
 
         return $field;
     }
