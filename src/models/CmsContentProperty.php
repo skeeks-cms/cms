@@ -16,16 +16,16 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%cms_content_property}}".
  *
- * @property integer $content_id
+ * @property integer                      $content_id
  *
- * @property CmsContent[] $cmsContents
+ * @property CmsContent[]                 $cmsContents
  * @property CmsContentProperty2content[] $cmsContentProperty2contents
  *
- * @property CmsContentPropertyEnum[] $enums
- * @property CmsContentElementProperty[] $elementProperties
+ * @property CmsContentPropertyEnum[]     $enums
+ * @property CmsContentElementProperty[]  $elementProperties
  *
- * @property CmsContentProperty2tree[] $cmsContentProperty2trees
- * @property CmsTree[] $cmsTrees
+ * @property CmsContentProperty2tree[]    $cmsContentProperty2trees
+ * @property CmsTree[]                    $cmsTrees
  */
 class CmsContentProperty extends RelatedPropertyModel
 {
@@ -70,7 +70,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cmsContents' => Yii::t('skeeks/cms', 'Linked to content'),
-            'cmsTrees' => Yii::t('skeeks/cms', 'Linked to sections'),
+            'cmsTrees'    => Yii::t('skeeks/cms', 'Linked to sections'),
         ]);
     }
 
@@ -130,6 +130,6 @@ class CmsContentProperty extends RelatedPropertyModel
     public function asText()
     {
         $result = parent::asText();
-        return $result . " ($this->code)";
+        return $result." ($this->code)";
     }
 }

@@ -62,13 +62,11 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                         'code',
                         'priority',
                         'hint',
-                        'active',
+                        'is_active',
                     ],
                     'columns' => [
-                        'active' => [
+                        'is_active' => [
                             'class' => BooleanColumn::class,
-                            'trueValue' => "Y",
-                            'falseValue' => "N",
                         ]
                     ]
                 ],
@@ -128,14 +126,10 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                     'is_required' => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
                     ],
-                    'active'      => [
+                    'is_active'      => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
                     ],
                     'name',
                     'code',

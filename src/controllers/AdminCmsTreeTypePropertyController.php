@@ -127,7 +127,7 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                         'custom',
                         //'id',
                         //'image_id',
-                        'active',
+                        'is_active',
                         'priority',
                         //'name',
                         'countElementProperties',
@@ -171,7 +171,7 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                             },
                         ],
 
-                        'active' => [
+                        'is_active' => [
                             'class' => BooleanColumn::class,
                         ],
 
@@ -242,14 +242,10 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                     'is_required' => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
                     ],
-                    'active'      => [
+                    'is_active'      => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
                     ],
                     'name',
                     'code',

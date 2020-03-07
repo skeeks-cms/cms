@@ -10,7 +10,6 @@
 
 namespace skeeks\cms\relatedProperties\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
@@ -21,29 +20,29 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $name
- * @property string $code
- * @property integer $content_id
- * @property string $active
- * @property integer $priority
- * @property string $property_type
- * @property string $multiple
- * @property string $is_required
- * @property string $component
- * @property string $component_settings
- * @property string $hint
+ * @property integer                       $id
+ * @property integer                       $created_by
+ * @property integer                       $updated_by
+ * @property integer                       $created_at
+ * @property integer                       $updated_at
+ * @property string                        $name
+ * @property string                        $code
+ * @property integer                       $content_id
+ * @property integer                       $priority
+ * @property string                        $property_type
+ * @property string                        $component
+ * @property string                        $component_settings
+ * @property string                        $hint
+ * @property bool                          $is_required
+ * @property bool                          $is_active
+ * @property bool                          $is_multiple
  *
  * @property RelatedElementPropertyModel[] $elementProperties
- * @property RelatedPropertyEnumModel[] $enums
+ * @property RelatedPropertyEnumModel[]    $enums
  *
- * @property PropertyType $handler
- * @property mixed $defaultValue
- * @property bool $isRequired
+ * @property PropertyType                  $handler
+ * @property mixed                         $defaultValue
+ * @property bool                          $isRequired
  */
 abstract class RelatedPropertyModel extends Core
 {
@@ -65,6 +64,7 @@ abstract class RelatedPropertyModel extends Core
      * @var RelatedPropertiesModel
      */
     public $relatedPropertiesModel = null;
+
     protected $_handler = null;
 
     public function behaviors()
@@ -72,9 +72,9 @@ abstract class RelatedPropertyModel extends Core
         return ArrayHelper::merge(parent::behaviors(), [
             Serialize::className() =>
                 [
-                    'class' => Serialize::className(),
-                    'fields' => ['component_settings']
-                ]
+                    'class'  => Serialize::className(),
+                    'fields' => ['component_settings'],
+                ],
         ]);
     }
 
@@ -91,7 +91,7 @@ abstract class RelatedPropertyModel extends Core
     {
         if ($handler = $this->handler) {
             $this->property_type = $handler->code;
-            $this->multiple = $handler->isMultiple ? Cms::BOOL_Y : Cms::BOOL_N;
+            $this->is_multiple = $handler->isMultiple ? 1 : 0;
         }
     }
 
@@ -106,21 +106,21 @@ abstract class RelatedPropertyModel extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'created_by' => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'name' => Yii::t('skeeks/cms', 'Name'),
-            'code' => Yii::t('skeeks/cms', 'Code'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
-            'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'property_type' => Yii::t('skeeks/cms', 'Property Type'),
-            'multiple' => Yii::t('skeeks/cms', 'Multiple'),
-            'is_required' => Yii::t('skeeks/cms', 'Is Required'),
-            'component' => Yii::t('skeeks/cms', 'Component'),
+            'id'                 => Yii::t('skeeks/cms', 'ID'),
+            'created_by'         => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'         => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'         => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'         => Yii::t('skeeks/cms', 'Updated At'),
+            'name'               => Yii::t('skeeks/cms', 'Name'),
+            'code'               => Yii::t('skeeks/cms', 'Code'),
+            'is_active'          => Yii::t('skeeks/cms', 'Active'),
+            'priority'           => Yii::t('skeeks/cms', 'Priority'),
+            'property_type'      => Yii::t('skeeks/cms', 'Property Type'),
+            'is_multiple'        => Yii::t('skeeks/cms', 'Multiple'),
+            'is_required'        => Yii::t('skeeks/cms', 'Is Required'),
+            'component'          => Yii::t('skeeks/cms', 'Component'),
             'component_settings' => Yii::t('skeeks/cms', 'Component Settings'),
-            'hint' => Yii::t('skeeks/cms', 'Hint'),
+            'hint'               => Yii::t('skeeks/cms', 'Hint'),
         ]);
     }
 
@@ -137,30 +137,37 @@ abstract class RelatedPropertyModel extends Core
             //[['code'], 'string', 'max' => 64],
             [
                 ['code'],
-                function($attribute) {
+                function ($attribute) {
                     if (!preg_match('/^[a-zA-Z]{1}[_a-zA-Z0-9]{1,255}$/',
                         $this->$attribute)) {
-                                            //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
-                    {
-                        $this->addError($attribute, \Yii::t('skeeks/cms',
-                            'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
-                            ['code' => 'code1']));
+                        //if(!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $this->$attribute))
+                        {
+                            $this->addError($attribute, \Yii::t('skeeks/cms',
+                                'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
+                                ['code' => 'code1']));
+                        }
                     }
-                    }
-                }
+                },
             ],
 
-            [['active', 'property_type', 'multiple', 'is_required'], 'string', 'max' => 1],
+            [['property_type'], 'string', 'max' => 1],
             [
                 'code',
                 'default',
-                'value' => function($model, $attribute) {
-                    return "property" . StringHelper::ucfirst(md5(rand(1, 10) . time()));
-                }
+                'value' => function ($model, $attribute) {
+                    return "property".StringHelper::ucfirst(md5(rand(1, 10).time()));
+                },
             ],
             ['priority', 'default', 'value' => 500],
-            [['active'], 'default', 'value' => Cms::BOOL_Y],
-            [['is_required'], 'default', 'value' => Cms::BOOL_N],
+
+            [['is_required'], 'integer'],
+            [['is_required'], 'default', 'value' => 0],
+
+            [['is_multiple'], 'integer'],
+            [['is_multiple'], 'default', 'value' => 0],
+
+            [['is_active'], 'integer'],
+            [['is_active'], 'default', 'value' => 1],
         ]);
     }
     /*{
@@ -181,11 +188,11 @@ abstract class RelatedPropertyModel extends Core
     abstract public function getEnums();
 
     /**
-     * @deprecated
-     *
      * @param ActiveForm $activeForm
      * @param null       $model
      * @return bool|\yii\widgets\ActiveField
+     * @deprecated
+     *
      */
     public function renderActiveForm(ActiveForm $activeForm, $model = null)
     {
@@ -247,7 +254,7 @@ abstract class RelatedPropertyModel extends Core
      */
     public function getIsRequired()
     {
-        return (bool)($this->is_required == Cms::BOOL_Y);
+        return (bool)($this->is_required == 1);
     }
 
 

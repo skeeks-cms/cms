@@ -20,6 +20,7 @@ use skeeks\yii2\form\Element;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
@@ -214,7 +215,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         'sections',
                         //'domains',
 
-                        'active',
+                        'is_active',
                         'priority',
                         /*'countElementProperties',*/
                     ],
@@ -286,7 +287,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                             },
                         ],
 
-                        'active' => [
+                        'is_active' => [
                             'class' => BooleanColumn::class,
                         ],
 
@@ -347,14 +348,10 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                     'is_required' => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
                     ],
-                    'active'      => [
+                    'is_active'      => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
                     ],
                     'name',
                     'code',
@@ -407,7 +404,9 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
                 'fields' => [
                     'hint',
-                    'priority',
+                    'priority' => [
+                        'class'    => NumberField::class,
+                    ],
                     'cmsContents' => [
                         'class'    => SelectField::class,
                         'multiple' => true,
