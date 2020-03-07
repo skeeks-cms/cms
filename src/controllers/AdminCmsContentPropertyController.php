@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
@@ -16,6 +18,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\yii2\form\Element;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -326,6 +329,47 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         $model->component_settings = $handler->toArray();
                     }
 
+                },
+            ],
+            
+            'enums' => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Элементы списка",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/cms/admin-cms-content-property-enum",
+                'relation'        => ['property_id' => 'id'],
+                'priority'        => 150,
+
+                'on gridInit'        => function($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'property_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+                
+                'accessCallback' => function (BackendModelAction $action) {
+
+                    /**
+                     * @var $model CmsContentProperty
+                     */
+                    $model = $action->model;
+
+                    if (!$model) {
+                        return false;
+                    }
+
+                    if ($model->property_type != PropertyType::CODE_LIST) {
+                        return false;
+                    }
+
+                    return true;
                 },
             ],
         ]);

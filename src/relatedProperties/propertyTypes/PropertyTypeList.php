@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
-use skeeks\cms\backend\widgets\ModalPermissionWidget;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
@@ -118,12 +117,20 @@ class PropertyTypeList extends PropertyType
             if ($this->property->isNewRecord) {
                 $result .= Alert::widget([
                     'options' => [
-                        'class' => 'alert-info',
+                        'class' => 'alert-info text-center',
                     ],
                     'body'    => \Yii::t('skeeks/cms', 'To start setting up options, save this property.'),
                 ]);
             } else {
-                if ($actionIndex) {
+                
+                $result .= Alert::widget([
+                    'options' => [
+                        'class' => 'alert-default text-center',
+                    ],
+                    'body'    => \Yii::t('skeeks/cms', 'Опции для этого списка задаются в отдельной вкладке, которая доступна после сохранения этого свойства.'),
+                ]);
+                
+                /*if ($actionIndex) {
                     $pjax = \yii\widgets\Pjax::begin();
 
                     $result .= "<div class='row'><div class='col-md-6'> ";
@@ -202,8 +209,7 @@ class PropertyTypeList extends PropertyType
                         ],
                     ]);
 
-                    \yii\widgets\Pjax::end();
-                }
+                    \yii\widgets\Pjax::end();*/
             }
 
         }
@@ -383,10 +389,10 @@ class PropertyTypeList extends PropertyType
             if ($data) {
                 $result = ArrayHelper::map($data, 'code', 'value');
             }
-            
+
 
             return implode(", ", $result);
-            
+
             //TODO: Вариант плох тем, что если опций очень много, то кончится память.
             /*if ($this->property->enums) {
                 $result = [];

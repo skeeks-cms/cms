@@ -77,6 +77,8 @@ class AdminCmsTreeTypePropertyEnumController extends BackendModelStandartControl
     public function fields($action)
     {
         $model = $action->model;
+        $model->load(\Yii::$app->request->get());
+        
         if ($property_id = \Yii::$app->request->get('property_id')) {
             $model->property_id = $property_id;
         }
