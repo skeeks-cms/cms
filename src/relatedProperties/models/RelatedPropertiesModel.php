@@ -13,14 +13,13 @@ use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\base\DynamicModel;
 use yii\base\Exception;
+use yii\base\InvalidArgumentException;
 use yii\base\ModelEvent;
 use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use yii\base\InvalidArgumentException;
-use yii\base\InvalidParamException;
 
 /**
  * @property RelatedPropertyModel[] $properties
@@ -359,6 +358,9 @@ class RelatedPropertiesModel extends DynamicModel
                         continue;
                     }
                     $className = $element->relatedElementPropertyClassName;
+                    /**
+                     * @var $productPropertyValue RelatedElementPropertyModel
+                     */
                     $productPropertyValue = new $className([
                         'element_id'   => $element->id,
                         'property_id'  => $property->id,
@@ -370,6 +372,13 @@ class RelatedPropertiesModel extends DynamicModel
                         'value_int2'   => $value,
                         'value_string' => (string)$value,
                     ]);
+                    if ($property->property_type == PropertyType::CODE_LIST) {
+                        $productPropertyValue->value_enum_id = (int)$value;
+                    } elseif ($property->property_type == PropertyType::CODE_ELEMENT) {
+                        $productPropertyValue->value_element_id = (int)$value;
+                    } else {
+                        $productPropertyValue->value_element_id = null;
+                    }
 
                     if (!$productPropertyValue->save()) {
                         throw new Exception("{$property->code} not save");
@@ -389,6 +398,15 @@ class RelatedPropertiesModel extends DynamicModel
                 $productPropertyValue->value_num2 = $value;
                 $productPropertyValue->value_int2 = $value;
                 $productPropertyValue->value_string = (string)$value;
+
+                if ($property->property_type == PropertyType::CODE_LIST) {
+                    $productPropertyValue->value_enum_id = (int)$value;
+                } elseif ($property->property_type == PropertyType::CODE_ELEMENT) {
+                    $productPropertyValue->value_element_id = (int)$value;
+                } else {
+                    $productPropertyValue->value_element_id = null;
+                }
+
             } else {
                 $className = $element->relatedElementPropertyClassName;
 
@@ -403,6 +421,15 @@ class RelatedPropertiesModel extends DynamicModel
                     'value_int2'   => $value,
                     'value_string' => (string)$value,
                 ]);
+                
+                if ($property->property_type == PropertyType::CODE_LIST) {
+                    $productPropertyValue->value_enum_id = (int) $value;
+                } elseif($property->property_type == PropertyType::CODE_ELEMENT) {
+                    $productPropertyValue->value_element_id = (int) $value;
+                } else {
+                    $productPropertyValue->value_element_id = null;
+                }
+                
             }
 
             if (empty($value)) {
@@ -569,14 +596,14 @@ class RelatedPropertiesModel extends DynamicModel
         ]);
         $property = $this->relatedElementModel::getDb()->cache(function ($db) use ($name) {
             return $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $name])->one();
-        }, 3600*24, $dependency);
+        }, 3600 * 24, $dependency);
 
         if ($property) {
             $this->_defineByProperty($property);
 
             $pv = $this->relatedElementModel::getDb()->cache(function ($db) use ($property) {
                 return $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
-            }, 3600*24, $dependency);
+            }, 3600 * 24, $dependency);
 
             //$pv = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
 

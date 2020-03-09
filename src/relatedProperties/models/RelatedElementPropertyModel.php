@@ -27,6 +27,8 @@ use yii\widgets\ActiveForm;
  * @property string $value
  * @property integer $value_enum
  * @property string $value_num
+ * @property string $value_element_id
+ * @property string $value_enum_id
  * @property string $description
  *
  * @property RelatedPropertyModel $property
@@ -108,6 +110,8 @@ abstract class RelatedElementPropertyModel extends Core
                     return $value;
                 }
             ],
+
+            [['value_element_id', 'value_enum_id'], 'integer'],
 
         ]);
     }
