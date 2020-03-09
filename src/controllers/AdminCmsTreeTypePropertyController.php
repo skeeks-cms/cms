@@ -13,6 +13,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\relatedProperties\PropertyType;
@@ -302,6 +303,21 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
                         ],
                         'items'          => function () {
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
+                        },
+                    ],
+                    'cms_measure_code'   => [
+                        'class'          => SelectField::class,
+                        /*'elementOptions' => [
+                            'data' => [
+                                'form-reload' => 'true',
+                            ],
+                        ],*/
+                        'items'          => function () {
+                            return ArrayHelper::map(
+                                CmsMeasure::find()->all(),
+                                'code',
+                                'asShortText'
+                            );
                         },
                     ],
                     [

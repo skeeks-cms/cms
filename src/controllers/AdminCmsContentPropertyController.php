@@ -15,6 +15,7 @@ use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -411,6 +412,21 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         ],*/
                         'items'          => function () {
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
+                        },
+                    ],
+                    'cms_measure_code'   => [
+                        'class'          => SelectField::class,
+                        /*'elementOptions' => [
+                            'data' => [
+                                'form-reload' => 'true',
+                            ],
+                        ],*/
+                        'items'          => function () {
+                            return ArrayHelper::map(
+                                CmsMeasure::find()->all(),
+                                'code',
+                                'asShortText'
+                            );
                         },
                     ],
                     [

@@ -11,6 +11,7 @@
 namespace skeeks\cms\relatedProperties\models;
 
 use skeeks\cms\helpers\StringHelper;
+use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
@@ -36,6 +37,7 @@ use yii\widgets\ActiveForm;
  * @property bool                          $is_required
  * @property bool                          $is_active
  * @property bool                          $is_multiple
+ * @property null|string                   $cms_measure_code
  *
  * @property RelatedElementPropertyModel[] $elementProperties
  * @property RelatedPropertyEnumModel[]    $enums
@@ -43,6 +45,7 @@ use yii\widgets\ActiveForm;
  * @property PropertyType                  $handler
  * @property mixed                         $defaultValue
  * @property bool                          $isRequired
+ * @property CmsMeasure                    $cmsMeasure
  */
 abstract class RelatedPropertyModel extends Core
 {
@@ -106,11 +109,6 @@ abstract class RelatedPropertyModel extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'                 => Yii::t('skeeks/cms', 'ID'),
-            'created_by'         => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by'         => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at'         => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at'         => Yii::t('skeeks/cms', 'Updated At'),
             'name'               => Yii::t('skeeks/cms', 'Name'),
             'code'               => Yii::t('skeeks/cms', 'Code'),
             'is_active'          => Yii::t('skeeks/cms', 'Active'),
@@ -121,6 +119,7 @@ abstract class RelatedPropertyModel extends Core
             'component'          => Yii::t('skeeks/cms', 'Component'),
             'component_settings' => Yii::t('skeeks/cms', 'Component Settings'),
             'hint'               => Yii::t('skeeks/cms', 'Hint'),
+            'cms_measure_code'               => Yii::t('skeeks/cms', 'Единица измерения'),
         ]);
     }
 
@@ -168,6 +167,21 @@ abstract class RelatedPropertyModel extends Core
 
             [['is_active'], 'integer'],
             [['is_active'], 'default', 'value' => 1],
+
+            [['cms_measure_code'], 'string'],
+            [
+                ['cms_measure_code'],
+                'default',
+                'value' => null,
+            ],
+            [
+                ['cms_measure_code'],
+                function ($model) {
+                    if (!$this->cmsMeasure) {
+                        $this->addError("cms_measure_code", "Указан код валюты которой нет в базе.");
+                    }
+                },
+            ],
         ]);
     }
     /*{
@@ -186,6 +200,15 @@ abstract class RelatedPropertyModel extends Core
      * @return \yii\db\ActiveQuery
      */
     abstract public function getEnums();
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsMeasure()
+    {
+        return $this->hasOne(CmsMeasure::class, ['code' => 'cms_measure_code']);
+
+    }
 
     /**
      * @param ActiveForm $activeForm
@@ -275,5 +298,19 @@ abstract class RelatedPropertyModel extends Core
     public function getDefaultValue()
     {
         return $this->handler->defaultValue;
+    }
+
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        $result = parent::asText();
+
+        if ($this->cms_measure_code) {
+            $result = $result . " ({$this->cmsMeasure->asShortText})";
+        }
+
+        return $result;
     }
 }

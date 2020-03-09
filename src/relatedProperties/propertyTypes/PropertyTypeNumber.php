@@ -66,11 +66,17 @@ class PropertyTypeNumber extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
+        $append = '';
+        if ($this->property->cms_measure_code) {
+            $append = $this->property->cmsMeasure->asShortText;
+        }
+
         //$field->textInput();
         $field->widget(NumberInputWidget::class, [
             'options' => [
                 'step' => '0.00000001'
-            ]
+            ],
+            'append' => $append
         ]);
 
         return $field;
