@@ -138,6 +138,8 @@ class Storage extends Component
                                 $extension = 'jpg';
                             } elseif(in_array("png", $extensions)) {
                                 $extension = 'png';
+                            } elseif(in_array("gif", $extensions)) {
+                                $extension = 'gif';
                             } else {
                                 if (!$extension) {
                                     $extension = $extensions[0];
