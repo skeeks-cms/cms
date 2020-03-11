@@ -98,6 +98,7 @@ class Storage extends Component
                         throw new Exception("Не удалось скачать файл: {$file}");
                     }
 
+
                     $extension = pathinfo($file, PATHINFO_EXTENSION);
                     $pos = strpos($extension, "?");
 
@@ -118,7 +119,7 @@ class Storage extends Component
                     }
 
                     //Если в ссылке нет расширения
-                    if (!$extension) {
+                    //if (!$extension) {
                         $tmpfile = new File($tmpfile->getPath());
 
                         try {
@@ -135,10 +136,10 @@ class Storage extends Component
                         if ($extensions) {
                             if (in_array("jpg", $extensions)) {
                                 $extension = 'jpg';
+                            } elseif(in_array("png", $extensions)) {
+                                $extension = 'png';
                             } else {
-                                if (in_array("png", $extensions)) {
-                                    $extension = 'png';
-                                } else {
+                                if (!$extension) {
                                     $extension = $extensions[0];
                                 }
                             }
@@ -148,7 +149,7 @@ class Storage extends Component
 
                             $tmpfile = $tmpfile->copy($newFile);
                         }
-                    }
+                    //}
 
                 } else {
                     throw new Exception("Файл должен быть определен как \yii\web\UploadedFile или \skeeks\sx\File или string");
