@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\components\storage;
 
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Exception;
@@ -102,10 +103,12 @@ class Storage extends Component
                     $extension = pathinfo($file, PATHINFO_EXTENSION);
                     
                     $fileNameData = $file;
-                    if ($pos = strpos($file, "?"))
-                    {
-                        $fileNameData = StringHelper::substr($file, 0, $pos);
-                    }
+                   
+                    $fileNameData = str_replace(".", "_", $fileNameData);
+                    $fileNameData = str_replace("?", "_", $fileNameData);
+                    $fileNameData = str_replace("&", "_", $fileNameData);
+                    $fileNameData = str_replace("?", "_", $fileNameData);
+                    
                     $original_file_name = pathinfo($fileNameData, PATHINFO_BASENAME);
                     
                     $pos = strpos($extension, "?");
@@ -160,6 +163,10 @@ class Storage extends Component
                             $tmpfile = $tmpfile->copy($newFile);
                         }
                     //}
+                    
+                    if (!strpos($original_file_name, ".")) {
+                        $original_file_name = $original_file_name . "." . $extension;
+                    }
 
                 } else {
                     throw new Exception("Файл должен быть определен как \yii\web\UploadedFile или \skeeks\sx\File или string");

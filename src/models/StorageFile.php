@@ -287,6 +287,9 @@ class StorageFile extends Core
         if ($this->name_to_save) {
             return $this->name_to_save . "." . $this->extension;
         } else {
+            if (!strpos($this->original_name, ".")) {
+                return $this->original_name . "." . $this->extension;
+            }
             return $this->original_name;
         }
     }
