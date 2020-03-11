@@ -100,6 +100,14 @@ class Storage extends Component
 
 
                     $extension = pathinfo($file, PATHINFO_EXTENSION);
+                    
+                    $fileNameData = $file;
+                    if ($pos = strpos($file, "?"))
+                    {
+                        $fileNameData = StringHelper::substr($file, 0, $pos);
+                    }
+                    $original_file_name = pathinfo($fileNameData, PATHINFO_BASENAME);
+                    
                     $pos = strpos($extension, "?");
 
                     if ($pos === false) {
