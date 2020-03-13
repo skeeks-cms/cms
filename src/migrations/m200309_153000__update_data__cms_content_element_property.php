@@ -15,7 +15,18 @@ class m200309_153000__update_data__cms_content_element_property extends Migratio
 
         $tableName = 'cms_content_element_property';
 
-        $subQuery = $this->db->createCommand("SELECT 
+        $subQuery = $this->db->createCommand("
+        UPDATE 
+            `cms_content_element_property` as p
+            LEFT JOIN cms_content_property on cms_content_property.id = p.property_id 
+            /*LEFT JOIN cms_content_property_enum on cms_content_property_enum.id = p.value_enum */
+        SET 
+            p.`value_element_id` = p.value_enum 
+        WHERE 
+            cms_content_property.property_type = 'E'
+	")->execute();
+
+        /*$subQuery = $this->db->createCommand("SELECT
                     {$tableName}.id 
                 FROM 
                     `{$tableName}` 
@@ -30,7 +41,7 @@ class m200309_153000__update_data__cms_content_element_property extends Migratio
             "in",
             "id",
             $subQuery,
-        ]);
+        ]);*/
 
 
     }
