@@ -21,6 +21,8 @@ use yii\behaviors\TimestampBehavior;
 /**
  * @method string getTableCacheTag()
  *
+ * @property integer      $id
+ * 
  * @property integer      $created_by
  * @property integer      $updated_by
  * @property integer      $created_at
