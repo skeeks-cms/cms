@@ -200,12 +200,16 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     $query = $e->dataProvider->query;
 
                                     if ($e->field->value) {
+                                        //$query->joinWith("childrenContentElements as child");
+                                        //$query->joinWith("childrenContentElements.parentContentElement as parent");
+                                        
                                         $query->andWhere([
                                             'or',
                                             ['like', CmsContentElement::tableName().'.id', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.name', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
+                                            //['like', 'child.name', $e->field->value],
                                         ]);
                                     }
                                 },
@@ -269,7 +273,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         $query = $event->sender->dataProvider->query;
 
                         if ($this->content) {
-                            $query->andWhere(['content_id' => $this->content->id]);
+                            $query->andWhere([CmsContentElement::tableName() . '.content_id' => $this->content->id]);
                         }
                         
                     },
