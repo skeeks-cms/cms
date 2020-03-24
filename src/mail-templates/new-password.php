@@ -11,7 +11,11 @@ use yii\helpers\Html;
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>
-Используйте новый пароль <b><?= $password ?></b> для авторизации на сайте <?= Html::a(\Yii::$app->cms->appName, \yii\helpers\Url::home(true)) ?>.
+Используйте новый пароль для авторизации на сайте <?= Html::a(\Yii::$app->cms->appName, \yii\helpers\Url::home(true)) ?>:
+<?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('p'); ?>
+<b><?= $password ?></b>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>
