@@ -220,9 +220,6 @@ class AdminUserController extends BackendModelStandartController
                                 if ($cmsUser->email) {
                                     $data[] = $cmsUser->email;
                                 }
-                                if ($cmsUser->phone) {
-                                    $data[] = $cmsUser->phone;
-                                }
 
                                 $rolesData = [];
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
