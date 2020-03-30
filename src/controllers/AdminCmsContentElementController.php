@@ -43,6 +43,7 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 use yii\web\Application;
 
@@ -159,8 +160,8 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 'field'             => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
-                                    //'items'       => new UnsetArrayValue(),
-                                    //'multiple'    => new UnsetArrayValue(),
+                                    'items'       => new UnsetArrayValue(),
+                                    'multiple'    => new UnsetArrayValue(),
                                 ],
                             ],
 
@@ -171,8 +172,8 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 'field'             => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
-                                    /*'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),*/
+                                    'items'       => new UnsetArrayValue(),
+                                    'multiple'    => new UnsetArrayValue(),
                                 ],
                             ],
 
