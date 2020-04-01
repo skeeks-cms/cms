@@ -120,6 +120,11 @@ class User
     }
 
     public function _cmsCheckBeforeSave($e) {
+
+        if (!isset(\Yii::$app->user)) {
+            return true;
+        }
+
         if (!\Yii::$app->user && !\Yii::$app->user->identity) {
             return true;
         }
