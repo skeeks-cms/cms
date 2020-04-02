@@ -139,11 +139,15 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         'rules' => [
                             ['q', 'safe'],
                             ['has_image', 'safe'],
+                            ['created_by', 'safe'],
+                            ['updated_by', 'safe'],
                         ],
 
                         'attributeDefines' => [
                             'q',
                             'has_image',
+                            'created_by',
+                            'updated_by',
                         ],
 
                         'fields' => [
