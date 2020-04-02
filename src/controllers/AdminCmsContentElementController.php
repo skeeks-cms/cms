@@ -29,6 +29,7 @@ use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
+use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\yii2\form\fields\BoolField;
@@ -123,6 +124,10 @@ class AdminCmsContentElementController extends BackendModelStandartController
                 },
 
                 "filters" => [
+                    'disableAutoFilters' => [
+                        'created_by',
+                        'updated_by',
+                    ],
                     'visibleFilters' => [
                         'q',
                         //'id',
@@ -156,24 +161,26 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             'created_by' => [
                                 /*'class' => WidgetField::class,
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
-                                'isAllowChangeMode' => false,
+                                //'isAllowChangeMode' => false,
+                                'class' => NumberFilterField::class,
                                 'field'             => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
-                                    'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),
+                                    /*'items'       => new UnsetArrayValue(),
+                                    'multiple'    => new UnsetArrayValue(),*/
                                 ],
                             ],
 
                             'updated_by' => [
+                                'class' => NumberFilterField::class,
                                 /*'class' => WidgetField::class,
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
-                                'isAllowChangeMode' => false,
+                                //'isAllowChangeMode' => false,
                                 'field'             => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
-                                    'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),
+                                    /*'items'       => new UnsetArrayValue(),
+                                    'multiple'    => new UnsetArrayValue(),*/
                                 ],
                             ],
 
