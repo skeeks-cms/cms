@@ -264,7 +264,7 @@ class StorageFile extends Core
     public function copy()
     {
         $newFile = \Yii::$app->storage->upload($this->absoluteSrc);
-
+        
         $newFile->name = $this->name;
         $newFile->description_full = $this->description_full;
         $newFile->description_short = $this->description_short;

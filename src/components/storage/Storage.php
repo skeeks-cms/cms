@@ -73,7 +73,9 @@ class Storage extends Component
                 throw new Exception("Файл не загружен во временную диррикторию");
             }
         } else {
+
             if ($file instanceof File || (is_string($file) && BaseUrl::isRelative($file))) {
+                /*print_r($file);die;*/
                 $file = File::object($file);
                 $original_file_name = $file->getBaseName();
 
@@ -159,8 +161,10 @@ class Storage extends Component
 
                             $newFile = new File($tmpfile->getPath());
                             $newFile->setExtension($extension);
-
-                            $tmpfile = $tmpfile->copy($newFile);
+                            
+                            if ($tmpfile->getExtension() != $newFile->getExtension()) {
+                                $tmpfile = $tmpfile->copy($newFile);
+                            }
                         }
                     //}
                     

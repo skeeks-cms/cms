@@ -650,6 +650,16 @@ class CmsContentElement extends RelatedElementModel
                     $newImage2 = $this->fullImage->copy();
                     $newModel->link('fullImage', $newImage2);
                 }
+                
+                
+                if ($this->images) {
+                    foreach ($this->images as $img)
+                    {
+                        $newImg = $img->copy();
+                        $newModel->link('images', $newImg);
+                    }
+                    
+                }
             }
 
             if ($rp = $this->relatedPropertiesModel) {
