@@ -12,8 +12,8 @@
 namespace skeeks\cms\grid;
 
 /**
- * Class CreatedAtColumn
- * @package skeeks\cms\grid
+ * @deprecated 
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class CreatedAtColumn extends DateTimeColumnData
 {

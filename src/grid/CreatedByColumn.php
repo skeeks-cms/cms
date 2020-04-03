@@ -12,6 +12,7 @@
 namespace skeeks\cms\grid;
 
 /**
+ * @deprecated 
  * Class CreatedAtColumn
  * @package skeeks\cms\grid
  */

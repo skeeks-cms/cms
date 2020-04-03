@@ -142,8 +142,11 @@ $searchModel    = $search->loadedModel;
         ],
 
         [
-            'class' => \skeeks\cms\grid\FileSizeColumnData::className(),
-            'attribute' => 'size'
+            'class' => \yii\grid\DataColumn::class,
+            'attribute' => 'size',
+            'value' => function($model) {
+                return \Yii::$app->formatter->asShortSize($model->size);
+            }
         ],
 
 

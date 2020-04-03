@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\CmsStorageFile;
@@ -193,8 +194,12 @@ JS
                             'view',*/
                         ],
                         'columns'        => [
-
-
+                            'created_by' => [
+                                'class' => UserColumnData::class  
+                            ],
+                            'updated_by' => [
+                                'class' => UserColumnData::class
+                            ],
                             'created_at' => [
                                 'class' => DateTimeColumnData::class,
                             ],

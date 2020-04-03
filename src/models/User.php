@@ -710,10 +710,10 @@ class User
     }
 
     /**
-     * @param int $width
-     * @param int $height
-     * @param $mode
-     * @return mixed|null|string
+     * @param int    $width
+     * @param int    $height
+     * @param string $mode
+     * @return string|null
      */
     public function getAvatarSrc($width = 50, $height = 50, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
     {
@@ -725,6 +725,8 @@ class User
                     'm' => $mode,
                 ]));
         }
+
+        return null;
     }
 
 

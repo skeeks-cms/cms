@@ -18,6 +18,7 @@ use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\IHasUrl;
@@ -31,7 +32,6 @@ use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
-use skeeks\cms\shop\models\ShopProduct;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
@@ -44,7 +44,6 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 use yii\web\Application;
 
@@ -56,7 +55,7 @@ use yii\web\Application;
  */
 class AdminCmsContentElementController extends BackendModelStandartController
 {
-    
+
     public $editForm = '_form';
 
     public $modelClassName = CmsContentElement::class;
@@ -107,7 +106,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
     public function actions()
     {
         $result = ArrayHelper::merge(parent::actions(), [
-            'index'            => [
+            'index' => [
                 'configKey'      => $this->uniqueId."-".($this->content ? $this->content->id : ""),
                 'on afterRender' => [$this, 'contentEdit'],
                 //'url' => [$this->uniqueId, 'content_id' => $this->content->id],
@@ -128,13 +127,13 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         'created_by',
                         'updated_by',
                     ],
-                    'visibleFilters' => [
+                    'visibleFilters'     => [
                         'q',
                         //'id',
                         //'name',
                         //'active',
                     ],
-                    'filtersModel'   => [
+                    'filtersModel'       => [
 
                         'rules' => [
                             ['q', 'safe'],
@@ -167,7 +166,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
                                 //'isAllowChangeMode' => false,
                                 'class' => NumberFilterField::class,
-                                'field'             => [
+                                'field' => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
                                     /*'items'       => new UnsetArrayValue(),
@@ -180,7 +179,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 /*'class' => WidgetField::class,
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
                                 //'isAllowChangeMode' => false,
-                                'field'             => [
+                                'field' => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
                                     /*'items'       => new UnsetArrayValue(),
@@ -214,7 +213,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     if ($e->field->value) {
                                         //$query->joinWith("childrenContentElements as child");
                                         //$query->joinWith("childrenContentElements.parentContentElement as parent");
-                                        
+
                                         $query->andWhere([
                                             'or',
                                             ['like', CmsContentElement::tableName().'.id', $e->field->value],
@@ -285,9 +284,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         $query = $event->sender->dataProvider->query;
 
                         if ($this->content) {
-                            $query->andWhere([CmsContentElement::tableName() . '.content_id' => $this->content->id]);
+                            $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
                         }
-                        
+
                     },
                     'defaultOrder'   => [
                         'active'   => SORT_DESC,
@@ -314,9 +313,11 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         'view',
                     ],
                     'columns'        => [
-                        'test'         => [
-                            'label' => "test",
-                            'value' => 1,
+                        'created_by' => [
+                            'class' => UserColumnData::class
+                        ],
+                        'updated_by' => [
+                            'class' => UserColumnData::class
                         ],
                         'active'       => [
                             //'class' => BooleanColumn::class,
@@ -394,9 +395,9 @@ HTML;
                         'image_id'     => [
                             'class' => ImageColumn2::class,
                         ],
-                        'image.src'     => [
-                            'label' => 'Ссылка на главное изображение',
-                            'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
+                        'image.src'    => [
+                            'label'  => 'Ссылка на главное изображение',
+                            'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
                                 if ($model->image) {
                                     return $model->image->absoluteSrc;
                                 } else {
@@ -404,7 +405,7 @@ HTML;
                                 }
 
                             },
-                            'format'         => 'raw',
+                            'format' => 'raw',
                         ],
                         'published_at' => [
                             'class' => DateTimeColumnData::class,
@@ -454,12 +455,12 @@ HTML;
                             'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
                                 if ($model->cmsContent->is_have_page) {
                                     return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $model->absoluteUrl,
-                                    [
-                                        'target'    => '_blank',
-                                        'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                                        'data-pjax' => '0',
-                                        'class'     => 'btn btn-sm',
-                                    ]);
+                                        [
+                                            'target'    => '_blank',
+                                            'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                                            'data-pjax' => '0',
+                                            'class'     => 'btn btn-sm',
+                                        ]);
                                 } else {
                                     return '';
                                 }
@@ -500,7 +501,7 @@ HTML;
                     ],
                 ],
             ],
-            
+
             "create"           => [
                 "callback" => [$this, 'create'],
             ],
@@ -905,16 +906,17 @@ HTML;
         }
 
         $url = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                "/cms/admin-cms-content/update", "pk" => $this->content->id
-            ])->enableEmptyLayout()->enableNoActions()->url;
-        
+            "/cms/admin-cms-content/update",
+            "pk" => $this->content->id,
+        ])->enableEmptyLayout()->enableNoActions()->url;
+
         $actionData = \yii\helpers\Json::encode([
             "isOpenNewWindow" => true,
             "url"             => $url,
         ]);
 
         $href = \yii\helpers\Html::a('Настройках контента', $url, [
-            'onclick' => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;"
+            'onclick' => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;",
         ]);
 
         $e->content = Alert::widget([
@@ -1283,14 +1285,19 @@ HTML
                 'class' => \skeeks\cms\grid\ImageColumn2::class,
             ],
             'name',
-            ['class' => \skeeks\cms\grid\CreatedAtColumn::class],
             [
-                'class'   => \skeeks\cms\grid\UpdatedAtColumn::class,
-                'visible' => false,
+                'attribute' => "created_at",
+                'class'     => DateTimeColumnData::class,
             ],
             [
-                'class'   => \skeeks\cms\grid\PublishedAtColumn::class,
-                'visible' => false,
+                'class'     => DateTimeColumnData::class,
+                'attribute' => 'updated_at',
+                'visible'   => false,
+            ],
+            [
+                'attribute' => "published_at",
+                'class'     => DateTimeColumnData::class,
+                'visible'   => false,
             ],
             [
                 'class'     => \skeeks\cms\grid\DateTimeColumnData::class,

@@ -227,7 +227,7 @@ class AdminUserController extends BackendModelStandartController
                                         $rolesData[] = Html::tag('label', $role->description, [
                                             'title' => $role->name,
                                             'class' => "u-label u-label-default g-rounded-20 g-mr-5 " . ($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "font-size: 11px;",
+                                            'style' => "font-size: 9px;",
                                         ]);
                                     }
                                 }
