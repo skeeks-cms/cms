@@ -588,7 +588,7 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getChildrenContentElements()
     {
-        return $this->hasMany(static::className(), ['parent_content_element_id' => 'id']);
+        return $this->hasMany(static::className(), ['parent_content_element_id' => 'id'])->from(['childElements' => static::tableName()]);
     }
 
 
