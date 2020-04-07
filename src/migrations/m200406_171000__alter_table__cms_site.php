@@ -14,10 +14,10 @@ class m200406_171000__alter_table__cms_site extends Migration
     {
         $tableName = "cms_site";
 
-        /*$this->addColumn($tableName, "is_active", $this->integer(1)->unsigned()->notNull()->defaultValue(1));
+        $this->addColumn($tableName, "is_active", $this->integer(1)->unsigned()->notNull()->defaultValue(1));
         $this->update($tableName, ['is_active' => 0], ['active' => 'N']);
 
-        $this->addColumn($tableName, "is_default", $this->integer(1)->unsigned());*/
+        $this->addColumn($tableName, "is_default", $this->integer(1)->unsigned());
         $this->update($tableName, ['is_default' => 1], ['def' => 'Y']);
 
         $this->createIndex("is_default", $tableName, ["is_default"], true);
