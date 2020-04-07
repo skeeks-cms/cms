@@ -65,7 +65,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
      * Условие выборки по сайтам
      * @var array
      */
-    public $site_codes = [];
+    public $site_ids = [];
 
     /**
      * Сортировка по умолчанию
@@ -131,7 +131,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                 'active'             => \Yii::t('skeeks/cms', 'Activity'),
                 'level'              => \Yii::t('skeeks/cms', 'The nesting level'),
                 'label'              => \Yii::t('skeeks/cms', 'Header'),
-                'site_codes'         => \Yii::t('skeeks/cms', 'Linking to sites'),
+                'site_ids'         => \Yii::t('skeeks/cms', 'Linking to sites'),
                 'orderBy'            => \Yii::t('skeeks/cms', 'Sorting'),
                 'order'              => \Yii::t('skeeks/cms', 'Sorting direction'),
                 'enabledCurrentSite' => \Yii::t('skeeks/cms', 'Consider the current site'),
@@ -162,7 +162,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                 [['viewFile', 'label', 'active', 'orderBy', 'enabledCurrentSite', 'enabledRunCache'], 'string'],
                 [['treePid', 'level', 'runCacheDuration', 'limit'], 'integer'],
                 [['order'], 'integer'],
-                [['site_codes'], 'safe'],
+                [['site_ids'], 'safe'],
                 [['tree_type_ids'], 'safe'],
             ]);
     }
@@ -207,11 +207,11 @@ class TreeMenuCmsWidget extends WidgetRenderable
                             'type' => 'number',
                         ],
                     ],
-                    'site_codes'         => [
+                    'site_ids'         => [
                         'class'    => SelectField::class,
                         'items'    => \yii\helpers\ArrayHelper::map(
                             \skeeks\cms\models\CmsSite::find()->active()->all(),
-                            'code',
+                            'id',
                             'name'
                         ),
                         'multiple' => true,
@@ -300,8 +300,8 @@ class TreeMenuCmsWidget extends WidgetRenderable
             $this->activeQuery->andWhere(['active' => $this->active]);
         }
 
-        if ($this->site_codes) {
-            $cmsSites = CmsSite::find()->where(['code' => $this->site_codes])->all();
+        if ($this->site_ids) {
+            $cmsSites = CmsSite::find()->where(['id' => $this->site_ids])->all();
             if ($cmsSites) {
                 $ids = ArrayHelper::map($cmsSites, 'id', 'id');
                 $this->activeQuery->andWhere(['cms_site_id' => $ids]);

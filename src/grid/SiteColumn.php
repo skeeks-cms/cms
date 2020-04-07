@@ -17,20 +17,7 @@ use yii\grid\DataColumn;
  */
 class SiteColumn extends DataColumn
 {
-    public $attribute = 'site_code';
-
-    public function init()
-    {
-        parent::init();
-
-        if (!$this->filter) {
-            $this->filter = \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\models\CmsSite::find()->all(),
-                'code',
-                'name'
-            );
-        }
-    }
+    public $attribute = 'cms_site_id';
 
     /**
      * @inheritdoc

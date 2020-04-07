@@ -132,13 +132,13 @@ class UrlRuleTree
         $treeModel = ArrayHelper::getValue($params, 'model');
 
         $dir = ArrayHelper::getValue($params, 'dir');
-        $site_code = ArrayHelper::getValue($params, 'site_code');
+        $site_id = ArrayHelper::getValue($params, 'site_id');
 
         ArrayHelper::remove($params, 'id');
         ArrayHelper::remove($params, 'model');
 
         ArrayHelper::remove($params, 'dir');
-        ArrayHelper::remove($params, 'site_code');
+        ArrayHelper::remove($params, 'site_id');
 
 
         if ($treeModel && $treeModel instanceof Tree) {
@@ -162,12 +162,12 @@ class UrlRuleTree
 
 
         if ($dir) {
-            if (!$site_code && \Yii::$app->cms && \Yii::$app->cms->site) {
-                $site_code = \Yii::$app->cms->site->code;
+            if (!$site_id && \Yii::$app->cms && \Yii::$app->cms->site) {
+                $site_id = \Yii::$app->cms->site->id;
             }
 
-            if ($site_code) {
-                $cmsSite = CmsSite::getByCode($site_code);
+            if ($site_id) {
+                $cmsSite = CmsSite::findOne($site_id);
             }
 
             if (!$cmsSite) {
