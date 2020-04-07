@@ -25,10 +25,9 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $active
- * @property string $def
+ * @property integer $is_active
+ * @property integer $is_default
  * @property integer $priority
- * @property string $code
  * @property string $name
  * @property string $server_name
  * @property string $description
@@ -101,15 +100,15 @@ class CmsSite extends Core
     public function beforeUpdateChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y) {
+        if ($this->is_default) {
             static::updateAll(
                 [
-                    'def' => Cms::BOOL_N
+                    'is_default' => null
                 ],
                 ['!=', 'id', $this->id]
             );
 
-            $this->active = Cms::BOOL_Y; //сайт по умолчанию всегда активный
+            $this->is_active = 1; //сайт по умолчанию всегда активный
         }
 
     }
@@ -121,12 +120,12 @@ class CmsSite extends Core
     public function beforeInsertChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y) {
+        if ($this->is_default) {
             static::updateAll([
-                'def' => Cms::BOOL_N
+                'is_default' => null
             ]);
 
-            $this->active = Cms::BOOL_Y; //сайт по умолчанию всегда активный
+            $this->is_active = 1; //сайт по умолчанию всегда активный
         }
 
     }
@@ -164,10 +163,9 @@ class CmsSite extends Core
             'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
             'created_at' => Yii::t('skeeks/cms', 'Created At'),
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
-            'def' => Yii::t('skeeks/cms', 'Default'),
+            'is_active' => Yii::t('skeeks/cms', 'Active'),
+            'is_default' => Yii::t('skeeks/cms', 'Default'),
             'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'code' => Yii::t('skeeks/cms', 'Code'),
             'name' => Yii::t('skeeks/cms', 'Name'),
             'description' => Yii::t('skeeks/cms', 'Description'),
             'image_id' => Yii::t('skeeks/cms', 'Image'),
@@ -182,15 +180,13 @@ class CmsSite extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
-            [['code', 'name'], 'required'],
-            [['active', 'def'], 'string', 'max' => 1],
-            [['code'], 'string', 'max' => 15],
+            [['is_active'], 'integer'],
+            [['is_default'], 'integer'],
             [['name', 'description'], 'string', 'max' => 255],
-            [['code'], 'unique'],
-            [['code'], 'validateCode'],
             ['priority', 'default', 'value' => 500],
-            ['active', 'default', 'value' => Cms::BOOL_Y],
-            ['def', 'default', 'value' => Cms::BOOL_N],
+            ['is_active', 'default', 'value' => 1],
+            ['is_default', 'default', 'value' => null],
+            /*[['is_default'], 'unique'],*/
             [['image_id'], 'safe'],
 
             [
@@ -204,16 +200,6 @@ class CmsSite extends Core
             ],
         ]);
     }
-
-    public function validateCode($attribute)
-    {
-        if (!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9-]{1,255}$/', $this->$attribute)) {
-            $this->addError($attribute, \Yii::t('skeeks/cms',
-                'Use only letters of the alphabet in lower or upper case and numbers, the first character of the letter (Example {code})',
-                ['code' => 'code1']));
-        }
-    }
-
 
     static public $sites = [];
 

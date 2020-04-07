@@ -41,7 +41,7 @@
 <?
 $search = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsSite::className());
 $search->search(\Yii::$app->request->get());
-$search->getDataProvider()->query->andWhere(['active' => \skeeks\cms\components\Cms::BOOL_Y]);
+$search->getDataProvider()->query->andWhere(['is_active' => 1]);
 
 ?>
 <?= \skeeks\cms\modules\admin\widgets\GridViewHasSettings::widget([

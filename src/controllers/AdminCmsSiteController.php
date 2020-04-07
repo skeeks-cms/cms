@@ -17,6 +17,7 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -91,11 +92,9 @@ class AdminCmsSiteController extends BackendModelStandartController
                             'name'     => [
                                 'isAllowChangeMode' => false,
                             ],
-                            'code'     => [
-                                'isAllowChangeMode' => false,
-                            ],
-                            'active'   => $bool,
-                            'def'      => $bool,
+                         
+                            'is_active'   => $bool,
+                            'is_default'      => $bool,
                             'image_id' => [
                                 'isAllowChangeMode' => true,
                                 'modes'             => [
@@ -141,10 +140,13 @@ class AdminCmsSiteController extends BackendModelStandartController
                         $dataProvider = $e->sender->dataProvider;
 
                         $query->joinWith('cmsSiteDomains as cmsSiteDomains');
+
+                        $qCountDomains = CmsSiteDomain::find()->select(["total" => "count(*)"])->where(['cms_site_id' => new Expression(CmsSite::tableName() . ".id")]);
+
                         $query->groupBy(CmsSite::tableName() . ".id");
                         $query->select([
                             CmsSite::tableName() . '.*',
-                            'countDomains' => new Expression("count(*)")
+                            'countDomains' => $qCountDomains
                         ]);
                     },
 
@@ -166,8 +168,7 @@ class AdminCmsSiteController extends BackendModelStandartController
                         'custom',
                         //'id',
                         //'image_id',
-                        'def',
-                        'active',
+                        'is_active',
                         'priority',
                         //'name',
                         'countDomains',
@@ -180,7 +181,7 @@ class AdminCmsSiteController extends BackendModelStandartController
                             'value' => function (CmsSite $model) {
 
                                 $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = ($model->is_default ? '<span class="fa fa-check text-success" title="Сайт по умолчанию"></span> ' : '') . Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
 
                                 if ($model->cmsSiteDomains) {
                                     foreach ($model->cmsSiteDomains as $cmsSiteDomain)
@@ -208,11 +209,15 @@ class AdminCmsSiteController extends BackendModelStandartController
                             }
                         ],
 
-                        'active'   => [
+                        'is_active'   => [
                             'class' => BooleanColumn::class,
+                            'trueValue' => 1,
+                            'falseValue' => 0,
                         ],
-                        'def'      => [
+                        'is_default'      => [
                             'class' => BooleanColumn::class,
+                            'trueValue' => 1,
+                            'falseValue' => 0,
                         ],
                         'image_id' => [
                             'class' => ImageColumn2::class,
@@ -294,18 +299,14 @@ class AdminCmsSiteController extends BackendModelStandartController
             'class'       => BoolField::class,
             'formElement' => BoolField::ELEMENT_RADIO_LIST,
             'allowNull'   => false,
-            'trueValue'   => 'Y',
-            'falseValue'  => 'N',
         ];
         $def = [
             'class'       => BoolField::class,
             'formElement' => BoolField::ELEMENT_RADIO_LIST,
             'allowNull'   => false,
-            'trueValue'   => 'Y',
-            'falseValue'  => 'N',
         ];
 
-        if ($action->model->def == 'Y') {
+        if ($action->model->is_default) {
             $active = [
                 'class'     => HiddenField::class,
                 'hint'      => \Yii::t('skeeks/cms', 'Site selected by default always active')
@@ -326,9 +327,8 @@ class AdminCmsSiteController extends BackendModelStandartController
                 ],
             ],
             'name',
-            'code',
-            'active'      => $active,
-            'def'         => $def,
+            'is_active'      => $active,
+            'is_default'         => $def,
             'description' => [
                 'class' => TextareaField::class,
             ],
