@@ -405,8 +405,8 @@ class AdminComponentSettingsController extends BackendController
                             };
                         } else {
                             if (\Yii::$app->request->post('do') == 'site') {
-                                $code = \Yii::$app->request->post('code');
-                                $site = CmsSite::find()->where(['code' => $code])->one();
+                                $site_id = \Yii::$app->request->post('site_id');
+                                $site = CmsSite::find()->where(['id' => $site_id])->one();
 
                                 if ($site) {
                                     $component->setOverride(Component::OVERRIDE_SITE)->setCmsSite($site);

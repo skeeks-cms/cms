@@ -65,7 +65,6 @@ $search->getDataProvider()->query->andWhere(['active' => \skeeks\cms\components\
         ],
 
         'name',
-        'code',
 
         [
             'class' => \skeeks\cms\grid\ComponentSettingsColumn::className(),

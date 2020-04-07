@@ -105,11 +105,11 @@ $this->registerJs(<<<JS
             this.ajaxQuery.execute();
         },
 
-        removeBySite: function(site_code)
+        removeBySite: function(site_id)
         {
             this.ajaxQuery.setData({
                 'do': 'site',
-                'code': site_code,
+                'site_id': site_id,
             });
 
             this.ajaxQuery.execute();

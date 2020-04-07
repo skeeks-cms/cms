@@ -17,7 +17,7 @@ $controller = $this->context;
 ]); ?>
 
 
-<h2><?= \Yii::t('skeeks/cms', 'Settings for the site') ?>: <?= $site->name; ?> (<?= $site->code; ?>)</h2>
+<h2><?= \Yii::t('skeeks/cms', 'Settings for the site') ?>: <?= $site->name; ?></h2>
 <div class="sx-box g-mb-10">
     <? $alert = \yii\bootstrap\Alert::begin([
         'options' => [
@@ -27,7 +27,7 @@ $controller = $this->context;
     ]); ?>
     <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentSite($component, $site)->one()) : ?>
         <button type="submit" class="btn btn-danger btn-xs"
-                onclick="sx.ComponentSettings.Remove.removeBySite('<?= $site->code; ?>'); return false;">
+                onclick="sx.ComponentSettings.Remove.removeBySite('<?= $site->id; ?>'); return false;">
             <i class="fa fa-times"></i> <?= \Yii::t('skeeks/cms', 'reset settings for this site') ?>
         </button>
         <small><?= \Yii::t('skeeks/cms',
