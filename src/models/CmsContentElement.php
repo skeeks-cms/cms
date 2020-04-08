@@ -308,7 +308,7 @@ class CmsContentElement extends RelatedElementModel
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 10,
-                'minSize'     => 1024,
+                'minSize'     => 256,
             ],
             [['imageIds', 'fileIds'], 'safe'],
             [
@@ -318,7 +318,7 @@ class CmsContentElement extends RelatedElementModel
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
                 'maxFiles'    => 40,
                 'maxSize'     => 1024 * 1024 * 10,
-                'minSize'     => 1024,
+                'minSize'     => 256,
             ],
             [
                 ['fileIds'],
@@ -327,7 +327,7 @@ class CmsContentElement extends RelatedElementModel
                 //'extensions'    => [''],
                 'maxFiles'    => 40,
                 'maxSize'     => 1024 * 1024 * 50,
-                'minSize'     => 1024,
+                'minSize'     => 256,
             ],
 
 
