@@ -433,6 +433,19 @@ class Tree extends Core
         return static::find()->where(['level' => 0])->orderBy(["priority" => SORT_ASC]);
     }
 
+    /**
+     * @param null $cmsSite
+     * @return ActiveQuery
+     */
+    public static function findRootsForSite($cmsSite = null)
+    {
+        if ($cmsSite === null) {
+            $cmsSite = \Yii::$app->cms->site;
+        }
+
+        return static::findRoots()->andWhere(['cms_site_id' => $cmsSite->id]);
+    }
+
 
     /**
      * @return string

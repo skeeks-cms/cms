@@ -44,11 +44,13 @@ class AdminTreeController extends AdminModelEditorController
         $this->modelShowAttribute = "name";
         $this->modelHeader = function () {
             $model = $this->model;
-            return Html::tag('h1', $model->fullName . Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
+            return Html::tag('h1', $model->asText . Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
                 'target' => "_blank",
                 'class' => "g-ml-20",
                 'title' => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-            ]));
+            ]), ['style' => "margin-bottom: 0px;",]) . Html::tag("div", $model->fullName, [
+                'style' => 'font-size: 20px; margin-bottom: 10px; color: gray;'
+                ]);
         };
         $this->modelClassName = Tree::className();
 
@@ -274,7 +276,7 @@ class AdminTreeController extends AdminModelEditorController
         if ($root_id = \Yii::$app->request->get('root_id')) {
             $query = CmsTree::find()->where([CmsTree::tableName().'.id' => $root_id]);
         } else {
-            $query = CmsTree::findRoots();
+            $query = CmsTree::findRootsForSite();
         }
 
         $models = $query
