@@ -8,19 +8,20 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
 use skeeks\yii2\form\fields\WidgetField;
 use Yii;
@@ -44,12 +45,12 @@ class AdminTreeController extends AdminModelEditorController
         $this->modelShowAttribute = "name";
         $this->modelHeader = function () {
             $model = $this->model;
-            return Html::tag('h1', $model->asText . Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
-                'target' => "_blank",
-                'class' => "g-ml-20",
-                'title' => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-            ]), ['style' => "margin-bottom: 0px;",]) . Html::tag("div", $model->fullName, [
-                'style' => 'font-size: 20px; margin-bottom: 10px; color: gray;'
+            return Html::tag('h1', $model->asText.Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
+                        'target' => "_blank",
+                        'class'  => "g-ml-20",
+                        'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                    ]), ['style' => "margin-bottom: 0px;",]).Html::tag("div", $model->fullName, [
+                    'style' => 'font-size: 20px; margin-bottom: 10px; color: gray;',
                 ]);
         };
         $this->modelClassName = Tree::className();
@@ -61,17 +62,137 @@ class AdminTreeController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(), [
             'index' => [
-                'class'    => AdminAction::className(),
-                'name'     => \Yii::t('skeeks/cms', 'Tree'),
-                'callback' => [$this, 'indexAction'],
+                'class'          => AdminAction::className(),
+                'name'           => \Yii::t('skeeks/cms', 'Tree'),
+                'callback'       => [$this, 'indexAction'],
                 'accessCallback' => true,
             ],
 
             'list' => [
-                'class'    => ModelEditorGridAction::className(),
+                'class'    => BackendGridModelAction::className(),
                 'name'     => \Yii::t('skeeks/cms', 'List'),
                 "icon"     => "fa fa-list",
                 "priority" => 10,
+
+                'on beforeRender' => function (Event $event) {
+                        if ($pid = \Yii::$app->request->get("pid")) {
+                            if ($cmsTree = CmsTree::find()->where(['id' => $pid])->one()) {
+                                $event->content = Html::tag("h2", $cmsTree->fullName);
+                            }
+                            
+                        }
+            
+                        
+                    },
+                
+                "filters" => [
+                    'visibleFilters' => [
+                        'q',
+                        //'id',
+                    ],
+                    'filtersModel'   => [
+
+                        'rules' => [
+                            ['q', 'safe'],
+                        ],
+
+                        'attributeDefines' => [
+                            'q',
+                        ],
+
+                        'fields' => [
+
+                            'q' => [
+                                'label'          => 'Поиск',
+                                'elementOptions' => [
+                                    'placeholder' => 'Поиск (название, описание)',
+                                ],
+                                'on apply'       => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        $query->andWhere([
+                                            'or',
+                                            ['like', CmsTree::tableName().'.id', $e->field->value],
+                                            ['like', CmsTree::tableName().'.name', $e->field->value],
+                                            ['like', CmsTree::tableName().'.description_short', $e->field->value],
+                                            ['like', CmsTree::tableName().'.description_full', $e->field->value],
+                                        ]);
+                                    }
+                                },
+                            ],
+
+                        ],
+                    ],
+                ],
+                
+                'grid' => [
+                    'on init'        => function (Event $event) {
+
+                        $query = $event->sender->dataProvider->query;
+                        if ($pid = \Yii::$app->request->get("pid")) {
+                            $query->andWhere(['pid' => $pid]);
+                        } else {
+                            $query->andWhere(['pid' => null]);
+                        }
+                        $query->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
+
+                        /*if (!\Yii::$app->user->can("cms/admin-storage-files/index") && \Yii::$app->user->can("cms/admin-storage-files/index/own")) {
+                            $query = $event->sender->dataProvider->query;
+                            $query->andWhere(['created_by' => \Yii::$app->user->identity->id]);
+                        }*/
+                        /*/**
+                         * @var $query ActiveQuery
+                        $query = $event->sender->dataProvider->query;
+                        if ($this->content) {
+                            $query->andWhere(['content_id' => $this->content->id]);
+                        }*/
+                    },
+                    'defaultOrder'   => [
+                        'priority' => SORT_ASC,
+                    ],
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        //'id',
+
+                        'custom',
+                        //'cluster_id',
+                        //'mime_type',
+                        //'extension',
+                        'priority',
+                        'created_by',
+
+                        /*'image_id',
+                        'name',
+
+                        'tree_id',
+                        'additionalSections',
+                        'published_at',
+                        'priority',
+
+                        'created_by',
+
+                        'active',
+
+                        'view',*/
+                    ],
+                    'columns'        => [
+                        'custom'     => [
+                            'attribute' => 'name',
+                            'format'    => 'raw',
+                            'value'     => function (Tree $cmsTree) {
+                                return '<i class="far fa-folder" style="font-size: 20px;"></i> ' . Html::a($cmsTree, Url::to(['/cms/admin-tree/list', 'pid' => $cmsTree->id]), ['data-pjax' => 0]);
+                            },
+                        ],
+                        'created_by' => [
+                            'class' => UserColumnData::class,
+                        ],
+                    ],
+                ],
             ],
 
             'create' => [
@@ -79,17 +200,17 @@ class AdminTreeController extends AdminModelEditorController
             ],
 
             'new-children' => [
-                'class' => BackendAction::class,
+                'class'     => BackendAction::class,
                 'isVisible' => false,
-                'name' => "Создать подраздел",
-                'callback' => [$this, 'actionNewChildren'],
+                'name'      => "Создать подраздел",
+                'callback'  => [$this, 'actionNewChildren'],
             ],
 
             'resort' => [
-                'class' => BackendAction::class,
+                'class'     => BackendAction::class,
                 'isVisible' => false,
-                'name' => "Сортировать подразделы",
-                'callback' => [$this, 'actionResort'],
+                'name'      => "Сортировать подразделы",
+                'callback'  => [$this, 'actionResort'],
             ],
 
             "update" => [
@@ -264,9 +385,9 @@ class AdminTreeController extends AdminModelEditorController
             'model'        => $model,
             'relatedModel' => $relatedModel,
 
-            'is_saved' => $is_saved,
+            'is_saved'  => $is_saved,
             'submitBtn' => \Yii::$app->request->post('submit-btn'),
-            'redirect' => $redirect,
+            'redirect'  => $redirect,
         ]);
     }
 
