@@ -233,7 +233,7 @@ return
                 'items' =>
                     [
                         [
-                            "label"    => \Yii::t('skeeks/cms', "User management"),
+                            "label"    => \Yii::t('skeeks/cms', "Users"),
                             "url"      => ["cms/admin-user"],
                             "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
                             'priority' => 0,
