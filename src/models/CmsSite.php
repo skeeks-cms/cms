@@ -40,6 +40,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsSiteDomain[] $cmsSiteDomains
  * @property CmsSiteDomain $cmsSiteMainDomain
  * @property CmsTree[] $cmsTrees
+ * @property CmsContentElement[] $cmsContentElements
  * @property CmsStorageFile $image
  */
 class CmsSite extends Core
@@ -255,6 +256,14 @@ class CmsSite extends Core
     public function getCmsTrees()
     {
         return $this->hasMany(CmsTree::class, ['cms_site_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElements()
+    {
+        return $this->hasMany(CmsContentElement::class, ['cms_site_id' => 'id']);
     }
 
 

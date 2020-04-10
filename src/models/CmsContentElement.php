@@ -53,8 +53,10 @@ use yii\helpers\Url;
  * @property string                      $meta_description
  * @property string                      $meta_keywords
  * @property string                      $seo_h1
+ * @property integer|null                $cms_site_id
+ * @property string|null                 $external_id
  *
- * @property bool                      $is_active
+ * @property bool                        $is_active
  *
  * @property integer                     $parent_content_element_id version > 2.4.8
  *
@@ -69,6 +71,7 @@ use yii\helpers\Url;
  *
  * @property CmsContent                  $cmsContent
  * @property Tree                        $cmsTree
+ * @property CmsSite                     $cmsSite
  * @property CmsContentElementProperty[] $relatedElementProperties
  * @property CmsContentProperty[]        $relatedProperties
  * @property CmsContentElementTree[]     $cmsContentElementTrees
@@ -228,7 +231,8 @@ class CmsContentElement extends RelatedElementModel
             'treeIds'                   => Yii::t('skeeks/cms', 'Additional sections'),
             'parent_content_element_id' => Yii::t('skeeks/cms', 'Parent element'),
             'show_counter'              => Yii::t('skeeks/cms', 'Number of views'),
-            'seo_h1' => Yii::t('skeeks/cms', 'SEO заголовок h1'),
+            'seo_h1'                    => Yii::t('skeeks/cms', 'SEO заголовок h1'),
+            'external_id'               => Yii::t('skeeks/cms', 'Идентификатор внешней системы'),
         ]);
     }
     /**
@@ -237,8 +241,9 @@ class CmsContentElement extends RelatedElementModel
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'treeIds' => Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.'),
-            'seo_h1' => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.'
+            'treeIds'     => Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.'),
+            'seo_h1'      => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.',
+            'external_id' => Yii::t('skeeks/cms', 'Обычно заполняется если этот элемент выгружается из какой-либо внешней системы'),
         ]);
     }
     /**
@@ -259,6 +264,7 @@ class CmsContentElement extends RelatedElementModel
                     'content_id',
                     'tree_id',
                     'show_counter',
+                    'cms_site_id',
                     'show_counter_start',
                 ],
                 'integer',
@@ -268,6 +274,8 @@ class CmsContentElement extends RelatedElementModel
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
             [['seo_h1'], 'string', 'max' => 255],
+            [['external_id'], 'string', 'max' => 255],
+            [['external_id'], 'default', 'value' => null],
             [
                 ['content_id', 'code'],
                 'unique',
@@ -296,6 +304,15 @@ class CmsContentElement extends RelatedElementModel
                 'value' => function () {
                     if ($this->cmsContent->defaultTree) {
                         return $this->cmsContent->defaultTree->id;
+                    }
+                },
+            ],
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->cms->site) {
+                        return \Yii::$app->cms->site->id;
                     }
                 },
             ],
@@ -349,6 +366,25 @@ class CmsContentElement extends RelatedElementModel
             }",
             ],
 
+            [
+                ['cms_site_id', 'external_id'],
+                'unique',
+                'targetAttribute' => ['cms_site_id', 'external_id'],
+                'when'            => function (CmsContentElement $model) {
+                    return (bool)$model->external_id;
+                },
+            ],
+
+            [
+                ['tree_id', 'cms_site_id'],
+                function ($attribute) {
+                    if ($this->cmsTree && $this->cmsSite) {
+                        if ($this->cmsSite->id != $this->cmsTree->cms_site_id) {
+                            $this->addError($attribute, "Раздел к которому привязывается элемент должен относится к тому же сайту");
+                        }
+                    }
+                }
+            ]
         ]);
     }
     /**
@@ -389,6 +425,14 @@ class CmsContentElement extends RelatedElementModel
     public function getCmsTree()
     {
         return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSite()
+    {
+        return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
     }
 
     static public $_contents = [];
@@ -650,15 +694,14 @@ class CmsContentElement extends RelatedElementModel
                     $newImage2 = $this->fullImage->copy();
                     $newModel->link('fullImage', $newImage2);
                 }
-                
-                
+
+
                 if ($this->images) {
-                    foreach ($this->images as $img)
-                    {
+                    foreach ($this->images as $img) {
                         $newImg = $img->copy();
                         $newModel->link('images', $newImg);
                     }
-                    
+
                 }
             }
 
@@ -702,7 +745,7 @@ class CmsContentElement extends RelatedElementModel
 
     public function getIs_active()
     {
-        return (bool) ($this->active == "Y");
+        return (bool)($this->active == "Y");
     }
 }
 

@@ -40,4 +40,8 @@
         ]
     )->label($contentModel->parentContent->name_one) ?>
 <?php endif; ?>
+
+<?= $form->field($model, 'external_id'); ?>
+
+
 <? $fieldSet::end(); ?>
