@@ -8,23 +8,10 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\admin\AdminController;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\BackendController;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\Search;
-use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
-use skeeks\sx\Dir;
 use skeeks\sx\File;
-use yii\data\ArrayDataProvider;
-use yii\filters\VerbFilter;
-use yii\grid\GridView;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Url;
-
-use Yii;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -36,6 +23,13 @@ class AdminInfoController extends BackendController
         $this->name = \Yii::t('skeeks/cms', "Information about the system");
         $this->generateAccessActions = false;
 
+        $this->accessCallback = function () {
+            if (!\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
+
         parent::init();
     }
 
@@ -45,10 +39,10 @@ class AdminInfoController extends BackendController
             [
                 'index' =>
                     [
-                        'class' => BackendAction::className(),
-                        'name' => \Yii::t('skeeks/cms', 'General information'),
+                        'class'    => BackendAction::className(),
+                        'name'     => \Yii::t('skeeks/cms', 'General information'),
                         'callback' => [$this, 'actionIndex'],
-                    ]
+                    ],
             ];
     }
 
@@ -56,24 +50,24 @@ class AdminInfoController extends BackendController
     {
         return $this->render($this->action->id,
             [
-                'phpVersion' => PHP_VERSION,
-                'yiiVersion' => \Yii::getVersion(),
+                'phpVersion'  => PHP_VERSION,
+                'yiiVersion'  => \Yii::getVersion(),
                 'application' => [
-                    'yii' => \Yii::getVersion(),
-                    'name' => \Yii::$app->cms->appName,
-                    'env' => YII_ENV,
+                    'yii'   => \Yii::getVersion(),
+                    'name'  => \Yii::$app->cms->appName,
+                    'env'   => YII_ENV,
                     'debug' => YII_DEBUG,
                 ],
-                'php' => [
-                    'version' => PHP_VERSION,
-                    'xdebug' => extension_loaded('xdebug'),
-                    'apc' => extension_loaded('apc'),
+                'php'         => [
+                    'version'  => PHP_VERSION,
+                    'xdebug'   => extension_loaded('xdebug'),
+                    'apc'      => extension_loaded('apc'),
                     'memcache' => extension_loaded('memcache'),
-                    'xcache' => extension_loaded('xcache'),
-                    'imagick' => extension_loaded('imagick'),
-                    'gd' => extension_loaded('gd'),
+                    'xcache'   => extension_loaded('xcache'),
+                    'imagick'  => extension_loaded('imagick'),
+                    'gd'       => extension_loaded('gd'),
                 ],
-                'extensions' => $this->getExtensions(),
+                'extensions'  => $this->getExtensions(),
             ]);
     }
 

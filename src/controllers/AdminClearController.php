@@ -14,24 +14,27 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\admin\AdminController;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
 use skeeks\sx\Dir;
-use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Url;
 
 /**
- * Class IndexController
- * @package skeeks\cms\admin\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminClearController extends AdminController
 {
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Deleting temporary files");
+
+        $this->generateAccessActions = false;
+        $this->accessCallback = function () {
+            if (!\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
+
         parent::init();
     }
 
@@ -41,8 +44,8 @@ class AdminClearController extends AdminController
             [
                 "index" =>
                     [
-                        "class" => BackendAction::className(),
-                        "name" => \Yii::t('skeeks/cms', 'Clearing temporary data'),
+                        "class"    => BackendAction::className(),
+                        "name"     => \Yii::t('skeeks/cms', 'Clearing temporary data'),
                         "callback" => [$this, 'actionIndex'],
                     ],
             ];
@@ -58,22 +61,22 @@ class AdminClearController extends AdminController
             foreach ($paths as $path) {
                 $clearDirs[] = [
                     'label' => 'Корневая временная дирриктория',
-                    'dir' => new Dir(\Yii::getAlias($path), false)
+                    'dir'   => new Dir(\Yii::getAlias($path), false),
                 ];
 
                 $clearDirs[] = [
                     'label' => 'Логи',
-                    'dir' => new Dir(\Yii::getAlias($path . "/logs"), false)
+                    'dir'   => new Dir(\Yii::getAlias($path."/logs"), false),
                 ];
 
                 $clearDirs[] = [
                     'label' => 'Кэш',
-                    'dir' => new Dir(\Yii::getAlias($path . "/cache"), false)
+                    'dir'   => new Dir(\Yii::getAlias($path."/cache"), false),
                 ];
 
                 $clearDirs[] = [
                     'label' => 'Дебаг',
-                    'dir' => new Dir(\Yii::getAlias($path . "/debug"), false)
+                    'dir'   => new Dir(\Yii::getAlias($path."/debug"), false),
                 ];
             }
         }

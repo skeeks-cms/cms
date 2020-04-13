@@ -50,6 +50,12 @@ class AdminUserController extends BackendModelStandartController
         $this->modelClassName = CmsUser::class;
 
         $this->generateAccessActions = false;
+        $this->accessCallback = function () {
+            if (!\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
         /*$this->permissionName = 'cms/admin-cms-site';*/
 
         parent::init();
