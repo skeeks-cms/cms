@@ -11,19 +11,28 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\controllers\AdminController;
 
 /**
  * Class AdminStorageFilesController
  * @package skeeks\cms\controllers
  */
-class AdminStorageController extends AdminController
+class AdminStorageController extends BackendController
 {
     public function init()
     {
         $this->name = "Управление серверами";
+        
         $this->generateAccessActions = false;
+
+        $this->accessCallback = function () {
+            if (!\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
+        
         parent::init();
     }
 

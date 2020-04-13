@@ -156,8 +156,17 @@ class AdminComponentSettingsController extends BackendController
             $attributes = $attibutes;
             $component->setAttributes($attributes);
         } else {
-            $component->overridePath = [Component::OVERRIDE_DEFAULT];
-            $component->refresh();
+            
+            //Если это сайт по умолчанию, то редактируем настройки по дефолту
+            if (\Yii::$app->cms->site->is_default) {
+                $component->overridePath = [Component::OVERRIDE_DEFAULT];
+                $component->refresh();
+            } else {
+                //Если это не сайт по умолчанию, то настройки этого сайта
+                $component->overridePath = [Component::OVERRIDE_DEFAULT, Component::OVERRIDE_SITE];
+                $component->cmsSite = \Yii::$app->cms->site;
+                $component->refresh();
+            }
         }
 
 
@@ -174,7 +183,14 @@ class AdminComponentSettingsController extends BackendController
 
             if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 if ($component->load(\Yii::$app->request->post()) && $component->validate()) {
-                    $component->override = Component::OVERRIDE_DEFAULT;
+                    
+                    if (\Yii::$app->cms->site->is_default) {
+                        $component->override = Component::OVERRIDE_DEFAULT;
+                    } else {
+                        $component->override = Component::OVERRIDE_SITE;
+                        $component->cmsSite = \Yii::$app->cms->site;
+                    }
+                    
                     if ($component->save()) {
                         \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
                     } else {

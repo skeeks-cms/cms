@@ -156,6 +156,8 @@ JS
 <!--<h1>Управление: <?php /*= $component->descriptor->name; */ ?></h1>
     <hr />-->
 <div class="row">
+    <? if (\Yii::$app->cms->site->is_default) : ?>
+
     <div class="col-lg-12">
         <!--<ul class="nav nav-tabs sx-nav-with-bg sx-mgr-6 sx-nav-model">-->
         <ul class="nav u-nav-v7-1 u-nav-primary sx-main-page-nav">
@@ -201,4 +203,5 @@ JS
 
         </ul>
     </div>
+    <? endif; ?>
     <div class="col-lg-12">
