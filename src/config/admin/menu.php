@@ -40,7 +40,8 @@ function contentMenu()
                             $controller = \Yii::$app->createController('cms/admin-cms-content-element')[0];
                             $controller->setContent($content);
 
-                            foreach ([$controller->permissionName] as $permissionName) {
+                            $permissionNames =  $controller->uniqueId . "__" . $content->id;
+                            foreach ([$permissionNames] as $permissionName) {
                                 if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
                                     if (!\Yii::$app->user->can($permission->name)) {
                                         return false;
