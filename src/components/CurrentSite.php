@@ -33,7 +33,14 @@ class CurrentSite extends Component
     {
         if ($this->_site === null) {
             if (\Yii::$app instanceof \yii\console\Application) {
-                $this->_site = CmsSite::find()->active()->andWhere(['is_default' => 1])->one();
+
+                if ($cms_site_id = getenv("CMS_SITE")) {
+                    $this->_site = CmsSite::find()->active()->andWhere(['id' => $cms_site_id])->one();
+                } else {
+                    $this->_site = CmsSite::find()->active()->andWhere(['is_default' => 1])->one();
+                }
+
+
             } else {
                 $this->_serverName = \Yii::$app->getRequest()->getServerName();
                 $dependencySiteDomain = new TagDependency([
