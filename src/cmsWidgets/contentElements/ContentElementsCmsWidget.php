@@ -123,6 +123,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
         if ($this->createdBy) {
             $this->dataProvider->query->andWhere([$className::tableName().'.created_by' => $this->createdBy]);
         }
+        $this->dataProvider->query->andWhere([$className::tableName().'.created_by' => $this->createdBy]);
 
         if ($this->active) {
             $this->dataProvider->query->andWhere([$className::tableName().'.active' => $this->active]);
