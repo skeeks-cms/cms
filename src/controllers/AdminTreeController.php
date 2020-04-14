@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsSite;
@@ -18,7 +19,6 @@ use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -34,10 +34,9 @@ use yii\helpers\Url;
 /**
  * @property Tree $model
  *
- * Class AdminUserController
- * @package skeeks\cms\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminTreeController extends AdminModelEditorController
+class AdminTreeController extends BackendModelStandartController
 {
     public function init()
     {
@@ -75,16 +74,16 @@ class AdminTreeController extends AdminModelEditorController
                 "priority" => 10,
 
                 'on beforeRender' => function (Event $event) {
-                        if ($pid = \Yii::$app->request->get("pid")) {
-                            if ($cmsTree = CmsTree::find()->where(['id' => $pid])->one()) {
-                                $event->content = Html::tag("h2", $cmsTree->fullName);
-                            }
-                            
+                    if ($pid = \Yii::$app->request->get("pid")) {
+                        if ($cmsTree = CmsTree::find()->where(['id' => $pid])->one()) {
+                            $event->content = Html::tag("h2", $cmsTree->fullName);
                         }
-            
-                        
-                    },
-                
+
+                    }
+
+
+                },
+
                 "filters" => [
                     'visibleFilters' => [
                         'q',
@@ -128,7 +127,7 @@ class AdminTreeController extends AdminModelEditorController
                         ],
                     ],
                 ],
-                
+
                 'grid' => [
                     'on init'        => function (Event $event) {
 
@@ -185,7 +184,7 @@ class AdminTreeController extends AdminModelEditorController
                             'attribute' => 'name',
                             'format'    => 'raw',
                             'value'     => function (Tree $cmsTree) {
-                                return '<i class="far fa-folder" style="font-size: 20px;"></i> ' . Html::a($cmsTree, Url::to(['/cms/admin-tree/list', 'pid' => $cmsTree->id]), ['data-pjax' => 0]);
+                                return '<i class="far fa-folder" style="font-size: 20px;"></i> '.Html::a($cmsTree, Url::to(['/cms/admin-tree/list', 'pid' => $cmsTree->id]), ['data-pjax' => 0]);
                             },
                         ],
                         'created_by' => [

@@ -520,6 +520,13 @@ HTML;
                     }
                 },
 
+                "eachAccessCallback" => function($model) {
+                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                },
+                "accessCallback" => function() {
+                    return \Yii::$app->user->can($this->permissionName . "/update");
+                },
+
             ],
             "deactivate-multi" => [
                 'class'   => BackendModelMultiDeactivateAction::class,
@@ -533,6 +540,12 @@ HTML;
                     }
                 },
 
+                "eachAccessCallback" => function($model) {
+                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                },
+                "accessCallback" => function() {
+                    return \Yii::$app->user->can($this->permissionName . "/update");
+                },
             ],
 
 
@@ -601,8 +614,12 @@ HTML;
                     if ($this->content) {
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     }
-
-
+                },
+                "eachAccessCallback" => function($model) {
+                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                },
+                "accessCallback" => function() {
+                    return \Yii::$app->user->can($this->permissionName . "/update");
                 },
             ],
 
@@ -620,6 +637,13 @@ HTML;
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     }
                 },
+
+                "eachAccessCallback" => function($model) {
+                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                },
+                "accessCallback" => function() {
+                    return \Yii::$app->user->can($this->permissionName . "/update");
+                },
             ],
 
             "rp" => [
@@ -635,6 +659,13 @@ HTML;
                     if ($this->content) {
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     }
+                },
+
+                "eachAccessCallback" => function($model) {
+                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                },
+                "accessCallback" => function() {
+                    return \Yii::$app->user->can($this->permissionName . "/update");
                 },
             ],
 

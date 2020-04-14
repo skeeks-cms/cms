@@ -91,7 +91,7 @@ JS
 
 <? $fieldSet::end(); ?>
 
-<?php if (\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model])) : ?>
+<?php if (\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model]) && $model->id != \Yii::$app->user->id) : ?>
     <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Groups')) ?>
 
     <?php $this->registerCss(<<<CSS

@@ -131,6 +131,13 @@ trait THasPermissions
                     $permission = \Yii::$app->authManager->createPermission($permissionName);
                     $permission->description = $permissionLabel;
                     \Yii::$app->authManager->add($permission);
+
+                    //После первого создания назначение администратору
+                    if ($roleAdmin = \Yii::$app->authManager->getRole(CmsManager::ROLE_ADMIN)) {
+                        if (!\Yii::$app->authManager->hasChild($roleAdmin, $permission)) {
+                            \Yii::$app->authManager->addChild($roleAdmin, $permission);
+                        }
+                    }
                 }
                 if ($roleRoot = \Yii::$app->authManager->getRole(CmsManager::ROLE_ROOT)) {
                     if (!\Yii::$app->authManager->hasChild($roleRoot, $permission)) {
