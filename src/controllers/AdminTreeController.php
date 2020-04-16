@@ -215,9 +215,11 @@ class AdminTreeController extends BackendModelStandartController
             "update" => [
                 'class'    => BackendModelUpdateAction::className(),
                 "callback" => [$this, 'update'],
+                "priority" => 100,
             ],
 
             "move" => [
+                "priority"       => 200,
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Move'),
                 "icon"           => "fas fa-expand-arrows-alt",

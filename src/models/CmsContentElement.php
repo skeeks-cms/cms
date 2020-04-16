@@ -276,7 +276,7 @@ class CmsContentElement extends RelatedElementModel
             [['seo_h1'], 'string', 'max' => 255],
             [['external_id'], 'string', 'max' => 255],
             [['external_id'], 'default', 'value' => null],
-            [
+            /*[
                 ['content_id', 'code'],
                 'unique',
                 'targetAttribute' => ['content_id', 'code'],
@@ -287,7 +287,7 @@ class CmsContentElement extends RelatedElementModel
                 'unique',
                 'targetAttribute' => ['tree_id', 'code'],
                 'message'         => \Yii::t('skeeks/cms', 'For this section of the code is already in use.'),
-            ],
+            ],*/
             [['treeIds'], 'safe'],
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
