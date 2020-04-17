@@ -55,7 +55,6 @@ use yii\web\View;
 use yii\widgets\ActiveForm;
 
 /**
- * @property CmsSite                          $site
  * @property Tree                             $currentTree
  *
  * @property CmsLang[]                        $languages
