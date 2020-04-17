@@ -194,6 +194,7 @@ class Cms extends \skeeks\cms\base\Component
     {
         return \Yii::$app->currentSite->site;
     }
+
     public function getLanguages()
     {
         if ($this->_languages === null) {
@@ -202,6 +203,7 @@ class Cms extends \skeeks\cms\base\Component
 
         return (array)$this->_languages;
     }
+    
     public function init()
     {
         parent::init();

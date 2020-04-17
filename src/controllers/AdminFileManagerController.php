@@ -11,6 +11,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Comment;
 use skeeks\cms\modules\admin\actions\AdminAction;
@@ -23,13 +24,20 @@ use skeeks\cms\models\searchs\User as UserSearch;
  * Class AdminFileManagerController
  * @package skeeks\cms\controllers
  */
-class AdminFileManagerController extends AdminController
+class AdminFileManagerController extends BackendController
 {
     public function init()
     {
         if (!$this->name) {
             $this->name = "Файловый менеджер";
         }
+        
+        $this->accessCallback = function () {
+            if (!\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
 
         parent::init();
     }
