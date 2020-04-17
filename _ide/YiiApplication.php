@@ -16,20 +16,19 @@ use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ConsoleComponent;
-use skeeks\cms\components\CurrentSite;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\i18n\I18N;
-use skeeks\cms\models\CmsSite;
+use skeeks\cms\Skeeks;
 
 /**
- * @property Storage $storage
- * @property Cms $cms
- * @property Imaging $imaging
- * @property Breadcrumbs $breadcrumbs
- * @property CmsSite $currentSite
- * @property ConsoleComponent $console
- * @property I18N $i18n
+ * @property Storage               $storage
+ * @property Cms                   $cms
+ * @property Imaging               $imaging
+ * @property Breadcrumbs           $breadcrumbs
+ * @property Skeeks                $skeeks
+ * @property ConsoleComponent      $console
+ * @property I18N                  $i18n
  *
  * @property \yii\web\User|UserIde $user
  *

@@ -137,7 +137,7 @@ class AdminTreeController extends BackendModelStandartController
                         } else {
                             $query->andWhere(['pid' => null]);
                         }
-                        $query->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
+                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
 
                         /*if (!\Yii::$app->user->can("cms/admin-storage-files/index") && \Yii::$app->user->can("cms/admin-storage-files/index/own")) {
                             $query = $event->sender->dataProvider->query;

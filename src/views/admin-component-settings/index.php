@@ -25,7 +25,7 @@ $controller = $this->context;
         ],
         'closeButton' => false,
     ]); ?>
-    <? if (\Yii::$app->cms->site->is_default) : ?>
+    <? if (\Yii::$app->skeeks->site->is_default) : ?>
         <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentDefault($component)->one()) : ?>
             <button type="submit" class="btn btn-danger btn-xs"
                     onclick="sx.ComponentSettings.Remove.removeDefault(); return false;">
@@ -40,9 +40,9 @@ $controller = $this->context;
         ?>
     <? else : ?>
 
-        <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentSite($component, \Yii::$app->cms->site)->one()) : ?>
+        <?php if ($settings = \skeeks\cms\models\CmsComponentSettings::findByComponentSite($component, \Yii::$app->skeeks->site)->one()) : ?>
             <button type="submit" class="btn btn-danger btn-xs"
-                    onclick="sx.ComponentSettings.Remove.removeBySite('<?= \Yii::$app->cms->site->id; ?>'); return false;">
+                    onclick="sx.ComponentSettings.Remove.removeBySite('<?= \Yii::$app->skeeks->site->id; ?>'); return false;">
                 <i class="fa fa-times"></i> <?= \Yii::t('skeeks/cms', 'reset settings for this site') ?>
             </button>
             <small><?= \Yii::t('skeeks/cms',

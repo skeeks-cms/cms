@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\modules\cms\user\models\User;
 use Yii;
@@ -20,28 +19,29 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%cms_site}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $is_active
- * @property integer $is_default
- * @property integer $priority
- * @property string $name
- * @property string $server_name
- * @property string $description
- * @property integer $image_id
+ * @property integer                $id
+ * @property integer                $created_by
+ * @property integer                $updated_by
+ * @property integer                $created_at
+ * @property integer                $updated_at
+ * @property integer                $is_active
+ * @property integer                $is_default
+ * @property integer                $priority
+ * @property string                 $name
+ * @property string                 $server_name
+ * @property string                 $description
+ * @property integer                $image_id
  *
- * @property string $url
+ * @property string                 $url
  *
- * @property CmsTree $rootCmsTree
- * @property CmsLang $cmsLang
- * @property CmsSiteDomain[] $cmsSiteDomains
- * @property CmsSiteDomain $cmsSiteMainDomain
- * @property CmsTree[] $cmsTrees
- * @property CmsContentElement[] $cmsContentElements
- * @property CmsStorageFile $image
+ * @property CmsTree                $rootCmsTree
+ * @property CmsLang                $cmsLang
+ * @property CmsSiteDomain[]        $cmsSiteDomains
+ * @property CmsSiteDomain          $cmsSiteMainDomain
+ * @property CmsTree[]              $cmsTrees
+ * @property CmsContentElement[]    $cmsContentElements
+ * @property CmsStorageFile         $image
+ * @property CmsComponentSettings[] $cmsComponentSettings
  */
 class CmsSite extends Core
 {
@@ -88,8 +88,8 @@ class CmsSite extends Core
 
             HasStorageFile::className() =>
                 [
-                    'class' => HasStorageFile::className(),
-                    'fields' => ['image_id']
+                    'class'  => HasStorageFile::className(),
+                    'fields' => ['image_id'],
                 ],
         ]);
     }
@@ -104,7 +104,7 @@ class CmsSite extends Core
         if ($this->is_default) {
             static::updateAll(
                 [
-                    'is_default' => null
+                    'is_default' => null,
                 ],
                 ['!=', 'id', $this->id]
             );
@@ -123,7 +123,7 @@ class CmsSite extends Core
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
         if ($this->is_default) {
             static::updateAll([
-                'is_default' => null
+                'is_default' => null,
             ]);
 
             $this->is_active = 1; //сайт по умолчанию всегда активный
@@ -159,17 +159,17 @@ class CmsSite extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'created_by' => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'is_active' => Yii::t('skeeks/cms', 'Active'),
-            'is_default' => Yii::t('skeeks/cms', 'Default'),
-            'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'name' => Yii::t('skeeks/cms', 'Name'),
+            'id'          => Yii::t('skeeks/cms', 'ID'),
+            'created_by'  => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'  => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'  => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'  => Yii::t('skeeks/cms', 'Updated At'),
+            'is_active'   => Yii::t('skeeks/cms', 'Active'),
+            'is_default'  => Yii::t('skeeks/cms', 'Default'),
+            'priority'    => Yii::t('skeeks/cms', 'Priority'),
+            'name'        => Yii::t('skeeks/cms', 'Name'),
             'description' => Yii::t('skeeks/cms', 'Description'),
-            'image_id' => Yii::t('skeeks/cms', 'Image'),
+            'image_id'    => Yii::t('skeeks/cms', 'Image'),
         ]);
     }
 
@@ -194,10 +194,10 @@ class CmsSite extends Core
                 ['image_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles' => 1,
-                'maxSize' => 1024 * 1024 * 2,
-                'minSize' => 1024,
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles'    => 1,
+                'maxSize'     => 1024 * 1024 * 2,
+                'minSize'     => 1024,
             ],
         ]);
     }
@@ -239,7 +239,7 @@ class CmsSite extends Core
     {
         return $this->hasMany(CmsSiteDomain::class, ['cms_site_id' => 'id']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -273,7 +273,7 @@ class CmsSite extends Core
     public function getUrl()
     {
         if ($this->cmsSiteMainDomain) {
-            return (($this->cmsSiteMainDomain->is_https ? "https:" : "http:") . "//" . $this->cmsSiteMainDomain->domain);
+            return (($this->cmsSiteMainDomain->is_https ? "https:" : "http:")."//".$this->cmsSiteMainDomain->domain);
         }
 
         return \Yii::$app->urlManager->hostInfo;
@@ -293,5 +293,17 @@ class CmsSite extends Core
     public function getImage()
     {
         return $this->hasOne(CmsStorageFile::className(), ['id' => 'image_id']);
+    }
+
+
+
+    /**
+     * Gets query for [[CmsComponentSettings]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsComponentSettings()
+    {
+        return $this->hasMany(CmsComponentSettings::className(), ['cms_site_id' => 'id']);
     }
 }

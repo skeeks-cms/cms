@@ -162,8 +162,8 @@ class UrlRuleTree
 
 
         if ($dir) {
-            if (!$site_id && \Yii::$app->cms && \Yii::$app->cms->site) {
-                $site_id = \Yii::$app->cms->site->id;
+            if (!$site_id && \Yii::$app->cms && \Yii::$app->skeeks->site) {
+                $site_id = \Yii::$app->skeeks->site->id;
             }
 
             if ($site_id) {
@@ -249,7 +249,7 @@ class UrlRuleTree
         {
             $treeNode = Tree::getDb()->cache(function($db) {
                 return Tree::find()->where([
-                    "cms_site_id" => \Yii::$app->cms->site->id,
+                    "cms_site_id" => \Yii::$app->skeeks->site->id,
                     "level" => 0,
                 ])->one();
             }, null, $dependency);
@@ -259,7 +259,7 @@ class UrlRuleTree
 
             $treeNode = Tree::find()->where([
                 "dir" => $originalDir,
-                "cms_site_id" => \Yii::$app->cms->site->id,
+                "cms_site_id" => \Yii::$app->skeeks->site->id,
             ])->one();
         }
 

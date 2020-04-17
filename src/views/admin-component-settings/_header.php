@@ -156,7 +156,7 @@ JS
 <!--<h1>Управление: <?php /*= $component->descriptor->name; */ ?></h1>
     <hr />-->
 <div class="row">
-    <? if (\Yii::$app->cms->site->is_default) : ?>
+    <? if (\Yii::$app->skeeks->site->is_default) : ?>
 
     <div class="col-lg-12">
         <!--<ul class="nav nav-tabs sx-nav-with-bg sx-mgr-6 sx-nav-model">-->

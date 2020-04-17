@@ -126,7 +126,8 @@ class CmsSiteDomain extends Core
      */
     public function getCmsSite()
     {
-        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'cms_site_id']);
     }
 
     /**

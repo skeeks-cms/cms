@@ -6,7 +6,7 @@
  * @date 27.03.2015
  */
 
-namespace skeeks\cms\components;
+namespace skeeks\cms;
 
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
@@ -15,15 +15,24 @@ use yii\caching\TagDependency;
 
 /**
  * @property CmsSite $site
- * @package skeeks\cms\components
+ *
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class CurrentSite extends Component
+class Skeeks extends Component
 {
     /**
      * @var CmsSite
      */
     protected $_site = null;
 
+    /**
+     * @var string
+     */
+    public $siteClass = CmsSite::class;
+
+    /**
+     * @var null
+     */
     private $_serverName = null;
 
     /**
@@ -31,13 +40,15 @@ class CurrentSite extends Component
      */
     public function getSite()
     {
+        $cmsSiteClass = $this->siteClass;
+
         if ($this->_site === null) {
             if (\Yii::$app instanceof \yii\console\Application) {
 
                 if ($cms_site_id = getenv("CMS_SITE")) {
-                    $this->_site = CmsSite::find()->active()->andWhere(['id' => $cms_site_id])->one();
+                    $this->_site = $cmsSiteClass::find()->active()->andWhere(['id' => $cms_site_id])->one();
                 } else {
-                    $this->_site = CmsSite::find()->active()->andWhere(['is_default' => 1])->one();
+                    $this->_site = $cmsSiteClass::find()->active()->andWhere(['is_default' => 1])->one();
                 }
 
 
@@ -51,7 +62,7 @@ class CurrentSite extends Component
                 ]);
 
 
-                $cmsDomain = CmsSiteDomain::getDb()->cache(function($db) {
+                $cmsDomain = CmsSiteDomain::getDb()->cache(function ($db) {
                     return CmsSiteDomain::find()->where(['domain' => $this->_serverName])->one();
                 }, null, $dependencySiteDomain);
 
@@ -62,14 +73,14 @@ class CurrentSite extends Component
                     $this->_site = $cmsDomain->cmsSite;
                 } else {
 
-                    $this->_site = CmsSiteDomain::getDb()->cache(function($db) {
-                        return CmsSite::find()->active()->andWhere(['is_default' => 1])->one();
+                    $this->_site = CmsSiteDomain::getDb()->cache(function ($db) {
+                        return $cmsSiteClass::find()->active()->andWhere(['is_default' => 1])->one();
                     },
                         null,
                         new TagDependency([
                             'tags' =>
                                 [
-                                    (new CmsSite())->getTableCacheTag(),
+                                    (new $cmsSiteClass())->getTableCacheTag(),
                                 ],
                         ])
                     );
@@ -78,15 +89,5 @@ class CurrentSite extends Component
         }
 
         return $this->_site;
-    }
-
-    /**
-     * @param CmsSite $site
-     * @return $this
-     */
-    public function set(CmsSite $site)
-    {
-        $this->_site = $site;
-        return $this;
     }
 }

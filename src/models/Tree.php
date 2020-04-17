@@ -231,7 +231,7 @@ class Tree extends Core
         if ($parent) {
             $this->cms_site_id = $parent->cms_site_id;
         } elseif (!$this->cms_site_id) {
-            if ($site = \Yii::$app->currentSite->site) {
+            if ($site = \Yii::$app->skeeks->site) {
                 $this->cms_site_id = $site->code;
             }
         }
@@ -440,7 +440,7 @@ class Tree extends Core
     public static function findRootsForSite($cmsSite = null)
     {
         if ($cmsSite === null) {
-            $cmsSite = \Yii::$app->cms->site;
+            $cmsSite = \Yii::$app->skeeks->site;
         }
 
         return static::findRoots()->andWhere(['cms_site_id' => $cmsSite->id]);

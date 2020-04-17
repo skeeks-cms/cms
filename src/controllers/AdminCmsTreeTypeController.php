@@ -36,7 +36,7 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
         $this->generateAccessActions = false;
 
         $this->accessCallback = function () {
-            if (!\Yii::$app->cms->site->is_default) {
+            if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
             return \Yii::$app->user->can($this->uniqueId);

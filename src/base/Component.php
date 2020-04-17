@@ -185,8 +185,8 @@ abstract class Component extends Model implements IHasConfigForm
         //\Yii::beginProfile("Init: ".static::class);
 
         if (!\Yii::$app instanceof Application) {
-            if ($this->cmsSite === null && isset(\Yii::$app->currentSite) && \Yii::$app->currentSite->site) {
-                $this->cmsSite = \Yii::$app->currentSite->site;
+            if ($this->cmsSite === null && isset(\Yii::$app->skeeks) && \Yii::$app->skeeks->site) {
+                $this->cmsSite = \Yii::$app->skeeks->site;
             }
 
             if (isset(\Yii::$app->user) && $this->cmsUser === null && !\Yii::$app->user->isGuest) {

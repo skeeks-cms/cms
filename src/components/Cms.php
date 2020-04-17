@@ -189,10 +189,11 @@ class Cms extends \skeeks\cms\base\Component
     }*/
     /**
      * @return CmsSite
+     * @deprecated 
      */
     public function getSite()
     {
-        return \Yii::$app->currentSite->site;
+        return \Yii::$app->skeeks->site;
     }
 
     public function getLanguages()

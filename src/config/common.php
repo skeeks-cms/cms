@@ -55,7 +55,11 @@ return [
         ],
 
         'currentSite' => [
-            'class' => '\skeeks\cms\components\CurrentSite',
+            'class' => '\skeeks\cms\Skeeks',
+        ],
+
+        'skeeks' => [
+            'class' => '\skeeks\cms\Skeeks',
         ],
 
         'imaging' => [

@@ -120,7 +120,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
         $className = $this->contentElementClass;
         $this->initDataProvider();
         
-        $this->dataProvider->query->andWhere([$className::tableName().'.cms_site_id' => \Yii::$app->cms->site->id]);
+        $this->dataProvider->query->andWhere([$className::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id]);
 
         if ($this->createdBy) {
             $this->dataProvider->query->andWhere([$className::tableName().'.created_by' => $this->createdBy]);

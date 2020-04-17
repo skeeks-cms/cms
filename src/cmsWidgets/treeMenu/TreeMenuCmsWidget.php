@@ -308,8 +308,8 @@ class TreeMenuCmsWidget extends WidgetRenderable
             }
         }
 
-        if ($this->enabledCurrentSite == Cms::BOOL_Y && \Yii::$app->cms->site) {
-            $this->activeQuery->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
+        if ($this->enabledCurrentSite == Cms::BOOL_Y && \Yii::$app->skeeks->site) {
+            $this->activeQuery->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
         }
 
         if ($this->orderBy) {
