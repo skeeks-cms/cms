@@ -73,15 +73,14 @@ class Skeeks extends Component
                     $this->_site = $cmsDomain->cmsSite;
                 } else {
 
-                    $this->_site = CmsSiteDomain::getDb()->cache(function ($db) {
+                    $this->_site = CmsSiteDomain::getDb()->cache(function ($db) use ($cmsSiteClass) {
                         return $cmsSiteClass::find()->active()->andWhere(['is_default' => 1])->one();
                     },
                         null,
                         new TagDependency([
-                            'tags' =>
-                                [
-                                    (new $cmsSiteClass())->getTableCacheTag(),
-                                ],
+                            'tags' => [
+                                (new $cmsSiteClass())->getTableCacheTag(),
+                            ],
                         ])
                     );
                 }
