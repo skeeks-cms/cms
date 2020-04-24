@@ -432,7 +432,8 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getCmsSite()
     {
-        return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'cms_site_id']);
     }
 
     static public $_contents = [];

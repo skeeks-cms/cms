@@ -23,8 +23,14 @@
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
 <?php else
     : ?>
+    <? if ($model->cms_site_id) : ?>
+        <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->andWhere(['cms_site_id' => $model->cms_site_id])->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC])->all();
+    ?>
+    <? else : ?>
     <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRootsForSite()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC])->all();
     ?>
+    <? endif; ?>
+    
 <?php endif; ?>
 
 <?php if ($contentModel->is_allow_change_tree) : ?>
