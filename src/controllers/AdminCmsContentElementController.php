@@ -32,6 +32,7 @@ use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
@@ -42,6 +43,7 @@ use yii\base\Exception;
 use yii\bootstrap\Alert;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -214,13 +216,28 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                         //$query->joinWith("childrenContentElements as child");
                                         //$query->joinWith("childrenContentElements.parentContentElement as parent");
 
+                                        $q = CmsContentElement::find()
+                                            ->select(['parent_id' => 'parent_content_element_id'])
+                                            ->where([
+                                                'or',
+                                                ['like', CmsContentElement::tableName().'.id', $e->field->value],
+                                                ['like', CmsContentElement::tableName().'.name', $e->field->value],
+                                                ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
+                                                ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
+                                                ['like', CmsContentElement::tableName().'.external_id', $e->field->value],
+                                            ])
+                                        ;
+
+                                        $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(CmsContentElement::tableName().".id")]);
+
                                         $query->andWhere([
                                             'or',
                                             ['like', CmsContentElement::tableName().'.id', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.name', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
                                             ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
-                                            //['like', 'child.name', $e->field->value],
+                                            ['like', CmsContentElement::tableName().'.external_id', $e->field->value],
+                                            ['is not', 'p.parent_id', null],
                                         ]);
                                     }
                                 },

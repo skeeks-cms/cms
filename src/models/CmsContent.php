@@ -9,58 +9,59 @@
 
 namespace skeeks\cms\models;
 
-use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_content}}".
  *
- * @property integer $id
- * @property integer|null $created_by
- * @property integer|null $updated_by
- * @property integer|null $created_at
- * @property integer|null $updated_at
- * @property string $name
- * @property string $code
- * @property integer $priority
- * @property string $description
- * @property string $content_type
- * @property string $index_for_search
- * @property string $tree_chooser
- * @property string $list_mode
- * @property string $name_meny
- * @property string $name_one
- * @property integer $default_tree_id
- * @property integer $is_allow_change_tree
- * @property integer $is_active
- * @property integer $is_count_views
- * @property integer $root_tree_id
- * @property string $view_file
- * @property integer $is_access_check_element
+ * @property integer              $id
+ * @property integer|null         $created_by
+ * @property integer|null         $updated_by
+ * @property integer|null         $created_at
+ * @property integer|null         $updated_at
+ * @property string               $name
+ * @property string               $code
+ * @property integer              $priority
+ * @property string               $description
+ * @property string               $content_type
+ * @property string               $index_for_search
+ * @property string               $tree_chooser
+ * @property string               $list_mode
+ * @property string               $name_meny
+ * @property string               $name_one
+ * @property integer              $default_tree_id
+ * @property integer              $is_allow_change_tree
+ * @property integer              $is_active
+ * @property integer              $is_count_views
+ * @property integer              $root_tree_id
+ * @property string               $view_file
+ * @property integer              $is_access_check_element
+ * @property array                $editable_fields
  *
- * @property string $meta_title_template
- * @property string $meta_description_template
- * @property string $meta_keywords_template
+ * @property string               $meta_title_template
+ * @property string               $meta_description_template
+ * @property string               $meta_keywords_template
  *
- * @property integer $parent_content_id
- * @property integer $is_visible
- * @property string $parent_content_on_delete
- * @property integer $is_parent_content_required
- * @property integer $is_have_page
+ * @property integer              $parent_content_id
+ * @property integer              $is_visible
+ * @property string               $parent_content_on_delete
+ * @property integer              $is_parent_content_required
+ * @property integer              $is_have_page
  *
  * ***
  *
- * @property string $adminPermissionName
+ * @property string               $adminPermissionName
  *
- * @property CmsTree $rootTree
- * @property CmsTree $defaultTree
- * @property CmsContentType $contentType
- * @property CmsContentElement[] $cmsContentElements
+ * @property CmsTree              $rootTree
+ * @property CmsTree              $defaultTree
+ * @property CmsContentType       $contentType
+ * @property CmsContentElement[]  $cmsContentElements
  * @property CmsContentProperty[] $cmsContentProperties
  *
- * @property CmsContent $parentContent
- * @property CmsContent[] $childrenContents
+ * @property CmsContent           $parentContent
+ * @property CmsContent[]         $childrenContents
  */
 class CmsContent extends Core
 {
@@ -74,10 +75,10 @@ class CmsContent extends Core
     public static function getOnDeleteOptions()
     {
         return [
-            self::CASCADE => "CASCADE (" . \Yii::t('skeeks/cms', 'Remove all items of that content') . ")",
-            self::RESTRICT => "RESTRICT (" . \Yii::t('skeeks/cms',
-                    'Deny delete parent is not removed, these elements') . ")",
-            self::SET_NULL => "SET NULL (" . \Yii::t('skeeks/cms', 'Remove the connection to a remote parent') . ")",
+            self::CASCADE  => "CASCADE (".\Yii::t('skeeks/cms', 'Remove all items of that content').")",
+            self::RESTRICT => "RESTRICT (".\Yii::t('skeeks/cms',
+                    'Deny delete parent is not removed, these elements').")",
+            self::SET_NULL => "SET NULL (".\Yii::t('skeeks/cms', 'Remove the connection to a remote parent').")",
         ];
     }
 
@@ -89,47 +90,74 @@ class CmsContent extends Core
         return '{{%cms_content}}';
     }
 
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+
+            HasJsonFieldsBehavior::className() => [
+                'class'  => HasJsonFieldsBehavior::className(),
+                'fields' => ['editable_fields'],
+            ],
+        ]);
+    }
+
     /**
      * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'is_have_page'    => Yii::t('skeeks/cms', 'Если эта опция включена, то показываются настройки SEO и URL'),
+            'code'            => Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.'),
+            'view_file'       => Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.'),
+            'root_tree_id'    => Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.'),
+            'editable_fields' => Yii::t('skeeks/cms', 'Поля которые отображаются при редактировании. Если ничего не выбрано, то показываются все!'),
+        ]);
+    }
+
+    /**
+     * @return array
      */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'created_by' => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'name' => Yii::t('skeeks/cms', 'Name'),
-            'code' => Yii::t('skeeks/cms', 'Code'),
-            'is_active' => Yii::t('skeeks/cms', 'Active'),
-            'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'description' => Yii::t('skeeks/cms', 'Description'),
-            'content_type' => Yii::t('skeeks/cms', 'Content Type'),
+            'id'               => Yii::t('skeeks/cms', 'ID'),
+            'created_by'       => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'       => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'       => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'       => Yii::t('skeeks/cms', 'Updated At'),
+            'name'             => Yii::t('skeeks/cms', 'Name'),
+            'code'             => Yii::t('skeeks/cms', 'Code'),
+            'is_active'        => Yii::t('skeeks/cms', 'Active'),
+            'priority'         => Yii::t('skeeks/cms', 'Priority'),
+            'description'      => Yii::t('skeeks/cms', 'Description'),
+            'content_type'     => Yii::t('skeeks/cms', 'Content Type'),
             'index_for_search' => Yii::t('skeeks/cms', 'To index for search module'),
-            'tree_chooser' => Yii::t('skeeks/cms', 'The Interface Binding Element to Sections'),
-            'list_mode' => Yii::t('skeeks/cms', 'View Mode Sections And Elements'),
-            'name_meny' => Yii::t('skeeks/cms', 'The Name Of The Elements (Plural)'),
-            'name_one' => Yii::t('skeeks/cms', 'The Name One Element'),
+            'tree_chooser'     => Yii::t('skeeks/cms', 'The Interface Binding Element to Sections'),
+            'list_mode'        => Yii::t('skeeks/cms', 'View Mode Sections And Elements'),
+            'name_meny'        => Yii::t('skeeks/cms', 'The Name Of The Elements (Plural)'),
+            'name_one'         => Yii::t('skeeks/cms', 'The Name One Element'),
 
-            'default_tree_id' => Yii::t('skeeks/cms', 'Default Section'),
+            'default_tree_id'      => Yii::t('skeeks/cms', 'Default Section'),
             'is_allow_change_tree' => Yii::t('skeeks/cms', 'Is Allow Change Default Section'),
-            'is_count_views' => Yii::t('skeeks/cms', 'Считать количество просмотров?'),
-            'root_tree_id' => Yii::t('skeeks/cms', 'Root Section'),
-            'view_file' => Yii::t('skeeks/cms', 'Template'),
+            'is_count_views'       => Yii::t('skeeks/cms', 'Считать количество просмотров?'),
+            'root_tree_id'         => Yii::t('skeeks/cms', 'Root Section'),
+            'view_file'            => Yii::t('skeeks/cms', 'Template'),
 
-            'meta_title_template' => Yii::t('skeeks/cms', 'Шаблон META TITLE'),
+            'meta_title_template'       => Yii::t('skeeks/cms', 'Шаблон META TITLE'),
             'meta_description_template' => Yii::t('skeeks/cms', 'Шаблон META KEYWORDS'),
-            'meta_keywords_template' => Yii::t('skeeks/cms', 'Шаблон META DESCRIPTION'),
+            'meta_keywords_template'    => Yii::t('skeeks/cms', 'Шаблон META DESCRIPTION'),
 
             'is_access_check_element' => Yii::t('skeeks/cms', 'Включить управление доступом к элементам'),
-            'parent_content_id' => Yii::t('skeeks/cms', 'Parent content'),
+            'parent_content_id'       => Yii::t('skeeks/cms', 'Parent content'),
 
-            'is_visible' => Yii::t('skeeks/cms', 'Show in menu'),
-            'parent_content_on_delete' => Yii::t('skeeks/cms', 'At the time of removal of the parent element'),
+            'is_visible'                 => Yii::t('skeeks/cms', 'Show in menu'),
+            'parent_content_on_delete'   => Yii::t('skeeks/cms', 'At the time of removal of the parent element'),
             'is_parent_content_required' => Yii::t('skeeks/cms', 'Parent element is required to be filled'),
 
             'is_have_page' => Yii::t('skeeks/cms', 'У элементов есть страница на сайте.'),
+
+            'editable_fields' => Yii::t('skeeks/cms', 'Редактируемые поля'),
         ]);
     }
 
@@ -141,7 +169,7 @@ class CmsContent extends Core
         return array_merge(parent::rules(), [
             [
                 ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_tree_id', 'root_tree_id', 'is_count_views', 'is_allow_change_tree', 'is_active'],
-                'integer'
+                'integer',
             ],
             [['is_visible'], 'integer'],
             [['is_parent_content_required'], 'integer'],
@@ -177,10 +205,15 @@ class CmsContent extends Core
             [
                 'code',
                 'default',
-                'value' => function($model, $attribute) {
-                    return "sxauto" . md5(rand(1, 10) . time());
-                }
+                'value' => function ($model, $attribute) {
+                    return "sxauto".md5(rand(1, 10).time());
+                },
             ],
+
+            [['editable_fields'], 'safe'],
+            //[['editable_fields'], 'default', 'value' => null],
+
+
         ]);
     }
 
@@ -286,8 +319,7 @@ class CmsContent extends Core
             ['id' => 'cms_content_property_id'])
             ->via('cmsContentProperty2contents')
             //->viaTable('cms_content_property2content', ['cms_content_id' => 'id'])
-            ->orderBy('priority')
-            ;
+            ->orderBy('priority');
     }
 
 
@@ -296,7 +328,7 @@ class CmsContent extends Core
      */
     public function getAdminPermissionName()
     {
-        return 'cms/admin-cms-content-element__' . $this->id;
+        return 'cms/admin-cms-content-element__'.$this->id;
     }
 
 
@@ -322,7 +354,23 @@ class CmsContent extends Core
     public function createElement()
     {
         return new CmsContentElement([
-            'content_id' => $this->id
+            'content_id' => $this->id,
         ]);
+    }
+
+
+    /**
+     * Разрешено редактировать поле?
+     *
+     * @param $code
+     * @return bool
+     */
+    public function isAllowEdit($code)
+    {
+        if (!$this->editable_fields) {
+            return true;
+        }
+
+        return (bool) in_array((string) $code, (array) $this->editable_fields);
     }
 }

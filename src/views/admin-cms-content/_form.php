@@ -26,19 +26,39 @@ $model->load(\Yii::$app->request->get());
         \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name'));
     ?>
 <?php endif; ?>
-<?= $form->field($model, 'is_active')->checkbox(); ?>
-<?= $form->field($model, 'name')->textInput(); ?>
-<?= $form->field($model, 'code')->textInput()
-    ->hint(\Yii::t('skeeks/cms',
-        'The name of the template to draw the elements of this type will be the same as the name of the code.')); ?>
 
-<?= $form->field($model, 'view_file')->textInput()
-    ->hint(\Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.')); ?>
+<?= $form->field($model, 'is_active')->checkbox([], false); ?>
+<?= $form->field($model, 'name'); ?>
+<?= $form->field($model, 'code'); ?>
+
+<?= $form->field($model, 'view_file'); ?>
 
 
 
-<?= $form->field($model, 'is_visible')->checkbox(); ?>
-<?= $form->field($model, 'is_have_page')->checkbox(); ?>
+<?= $form->field($model, 'is_visible')->checkbox([], false); ?>
+<?= $form->field($model, 'is_have_page')->checkbox([], false); ?>
+<?
+$element = new \skeeks\cms\models\CmsContentElement();
+$items = [
+    'description_short' => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "description_short"),
+    'description_full'  => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "description_full"),
+    'priority'          => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "priority"),
+    'active'            => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "active"),
+    'code'              => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "code"),
+    'image_id'          => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "image_id"),
+    'image_full_id'     => "Главное изображение (из подробного описания)",
+    'imageIds'          => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "imageIds"),
+    'fileIds'           => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "fileIds"),
+    'treeIds'           => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "treeIds"),
+    'external_id'       => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "external_id"),
+    'published_at'      => "Время публикации",
+];
+echo $form->field($model, 'editable_fields')->widget(
+    \skeeks\widget\chosen\Chosen::class, [
+        'multiple' => true,
+        'items'    => $items,
+    ]
+); ?>
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -49,12 +69,12 @@ $model->load(\Yii::$app->request->get());
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
 ); ?>
 
-<?= $form->field($model, 'is_allow_change_tree')->checkbox(); ?>
+<?= $form->field($model, 'is_allow_change_tree')->checkbox([], false); ?>
 
 
 <?= $form->field($model, 'root_tree_id')->widget(
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
-)->hint(\Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.')); ?>
+); ?>
 
 <?php /*= $form->fieldSelect($model, 'root_tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
             'allowDeselect' => true
@@ -75,7 +95,7 @@ $model->load(\Yii::$app->request->get());
     ]
 ); ?>
 
-<?= $form->field($model, 'is_parent_content_required')->checkbox(); ?>
+<?= $form->field($model, 'is_parent_content_required')->checkbox([], false); ?>
 
 <?= $form->fieldSelect($model, 'parent_content_on_delete',
     \skeeks\cms\models\CmsContent::getOnDeleteOptions()); ?>
@@ -98,26 +118,32 @@ $model->load(\Yii::$app->request->get());
 <? $fieldSet::end(); ?>
 
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Seo')); ?>
-<?= $form->field($model, 'meta_title_template')->textarea()->hint("Используйте конструкции вида {=model.name}"); ?>
-<?= $form->field($model, 'meta_description_template')->textarea(); ?>
-<?= $form->field($model, 'meta_keywords_template')->textarea(); ?>
-<? $fieldSet::end(); ?>
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Captions')); ?>
-<?= $form->field($model, 'name_one')->textInput(); ?>
-<?= $form->field($model, 'name_meny')->textInput(); ?>
-<? $fieldSet::end(); ?>
+
+
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally')); ?>
 
 
-<?= $form->field($model, 'is_access_check_element')->checkbox(); ?>
+<?= $form->field($model, 'is_access_check_element')->checkbox([], false); ?>
 
-<?= $form->field($model, 'priority'); ?>
-<?= $form->field($model, 'is_count_views')->checkbox(); ?>
+<?= $form->field($model, 'priority')->widget(
+    \skeeks\cms\backend\widgets\forms\NumberInputWidget::class
+); ?>
+<?= $form->field($model, 'is_count_views')->checkbox([], false); ?>
 <?php /*= $form->fieldRadioListBoolean($model, 'index_for_search'); */ ?>
 
+<? $fieldSet::end(); ?>
+
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Captions'), ['isOpen' => false]); ?>
+<?= $form->field($model, 'name_one')->textInput(); ?>
+<?= $form->field($model, 'name_meny')->textInput(); ?>
+<? $fieldSet::end(); ?>
+
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Seo'), ['isOpen' => false]); ?>
+<?= $form->field($model, 'meta_title_template')->textarea()->hint("Используйте конструкции вида {=model.name}"); ?>
+<?= $form->field($model, 'meta_description_template')->textarea(); ?>
+<?= $form->field($model, 'meta_keywords_template')->textarea(); ?>
 <? $fieldSet::end(); ?>
 
 <?= $form->buttonsStandart($model); ?>

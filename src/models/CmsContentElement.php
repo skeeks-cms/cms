@@ -10,6 +10,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\urlRules\UrlRuleContentElement;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -232,7 +233,7 @@ class CmsContentElement extends RelatedElementModel
             'parent_content_element_id' => Yii::t('skeeks/cms', 'Parent element'),
             'show_counter'              => Yii::t('skeeks/cms', 'Number of views'),
             'seo_h1'                    => Yii::t('skeeks/cms', 'SEO заголовок h1'),
-            'external_id'               => Yii::t('skeeks/cms', 'Идентификатор внешней системы'),
+            'external_id'               => Yii::t('skeeks/cms', 'Уникальный код'),
         ]);
     }
     /**
@@ -328,6 +329,7 @@ class CmsContentElement extends RelatedElementModel
                 'minSize'     => 256,
             ],
             [['imageIds', 'fileIds'], 'safe'],
+
             [
                 ['imageIds'],
                 \skeeks\cms\validators\FileValidator::class,
@@ -384,7 +386,7 @@ class CmsContentElement extends RelatedElementModel
                         }
                     }
                 }
-            ]
+            ],
         ]);
     }
     /**

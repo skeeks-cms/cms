@@ -5,6 +5,7 @@
 ?>
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
+<? if ($contentModel->isAllowEdit("active")) : ?>
 <div class="row">
     <div class="col" style="<?= !$model->is_active ? "color: red;" : ""; ?>">
         <?= $form->field($model, 'active')->checkbox([
@@ -14,6 +15,7 @@
         ]); ?>
     </div>
 </div>
+<? endif; ?>
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
@@ -54,6 +56,11 @@
         </div>
     <?php endif; ?>
 <?php endif; ?>
+
+<? if ($contentModel->isAllowEdit("external_id")) : ?>
+    <?= $form->field($model, 'external_id'); ?>
+<? endif; ?>
+
 
 <?
 

@@ -3,16 +3,19 @@
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Sections'), ['isOpen' => false]); ?>
-<?php if ($contentModel->root_tree_id) : ?>
-    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
-<?php else
-    : ?>
-    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRootsForSite()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all();
-    ?>
-<?php endif; ?>
 
-<?php /* if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : */ ?><!--
+<? if ($contentModel->isAllowEdit("treeIds")) : ?>
+
+    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Sections'), ['isOpen' => false]); ?>
+    <?php if ($contentModel->root_tree_id) : ?>
+        <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
+    <?php else
+        : ?>
+        <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRootsForSite()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC])->all();
+        ?>
+    <?php endif; ?>
+
+    <?php /* if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : */ ?><!--
         <?php /* if ($rootTreeModels) : */ ?>
             <div class="row">
                 <div class="col-lg-8 col-md-12 col-sm-12">
@@ -34,20 +37,21 @@
         <?php /* endif; */ ?>
     --><?php /* endif; */ ?>
 
-<?php if ($rootTreeModels) : ?>
-            <?= $form->field($model, 'treeIds')->widget(
-                \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
-                [
-                    'options' => [
-                        //'data-form-reload' => 'true'
+    <?php if ($rootTreeModels) : ?>
+        <?= $form->field($model, 'treeIds')->widget(
+            \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+            [
+                'options'           => [
+                    //'data-form-reload' => 'true'
+                ],
+                'multiple'          => true,
+                'treeWidgetOptions' =>
+                    [
+                        'models' => $rootTreeModels,
                     ],
-                    'multiple' => true,
-                    'treeWidgetOptions' =>
-                        [
-                            'models' => $rootTreeModels
-                        ]
-                ]
-            )->label(false); ?>
-<?php endif; ?>
+            ]
+        )->label(false); ?>
+    <?php endif; ?>
 
-<? $fieldSet::end(); ?>
+    <? $fieldSet::end(); ?>
+<?php endif; ?>
