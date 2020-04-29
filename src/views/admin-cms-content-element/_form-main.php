@@ -199,6 +199,8 @@ $properties = $properties->orderBy(['priority' => SORT_ASC])->all();
                         echo $field;
                         ?>
 
+                    <?php else: ?>
+                        <?= $property->renderActiveForm($form, $model) ?>
                     <?php endif; ?>
                 </div>
             </div>

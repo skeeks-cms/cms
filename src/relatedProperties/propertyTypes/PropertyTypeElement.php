@@ -23,6 +23,7 @@ use yii\widgets\ActiveForm;
 class PropertyTypeElement extends PropertyType
 {
     public $code = self::CODE_ELEMENT;
+    public $dialogControllerUniqueId = "";
     public $name = "";
 
     const FIELD_ELEMENT_SELECT = "select";
@@ -81,6 +82,7 @@ class PropertyTypeElement extends PropertyType
             [
                 'content_id' => \Yii::t('skeeks/cms', 'Content'),
                 'fieldElement' => \Yii::t('skeeks/cms', 'Form element type'),
+                'dialogControllerUniqueId' => \Yii::t('skeeks/cms', 'ID контроллера'),
             ]);
     }
 
@@ -90,6 +92,7 @@ class PropertyTypeElement extends PropertyType
             [
                 ['content_id', 'integer'],
                 ['fieldElement', 'in', 'range' => array_keys(static::fieldElements())],
+                ['dialogControllerUniqueId', 'string'],
                 ['fieldElement', 'string'],
             ]);
     }
@@ -142,21 +145,35 @@ class PropertyTypeElement extends PropertyType
                     } else {
                         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG) {
                             $field = parent::renderForActiveForm();
+                            
+                            $data = [
+                                'content_id' => $this->content_id
+                            ];
+                            
+                            if ($this->dialogControllerUniqueId) {
+                                $data['dialogRoute'] = ["/" . $this->dialogControllerUniqueId];
+                            }
+                        
                             $field->widget(
                                 SelectModelDialogContentElementWidget::class,
-                                [
-                                    'content_id' => $this->content_id
-                                ]
+                                $data
                             );
                         } else {
                             if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE) {
+
+                                $data = [
+                                    'content_id' => $this->content_id,
+                                    'multiple' => true,
+                                ];
+                                
+                                if ($this->dialogControllerUniqueId) {
+                                    $data['dialogRoute'] = ["/" . $this->dialogControllerUniqueId];
+                                }
+                                
                                 $field = parent::renderForActiveForm();
                                 $field->widget(
                                     SelectModelDialogContentElementWidget::class,
-                                    [
-                                        'content_id' => $this->content_id,
-                                        'multiple' => true
-                                    ]
+                                    $data
                                 );
                             }
                         }
@@ -183,6 +200,7 @@ class PropertyTypeElement extends PropertyType
         $result = $activeForm->fieldSelect($this, 'fieldElement',
             \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::fieldElements());
         $result .= $activeForm->fieldSelect($this, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect());
+        $result .= $activeForm->field($this, 'dialogControllerUniqueId');
         return $result;
     }
 
