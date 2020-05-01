@@ -64,25 +64,7 @@
 
 <?
 
-$properties = $model->getRelatedProperties()
-    ->joinWith('cmsContentProperty2trees as map2trees')
-    ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
-
-$treeIds = $model->treeIds;
-if ($model->tree_id) {
-    $treeIds[] = $model->tree_id;
-}
-if ($treeIds) {
-    $properties->andWhere([
-        'or',
-        ['map2trees.cms_tree_id' => $treeIds],
-        ['map2trees.cms_tree_id' => null],
-    ]);
-} else {
-    $properties->andWhere(['map2trees.cms_tree_id' => null]);
-}
-
-$properties = $properties->orderBy(['priority' => SORT_ASC])->all();
+$properties = $model->getRelatedProperties()->all();
 /**
  * @var $property \skeeks\cms\relatedProperties\models\RelatedPropertyModel
  */

@@ -445,7 +445,9 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getRelatedProperties()
     {
-
+        /**
+         * @var $cmsContent CmsContent
+         */
         //return $this->treeType->getCmsTreeTypeProperties();
         if (isset(self::$_contents[$this->content_id])) {
             $cmsContent = self::$_contents[$this->content_id];
@@ -453,7 +455,26 @@ class CmsContentElement extends RelatedElementModel
             self::$_contents[$this->content_id] = $this->cmsContent;
             $cmsContent = self::$_contents[$this->content_id];
         }
-        return $cmsContent->getCmsContentProperties();
+        
+        $q = $cmsContent->getCmsContentProperties();
+        $q->joinWith('cmsContentProperty2trees as map2trees')
+                    ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
+        
+        if ($this->tree_id) {
+            $q->andWhere([
+                'or',
+                ['map2trees.cms_tree_id' => $this->tree_id],
+                ['map2trees.cms_tree_id' => null],
+            ]);
+        } else {
+            $q->andWhere(
+                ['map2trees.cms_tree_id' => null]
+            );
+        }
+        
+        $q->orderBy(['priority' => SORT_ASC]);
+        
+        return $q;
         //return $this->cmsContent->getCmsContentProperties();
 
         //return $this->cmsContent->getCmsContentProperties();
@@ -750,6 +771,9 @@ class CmsContentElement extends RelatedElementModel
     {
         return (bool)($this->active == "Y");
     }
+    
+    
+    
 }
 
 
