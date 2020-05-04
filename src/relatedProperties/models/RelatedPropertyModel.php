@@ -10,10 +10,10 @@
 
 namespace skeeks\cms\relatedProperties\models;
 
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\behaviors\Serialize;
-use skeeks\cms\models\Core;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
 use Yii;
@@ -47,7 +47,7 @@ use yii\widgets\ActiveForm;
  * @property bool                          $isRequired
  * @property CmsMeasure                    $cmsMeasure
  */
-abstract class RelatedPropertyModel extends Core
+abstract class RelatedPropertyModel extends ActiveRecord
 {
     const VALUE_TYPE_BOOL = 'bool';
     const VALUE_TYPE_INT = 'int';
@@ -119,7 +119,7 @@ abstract class RelatedPropertyModel extends Core
             'component'          => Yii::t('skeeks/cms', 'Component'),
             'component_settings' => Yii::t('skeeks/cms', 'Component Settings'),
             'hint'               => Yii::t('skeeks/cms', 'Hint'),
-            'cms_measure_code'               => Yii::t('skeeks/cms', 'Единица измерения'),
+            'cms_measure_code'   => Yii::t('skeeks/cms', 'Единица измерения'),
         ]);
     }
 
@@ -308,7 +308,7 @@ abstract class RelatedPropertyModel extends Core
         $result = parent::asText();
 
         if ($this->cms_measure_code) {
-            $result = $result . " ({$this->cmsMeasure->asShortText})";
+            $result = $result." ({$this->cmsMeasure->asShortText})";
         }
 
         return $result;

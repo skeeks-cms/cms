@@ -103,8 +103,6 @@ class PropertyTypeBool extends PropertyType
      */
     public function addRules()
     {
-
-
         if ($this->property->isRequired) {
             $this->property->relatedPropertiesModel->addRule($this->property->code, 'required', [
                 'requiredValue' => '1',

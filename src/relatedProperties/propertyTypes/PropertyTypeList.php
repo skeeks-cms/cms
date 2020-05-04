@@ -9,6 +9,7 @@
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\widget\chosen\Chosen;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -266,12 +267,21 @@ class PropertyTypeList extends PropertyType
         $field = '';
 
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT) {
-            $field = $this->activeForm->fieldSelect(
+            $field = $this->activeForm->field(
+                $this->property->relatedPropertiesModel,
+                $this->property->code,
+                []
+            )->widget(
+                Chosen::class,
+                ['items' => ArrayHelper::map($this->property->enums, 'id', 'value')]
+            );
+            
+            /*$field = $this->activeForm->fieldSelect(
                 $this->property->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($this->property->enums, 'id', 'value'),
                 []
-            );
+            );*/
         } else {
             if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI) {
                 $field = $this->activeForm->fieldSelectMulti(
