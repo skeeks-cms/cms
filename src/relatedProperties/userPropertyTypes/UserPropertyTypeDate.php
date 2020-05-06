@@ -90,4 +90,13 @@ class UserPropertyTypeDate extends PropertyType
             'type')->radioList(\skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate::types());
     }
 
+    /**
+     * @return string
+     * @depricated
+     */
+    public function getStringValue()
+    {
+        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        return \Yii::$app->formatter->asDatetime($value);
+    }
 }
