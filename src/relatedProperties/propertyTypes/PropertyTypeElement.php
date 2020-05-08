@@ -113,7 +113,7 @@ class PropertyTypeElement extends PropertyType
 
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT) {
             $config = [];
-            if ($this->property->is_required == Cms::BOOL_Y) {
+            if ($this->property->is_required) {
                 $config['allowDeselect'] = false;
             } else {
                 $config['allowDeselect'] = true;
