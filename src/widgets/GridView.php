@@ -668,6 +668,13 @@ JS
     protected function _applyColumns()
     {
         $result = [];
+        
+        if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
+            $this->visibleColumns = ArrayHelper::merge([
+                "sx-choose"
+            ], (array) $this->visibleColumns);
+        }
+        
         //Есть логика включенных выключенных колонок
         if ($this->visibleColumns && $this->columns) {
 
@@ -685,6 +692,7 @@ JS
             $this->columns = $result;
         }
 
+        
 
         return $this;
     }
