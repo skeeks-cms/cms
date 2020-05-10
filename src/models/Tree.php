@@ -36,77 +36,80 @@ use yii\helpers\Url;
 /**
  * This is the model class for table "{{%cms_tree}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $name
- * @property string $description_short
- * @property string $description_full
- * @property string $code
- * @property integer $pid
- * @property string $pids
- * @property integer $level
- * @property string $dir
- * @property integer $priority
- * @property string $tree_type_id
- * @property integer $published_at
- * @property string $redirect
- * @property string $active
- * @property string $meta_title
- * @property string $meta_description
- * @property string $meta_keywords
- * @property string $cms_site_id
- * @property string $description_short_type
- * @property string $description_full_type
- * @property integer $image_full_id
- * @property integer $image_id
- * @property integer $redirect_tree_id
- * @property integer $redirect_code
- * @property string $name_hidden
- * @property string $view_file
- * @property string $seo_h1
- * @property string|null $external_id
+ * @property integer                   $id
+ * @property integer                   $created_by
+ * @property integer                   $updated_by
+ * @property integer                   $created_at
+ * @property integer                   $updated_at
+ * @property string                    $name
+ * @property string                    $description_short
+ * @property string                    $description_full
+ * @property string                    $code
+ * @property integer                   $pid
+ * @property string                    $pids
+ * @property integer                   $level
+ * @property string                    $dir
+ * @property integer                   $priority
+ * @property string                    $tree_type_id
+ * @property integer                   $published_at
+ * @property string                    $redirect
+ * @property string                    $active
+ * @property string                    $meta_title
+ * @property string                    $meta_description
+ * @property string                    $meta_keywords
+ * @property string                    $cms_site_id
+ * @property string                    $description_short_type
+ * @property string                    $description_full_type
+ * @property integer                   $image_full_id
+ * @property integer                   $image_id
+ * @property integer                   $redirect_tree_id
+ * @property integer                   $redirect_code
+ * @property string                    $name_hidden
+ * @property string                    $view_file
+ * @property string                    $seo_h1
+ * @property string|null               $external_id
+ * @property integer|null              $main_cms_tree_id
  *
  * ***
  *
- * @property string $fullName
+ * @property string                    $fullName
  *
- * @property string $absoluteUrl
- * @property string $url
+ * @property string                    $absoluteUrl
+ * @property string                    $url
  *
- * @property CmsStorageFile $image
- * @property CmsStorageFile $fullImage
+ * @property CmsStorageFile|null       $mainImage
+ * @property CmsStorageFile|null       $image
+ * @property CmsStorageFile|null       $fullImage
  *
- * @property CmsTreeFile[] $cmsTreeFiles
- * @property CmsTreeImage[] $cmsTreeImages
- * @property CmsTree $redirectTree
+ * @property CmsTreeFile[]             $cmsTreeFiles
+ * @property CmsTreeImage[]            $cmsTreeImages
+ * @property CmsTree                   $redirectTree
+ * @property CmsTree                   $mainCmsTree
  *
- * @property CmsStorageFile[] $files
- * @property CmsStorageFile[] $images
+ * @property CmsStorageFile[]          $files
+ * @property CmsStorageFile[]          $images
  *
- * @property CmsContentElement[] $cmsContentElements
- * @property CmsContentElementTree[] $cmsContentElementTrees
- * @property CmsSite $site
- * @property CmsSite $cmsSiteRelation
- * @property CmsTreeType $treeType
- * @property CmsTreeProperty[] $cmsTreeProperties
+ * @property CmsContentElement[]       $cmsContentElements
+ * @property CmsContentElementTree[]   $cmsContentElementTrees
+ * @property CmsSite                   $site
+ * @property CmsSite                   $cmsSiteRelation
+ * @property CmsTreeType               $treeType
+ * @property CmsTreeProperty[]         $cmsTreeProperties
  *
  * @property CmsContentProperty2tree[] $cmsContentProperty2trees
- * @property CmsContentProperty[] $cmsContentProperties
+ * @property CmsContentProperty[]      $cmsContentProperties
  *
- * @property string                      $seoName
- * 
- * @property Tree $parent
- * @property Tree[] $parents
- * @property Tree[] $children
- * @property Tree[] $activeChildren
- * @property Tree $root
- * @property Tree $prev
- * @property Tree $next
- * @property Tree[] $descendants
- * 
+ * @property string                    $seoName
+ *
+ * @property Tree                      $parent
+ * @property Tree[]                    $parents
+ * @property Tree[]                    $children
+ * @property Tree[]                    $activeChildren
+ * @property Tree                      $root
+ * @property Tree                      $prev
+ * @property Tree                      $next
+ * @property Tree[]                    $descendants
+ *
  * @depricated
  */
 class Tree extends Core
@@ -133,37 +136,37 @@ class Tree extends Core
 
             HasStorageFile::className() =>
                 [
-                    'class' => HasStorageFile::className(),
-                    'fields' => ['image_id', 'image_full_id']
+                    'class'  => HasStorageFile::className(),
+                    'fields' => ['image_id', 'image_full_id'],
                 ],
 
             HasStorageFileMulti::className() =>
                 [
-                    'class' => HasStorageFileMulti::className(),
+                    'class'     => HasStorageFileMulti::className(),
                     'relations' => [
                         [
                             'relation' => 'images',
-                            'property' => 'imageIds'
+                            'property' => 'imageIds',
                         ],
                         [
                             'relation' => 'files',
-                            'property' => 'fileIds'
+                            'property' => 'fileIds',
                         ],
-                    ]
+                    ],
                 ],
 
             HasRelatedProperties::className() =>
                 [
-                    'class' => HasRelatedProperties::className(),
+                    'class'                           => HasRelatedProperties::className(),
                     'relatedElementPropertyClassName' => CmsTreeProperty::className(),
-                    'relatedPropertyClassName' => CmsTreeTypeProperty::className(),
+                    'relatedPropertyClassName'        => CmsTreeTypeProperty::className(),
                 ],
 
             [
-                'class' => AdjacencyListBehavior::className(),
+                'class'           => AdjacencyListBehavior::className(),
                 'parentAttribute' => 'pid',
-                'sortable' => [
-                    'sortAttribute' => 'priority'
+                'sortable'        => [
+                    'sortAttribute' => 'priority',
                 ],
                 /*'parentsJoinLevels'  => 0,
                 'childrenJoinLevels' => 0,
@@ -171,11 +174,11 @@ class Tree extends Core
             ],
 
             [
-                'class' => MaterializedPathBehavior::className(),
-                'pathAttribute' => 'pids',
+                'class'          => MaterializedPathBehavior::className(),
+                'pathAttribute'  => 'pids',
                 'depthAttribute' => 'level',
-                'sortable' => [
-                    'sortAttribute' => 'priority'
+                'sortable'       => [
+                    'sortAttribute' => 'priority',
                 ],
             ],
         ]);
@@ -223,7 +226,7 @@ class Tree extends Core
 
             if ($this->level > 1) {
                 $parent = $this->getParent()->one();
-                $this->dir = $parent->dir . "/" . $this->code;
+                $this->dir = $parent->dir."/".$this->code;
             }
         }
 
@@ -278,8 +281,8 @@ class Tree extends Core
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'seo_h1' => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.',
-            'external_id' => 'Это поле чаще всего задействуют программисты, для интеграций со сторонними системами'
+            'seo_h1'      => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.',
+            'external_id' => 'Это поле чаще всего задействуют программисты, для интеграций со сторонними системами',
         ]);
     }
 
@@ -289,40 +292,40 @@ class Tree extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'created_by' => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'published_at' => Yii::t('skeeks/cms', 'Published At'),
-            'published_to' => Yii::t('skeeks/cms', 'Published To'),
-            'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
-            'name' => Yii::t('skeeks/cms', 'Name'),
-            'tree_type_id' => Yii::t('skeeks/cms', 'Type'),
-            'redirect' => Yii::t('skeeks/cms', 'Redirect'),
-            'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'code' => Yii::t('skeeks/cms', 'Code'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
-            'meta_title' => Yii::t('skeeks/cms', 'Meta Title'),
-            'meta_keywords' => Yii::t('skeeks/cms', 'Meta Keywords'),
-            'meta_description' => Yii::t('skeeks/cms', 'Meta Description'),
-            'description_short' => Yii::t('skeeks/cms', 'Description Short'),
-            'description_full' => Yii::t('skeeks/cms', 'Description Full'),
+            'id'                     => Yii::t('skeeks/cms', 'ID'),
+            'created_by'             => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'             => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'             => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'             => Yii::t('skeeks/cms', 'Updated At'),
+            'published_at'           => Yii::t('skeeks/cms', 'Published At'),
+            'published_to'           => Yii::t('skeeks/cms', 'Published To'),
+            'priority'               => Yii::t('skeeks/cms', 'Priority'),
+            'active'                 => Yii::t('skeeks/cms', 'Active'),
+            'name'                   => Yii::t('skeeks/cms', 'Name'),
+            'tree_type_id'           => Yii::t('skeeks/cms', 'Type'),
+            'redirect'               => Yii::t('skeeks/cms', 'Redirect'),
+            'priority'               => Yii::t('skeeks/cms', 'Priority'),
+            'code'                   => Yii::t('skeeks/cms', 'Code'),
+            'active'                 => Yii::t('skeeks/cms', 'Active'),
+            'meta_title'             => Yii::t('skeeks/cms', 'Meta Title'),
+            'meta_keywords'          => Yii::t('skeeks/cms', 'Meta Keywords'),
+            'meta_description'       => Yii::t('skeeks/cms', 'Meta Description'),
+            'description_short'      => Yii::t('skeeks/cms', 'Description Short'),
+            'description_full'       => Yii::t('skeeks/cms', 'Description Full'),
             'description_short_type' => Yii::t('skeeks/cms', 'Description Short Type'),
-            'description_full_type' => Yii::t('skeeks/cms', 'Description Full Type'),
-            'image_id' => Yii::t('skeeks/cms', 'Main Image (announcement)'),
-            'image_full_id' => Yii::t('skeeks/cms', 'Main Image'),
-            'images' => Yii::t('skeeks/cms', 'Images'),
-            'imageIds' => Yii::t('skeeks/cms', 'Images'),
-            'files' => Yii::t('skeeks/cms', 'Files'),
-            'fileIds' => Yii::t('skeeks/cms', 'Files'),
-            'redirect_tree_id' => Yii::t('skeeks/cms', 'Redirect Section'),
-            'redirect_code' => Yii::t('skeeks/cms', 'Redirect Code'),
-            'name_hidden' => Yii::t('skeeks/cms', 'Hidden Name'),
-            'view_file' => Yii::t('skeeks/cms', 'Template'),
-            'seo_h1' => Yii::t('skeeks/cms', 'SEO заголовок h1'),
-            'external_id' => Yii::t('skeeks/cms', 'ID из внешней системы'),
+            'description_full_type'  => Yii::t('skeeks/cms', 'Description Full Type'),
+            'image_id'               => Yii::t('skeeks/cms', 'Main Image (announcement)'),
+            'image_full_id'          => Yii::t('skeeks/cms', 'Main Image'),
+            'images'                 => Yii::t('skeeks/cms', 'Images'),
+            'imageIds'               => Yii::t('skeeks/cms', 'Images'),
+            'files'                  => Yii::t('skeeks/cms', 'Files'),
+            'fileIds'                => Yii::t('skeeks/cms', 'Files'),
+            'redirect_tree_id'       => Yii::t('skeeks/cms', 'Redirect Section'),
+            'redirect_code'          => Yii::t('skeeks/cms', 'Redirect Code'),
+            'name_hidden'            => Yii::t('skeeks/cms', 'Hidden Name'),
+            'view_file'              => Yii::t('skeeks/cms', 'Template'),
+            'seo_h1'                 => Yii::t('skeeks/cms', 'SEO заголовок h1'),
+            'external_id'            => Yii::t('skeeks/cms', 'ID из внешней системы'),
         ]);
     }
 
@@ -348,17 +351,18 @@ class Tree extends Core
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
             [['cms_site_id'], 'integer'],
+            [['main_cms_tree_id'], 'integer'],
             [
                 ['pid', 'code'],
                 'unique',
                 'targetAttribute' => ['pid', 'code'],
-                'message' => \Yii::t('skeeks/cms', 'For this subsection of the code is already in use.')
+                'message'         => \Yii::t('skeeks/cms', 'For this subsection of the code is already in use.'),
             ],
             [
                 ['pid', 'code'],
                 'unique',
                 'targetAttribute' => ['pid', 'code'],
-                'message' => \Yii::t('skeeks/cms', 'The combination of Code and Pid has already been taken.')
+                'message'         => \Yii::t('skeeks/cms', 'The combination of Code and Pid has already been taken.'),
             ],
 
             ['description_short_type', 'string'],
@@ -372,42 +376,61 @@ class Tree extends Core
                 ['image_id', 'image_full_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles' => 1,
-                'maxSize' => 1024 * 1024 * 10,
-                'minSize' => 1024,
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles'    => 1,
+                'maxSize'     => 1024 * 1024 * 10,
+                'minSize'     => 1024,
             ],
             [['imageIds', 'fileIds'], 'safe'],
             [
                 ['imageIds'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles' => 40,
-                'maxSize' => 1024 * 1024 * 10,
-                'minSize' => 1024,
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles'    => 40,
+                'maxSize'     => 1024 * 1024 * 10,
+                'minSize'     => 1024,
             ],
             [
                 ['fileIds'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 //'extensions'    => [''],
-                'maxFiles' => 40,
-                'maxSize' => 1024 * 1024 * 50,
-                'minSize' => 1024,
+                'maxFiles'    => 40,
+                'maxSize'     => 1024 * 1024 * 50,
+                'minSize'     => 1024,
             ],
 
             [
                 ['name'],
                 'default',
-                'value' => function(self $model) {
+                'value' => function (self $model) {
                     $lastTree = static::find()->orderBy(["id" => SORT_DESC])->one();
                     if ($lastTree) {
-                        return "pk-" . $lastTree->primaryKey;
+                        return "pk-".$lastTree->primaryKey;
                     }
 
                     return 'root';
-                }
+                },
+            ],
+
+            [
+                ['main_cms_tree_id'],
+                'default',
+                'value' => null,
+            ],
+
+            [['code'], "trim"],
+            [
+                ['code'],
+                function ($attribute) {
+                    $string = $this->{$attribute};
+
+                    if (!preg_match('/^[a-z]{1}[a-z0-9_-]+$/', $string)) {
+                        $this->addError($attribute, \Yii::t('skeeks/cms', "Используйте буквы латинского алфавита, так же допустимо использование символов _-"));
+                        return false;
+                    }
+                },
             ],
 
         ]);
@@ -420,6 +443,13 @@ class Tree extends Core
     public function getRedirectTree()
     {
         return $this->hasOne(CmsTree::className(), ['id' => 'redirect_tree_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMainCmsTree()
+    {
+        return $this->hasOne(CmsTree::className(), ['id' => 'main_cms_tree_id']);
     }
 
     /**
@@ -623,8 +653,7 @@ class Tree extends Core
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
             ->via('cmsTreeImages')
-            ->orderBy(['priority' => SORT_ASC])
-            ;
+            ->orderBy(['priority' => SORT_ASC]);
     }
 
     /**
@@ -634,8 +663,7 @@ class Tree extends Core
     {
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
             ->via('cmsTreeFiles')
-            ->orderBy(['priority' => SORT_ASC])
-            ;
+            ->orderBy(['priority' => SORT_ASC]);
     }
 
 
@@ -671,7 +699,7 @@ class Tree extends Core
     {
         return $this->hasMany(CmsContentProperty::class,
             ['id' => 'cms_content_property_id'])->viaTable('cms_content_property2tree', ['cms_tree_id' => 'id'])
-            ->orderBy([CmsContentProperty::tableName() . ".priority" => SORT_ASC]);
+            ->orderBy([CmsContentProperty::tableName().".priority" => SORT_ASC]);
     }
 
 
@@ -688,7 +716,7 @@ class Tree extends Core
         $this->code = YaSlugHelper::slugify($this->name);
 
         if (strlen($this->code) < 2) {
-            $this->code = $this->code . "-" . md5(microtime());
+            $this->code = $this->code."-".md5(microtime());
         }
 
         if (strlen($this->code) > \Yii::$app->cms->tree_max_code_length) {
@@ -698,11 +726,11 @@ class Tree extends Core
         $matches = [];
         //Роутинг элементов нужно исключить
         if (preg_match('/(?<id>\d+)\-(?<code>\S+)$/i', $this->code, $matches)) {
-            $this->code = "s" . $this->code;
+            $this->code = "s".$this->code;
         }
 
         if (!$this->_isValidCode()) {
-            $this->code = YaSlugHelper::slugify($this->code . "-" . substr(md5(uniqid() . time()), 0, 4));
+            $this->code = YaSlugHelper::slugify($this->code."-".substr(md5(uniqid().time()), 0, 4));
 
             if (!$this->_isValidCode()) {
                 return $this->_generateCode();
@@ -724,14 +752,14 @@ class Tree extends Core
         $find = $this->parent->getChildren()
             ->where([
                 "code" => $this->code,
-                'pid' => $this->pid
+                'pid'  => $this->pid,
             ]);
 
         if (!$this->isNewRecord) {
             $find->andWhere([
                 "!=",
                 'id',
-                $this->id
+                $this->id,
             ]);
         }
 
@@ -761,7 +789,7 @@ class Tree extends Core
 
             if ($this->level > 1) {
                 $parent = $this->getParent()->one();
-                $this->setAttribute('dir', $parent->dir . "/" . $this->code);
+                $this->setAttribute('dir', $parent->dir."/".$this->code);
             }
 
             if (!$this->save()) {
@@ -803,7 +831,7 @@ class Tree extends Core
         if ($this->parents) {
             foreach ($this->parents as $parent) {
                 if ($parent->isRoot()) {
-                    $paths[] = "[" . $parent->site->name . "] " . $parent->name;
+                    $paths[] = "[".$parent->site->name."] ".$parent->name;
                 } else {
                     $paths[] = $parent->name;
                 }
@@ -822,10 +850,10 @@ class Tree extends Core
     {
         return $this->getChildren()->active();
     }
-    
+
     /**
      * Полное название
-     * 
+     *
      * @return string
      */
     public function getSeoName()
@@ -837,7 +865,23 @@ class Tree extends Core
             return $this->name;
         }
     }
-    
+
+
+    /**
+     * @return CmsStorageFile|null
+     */
+    public function getMainImage()
+    {
+        if ($this->image) {
+            return $this->image;
+        }
+
+        if ($this->main_cms_tree_id) {
+            return $this->mainCmsTree->image;
+        }
+
+        return null;
+    }
 }
 
 

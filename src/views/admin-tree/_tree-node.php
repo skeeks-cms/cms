@@ -1,13 +1,17 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
- * @date 18.12.2016
+ *
+ * @var \skeeks\cms\models\CmsTree $model
  */
+
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\widgets\tree\CmsTreeWidget */
-/* @var $model \skeeks\cms\models\CmsTree */
+/*   */
+
 $widget = $this->context;
 
 $result = $model->name;
@@ -31,42 +35,27 @@ if ($additionalName) {
 
 <div class="sx-label-node level-<?= $model->level; ?> status-<?= $model->active; ?>">
 
-
     <a href="<?= $widget->getOpenCloseLink($model); ?>">
         <?= $result; ?>
     </a>
-    <?php if ($model->redirect || $model->redirect_tree_id) : ?>
-        →
-    <?php endif; ?>
-    <?php if ($model->redirect) : ?>
-        <?= $model->redirect; ?>
-    <?php endif; ?>
+
+    <? if ($count = $model->getCmsContentElements()->count()) : ?>
+        <small title="Сколько элементов привязано к этому разделу. Учитывается только главная привязка."><b>(<?php echo $count; ?>)</b></small>
+    <? endif; ?>
+
     <?php if ($model->redirectTree) : ?>
-        <?php if ($parents = $model->redirectTree->parents) : ?>
-            <?
-            $root = $parents[0];
-            unset($parents[0]);
-            /**
-             * @var \skeeks\cms\models\CmsTree $root
-             */
-            $names[] = $root->site->name;
-            if ($parents) {
-                $names = \yii\helpers\ArrayHelper::merge($names,
-                    \yii\helpers\ArrayHelper::map($parents, 'name', 'name'));
-            }
-            $names[] = $model->redirectTree->name;
-            echo implode(" / ", $names);
-            ?>
-        <?php else
-            : ?>
-            <?
-            $names[] = $model->redirectTree->site->name;
-
-            echo implode(" / ", $names);
-            ?>
-        <?php endif; ?>
-
+        → <small title="<?= $model->redirect_code ?> редирект"><?= $model->fullName; ?></small>
     <?php endif; ?>
+
+    <?php if ($model->redirect) : ?>
+        → <small title="<?= $model->redirect_code ?> редирект"><?= $model->redirect; ?></small>
+    <?php endif; ?>
+
+
+    <?php if ($model->mainCmsTree) : ?>
+        <small title="Связан с разделом: <?= $model->mainCmsTree->fullName; ?>"><i class="fas fa-link"></i> <?= $model->mainCmsTree->name; ?></small>
+    <?php endif; ?>
+
 </div>
 
 
@@ -206,6 +195,7 @@ JS
 
 <?php if ($model->treeType) : ?>
     <div class="pull-right sx-tree-type">
+        <i class="fas fa-file"></i>
         <?= $model->treeType->name; ?>
     </div>
 <?php endif; ?>

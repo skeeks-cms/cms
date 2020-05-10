@@ -297,6 +297,9 @@ class AdminTreeController extends BackendModelStandartController
                         $childrents[] = $model->pid;
                     }
 
+                    $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->andWhere(['cms_site_id' => $model->cms_site_id])->joinWith('cmsSiteRelation')
+                        ->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC])->all();
+
 
                     if (!$model->isRoot()) {
                         return [
@@ -311,6 +314,10 @@ class AdminTreeController extends BackendModelStandartController
 
                                         return true;
                                     },
+                                    'treeWidgetOptions'         =>
+                                        [
+                                            'models' => $rootTreeModels,
+                                        ],
                                 ],
                                 //'widgetClass' => SelectModelDialogTreeWidget::class,
                                 'label'        => ['skeeks/cms', 'Новый родительский раздел'],
