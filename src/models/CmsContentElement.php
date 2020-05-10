@@ -473,7 +473,6 @@ class CmsContentElement extends RelatedElementModel
         }
         
         $q->orderBy(['priority' => SORT_ASC]);
-        
         return $q;
         //return $this->cmsContent->getCmsContentProperties();
 
