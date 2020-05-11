@@ -44,7 +44,7 @@ class AdminCmsSiteController extends BackendModelStandartController
     {
         $this->name = \Yii::t('skeeks/cms', "Site management");
         $this->modelShowAttribute = "name";
-        $this->modelClassName = CmsSite::class;
+        $this->modelClassName = \Yii::$app->skeeks->siteClass;
 
         $this->generateAccessActions = false;
         
