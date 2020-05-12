@@ -416,7 +416,21 @@ class PropertyTypeList extends PropertyType
                 return implode(", ", $result);
             }*/
         } else {
-            if ($this->property->enums) {
+            if (isset(self::$propertyEnumValues[$this->property->id][$value])) {
+                return self::$propertyEnumValues[$this->property->id][$value];
+            } else {
+                if ($enum = $this->property->getEnums()->andWhere(['id' => $value])->one()) {
+                    if ($enum) {
+                        self::$propertyEnumValues[$this->property->id][$value] = $enum->value;
+                        return self::$propertyEnumValues[$this->property->id][$value];
+                    }
+                }
+
+                self::$propertyEnumValues[$this->property->id][$value] = "";
+                return "";
+            }
+
+            /*if ($this->property->enums) {
                 $enums = (array)$this->property->enums;
 
                 foreach ($enums as $enum) {
@@ -424,9 +438,11 @@ class PropertyTypeList extends PropertyType
                         return $enum->value;
                     }
                 }
-            }
+            }*/
 
-            return "";
+            //return "";
         }
     }
+
+    static public $propertyEnumValues = [];
 }
