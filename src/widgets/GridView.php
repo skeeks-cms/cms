@@ -323,7 +323,7 @@ class GridView extends \yii\grid\GridView
         //Получение настроек из хранилища
         parent::init();
 
-        //Применение включенных/выключенных колонок
+        //Применение сортировки колонок
         $this->_applyColumns();
 
         $this->_initPagination();
@@ -336,6 +336,50 @@ class GridView extends \yii\grid\GridView
             }
         }
     }
+
+
+    /**
+     * Creates column objects and initializes them.
+     */
+    protected function initColumns()
+    {
+        if (empty($this->columns)) {
+            $this->guessColumns();
+        }
+
+        if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
+            $this->visibleColumns = ArrayHelper::merge([
+                "sx-choose"
+            ], (array) $this->visibleColumns);
+        }
+
+        foreach ($this->columns as $i => $column) {
+            if ($this->visibleColumns && !in_array($i, $this->visibleColumns)) {
+                unset($this->columns[$i]);
+                continue;
+            }
+            if (is_string($column)) {
+                $column = $this->createDataColumn($column);
+            } else {
+                if (isset($column['beforeCreateCallback'])) {
+                    if (is_callable($column['beforeCreateCallback'])) {
+                        call_user_func($column['beforeCreateCallback'], $this);
+                    }
+                    unset($column['beforeCreateCallback']);
+                }
+                $column = \Yii::createObject(array_merge([
+                    'class' => $this->dataColumnClass ?: DataColumn::className(),
+                    'grid' => $this,
+                ], $column));
+            }
+            if (!$column->visible) {
+                unset($this->columns[$i]);
+                continue;
+            }
+            $this->columns[$i] = $column;
+        }
+    }
+
 
     public $exportParam = '_sx-export';
     public $exportFileName = 'export';
@@ -669,11 +713,11 @@ JS
     {
         $result = [];
         
-        if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
+        /*if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
             $this->visibleColumns = ArrayHelper::merge([
                 "sx-choose"
             ], (array) $this->visibleColumns);
-        }
+        }*/
         
         //Есть логика включенных выключенных колонок
         if ($this->visibleColumns && $this->columns) {
