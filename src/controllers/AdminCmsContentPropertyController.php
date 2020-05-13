@@ -18,6 +18,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\yii2\form\Element;
@@ -193,12 +194,17 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
                             'property_id' => new Expression(CmsContentProperty::tableName().".id")
                         ]);
+                        
+                        $subQuery2 = CmsContentPropertyEnum::find()->select([new Expression("count(1)")])->where([
+                            'property_id' => new Expression(CmsContentProperty::tableName().".id")
+                        ]);
                             
                         $query->groupBy(CmsContentProperty::tableName().".id");
                         $query->select([
                             CmsContentProperty::tableName().'.*',
                             //'countElementProperties' => new Expression("count(*)"),
                             'countElementProperties' => $subQuery,
+                            'countEnums' => $subQuery2,
                         ]);
                     },
 
@@ -207,6 +213,12 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                             'asc'     => ['countElementProperties' => SORT_ASC],
                             'desc'    => ['countElementProperties' => SORT_DESC],
                             'label'   => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
+                            'default' => SORT_ASC,
+                        ],
+                        'countEnums' => [
+                            'asc'     => ['countEnums' => SORT_ASC],
+                            'desc'    => ['countEnums' => SORT_DESC],
+                            'label'   => \Yii::t('skeeks/cms', 'Количество значений списка'),
                             'default' => SORT_ASC,
                         ],
                     ],
@@ -284,8 +296,9 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         'countElementProperties' => [
                             'attribute' => 'countElementProperties',
                             'format'    => 'raw',
-                            'label'     => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
+                            'label'     => \Yii::t('skeeks/cms', 'Где заполнено свойство'),
                             'value'     => function (CmsContentProperty $model) {
+                                return $model->raw_row['countElementProperties'];
                                 return Html::a($model->raw_row['countElementProperties'], [
                                     '/cms/admin-tree/list',
                                     'DynamicModel' => [
@@ -295,6 +308,15 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                                     'data-pjax' => '0',
                                     'target'    => '_blank',
                                 ]);
+                            },
+                        ],
+
+                        'countEnums' => [
+                            'attribute' => 'countEnums',
+                            'format'    => 'raw',
+                            'label'     => \Yii::t('skeeks/cms', 'Количество значений списка'),
+                            'value'     => function (CmsContentProperty $model) {
+                                return $model->raw_row['countEnums'];
                             },
                         ],
 
@@ -359,7 +381,16 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                     ArrayHelper::removeValue($visibleColumns, 'property_id');
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+                    
+                    $action->relatedIndexAction->grid['on init'] = function (Event $e) use ($action) {
+                        /**
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
 
+                        $query->andWhere($action->getBindRelation($action->model));
+                        AdminCmsContentPropertyEnumController::initGridQuery($query);
+                    };
                 },
                 
                 'accessCallback' => function (BackendModelAction $action) {

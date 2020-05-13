@@ -9,8 +9,13 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\yii2\form\fields\SelectField;
+use yii\base\Event;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -36,6 +41,19 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         parent::init();
     }
 
+    static public function initGridQuery($query)
+    {
+        $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
+            'value_enum_id' => new Expression(CmsContentPropertyEnum::tableName().".id")
+        ]);
+      
+        $query->groupBy(CmsContentPropertyEnum::tableName().".id");
+        $query->select([
+            CmsContentPropertyEnum::tableName().'.*',
+            'countElementProperties' => $subQuery,
+        ]);
+    }
+    
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
@@ -47,6 +65,32 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                     ],
                 ],
                 'grid'    => [
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $dataProvider = $e->sender->dataProvider;
+
+                        //$query->joinWith('elementProperties as elementProperties');
+                        self::initGridQuery($query);
+                    },
+                    
+                    'sortAttributes' => [
+                        'countElementProperties' => [
+                            'asc'     => ['countElementProperties' => SORT_ASC],
+                            'desc'    => ['countElementProperties' => SORT_DESC],
+                            'label'   => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
+                            'default' => SORT_ASC,
+                        ],
+                    ],
+                    
+                    'defaultOrder'   => [
+                        //'def' => SORT_DESC,
+                        'priority' => SORT_ASC,
+                    ],
+                    
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
@@ -55,6 +99,7 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                         'property_id',
                         'code',
                         'priority',
+                        'countElementProperties',
                     ],
                     'columns' => [
                         'value' => [
@@ -64,6 +109,15 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                                 return Html::a($model->value, "#", [
                                     'class' => "sx-trigger-action",
                                 ]);
+                            },
+                        ],
+                        
+                        'countElementProperties' => [
+                            'attribute' => 'countElementProperties',
+                            'format'    => 'raw',
+                            'label'     => \Yii::t('skeeks/cms', 'Где заполнена опция'),
+                            'value'     => function (CmsContentPropertyEnum $model) {
+                                return isset($model->raw_row['countElementProperties']) ? $model->raw_row['countElementProperties'] : "";
                             },
                         ],
                     ]
