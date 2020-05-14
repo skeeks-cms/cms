@@ -25,6 +25,7 @@ use skeeks\cms\IHasUrl;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
@@ -696,7 +697,9 @@ HTML;
     public function initGridData($action, $content)
     {
         /**
+         * @var $content CmsContent
          * @var $action BackendGridModelAction
+         * @var $property CmsContentProperty
          */
 
         $model = null;
@@ -712,19 +715,20 @@ HTML;
             ]);
         }
 
-        if ($model) {
+        if ($model && $content && $content->getCmsContentProperties()->count()) {
             $relatedPropertiesModel = $model->relatedPropertiesModel;
 
-            $relatedPropertiesModel->initAllProperties();
+            $properties = $content->getCmsContentProperties()->all();
 
-            foreach ($relatedPropertiesModel->toArray($relatedPropertiesModel->attributes()) as $name => $value) {
+            foreach ($properties as $property) {
 
-                $property = $relatedPropertiesModel->getRelatedProperty($name);
+                $name = $property->code;
+                //$property = $relatedPropertiesModel->getRelatedProperty($name);
                 $filter = '';
 
                 $autoColumns["property{$property->id}"] = [
                     //'attribute' => $name,
-                    'label'  => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                    'label'  => $property->name." [свойство]",
                     'format' => 'raw',
                     'value'  => function ($model, $key, $index) use ($name, $relatedPropertiesModel) {
                         /**
@@ -740,13 +744,13 @@ HTML;
                 ];
 
                 $autoRules[] = ["property{$property->id}", "safe"];
-                $autoLabels["property{$property->id}"] = \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]";
+                $autoLabels["property{$property->id}"] = $property->name . " [свойство]";
 
 
                 if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
                     $autoFilters["property{$property->id}"] = [
                         'class'    => TextField::class,
-                        'label'    => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'label'    => $property->name." [свойство]",
                         'on apply' => function (QueryFiltersEvent $e) use ($property) {
                             /**
                              * @var $query ActiveQuery
@@ -775,7 +779,7 @@ HTML;
 
                     $autoFilters["property{$property->id}"] = [
                         'class'    => BoolField::class,
-                        'label'    => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'label'    => $property->name." [свойство]",
                         'on apply' => function (QueryFiltersEvent $e) use ($property) {
                             /**
                              * @var $query ActiveQuery
@@ -826,7 +830,7 @@ HTML;
                         ];
                     }
 
-                    $autoFilters["property{$property->id}"]['label'] = \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]";
+                    $autoFilters["property{$property->id}"]['label'] = $property->name." [свойство]";
                     $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
                         /**
                          * @var $query ActiveQuery
@@ -870,7 +874,7 @@ HTML;
                         ];
                     }
 
-                    $autoFilters["property{$property->id}"]["label"] = \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]";
+                    $autoFilters["property{$property->id}"]["label"] = $property->name." [свойство]";
                     $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
                         /**
                          * @var $query ActiveQuery
@@ -897,7 +901,7 @@ HTML;
                     $autoFilters["property{$property->id}"] = [
                         'class'       => WidgetField::class,
                         'widgetClass' => \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class,
-                        'label'       => \yii\helpers\ArrayHelper::getValue($relatedPropertiesModel->attributeLabels(), $name)." [свойство]",
+                        'label'       => $property->name." [свойство]",
                         'on apply'    => function (QueryFiltersEvent $e) use ($property) {
                             /**
                              * @var $query ActiveQuery
