@@ -115,6 +115,7 @@ class PropertyTypeStorageFile extends PropertyType
             $this->property->relatedPropertiesModel->addRule($this->property->code, \skeeks\cms\validators\FileValidator::class, [
                 'skipOnEmpty' => false,
                 'extensions'  => $extensions,
+                'checkExtensionByMimeType'    => false,
                 'maxFiles'    => $this->maxFiles,
                 'maxSize'     => $this->maxSize,
                 'minSize'     => $this->minSize,
@@ -134,6 +135,7 @@ class PropertyTypeStorageFile extends PropertyType
             $this->property->relatedPropertiesModel->addRule($this->property->code, \skeeks\cms\validators\FileValidator::class, [
                 'skipOnEmpty' => false,
                 'extensions'  => $extensions,
+                'checkExtensionByMimeType'    => false,
                 'maxFiles'    => 1,
                 'maxSize'     => $this->maxSize,
                 'minSize'     => $this->minSize,
