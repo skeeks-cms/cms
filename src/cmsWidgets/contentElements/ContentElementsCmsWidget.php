@@ -103,7 +103,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('skeeks/cms', 'Content elements'),
+            'name' => \Yii::t('skeeks/cms', 'Отображение элементов'),
         ]);
     }
     public function init()
