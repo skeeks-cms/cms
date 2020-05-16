@@ -16,8 +16,6 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%cms_content_property}}".
  *
- * @property integer                      $content_id
- *
  * @property CmsContent[]                 $cmsContents
  * @property CmsContentProperty2content[] $cmsContentProperty2contents
  *
@@ -81,7 +79,6 @@ class CmsContentProperty extends RelatedPropertyModel
     public function rules()
     {
         $rules = ArrayHelper::merge(parent::rules(), [
-            [['content_id'], 'integer'],
             [['cmsContents'], 'safe'],
             [['cmsTrees'], 'safe'],
             [['code'], 'unique'],
