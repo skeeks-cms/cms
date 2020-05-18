@@ -20,10 +20,9 @@ use Yii;
  * @property integer $updated_at
  * @property string $name
  * @property string $code
- * @property string $active
+ * @property integer $is_active
  * @property integer $priority
  * @property string $description
- * @property string $index_for_search
  * @property string $name_meny
  * @property string $name_one
  * @property string $viewFile
@@ -61,10 +60,9 @@ class CmsTreeType extends Core
             'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
             'name' => Yii::t('skeeks/cms', 'Name'),
             'code' => Yii::t('skeeks/cms', 'Code'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
+            'is_active' => Yii::t('skeeks/cms', 'Active'),
             'priority' => Yii::t('skeeks/cms', 'Priority'),
             'description' => Yii::t('skeeks/cms', 'Description'),
-            'index_for_search' => Yii::t('skeeks/cms', 'To index for search module'),
             'name_meny' => Yii::t('skeeks/cms', 'Name of many sections'),
             'name_one' => Yii::t('skeeks/cms', 'Name of one section'),
             'view_file' => Yii::t('skeeks/cms', 'Template'),
@@ -90,19 +88,17 @@ class CmsTreeType extends Core
     {
         return array_merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_children_tree_type'],
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_children_tree_type', 'is_active'],
                 'integer'
             ],
             [['name', 'code'], 'required'],
             [['description'], 'string'],
             [['name', 'view_file'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
-            [['active', 'index_for_search'], 'string', 'max' => 1],
             [['name_meny', 'name_one'], 'string', 'max' => 100],
             [['code'], 'unique'],
             [['code'], 'validateCode'],
             ['priority', 'default', 'value' => 500],
-            ['active', 'default', 'value' => "Y"],
             ['name_meny', 'default', 'value' => \Yii::t('skeeks/cms', 'Sections')],
             ['name_one', 'default', 'value' => \Yii::t('skeeks/cms', 'Section')],
         ]);

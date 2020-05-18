@@ -126,7 +126,7 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                         'custom',
 
                         'countCmsTrees',
-                        'active',
+                        'is_active',
                         'priority',
                     ],
 
@@ -138,7 +138,7 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                                 return $model->raw_row['countCmsTrees'];
                             },
                         ],
-                        'active'        => [
+                        'is_active'        => [
                             'class' => BooleanColumn::class,
                         ],
                         'custom'        => [
@@ -181,11 +181,9 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                     'name',
                     'code',
                     'view_file',
-                    'active'                     => [
+                    'is_active'                     => [
                         'class'      => BoolField::class,
                         'allowNull'  => false,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
                     ],
                     'default_children_tree_type' => [
                         'class' => SelectField::class,
