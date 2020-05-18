@@ -13,14 +13,14 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
-use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\Element;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -191,20 +191,17 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         $dataProvider = $e->sender->dataProvider;
 
                         //$query->joinWith('elementProperties as elementProperties');
-                        $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
-                            'property_id' => new Expression(CmsContentProperty::tableName().".id")
+                       /* $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
+                            'property_id' => new Expression(CmsContentProperty::tableName().".id"),
                         ]);
-                        
+
                         $subQuery2 = CmsContentPropertyEnum::find()->select([new Expression("count(1)")])->where([
-                            'property_id' => new Expression(CmsContentProperty::tableName().".id")
-                        ]);
-                            
+                            'property_id' => new Expression(CmsContentProperty::tableName().".id"),
+                        ]);*/
+
                         $query->groupBy(CmsContentProperty::tableName().".id");
                         $query->select([
                             CmsContentProperty::tableName().'.*',
-                            //'countElementProperties' => new Expression("count(*)"),
-                            'countElementProperties' => $subQuery,
-                            'countEnums' => $subQuery2,
                         ]);
                     },
 
@@ -215,7 +212,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                             'label'   => \Yii::t('skeeks/cms', 'Number of partitions where the property is filled'),
                             'default' => SORT_ASC,
                         ],
-                        'countEnums' => [
+                        'countEnums'             => [
                             'asc'     => ['countEnums' => SORT_ASC],
                             'desc'    => ['countEnums' => SORT_DESC],
                             'label'   => \Yii::t('skeeks/cms', 'Количество значений списка'),
@@ -240,6 +237,8 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                         'is_active',
                         'priority',
+                        'countElementProperties',
+                        /*'countEnums',*/
                         /*'countElementProperties',*/
                     ],
                     'columns'        => [
@@ -294,10 +293,31 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         ],
 
                         'countElementProperties' => [
-                            'attribute' => 'countElementProperties',
-                            'format'    => 'raw',
-                            'label'     => \Yii::t('skeeks/cms', 'Где заполнено свойство'),
-                            'value'     => function (CmsContentProperty $model) {
+                            'attribute'            => 'countElementProperties',
+                            'format'               => 'raw',
+                            'label'                => \Yii::t('skeeks/cms', 'Где заполнено свойство'),
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
+                                    'property_id' => new Expression(CmsContentProperty::tableName().".id"),
+                                ]);
+
+
+                                $query->addSelect([
+                                    'countElementProperties' => $subQuery,
+                                ]);
+
+                                $grid->sortAttributes["countElementProperties"] = [
+                                    'asc'  => ['countElementProperties' => SORT_ASC],
+                                    'desc' => ['countElementProperties' => SORT_DESC],
+                                ];
+                            },
+
+                            'value' => function (CmsContentProperty $model) {
                                 return $model->raw_row['countElementProperties'];
                                 return Html::a($model->raw_row['countElementProperties'], [
                                     '/cms/admin-tree/list',
@@ -317,6 +337,52 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                             'label'     => \Yii::t('skeeks/cms', 'Количество значений списка'),
                             'value'     => function (CmsContentProperty $model) {
                                 return $model->raw_row['countEnums'];
+                            },
+                            
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery2 = CmsContentPropertyEnum::find()->select([new Expression("count(1)")])->where([
+                                    'property_id' => new Expression(CmsContentProperty::tableName().".id"),
+                                ]);
+
+
+                                $query->addSelect([
+                                    'countEnums' => $subQuery2,
+                                ]);
+
+                                $grid->sortAttributes["countEnums"] = [
+                                    'asc'  => ['countEnums' => SORT_ASC],
+                                    'desc' => ['countEnums' => SORT_DESC],
+                                ];
+                            },
+                        ],
+
+                        'cmsTreeFull' => [
+                            'attribute' => 'cmsTreeFull',
+                            'format'    => 'raw',
+                            'label'     => \Yii::t('skeeks/cms', 'Разделы где заполнено свойство'),
+                            'value'     => function (CmsContentProperty $model) {
+            
+                                $subquery = CmsContentElementProperty::find()
+                                    ->joinWith("element as element")
+                                    ->joinWith("element.cmsTree as cmsTree")
+                                    ->select(["cmsTree.id as tree_id"])
+                                    ->where([
+                                        'property_id' => $model->id,
+                                    ])
+                                ;
+                                
+                                
+                                $treesQ = CmsTree::find()->where(['in', 'id', $subquery]);
+                                if ($trees = $treesQ->all()) {
+                                    return implode("<br />", ArrayHelper::map($trees, 'id', 'fullName'));
+                                }
+                                
+                                return '';
                             },
                         ],
 
@@ -361,7 +427,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                 },
             ],
-            
+
             'enums' => [
                 'class'           => BackendGridModelRelatedAction::class,
                 'accessCallback'  => true,
@@ -371,7 +437,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 'relation'        => ['property_id' => 'id'],
                 'priority'        => 150,
 
-                'on gridInit'        => function($e) {
+                'on gridInit' => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -381,7 +447,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                     ArrayHelper::removeValue($visibleColumns, 'property_id');
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
-                    
+
                     $action->relatedIndexAction->grid['on init'] = function (Event $e) use ($action) {
                         /**
                          * @var $query ActiveQuery
@@ -392,7 +458,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         AdminCmsContentPropertyEnumController::initGridQuery($query);
                     };
                 },
-                
+
                 'accessCallback' => function (BackendModelAction $action) {
 
                     /**
@@ -428,17 +494,17 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Basic settings'),
                 'fields' => [
-                    'is_required' => [
-                        'class'      => BoolField::class,
-                        'allowNull'  => false,
+                    'is_required'      => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ],
-                    'is_active'      => [
-                        'class'      => BoolField::class,
-                        'allowNull'  => false,
+                    'is_active'        => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ],
                     'name',
                     'code',
-                    'component'   => [
+                    'component'        => [
                         'class'          => SelectField::class,
                         'elementOptions' => [
                             'data' => [
@@ -452,14 +518,14 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
                         },
                     ],
-                    'cms_measure_code'   => [
-                        'class'          => SelectField::class,
+                    'cms_measure_code' => [
+                        'class' => SelectField::class,
                         /*'elementOptions' => [
                             'data' => [
                                 'form-reload' => 'true',
                             ],
                         ],*/
-                        'items'          => function () {
+                        'items' => function () {
                             return ArrayHelper::map(
                                 CmsMeasure::find()->all(),
                                 'code',
@@ -489,7 +555,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                                 $content = $handler->renderConfigFormFields($formElement->activeForm);
 
                                 if ($content) {
-                                    $formElement->content = \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]) . $content;
+                                    $formElement->content = \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]).$content;
                                 }
                             }
                         },
@@ -502,8 +568,8 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
                 'fields' => [
                     'hint',
-                    'priority' => [
-                        'class'    => NumberField::class,
+                    'priority'    => [
+                        'class' => NumberField::class,
                     ],
                     'cmsContents' => [
                         'class'    => SelectField::class,

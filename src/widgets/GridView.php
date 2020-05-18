@@ -449,9 +449,20 @@ class GridView extends \yii\grid\GridView
 
         _onDomReady: function()
         {
+            var self = this;
+            
             $('table tr').on('dblclick', function()
             {
                 $(".sx-row-action", $(this)).click();
+                return false;
+            });
+            
+            $('table tr .sx-row-action').on('click', function()
+            {
+                self.submit($(this).data());
+                $(this).empty().append('<i class="fas fa-check"></i>&nbsp;Выборано');
+                $(this).addClass("btn-primary");
+                return false;
             });
         },
 
@@ -823,10 +834,11 @@ JS
 
                     }
 
-                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('skeeks/cms',
-                            'Choose'), '#', [
-                        'class'     => 'btn btn-primary sx-row-action',
-                        'onclick'   => 'sx.SelectCmsElement.submit('.\yii\helpers\Json::encode($data).'); return false;',
+                    return \yii\helpers\Html::a('<i class="fas fa-arrow-left"></i>&nbsp;'.\Yii::t('skeeks/cms', 'Choose'), '#', [
+                        'class'     => 'btn btn-secondary sx-row-action',
+                        'data'     => $data,
+                        'style'     => "min-width: 112px;",
+                        //'onclick'   => 'sx.SelectCmsElement.submit('.\yii\helpers\Json::encode($data).'); return false;',
                         'data-pjax' => 0,
                     ]);
                 },

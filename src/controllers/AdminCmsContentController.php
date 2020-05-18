@@ -13,6 +13,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
@@ -137,6 +138,11 @@ class AdminCmsContentController extends BackendModelStandartController
                         $query = $e->sender->dataProvider->query;
                         $query->joinWith("cmsContents as cmsContents");
                         $query->andWhere(['cmsContents.id' => $this->model->id]);
+                        
+                        $query->groupBy(CmsContentProperty::tableName().".id");
+                        $query->select([
+                            CmsContentProperty::tableName().'.*',
+                        ]);
                     };
                     
                     $controller = $action->relatedController;
