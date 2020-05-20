@@ -34,7 +34,7 @@ use yii\web\ErrorHandler;
  * @property integer $show_counter
  * @property integer $show_counter_start
  */
-abstract class RelatedElementModel extends Core
+abstract class RelatedElementModel extends \skeeks\cms\base\ActiveRecord
 {
     use HasRelatedPropertiesTrait;
 

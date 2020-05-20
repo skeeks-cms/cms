@@ -13,8 +13,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementTree;
-use skeeks\cms\models\Search;
-use skeeks\cms\models\Tree;
+use skeeks\cms\query\CmsContentElementActiveQuery;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTree;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -24,7 +23,6 @@ use yii\caching\TagDependency;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use yii\widgets\ActiveForm;
 
 /**
  * Class СontentElementsCmsWidget
@@ -96,10 +94,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
      * @var ActiveDataProvider
      */
     public $dataProvider = null;
-    /**
-     * @var Search
-     */
-    public $search = null;
+
     public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
@@ -112,6 +107,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         $this->initActiveQuery();
     }
+
     /**
      * @return $this
      */
@@ -119,25 +115,29 @@ class ContentElementsCmsWidget extends WidgetRenderable
     {
         $className = $this->contentElementClass;
         $this->initDataProvider();
-        
-        $this->dataProvider->query->andWhere([$className::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id]);
+
+        /**
+         * @var $query CmsContentElementActiveQuery
+         */
+        $query = $this->dataProvider->query;
+
+        $query->cmsSite();
 
         if ($this->createdBy) {
             $this->dataProvider->query->andWhere([$className::tableName().'.created_by' => $this->createdBy]);
         }
-        
+
         if ($this->active) {
-            $this->dataProvider->query->andWhere([$className::tableName().'.active' => $this->active]);
+            $query->active();
         }
 
         if ($this->content_ids) {
-            $this->dataProvider->query->andWhere([$className::tableName().'.content_id' => $this->content_ids]);
+            $query->andWhere([$className::tableName().'.content_id' => $this->content_ids]);
         }
 
         if ($this->limit) {
-            $this->dataProvider->query->limit($this->limit);
+            $query->limit($this->limit);
         }
-
 
         $treeIds = (array)$this->tree_ids;
 
@@ -158,7 +158,6 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 }
 
                 $treeIds[] = $tree->id;
-
             }
         }
 
@@ -177,13 +176,11 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
                 if ($this->isJoinTreeMap === true) {
                     $query->joinWith('cmsContentElementTrees');
-                    $query->andWhere(
-                        [
-                            'or',
-                            [$className::tableName().'.tree_id' => $treeIds],
-                            [CmsContentElementTree::tableName().'.tree_id' => $treeIds],
-                        ]
-                    );
+                    $query->andWhere([
+                        'or',
+                        [$className::tableName().'.tree_id' => $treeIds],
+                        [CmsContentElementTree::tableName().'.tree_id' => $treeIds],
+                    ]);
                 } else {
                     $query->andWhere([$className::tableName().'.tree_id' => $treeIds]);
                 }
@@ -194,17 +191,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
 
         if ($this->enabledActiveTime == Cms::BOOL_Y) {
-            $this->dataProvider->query->andWhere(
-                ["<=", $className::tableName().'.published_at', \Yii::$app->formatter->asTimestamp(time())]
-            );
-
-            $this->dataProvider->query->andWhere(
-                [
-                    'or',
-                    [">=", $className::tableName().'.published_to', \Yii::$app->formatter->asTimestamp(time())],
-                    [CmsContentElement::tableName().'.published_to' => null],
-                ]
-            );
+            $query->publishedTime();
         }
 
         /**
@@ -228,12 +215,14 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
         return $this;
     }
+
+
     public function initDataProvider()
     {
         $className = $this->contentElementClass;
-
-        $this->search = new Search($className::className());
-        $this->dataProvider = $this->search->getDataProvider();
+        $this->dataProvider = new ActiveDataProvider([
+            'query' => $className::find(),
+        ]);
 
         if ($this->enabledPaging == Cms::BOOL_Y) {
             $this->dataProvider->getPagination()->defaultPageSize = $this->pageSize;
@@ -247,14 +236,14 @@ class ContentElementsCmsWidget extends WidgetRenderable
         }
 
         if ($this->orderBy) {
-            $this->dataProvider->getSort()->defaultOrder =
-                [
-                    $this->orderBy => (int)$this->order,
-                ];
+            $this->dataProvider->getSort()->defaultOrder = [
+                $this->orderBy => (int)$this->order,
+            ];
         }
 
         return $this;
     }
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
@@ -389,7 +378,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         'class'      => BoolField::class,
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
-                        'allowNull' => false,
+                        'allowNull'  => false,
                     ],
                     'createdBy'         => [
                         'class' => SelectField::class,
@@ -409,19 +398,19 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         'class'      => BoolField::class,
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
-                        'allowNull' => false,
+                        'allowNull'  => false,
                     ],
                     'enabledCurrentTreeChild'    => [
                         'class'      => BoolField::class,
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
-                        'allowNull' => false,
+                        'allowNull'  => false,
                     ],
                     'enabledCurrentTreeChildAll' => [
                         'class'      => BoolField::class,
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
-                        'allowNull' => false,
+                        'allowNull'  => false,
                     ],
 
                     'tree_ids' => [
@@ -438,7 +427,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         'class'      => BoolField::class,
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
-                        'allowNull' => false,
+                        'allowNull'  => false,
                     ],
                 ],
             ],
@@ -490,31 +479,6 @@ class ContentElementsCmsWidget extends WidgetRenderable
                 ],
             ],
         ];
-    }
-    /**
-     * @param Tree $tree
-     * @return array
-     */
-    public function getAllIdsForChildren(Tree $tree)
-    {
-        $treeIds = [];
-        /**
-         * @var $query ActiveQuery
-         */
-        $childrens = $tree->getChildren()->with('children')->all();
-
-        if ($childrens) {
-            foreach ($childrens as $chidren) {
-                if ($chidren->children) {
-                    $treeIds[$chidren->id] = $chidren->id;
-                    $treeIds = array_merge($treeIds, $this->getAllIdsForChildren($chidren));
-                } else {
-                    $treeIds[$chidren->id] = $chidren->id;
-                }
-            }
-        }
-
-        return $treeIds;
     }
 
     public function run()

@@ -160,6 +160,12 @@ abstract class Component extends Model implements IHasConfigForm
         }
         $record->_oldAttributes = $record->toArray();
     }
+
+    /**
+     * @var array
+     */
+    public $_constructConfig = [];
+
     /**
      * Creates an active record instance.
      *
@@ -176,6 +182,16 @@ abstract class Component extends Model implements IHasConfigForm
     public static function instantiate($row)
     {
         return new static;
+    }
+
+    /**
+     * Component constructor.
+     * @param array $config
+     */
+    public function __construct($config = [])
+    {
+        $this->_constructConfig = $config;
+        parent::__construct($config);
     }
 
     public function init()

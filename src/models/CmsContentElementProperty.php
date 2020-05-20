@@ -28,10 +28,12 @@ use skeeks\cms\relatedProperties\models\RelatedElementPropertyModel;
  * @property CmsContentProperty $property
  * @property CmsContentElement $element
  *
- * @property CmsContentElement[] $valueCmsContentElements
+ * @property CmsContentElement $valueCmsContentElements
  */
 class CmsContentElementProperty extends RelatedElementPropertyModel
 {
+    public $elementClass = CmsContentElement::class;
+
     /**
      * @inheritdoc
      */
@@ -45,7 +47,7 @@ class CmsContentElementProperty extends RelatedElementPropertyModel
      */
     public function getProperty()
     {
-        return $this->hasOne(CmsContentProperty::className(), ['id' => 'property_id']);
+        return $this->hasOne(CmsContentProperty::class, ['id' => 'property_id']);
     }
 
     /**
@@ -53,14 +55,16 @@ class CmsContentElementProperty extends RelatedElementPropertyModel
      */
     public function getElement()
     {
-        return $this->hasOne(CmsContentElement::className(), ['id' => 'element_id']);
+        $class = $this->elementClass;
+        return $this->hasOne($class, ['id' => 'element_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getValueCmsContentElements()
+    public function getValueCmsContentElement()
     {
-        return $this->hasMany(CmsContentElement::className(), ['id' => 'value_enum']);
+        $class = $this->elementClass;
+        return $this->hasOne($class, ['id' => 'value_element_id']);
     }
 }

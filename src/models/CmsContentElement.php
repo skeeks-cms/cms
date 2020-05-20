@@ -21,6 +21,7 @@ use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasTreesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
+use skeeks\cms\query\CmsContentElementActiveQuery;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
@@ -77,6 +78,7 @@ use yii\helpers\Url;
  * @property CmsContentProperty[]        $relatedProperties
  * @property CmsContentElementTree[]     $cmsContentElementTrees
  * @property CmsContentElementProperty[] $cmsContentElementProperties
+ * @property CmsContentElementProperty[] $cmsContentElementPropertyValues
  * @property CmsContentProperty[]        $cmsContentProperties
  *
  * @property CmsStorageFile              $image
@@ -516,6 +518,17 @@ class CmsContentElement extends RelatedElementModel
         return $this->hasMany(CmsContentProperty::className(), ['id' => 'property_id'])
             ->via('cmsContentElementProperties');
     }
+
+    /**
+     * Значения свойств
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContentElementPropertyValues()
+    {
+        return $this->hasMany(CmsContentElementProperty::className(), ['value_element_id' => 'id'])->from(['values' => CmsContentElementProperty::tableName()]);
+    }
+
     /**
      * @return string
      */
@@ -770,8 +783,19 @@ class CmsContentElement extends RelatedElementModel
     {
         return (bool)($this->active == "Y");
     }
-    
-    
+
+
+    /**
+     * @return \skeeks\cms\query\CmsActiveQuery|CmsContentElementActiveQuery
+     */
+    public static function find()
+    {
+        if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('is_active')) {
+            return new CmsContentElementActiveQuery(get_called_class(), ['is_active' => true]);
+        }
+
+        return new CmsContentElementActiveQuery(get_called_class(), ['is_active' => false]);
+    }
     
 }
 

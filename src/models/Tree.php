@@ -453,10 +453,7 @@ class Tree extends Core
     }
 
     /**
-     *
-     * Корневые разделы дерева.
-     *
-     * @return ActiveQuery
+     * @return \skeeks\cms\query\CmsActiveQuery
      */
     public static function findRoots()
     {

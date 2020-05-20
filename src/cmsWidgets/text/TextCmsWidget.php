@@ -37,6 +37,7 @@ class TextCmsWidget extends Widget
 
         ob_start();
         ob_implicit_flush(false);
+        return $widget;
     }
 
     public function attributeLabels()

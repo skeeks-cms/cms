@@ -26,9 +26,11 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * Class TreeMenuCmsWidget
+ * @deprecated
  *
- * @package skeeks\cms\cmsWidgets\treeMenu
+ * @use TreeMenuCmsWidget
+ *
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class TreeMenuCmsWidget extends WidgetRenderable
 {
