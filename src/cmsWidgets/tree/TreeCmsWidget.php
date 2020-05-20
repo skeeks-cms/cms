@@ -140,6 +140,13 @@ class TreeCmsWidget extends WidgetRenderable
                 $query->limit($this->limit);
             }
 
+            /**
+             *
+             */
+            if ($this->tree_type_ids) {
+                $query->andWhere([$table . ".tree_type_id" => $this->tree_type_ids]);
+            }
+
             if ($this->parent_tree_id) {
                 $query->andWhere([$table.'.pid' => $this->parent_tree_id]);
             } else {

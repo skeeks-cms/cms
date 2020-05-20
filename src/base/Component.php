@@ -413,6 +413,7 @@ abstract class Component extends Model implements IHasConfigForm
                 ],
         ]);
 
+
         $settingsValues = [];
 
         if ($useCache === true) {
@@ -455,8 +456,8 @@ abstract class Component extends Model implements IHasConfigForm
             static::class,
             $this->namespace,
             \Yii::$app->language,
-            $this->cmsUser ? (string)$this->cmsUser->id : '',
-            $this->cmsSite ? (string)$this->cmsSite->id : '',
+            $this->cmsUser ? "u" . (string) $this->cmsUser->id : 'u',
+            $this->cmsSite ? "site" . (string) $this->cmsSite->id : 'site',
         ]);
     }
     /**
