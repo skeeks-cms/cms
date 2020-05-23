@@ -50,9 +50,9 @@ CSS
                              alt="<? /*= $loadedComponent->descriptor->name; */ ?>">
                     </a>
 
-                    <h3 class="g-font-weight-300 g-font-size-20 g-color-black g-mb-2" style="height: 60px; overflow: hidden;">
-                        <a href="<?= $url; ?>" data-pjax="0">
-                            <?= $loadedComponent->descriptor->name; ?></a>
+                    <h3 class="g-font-weight-300 g-font-size-20 g-color-black g-mb-2" style="height: 100px; overflow: hidden;">
+                        <a href="<?= $url; ?>" data-pjax="0"><?= $loadedComponent->descriptor->name; ?></a>
+                        <div style="font-size: 16px;"><?= $loadedComponent->descriptor->description; ?></div>
                     </h3>
                 </header>
             </div>
