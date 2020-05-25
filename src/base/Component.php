@@ -164,7 +164,7 @@ abstract class Component extends Model implements IHasConfigForm
     /**
      * @var array
      */
-    public $_constructConfig = [];
+    //public $_constructConfig = [];
 
     /**
      * Creates an active record instance.
@@ -190,7 +190,7 @@ abstract class Component extends Model implements IHasConfigForm
      */
     public function __construct($config = [])
     {
-        $this->_constructConfig = $config;
+        //$this->_constructConfig = $config;
         parent::__construct($config);
     }
 
