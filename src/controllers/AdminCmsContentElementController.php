@@ -718,7 +718,18 @@ HTML;
         if ($model && $content && $content->getCmsContentProperties()->count()) {
             $relatedPropertiesModel = $model->relatedPropertiesModel;
 
-            $properties = $content->getCmsContentProperties()->all();
+            $properties = $content->getCmsContentProperties();
+            if (!\Yii::$app->skeeks->site->is_default) {
+                $properties->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+            } else {
+                $properties->andWhere([
+                    'or',
+                    [CmsContentProperty::tableName() . '.cms_site_id' => \Yii::$app->skeeks->site->id],
+                    [CmsContentProperty::tableName() . '.cms_site_id' => null]
+                ]);
+            }
+                
+            $properties = $properties->all();
 
             foreach ($properties as $property) {
 
