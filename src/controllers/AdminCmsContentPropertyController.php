@@ -17,6 +17,7 @@ use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\relatedProperties\PropertyType;
@@ -506,7 +507,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
-        return [
+        $result = [
             'main' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Basic settings'),
@@ -615,5 +616,25 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 ],
             ],
         ];
+        
+        if (\Yii::$app->skeeks->site->is_default && CmsSite::find()->count() > 1) {
+            $result['site'] = [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Показ на сайтах'),
+                'fields' => [
+                    'cms_site_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            CmsSite::find()->all(),
+                            'id',
+                            'asText'
+                        )
+                    ],
+                ]
+            ];
+                
+        }
+        
+        return $result;
     }
 }

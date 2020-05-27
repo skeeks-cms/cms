@@ -71,6 +71,16 @@ class CmsContentProperty extends RelatedPropertyModel
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cmsContents' => Yii::t('skeeks/cms', 'Linked to content'),
             'cmsTrees'    => Yii::t('skeeks/cms', 'Linked to sections'),
+            'cms_site_id'    => Yii::t('skeeks/cms', 'Сайт'),
+        ]);
+    }
+    /**
+     * @return array
+     */
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'cms_site_id'    => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
         ]);
     }
 

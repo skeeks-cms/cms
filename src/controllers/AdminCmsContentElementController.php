@@ -1004,6 +1004,7 @@ HTML
 
         $model->loadDefaultValues();
         $model->content_id = $this->content->id;
+        $model->cms_site_id = \Yii::$app->skeeks->site->id;
 
         $relatedModel = $model->relatedPropertiesModel;
         $relatedModel->loadDefaultValues();
