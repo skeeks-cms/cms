@@ -200,10 +200,12 @@ abstract class Component extends Model implements IHasConfigForm
 
         //\Yii::beginProfile("Init: ".static::class);
 
+        if ($this->cmsSite === null && isset(\Yii::$app->skeeks) && \Yii::$app->skeeks->site) {
+            $this->cmsSite = \Yii::$app->skeeks->site;
+        }
+
+
         if (!\Yii::$app instanceof Application) {
-            if ($this->cmsSite === null && isset(\Yii::$app->skeeks) && \Yii::$app->skeeks->site) {
-                $this->cmsSite = \Yii::$app->skeeks->site;
-            }
 
             if (isset(\Yii::$app->user) && $this->cmsUser === null && !\Yii::$app->user->isGuest) {
                 $this->cmsUser = \Yii::$app->user->identity;
@@ -402,17 +404,17 @@ abstract class Component extends Model implements IHasConfigForm
         $key = $this->getCacheKey();
 
         $dependency = new TagDependency([
-            'tags' =>
-                [
-                    \Yii::getAlias('@webroot'),
-                    static::class,
-                    $this->namespace,
-                    implode('.', $this->overridePath),
-                    $this->cmsUser ? (string)$this->cmsUser->id : '',
-                    $this->cmsSite ? (string)$this->cmsSite->id : '',
-                ],
+            'tags' => [
+                \Yii::$app instanceof Application ? "console" : "",
+                \Yii::$app instanceof \yii\web\Application ? "web" : "",
+                \Yii::getAlias('@webroot'),
+                static::class,
+                $this->namespace,
+                implode('.', $this->overridePath),
+                $this->cmsUser ? 'u' . (string)$this->cmsUser->id : 'u',
+                $this->cmsSite ? 'site' . (string)$this->cmsSite->id : 'site',
+            ],
         ]);
-
 
         $settingsValues = [];
 
@@ -452,6 +454,8 @@ abstract class Component extends Model implements IHasConfigForm
     public function getCacheKey()
     {
         return implode([
+            \Yii::$app instanceof Application ? "console" : "",
+            \Yii::$app instanceof \yii\web\Application ? "web" : "",
             \Yii::getAlias('@webroot'),
             static::class,
             $this->namespace,
