@@ -720,7 +720,11 @@ HTML;
 
             $properties = $content->getCmsContentProperties();
             if (!\Yii::$app->skeeks->site->is_default) {
-                $properties->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                $properties->andWhere([
+                    'or',
+                    [CmsContentProperty::tableName() . '.cms_site_id' => \Yii::$app->skeeks->site->id],
+                    [CmsContentProperty::tableName() . '.cms_site_id' => null]
+                ]);
             } else {
                 $properties->andWhere([
                     'or',
@@ -728,6 +732,8 @@ HTML;
                     [CmsContentProperty::tableName() . '.cms_site_id' => null]
                 ]);
             }
+            
+            //print_r($properties->createCommand()->rawSql);die;
                 
             $properties = $properties->all();
 
