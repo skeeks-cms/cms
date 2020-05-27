@@ -32,6 +32,15 @@ abstract class RelatedPropertyEnumModel extends Core
     /**
      * @inheritdoc
      */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'code' => "Не обязательно к заполнению. Это поле будет сгенерировано автоматически.",
+        ]);
+    }
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [

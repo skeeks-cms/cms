@@ -10,7 +10,11 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsContentElementProperty;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\models\CmsTreeTypeProperty;
+use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
@@ -30,13 +34,13 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $this->modelShowAttribute = "value";
         $this->modelClassName = CmsContentPropertyEnum::class;
 
-        $this->generateAccessActions = false;
-        $this->accessCallback = function () {
+        //$this->generateAccessActions = false;
+        /*$this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
             return \Yii::$app->user->can($this->uniqueId);
-        };
+        };*/
 
         parent::init();
     }
@@ -46,7 +50,18 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
             'value_enum_id' => new Expression(CmsContentPropertyEnum::tableName().".id")
         ]);
-      
+
+        if (!\Yii::$app->skeeks->site->is_default) {
+            $query->andWhere(['property.cms_site_id' => \Yii::$app->skeeks->site->id]);
+        } else {
+            $query->andWhere([
+                'or',
+                ['property.cms_site_id' => \Yii::$app->skeeks->site->id],
+                ['property.cms_site_id' => null]
+            ]);
+        }
+
+        $query->joinWith("property as property");
         $query->groupBy(CmsContentPropertyEnum::tableName().".id");
         $query->select([
             CmsContentPropertyEnum::tableName().'.*',
@@ -140,23 +155,66 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
-        if ($property_id = \Yii::$app->request->get("property_id")) {
+        /*if ($property_id = \Yii::$app->request->get("property_id")) {
             $model->property_id = $property_id;
+        }*/
+
+        $qProperty = \skeeks\cms\models\CmsContentProperty::find();
+
+        if (!\Yii::$app->skeeks->site->is_default) {
+            $qProperty->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+        } else {
+            $qProperty->andWhere([
+                'or',
+                [CmsContentProperty::tableName() . '.cms_site_id' => \Yii::$app->skeeks->site->id],
+                [CmsContentProperty::tableName() . '.cms_site_id' => null]
+            ]);
         }
-        return [
-            'property_id' => [
-                'class' => SelectField::class,
-                'items' => function() {
-                    return \yii\helpers\ArrayHelper::map(
-                        \skeeks\cms\models\CmsContentProperty::find()->all(),
+
+        if ($model->property_id && $model->isNewRecord) {
+            $result = [
+                [
+                    'class' => HtmlBlock::class,
+                    'content' => "<div style='display: none;'>"
+                ],
+                'property_id' => [
+                    'class' => SelectField::class,
+                    'items' =>  \yii\helpers\ArrayHelper::map(
+                        $qProperty->all(),
                         "id",
                         "name"
-                    );
-                }
-            ],
-            'value',
-            'code',
-            'priority',
-        ];
+                    )
+                ],
+                [
+                    'class' => HtmlBlock::class,
+                    'content' => "</div>"
+                ],
+                'value',
+                'code',
+                'priority' => [
+                    'class' => NumberField::class,
+                ],
+            ];
+        } else {
+
+            $result = [
+
+                'property_id' => [
+                    'class' => SelectField::class,
+                    'items' => \yii\helpers\ArrayHelper::map(
+                        $qProperty->all(),
+                        "id",
+                        "name"
+                    )
+                ],
+                'value',
+                'code',
+                'priority' => [
+                    'class' => NumberField::class,
+                ],
+            ];
+        }
+
+        return $result;
     }
 }

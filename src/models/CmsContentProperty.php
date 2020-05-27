@@ -15,6 +15,7 @@ use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_content_property}}".
+ * @property integer|null                 $cms_site_id
  *
  * @property CmsContent[]                 $cmsContents
  * @property CmsContentProperty2content[] $cmsContentProperty2contents
@@ -24,6 +25,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsContentProperty2tree[]    $cmsContentProperty2trees
  * @property CmsTree[]                    $cmsTrees
+ * @property CmsSite                      $cmsSite
  */
 class CmsContentProperty extends RelatedPropertyModel
 {
@@ -82,6 +84,20 @@ class CmsContentProperty extends RelatedPropertyModel
             [['cmsContents'], 'safe'],
             [['cmsTrees'], 'safe'],
             [['code'], 'unique'],
+            [['cms_site_id'], 'integer'],
+            [['cms_site_id'], 'default', 'value' => function() {
+
+                if (\Yii::$app->skeeks->site->is_default) {
+                    return null;
+                } else {
+                    return \Yii::$app->skeeks->site->id;
+                }
+            }],
+
+
+            [['cmsContents'], 'required'],
+
+
             //[['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
         ]);
 
@@ -117,6 +133,13 @@ class CmsContentProperty extends RelatedPropertyModel
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getCmsSite()
+    {
+        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getCmsTrees()
     {
         return $this->hasMany(CmsTree::className(), ['id' => 'cms_tree_id'])->viaTable('cms_content_property2tree',
@@ -126,7 +149,7 @@ class CmsContentProperty extends RelatedPropertyModel
 
     public function asText()
     {
-        $result = parent::asText();
+        return parent::asText();
         return $result." ($this->code)";
     }
 }

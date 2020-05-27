@@ -329,24 +329,24 @@ return
 
                     [
                         "label" => \Yii::t('skeeks/cms', "Content settings"),
-                        "url"   => ["cms/admin-cms-content-type"],
+                        //"url"   => ["cms/admin-cms-content-type"],
                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/content.png'],
 
-                        'items' => \yii\helpers\ArrayHelper::merge([
-                            'contentSettings'     => [
-                                'url'   => ["/cms/admin-cms-content-property"],
+                        'items' => [
+                            [
+                                'url'   => ["cms/admin-cms-content-property"],
                                 'label' => \Yii::t('skeeks/cms', "Properties"),
                             ],
-                            'contentSettingsEnum' => [
-                                'url'   => ["/cms/admin-cms-content-property-enum"],
+                            [
+                                'url'   => ["cms/admin-cms-content-property-enum"],
                                 'label' => \Yii::t('skeeks/cms', "Options"),
                             ],
                             [
-                                'url'   => ["/cms/admin-cms-content-type"],
+                                'url'   => ["cms/admin-cms-content-type"],
                                 'label' => \Yii::t('skeeks/cms', "Группы контента"),
                                 "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.tree.gif'],
                             ],
-                        ], []),
+                        ],
                         //contentEditMenu()
                     ],
 

@@ -473,8 +473,19 @@ class CmsContentElement extends RelatedElementModel
                 ['map2trees.cms_tree_id' => null]
             );
         }
-        
+
+        if ($this->cms_site_id) {
+            $q->andWhere([
+                'or',
+                [CmsContentProperty::tableName() . '.cms_site_id' => null],
+                [CmsContentProperty::tableName() . '.cms_site_id' => $this->cms_site_id],
+            ]);
+        }
+
         $q->orderBy(['priority' => SORT_ASC]);
+
+
+
         return $q;
         //return $this->cmsContent->getCmsContentProperties();
 
