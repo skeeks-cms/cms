@@ -990,8 +990,9 @@ HTML;
 
         $e->content = Alert::widget([
             'options' => [
-                'class' => 'alert-info',
+                'class' => 'sx-bg-gray-light',
             ],
+            'closeButton' => false,
 
             'body' => <<<HTML
     Изменить свойства и права доступа к информационному блоку вы можете в {$href}
