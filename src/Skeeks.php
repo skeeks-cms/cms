@@ -48,17 +48,21 @@ class Skeeks extends Component
                 if ($cms_site_id = getenv("CMS_SITE")) {
                     $this->_site = $cmsSiteClass::find()->active()->andWhere(['id' => $cms_site_id])->one();
                 } else {
-                    $this->_site = $cmsSiteClass::find()->active()->andWhere(['is_default' => 1])->one();
+
+                    if ($cmsSiteClass::safeGetTableSchema()->getColumn('is_default')) {
+                        $this->_site = $cmsSiteClass::find()->active()->andWhere(['is_default' => 1])->one();
+                    } else {
+                        $this->_site = $cmsSiteClass::find()->active()->one();
+                    }
                 }
 
 
             } else {
                 $this->_serverName = \Yii::$app->getRequest()->getServerName();
                 $dependencySiteDomain = new TagDependency([
-                    'tags' =>
-                        [
-                            (new CmsSiteDomain())->getTableCacheTag(),
-                        ],
+                'tags' => [
+                        (new CmsSiteDomain())->getTableCacheTag(),
+                    ],
                 ]);
 
 
