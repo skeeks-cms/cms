@@ -155,9 +155,10 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
-        /*if ($property_id = \Yii::$app->request->get("property_id")) {
+        //Используется в создании свойств прям со страницы заполнения товара/элемента
+        if ($property_id = \Yii::$app->request->get("property_id")) {
             $model->property_id = $property_id;
-        }*/
+        }
 
         $qProperty = \skeeks\cms\models\CmsContentProperty::find();
 
@@ -177,14 +178,7 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                     'class' => HtmlBlock::class,
                     'content' => "<div style='display: none;'>"
                 ],
-                'property_id' => [
-                    'class' => SelectField::class,
-                    'items' =>  \yii\helpers\ArrayHelper::map(
-                        $qProperty->all(),
-                        "id",
-                        "name"
-                    )
-                ],
+                'property_id',
                 [
                     'class' => HtmlBlock::class,
                     'content' => "</div>"
