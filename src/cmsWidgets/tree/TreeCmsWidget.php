@@ -113,7 +113,7 @@ class TreeCmsWidget extends WidgetRenderable
     public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('skeeks/shop/app', 'Подразделы'),
+            'name' => \Yii::t('skeeks/cms', 'Подразделы'),
         ]);
     }
 
@@ -189,13 +189,13 @@ class TreeCmsWidget extends WidgetRenderable
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'limit'             => \Yii::t('skeeks/shop/app', 'Максимальное количество разделов'),
-            'is_active_only'    => \Yii::t('skeeks/shop/app', 'Показывать только активные разделы?'),
-            'is_has_image_only' => \Yii::t('skeeks/shop/app', 'Показывать только разделы с фото?'),
-            'tree_type_ids'     => \Yii::t('skeeks/shop/app', 'Типы разделов'),
-            'sorting_option'    => \Yii::t('skeeks/shop/app', 'Параметр сортировки'),
-            'sorting_direction' => \Yii::t('skeeks/shop/app', 'Направление сортировки'),
-            'parent_tree_id'    => \Yii::t('skeeks/shop/app', 'Корневой раздел'),
+            'limit'             => \Yii::t('skeeks/cms', 'Максимальное количество разделов'),
+            'is_active_only'    => \Yii::t('skeeks/cms', 'Показывать только активные разделы?'),
+            'is_has_image_only' => \Yii::t('skeeks/cms', 'Показывать только разделы с фото?'),
+            'tree_type_ids'     => \Yii::t('skeeks/cms', 'Типы разделов'),
+            'sorting_option'    => \Yii::t('skeeks/cms', 'Параметр сортировки'),
+            'sorting_direction' => \Yii::t('skeeks/cms', 'Направление сортировки'),
+            'parent_tree_id'    => \Yii::t('skeeks/cms', 'Корневой раздел'),
         ]);
     }
 
