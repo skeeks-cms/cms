@@ -93,7 +93,7 @@ use yii\helpers\Url;
  * @property CmsContentElementTree[]   $cmsContentElementTrees
  * @property CmsSite                   $site
  * @property CmsSite                   $cmsSiteRelation
- * @property CmsTreeType               $treeType
+ * @property CmsTreeType               $cmsTreeType
  * @property CmsTreeProperty[]         $cmsTreeProperties
  *
  * @property CmsContentProperty2tree[] $cmsContentProperty2trees
@@ -543,6 +543,14 @@ class Tree extends Core
      * @return \yii\db\ActiveQuery
      */
     public function getTreeType()
+    {
+        return $this->getCmsTreeType();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeType()
     {
         return $this->hasOne(CmsTreeType::className(), ['id' => 'tree_type_id']);
     }
