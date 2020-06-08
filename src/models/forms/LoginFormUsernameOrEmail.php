@@ -69,7 +69,7 @@ class LoginFormUsernameOrEmail extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (\Yii::$app->cms->auth_only_email_is_approved && !$user->email_is_approved) {
-                $this->addError($attribute, \Yii::t('skeeks/cms', 'Вам необходимо подтвердить ваш email. Для этого перейдите по ссылке из письма.'));
+                $this->addError($attribute, \Yii::t('skeeks/cms', 'Вам необходимо подтвердить ваш email.'));
             }
         }
     }
