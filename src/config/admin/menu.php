@@ -386,7 +386,13 @@ return
                 'items' =>
                     [
 
-                        [
+                            [
+                                "label" => \Yii::t('skeeks/cms', "Для разработчика"),
+                                "url"   => ["cms/admin-info"],
+                                "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.infoblock.png'],
+                            ],
+                
+                        /*[
                             'label'    => \Yii::t('skeeks/cms', 'Instruments'),
                             'priority' => 0,
                             'enabled'  => true,
@@ -401,7 +407,7 @@ return
                                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.infoblock.png'],
                                     ],
                                 ],
-                        ],
+                        ],*/
 
                         [
                             "label" => \Yii::t('skeeks/cms', "Clearing temporary data"),
