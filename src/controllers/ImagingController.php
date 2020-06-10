@@ -71,7 +71,7 @@ class ImagingController extends Controller
         $originalFile = new File($originalFileRoot);
 
         if (!$originalFile->isExist()) {
-            throw new NotFoundHttpException("The original file is not found: ".$newFileSrc);
+            throw new NotFoundHttpException("The original file is not found: ".\Yii::$app->request->absoluteUrl);
         }
 
         //Проверено наличие оригинального файла, есть пути к оригиналу, и результирующему файлу.
