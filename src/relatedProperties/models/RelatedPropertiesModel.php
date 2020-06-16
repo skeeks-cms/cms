@@ -71,6 +71,15 @@ class RelatedPropertiesModel extends DynamicModel
         parent::setAttributes($values, $safeOnly);
     }
 
+    /**
+     * @param $property
+     * @return $this
+     */
+    public function defineProperty($property) {
+        $this->_defineByProperty($property);
+        return $this;
+    }
+
     protected function _defineByProperty($property)
     {
 

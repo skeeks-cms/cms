@@ -355,6 +355,7 @@ class CmsContent extends Core
     {
         return new CmsContentElement([
             'content_id' => $this->id,
+            'cms_site_id' => \Yii::$app->skeeks->site->id,
         ]);
     }
 

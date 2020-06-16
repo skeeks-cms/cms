@@ -12,7 +12,7 @@
 $model = new \skeeks\cms\models\CmsContentElement();
 
 $jsData = \yii\helpers\Json::encode([
-    'id' => $action->id
+    'id' => $action->id,
 ]);
 
 $this->registerJs(<<<JS
@@ -56,12 +56,20 @@ JS
 <div id="<?= $action->id; ?>">
     <?php if ($action->controller && $action->controller->content) : ?>
 
-        <?php $content = $action->controller->content; ?>
+        <?php $content = $action->controller->content;
+        $q = $content->getCmsContentProperties();
+        $q->andWhere([
+            'or',
+            [\skeeks\cms\models\CmsContentProperty::tableName().'.cms_site_id' => null],
+            [\skeeks\cms\models\CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+        ]);
+        $q->orderBy(['priority' => SORT_ASC]);
+        $properties = $q->all();
+        ?>
         <?php $element = $content->createElement(); ?>
         <?php $element->loadDefaultValues(); ?>
-
         <?
-            $rpm = $element->relatedPropertiesModel;
+        $rpm = $element->relatedPropertiesModel;
         ?>
 
         <?php if ($element && $rpm) : ?>
@@ -70,21 +78,22 @@ JS
             <?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
                 'options' => [
                     'class' => 'sx-form',
-                ]
+                ],
             ]); ?>
             <?= \skeeks\widget\chosen\Chosen::widget([
                 'multiple' => true,
-                'name' => 'fields',
-                'options' => [
-                    'class' => 'sx-select'
+                'name'     => 'fields',
+                'options'  => [
+                    'class' => 'sx-select',
                 ],
-                'items' => $rpm->attributeLabels()
+                'items'    => \yii\helpers\ArrayHelper::map($properties, "code", "name"),
             ]); ?>
 
             <?= \yii\helpers\Html::hiddenInput('content_id', $content->id); ?>
 
 
-            <?php foreach ($rpm->getProperties() as $property) : ?>
+            <?php foreach ($properties as $property) : ?>
+                <?php $rpm->defineProperty($property); ?>
                 <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
                     <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
 
@@ -93,7 +102,7 @@ JS
                             echo $form->field($rpm, $property->code)->widget(
                                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
                                 [
-                                    'content_id' => $property->handler->content_id
+                                    'content_id' => $property->handler->content_id,
                                 ]
                             );
                             ?>
@@ -104,7 +113,7 @@ JS
                                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
                                 [
                                     'content_id' => $property->handler->content_id,
-                                    'multiple' => true
+                                    'multiple'   => true,
                                 ]
                             );
                             ?>
