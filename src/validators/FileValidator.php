@@ -43,13 +43,21 @@ class FileValidator extends \yii\validators\FileValidator
 
     public function validateAttribute($model, $attribute)
     {
-        if ($this->maxFiles != 1) {
+        if ($this->maxFiles != 1 || $this->minFiles > 1) {
             $files = $model->$attribute;
             if (!is_array($files)) {
                 //$this->addError($model, $attribute, $this->uploadRequired);
                 return;
             }
-            if ($this->maxFiles && count($files) > $this->maxFiles) {
+
+            $filesCount = count($files);
+
+            if ($this->minFiles && $this->minFiles > $filesCount) {
+                $this->addError($model, $attribute, $this->tooFew, ['limit' => $this->minFiles]);
+            }
+
+
+            if ($this->maxFiles && $filesCount > $this->maxFiles) {
                 $this->addError($model, $attribute, $this->tooMany, ['limit' => $this->maxFiles]);
             } else {
                 foreach ($files as $file) {
