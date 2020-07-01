@@ -219,8 +219,8 @@ class ContentElementController extends Controller
         if ($title = $model->meta_title) {
             $this->view->title = $title;
         } else {
-            if (isset($model->name)) {
-                $this->view->title = $model->name;
+            if (isset($model->seoName)) {
+                $this->view->title = $model->seoName;
             }
         }
 
