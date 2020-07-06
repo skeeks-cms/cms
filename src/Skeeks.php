@@ -12,6 +12,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use yii\base\Component;
 use yii\caching\TagDependency;
+use yii\console\Application;
 
 /**
  * @property CmsSite $site
@@ -90,6 +91,13 @@ class Skeeks extends Component
                 }
             }
         }
+
+        if (\Yii::$app instanceof Application) {
+            \Yii::$app->urlManager->hostInfo = $this->_site->cmsSiteMainDomain->url;
+        }
+
+
+
 
         return $this->_site;
     }
