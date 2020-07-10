@@ -424,7 +424,15 @@ class User
      */
     public function getDisplayName()
     {
-        return $this->name ? $this->name : $this->username;
+        if ($this->name) {
+            return $this->name;
+        }
+
+        if ($this->email) {
+            return $this->email;
+        }
+
+        return $this->username;
     }
 
 
