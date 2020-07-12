@@ -50,10 +50,13 @@ class Skeeks extends Component
                     $this->_site = $cmsSiteClass::find()->active()->andWhere(['id' => $cms_site_id])->one();
                 } else {
 
-                    if ($cmsSiteClass::safeGetTableSchema()->getColumn('is_default')) {
-                        $this->_site = $cmsSiteClass::find()->active()->andWhere(['is_default' => 1])->one();
-                    } else {
-                        $this->_site = $cmsSiteClass::find()->active()->one();
+                    $table = $cmsSiteClass::safeGetTableSchema();
+                    if ($table) {
+                        if ($table->getColumn('is_default')) {
+                            $this->_site = $cmsSiteClass::find()->active()->andWhere(['is_default' => 1])->one();
+                        } else {
+                            $this->_site = $cmsSiteClass::find()->active()->one();
+                        }
                     }
                 }
 
