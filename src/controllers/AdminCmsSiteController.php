@@ -281,6 +281,73 @@ class AdminCmsSiteController extends BackendModelStandartController
                 },
             ],
 
+            "emails" => [
+                'class' => BackendGridModelRelatedAction::class,
+                'accessCallback' => true,
+                'name'            => "Email-ы",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/cms/admin-cms-site-email",
+                'relation'        => ['cms_site_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'        => function($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'cms_site_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+            "phones" => [
+                'class' => BackendGridModelRelatedAction::class,
+                'accessCallback' => true,
+                'name'            => "Телефоны",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/cms/admin-cms-site-phone",
+                'relation'        => ['cms_site_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'        => function($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'cms_site_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+
+            "socials" => [
+                'class' => BackendGridModelRelatedAction::class,
+                'accessCallback' => true,
+                'name'            => "Социальные сети",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/cms/admin-cms-site-social",
+                'relation'        => ['cms_site_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'        => function($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'cms_site_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
 
             "update" => [
                 'fields' => [$this, 'updateFields'],

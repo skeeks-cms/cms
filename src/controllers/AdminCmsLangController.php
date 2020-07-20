@@ -65,7 +65,7 @@ class AdminCmsLangController extends BackendModelStandartController
                         'checkbox',
                         'actions',
                         'custom',
-                        'code',
+                        //'code',
                         'is_active',
                         'priority',
                     ],
@@ -86,7 +86,7 @@ class AdminCmsLangController extends BackendModelStandartController
                                                     <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a>
                                                 </div>
-                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
+                                                <div style='margin-left: 5px;'>" . $info  . " (" . $model->code . ")</div></div>";
 
                                             ;
                             }

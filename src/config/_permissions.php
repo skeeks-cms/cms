@@ -86,6 +86,13 @@ return [
                     
                     "cms/admin-cms-content-type",
                     "cms/admin-cms-content",
+                    
+                    "cms/admin-cms-site-phone",
+                    "cms/admin-cms-site-email",
+                    "cms/admin-cms-site-social",
+                    "cms/admin-cms-site-address",
+                    "cms/admin-cms-site-address-phone",
+                    "cms/admin-cms-site-address-email",
                 ],
             ],
         ],

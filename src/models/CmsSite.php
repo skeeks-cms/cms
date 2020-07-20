@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\assets\CmsAsset;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\modules\cms\user\models\User;
 use Yii;
@@ -31,6 +33,8 @@ use yii\helpers\ArrayHelper;
  * @property string                 $server_name
  * @property string                 $description
  * @property integer                $image_id
+ * @property integer                $favicon_storage_file_id
+ * @property array                  $work_time
  *
  * @property string                 $url
  *
@@ -41,7 +45,19 @@ use yii\helpers\ArrayHelper;
  * @property CmsTree[]              $cmsTrees
  * @property CmsContentElement[]    $cmsContentElements
  * @property CmsStorageFile         $image
+ * @property CmsStorageFile         $favicon
  * @property CmsComponentSettings[] $cmsComponentSettings
+ * @property CmsSiteEmail|null      $cmsSiteEmail
+ * @property CmsSiteEmail|null      $cmsSitePhone
+ * @property CmsSiteAddress|null    $cmsSiteAddress
+ * @property CmsSiteEmail[]         $cmsSiteEmails
+ * @property CmsSiteAddress[]       $cmsSiteAddresses
+ * @property CmsSitePhone[]         $cmsSitePhones
+ * @property CmsSiteSocial[]        $cmsSiteSocials
+ *
+ * @property string                 $faviconRootSrc
+ * @property string                 $faviconUrl всегда вернет какую нибудь фавиконку, не важно задана она для сайта или нет
+ * @property string                 $faviconType полный тип фивикон https://yandex.ru/support/webmaster/search-results/create-favicon.html
  */
 class CmsSite extends Core
 {
@@ -86,11 +102,14 @@ class CmsSite extends Core
     {
         return ArrayHelper::merge(parent::behaviors(), [
 
-            HasStorageFile::className() =>
-                [
-                    'class'  => HasStorageFile::className(),
-                    'fields' => ['image_id'],
-                ],
+            HasStorageFile::className()        => [
+                'class'  => HasStorageFile::className(),
+                'fields' => ['image_id', 'favicon_storage_file_id'],
+            ],
+            HasJsonFieldsBehavior::className() => [
+                'class'  => HasJsonFieldsBehavior::className(),
+                'fields' => ['work_time'],
+            ],
         ]);
     }
 
@@ -159,17 +178,26 @@ class CmsSite extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'          => Yii::t('skeeks/cms', 'ID'),
-            'created_by'  => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by'  => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at'  => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at'  => Yii::t('skeeks/cms', 'Updated At'),
-            'is_active'   => Yii::t('skeeks/cms', 'Active'),
-            'is_default'  => Yii::t('skeeks/cms', 'Default'),
-            'priority'    => Yii::t('skeeks/cms', 'Priority'),
-            'name'        => Yii::t('skeeks/cms', 'Name'),
-            'description' => Yii::t('skeeks/cms', 'Description'),
-            'image_id'    => Yii::t('skeeks/cms', 'Image'),
+            'is_active'               => Yii::t('skeeks/cms', 'Active'),
+            'is_default'              => Yii::t('skeeks/cms', 'Default'),
+            'priority'                => Yii::t('skeeks/cms', 'Priority'),
+            'name'                    => Yii::t('skeeks/cms', 'Name'),
+            'description'             => Yii::t('skeeks/cms', 'Description'),
+            'image_id'                => Yii::t('skeeks/cms', 'Логотип'),
+            'favicon_storage_file_id' => Yii::t('skeeks/cms', 'Favicon'),
+            'work_time'               => Yii::t('skeeks/cms', 'Рабочее время'),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'name'                    => Yii::t('skeeks/cms', 'Основное название сайта, отображается в разных местах шаблона, в заголовках писем и других местах.'),
+            'favicon_storage_file_id' => Yii::t('skeeks/cms',
+                'Формат: ICO (рекомендуемый), Размер: 16 × 16, 32 × 32 или 120 × 120 пикселей. Иконка сайта отображаемая в браузере, а так же в различных поисковиках. <br />Подробная документация <a href="https://yandex.ru/support/webmaster/search-results/favicon.html" target="_blank" data-pjax="0">https://yandex.ru/support/webmaster/search-results/favicon.html</a>'),
         ]);
     }
 
@@ -189,6 +217,8 @@ class CmsSite extends Core
             ['is_default', 'default', 'value' => null],
             /*[['is_default'], 'unique'],*/
             [['image_id'], 'safe'],
+            [['work_time'], 'safe'],
+            [['favicon_storage_file_id'], 'safe'],
 
             [
                 ['image_id'],
@@ -198,6 +228,16 @@ class CmsSite extends Core
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 2,
                 'minSize'     => 1024,
+            ],
+
+            [
+                ['favicon_storage_file_id'],
+                \skeeks\cms\validators\FileValidator::class,
+                'skipOnEmpty' => false,
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'ico'],
+                'maxFiles'    => 1,
+                'maxSize'     => 1024 * 1024 * 2,
+                //'minSize'     => 1024,
             ],
         ]);
     }
@@ -238,6 +278,80 @@ class CmsSite extends Core
     public function getCmsSiteDomains()
     {
         return $this->hasMany(CmsSiteDomain::class, ['cms_site_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[CmsSiteEmails]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSiteEmails()
+    {
+        return $this->hasMany(CmsSiteEmail::className(), ['cms_site_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
+
+    /**
+     * Gets query for [[CmsSiteEmails]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSiteAddresses()
+    {
+        return $this->hasMany(CmsSiteAddress::className(), ['cms_site_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
+
+    /**
+     * Gets query for [[CmsSitePhones]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSitePhones()
+    {
+        return $this->hasMany(CmsSitePhone::className(), ['cms_site_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
+
+    /**
+     * Главный телефон сайта
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSitePhone()
+    {
+        $q = $this->getCmsSitePhones()->limit(1);
+        $q->multiple = false;
+        return $q;
+    }
+
+    /**
+     * Главный адрес сайта
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSiteAddress()
+    {
+        $q = $this->getCmsSiteAddresses()->limit(1);
+        $q->multiple = false;
+        return $q;
+    }
+
+    /**
+     * Главный email сайта
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSiteEmail()
+    {
+        $q = $this->getCmsSiteEmails()->limit(1);
+        $q->multiple = false;
+        return $q;
+    }
+
+    /**
+     * Gets query for [[CmsSiteSocials]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSiteSocials()
+    {
+        return $this->hasMany(CmsSiteSocial::className(), ['cms_site_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 
     /**
@@ -296,6 +410,14 @@ class CmsSite extends Core
     }
 
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFavicon()
+    {
+        return $this->hasOne(CmsStorageFile::className(), ['id' => 'favicon_storage_file_id']);
+    }
+
 
     /**
      * Gets query for [[CmsComponentSettings]].
@@ -305,5 +427,45 @@ class CmsSite extends Core
     public function getCmsComponentSettings()
     {
         return $this->hasMany(CmsComponentSettings::className(), ['cms_site_id' => 'id']);
+    }
+
+    /**
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getFaviconUrl()
+    {
+        if ($this->favicon) {
+            return $this->favicon->absoluteSrc;
+        } else {
+            return CmsAsset::getAssetUrl('favicon.ico');
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getFaviconRootSrc()
+    {
+        if ($this->favicon) {
+            return $this->favicon->getRootSrc();
+        } else {
+            return \Yii::getAlias('@skeeks/cms/assets/src/favicon.ico');
+        }
+    }
+
+    /**
+     * @return string
+     * @see https://yandex.ru/support/webmaster/search-results/create-favicon.html
+     */
+    public function getFaviconType()
+    {
+        $data = pathinfo($this->faviconUrl);
+        $extension = strtolower(ArrayHelper::getValue($data, "extension"));
+        $last = 'x-icon';
+        if (in_array($extension, ["png", "jpeg", "gif", "bmp"])) {
+            $last = $extension;
+        }
+        return "image/".$last;
     }
 }

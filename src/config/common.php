@@ -107,7 +107,10 @@ return [
                 'skeeks-cms' => 'cms/cms/index',
                 'skeeks-cms/<action>' => 'cms/cms/<action>',
 
+                'favicon.<extension:\w+>' => '/cms/favicon/on-request',
+
                 "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'],
+                
                 //Resize image on request
             ],
         ],

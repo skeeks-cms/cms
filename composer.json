@@ -44,6 +44,7 @@
         "skeeks/cms-marketplace": "^2.0.1 || dev-master@dev",
         "skeeks/cms-toolbar": "^1.0.0 || dev-master@dev",
         "skeeks/cms-agent": "^2.0.0 || dev-master@dev",
+        "skeeks/cms-ya-map": "^1.1 || dev-master@dev",
         "skeeks/yii2-ajax-file-upload": "^1.0.0",
         "skeeks/yii2-imagine": "^2.0.1 || dev-master@dev",
         "skeeks/yii2-sx": "^1.4.0 || dev-master@dev",
@@ -54,6 +55,7 @@
         "skeeks/yii2-widget-codemirror": "^1.0.3 || dev-master@dev",
         "skeeks/yii2-slug-behavior": "^1.0.0 || dev-master@dev",
         "skeeks/yii2-ya-slug": "^1.0.0 || dev-master@dev",
+        "skeeks/yii2-schedule-input-widget": "^1.0.0 || dev-master@dev",
 
         "skeeks/cms-measure": "^2.0.0 || dev-master",
 

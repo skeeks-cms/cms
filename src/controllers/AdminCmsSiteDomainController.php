@@ -9,12 +9,15 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HiddenField;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -41,24 +44,39 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
     {
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
+                "backendShowings" => false,
                 "filters" => [
                     'visibleFilters' => [
-                        'id',
+                        //'id',
                         'domain',
-                        'cms_site_id',
+                        //'cms_site_id',
                     ],
                 ],
                 'grid'    => [
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                    },
+
+
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
-                        'id',
+                        //'id',
                         'domain',
-                        'cms_site_id',
+                        //'cms_site_id',
                         'is_main',
                         'is_https',
                     ],
                     'columns' => [
+                        'domain' => [
+                            'class' => DefaultActionColumn::class
+                        ],
                         'is_main' => [
                             'class' => BooleanColumn::class,
                             'trueValue' => 1,
@@ -83,9 +101,6 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
 
     public function updateFields($action)
     {
-        /**
-         * @var $model CmsSiteDomain
-         */
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
@@ -116,7 +131,15 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
                 'allowNull' => false,
                 'formElement' => BoolField::ELEMENT_CHECKBOX,
             ],
+            [
+                'class' => HtmlBlock::class,
+                'content' => "<div style='display: none;'>"
+            ],
             'cms_site_id' => $field,
+            [
+                'class' => HtmlBlock::class,
+                'content' => "</div>"
+            ],
         ];
 
         return $updateFields;

@@ -86,10 +86,7 @@ class Cms extends \skeeks\cms\base\Component
      * @var string E-Mail администратора сайта (отправитель по умолчанию).
      */
     public $adminEmail = 'admin@skeeks.com';
-    /**
-     * @var string
-     */
-    public $appName;
+
     /**
      * @var string Это изображение показывается в тех случаях, когда не найдено основное.
      */
@@ -209,11 +206,7 @@ class Cms extends \skeeks\cms\base\Component
         parent::init();
 
         //Название проекта.
-        if (!$this->appName) {
-            $this->appName = \Yii::$app->name;
-        } else {
-            \Yii::$app->name = $this->appName;
-        }
+        \Yii::$app->name = \Yii::$app->skeeks->site->name;
 
         //Язык
         if ($this->languageCode) {
@@ -292,6 +285,12 @@ class Cms extends \skeeks\cms\base\Component
                             "content" => "7170fe3a42c6f80cd95fd8bce765333d",
                         ], 'cmsmagazine');
                     }
+
+                     $view->registerLinkTag([
+                         'rel' => 'icon',
+                         'type' => \Yii::$app->skeeks->site->faviconType,
+                         'href' => \Yii::$app->skeeks->site->faviconUrl,
+                     ]);
                 }
             });
 
@@ -308,12 +307,10 @@ class Cms extends \skeeks\cms\base\Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['adminEmail', 'noImageUrl', 'appName', 'languageCode'], 'string'],
+            [['adminEmail', 'noImageUrl', 'languageCode'], 'string'],
             [['adminEmail'], 'email'],
             [['adminEmail'], 'email'],
             [['registerRoles'], 'safe'],
-            [['tree_max_code_length'], 'integer'],
-            [['element_max_code_length'], 'integer'],
             [['auth_only_email_is_approved'], 'integer'],
             [['email_approved_key_length'], 'integer'],
             [['approved_key_is_letter'], 'integer'],
@@ -324,11 +321,8 @@ class Cms extends \skeeks\cms\base\Component
         return ArrayHelper::merge(parent::attributeLabels(), [
             'adminEmail'                  => 'Основной Email Администратора сайта',
             'noImageUrl'                  => 'Изображение заглушка',
-            'appName'                     => 'Название проекта',
             'languageCode'                => 'Язык по умолчанию',
             'registerRoles'               => 'При регистрации добавлять в группу',
-            'tree_max_code_length'        => 'Максимальная длинна кода (url) разделов',
-            'element_max_code_length'     => 'Максимальная длинна кода (url) элементов',
             'auth_only_email_is_approved' => 'Разрешить авторизацию на сайте только с подтвержденными email?',
             'email_approved_key_length' => 'Длина проверочного кода',
             'approved_key_is_letter' => 'Проверочный код содержит буквы?',
@@ -353,7 +347,6 @@ class Cms extends \skeeks\cms\base\Component
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Main'),
                 'fields' => [
-                    'appName',
                     'adminEmail',
                     'noImageUrl' => [
                         'class'       => WidgetField::class,
@@ -398,21 +391,7 @@ class Cms extends \skeeks\cms\base\Component
                 ],
             ],
 
-            'section' => [
-                'class'  => FieldSet::class,
-                'name'   => 'Разделы',
-                'fields' => [
-                    'tree_max_code_length',
-                ],
-            ],
 
-            'element' => [
-                'class'  => FieldSet::class,
-                'name'   => 'Элементы',
-                'fields' => [
-                    'element_max_code_length',
-                ],
-            ],
 
             'access' => [
                 'class'  => FieldSet::class,
@@ -643,5 +622,14 @@ class Cms extends \skeeks\cms\base\Component
     public function getCmsName()
     {
         return "SkeekS CMS";
+    }
+
+    /**
+     * @return string
+     * @deprecated
+     */
+    public function getAppName()
+    {
+        return \Yii::$app->skeeks->site->name;
     }
 }

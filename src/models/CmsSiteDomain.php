@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\modules\cms\user\models\User;
 use Yii;
@@ -30,7 +31,7 @@ use yii\helpers\ArrayHelper;
  * @property string $url
  * @property CmsSite $cmsSite
  */
-class CmsSiteDomain extends Core
+class CmsSiteDomain extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -85,7 +86,7 @@ class CmsSiteDomain extends Core
     {
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-            [['cms_site_id', 'domain'], 'required'],
+            [['domain'], 'required'],
             [['is_main', 'is_https'], 'boolean'],
             
             [['is_main', 'is_https'], 'default', 'value' => null],
@@ -116,6 +117,15 @@ class CmsSiteDomain extends Core
                     }
                     $this->addError($attribute, "Доменное имя указано неверно");
                     return false;
+                },
+            ],
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
                 },
             ],
         ]);

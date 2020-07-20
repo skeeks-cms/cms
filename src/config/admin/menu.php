@@ -38,7 +38,7 @@ function contentMenu()
 
                         "accessCallback" => function ($adminMenuItem) use ($content) {
 
-                            $permissionNames =  "cms/admin-cms-content-element__" . $content->id;
+                            $permissionNames = "cms/admin-cms-content-element__".$content->id;
                             foreach ([$permissionNames] as $permissionName) {
                                 if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
                                     if (!\Yii::$app->user->can($permission->name)) {
@@ -253,6 +253,38 @@ return
             ],
 
 
+        'siteinfo' => [
+            'priority' => 290,
+            'label'    => \Yii::t('skeeks/cms', 'Информация о сайте'),
+            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/information.png'],
+
+            'items' => [
+                [
+                    'label' => 'Общая информация',
+                    'url'   => ['cms/admin-cms-site-info'],
+                ],
+                [
+                    'label' => 'Телефоны',
+                    'url'   => ['cms/admin-cms-site-phone'],
+                ],
+                [
+                    'label' => 'Email-ы',
+                    'url'   => ['cms/admin-cms-site-email'],
+                ],
+                [
+                    'label' => 'Адреса',
+                    'url'   => ['cms/admin-cms-site-address'],
+                ],
+                [
+                    'label' => 'Социальные сети',
+                    'url'   => ['cms/admin-cms-site-social'],
+                ],
+                [
+                    'label' => 'Домены',
+                    'url'   => ['cms/admin-cms-site-domain'],
+                ],
+            ],
+        ],
         'settings' => [
             'priority' => 300,
             'label'    => \Yii::t('skeeks/cms', 'Settings'),
@@ -289,13 +321,14 @@ return
 
                     [
                         "label" => \Yii::t('skeeks/cms', "Components"),
-                        "url"       => ["cms/admin-settings"],
+                        "url"   => ["cms/admin-settings"],
                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
                         /*'items' => componentsMenu(),*/
                     ],
 
+
                     [
-                        "label" => \Yii::t('skeeks/cms', "Server file storage"),
+                        "label" => \Yii::t('skeeks/cms', "Файловое хранилище"),
                         "url"   => ["cms/admin-storage/index"],
                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/servers.png'],
                     ],
@@ -372,7 +405,6 @@ return
                     ],
 
 
-
                 ],
         ],
 
@@ -386,12 +418,12 @@ return
                 'items' =>
                     [
 
-                            [
-                                "label" => \Yii::t('skeeks/cms', "Для разработчика"),
-                                "url"   => ["cms/admin-info"],
-                                "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.infoblock.png'],
-                            ],
-                
+                        [
+                            "label" => \Yii::t('skeeks/cms', "Для разработчика"),
+                            "url"   => ["cms/admin-info"],
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.infoblock.png'],
+                        ],
+
                         /*[
                             'label'    => \Yii::t('skeeks/cms', 'Instruments'),
                             'priority' => 0,
