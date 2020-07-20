@@ -47,12 +47,15 @@ class HasJsonFieldsBehavior extends Behavior
     public function jsonEncodeFields($event)
     {
         foreach ($this->fields as $fielName) {
-            if ($this->owner->{$fielName}) {
+            if (isset($this->owner->{$fielName}) && $this->owner->{$fielName}) {
                 if (is_array($this->owner->{$fielName})) {
                     $this->owner->{$fielName} = Json::encode((array)$this->owner->{$fielName});
                 }
             } else {
-                $this->owner->{$fielName} = "";
+                if (isset($this->owner->{$fielName})) {
+                    $this->owner->{$fielName} = "";
+                }
+
             }
         }
     }
@@ -64,7 +67,7 @@ class HasJsonFieldsBehavior extends Behavior
     public function jsonDecodeFields($event)
     {
         foreach ($this->fields as $fielName) {
-            if ($this->owner->{$fielName}) {
+            if (isset($this->owner->{$fielName}) && $this->owner->{$fielName}) {
                 if (is_string($this->owner->{$fielName})) {
                     try {
                         $this->owner->{$fielName} = Json::decode($this->owner->{$fielName});
@@ -77,7 +80,9 @@ class HasJsonFieldsBehavior extends Behavior
 
                 }
             } else {
-                $this->owner->{$fielName} = [];
+                if (isset($this->owner->{$fielName})) {
+                    $this->owner->{$fielName} = [];
+                }
             }
         }
     }
