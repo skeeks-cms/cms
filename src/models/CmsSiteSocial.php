@@ -33,7 +33,7 @@ class CmsSiteSocial extends ActiveRecord
     const SOCIAL_INSTAGRAM = 'instagram';
     const SOCIAL_FACEBOOK = 'facebook';
     const SOCIAL_VK = 'vk';
-    const SOCIAL_OK = 'ok';
+    const SOCIAL_OK = 'odnoklassniki';
     const SOCIAL_YOUTUBE = 'youtube';
     const SOCIAL_OTHER = 'other';
 
