@@ -175,16 +175,6 @@ return [
             ],
 
         ],
-
-        [
-            'name'        => \skeeks\cms\rbac\CmsManager::ROLE_APPROVED,
-            'description' => ['skeeks/cms', 'Confirmed user'],
-
-            //Есть доступ к системе администрирования
-            'permissions' => [
-                \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-            ],
-        ],
     ],
 
     'permissions' => [
