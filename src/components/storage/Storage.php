@@ -19,6 +19,7 @@ use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
+use yii\httpclient\Client;
 use yii\web\UploadedFile;
 use yii\helpers\BaseUrl;
 
@@ -83,7 +84,24 @@ class Storage extends Component
                 $tmpfile = $file->move($tmpfile);
             } else {
                 if (is_string($file) && !BaseUrl::isRelative($file)) {
-                    $curl_session = curl_init($file);
+
+                    $client = new Client();
+                    $response = $client
+                        ->createRequest()
+                        ->setUrl($file)
+                        ->setOptions([
+                            //'timeout' => 10,
+                            'followLocation' => true,
+                        ])
+                        ->send();
+
+                    if ($response->isOk) {
+                        $file_content = $response->content;
+                    } else {
+                        throw new Exception("Не удалось скачать файл: {$file} " . $response->statusCode);
+                    }
+
+                    /*$curl_session = curl_init($file);
 
                     if (!$curl_session) {
                         throw new Exception("Неверная ссылка");
@@ -95,10 +113,10 @@ class Storage extends Component
 
                     $file_content = curl_exec($curl_session);
 
-                    curl_close($curl_session);
+                    curl_close($curl_session);*/
 
                     if (!$file_content) {
-                        throw new Exception("Не удалось скачать файл: {$file}");
+                        throw new Exception("Скачанный файл пустой: {$file}");
                     }
 
 
