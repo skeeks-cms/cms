@@ -109,6 +109,7 @@ use yii\helpers\Url;
  * @property Tree                      $prev
  * @property Tree                      $next
  * @property Tree[]                    $descendants
+ * @property bool                      $isActive
  *
  * @depricated
  */
@@ -886,6 +887,15 @@ class Tree extends Core
         }
 
         return null;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getIsActive()
+    {
+        return $this->active == 'Y';
     }
 }
 
