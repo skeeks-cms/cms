@@ -213,6 +213,7 @@ class User
 
             [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved'], 'integer'],
 
+            
             [['image_id'], 'safe'],
             [
                 ['image_id'],
@@ -278,7 +279,10 @@ class User
             ],
 
             [['roleNames'], 'safe'],
-            [['roleNames'], 'default', 'value' => \Yii::$app->cms->registerRoles]
+            [['roleNames'], 'default', 'value' => \Yii::$app->cms->registerRoles],
+            
+            [['first_name', 'last_name'], 'trim'],
+
         ];
     }
 
