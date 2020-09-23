@@ -162,22 +162,34 @@ class UrlRuleContentElement
             $pathInfo = substr($pathInfo, 0, strlen($pathInfo) - strlen($suffix));
         }
 
-        if (!preg_match('/\/(?<code>\S+)\-(?<id>\d+)$/i', "/" . $pathInfo, $matches)) {
-            return false;
+        if (preg_match('/\/(?<code>\S+)\-(?<id>\d+)$/i', "/" . $pathInfo, $matches)) {
+            return [
+                'cms/content-element/view', [
+                    'id' => $matches['id'],
+                    'code' => $matches['code']
+                ]
+            ];
         }
 
+        /**
+         * @deprecated 
+         */
+        if (preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
+            return [
+                'cms/content-element/view', [
+                    'id' => $matches['id'],
+                    'code' => $matches['code']
+                ]
+            ];
+        }
+
+        return false;
         /*if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
             return false;
         }*/
 
 
-        return [
-            'cms/content-element/view',
-            [
-                'id' => $matches['id'],
-                'code' => $matches['code']
-            ]
-        ];
+        
     }
 
 

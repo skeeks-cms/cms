@@ -195,7 +195,8 @@ class UtilsController extends Controller
             $contentElementClass = ShopCmsContentElement::class;
         }
 
-        $query = $contentElementClass::find();
+        $query = $contentElementClass::find()
+                    ->andWhere(['>', 'id', 57215]);
         if ($contentId) {
             $query->andWhere(['content_id' => $contentId]);
         }
