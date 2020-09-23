@@ -211,7 +211,7 @@ class UtilsController extends Controller
             'content_id' => SORT_ASC,
             'id' => SORT_ASC
         ])->each(10) as $cmsContentElement) {
-            //$this->stdout("\t{$cmsContentElement->id}: {$cmsContentElement->name}");
+            $this->stdout("\t{$cmsContentElement->id}: {$cmsContentElement->name}\n");
 
             try {
                 $cmsContentElement->code = '';
@@ -224,8 +224,8 @@ class UtilsController extends Controller
                 $this->stdout("\tError:" . $e->getMessage() . "\n", Console::FG_RED);
                 sleep(5);
             }
-
-            $this->stdout($this->memoryUsage(memory_get_usage(), $base_memory_usage) . "\n");
+            
+            //$this->stdout($this->memoryUsage(memory_get_usage(), $base_memory_usage) . "\n");
 
         }
     }
