@@ -51,15 +51,16 @@ class UrlRuleContentElement
             $cmsTree = ArrayHelper::getValue($params, 'cmsTree');
             ArrayHelper::remove($params, 'cmsTree');
             //We need to build on what that particular section of the settings
-            if (!$cmsTree) {
+            /*if (!$cmsTree) {
                 $cmsTree = $contentElement->cmsTree;
-            }
+            }*/
 
             if ($cmsTree) {
                 $url = $cmsTree->dir . "/";
             }
 
-            $url .= $contentElement->id . '-' . $contentElement->code;
+            //$url .= $contentElement->id . "-" . $contentElement->code;
+            $url .= $contentElement->code . '-' . $contentElement->id;
 
 
             if (strpos($url, '//') !== false) {
@@ -157,9 +158,17 @@ class UrlRuleContentElement
             return false;
         }
 
-        if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
+        if ($suffix) {
+            $pathInfo = substr($pathInfo, 0, strlen($pathInfo) - strlen($suffix));
+        }
+
+        if (!preg_match('/\/(?<code>\S+)\-(?<id>\d+)$/i', "/" . $pathInfo, $matches)) {
             return false;
         }
+
+        /*if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
+            return false;
+        }*/
 
 
         return [

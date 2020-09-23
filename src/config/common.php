@@ -130,6 +130,12 @@ return [
                     'interval' => 3600 * 24,
                 ],
 
+                /*'cms/utils/update-content-element-codes' => [
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => ['skeeks/cms', 'Обновляет url для элементов'],
+                    'interval' => 3600 * 24 * 7,
+                ],*/
+
             ],
         ],
 

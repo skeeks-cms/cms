@@ -131,7 +131,7 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var int
      */
-    public $element_max_code_length = 128;
+    public $element_max_code_length = 48;
 
     /**
      * Время последней активности когда считается что пользователь онлайн

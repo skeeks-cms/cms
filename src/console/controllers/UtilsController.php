@@ -17,6 +17,7 @@ use skeeks\cms\models\CmsContentProperty2content;
 use skeeks\cms\models\CmsSearchPhrase;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\StorageFile;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\sx\Dir;
 use Yii;
 use yii\base\Event;
@@ -175,6 +176,62 @@ class UtilsController extends Controller
                 }
             }
         }
+    }
+
+
+    /**
+     * Обновляет адреса страниц элементов контента
+     * @param null $contentId
+     */
+    public function actionUpdateContentElementCodes($contentId = null)
+    {
+        ini_set('memory_limit', '4095M'); // 4 GBs minus 1 MB
+
+        $base_memory_usage = memory_get_usage();
+        $this->memoryUsage(memory_get_usage(), $base_memory_usage);
+
+        $contentElementClass = CmsContentElement::class;
+        if (class_exists(ShopCmsContentElement::class)) {
+            $contentElementClass = ShopCmsContentElement::class;
+        }
+
+        $query = $contentElementClass::find();
+        if ($contentId) {
+            $query->andWhere(['content_id' => $contentId]);
+        }
+
+        if (!$count = $query->count()) {
+            $this->stdout("Content elements not found!\n", Console::BOLD);
+            return;
+        }
+
+        $this->stdout("1. Found elements: {$count}!\n", Console::BOLD);
+
+        foreach ($query->orderBy([
+            'content_id' => SORT_ASC,
+            'id' => SORT_ASC
+        ])->each(10) as $cmsContentElement) {
+            //$this->stdout("\t{$cmsContentElement->id}: {$cmsContentElement->name}");
+
+            try {
+                $cmsContentElement->code = '';
+                if (!$cmsContentElement->save()) {
+                    $this->stdout("\tError:" . print_r($cmsContentElement->errors, true) . "\n", Console::FG_RED);
+                    sleep(5);
+                }
+
+            } catch (\Exception $e) {
+                $this->stdout("\tError:" . $e->getMessage() . "\n", Console::FG_RED);
+                sleep(5);
+            }
+
+            $this->stdout($this->memoryUsage(memory_get_usage(), $base_memory_usage) . "\n");
+
+        }
+    }
+
+    public function memoryUsage($usage, $base_memory_usage) {
+        return \Yii::$app->formatter->asSize($usage - $base_memory_usage);
     }
 
     /**

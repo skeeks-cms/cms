@@ -10,7 +10,6 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\urlRules\UrlRuleContentElement;
-use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -190,8 +189,9 @@ class CmsContentElement extends RelatedElementModel
 
             YaSlugBehavior::class => [
                 'class'         => YaSlugBehavior::class,
-                'attribute'     => 'name',
+                'attribute'     => 'seoName',
                 'slugAttribute' => 'code',
+                'ensureUnique'  => false,
                 'maxLength'     => \Yii::$app->cms->element_max_code_length,
             ],
         ]);
@@ -387,7 +387,7 @@ class CmsContentElement extends RelatedElementModel
                             $this->addError($attribute, "Раздел к которому привязывается элемент должен относится к тому же сайту");
                         }
                     }
-                }
+                },
             ],
         ]);
     }
@@ -457,11 +457,11 @@ class CmsContentElement extends RelatedElementModel
             self::$_contents[$this->content_id] = $this->cmsContent;
             $cmsContent = self::$_contents[$this->content_id];
         }
-        
+
         $q = $cmsContent->getCmsContentProperties();
         $q->joinWith('cmsContentProperty2trees as map2trees')
-                    ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
-        
+            ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
+
         if ($this->tree_id) {
             $q->andWhere([
                 'or',
@@ -477,13 +477,12 @@ class CmsContentElement extends RelatedElementModel
         if ($this->cms_site_id) {
             $q->andWhere([
                 'or',
-                [CmsContentProperty::tableName() . '.cms_site_id' => null],
-                [CmsContentProperty::tableName() . '.cms_site_id' => $this->cms_site_id],
+                [CmsContentProperty::tableName().'.cms_site_id' => null],
+                [CmsContentProperty::tableName().'.cms_site_id' => $this->cms_site_id],
             ]);
         }
 
         $q->orderBy(['priority' => SORT_ASC]);
-
 
 
         return $q;
@@ -807,7 +806,7 @@ class CmsContentElement extends RelatedElementModel
 
         return new CmsContentElementActiveQuery(get_called_class(), ['is_active' => false]);
     }
-    
+
 }
 
 
