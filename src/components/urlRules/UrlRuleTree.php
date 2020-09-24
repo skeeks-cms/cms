@@ -239,7 +239,7 @@ class UrlRuleTree
         $dependency = new TagDependency([
             'tags' =>
                 [
-                    (new Tree())->getTableCacheTag(),
+                    (new Tree())->getTableCacheTagCmsSite(),
                 ],
         ]);
 
@@ -256,11 +256,12 @@ class UrlRuleTree
 
         } else //второстепенная страница
         {
-
-            $treeNode = Tree::find()->where([
-                "dir" => $originalDir,
-                "cms_site_id" => \Yii::$app->skeeks->site->id,
-            ])->one();
+            $treeNode = Tree::getDb()->cache(function($db) use ($originalDir) {
+                return Tree::find()->where([
+                    "dir"         => $originalDir,
+                    "cms_site_id" => \Yii::$app->skeeks->site->id,
+                ])->one();
+            }, null, $dependency);
         }
 
 

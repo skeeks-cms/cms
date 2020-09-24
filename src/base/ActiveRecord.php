@@ -20,6 +20,7 @@ use yii\behaviors\TimestampBehavior;
 
 /**
  * @method string getTableCacheTag()
+ * @method string getTableCacheTagCmsSite()
  *
  * @property integer      $id
  * 

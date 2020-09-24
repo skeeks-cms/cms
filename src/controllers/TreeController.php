@@ -61,9 +61,13 @@ class TreeController extends Controller
             return false;
         }
 
-        $this->_model = CmsTree::find()->where([
-            'id' => $id
-        ])->one();
+        $this->_model = \Yii::$app->cms->currentTree;
+        if (!$this->_model) {
+            $this->_model = CmsTree::find()->where([
+                'id' => $id
+            ])->one();
+        }
+
 
         return $this->_model;
     }

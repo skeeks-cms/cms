@@ -21,6 +21,16 @@ class WidgetRenderable extends Widget
      */
     public $viewFile = "default";
 
+    /**
+     * @var bool 
+     */
+    public $is_cache = false;
+
+    /**
+     * @var int 
+     */
+    public $cache_duration = 0;
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
@@ -45,4 +55,28 @@ class WidgetRenderable extends Widget
             return \Yii::t('skeeks/cms', "Template not found");
         }
     }
+    
+    
+    
+    public function run()
+    {
+        $cacheKey = $this->getCacheKey().'run';
+
+        $dependency = new TagDependency([
+            'tags' => [
+                $this->className().(string)$this->namespace,
+                (new CmsContentElement())->getTableCacheTagCmsSite(),
+            ],
+        ]);
+
+        $result = \Yii::$app->cache->get($cacheKey);
+        if ($result === false || $this->enabledRunCache == Cms::BOOL_N) {
+            $result = parent::run();
+
+            \Yii::$app->cache->set($cacheKey, $result, (int)$this->runCacheDuration, $dependency);
+        }
+
+        return $result;
+    }
+    
 }

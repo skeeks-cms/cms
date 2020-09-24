@@ -11,11 +11,7 @@ namespace skeeks\cms\models\behaviors;
 use yii\base\Behavior;
 use yii\caching\Cache;
 use yii\caching\TagDependency;
-use yii\db\ActiveQuery;
-use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
-use yii\helpers\ArrayHelper;
-use yii\web\ErrorHandler;
 
 /**
  * Class HasTableCache
@@ -33,12 +29,11 @@ class HasTableCache extends Behavior
      */
     public function events()
     {
-        return
-            [
-                BaseActiveRecord::EVENT_AFTER_UPDATE => "invalidateTableCache",
-                BaseActiveRecord::EVENT_AFTER_INSERT => "invalidateTableCache",
-                BaseActiveRecord::EVENT_AFTER_DELETE => "invalidateTableCache",
-            ];
+        return [
+            BaseActiveRecord::EVENT_AFTER_UPDATE => "invalidateTableCache",
+            BaseActiveRecord::EVENT_AFTER_INSERT => "invalidateTableCache",
+            BaseActiveRecord::EVENT_BEFORE_DELETE => "invalidateTableCache",
+        ];
     }
 
     /**
@@ -48,8 +43,21 @@ class HasTableCache extends Behavior
     public function invalidateTableCache()
     {
         TagDependency::invalidate($this->cache, [
-            $this->getTableCacheTag()
+            $this->getTableCacheTag(),
         ]);
+
+        $owner = $this->owner;
+        if (isset($owner->cms_site_id)) {
+            TagDependency::invalidate($this->cache, [
+                $this->getTableCacheTagCmsSite($owner->cms_site_id),
+            ]);
+        }
+
+        if (isset($owner->site_id)) {
+            TagDependency::invalidate($this->cache, [
+                $this->getTableCacheTagCmsSite($owner->cms_site_id),
+            ]);
+        }
 
         return $this;
     }
@@ -60,6 +68,18 @@ class HasTableCache extends Behavior
     public function getTableCacheTag()
     {
         return 'sx-table-' . $this->owner->tableName();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableCacheTagCmsSite($cms_site_id = null)
+    {
+        if ($cms_site_id === null) {
+            $cms_site_id = \Yii::$app->skeeks->site->id;
+        }
+
+        return 'sx-table-' . $this->owner->tableName() . "-" . $cms_site_id;
     }
 
 }

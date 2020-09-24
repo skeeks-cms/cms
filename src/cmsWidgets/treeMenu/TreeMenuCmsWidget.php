@@ -350,7 +350,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
             'tags' =>
                 [
                     $this->className().(string)$this->namespace,
-                    (new Tree())->getTableCacheTag(),
+                    (new Tree())->getTableCacheTagCmsSite(),
                 ],
         ]);
 

@@ -486,11 +486,10 @@ class ContentElementsCmsWidget extends WidgetRenderable
         $cacheKey = $this->getCacheKey().'run';
 
         $dependency = new TagDependency([
-            'tags' =>
-                [
-                    $this->className().(string)$this->namespace,
-                    (new CmsContentElement())->getTableCacheTag(),
-                ],
+            'tags' => [
+                $this->className().(string)$this->namespace,
+                (new CmsContentElement())->getTableCacheTagCmsSite(),
+            ],
         ]);
 
         $result = \Yii::$app->cache->get($cacheKey);

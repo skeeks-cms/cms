@@ -12,16 +12,6 @@
 namespace skeeks\cms\models;
 
 /**
- * @method string getTableCacheTag()
- *
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- *
- * @property User    $createdBy
- * @property User    $updatedBy
- *
  * @deprecated
  */
 abstract class Core extends \skeeks\cms\base\ActiveRecord
