@@ -19,6 +19,8 @@ use skeeks\yii2\form\fields\FieldSetEnd;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\caching\Dependency;
+use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -26,36 +28,36 @@ use yii\widgets\ActiveForm;
  *
  * Example 1
  * <?php
-        $widget = \skeeks\cms\cmsWidgets\tree\TreeCmsWidget::beginWidget('menu-top');
-        $widget->descriptor->name = 'Главное верхнее меню';
-        $widget->viewFile = '@app/views/widgets/TreeMenuCmsWidget/menu-top';
-        $widget::end();
-    ?>
+ * $widget = \skeeks\cms\cmsWidgets\tree\TreeCmsWidget::beginWidget('menu-top');
+ * $widget->descriptor->name = 'Главное верхнее меню';
+ * $widget->viewFile = '@app/views/widgets/TreeMenuCmsWidget/menu-top';
+ * $widget::end();
+ * ?>
  *
  * Example 2
  * <?php
-        $widget = \skeeks\cms\cmsWidgets\tree\TreeCmsWidget::beginWidget('sub-catalog');
-        $widget->descriptor->name = 'Подразделы каталога';
-        $widget->viewFile = '@app/views/widgets/TreeMenuCmsWidget/sub-catalog-small';
-        $widget->parent_tree_id = $model->id;
-        $widget->activeQuery->with('image');
-        $widget::end();
-    ?>
+ * $widget = \skeeks\cms\cmsWidgets\tree\TreeCmsWidget::beginWidget('sub-catalog');
+ * $widget->descriptor->name = 'Подразделы каталога';
+ * $widget->viewFile = '@app/views/widgets/TreeMenuCmsWidget/sub-catalog-small';
+ * $widget->parent_tree_id = $model->id;
+ * $widget->activeQuery->with('image');
+ * $widget::end();
+ * ?>
  *
  * Example 3
  * <?php
-        $catalogTree = \skeeks\cms\models\CmsTree::find()->cmsSite()->joinWith('treeType as treeType')->andWhere(['treeType.code' => 'catalog'])->orderBy(['level' => SORT_ASC])->limit(1)->one();
-        $config = [];
-        if ($catalogTree) {
-            $config['parent_tree_id'] = $catalogTree->id;
-        }
-        $widget = \skeeks\cms\cmsWidgets\tree\TreeCmsWidget::beginWidget('home-tree-slider', $config);
-        $widget->descriptor->name = 'Слайдер разделов';
-        $widget->viewFile = '@app/views/widgets/TreeMenuCmsWidget/revolution-slider';
-        $widget->is_has_image_only = true;
-        $widget->activeQuery->with('image');
-        $widget::end();
-   ?>
+ * $catalogTree = \skeeks\cms\models\CmsTree::find()->cmsSite()->joinWith('treeType as treeType')->andWhere(['treeType.code' => 'catalog'])->orderBy(['level' => SORT_ASC])->limit(1)->one();
+ * $config = [];
+ * if ($catalogTree) {
+ * $config['parent_tree_id'] = $catalogTree->id;
+ * }
+ * $widget = \skeeks\cms\cmsWidgets\tree\TreeCmsWidget::beginWidget('home-tree-slider', $config);
+ * $widget->descriptor->name = 'Слайдер разделов';
+ * $widget->viewFile = '@app/views/widgets/TreeMenuCmsWidget/revolution-slider';
+ * $widget->is_has_image_only = true;
+ * $widget->activeQuery->with('image');
+ * $widget::end();
+ * ?>
  *
  * @property CmsActiveQuery $activeQuery
  *
@@ -109,6 +111,15 @@ class TreeCmsWidget extends WidgetRenderable
      */
     public $sorting_direction = SORT_ASC;
 
+    /**
+     * @var bool
+     */
+    public $is_cache = true;
+    /**
+     * @var bool
+     */
+    public $is_cache_unique_for_user = false;
+
 
     public static function descriptorConfig()
     {
@@ -144,7 +155,7 @@ class TreeCmsWidget extends WidgetRenderable
              *
              */
             if ($this->tree_type_ids) {
-                $query->andWhere([$table . ".tree_type_id" => $this->tree_type_ids]);
+                $query->andWhere([$table.".tree_type_id" => $this->tree_type_ids]);
             }
 
             if ($this->parent_tree_id) {
@@ -201,7 +212,7 @@ class TreeCmsWidget extends WidgetRenderable
 
     public function attributeHints()
     {
-        return array_merge(parent::attributeLabels(), [
+        return array_merge(parent::attributeHints(), [
             'limit'          => 'Задайте максимальное количество разделов, которое может отображаться в этом виджете',
             'is_active_only' => 'Эта настройка включает отображение только активных разделов (скрытые разделы отображаться не будут!)',
             'tree_type_ids'  => 'Показывать разделы только выбранных типов, если ничего не указано то будут показаны разделы всех типов',
@@ -235,70 +246,88 @@ class TreeCmsWidget extends WidgetRenderable
      */
     public function getConfigFormFields()
     {
-        return [
+        $result = [
             'filters' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Фильтрация и количество',
-                'fields' => $this->getFiltersFields(),
-            ],
-        ];
-    }
+                'fields' => [
+                    'limit'             => [
+                        'class' => NumberField::class,
+                    ],
+                    'is_active_only'    => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'is_has_image_only' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'tree_type_ids'     => [
+                        'class'    => SelectField::class,
+                        'items'    => \yii\helpers\ArrayHelper::map(
+                            \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
+                        ),
+                        'multiple' => true,
+                    ],
 
-    public function getFiltersFields()
-    {
-        return [
-            'limit'             => [
-                'class' => NumberField::class,
-            ],
-            'is_active_only'    => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
-            ],
-            'is_has_image_only' => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
-            ],
-            'tree_type_ids'     => [
-                'class'    => SelectField::class,
-                'items'    => \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'name'
-                ),
-                'multiple' => true,
-            ],
+                    'sorting_option'    => [
+                        'class' => SelectField::class,
+                        'items' => [
+                            'priority'  => 'Приоритет',
+                            'name'      => 'Название',
+                            'has_image' => 'Наличие картинки',
+                        ],
+                    ],
+                    'sorting_direction' => [
+                        'class' => SelectField::class,
+                        'items' => [
+                            SORT_ASC  => \Yii::t('skeeks/cms', 'ASC (from lowest to highest)'),
+                            SORT_DESC => \Yii::t('skeeks/cms', 'DESC (from highest to lowest)'),
+                        ],
+                    ],
 
-            'sorting_option'    => [
-                'class' => SelectField::class,
-                'items' => [
-                    'priority'  => 'Приоритет',
-                    'name'      => 'Название',
-                    'has_image' => 'Наличие картинки',
-                ],
-            ],
-            'sorting_direction' => [
-                'class' => SelectField::class,
-                'items' => [
-                    SORT_ASC  => \Yii::t('skeeks/cms', 'ASC (from lowest to highest)'),
-                    SORT_DESC => \Yii::t('skeeks/cms', 'DESC (from highest to lowest)'),
-                ],
-            ],
+                    'parent_tree_id' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => SelectTreeInputWidget::class,
+                        'widgetConfig' => [
+                            'isAllowNodeSelectCallback' => function ($tree) {
+                                /*if (in_array($tree->id, $childrents)) {
+                                    return false;
+                                }*/
 
-
-            'parent_tree_id' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => SelectTreeInputWidget::class,
-                'widgetConfig' => [
-                    'isAllowNodeSelectCallback' => function ($tree) {
-                        /*if (in_array($tree->id, $childrents)) {
-                            return false;
-                        }*/
-
-                        return true;
-                    },
-                    'treeWidgetOptions'         => [
-                        'models' => CmsTree::findRoots()->cmsSite()->all(),
+                                return true;
+                            },
+                            'treeWidgetOptions'         => [
+                                'models' => CmsTree::findRoots()->cmsSite()->all(),
+                            ],
+                        ],
                     ],
                 ],
             ],
+
+
         ];
+
+
+        $result = ArrayHelper::merge($result, $this->_getConfigFormCache());
+
+        return $result;
+    }
+
+
+    /**
+     * @return \yii\caching\ChainedDependency|Dependency
+     */
+    public function getCacheDependency()
+    {
+        $dependency = parent::getCacheDependency();
+
+        $dependency->dependencies[] = new TagDependency([
+            'tags' => [
+                (new CmsTree())->getTableCacheTagCmsSite(),
+            ],
+        ]);
+
+        return $dependency;
     }
 }

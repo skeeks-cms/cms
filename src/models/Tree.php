@@ -14,6 +14,7 @@ namespace skeeks\cms\models;
 use paulzi\adjacencyList\AdjacencyListBehavior;
 use paulzi\autotree\AutoTreeTrait;
 use paulzi\materializedPath\MaterializedPathBehavior;
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\urlRules\UrlRuleTree;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
@@ -113,7 +114,7 @@ use yii\helpers\Url;
  *
  * @depricated
  */
-class Tree extends Core
+class Tree extends ActiveRecord
 {
     use HasRelatedPropertiesTrait;
     use AutoTreeTrait;
@@ -135,33 +136,30 @@ class Tree extends Core
 
         return ArrayHelper::merge(parent::behaviors(), [
 
-            HasStorageFile::className() =>
-                [
-                    'class'  => HasStorageFile::className(),
-                    'fields' => ['image_id', 'image_full_id'],
-                ],
+            HasStorageFile::className() => [
+                'class'  => HasStorageFile::className(),
+                'fields' => ['image_id', 'image_full_id'],
+            ],
 
-            HasStorageFileMulti::className() =>
-                [
-                    'class'     => HasStorageFileMulti::className(),
-                    'relations' => [
-                        [
-                            'relation' => 'images',
-                            'property' => 'imageIds',
-                        ],
-                        [
-                            'relation' => 'files',
-                            'property' => 'fileIds',
-                        ],
+            HasStorageFileMulti::className() => [
+                'class'     => HasStorageFileMulti::className(),
+                'relations' => [
+                    [
+                        'relation' => 'images',
+                        'property' => 'imageIds',
+                    ],
+                    [
+                        'relation' => 'files',
+                        'property' => 'fileIds',
                     ],
                 ],
+            ],
 
-            HasRelatedProperties::className() =>
-                [
-                    'class'                           => HasRelatedProperties::className(),
-                    'relatedElementPropertyClassName' => CmsTreeProperty::className(),
-                    'relatedPropertyClassName'        => CmsTreeTypeProperty::className(),
-                ],
+            HasRelatedProperties::className() => [
+                'class'                           => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName' => CmsTreeProperty::className(),
+                'relatedPropertyClassName'        => CmsTreeTypeProperty::className(),
+            ],
 
             [
                 'class'           => AdjacencyListBehavior::className(),

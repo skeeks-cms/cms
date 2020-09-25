@@ -401,18 +401,15 @@ abstract class Component extends Model implements IHasConfigForm
      */
     public function getSettings($useCache = true)
     {
-        $key = $this->getCacheKey();
+        $key = $this->getCacheKey() . 'Settings';
 
         $dependency = new TagDependency([
             'tags' => [
-                \Yii::$app instanceof Application ? "console" : "",
-                \Yii::$app instanceof \yii\web\Application ? "web" : "",
-                \Yii::getAlias('@webroot'),
+                \Yii::$app instanceof Application ? "console" : "web",
                 static::class,
                 $this->namespace,
-                implode('.', $this->overridePath),
-                $this->cmsUser ? 'u' . (string)$this->cmsUser->id : 'u',
-                $this->cmsSite ? 'site' . (string)$this->cmsSite->id : 'site',
+                $this->cmsUser ? $this->cmsUser->cacheTag : '',
+                $this->cmsSite ? $this->cmsSite->cacheTag : '',
             ],
         ]);
 
@@ -448,21 +445,34 @@ abstract class Component extends Model implements IHasConfigForm
 
         return $settingsValues;
     }
+
     /**
+     * Учитывать текущего пользователя?
+     *
+     * @param bool $is_user
      * @return string
      */
-    public function getCacheKey()
+    public function getCacheKey($is_user = true)
     {
-        return implode([
-            \Yii::$app instanceof Application ? "console" : "",
-            \Yii::$app instanceof \yii\web\Application ? "web" : "",
+        $data = [
+            \Yii::$app instanceof Application ? "console" : "web",
             \Yii::getAlias('@webroot'),
             static::class,
             $this->namespace,
             \Yii::$app->language,
-            $this->cmsUser ? "u" . (string) $this->cmsUser->id : 'u',
-            $this->cmsSite ? "site" . (string) $this->cmsSite->id : 'site',
-        ]);
+            implode('.', $this->overridePath),
+            $this->cmsSite ? $this->cmsSite->cacheTag : "",
+        ];
+
+        if ($is_user) {
+            if ($this->cmsUser) {
+                $data[] = $this->cmsUser->cacheTag;
+            }
+        }
+
+        $data = array_merge($data, $this->toArray());
+
+        return md5(print_r($data, true));
     }
     /**
      * @param $overrideName

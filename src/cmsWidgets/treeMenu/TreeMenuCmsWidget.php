@@ -10,7 +10,6 @@ namespace skeeks\cms\cmsWidgets\treeMenu;
 
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
-use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
@@ -23,7 +22,6 @@ use skeeks\yii2\form\fields\WidgetField;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use yii\widgets\ActiveForm;
 
 /**
  * @deprecated
@@ -133,7 +131,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                 'active'             => \Yii::t('skeeks/cms', 'Activity'),
                 'level'              => \Yii::t('skeeks/cms', 'The nesting level'),
                 'label'              => \Yii::t('skeeks/cms', 'Header'),
-                'site_ids'         => \Yii::t('skeeks/cms', 'Linking to sites'),
+                'site_ids'           => \Yii::t('skeeks/cms', 'Linking to sites'),
                 'orderBy'            => \Yii::t('skeeks/cms', 'Sorting'),
                 'order'              => \Yii::t('skeeks/cms', 'Sorting direction'),
                 'enabledCurrentSite' => \Yii::t('skeeks/cms', 'Consider the current site'),
@@ -141,7 +139,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                 'runCacheDuration'   => \Yii::t('skeeks/cms', 'Cache lifetime'),
                 'tree_type_ids'      => \Yii::t('skeeks/cms', 'Section types'),
                 'limit'              => \Yii::t('skeeks/cms', 'The maximum number of entries in the sample ({limit})',
-                                                            ['limit' => 'limit']),
+                    ['limit' => 'limit']),
             ]);
     }
 
@@ -183,7 +181,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                 ],
             ],
 
-            'filtration' => [
+            'filtration'   => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Filtration'),
                 'fields' => [
@@ -209,7 +207,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                             'type' => 'number',
                         ],
                     ],
-                    'site_ids'         => [
+                    'site_ids'           => [
                         'class'    => SelectField::class,
                         'items'    => \yii\helpers\ArrayHelper::map(
                             \skeeks\cms\models\CmsSite::find()->active()->all(),
@@ -224,7 +222,7 @@ class TreeMenuCmsWidget extends WidgetRenderable
                     ],
                 ],
             ],
-            'sort'       => [
+            'sort'         => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Sorting'),
                 'fields' => [
@@ -239,25 +237,25 @@ class TreeMenuCmsWidget extends WidgetRenderable
                             SORT_DESC => \Yii::t('skeeks/cms', 'DESC (from highest to lowest)'),
                         ],
                     ],
-                    'limit'
+                    'limit',
                 ],
             ],
-            'additionally'       => [
+            'additionally' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
                 'fields' => [
-                    'label'
+                    'label',
                 ],
             ],
-            'cache'       => [
+            'cache'        => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Cache settings'),
                 'fields' => [
-                    'enabledRunCache' => [
-                        'class' => BoolField::class,
+                    'enabledRunCache'  => [
+                        'class'      => BoolField::class,
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
-                        'allowNull' => false,
+                        'allowNull'  => false,
                     ],
                     'runCacheDuration' => [
                         'elementOptions' => [
@@ -347,15 +345,14 @@ class TreeMenuCmsWidget extends WidgetRenderable
         $key = $this->getCacheKey().'run';
 
         $dependency = new TagDependency([
-            'tags' =>
-                [
-                    $this->className().(string)$this->namespace,
-                    (new Tree())->getTableCacheTagCmsSite(),
-                ],
+            'tags' => [
+                $this->className().(string)$this->namespace,
+                (new Tree())->getTableCacheTagCmsSite(),
+            ],
         ]);
 
         $result = \Yii::$app->cache->get($key);
-        if ($result === false || $this->enabledRunCache == Cms::BOOL_N) {
+        if ($result === false || !$this->is_cache) {
             $result = parent::run();
             \Yii::$app->cache->set($key, $result, (int)$this->runCacheDuration, $dependency);
         }

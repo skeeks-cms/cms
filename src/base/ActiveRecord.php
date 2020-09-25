@@ -29,6 +29,8 @@ use yii\behaviors\TimestampBehavior;
  * @property integer      $created_at
  * @property integer      $updated_at
  *
+ * @property integer      $cacheTag
+ *
  * @property CmsUser|User $createdBy
  * @property CmsUser|User $updatedBy
  *
@@ -187,5 +189,14 @@ class ActiveRecord extends \yii\db\ActiveRecord
                  'id'
              ], 'integer'],
          ];*/
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCacheTag()
+    {
+        return static::tableName() . $this->primaryKey;
     }
 }

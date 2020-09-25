@@ -13,10 +13,12 @@ namespace skeeks\cms\models;
 
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\authclient\models\UserAuthClient;
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasSubscribes;
+use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\rbac\models\CmsAuthAssignment;
@@ -31,58 +33,58 @@ use yii\web\IdentityInterface;
 /**
  * This is the model class for table "{{%cms_user}}".
  *
- * @property integer $id
- * @property string $username
- * @property string $auth_key
- * @property string $password_hash
- * @property string $password_reset_token
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $image_id
- * @property integer $first_name
- * @property integer $last_name
- * @property integer $patronymic
+ * @property integer                     $id
+ * @property string                      $username
+ * @property string                      $auth_key
+ * @property string                      $password_hash
+ * @property string                      $password_reset_token
+ * @property integer                     $created_at
+ * @property integer                     $updated_at
+ * @property integer                     $image_id
+ * @property integer                     $first_name
+ * @property integer                     $last_name
+ * @property integer                     $patronymic
  *
- * @property string $gender
- * @property string $active
- * @property integer $updated_by
- * @property integer $created_by
- * @property integer $logged_at
- * @property integer $last_activity_at
- * @property integer $last_admin_activity_at
- * @property string $email
- * @property string $phone
- * @property integer $email_is_approved
- * @property integer $phone_is_approved
+ * @property string                      $gender
+ * @property string                      $active
+ * @property integer                     $updated_by
+ * @property integer                     $created_by
+ * @property integer                     $logged_at
+ * @property integer                     $last_activity_at
+ * @property integer                     $last_admin_activity_at
+ * @property string                      $email
+ * @property string                      $phone
+ * @property integer                     $email_is_approved
+ * @property integer                     $phone_is_approved
  *
  * ***
  *
- * @property string $name
- * @property string $lastActivityAgo
- * @property string $lastAdminActivityAgo
+ * @property string                      $name
+ * @property string                      $lastActivityAgo
+ * @property string                      $lastAdminActivityAgo
  *
- * @property CmsStorageFile $image
- * @property string $avatarSrc
- * @property string $profileUrl
+ * @property CmsStorageFile              $image
+ * @property string                      $avatarSrc
+ * @property string                      $profileUrl
  *
- * @property CmsUserEmail[] $cmsUserEmails
- * @property CmsUserPhone[] $cmsUserPhones
- * @property UserAuthClient[] $cmsUserAuthClients
+ * @property CmsUserEmail[]              $cmsUserEmails
+ * @property CmsUserPhone[]              $cmsUserPhones
+ * @property UserAuthClient[]            $cmsUserAuthClients
  *
- * @property \yii\rbac\Role[] $roles
+ * @property \yii\rbac\Role[]            $roles
  * @property []   $roleNames
  *
- * @property string $displayName
- * @property string $shortDisplayName
- * @property string $isOnline Пользователь онлайн?
+ * @property string                      $displayName
+ * @property string                      $shortDisplayName
+ * @property string                      $isOnline Пользователь онлайн?
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
- * @property CmsContentElement[] $favoriteCmsContentElements
- * @property CmsAuthAssignment[] $cmsAuthAssignments
+ * @property CmsContentElement[]         $favoriteCmsContentElements
+ * @property CmsAuthAssignment[]         $cmsAuthAssignments
  *
  */
 class User
-    extends Core
+    extends ActiveRecord
     implements IdentityInterface
 {
     use HasRelatedPropertiesTrait;
@@ -119,7 +121,8 @@ class User
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
     }
 
-    public function _cmsCheckBeforeSave($e) {
+    public function _cmsCheckBeforeSave($e)
+    {
 
         if (!isset(\Yii::$app->user)) {
             return true;
@@ -151,7 +154,7 @@ class User
                         //todo: добавить проверку
                         \Yii::$app->authManager->assign($role, $this->id);
                     } catch (\Exception $e) {
-                        \Yii::error("Ошибка назначения роли: " . $e->getMessage(), self::class);
+                        \Yii::error("Ошибка назначения роли: ".$e->getMessage(), self::class);
                         //throw $e;
                     }
                 } else {
@@ -181,24 +184,26 @@ class User
      */
     public function behaviors()
     {
-        return array_merge(parent::behaviors(), [
+        $behaviors = array_merge(parent::behaviors(), [
 
             TimestampBehavior::class,
 
-            HasStorageFile::class =>
-                [
-                    'class' => HasStorageFile::class,
-                    'fields' => ['image_id']
-                ],
+            HasStorageFile::class => [
+                'class'  => HasStorageFile::class,
+                'fields' => ['image_id'],
+            ],
 
-            HasRelatedProperties::class =>
-                [
-                    'class' => HasRelatedProperties::class,
-                    'relatedElementPropertyClassName' => CmsUserProperty::class,
-                    'relatedPropertyClassName' => CmsUserUniversalProperty::class,
-                ],
-
+            HasRelatedProperties::class => [
+                'class'                           => HasRelatedProperties::class,
+                'relatedElementPropertyClassName' => CmsUserProperty::class,
+                'relatedPropertyClassName'        => CmsUserUniversalProperty::class,
+            ],
         ]);
+
+        if (isset($behaviors[HasTableCache::class])) {
+            unset($behaviors[HasTableCache::class]);
+        }
+        return $behaviors;
     }
 
     /**
@@ -213,23 +218,23 @@ class User
 
             [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved'], 'integer'],
 
-            
+
             [['image_id'], 'safe'],
             [
                 ['image_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions' => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles' => 1,
-                'maxSize' => 1024 * 1024 * 5,
-                'minSize' => 1024,
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'maxFiles'    => 1,
+                'maxSize'     => 1024 * 1024 * 5,
+                'minSize'     => 1024,
             ],
 
             [['gender'], 'string'],
             [
                 ['username', 'password_hash', 'password_reset_token', 'email', 'first_name', 'last_name', 'patronymic'],
                 'string',
-                'max' => 255
+                'max' => 255,
             ],
             [['auth_key'], 'string', 'max' => 32],
 
@@ -254,10 +259,10 @@ class User
             [
                 ['username'],
                 'default',
-                'value' => function(self $model) {
+                'value' => function (self $model) {
                     $userLast = static::find()->orderBy("id DESC")->limit(1)->one();
-                    return "id" . ($userLast->id + 1);
-                }
+                    return "id".($userLast->id + 1);
+                },
             ],
 
             [['email_is_approved', 'phone_is_approved'], 'default', 'value' => 0],
@@ -265,22 +270,22 @@ class User
             [
                 ['auth_key'],
                 'default',
-                'value' => function(self $model) {
+                'value' => function (self $model) {
                     return \Yii::$app->security->generateRandomString();
-                }
+                },
             ],
 
             [
                 ['password_hash'],
                 'default',
-                'value' => function(self $model) {
+                'value' => function (self $model) {
                     return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
-                }
+                },
             ],
 
             [['roleNames'], 'safe'],
             [['roleNames'], 'default', 'value' => \Yii::$app->cms->registerRoles],
-            
+
             [['first_name', 'last_name'], 'trim'],
 
         ];
@@ -299,28 +304,28 @@ class User
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'username' => Yii::t('skeeks/cms', 'Login'),
-            'auth_key' => Yii::t('skeeks/cms', 'Auth Key'),
-            'password_hash' => Yii::t('skeeks/cms', 'Password Hash'),
-            'password_reset_token' => Yii::t('skeeks/cms', 'Password Reset Token'),
-            'email' => Yii::t('skeeks/cms', 'Email'),
-            'phone' => Yii::t('skeeks/cms', 'Phone'),
-            'active' => Yii::t('skeeks/cms', 'Active'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'name' => \Yii::t('skeeks/cms/user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
-            'first_name' => \Yii::t('skeeks/cms', 'First name'),
-            'last_name' => \Yii::t('skeeks/cms', 'Last name'),
-            'patronymic' => \Yii::t('skeeks/cms', 'Patronymic'),
-            'gender' => Yii::t('skeeks/cms', 'Gender'),
-            'logged_at' => Yii::t('skeeks/cms', 'Logged At'),
-            'last_activity_at' => Yii::t('skeeks/cms', 'Last Activity At'),
+            'id'                     => Yii::t('skeeks/cms', 'ID'),
+            'username'               => Yii::t('skeeks/cms', 'Login'),
+            'auth_key'               => Yii::t('skeeks/cms', 'Auth Key'),
+            'password_hash'          => Yii::t('skeeks/cms', 'Password Hash'),
+            'password_reset_token'   => Yii::t('skeeks/cms', 'Password Reset Token'),
+            'email'                  => Yii::t('skeeks/cms', 'Email'),
+            'phone'                  => Yii::t('skeeks/cms', 'Phone'),
+            'active'                 => Yii::t('skeeks/cms', 'Active'),
+            'created_at'             => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'             => Yii::t('skeeks/cms', 'Updated At'),
+            'name'                   => \Yii::t('skeeks/cms/user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
+            'first_name'             => \Yii::t('skeeks/cms', 'First name'),
+            'last_name'              => \Yii::t('skeeks/cms', 'Last name'),
+            'patronymic'             => \Yii::t('skeeks/cms', 'Patronymic'),
+            'gender'                 => Yii::t('skeeks/cms', 'Gender'),
+            'logged_at'              => Yii::t('skeeks/cms', 'Logged At'),
+            'last_activity_at'       => Yii::t('skeeks/cms', 'Last Activity At'),
             'last_admin_activity_at' => Yii::t('skeeks/cms', 'Last Activity In The Admin At'),
-            'image_id' => Yii::t('skeeks/cms', 'Image'),
-            'roleNames' => Yii::t('skeeks/cms', 'Группы'),
-            'email_is_approved' => Yii::t('skeeks/cms', 'Email is approved'),
-            'phone_is_approved' => Yii::t('skeeks/cms', 'Phone is approved'),
+            'image_id'               => Yii::t('skeeks/cms', 'Image'),
+            'roleNames'              => Yii::t('skeeks/cms', 'Группы'),
+            'email_is_approved'      => Yii::t('skeeks/cms', 'Email is approved'),
+            'phone_is_approved'      => Yii::t('skeeks/cms', 'Phone is approved'),
         ];
     }
 
@@ -445,7 +450,7 @@ class User
      * TODO: Is depricated > 2.7.1
      *
      * @param string $action
-     * @param array $params
+     * @param array  $params
      * @return string
      */
     public function getPageUrl($action = 'view', $params = [])
@@ -456,14 +461,14 @@ class User
 
     /**
      * @param string $action
-     * @param array $params
+     * @param array  $params
      * @return string
      */
     public function getProfileUrl($action = 'view', $params = [])
     {
         $params = ArrayHelper::merge([
-            "cms/user/" . $action,
-            "username" => $this->username
+            "cms/user/".$action,
+            "username" => $this->username,
         ], $params);
 
         return \Yii::$app->urlManager->createUrl($params);
@@ -491,15 +496,15 @@ class User
 
         return $data ? implode(" ", $data) : null;
     }
-    
-    
+
+
     public function asText()
     {
         if ($this->name) {
             return parent::asText();
         }
-        
-        return parent::asText() . "{$this->username}";
+
+        return parent::asText()."{$this->username}";
     }
 
 
@@ -575,7 +580,8 @@ class User
      * @param string|array $assignments
      * @return \skeeks\cms\query\CmsActiveQuery
      */
-    public static function findByAuthAssignments($assignments) {
+    public static function findByAuthAssignments($assignments)
+    {
         return static::find()->joinWith('cmsAuthAssignments as cmsAuthAssignments')
             ->where(['cmsAuthAssignments.item_name' => $assignments]);
     }
@@ -594,7 +600,7 @@ class User
 
         return static::findOne([
             'password_reset_token' => $token,
-            'active' => Cms::BOOL_Y,
+            'active'               => Cms::BOOL_Y,
         ]);
     }
 
@@ -688,10 +694,10 @@ class User
         }*/
 
         $userLast = static::find()->orderBy("id DESC")->limit(1)->one();
-        $this->username = "id" . ($userLast->id + 1);
+        $this->username = "id".($userLast->id + 1);
 
         if (static::find()->where(['username' => $this->username])->limit(1)->one()) {
-            $this->username = $this->username . "_" . \skeeks\cms\helpers\StringHelper::substr(md5(time()), 0, 6);
+            $this->username = $this->username."_".\skeeks\cms\helpers\StringHelper::substr(md5(time()), 0, 6);
         }
 
         return $this;
@@ -710,7 +716,7 @@ class User
      */
     public function generatePasswordResetToken()
     {
-        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+        $this->password_reset_token = Yii::$app->security->generateRandomString().'_'.time();
     }
 
     /**
@@ -834,11 +840,9 @@ class User
     public function getIsOnline()
     {
         $time = \Yii::$app->formatter->asTimestamp(time()) - $this->last_activity_at;
-        if ($time <= \Yii::$app->cms->userOnlineTime)
-        {
+        if ($time <= \Yii::$app->cms->userOnlineTime) {
             return true;
-        } else
-        {
+        } else {
             return false;
         }
     }

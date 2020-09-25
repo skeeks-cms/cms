@@ -47,13 +47,16 @@ class HasTableCache extends Behavior
         ]);
 
         $owner = $this->owner;
-        if (isset($owner->cms_site_id)) {
+
+        if (isset($owner->cms_site_id) && $owner->cms_site_id) {
+            //\Yii::info("Invalidate: " . $this->getTableCacheTagCmsSite($owner->cms_site_id));
             TagDependency::invalidate($this->cache, [
                 $this->getTableCacheTagCmsSite($owner->cms_site_id),
             ]);
         }
 
-        if (isset($owner->site_id)) {
+        if (isset($owner->site_id) && $owner->site_id) {
+            //die('111');
             TagDependency::invalidate($this->cache, [
                 $this->getTableCacheTagCmsSite($owner->cms_site_id),
             ]);
