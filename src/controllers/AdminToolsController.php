@@ -71,10 +71,10 @@ class AdminToolsController extends AdminController
      * The name of the privilege of access to this controller
      * @return string
      */
-    public function getPermissionName()
+    /*public function getPermissionName()
     {
         return '';
-    }
+    }*/
 
     public function actionViewFileEdit()
     {

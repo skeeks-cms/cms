@@ -10,7 +10,8 @@
 
     table.sx-table>thead:first-child>tr:first-child>th
     {
-        border-color:#d6dfe1 #ced7d8 #ced7d8 #ced7d8;
+        border: 1px solid #dee2e685;
+        /*border-color:#d6dfe1 #ced7d8 #ced7d8 #ced7d8;*/
         padding: 10px;
         font-weight: normal;
     }
@@ -34,7 +35,7 @@
     {
         color: #0e0e0e;
         text-shadow: 0 1px rgba(255,255,255,0.7);
-        border-bottom: 1px solid;
+        border-bottom: 1px solid #00000024;
     }
     table.sx-table thead tr th a:hover
     {
