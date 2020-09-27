@@ -14,6 +14,7 @@
         /*border-color:#d6dfe1 #ced7d8 #ced7d8 #ced7d8;*/
         padding: 10px;
         font-weight: normal;
+        line-height: 14px;
     }
     table.sx-table thead tr th
     {
