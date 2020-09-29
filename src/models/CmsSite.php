@@ -11,6 +11,7 @@ namespace skeeks\cms\models;
 use skeeks\cms\assets\CmsAsset;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\cms\rbac\models\CmsAuthAssignment;
 use skeeks\modules\cms\user\models\User;
 use Yii;
 use yii\base\Event;
@@ -38,6 +39,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property string                 $url
  *
+ * @property CmsAuthAssignment[]       $authAssignments
  * @property CmsTree                $rootCmsTree
  * @property CmsLang                $cmsLang
  * @property CmsSiteDomain[]        $cmsSiteDomains
@@ -467,5 +469,17 @@ class CmsSite extends Core
             $last = $extension;
         }
         return "image/".$last;
+    }
+    
+    
+    
+    /**
+     * Gets query for [[AuthAssignments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsAuthAssignments()
+    {
+        return $this->hasMany(CmsAuthAssignment::className(), ['cms_site_id' => 'id']);
     }
 }

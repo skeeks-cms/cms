@@ -36,8 +36,6 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
 
                     "cms/admin-settings",
                     "cms/admin-info",
@@ -93,6 +91,8 @@ return [
                     "cms/admin-cms-site-address",
                     "cms/admin-cms-site-address-phone",
                     "cms/admin-cms-site-address-email",
+
+                    "cms/admin-site-user",
                 ],
             ],
         ],
@@ -110,7 +110,6 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
 
                     "cms/admin-tree",
                     "cms/admin-tree/new-children",
@@ -142,7 +141,6 @@ return [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
 
                     "cms/admin-tree",
                     "cms/admin-tree/new-children",
@@ -278,7 +276,12 @@ return [
 
         [
             'name'        => 'cms/admin-user/delete',
-            'description' => ['skeeks/cms', 'Удаление пользователя'],
+            'description' => ['skeeks/cms', 'Удаление пользователями портала'],
+        ],
+
+        [
+            'name'        => 'cms/admin-site-user',
+            'description' => ['skeeks/cms', 'Удаление пользователями сайта'],
         ],
 
         /*[

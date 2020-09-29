@@ -194,7 +194,7 @@ return
 
         'content' =>
             [
-                'priority' => 200,
+                'priority' => 180,
                 'label'    => \Yii::t('skeeks/cms', 'Content'),
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
 
@@ -222,34 +222,40 @@ return
                 ], contentMenu()),
             ],
 
-        'users' =>
+        'site-users' => [
+            "label"    => \Yii::t('skeeks/cms', "Пользователи сайта"),
+            "url"      => ["cms/admin-site-user"],
+            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
+            'priority' => 200,
+        ],
+        'users'      =>
             [
                 'label'    => \Yii::t('skeeks/cms', 'Users'),
                 'priority' => 200,
                 'enabled'  => true,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
 
-                'items' =>
+                'items' => [
                     [
-                        [
-                            "label"    => \Yii::t('skeeks/cms', "Users"),
-                            "url"      => ["cms/admin-user"],
-                            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
-                            'priority' => 0,
-                        ],
-
-                        /*[
-                            "label" => \Yii::t('skeeks/cms', 'The base of {email} addresses', ['email' => 'email']),
-                            "url"   => ["cms/admin-user-email"],
-                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/email-2.png'],
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/cms', "Base phones"),
-                            "url"   => ["cms/admin-user-phone"],
-                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/phone.png'],
-                        ],*/
+                        "label"    => \Yii::t('skeeks/cms', "Users"),
+                        "url"      => ["cms/admin-user"],
+                        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
+                        'priority' => 0,
                     ],
+
+
+                    /*[
+                        "label" => \Yii::t('skeeks/cms', 'The base of {email} addresses', ['email' => 'email']),
+                        "url"   => ["cms/admin-user-email"],
+                        "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/email-2.png'],
+                    ],
+
+                    [
+                        "label" => \Yii::t('skeeks/cms', "Base phones"),
+                        "url"   => ["cms/admin-user-phone"],
+                        "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/phone.png'],
+                    ],*/
+                ],
             ],
 
 
@@ -292,24 +298,12 @@ return
 
             'items' =>
                 [
-                    [
+                    /*[
                         "label" => \Yii::t('skeeks/cms', 'Sites'),
                         "url"   => ["/cms/admin-cms-site"],
                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
 
-                        /*'items' => [
-                            [
-                                "label" => \Yii::t('skeeks/cms', 'Sites'),
-                                "url"   => ["/cms/admin-cms-site"],
-                                "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
-                            ],
-                            [
-                                "label" => \Yii::t('skeeks/cms', 'Domains'),
-                                "url"   => ["/cms/admin-cms-site-domain"],
-                                "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
-                            ],
-                        ],*/
-                    ],
+                    ],*/
 
 
                     [
@@ -406,6 +400,13 @@ return
 
 
                 ],
+        ],
+
+        'sites' => [
+            'priority' => 310,
+            'label'    => \Yii::t('skeeks/cms', 'Sites'),
+            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
+            "url"      => ["/cms/admin-cms-site"],
         ],
 
 

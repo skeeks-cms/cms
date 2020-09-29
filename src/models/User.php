@@ -103,7 +103,7 @@ class User
      */
     public static function getProtectedUsernames()
     {
-        return ['root', 'admin'];
+        return ['root'];
     }
 
     /**
@@ -776,7 +776,7 @@ class User
      */
     public function getCmsAuthAssignments()
     {
-        return $this->hasMany(CmsAuthAssignment::class, ['user_id' => 'id']);
+        return $this->hasMany(CmsAuthAssignment::class, ['cms_user_id' => 'id']);
     }
 
     /**
