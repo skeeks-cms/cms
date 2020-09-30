@@ -103,7 +103,7 @@ CSS
     ) ?>
     <?
     $roles = \Yii::$app->authManager->getAvailableRoles();
-    \yii\helpers\ArrayHelper::remove($roles, \skeeks\cms\rbac\DbManager::ROLE_GUEST);
+    \yii\helpers\ArrayHelper::remove($roles, \skeeks\cms\rbac\CmsManager::ROLE_GUEST);
     echo $form->field($model, 'roleNames')->checkboxList(
         \yii\helpers\ArrayHelper::map($roles, 'name', 'description'), [
             'class' => 'sx-checkbox'

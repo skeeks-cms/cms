@@ -30,6 +30,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
@@ -110,6 +111,8 @@ class AdminCmsContentElementController extends BackendModelStandartController
      */
     public function actions()
     {
+        $content = $this->content;
+        
         $result = ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'configKey'      => $this->uniqueId."-".($this->content ? $this->content->id : ""),
@@ -129,7 +132,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
 
                 "filters" => [
                     'disableAutoFilters' => [
-                        'created_by',
+                        //'created_by',
                         'updated_by',
                     ],
                     'visibleFilters'     => [
@@ -144,14 +147,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             ['q', 'safe'],
                             ['has_image', 'safe'],
                             ['created_by', 'safe'],
-                            ['updated_by', 'safe'],
                         ],
 
                         'attributeDefines' => [
                             'q',
                             'has_image',
                             'created_by',
-                            'updated_by',
                         ],
 
                         'fields' => [
@@ -167,30 +168,43 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             ],
 
                             'created_by' => [
+                                'field'             => [
+                                    'class'      => SelectField::class,
+                                    'items' => function() use ($content) {
+                                        $userIds = CmsContentElement::find()
+                                                ->cmsSite()
+                                                ->andWhere(['content_id' => $content->id])
+                                                ->groupBy("created_by")
+                                                ->select('created_by')
+                                            ->asArray()
+                                            ->indexBy("created_by")
+                                            ->all()
+                                        ;
+                                        
+                                        if ($userIds) {
+                                            $userIds = array_keys($userIds);
+                                            $q = CmsUser::find()->where(['id' => $userIds]);
+                                            return ArrayHelper::map($q->all(), 'id', function(CmsUser $model) {
+                                                return $model->shortDisplayName . ($model->email ? " ($model->email)" : "");
+                                            });
+                                        }
+                                        
+                                        return [];
+                                    }
+                                ],
+                                
                                 /*'class' => WidgetField::class,
                                 'widgetClass' => SelectModelDialogUserWidget::class,*/
                                 //'isAllowChangeMode' => false,
-                                'class' => NumberFilterField::class,
+                                /*'class' => NumberFilterField::class,
                                 'field' => [
                                     'class'       => WidgetField::class,
                                     'widgetClass' => SelectModelDialogUserWidget::class,
                                     /*'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),*/
-                                ],
+                                    'multiple'    => new UnsetArrayValue(),
+                                ]*/
                             ],
 
-                            'updated_by' => [
-                                'class' => NumberFilterField::class,
-                                /*'class' => WidgetField::class,
-                                'widgetClass' => SelectModelDialogUserWidget::class,*/
-                                //'isAllowChangeMode' => false,
-                                'field' => [
-                                    'class'       => WidgetField::class,
-                                    'widgetClass' => SelectModelDialogUserWidget::class,
-                                    /*'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),*/
-                                ],
-                            ],
 
                             'tree_id' => [
                                 /*'class' => WidgetField::class,
@@ -742,7 +756,6 @@ HTML;
                     [CmsContentProperty::tableName().'.cms_site_id' => null],
                 ]);
             }
-
             //print_r($properties->createCommand()->rawSql);die;
 
             $properties = $properties->all();
@@ -852,7 +865,10 @@ HTML;
                     } else {
                         $autoFilters["property{$property->id}"] = [
                             'class'    => SelectField::class,
-                            'items'    => ArrayHelper::map(CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->all(), 'id', 'value'),
+                            'items'    => function() use ($property) {
+                                return ArrayHelper::map(CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->all(), 'id', 'value');
+                            },
+                            //'items'    => ArrayHelper::map(CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->all(), 'id', 'value')
                             'multiple' => true,
                         ];
                     }
@@ -896,7 +912,9 @@ HTML;
                     } else {
                         $autoFilters["property{$property->id}"] = [
                             'class'    => SelectField::class,
-                            'items'    => ArrayHelper::map(CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->all(), 'id', 'name'),
+                            'items'    => function () use ($propertyType) {
+                                return ArrayHelper::map(CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->all(), 'id', 'name');
+                            },
                             'multiple' => true,
                         ];
                     }
