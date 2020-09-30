@@ -46,15 +46,18 @@ $all = $q
 <?php $form = \yii\widgets\ActiveForm::begin([
     'method' => 'get',
 ]); ?>
-<div class="row sx-bg-secondary" style="padding: 5px;">
-    <div class="col">
-        <?php echo $form->field($dm, 'from')->textInput(['type' => 'date'])->label("Начало периода"); ?>
-    </div>
-    <div class="col">
-        <?php echo $form->field($dm, 'to')->textInput(['type' => 'date'])->label("Конец периода"); ?>
-    </div>
-    <div class="col my-auto">
-        <button type="submit" class="btn btn-primary">Отправить</button>
+
+<div class="sx-bg-secondary">
+    <div class="row" style="padding: 15px; padding-bottom: 0px;">
+        <div class="col">
+            <?php echo $form->field($dm, 'from')->textInput(['type' => 'date'])->label("Начало периода"); ?>
+        </div>
+        <div class="col">
+            <?php echo $form->field($dm, 'to')->textInput(['type' => 'date'])->label("Конец периода"); ?>
+        </div>
+        <div class="col my-auto">
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </div>
     </div>
 </div>
 <?php $form::end(); ?>
@@ -69,7 +72,7 @@ $all = $q
                             <?php $user = \skeeks\cms\models\CmsUser::findOne($data['created_by']); ?>
                             <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                                 'controllerId' => 'cms/admin-user',
-                                'modelId' => $user->id
+                                'modelId'      => $user->id,
                             ]); ?>
                             <div class="d-flex flex-row">
                                 <div class="my-auto" style="margin-right: 5px;">
