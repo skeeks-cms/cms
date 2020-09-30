@@ -82,7 +82,6 @@ return [
                     "cms/admin-cms-user-universal-property",
                     "cms/admin-cms-user-universal-property-enum",
                     
-                    "cms/admin-cms-content-type",
                     "cms/admin-cms-content",
                     
                     "cms/admin-cms-site-phone",
@@ -282,6 +281,22 @@ return [
         [
             'name'        => 'cms/admin-site-user',
             'description' => ['skeeks/cms', 'Удаление пользователями сайта'],
+        ],
+
+        
+        [
+            'name'        => 'cms/admin-cms-content-property',
+            'description' => ['skeeks/cms', 'Управление свойствами'],
+        ],
+
+        
+        [
+            'name'        => 'cms/admin-cms-content-property-enum',
+            'description' => ['skeeks/cms', 'Управление опциями свойств'],
+        ],
+        [
+            'name'        => 'cms/admin-cms-content',
+            'description' => ['skeeks/cms', 'Управление контентом'],
         ],
 
         /*[

@@ -33,6 +33,8 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $this->name = \Yii::t('skeeks/cms', 'Managing property values');
         $this->modelShowAttribute = "value";
         $this->modelClassName = CmsContentPropertyEnum::class;
+        
+        $this->generateAccessActions = false;
 
         //$this->generateAccessActions = false;
         /*$this->accessCallback = function () {

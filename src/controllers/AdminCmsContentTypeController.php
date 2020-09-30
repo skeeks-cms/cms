@@ -29,11 +29,13 @@ class AdminCmsContentTypeController extends BackendModelStandartController
         $this->modelClassName = CmsContentType::class;
 
         $this->generateAccessActions = false;
+        $this->permissionName = 'cms/admin-cms-content';
+        
         $this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
-            return \Yii::$app->user->can($this->uniqueId);
+            return \Yii::$app->user->can($this->permissionName);
         };
 
         parent::init();
