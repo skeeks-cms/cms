@@ -11,9 +11,12 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelAction;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
 use skeeks\cms\grid\DateTimeColumnData;
@@ -33,7 +36,6 @@ use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
-use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
@@ -226,8 +228,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                                 ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
                                                 ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
                                                 ['like', CmsContentElement::tableName().'.external_id', $e->field->value],
-                                            ])
-                                        ;
+                                            ]);
 
                                         $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(CmsContentElement::tableName().".id")]);
 
@@ -331,11 +332,11 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         'view',
                     ],
                     'columns'        => [
-                        'created_by' => [
-                            'class' => UserColumnData::class
+                        'created_by'   => [
+                            'class' => UserColumnData::class,
                         ],
-                        'updated_by' => [
-                            'class' => UserColumnData::class
+                        'updated_by'   => [
+                            'class' => UserColumnData::class,
                         ],
                         'active'       => [
                             //'class' => BooleanColumn::class,
@@ -520,12 +521,21 @@ HTML;
                 ],
             ],
 
-            "create"           => [
+            "create" => [
                 "callback" => [$this, 'create'],
             ],
-            "update"           => [
+            "update" => [
                 "callback" => [$this, 'update'],
             ],
+
+            'stat' => [
+                'class'          => ViewBackendAction::class,
+                'name'           => 'Статистика',
+                'icon'           => 'fas fa-info-circle',
+                'priority'       => 500,
+                "accessCallback" => true,
+            ],
+
             "activate-multi"   => [
                 'class'   => BackendModelMultiActivateAction::class,
                 'on init' => function ($e) {
@@ -538,11 +548,11 @@ HTML;
                     }
                 },
 
-                "eachAccessCallback" => function($model) {
-                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                "eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
-                "accessCallback" => function() {
-                    return \Yii::$app->user->can($this->permissionName . "/update");
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/update");
                 },
 
             ],
@@ -558,11 +568,11 @@ HTML;
                     }
                 },
 
-                "eachAccessCallback" => function($model) {
-                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                "eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
-                "accessCallback" => function() {
-                    return \Yii::$app->user->can($this->permissionName . "/update");
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/update");
                 },
             ],
 
@@ -620,11 +630,11 @@ HTML;
 
 
             "change-tree-multi" => [
-                'class'        => BackendModelMultiDialogEditAction::class,
-                "name"         => \Yii::t('skeeks/cms', 'The main section'),
-                "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
-                "eachCallback" => [$this, 'eachMultiChangeTree'],
-                'on init'      => function ($e) {
+                'class'              => BackendModelMultiDialogEditAction::class,
+                "name"               => \Yii::t('skeeks/cms', 'The main section'),
+                "viewDialog"         => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
+                "eachCallback"       => [$this, 'eachMultiChangeTree'],
+                'on init'            => function ($e) {
                     /**
                      * @var BackendGridModelAction $action
                      */
@@ -633,11 +643,11 @@ HTML;
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     }
                 },
-                "eachAccessCallback" => function($model) {
-                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                "eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
-                "accessCallback" => function() {
-                    return \Yii::$app->user->can($this->permissionName . "/update");
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/update");
                 },
             ],
 
@@ -656,11 +666,11 @@ HTML;
                     }
                 },
 
-                "eachAccessCallback" => function($model) {
-                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                "eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
-                "accessCallback" => function() {
-                    return \Yii::$app->user->can($this->permissionName . "/update");
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/update");
                 },
             ],
 
@@ -679,11 +689,11 @@ HTML;
                     }
                 },
 
-                "eachAccessCallback" => function($model) {
-                    return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                "eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
-                "accessCallback" => function() {
-                    return \Yii::$app->user->can($this->permissionName . "/update");
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/update");
                 },
             ],
 
@@ -722,19 +732,19 @@ HTML;
             if (!\Yii::$app->skeeks->site->is_default) {
                 $properties->andWhere([
                     'or',
-                    [CmsContentProperty::tableName() . '.cms_site_id' => \Yii::$app->skeeks->site->id],
-                    [CmsContentProperty::tableName() . '.cms_site_id' => null]
+                    [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                    [CmsContentProperty::tableName().'.cms_site_id' => null],
                 ]);
             } else {
                 $properties->andWhere([
                     'or',
-                    [CmsContentProperty::tableName() . '.cms_site_id' => \Yii::$app->skeeks->site->id],
-                    [CmsContentProperty::tableName() . '.cms_site_id' => null]
+                    [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                    [CmsContentProperty::tableName().'.cms_site_id' => null],
                 ]);
             }
-            
+
             //print_r($properties->createCommand()->rawSql);die;
-                
+
             $properties = $properties->all();
 
             foreach ($properties as $property) {
@@ -761,7 +771,7 @@ HTML;
                 ];
 
                 $autoRules[] = ["property{$property->id}", "safe"];
-                $autoLabels["property{$property->id}"] = $property->name . " [свойство]";
+                $autoLabels["property{$property->id}"] = $property->name." [свойство]";
 
 
                 if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
@@ -989,7 +999,7 @@ HTML;
         ]);
 
         $e->content = Alert::widget([
-            'options' => [
+            'options'     => [
                 'class' => 'sx-bg-gray-light',
             ],
             'closeButton' => false,

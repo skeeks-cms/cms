@@ -317,9 +317,23 @@ class AdminUserController extends BackendModelStandartController
                 },
             ],
 
+            'stat' => [
+                'class'          => BackendModelAction::class,
+                'name'           => 'Статистика',
+                'icon'           => 'fas fa-info-circle',
+                'priority'       => 500,
+                "accessCallback" => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can("cms/admin-user/update", ["model" => $this->model]);
+                },
+            ],
+
             'add-site-permission' => [
                 'class'          => BackendModelAction::class,
-                'isVisible'           => false,
+                'isVisible'      => false,
                 'name'           => 'Профиль',
                 "callback"       => [$this, 'addSite'],
                 "accessCallback" => function () {
@@ -333,7 +347,7 @@ class AdminUserController extends BackendModelStandartController
 
             'save-site-permissions' => [
                 'class'          => BackendModelAction::class,
-                'isVisible'           => false,
+                'isVisible'      => false,
                 'name'           => 'Профиль',
                 "callback"       => [$this, 'saveSitePermissions'],
                 "accessCallback" => function () {
@@ -705,34 +719,32 @@ class AdminUserController extends BackendModelStandartController
 
         return Html::renderSelectOptions('', $result);
     }
-    
-    
-    
+
+
     public function addSite()
     {
         /**
          * @var $model User
          */
         $model = $this->model;
-        
+
         $rr = new RequestResponse();
-        
+
         if ($rr->isRequestAjaxPost()) {
             $site_id = \Yii::$app->request->post("cms_site_id");
             $cmsSite = CmsSite::find()->where(['id' => $site_id])->one();
-            
+
             $manager = new CmsManager(['cmsSite' => $cmsSite]);
-            foreach (\Yii::$app->cms->registerRoles as $roleCode)
-            {
+            foreach (\Yii::$app->cms->registerRoles as $roleCode) {
                 if (!$manager->getAssignment($roleCode, $model->id)) {
-                    $manager->assign($manager->getRole($roleCode), $model->id);    
+                    $manager->assign($manager->getRole($roleCode), $model->id);
                 }
             }
-            
+
             $rr->success = true;
-            
+
         }
-        
+
         return $rr;
     }
 
@@ -745,15 +757,15 @@ class AdminUserController extends BackendModelStandartController
         $model = $this->model;
 
         $rr = new RequestResponse();
-        
+
         if ($rr->isRequestAjaxPost()) {
             $site_id = \Yii::$app->request->post("cms_site_id");
-            $permissions = (array) \Yii::$app->request->post("permissions");
+            $permissions = (array)\Yii::$app->request->post("permissions");
             $cmsSite = CmsSite::find()->where(['id' => $site_id])->one();
 
             $manager = new CmsManager(['cmsSite' => $cmsSite]);
             $roles = $manager->getRolesByUser($model->id);
-            
+
             if ($roles) {
                 foreach ($roles as $roleExist) {
                     if (!in_array($roleExist->name, (array)$permissions)) {

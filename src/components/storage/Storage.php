@@ -225,7 +225,7 @@ class Storage extends Component
 
         $data = array_merge((array) $newData, (array) $data);
         $file = new StorageFile($data);
-        $file->save(false);
+        $file->save();
 
         return $file;
     }

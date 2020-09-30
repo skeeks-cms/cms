@@ -116,4 +116,14 @@ class Skeeks extends Component
 
         return $this->_site;
     }
+
+    /**
+     * @param CmsSite $cmsSite
+     * @return $this
+     */
+    public function setSite(CmsSite $cmsSite)
+    {
+        $this->_site = $cmsSite;
+        return $this;
+    }
 }

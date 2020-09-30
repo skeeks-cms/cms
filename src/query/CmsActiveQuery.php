@@ -27,10 +27,10 @@ class CmsActiveQuery extends ActiveQuery
     public function active($state = true)
     {
         if ($this->is_active === true) {
-            return $this->andWhere([$this->getPrimaryTableName() . '.is_active' => $state]);
+            return $this->andWhere([$this->getPrimaryTableName().'.is_active' => $state]);
         }
 
-        return $this->andWhere([$this->getPrimaryTableName() . '.active' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
+        return $this->andWhere([$this->getPrimaryTableName().'.active' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
     }
 
     /**
@@ -55,6 +55,14 @@ class CmsActiveQuery extends ActiveQuery
             $cmsSite = \Yii::$app->skeeks->site;
         }
 
-        return $this->andWhere([$this->getPrimaryTableName().'.cms_site_id' => $cmsSite->id]);
+        $alias = $this->getPrimaryTableName();
+        if ($this->from) {
+            foreach ($this->from as $code => $table) {
+                if ($table == $alias) {
+                    $alias = $code;
+                }
+            }
+        }
+        return $this->andWhere([$alias.'.cms_site_id' => $cmsSite->id]);
     }
 }

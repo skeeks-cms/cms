@@ -103,6 +103,7 @@ JS
                     },
                     'on init'         => function ($e) {
                         $action = $e->sender;
+                        
                     },
                     "filters"         => [
                         'visibleFilters' => [
@@ -156,6 +157,16 @@ JS
                                 $query = $event->sender->dataProvider->query;
                                 $query->andWhere(['created_by' => \Yii::$app->user->identity->id]);
                             }
+                            
+                        
+                            /**
+                             * @var $dataProvider ActiveDataProvider
+                             * @var $query ActiveQuery
+                             */
+                            $query = $event->sender->dataProvider->query;
+        
+                            $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                            
                             /*/**
                              * @var $query ActiveQuery
                             $query = $event->sender->dataProvider->query;

@@ -20,29 +20,31 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%cms_storage_file}}".
  *
- * @property integer $id
- * @property string $cluster_id
- * @property string $cluster_file
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $size
- * @property string $mime_type
- * @property string $extension
- * @property string $original_name
- * @property string $name_to_save
- * @property string $name
- * @property string $description_short
- * @property string $description_full
- * @property integer $image_height
- * @property integer $image_width
- * @property integer $priority
+ * @property integer                                $id
+ * @property string                                 $cluster_id
+ * @property string                                 $cluster_file
+ * @property integer                                $created_by
+ * @property integer                                $updated_by
+ * @property integer                                $created_at
+ * @property integer                                $updated_at
+ * @property string                                 $size
+ * @property string                                 $mime_type
+ * @property string                                 $extension
+ * @property string                                 $original_name
+ * @property string                                 $name_to_save
+ * @property string                                 $name
+ * @property string                                 $description_short
+ * @property string                                 $description_full
+ * @property integer                                $image_height
+ * @property integer                                $image_width
+ * @property integer                                $priority
+ * @property integer                                $cms_site_id
  *
- * @property string $fileName
- * @property string $src
- * @property string $absoluteSrc
- * @property string $downloadName
+ * @property string                                 $fileName
+ * @property string                                 $src
+ * @property string                                 $absoluteSrc
+ * @property string                                 $downloadName
+ * @property CmsSite                                $cmsSite
  *
  * @property \skeeks\cms\components\storage\Cluster $cluster
  */
@@ -63,8 +65,8 @@ class StorageFile extends Core
     {
         return array_merge(parent::rules(), [
             [
-                ['created_by', 'priority', 'updated_by', 'created_at', 'updated_at', 'size', 'image_height', 'image_width'],
-                'integer'
+                ['created_by', 'priority', 'updated_by', 'created_at', 'updated_at', 'size', 'cms_site_id', 'image_height', 'image_width'],
+                'integer',
             ],
             [['description_short', 'description_full'], 'string'],
             [['cluster_file', 'original_name', 'name'], 'string', 'max' => 255],
@@ -74,9 +76,20 @@ class StorageFile extends Core
                 ['cluster_id', 'cluster_file'],
                 'unique',
                 'targetAttribute' => ['cluster_id', 'cluster_file'],
-                'message' => Yii::t('skeeks/cms',
-                    'The combination of Cluster ID and Cluster Src has already been taken.')
+                'message'         => Yii::t('skeeks/cms',
+                    'The combination of Cluster ID and Cluster Src has already been taken.'),
             ],
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                },
+            ],
+            
+            [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::class, 'targetAttribute' => ['cms_site_id' => 'id']],
         ]);
     }
 
@@ -86,23 +99,23 @@ class StorageFile extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'cluster_id' => Yii::t('skeeks/cms', 'Storage'),
-            'cluster_file' => Yii::t('skeeks/cms', 'Cluster File'),
-            'created_by' => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'size' => Yii::t('skeeks/cms', 'File Size'),
-            'mime_type' => Yii::t('skeeks/cms', 'File Type'),
-            'extension' => Yii::t('skeeks/cms', 'Extension'),
-            'original_name' => Yii::t('skeeks/cms', 'Original FileName'),
-            'name_to_save' => Yii::t('skeeks/cms', 'Name To Save'),
-            'name' => Yii::t('skeeks/cms', 'Name'),
+            'id'                => Yii::t('skeeks/cms', 'ID'),
+            'cluster_id'        => Yii::t('skeeks/cms', 'Storage'),
+            'cluster_file'      => Yii::t('skeeks/cms', 'Cluster File'),
+            'created_by'        => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'        => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'        => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'        => Yii::t('skeeks/cms', 'Updated At'),
+            'size'              => Yii::t('skeeks/cms', 'File Size'),
+            'mime_type'         => Yii::t('skeeks/cms', 'File Type'),
+            'extension'         => Yii::t('skeeks/cms', 'Extension'),
+            'original_name'     => Yii::t('skeeks/cms', 'Original FileName'),
+            'name_to_save'      => Yii::t('skeeks/cms', 'Name To Save'),
+            'name'              => Yii::t('skeeks/cms', 'Name'),
             'description_short' => Yii::t('skeeks/cms', 'Description Short'),
-            'description_full' => Yii::t('skeeks/cms', 'Description Full'),
-            'image_height' => Yii::t('skeeks/cms', 'Image Height'),
-            'image_width' => Yii::t('skeeks/cms', 'Image Width'),
+            'description_full'  => Yii::t('skeeks/cms', 'Description Full'),
+            'image_height'      => Yii::t('skeeks/cms', 'Image Height'),
+            'image_width'       => Yii::t('skeeks/cms', 'Image Width'),
         ]);
     }
 
@@ -129,6 +142,15 @@ class StorageFile extends Core
         }
 
         return parent::delete();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSite()
+    {
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'cms_site_id']);
     }
 
     /**
@@ -178,7 +200,7 @@ class StorageFile extends Core
                 return $this;
             }
 
-            $src = \Yii::$app->request->hostInfo . $this->src;
+            $src = \Yii::$app->request->hostInfo.$this->src;
         }
         //Елси это изображение
         if ($this->isImage()) {
@@ -223,9 +245,9 @@ class StorageFile extends Core
     public function fields()
     {
         return ArrayHelper::merge(parent::fields(), [
-            'src', 
-            'absoluteSrc', 
-            'rootSrc', 
+            'src',
+            'absoluteSrc',
+            'rootSrc',
         ]);
     }
     /**
@@ -264,7 +286,7 @@ class StorageFile extends Core
     public function copy()
     {
         $newFile = \Yii::$app->storage->upload($this->absoluteSrc);
-        
+
         $newFile->name = $this->name;
         $newFile->description_full = $this->description_full;
         $newFile->description_short = $this->description_short;
@@ -285,10 +307,10 @@ class StorageFile extends Core
     public function getDownloadName()
     {
         if ($this->name_to_save) {
-            return $this->name_to_save . "." . $this->extension;
+            return $this->name_to_save.".".$this->extension;
         } else {
             if (!strpos($this->original_name, ".")) {
-                return $this->original_name . "." . $this->extension;
+                return $this->original_name.".".$this->extension;
             }
             return $this->original_name;
         }
