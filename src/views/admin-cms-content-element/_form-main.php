@@ -120,7 +120,8 @@ $properties = $model->getRelatedProperties()->all();
                         ?>
                     <?php endif; ?>
 
-                    <? $field = $property->renderActiveForm($form, $model);
+                    <? 
+                    $field = $property->renderActiveForm($form, $model);
                     $field->template = '<div class="row sx-inline-row"><div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3">' . $create . '</div></div>';
                     echo $field;
                     ?>
