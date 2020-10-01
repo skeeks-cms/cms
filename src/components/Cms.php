@@ -391,44 +391,6 @@ class Cms extends \skeeks\cms\base\Component
                 ],
             ],
 
-
-
-            'access' => [
-                'class'  => FieldSet::class,
-                'name'   => 'Доступ',
-                'fields' => [
-                    'access' => [
-                        'class'   => HtmlBlock::class,
-                        'content' => function (HtmlBlock $htmlBlock) {
-                            $content = \yii\bootstrap\Alert::widget([
-                                'options' => [
-                                    'class' => 'alert-warning',
-                                ],
-                                'body'    => "<b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.",
-                            ]);
-
-                            $content .= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                                'content' => "Файлы",
-                            ]);
-                            $content .= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                                'permissionName' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
-                                'label'          => 'Доступ к личным файлам',
-                            ]);
-                            $content .= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                                'permissionName' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_COMMON_PUBLIC_FILES,
-                                'label'          => 'Доступ к общим файлам',
-                            ]);
-                            $content .= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                                'permissionName' => \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_ADDITIONAL_FILES,
-                                'label'          => 'Доступ ко всем файлам',
-                            ]);
-
-                            return $content;
-                        },
-                    ],
-                ],
-            ],
-
         ];
     }
     /**

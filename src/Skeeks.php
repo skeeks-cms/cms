@@ -111,9 +111,6 @@ class Skeeks extends Component
             \Yii::$app->urlManager->hostInfo = $this->_site->cmsSiteMainDomain->url;
         }
 
-
-
-
         return $this->_site;
     }
 

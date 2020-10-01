@@ -33,7 +33,6 @@ return [
                 //Есть доступ к системе администрирования
                 'permissions' => [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
 
@@ -106,7 +105,6 @@ return [
                 //Есть доступ к системе администрирования
                 'permissions' => [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
 
@@ -137,7 +135,6 @@ return [
                 //Есть доступ к системе администрирования
                 'permissions' => [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
-                    \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
 
@@ -188,11 +185,6 @@ return [
         [
             'name'        => \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
             'description' => ['skeeks/cms', 'Access to system administration'],
-        ],
-
-        [
-            'name'        => \skeeks\cms\rbac\CmsManager::PERMISSION_CONTROLL_PANEL,
-            'description' => ['skeeks/cms', 'Access to the site control panel'],
         ],
 
         [
