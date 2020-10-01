@@ -11,25 +11,16 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
-use skeeks\cms\models\Search;
+use skeeks\cms\models\User;
 use skeeks\cms\models\UserGroup;
-use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\rbac\CmsManager;
-use Yii;
-use skeeks\cms\models\User;
-use skeeks\cms\models\searchs\User as UserSearch;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -58,24 +49,14 @@ class AdminProfileController extends BackendModelController
 
     public function actions()
     {
-        $actions = ArrayHelper::merge(parent::actions(),
-            [
-                /*'file-manager' =>
-                [
-                    "class"         => BackendModelAction::class,
-                    "name"          => "Личные файлы",
-                    "icon"          => "glyphicon glyphicon-folder-open",
-                    "callback"      => [$this, 'actionFileManager'],
-                ],*/
-
-                'update' =>
-                    [
-                        'class' => BackendModelUpdateAction::class,
-                        "callback" => [$this, 'update'],
-                        "isVisible" => false,
-                        "accessCallback" => false
-                    ],
-            ]);
+        $actions = ArrayHelper::merge(parent::actions(), [
+            'update' => [
+                'class'          => BackendModelUpdateAction::class,
+                "callback"       => [$this, 'update'],
+                "isVisible"      => false,
+                "accessCallback" => false,
+            ],
+        ]);
 
 
         ArrayHelper::remove($actions, 'delete');
@@ -94,7 +75,7 @@ class AdminProfileController extends BackendModelController
         $model = $this->model;
         $relatedModel = $model->relatedPropertiesModel;
         $passwordChange = new PasswordChangeForm([
-            'user' => $model
+            'user' => $model,
         ]);
         $passwordChange->scenario = PasswordChangeForm::SCENARION_NOT_REQUIRED;
 
@@ -108,7 +89,7 @@ class AdminProfileController extends BackendModelController
             return \yii\widgets\ActiveForm::validateMultiple([
                 $model,
                 $relatedModel,
-                $passwordChange
+                $passwordChange,
             ]);
         }
 
@@ -125,7 +106,7 @@ class AdminProfileController extends BackendModelController
 
                     if ($relatedModel->load(\Yii::$app->request->post())) {
                         if (!$relatedModel->save()) {
-                            throw new Exception("Не удалось сохранить дополнительные свойства: " . print_r($relatedModel->errors, true));
+                            throw new Exception("Не удалось сохранить дополнительные свойства: ".print_r($relatedModel->errors, true));
                         }
                     }
 
@@ -151,7 +132,7 @@ class AdminProfileController extends BackendModelController
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Данные обновлены'));
 
                 } else {
-                    throw new Exception("Не удалось сохранить дополнительные свойства: " . print_r($model->errors, true));
+                    throw new Exception("Не удалось сохранить дополнительные свойства: ".print_r($model->errors, true));
                 }
 
             } catch (\Exception $e) {
@@ -160,8 +141,8 @@ class AdminProfileController extends BackendModelController
         }
 
         return $this->render('_form', [
-            'model' => $model,
-            'relatedModel' => $relatedModel,
+            'model'          => $model,
+            'relatedModel'   => $relatedModel,
             'passwordChange' => $passwordChange,
         ]);
     }
@@ -208,7 +189,7 @@ class AdminProfileController extends BackendModelController
         $model = $this->model;
 
         $modelForm = new PasswordChangeForm([
-            'user' => $model
+            'user' => $model,
         ]);
 
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
@@ -227,7 +208,7 @@ class AdminProfileController extends BackendModelController
             }
 
             return $this->render('@skeeks/cms/views/admin-user/change-password.php', [
-                'model' => $modelForm
+                'model' => $modelForm,
             ]);
 
             /*return $this->render('_form-change-password', [
