@@ -768,6 +768,13 @@ HTML;
 
                 $autoColumns["property{$property->id}"] = [
                     //'attribute' => $name,
+                    'headerOptions' => [
+                        'style' => 'width: 150px;'
+                    ],
+                    'contentOptions' => [
+                        'style' => 'width: 150px;'
+                    ],
+
                     'label'  => $property->name." [свойство]",
                     'format' => 'raw',
                     'value'  => function ($model, $key, $index) use ($name, $relatedPropertiesModel) {

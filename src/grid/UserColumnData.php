@@ -18,6 +18,14 @@ use yii\helpers\Html;
  */
 class UserColumnData extends DataColumn
 {
+    public $headerOptions = [
+        'style' => 'width: 150px;'
+    ];
+
+    public $contentOptions = [
+        'style' => 'width: 150px;'
+    ];
+
     /**
      * @inheritdoc
      */

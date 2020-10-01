@@ -253,11 +253,25 @@ JS
                                     $result[] = Html::tag('label', $model->extension, [
                                             'title' => $model->extension,
                                             'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
-                                            'style' => "font-size: 11px;",
+                                            'style' => "    font-size: 10px;
+    padding: 2px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    background: silver;
+        margin-bottom: 0;
+        ",
                                         ]).Html::tag('label', $model->mime_type, [
                                             'title' => $model->mime_type,
                                             'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
-                                            'style' => "font-size: 11px;",
+                                            'style' => "    font-size: 10px;
+    padding: 2px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    background: silver;
+        margin-bottom: 0;
+        ",
                                         ]);
 
                                     $info = implode("<br />", $result);
@@ -279,7 +293,8 @@ JS
                                             'Increase')."'>".\yii\helpers\Html::tag('span', $model->extension,
                                             [
                                                 'class' => 'label label-primary u-label u-label-primary',
-                                                'style' => 'font-size: 18px;
+                                                'style' => '
+                                                font-size: 18px;
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -293,6 +308,12 @@ JS
 
 
                             'size' => [
+                                'headerOptions' => [
+                                    'style' => 'width: 110px;'
+                                ],
+                                'contentOptions' => [
+                                    'style' => 'width: 110px;'
+                                ],
                                 'value'  => function (StorageFile $model) {
                                     return \Yii::$app->formatter->asShortSize($model->size);
                                 },

@@ -71,6 +71,16 @@ class BooleanColumn extends DataColumn
      */
     public $showNullAsFalse = false;
 
+
+    public $contentOptions = [
+        'style' => 'width: 70px;'
+    ];
+
+    public $headerOptions = [
+        'style' => 'width: 70px;'
+    ];
+
+
     /**
      * @inheritdoc
      */

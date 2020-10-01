@@ -271,6 +271,9 @@ class AdminUserController extends BackendModelStandartController
                         'last_activity_at' => [
                             'class' => DateTimeColumnData::class,
                         ],
+                        'last_admin_activity_at' => [
+                            'class' => DateTimeColumnData::class,
+                        ],
                         'image_id'         => [
                             'class' => ImageColumn2::class,
                         ],

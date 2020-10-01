@@ -12,6 +12,7 @@
 namespace skeeks\cms\grid;
 
 use yii\grid\DataColumn;
+use yii\helpers\Html;
 
 /**
  * Class DateTimeColumnData
@@ -21,12 +22,24 @@ class DateTimeColumnData extends DataColumn
 {
     public $filter = false;
 
+    public $headerOptions = [
+        'style' => 'width: 130px;'
+    ];
+
+    public $contentOptions = [
+        'style' => 'width: 130px;'
+    ];
+
     /**
      * @inheritdoc
      */
     protected function renderDataCellContent($model, $key, $index)
     {
         $timestamp = $model->{$this->attribute};
-        return \Yii::$app->formatter->asDatetime($timestamp) . "<br /><small>" . \Yii::$app->formatter->asRelativeTime($timestamp) . "</small>";
+        return Html::tag("span", \Yii::$app->formatter->asRelativeTime($timestamp), [
+            'title' => \Yii::$app->formatter->asDatetime($timestamp),
+            'data-toggle' => "tooltip"
+        ]);
+        //return \Yii::$app->formatter->asDatetime($timestamp) . "<br /><small>" . \Yii::$app->formatter->asRelativeTime($timestamp) . "</small>";
     }
 }
