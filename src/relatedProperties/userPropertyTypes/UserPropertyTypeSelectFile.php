@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\relatedProperties\userPropertyTypes;
 
+use skeeks\cms\backend\widgets\SelectModelDialogStorageFileSrcWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
@@ -54,10 +55,7 @@ class UserPropertyTypeSelectFile extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        $field->widget(\skeeks\cms\modules\admin\widgets\formInputs\OneImage::className(),
-            [
-                'filesModel' => $this->property->relatedPropertiesModel->relatedElementModel
-            ]);
+        $field->widget(SelectModelDialogStorageFileSrcWidget::class);
 
         return $field;
     }

@@ -9,6 +9,7 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\assets\CmsAsset;
+use skeeks\cms\backend\widgets\SelectModelDialogStorageFileSrcWidget;
 use skeeks\cms\base\Module;
 use skeeks\cms\helpers\ComposerHelper;
 use skeeks\cms\helpers\FileHelper;
@@ -18,7 +19,6 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
-use skeeks\cms\modules\admin\widgets\formInputs\OneImage;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeBool;
@@ -350,7 +350,7 @@ class Cms extends \skeeks\cms\base\Component
                     'adminEmail',
                     'noImageUrl' => [
                         'class'       => WidgetField::class,
-                        'widgetClass' => OneImage::class,
+                        'widgetClass' => SelectModelDialogStorageFileSrcWidget::class,
                     ],
                 ],
             ],
