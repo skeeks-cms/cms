@@ -43,10 +43,17 @@ class Select extends Select2
             $this->options['multiple'] = 'multiple';
         }
         
-        if ($this->allowDeselect && !$this->multiple) {
+        if ($this->allowDeselect) {
             if ($this->isRequired()) {
             } else {
-                $this->data = ArrayHelper::merge(['' => ''], (array) $this->data);
+                if (!isset($this->options['placeholder'])) {
+                    $this->options['placeholder'] = '';
+                }
+                $this->pluginOptions['allowClear'] = true;
+                if (!$this->multiple) {
+                    $this->data = ArrayHelper::merge(['' => ''], (array) $this->data);
+                }
+                
             }
         }
         
