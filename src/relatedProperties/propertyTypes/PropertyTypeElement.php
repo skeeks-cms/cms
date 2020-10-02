@@ -13,6 +13,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\widgets\AjaxSelect;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -119,13 +120,86 @@ class PropertyTypeElement extends PropertyType
                 $config['allowDeselect'] = true;
             }
 
-            $field = $this->activeForm->fieldSelect(
+            //echo $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+            $field->widget(
+                AjaxSelect::class, [
+                    'dataCallback' => function($q = '') use ($find) {
+
+                        $query = $find;
+
+                        if ($q) {
+                            $query->andWhere(['like', 'name', $q]);
+                        }
+
+                        $data = $query->limit(50)
+                            ->all();
+
+                        $result = [];
+
+                        if ($data) {
+                            foreach ($data as $model)
+                            {
+                                $result[] = [
+                                    'id' => $model->id,
+                                    'text' => $model->name
+                                ];
+                            }
+                        }
+
+                        return $result;
+                    },
+
+                    'valueCallback' => function($value) {
+                        return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
+                    },
+                ]
+            );
+
+            /*$field = $this->activeForm->fieldSelect(
                 $this->property->relatedPropertiesModel,
                 $this->property->code,
                 ArrayHelper::map($find->all(), 'id', 'name'),
                 $config
+            );*/
+        } elseif ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI) {
+
+            $field->widget(
+                AjaxSelect::class, [
+                    'multiple' => true,
+                    'dataCallback' => function($q = '') use ($find) {
+
+                        $query = $find;
+
+                        if ($q) {
+                            $query->andWhere(['like', 'name', $q]);
+                        }
+
+                        $data = $query->limit(50)
+                            ->all();
+
+                        $result = [];
+
+                        if ($data) {
+                            foreach ($data as $model)
+                            {
+                                $result[] = [
+                                    'id' => $model->id,
+                                    'text' => $model->name
+                                ];
+                            }
+                        }
+
+                        return $result;
+                    },
+
+                    'valueCallback' => function($value) {
+                        return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
+                    },
+                ]
             );
-        } else {
+
+        }
+        else {
             if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI) {
                 $field = $this->activeForm->fieldSelectMulti(
                     $this->property->relatedPropertiesModel,

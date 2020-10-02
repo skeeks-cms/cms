@@ -353,14 +353,14 @@ class AdminTreeController extends BackendModelStandartController
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
+        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             return \yii\widgets\ActiveForm::validateMultiple([
                 $model,
                 $relatedModel,
             ]);
-        }
+        }*/
 
         if ($post = \Yii::$app->request->post()) {
             $model->load($post);

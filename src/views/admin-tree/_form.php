@@ -73,13 +73,43 @@ JS
 
     <div data-listen="isLink" data-show="0" class="sx-hide">
         <?= $form->field($model, 'tree_type_id')->widget(
-            \skeeks\cms\widgets\Select::class,
+            \skeeks\cms\widgets\AjaxSelect::class,
             [
-                'items'   => \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\models\CmsTreeType::find()->active()->all(),
+                'dataCallback' => function($q = '') {
+                
+                    $query = \skeeks\cms\models\CmsTreeType::find()
+                        ->active();
+                    
+                    if ($q) {
+                        $query->andWhere(['like', 'name', $q]);
+                    }
+                        
+                    $data = $query->limit(100)
+                        ->all();
+                    
+                    $result = [];
+                    
+                    if ($data) {
+                        foreach ($data as $model)
+                        {
+                            $result[] = [
+                                'id' => $model->id,
+                                'text' => $model->name
+                            ];
+                        }
+                    }
+                    
+                    return $result;
+                },
+
+                'valueCallback' => function($value) {
+                    return \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->where(['id' => $value])->all(), 'id', 'name');
+                },
+                /*'items'   => \yii\helpers\ArrayHelper::map(
+                   \skeeks\cms\models\CmsTreeType::find()->active()->all(),
                     "id",
                     "name"
-                ),
+                ),*/
                 'allowDeselect' => false,
                 'options' => [
                     'data-form-reload' => 'true',
