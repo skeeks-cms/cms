@@ -136,6 +136,18 @@ class User
         if ($this->active == "N" && $this->id == \Yii::$app->user->identity->id) {
             throw new Exception(\Yii::t('skeeks/cms', 'Нельзя деактивировать себя'));
         }
+        
+        if ($this->isAttributeChanged('image_id')) {
+            if ($this->image) {
+                if (!$this->image->cmsSite->is_default) {
+                    $img = $this->image;
+                    $site = CmsSite::find()->default()->one();
+                    $img->cms_site_id = $site->id;
+                    $img->update(false, ['cms_site_id']);
+
+                }
+            }
+        }
     }
 
     public function _cmsAfterSave(AfterSaveEvent $e)
@@ -164,9 +176,7 @@ class User
             }
         }
 
-        if (in_array("image_id", $e->changedAttributes)) {
-
-        }
+        
     }
 
     /**

@@ -34,6 +34,19 @@ class CmsActiveQuery extends ActiveQuery
     }
 
     /**
+     * @param bool $state
+     * @return $this
+     */
+    public function default($state = true)
+    {
+        if ($state === true) {
+            return $this->andWhere([$this->getPrimaryTableName().'.is_default' => 1]);
+        } else {
+            return $this->andWhere(['!=', $this->getPrimaryTableName().'.is_default', 1]);
+        }
+    }
+
+    /**
      * @depricated
      *
      * @param bool $state
