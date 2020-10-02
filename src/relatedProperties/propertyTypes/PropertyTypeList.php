@@ -9,7 +9,7 @@
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
 use skeeks\cms\relatedProperties\PropertyType;
-use skeeks\widget\chosen\Chosen;
+use skeeks\cms\widgets\Select;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -272,7 +272,7 @@ class PropertyTypeList extends PropertyType
                 $this->property->code,
                 []
             )->widget(
-                Chosen::class,
+                Select::class,
                 ['items' => ArrayHelper::map($this->property->enums, 'id', 'value')]
             );
             

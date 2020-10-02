@@ -80,7 +80,7 @@ JS
                     'class' => 'sx-form',
                 ],
             ]); ?>
-            <?= \skeeks\widget\chosen\Chosen::widget([
+            <?= \skeeks\cms\widgets\Select::widget([
                 'multiple' => true,
                 'name'     => 'fields',
                 'options'  => [

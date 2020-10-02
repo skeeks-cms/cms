@@ -2,7 +2,6 @@
 
 use skeeks\cms\models\Tree;
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
@@ -69,22 +68,23 @@ JS
     'value' => '1',
     'label' => \Yii::t('skeeks/cms', 'This section is a link'),
     'class' => 'smartCheck',
-    'id' => 'isLink',
+    'id'    => 'isLink',
 ]); ?>
 
     <div data-listen="isLink" data-show="0" class="sx-hide">
         <?= $form->field($model, 'tree_type_id')->widget(
-            \skeeks\widget\chosen\Chosen::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\models\CmsTreeType::find()->active()->all(),
-                "id",
-                "name"
-            ),
-            'options' =>
-                [
-                    'data-form-reload' => 'true'
-                ]
-        ])->label('Тип раздела')->hint(\Yii::t('skeeks/cms',
+            \skeeks\cms\widgets\Select::class,
+            [
+                'items'   => \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\models\CmsTreeType::find()->active()->all(),
+                    "id",
+                    "name"
+                ),
+                'allowDeselect' => false,
+                'options' => [
+                    'data-form-reload' => 'true',
+                ],
+            ])->label('Тип раздела')->hint(\Yii::t('skeeks/cms',
             'On selected type of partition can depend how it will be displayed.'));
         ?>
 
@@ -95,11 +95,11 @@ JS
 
     <div data-listen="isLink" data-show="1" class="sx-hide">
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('skeeks/cms', 'Redirect')
+            'content' => \Yii::t('skeeks/cms', 'Redirect'),
         ]); ?>
         <?= $form->field($model, 'redirect_code', [])->radioList([
             301 => 'Постоянное перенаправление [301]',
-            302 => 'Временное перенаправление [302]'
+            302 => 'Временное перенаправление [302]',
         ])
             ->label(\Yii::t('skeeks/cms', 'Redirect Code')) ?>
         <div class="row">
@@ -113,13 +113,13 @@ JS
                 <?= $form->field($model, 'redirect_tree_id')->widget(
                     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
                 ) ?>
-                <?/*= $form->field($model, 'redirect_tree_id')->widget(
+                <? /*= $form->field($model, 'redirect_tree_id')->widget(
                     \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
                     [
                         "attributeSingle" => "redirect_tree_id",
                         "mode" => \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_SINGLE
                     ]
-                ) */?>
+                ) */ ?>
             </div>
         </div>
 
@@ -131,7 +131,7 @@ JS
 <?php if ($relatedModel->properties) : ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/cms', 'Additional properties')
+        'content' => \Yii::t('skeeks/cms', 'Additional properties'),
     ]); ?>
 
     <?php foreach ($relatedModel->properties as $property) : ?>
@@ -147,14 +147,13 @@ JS
 <? $fieldSet::end(); ?>
 
 
-
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement'), ['isOpen' => false]); ?>
 
 <?= $form->field($model, 'image_id')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
     [
-        'accept' => 'image/*',
-        'multiple' => false
+        'accept'   => 'image/*',
+        'multiple' => false,
     ]
 ); ?>
 
@@ -199,8 +198,8 @@ JS
 <?= $form->field($model, 'image_full_id')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
     [
-        'accept' => 'image/*',
-        'multiple' => false
+        'accept'   => 'image/*',
+        'multiple' => false,
     ]
 ); ?>
 
@@ -229,15 +228,15 @@ JS
 <?= $form->field($model, 'imageIds')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
     [
-        'accept' => 'image/*',
-        'multiple' => true
+        'accept'   => 'image/*',
+        'multiple' => true,
     ]
 ); ?>
 
 <?= $form->field($model, 'fileIds')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
     [
-        'multiple' => true
+        'multiple' => true,
     ]
 ); ?>
 

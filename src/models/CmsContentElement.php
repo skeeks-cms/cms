@@ -117,6 +117,8 @@ class CmsContentElement extends RelatedElementModel
     {
         parent::init();
 
+        $this->cms_site_id = \Yii::$app->skeeks->site->id;
+        
         $this->on(self::EVENT_BEFORE_DELETE, [$this, '_beforeDeleteE']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, '_afterDeleteE']);
     }
@@ -473,6 +475,7 @@ class CmsContentElement extends RelatedElementModel
                 ['map2trees.cms_tree_id' => null]
             );
         }
+        
 
         if ($this->cms_site_id) {
             $q->andWhere([

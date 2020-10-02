@@ -51,7 +51,7 @@ if ($filter->fill) {
 <?= $form->field($filter, 'fill')
     ->label(\Yii::t('skeeks/cms', 'Связь с разделами'))
     ->widget(
-        \skeeks\widget\chosen\Chosen::class,
+        \skeeks\cms\widgets\Select::class,
         [
             'items' => \yii\helpers\ArrayHelper::map(
                 \skeeks\cms\models\CmsTreeTypeProperty::find()->all(), 'id', 'name'

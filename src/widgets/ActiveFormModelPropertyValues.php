@@ -10,7 +10,6 @@ namespace skeeks\cms\widgets;
 
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit;
 use skeeks\modules\cms\form\models\Form;
-use skeeks\widget\chosen\Chosen;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -66,14 +65,14 @@ class ActiveFormModelPropertyValues extends ActiveFormAjaxSubmit
             ]
         );
 
-        foreach ($config as $key => $value) {
+        /*foreach ($config as $key => $value) {
             if (property_exists(Chosen::className(), $key) === false) {
                 unset($config[$key]);
             }
-        }
+        }*/
 
         return $this->field($model, $attribute, $fieldOptions)->widget(
-            Chosen::className(),
+            Select::className(),
             $config
         );
     }

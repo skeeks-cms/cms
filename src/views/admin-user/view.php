@@ -156,7 +156,7 @@ JS
                                 $manager = new \skeeks\cms\rbac\CmsManager(['cmsSite' => $cmsSite]);
                                 $roleNames = \yii\helpers\ArrayHelper::map($manager->getAvailableRoles(), 'name', 'description');
                                 \yii\helpers\ArrayHelper::remove($roleNames, \skeeks\cms\rbac\CmsManager::ROLE_GUEST);
-                                echo \skeeks\widget\chosen\Chosen::widget([
+                                echo \skeeks\cms\widgets\Select::widget([
                                     'items' => $roleNames,
                                     'multiple' => true,
                                     'name' => 'roles',

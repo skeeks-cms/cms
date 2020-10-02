@@ -113,7 +113,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
         $config = ArrayHelper::merge(
             $config, //Опции по умолчанию
             [
-                'multiple' => 'multiple',
+                'multiple' => true,
                 'size' => 5
             ]
         );

@@ -54,10 +54,16 @@ $items = [
     'published_at'      => "Время публикации",
 ];
 echo $form->field($model, 'editable_fields')->widget(
-    \skeeks\widget\chosen\Chosen::class, [
-        'multiple' => true,
-        'items'    => $items,
+    \skeeks\cms\widgets\Select::class, [
+        'options' => [
+            'multiple' => true,
+        ],
+        'data'    => $items,
     ]
+/*\skeeks\widget\chosen\Chosen::class, [
+    'multiple' => true,
+    'items'    => $items,
+]*/
 ); ?>
 
 
