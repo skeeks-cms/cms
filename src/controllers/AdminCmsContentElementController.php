@@ -776,7 +776,7 @@ HTML;
                         'style' => 'width: 150px;'
                     ],
 
-                    'label'  => $property->name." [свойство]",
+                    'label'  => $property->name,
                     'format' => 'raw',
                     'value'  => function ($model, $key, $index) use ($name, $relatedPropertiesModel) {
                         /**
@@ -792,7 +792,7 @@ HTML;
                 ];
 
                 $autoRules[] = ["property{$property->id}", "safe"];
-                $autoLabels["property{$property->id}"] = $property->name." [свойство]";
+                $autoLabels["property{$property->id}"] = $property->name;
 
 
                 if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
