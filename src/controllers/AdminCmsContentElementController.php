@@ -37,6 +37,7 @@ use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\widgets\AjaxSelect;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
@@ -797,7 +798,7 @@ HTML;
                 if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
                     $autoFilters["property{$property->id}"] = [
                         'class'    => TextField::class,
-                        'label'    => $property->name." [свойство]",
+                        'label'    => $property->name,
                         'on apply' => function (QueryFiltersEvent $e) use ($property) {
                             /**
                              * @var $query ActiveQuery
@@ -826,7 +827,7 @@ HTML;
 
                     $autoFilters["property{$property->id}"] = [
                         'class'    => BoolField::class,
-                        'label'    => $property->name." [свойство]",
+                        'label'    => $property->name,
                         'on apply' => function (QueryFiltersEvent $e) use ($property) {
                             /**
                              * @var $query ActiveQuery
@@ -853,7 +854,7 @@ HTML;
 
                 } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
 
-                    $count = CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->count();
+                    /*$count = CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->count();
 
                     if ($count > 100) {
                         $autoFilters["property{$property->id}"] = [
@@ -878,9 +879,56 @@ HTML;
                             //'items'    => ArrayHelper::map(CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->all(), 'id', 'value')
                             'multiple' => true,
                         ];
-                    }
+                    }*/
 
-                    $autoFilters["property{$property->id}"]['label'] = $property->name." [свойство]";
+
+
+                    $find = CmsContentPropertyEnum::find()->where(['property_id' => $property->id]);
+                    $autoFilters["property{$property->id}"] = [
+                        'class'    => WidgetField::class,
+                        'widgetClass' => AjaxSelect::class,
+                        'widgetConfig' => [
+                            'multiple' => true,
+                            'dataCallback' => function($q = '') use ($find) {
+
+                                $query = $find;
+
+                                if ($q) {
+                                    $query->andWhere(['like', 'value', $q]);
+                                }
+
+                                $data = $query->limit(50)
+                                    ->all();
+
+                                $result = [];
+
+                                if ($data) {
+                                    foreach ($data as $model)
+                                    {
+                                        $result[] = [
+                                            'id' => $model->id,
+                                            'text' => $model->value
+                                        ];
+                                    }
+                                }
+
+                                return $result;
+                            },
+
+                            'valueCallback' => function($value) {
+                                return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
+                            },
+
+                        ]
+
+                        /*'items'    => function () use ($propertyType) {
+                            return ArrayHelper::map(CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->all(), 'id', 'name');
+                        },*/
+
+                    ];
+
+
+                    $autoFilters["property{$property->id}"]['label'] = $property->name;
                     $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
                         /**
                          * @var $query ActiveQuery
@@ -906,7 +954,52 @@ HTML;
 
                     $propertyType = $property->handler;
 
-                    $count = CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->count();
+                    $find = CmsContentElement::find()->where(['content_id' => $propertyType->content_id]);
+                    $autoFilters["property{$property->id}"] = [
+                        'class'    => WidgetField::class,
+                        'widgetClass' => AjaxSelect::class,
+                        'widgetConfig' => [
+                            'multiple' => true,
+                            'dataCallback' => function($q = '') use ($find) {
+
+                                $query = $find;
+
+                                if ($q) {
+                                    $query->andWhere(['like', 'name', $q]);
+                                }
+
+                                $data = $query->limit(50)
+                                    ->all();
+
+                                $result = [];
+
+                                if ($data) {
+                                    foreach ($data as $model)
+                                    {
+                                        $result[] = [
+                                            'id' => $model->id,
+                                            'text' => $model->name
+                                        ];
+                                    }
+                                }
+
+                                return $result;
+                            },
+
+                            'valueCallback' => function($value) {
+                                return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
+                            },
+
+                        ]
+
+                        /*'items'    => function () use ($propertyType) {
+                            return ArrayHelper::map(CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->all(), 'id', 'name');
+                        },*/
+
+                    ];
+
+
+                    /*$count = CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->count();
 
                     if ($count > 100) {
                         $autoFilters["property{$property->id}"] = [
@@ -924,9 +1017,9 @@ HTML;
                             },
                             'multiple' => true,
                         ];
-                    }
+                    }*/
 
-                    $autoFilters["property{$property->id}"]["label"] = $property->name." [свойство]";
+                    $autoFilters["property{$property->id}"]["label"] = $property->name;
                     $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
                         /**
                          * @var $query ActiveQuery
@@ -953,7 +1046,7 @@ HTML;
                     $autoFilters["property{$property->id}"] = [
                         'class'       => WidgetField::class,
                         'widgetClass' => \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class,
-                        'label'       => $property->name." [свойство]",
+                        'label'       => $property->name,
                         'on apply'    => function (QueryFiltersEvent $e) use ($property) {
                             /**
                              * @var $query ActiveQuery

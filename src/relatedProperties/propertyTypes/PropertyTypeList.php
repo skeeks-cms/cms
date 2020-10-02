@@ -8,7 +8,9 @@
 
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
+use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\widgets\AjaxSelect;
 use skeeks\cms\widgets\Select;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
@@ -264,17 +266,63 @@ class PropertyTypeList extends PropertyType
      */
     public function renderForActiveForm()
     {
-        $field = '';
+        $field = parent::renderForActiveForm();
+
+        $find = CmsContentPropertyEnum::find();
 
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT) {
-            $field = $this->activeForm->field(
+
+            $config = [];
+            if ($this->property->is_required) {
+                $config['allowDeselect'] = false;
+            } else {
+                $config['allowDeselect'] = true;
+            }
+
+            //echo $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+            $field->widget(
+                AjaxSelect::class, [
+                    'dataCallback' => function($q = '') use ($find) {
+
+                        $query = $find;
+
+                        if ($q) {
+                            $query->andWhere(['like', 'value', $q]);
+                        }
+
+                        $data = $query->limit(50)
+                            ->all();
+
+                        $result = [];
+
+                        if ($data) {
+                            foreach ($data as $model)
+                            {
+                                $result[] = [
+                                    'id' => $model->id,
+                                    'text' => $model->value
+                                ];
+                            }
+                        }
+
+                        return $result;
+                    },
+
+                    'valueCallback' => function($value) {
+                        return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
+                    },
+                ]
+            );
+
+
+            /*$field = $this->activeForm->field(
                 $this->property->relatedPropertiesModel,
                 $this->property->code,
                 []
             )->widget(
                 Select::class,
                 ['items' => ArrayHelper::map($this->property->enums, 'id', 'value')]
-            );
+            );*/
             
             /*$field = $this->activeForm->fieldSelect(
                 $this->property->relatedPropertiesModel,
@@ -284,12 +332,48 @@ class PropertyTypeList extends PropertyType
             );*/
         } else {
             if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI) {
-                $field = $this->activeForm->fieldSelectMulti(
+
+                $field->widget(
+                AjaxSelect::class, [
+                    'multiple' => true,
+                    'dataCallback' => function($q = '') use ($find) {
+
+                        $query = $find;
+
+                        if ($q) {
+                            $query->andWhere(['like', 'value', $q]);
+                        }
+
+                        $data = $query->limit(50)
+                            ->all();
+
+                        $result = [];
+
+                        if ($data) {
+                            foreach ($data as $model)
+                            {
+                                $result[] = [
+                                    'id' => $model->id,
+                                    'text' => $model->value
+                                ];
+                            }
+                        }
+
+                        return $result;
+                    },
+
+                    'valueCallback' => function($value) {
+                        return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
+                    },
+                ]
+            );
+
+                /*$field = $this->activeForm->fieldSelectMulti(
                     $this->property->relatedPropertiesModel,
                     $this->property->code,
                     ArrayHelper::map($this->property->enums, 'id', 'value'),
                     []
-                );
+                );*/
             } else {
                 if ($this->fieldElement == self::FIELD_ELEMENT_RADIO_LIST) {
                     $field = parent::renderForActiveForm();
