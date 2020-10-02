@@ -27,6 +27,7 @@ use Yii;
 use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 
@@ -137,7 +138,7 @@ class User
         }
     }
 
-    public function _cmsAfterSave($e)
+    public function _cmsAfterSave(AfterSaveEvent $e)
     {
         if ($this->_roleNames !== null) {
             if ($this->roles) {
@@ -161,6 +162,10 @@ class User
                     \Yii::warning("Роль {$roleName} не зарегистрированна в системе", self::class);
                 }
             }
+        }
+
+        if (in_array("image_id", $e->changedAttributes)) {
+
         }
     }
 
