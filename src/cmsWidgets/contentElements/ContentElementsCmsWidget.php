@@ -60,7 +60,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public $createdBy = [];
     public $content_ids = [];
 
-    public $enabledActiveTime = CMS::BOOL_Y;
+    public $enabledActiveTime = CMS::BOOL_N;
 
 
     public $enabledRunCache = Cms::BOOL_N;
@@ -190,9 +190,9 @@ class ContentElementsCmsWidget extends WidgetRenderable
         }
 
 
-        if ($this->enabledActiveTime == Cms::BOOL_Y) {
+        /*if ($this->enabledActiveTime == Cms::BOOL_Y) {
             $query->publishedTime();
-        }
+        }*/
 
         /**
          *
@@ -374,12 +374,12 @@ class ContentElementsCmsWidget extends WidgetRenderable
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
                     ],
-                    'enabledActiveTime' => [
+                    /*'enabledActiveTime' => [
                         'class'      => BoolField::class,
                         'trueValue'  => 'Y',
                         'falseValue' => 'N',
                         'allowNull'  => false,
-                    ],
+                    ],*/
                     'createdBy'         => [
                         'class' => SelectField::class,
                         'items' => \yii\helpers\ArrayHelper::map(
