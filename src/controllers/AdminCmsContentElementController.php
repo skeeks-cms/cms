@@ -51,6 +51,7 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 use yii\web\Application;
 
@@ -170,8 +171,68 @@ class AdminCmsContentElementController extends BackendModelStandartController
 
                             'created_by' => [
                                 'field'             => [
-                                    'class'      => SelectField::class,
-                                    'items' => function() use ($content) {
+                                    'class'             => WidgetField::class,
+                                    'widgetClass'      => AjaxSelect::class,
+                                    'widgetConfig'      => [
+                                        'multiple' => true,
+                                        'dataCallback' => function($q = '') use ($content) {
+
+                                            $userIds = CmsContentElement::find()
+                                                    ->cmsSite()
+                                                    ->andWhere(['content_id' => $content->id])
+                                                    ->groupBy("created_by")
+                                                    ->select('created_by')
+                                                ->asArray()
+                                                ->indexBy("created_by")
+                                                ->all()
+                                            ;
+
+                                            $query = null;
+                                            if ($userIds) {
+                                                $userIds = array_keys($userIds);
+                                                $query = CmsUser::find()->where(['id' => $userIds]);
+                                                /*return ArrayHelper::map($q->all(), 'id', function(CmsUser $model) {
+                                                    return $model->shortDisplayName . ($model->email ? " ($model->email)" : "");
+                                                });*/
+                                            } else {
+                                                return [];
+                                            }
+
+
+                                            if ($q) {
+                                                $query->andWhere([
+                                                    'or',
+                                                    ['like', 'first_name', $q],
+                                                    ['like', 'last_name', $q],
+                                                    ['like', 'email', $q],
+                                                    ['like', 'phone', $q],
+                                                ]);
+                                            }
+
+                                            $data = $query->limit(50)
+                                                ->all();
+
+                                            $result = [];
+
+                                            if ($data) {
+                                                foreach ($data as $model)
+                                                {
+                                                    $result[] = [
+                                                        'id' => $model->id,
+                                                        'text' => $model->shortDisplayName
+                                                    ];
+                                                }
+                                            }
+
+                                            return $result;
+                                        },
+                                        'valueCallback' => function($value) {
+                                            return \yii\helpers\ArrayHelper::map(CmsUser::find()->where(['id' => $value])->all(), 'id', 'shortDisplayName');
+                                        },
+                                    ],
+                                    'items' => new UnsetArrayValue(),
+                                    'multiple' => new UnsetArrayValue(),
+                                    /*'items' => function() use ($content) {
                                         $userIds = CmsContentElement::find()
                                                 ->cmsSite()
                                                 ->andWhere(['content_id' => $content->id])
@@ -191,7 +252,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                         }
                                         
                                         return [];
-                                    }
+                                    }*/
                                 ],
                                 
                                 /*'class' => WidgetField::class,

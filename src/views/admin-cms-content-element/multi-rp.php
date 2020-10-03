@@ -95,34 +95,7 @@ JS
             <?php foreach ($properties as $property) : ?>
                 <?php $rpm->defineProperty($property); ?>
                 <div class="sx-multi sx-multi-<?= $property->code; ?>" style="display: none;">
-                    <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
-
-                        <?php if ($property->handler->fieldElement == \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT) : ?>
-                            <?
-                            echo $form->field($rpm, $property->code)->widget(
-                                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                                [
-                                    'content_id' => $property->handler->content_id,
-                                ]
-                            );
-                            ?>
-                        <?php else
-                            : ?>
-                            <?
-                            echo $form->field($rpm, $property->code)->widget(
-                                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                                [
-                                    'content_id' => $property->handler->content_id,
-                                    'multiple'   => true,
-                                ]
-                            );
-                            ?>
-                        <?php endif; ?>
-                    <?php else
-                        : ?>
-                        <?= $property->renderActiveForm($form);
-                        ?>
-                    <?php endif; ?>
+                    <?= $property->renderActiveForm($form); ?>
                 </div>
             <?php endforeach; ?>
             <?= $form->buttonsStandart($model, ['save']); ?>
