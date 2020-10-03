@@ -597,19 +597,25 @@ HTML;
                 ],
             ],
 
+            "delete" => [
+                'generateAccess' => true,
+            ],
             "create" => [
+                'generateAccess' => true,
                 "callback" => [$this, 'create'],
             ],
+
             "update" => [
+                'generateAccess' => true,
                 "callback" => [$this, 'update'],
             ],
 
             'stat' => [
+                'generateAccess' => true,
                 'class'          => ViewBackendAction::class,
                 'name'           => 'Статистика',
                 'icon'           => 'fas fa-info-circle',
                 'priority'       => 500,
-                "accessCallback" => true,
             ],
 
             "activate-multi"   => [
@@ -660,6 +666,10 @@ HTML;
                 "icon"           => "fas fa-copy",
                 "beforeContent"  => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
                 "successMessage" => "Элемент успешно скопирован",
+
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/create");
+                },
 
                 'on initFormModels' => function (Event $e) {
                     $model = $e->sender->model;

@@ -51,6 +51,7 @@ class AdminStorageFilesController extends BackendModelStandartController
     {
         $this->name = "Управление файлами хранилища";
         $this->modelClassName = StorageFile::class;
+        $this->generateAccessActions = true;
 
         parent::init();
     }
@@ -76,6 +77,7 @@ class AdminStorageFilesController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(),
             [
                 'upload' => [
+                    'generateAccess' => false,
                     'class'     => BackendAction::class,
                     'name'      => "Загрузить файлы",
                     'isVisible' => false,
@@ -84,6 +86,7 @@ class AdminStorageFilesController extends BackendModelStandartController
                 ],
 
                 'index' => [
+                    'generateAccess' => false,
                     'accessCallback'  => function () {
                         return (\Yii::$app->user->can("cms/admin-storage-files/index") || \Yii::$app->user->can("cms/admin-storage-files/index/own"));
                     },

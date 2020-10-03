@@ -56,7 +56,7 @@ class AdminUserController extends BackendModelStandartController
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
-            return \Yii::$app->user->can($this->uniqueId);
+            return true;
         };
         /*$this->permissionName = 'cms/admin-cms-site';*/
 
@@ -68,7 +68,6 @@ class AdminUserController extends BackendModelStandartController
         $actions = ArrayHelper::merge(parent::actions(), [
 
             "index" => [
-                'accessCallback' => true,
                 "filters"        => [
                     "visibleFilters" => [
                         'q',
@@ -301,22 +300,22 @@ class AdminUserController extends BackendModelStandartController
 
             'create' => [
                 "callback"       => [$this, 'create'],
-                "accessCallback" => function () {
-                    return \Yii::$app->user->can("cms/admin-user/create");
-                },
+                'generateAccess' => true,
             ],
+
 
             'view' => [
                 'class'          => BackendModelAction::class,
                 'name'           => 'Профиль',
                 'icon'           => 'fa fa-user',
                 "callback"       => [$this, 'view'],
+                'permissionName' => 'cms/admin-user/update',
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/update", ["model" => $this->model]);
+                    return true;
                 },
             ],
 
@@ -325,12 +324,15 @@ class AdminUserController extends BackendModelStandartController
                 'name'           => 'Статистика',
                 'icon'           => 'fas fa-info-circle',
                 'priority'       => 500,
+
+                'permissionName' => 'cms/admin-user/update-advanced',
+
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/update", ["model" => $this->model]);
+                    return true;
                 },
             ],
 
@@ -339,12 +341,16 @@ class AdminUserController extends BackendModelStandartController
                 'isVisible'      => false,
                 'name'           => 'Профиль',
                 "callback"       => [$this, 'addSite'],
+
+                'permissionName' => 'cms/admin-user/update-advanced',
+
                 "accessCallback" => function () {
+
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/update-advanced", ["model" => $this->model]);
+                    return true;
                 },
             ],
 
@@ -353,32 +359,34 @@ class AdminUserController extends BackendModelStandartController
                 'isVisible'      => false,
                 'name'           => 'Профиль',
                 "callback"       => [$this, 'saveSitePermissions'],
+                'permissionName' => 'cms/admin-user/update-advanced',
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/update-advanced", ["model" => $this->model]);
+                    return true;
                 },
             ],
 
             'update' => [
                 "callback"       => [$this, 'update'],
+                'generateAccess' => true,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/update", ["model" => $this->model]);
+                    return true;
                 },
             ],
 
             'delete' => [
+                'generateAccess' => true,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
-                    return \Yii::$app->user->can("cms/admin-user/delete", ["model" => $this->model]);
                 },
 
             ],
@@ -400,7 +408,6 @@ class AdminUserController extends BackendModelStandartController
                     return \Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model]);
                 },
                 "accessCallback"     => function () {
-
                     return \Yii::$app->user->can("cms/admin-user/update-advanced");
                 },
             ],
@@ -408,6 +415,9 @@ class AdminUserController extends BackendModelStandartController
             "delete-multi" => [
                 "eachAccessCallback" => function ($model) {
                     return \Yii::$app->user->can("cms/admin-user/delete", ['model' => $model]);
+                },
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can("cms/admin-user/delete");
                 },
             ],
         ]);

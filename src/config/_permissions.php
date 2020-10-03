@@ -33,11 +33,11 @@ return [
                 //Есть доступ к системе администрирования
                 'permissions' => [
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS,
+                    \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
 
                     \skeeks\cms\rbac\CmsManager::PERMISSION_ELFINDER_USER_FILES,
 
                     "cms/admin-settings",
-                    "cms/admin-info",
 
                     "cms/admin-cms-site",
                     "cms/admin-cms-lang",
@@ -66,9 +66,6 @@ return [
                     "cms/admin-user/update",
                     "cms/admin-user/update-advanced",
                     "cms/admin-user/delete",
-                    "cms/admin-user/delete-multi",
-                    "cms/admin-user/activate-multi",
-                    "cms/admin-user/deactivate-multi",
 
                     "cms/admin-storage",
                     "cms/admin-cms-tree-type",
@@ -175,6 +172,10 @@ return [
         [
             'name'        =>\skeeks\cms\rbac\CmsManager::PERMISSION_ROOT_ACCESS,
             'description' => ['skeeks/cms', 'Возможности суперадминистратора'],
+        ],
+        [
+            'name'        =>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+            'description' => ['skeeks/cms', 'Возможности администратора'],
         ],
 
         [

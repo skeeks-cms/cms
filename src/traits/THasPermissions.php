@@ -14,7 +14,6 @@ use yii\web\Application;
 
 /**
  * @property callable|null $accessCallback;
- * @property string|null $permissionName;
  * @property array|null $permissionNames;
  * @property bool $isAllow;
  *
@@ -74,39 +73,19 @@ trait THasPermissions
     }
 
 
-
-    /**
-     * @var string
-     * @deprecated
-     */
-    protected $_permissionName = null;
-
-    /**
-     * @return string
-     * @deprecated
-     */
-    public function getPermissionName()
-    {
-        return $this->_permissionName;
-    }
-
-    /**
-     * @param string|null $permissionName
-     * @return $this
-     * @deprecated
-     */
-    public function setPermissionName($permissionName = null)
-    {
-        $this->_permissionName = $permissionName;
-        return $this;
-    }
-
-
     /**
      * @return bool
      */
     public function getIsAllow()
     {
+        //Если указаны привелегии для проверки, то нужно их проверить, если нет доступа к ним дальше нет смысла проверять.
+        if ($this->permissionNames) {
+            if (!$this->_isAllowPermissions()) {
+                return false;
+            }
+        }
+
+
         if ($this->accessCallback && is_callable($this->accessCallback)) {
             $callback = $this->accessCallback;
             return (bool)call_user_func($callback, $this);
@@ -123,6 +102,15 @@ trait THasPermissions
      * @return bool
      */
     protected function _isAllow()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     * @throws \yii\base\Exception
+     */
+    protected function _isAllowPermissions()
     {
         if ($this->permissionNames) {
             foreach ($this->permissionNames as $permissionName => $permissionLabel) {

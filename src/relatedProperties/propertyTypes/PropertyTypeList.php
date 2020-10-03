@@ -268,7 +268,7 @@ class PropertyTypeList extends PropertyType
     {
         $field = parent::renderForActiveForm();
 
-        $find = CmsContentPropertyEnum::find();
+        $find = CmsContentPropertyEnum::find()->andWhere(['property_id' => $this->property->id]);
 
         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT) {
 
