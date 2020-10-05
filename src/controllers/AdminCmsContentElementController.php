@@ -1217,7 +1217,7 @@ HTML
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
+        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
 
@@ -1225,7 +1225,7 @@ HTML
                 $model,
                 $relatedModel,
             ]);
-        }
+        }*/
 
         if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
