@@ -39,6 +39,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                                $image_width
  * @property integer                                $priority
  * @property integer                                $cms_site_id
+ * @property integer                                $external_id
  *
  * @property string                                 $fileName
  * @property string                                 $src
@@ -90,6 +91,18 @@ class StorageFile extends Core
             ],
             
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::class, 'targetAttribute' => ['cms_site_id' => 'id']],
+            
+            [['external_id'], 'string', 'max' => 255],
+            [['external_id'], 'default', 'value' => null],
+            [
+                ['cms_site_id', 'external_id'],
+                'unique',
+                'targetAttribute' => ['cms_site_id', 'external_id'],
+                'when'            => function (self $model) {
+                    return (bool)$model->external_id;
+                },
+            ],
+
         ]);
     }
 

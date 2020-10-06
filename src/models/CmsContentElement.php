@@ -339,7 +339,7 @@ class CmsContentElement extends RelatedElementModel
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles'    => 40,
+                'maxFiles'    => 50,
                 'maxSize'     => 1024 * 1024 * 10,
                 'minSize'     => 256,
             ],
@@ -348,7 +348,7 @@ class CmsContentElement extends RelatedElementModel
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 //'extensions'    => [''],
-                'maxFiles'    => 40,
+                'maxFiles'    => 50,
                 'maxSize'     => 1024 * 1024 * 50,
                 'minSize'     => 256,
             ],
@@ -373,9 +373,9 @@ class CmsContentElement extends RelatedElementModel
             ],
 
             [
-                ['cms_site_id', 'external_id'],
+                ['cms_site_id', 'external_id', 'content_id'],
                 'unique',
-                'targetAttribute' => ['cms_site_id', 'external_id'],
+                'targetAttribute' => ['cms_site_id', 'external_id', 'content_id'],
                 'when'            => function (CmsContentElement $model) {
                     return (bool)$model->external_id;
                 },
