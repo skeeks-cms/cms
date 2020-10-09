@@ -28,13 +28,42 @@ class AjaxSelect extends Select
     /**
      * @var null
      */
+    public $ajaxUrl = null;
+
+    /**
+     * @var null
+     */
     public $valueCallback = null;
+
+    public function init()
+    {
+        $ajaxOptions = [];
+
+        if (isset($this->pluginOptions['ajax'])) {
+            $ajaxOptions = $this->pluginOptions['ajax'];
+        }
+
+        $this->pluginOptions['ajax'] = ArrayHelper::merge([
+            'url'      => $this->ajaxUrl ? $this->ajaxUrl : Url::current(['ajaxid' => $this->id]),
+            //'url' => Url::to([\Yii::$app->controller->action->id, 'ajaxid' => $this->id]),
+            'dataType' => 'json',
+            'delay'    => 250,
+            'cache'    => true,
+            'data'     => new JsExpression('function(params) { return {q:params.term}; }'),
+        ], $ajaxOptions);
+
+        parent::init();
+
+
+
+    }
 
 
     public function run() {
 
-        if (\Yii::$app->request->isAjax && \Yii::$app->request->get('ajaxid') == $this->id) {
-            $callback = $this->dataCallback;
+        $callback = $this->dataCallback;
+
+        if ($callback && \Yii::$app->request->isAjax && \Yii::$app->request->get('ajaxid') == $this->id) {
 
             \Yii::$app->on(Application::EVENT_AFTER_ACTION, function () use ($callback) {
                 ob_get_clean();
@@ -50,14 +79,7 @@ class AjaxSelect extends Select
             $this->data = call_user_func($callback, $this->value);
         }
 
-        $this->pluginOptions['ajax'] = [
-            'url'      => Url::current(['ajaxid' => $this->id]),
-            //'url' => Url::to([\Yii::$app->controller->action->id, 'ajaxid' => $this->id]),
-            'dataType' => 'json',
-            'delay'    => 250,
-            'cache'    => true,
-            'data'     => new JsExpression('function(params) { return {q:params.term}; }'),
-        ];
+
 
         parent::run();
     }

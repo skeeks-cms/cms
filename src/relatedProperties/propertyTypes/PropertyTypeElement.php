@@ -15,6 +15,7 @@ use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\AjaxSelect;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
@@ -40,11 +41,13 @@ class PropertyTypeElement extends PropertyType
     public static function fieldElements()
     {
         return [
-            self::FIELD_ELEMENT_SELECT => \Yii::t('skeeks/cms', 'Combobox') . ' (select)',
-            self::FIELD_ELEMENT_SELECT_MULTI => \Yii::t('skeeks/cms', 'Combobox') . ' (select multiple)',
-            self::FIELD_ELEMENT_RADIO_LIST => \Yii::t('skeeks/cms', 'Radio Buttons (selecting one value)'),
-            self::FIELD_ELEMENT_CHECKBOX_LIST => \Yii::t('skeeks/cms', 'Checkbox List'),
-            self::FIELD_ELEMENT_SELECT_DIALOG => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
+            self::FIELD_ELEMENT_SELECT                 => \Yii::t('skeeks/cms', 'Выпадающий список'),
+            self::FIELD_ELEMENT_SELECT_MULTI           => \Yii::t('skeeks/cms', 'Выпадающий список (возможность выбора нескольких значений)'),
+            //self::FIELD_ELEMENT_RADIO_LIST             => \Yii::t('skeeks/cms', 'Radio Buttons (selecting one value)'),
+            //self::FIELD_ELEMENT_CHECKBOX_LIST          => \Yii::t('skeeks/cms', 'Checkbox List'),
+            //self::FIELD_ELEMENT_LISTBOX                => \Yii::t('skeeks/cms', 'ListBox'),
+            //self::FIELD_ELEMENT_LISTBOX_MULTI          => \Yii::t('skeeks/cms', 'ListBox Multi'),
+            self::FIELD_ELEMENT_SELECT_DIALOG          => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
             self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE => \Yii::t('skeeks/cms',
                 'Selection widget in the dialog box (multiple choice)'),
         ];
@@ -87,6 +90,13 @@ class PropertyTypeElement extends PropertyType
             ]);
     }
 
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+                'fieldElement' => \Yii::t('skeeks/cms', 'Задайте то, как будет происходить выбор значений списка'),
+            ]);
+    }
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
@@ -123,7 +133,8 @@ class PropertyTypeElement extends PropertyType
             //echo $this->property->relatedPropertiesModel->getAttribute($this->property->code);
             $field->widget(
                 AjaxSelect::class, [
-                    'dataCallback' => function($q = '') use ($find) {
+                    'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
+                    /*'dataCallback' => function($q = '') use ($find) {
 
                         $query = $find;
 
@@ -147,7 +158,7 @@ class PropertyTypeElement extends PropertyType
                         }
 
                         return $result;
-                    },
+                    },*/
 
                     'valueCallback' => function($value) {
                         return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
@@ -166,7 +177,8 @@ class PropertyTypeElement extends PropertyType
             $field->widget(
                 AjaxSelect::class, [
                     'multiple' => true,
-                    'dataCallback' => function($q = '') use ($find) {
+                    'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
+                    /*'dataCallback' => function($q = '') use ($find) {
 
                         $query = $find;
 
@@ -190,7 +202,7 @@ class PropertyTypeElement extends PropertyType
                         }
 
                         return $result;
-                    },
+                    },*/
 
                     'valueCallback' => function($value) {
                         return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');

@@ -960,7 +960,8 @@ HTML;
                         'widgetClass' => AjaxSelect::class,
                         'widgetConfig' => [
                             'multiple' => true,
-                            'dataCallback' => function($q = '') use ($find) {
+                            'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
+                            /*'dataCallback' => function($q = '') use ($find) {
 
                                 $query = $find;
 
@@ -984,7 +985,7 @@ HTML;
                                 }
 
                                 return $result;
-                            },
+                            },*/
 
                             'valueCallback' => function($value) {
                                 return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
@@ -1031,7 +1032,8 @@ HTML;
                         'widgetClass' => AjaxSelect::class,
                         'widgetConfig' => [
                             'multiple' => true,
-                            'dataCallback' => function($q = '') use ($find) {
+                            'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
+                            /*'dataCallback' => function($q = '') use ($find) {
 
                                 $query = $find;
 
@@ -1055,7 +1057,7 @@ HTML;
                                 }
 
                                 return $result;
-                            },
+                            },*/
 
                             'valueCallback' => function($value) {
                                 return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
