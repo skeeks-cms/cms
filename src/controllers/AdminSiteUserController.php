@@ -30,6 +30,7 @@ use skeeks\cms\widgets\ActiveForm;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
+use yii\bootstrap\Alert;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -46,16 +47,16 @@ class AdminSiteUserController extends BackendModelStandartController
         $this->modelShowAttribute = "displayName";
         $this->modelClassName = CmsUser::class;
 
-        $this->generateAccessActions = false;
         $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
+            /*if (\Yii::$app->skeeks->site->is_default) {
                 return false;
-            }
+            }*/
+
             if (CmsSite::find()->active()->count() == 1) {
                 return false;
             }
             
-            return \Yii::$app->user->can($this->uniqueId);
+            return true;
         };
         /*$this->permissionName = 'cms/admin-cms-site';*/
 
@@ -66,9 +67,26 @@ class AdminSiteUserController extends BackendModelStandartController
     {
         $actions = ArrayHelper::merge(parent::actions(), [
 
-            //"update" => new UnsetArrayValue(),
+            "create" => new UnsetArrayValue(),
+            "update" => new UnsetArrayValue(),
             "delete" => new UnsetArrayValue(),
             "index"  => [
+                'on beforeRender' => function (Event $e) {
+                    if (\Yii::$app->skeeks->site->is_default) {
+                        $e->content = Alert::widget([
+                            'closeButton' => false,
+                            'options'     => [
+                                'class' => 'alert-default',
+                            ],
+
+                            'body' => <<<HTML
+    <p>На портале имеется много сайтов и на каждом из них список пользователей может отличаться. В этом разделе показаны пользователи которые относятся к этому сайту.</p>
+HTML
+                            ,
+                        ]);
+                    }
+                },
+
                 'backendShowings' => false,
                 'accessCallback'  => true,
                 "filters"         => [
@@ -186,17 +204,23 @@ class AdminSiteUserController extends BackendModelStandartController
 
                     'on init' => function (Event $event) {
 
+                        $query = $event->sender->dataProvider->query;
+
+                        $query->joinWith('cmsAuthAssignments as cmsAuthAssignments')->andWhere([
+                            'cmsAuthAssignments.cms_site_id' => \Yii::$app->skeeks->site->id
+                        ]);
+
                         if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROOT_ACCESS)) {
                             //TODO: доработать запрос
-                            $query = $event->sender->dataProvider->query;
                             $query->innerJoin('auth_assignment', 'auth_assignment.cms_user_id = cms_user.id');
                             $query->andFilterWhere([
                                 "!=",
                                 'auth_assignment.item_name',
                                 CmsManager::ROLE_ROOT,
                             ]);
-                            $query->groupBy([CmsUser::tableName().".id"]);
+
                         }
+                        $query->groupBy([CmsUser::tableName().".id"]);
 
                     },
 
@@ -290,13 +314,13 @@ class AdminSiteUserController extends BackendModelStandartController
                 ],
             ],
 
-            'create' => [
+            /*'create' => [
                 "callback"       => [$this, 'create'],
                 "name"          => "Добавить",
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-user/create");
                 },
-            ],
+            ],*/
 
             'view' => [
                 'class'          => BackendModelAction::class,
