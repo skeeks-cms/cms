@@ -14,6 +14,63 @@ use yii\web\Application;
 use yii\web\JsExpression;
 
 /**
+ * 
+ * 
+ * 
+     'dataCallback' => function($q = '') use ($content) {
+    
+        $userIds = CmsContentElement::find()
+                ->cmsSite()
+                ->andWhere(['content_id' => $content->id])
+                ->groupBy("created_by")
+                ->select('created_by')
+            ->asArray()
+            ->indexBy("created_by")
+            ->all()
+        ;
+    
+        $query = null;
+        if ($userIds) {
+            $userIds = array_keys($userIds);
+            $query = CmsUser::find()->where(['id' => $userIds]);
+         
+        } else {
+            return [];
+        }
+    
+    
+        if ($q) {
+            $query->andWhere([
+                'or',
+                ['like', 'first_name', $q],
+                ['like', 'last_name', $q],
+                ['like', 'email', $q],
+                ['like', 'phone', $q],
+            ]);
+        }
+    
+        $data = $query->limit(50)
+            ->all();
+    
+        $result = [];
+    
+        if ($data) {
+            foreach ($data as $model)
+            {
+                $result[] = [
+                    'id' => $model->id,
+                    'text' => $model->shortDisplayName
+                ];
+            }
+        }
+    
+        return $result;
+    },
+    'valueCallback' => function($value) {
+        return \yii\helpers\ArrayHelper::map(CmsUser::find()->where(['id' => $value])->all(), 'id', 'shortDisplayName');
+    },
+    
+    
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AjaxSelect extends Select
