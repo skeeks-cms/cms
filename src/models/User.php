@@ -42,9 +42,9 @@ use yii\web\IdentityInterface;
  * @property integer                     $created_at
  * @property integer                     $updated_at
  * @property integer                     $image_id
- * @property integer                     $first_name
- * @property integer                     $last_name
- * @property integer                     $patronymic
+ * @property string                      $first_name
+ * @property string                      $last_name
+ * @property string                      $patronymic
  *
  * @property string                      $gender
  * @property string                      $active
@@ -136,7 +136,7 @@ class User
         if ($this->active == "N" && $this->id == \Yii::$app->user->identity->id) {
             throw new Exception(\Yii::t('skeeks/cms', 'Нельзя деактивировать себя'));
         }
-        
+
         if ($this->isAttributeChanged('image_id')) {
             if ($this->image) {
                 if (!$this->image->cmsSite->is_default) {
@@ -176,7 +176,7 @@ class User
             }
         }
 
-        
+
     }
 
     /**
