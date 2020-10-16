@@ -440,7 +440,6 @@ class GridView extends \yii\grid\GridView
 
     protected function _initDialogCallbackData()
     {
-
         if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
             $this->view->registerJs(<<<JS
 (function(sx, $, _)
@@ -460,7 +459,7 @@ class GridView extends \yii\grid\GridView
             $('table tr .sx-row-action').on('click', function()
             {
                 self.submit($(this).data());
-                $(this).empty().append('<i class="fas fa-check"></i>&nbsp;Выборано');
+                $(this).empty().append('<i class="fas fa-check"></i>&nbsp;Выбрано');
                 $(this).addClass("btn-primary");
                 return false;
             });
@@ -468,6 +467,9 @@ class GridView extends \yii\grid\GridView
 
         submit: function(data)
         {
+            this.trigger("submit", data);
+            sx.EventManager.trigger('submitElement', data);
+            
             if (window.opener)
             {
                 if (window.opener.sx)

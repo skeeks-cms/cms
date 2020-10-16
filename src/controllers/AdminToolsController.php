@@ -110,7 +110,7 @@ class AdminToolsController extends AdminController
      * Выбор файла
      * @return string
      */
-    public function actionSelectFile()
+    /*public function actionSelectFile()
     {
         //$this->layout = '@skeeks/cms/modules/admin/views/layouts/main.php';
         \Yii::$app->cmsToolbar->enabled = 0;
@@ -129,7 +129,7 @@ class AdminToolsController extends AdminController
         return $this->render($this->action->id, [
             'model' => $model
         ]);
-    }
+    }*/
 
 
     /**

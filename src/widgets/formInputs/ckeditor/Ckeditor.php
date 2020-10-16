@@ -8,15 +8,10 @@
 
 namespace skeeks\cms\widgets\formInputs\ckeditor;
 
+use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\Exception;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\yii2\ckeditor\CKEditorWidget;
-use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
-use yii\widgets\InputWidget;
-use Yii;
 
 /**
  * Class Ckeditor
@@ -41,14 +36,24 @@ class Ckeditor extends CKEditorWidget
     public function init()
     {
         $additionalData = [];
-        if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord)) {
+        /*if ($this->relatedModel && ($this->relatedModel instanceof ActiveRecord && !$this->relatedModel->isNewRecord)) {
             $additionalData = [
                 'className' => $this->relatedModel->className(),
                 'pk' => $this->relatedModel->primaryKey,
             ];
-        }
+        }*/
 
-        $this->clientOptions['filebrowserImageUploadUrl'] = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-tools/select-file'])
+        $url = BackendUrlHelper::createByParams(['/cms/admin-storage-files'])
+            ->enableEmptyLayout()
+            ->setCallbackEventName("ckeditor")
+            ->url;
+
+        //$this->clientOptions['filebrowserImageUploadUrl'] = $url;
+        $this->clientOptions['filebrowserImageBrowseUrl'] = $url;
+        $this->clientOptions['filebrowserBrowseUrl'] = $url;
+
+
+        /*$this->clientOptions['filebrowserImageUploadUrl'] = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-tools/select-file'])
             ->merge($additionalData)
             ->enableEmptyLayout()
             ->url;
@@ -61,7 +66,7 @@ class Ckeditor extends CKEditorWidget
         $this->clientOptions['filebrowserBrowseUrl'] = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-tools/select-file'])
             ->merge($additionalData)
             ->enableEmptyLayout()
-            ->url;
+            ->url;*/
 
         parent::init();
     }

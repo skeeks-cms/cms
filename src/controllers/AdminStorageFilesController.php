@@ -91,9 +91,23 @@ class AdminStorageFilesController extends BackendModelStandartController
                         return (\Yii::$app->user->can("cms/admin-storage-files/index") || \Yii::$app->user->can("cms/admin-storage-files/index/own"));
                     },
                     'on beforeRender' => function (Event $event) {
+
+                        if ($CKEditorFuncNum = \Yii::$app->request->get("CKEditorFuncNum")) {
+                            \Yii::$app->view->registerJs(<<<JS
+                            if (window.opener) {
+                                if (window.opener.CKEDITOR) {
+                                    sx.EventManager.on("submitElement", function(e, data) {
+                                        window.opener.CKEDITOR.tools.callFunction({$CKEditorFuncNum}, data.src);
+                                        window.close();
+                                    });
+                                }
+                            }
+JS
+                            );
+                        }
+
                         $event->content = \skeeks\cms\widgets\StorageFileManager::widget([
-                                'clientOptions' =>
-                                    [
+                                'clientOptions' => [
                                         'completeUploadFile' => new \yii\web\JsExpression(<<<JS
         function(data)
         {
