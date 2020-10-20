@@ -166,7 +166,7 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
         ])
             ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
             ->setTo(trim($this->value))
-            ->setSubject('Подтверждение email')
+            ->setSubject('Подтверждение e-mail')
             ->send();
     }
 

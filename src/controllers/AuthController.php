@@ -374,7 +374,7 @@ class AuthController extends Controller
                     return $this->redirect(Yii::$app->getUser()->getReturnUrl());
 
                     $rr->success = true;
-                    $rr->message = 'Поздравляем! Ваш email успешно подтвержден и теперь вы можете авторизоваться на сайте.';
+                    $rr->message = 'Поздравляем! Ваш e-mail успешно подтвержден и теперь вы можете авторизоваться на сайте.';
 
                 } else {
                     $rr->success = false;
