@@ -13,22 +13,23 @@ use skeeks\cms\relatedProperties\models\RelatedElementPropertyModel;
 /**
  * This is the model class for table "{{%cms_content_element_property}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $property_id
- * @property integer $element_id
- * @property string $value
- * @property integer $value_enum
- * @property string $value_num
- * @property string $description
+ * @property integer                $id
+ * @property integer                $created_by
+ * @property integer                $updated_by
+ * @property integer                $created_at
+ * @property integer                $updated_at
+ * @property integer                $property_id
+ * @property integer                $element_id
+ * @property string                 $value
+ * @property integer                $value_enum
+ * @property string                 $value_num
+ * @property string                 $description
  *
- * @property CmsContentProperty $property
- * @property CmsContentElement $element
+ * @property CmsContentProperty     $property
+ * @property CmsContentElement      $element
+ * @property CmsContentPropertyEnum $valueEnum
  *
- * @property CmsContentElement $valueCmsContentElements
+ * @property CmsContentElement      $valueCmsContentElements
  */
 class CmsContentElementProperty extends RelatedElementPropertyModel
 {
@@ -66,5 +67,13 @@ class CmsContentElementProperty extends RelatedElementPropertyModel
     {
         $class = $this->elementClass;
         return $this->hasOne($class, ['id' => 'value_element_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getValueEnum()
+    {
+        $class = $this->elementClass;
+        return $this->hasOne(CmsContentPropertyEnum::class, ['id' => 'value_enum_id']);
     }
 }

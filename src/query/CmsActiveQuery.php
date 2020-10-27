@@ -45,6 +45,14 @@ class CmsActiveQuery extends ActiveQuery
             return $this->andWhere(['!=', $this->getPrimaryTableName().'.is_default', 1]);
         }
     }
+    /**
+     * @param int $order
+     * @return CmsActiveQuery
+     */
+    public function sort($order = SORT_ASC)
+    {
+        return $this->orderBy([$this->getPrimaryTableName().'.priority' => $order]);
+    }
 
     /**
      * @depricated
