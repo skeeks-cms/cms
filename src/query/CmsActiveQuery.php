@@ -86,4 +86,26 @@ class CmsActiveQuery extends ActiveQuery
         }
         return $this->andWhere([$alias.'.cms_site_id' => $cmsSite->id]);
     }
+
+
+    /**
+     * @param string $word
+     * @return CmsActiveQuery
+     */
+    public function search($word = '')
+    {
+        $modelClass = $this->modelClass;
+        if ($modelClass::getTableSchema()->columns) {
+            $where = [];
+            $where[] = "or";
+            foreach ($modelClass::getTableSchema()->columns as $key => $column)
+            {
+                $where[] = ['like', $key, $word];
+            }
+
+            $this->andWhere($where);
+        }
+
+        return $this;
+    }
 }
