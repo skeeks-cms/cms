@@ -19,10 +19,10 @@ class FancyboxAssets extends AssetBundle
     public $sourcePath = '@bower/fancybox/dist';
 
     public $js = [
-        'jquery.fancybox.js',
+        'jquery.fancybox.min.js',
     ];
 
     public $css = [
-        'jquery.fancybox.css',
+        'jquery.fancybox.min.css',
     ];
 }
