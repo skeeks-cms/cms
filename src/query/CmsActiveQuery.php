@@ -84,9 +84,9 @@ class CmsActiveQuery extends ActiveQuery
                 }
             }
         }
+        
         return $this->andWhere([$alias.'.cms_site_id' => $cmsSite->id]);
     }
-
 
     /**
      * @param string $word
@@ -100,7 +100,7 @@ class CmsActiveQuery extends ActiveQuery
             $where[] = "or";
             foreach ($modelClass::getTableSchema()->columns as $key => $column)
             {
-                $where[] = ['like', $key, $word];
+                $where[] = ['like', $this->getPrimaryTableName() . "." . $key, $word];
             }
 
             $this->andWhere($where);
