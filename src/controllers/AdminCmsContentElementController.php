@@ -38,6 +38,7 @@ use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\AjaxSelect;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
@@ -172,11 +173,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             'created_by' => [
                                 'field'             => [
                                     'class'             => WidgetField::class,
-                                    'widgetClass'      => AjaxSelect::class,
                                     'widgetConfig'      => [
                                         'multiple' => true,
-                                        'dataCallback' => function($q = '') use ($content) {
-
+                                        'searchQuery' => function($word = '') use ($content) {
                                             $userIds = CmsContentElement::find()
                                                     ->cmsSite()
                                                     ->andWhere(['content_id' => $content->id])
@@ -195,64 +194,23 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                                     return $model->shortDisplayName . ($model->email ? " ($model->email)" : "");
                                                 });*/
                                             } else {
-                                                return [];
+                                                $query = CmsUser::find()->where(['id' => null]);
                                             }
 
 
-                                            if ($q) {
+                                            if ($word) {
                                                 $query->andWhere([
                                                     'or',
-                                                    ['like', 'first_name', $q],
-                                                    ['like', 'last_name', $q],
-                                                    ['like', 'email', $q],
-                                                    ['like', 'phone', $q],
+                                                    ['like', 'first_name', $word],
+                                                    ['like', 'last_name', $word],
+                                                    ['like', 'email', $word],
+                                                    ['like', 'phone', $word],
                                                 ]);
                                             }
-
-                                            $data = $query->limit(50)
-                                                ->all();
-
-                                            $result = [];
-
-                                            if ($data) {
-                                                foreach ($data as $model)
-                                                {
-                                                    $result[] = [
-                                                        'id' => $model->id,
-                                                        'text' => $model->shortDisplayName
-                                                    ];
-                                                }
-                                            }
-
-                                            return $result;
-                                        },
-                                        'valueCallback' => function($value) {
-                                            return \yii\helpers\ArrayHelper::map(CmsUser::find()->where(['id' => $value])->all(), 'id', 'shortDisplayName');
+                                            
+                                            return $query;
                                         },
                                     ],
-                                    'items' => new UnsetArrayValue(),
-                                    'multiple' => new UnsetArrayValue(),
-                                    /*'items' => function() use ($content) {
-                                        $userIds = CmsContentElement::find()
-                                                ->cmsSite()
-                                                ->andWhere(['content_id' => $content->id])
-                                                ->groupBy("created_by")
-                                                ->select('created_by')
-                                            ->asArray()
-                                            ->indexBy("created_by")
-                                            ->all()
-                                        ;
-                                        
-                                        if ($userIds) {
-                                            $userIds = array_keys($userIds);
-                                            $q = CmsUser::find()->where(['id' => $userIds]);
-                                            return ArrayHelper::map($q->all(), 'id', function(CmsUser $model) {
-                                                return $model->shortDisplayName . ($model->email ? " ($model->email)" : "");
-                                            });
-                                        }
-                                        
-                                        return [];
-                                    }*/
                                 ],
                                 
                                 /*'class' => WidgetField::class,
