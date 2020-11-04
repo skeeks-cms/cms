@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\base;
 
-use skeeks\cms\grid\BooleanColumn;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
@@ -49,13 +48,18 @@ class WidgetRenderable extends Widget
      */
     public $cache_tags = [];
 
+    /**
+     * @var array 
+     */
+    public $params = [];
+
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'viewFile' => \Yii::t('skeeks/cms', 'File-template'),
-            'is_cache' => "Включить кэширование",
-            'cache_duration' => "Время жизни кэша",
+            'viewFile'                 => \Yii::t('skeeks/cms', 'File-template'),
+            'is_cache'                 => "Включить кэширование",
+            'cache_duration'           => "Время жизни кэша",
             'is_cache_unique_for_user' => "У каждого юзера свой кэш?",
         ]);
     }
@@ -63,8 +67,8 @@ class WidgetRenderable extends Widget
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'is_cache' => "Внимание если в виджете подключаются какие либо скрипты, то возможно, ваш виджет с кэшированием будет работать некорректно.",
-            'cache_duration' => "Максимальное время жизни кэша. Но он может сброситься и раньше по мере необходимости.",
+            'is_cache'                 => "Внимание если в виджете подключаются какие либо скрипты, то возможно, ваш виджет с кэшированием будет работать некорректно.",
+            'cache_duration'           => "Максимальное время жизни кэша. Но он может сброситься и раньше по мере необходимости.",
             'is_cache_unique_for_user' => "Если эта настройка включена, то у каждого авторизованного пользоателя этот блок будет кэшироваться по своему.",
         ]);
     }
@@ -87,23 +91,23 @@ class WidgetRenderable extends Widget
     {
         return [
             'cache' => [
-                'class' => FieldSet::class,
-                'name' => 'Настройки кэширования',
+                'class'  => FieldSet::class,
+                'name'   => 'Настройки кэширования',
                 'fields' => [
-                    'is_cache' => [
-                        'class' => BoolField::class,
+                    'is_cache'                 => [
+                        'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'cache_duration' => [
-                        'class' => NumberField::class,
-                        'append' => "сек"
+                    'cache_duration'           => [
+                        'class'  => NumberField::class,
+                        'append' => "сек",
                     ],
                     'is_cache_unique_for_user' => [
-                        'class' => BoolField::class,
+                        'class'     => BoolField::class,
                         'allowNull' => false,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -144,7 +148,7 @@ class WidgetRenderable extends Widget
                         $this->cmsUser ? $this->cmsUser->cacheTag : '',
                         $this->cmsSite ? $this->cmsSite->cacheTag : '',
                     ],
-                ])
+                ]),
             ];
 
             $this->_cacheDependency = $dependency;
@@ -166,15 +170,15 @@ class WidgetRenderable extends Widget
 
     public function run()
     {
-        $cacheKey = $this->getCacheKey($this->is_cache_unique_for_user) . 'WidgetRenderableRun';
+        $cacheKey = $this->getCacheKey($this->is_cache_unique_for_user).'WidgetRenderableRun';
 
         $result = \Yii::$app->cache->get($cacheKey);
         if ($result === false || $this->is_cache === false) {
 
             if ($this->viewFile) {
-                $result = $this->render($this->viewFile, [
+                $result = $this->render($this->viewFile, ArrayHelper::merge($this->params, [
                     'widget' => $this,
-                ]);
+                ]));
             } else {
                 $result = \Yii::t('skeeks/cms', "Template not found");
             }
