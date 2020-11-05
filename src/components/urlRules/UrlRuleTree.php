@@ -1,9 +1,9 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
- * @date 24.05.2015
  */
 
 namespace skeeks\cms\components\urlRules;
@@ -11,11 +11,8 @@ namespace skeeks\cms\components\urlRules;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
-use \yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
-use yii\db\Exception;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
 
 /**
  * Class UrlRuleTree
@@ -35,8 +32,8 @@ class UrlRuleTree
 
     /**
      * @param \yii\web\UrlManager $manager
-     * @param string $route
-     * @param array $params
+     * @param string              $route
+     * @param array               $params
      * @return bool|string
      */
     public function createUrl($manager, $route, $params)
@@ -59,7 +56,7 @@ class UrlRuleTree
 
                     if ($tree->site) {
                         if ($tree->site->cmsSiteMainDomain) {
-                            return $tree->site->url . '/' . $url;
+                            return $tree->site->url.'/'.$url;
                         } else {
                             return $url;
                         }
@@ -102,7 +99,7 @@ class UrlRuleTree
              * @see parent::createUrl()
              */
             if (!empty($params) && ($query = http_build_query($params)) !== '') {
-                $url .= '?' . $query;
+                $url .= '?'.$query;
             }
 
 
@@ -110,7 +107,7 @@ class UrlRuleTree
             if ($tree->site) {
                 //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
                 if ($tree->site->cmsSiteMainDomain) {
-                    return $tree->site->url . '/' . $url;
+                    return $tree->site->url.'/'.$url;
                 }
             }
 
@@ -141,7 +138,7 @@ class UrlRuleTree
         ArrayHelper::remove($params, 'site_id');
 
 
-        if ($treeModel && $treeModel instanceof Tree) {
+        if ($treeModel && $treeModel instanceof CmsTree) {
             $tree = $treeModel;
             self::$models[$treeModel->id] = $treeModel;
 
@@ -175,8 +172,8 @@ class UrlRuleTree
             }
 
             $tree = CmsTree::findOne([
-                'dir' => $dir,
-                'cms_site_id' => $cmsSite->id
+                'dir'         => $dir,
+                'cms_site_id' => $cmsSite->id,
             ]);
 
             if ($tree) {
@@ -191,7 +188,7 @@ class UrlRuleTree
 
     /**
      * @param \yii\web\UrlManager $manager
-     * @param \yii\web\Request $request
+     * @param \yii\web\Request    $request
      * @return array|bool
      */
     public function parseRequest($manager, $request)
@@ -224,7 +221,7 @@ class UrlRuleTree
         }
 
         if ($this->host !== null) {
-            $pathInfo = strtolower($request->getHostInfo()) . ($pathInfo === '' ? '' : '/' . $pathInfo);
+            $pathInfo = strtolower($request->getHostInfo()).($pathInfo === '' ? '' : '/'.$pathInfo);
         }
 
         $params = $request->getQueryParams();
@@ -239,25 +236,24 @@ class UrlRuleTree
         $dependency = new TagDependency([
             'tags' =>
                 [
-                    (new Tree())->getTableCacheTagCmsSite(),
+                    (new CmsTree())->getTableCacheTagCmsSite(),
                 ],
         ]);
 
 
         //Main page
-        if (!$pathInfo)
-        {
-            $treeNode = Tree::getDb()->cache(function($db) {
-                return Tree::find()->where([
+        if (!$pathInfo) {
+            $treeNode = CmsTree::getDb()->cache(function ($db) {
+                return CmsTree::find()->where([
                     "cms_site_id" => \Yii::$app->skeeks->site->id,
-                    "level" => 0,
+                    "level"       => 0,
                 ])->one();
             }, null, $dependency);
 
         } else //второстепенная страница
         {
-            $treeNode = Tree::getDb()->cache(function($db) use ($originalDir) {
-                return Tree::find()->where([
+            $treeNode = CmsTree::getDb()->cache(function ($db) use ($originalDir) {
+                return CmsTree::find()->where([
                     "dir"         => $originalDir,
                     "cms_site_id" => \Yii::$app->skeeks->site->id,
                 ])->one();

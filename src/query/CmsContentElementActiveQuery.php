@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\query;
 
+use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\CmsTree;
 use yii\helpers\ArrayHelper;
 
@@ -62,15 +63,15 @@ class CmsContentElementActiveQuery extends CmsActiveQuery
         }
 
         if ($isJoinSecondTrees === true) {
-            $query->joinWith('cmsContentElementTrees');
-            $query->andWhere([
+            $this->joinWith('cmsContentElementTrees');
+            $this->andWhere([
                 'or',
                 [$this->getPrimaryTableName().'.tree_id' => $treeIds],
                 [CmsContentElementTree::tableName().'.tree_id' => $treeIds],
             ]);
-            $query->groupBy([$this->getPrimaryTableName().'.id']);
+            $this->groupBy([$this->getPrimaryTableName().'.id']);
         } else {
-            $query->andWhere([$this->getPrimaryTableName().'.tree_id' => $treeIds]);
+            $this->andWhere([$this->getPrimaryTableName().'.tree_id' => $treeIds]);
         }
 
         return $this;
