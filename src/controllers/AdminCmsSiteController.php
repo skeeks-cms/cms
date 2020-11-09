@@ -401,6 +401,7 @@ class AdminCmsSiteController extends BackendModelStandartController
                 ],
             ],
             'name',
+            'internal_name',
             'is_active'      => $active,
             'is_default'         => $def,
             'description' => [
@@ -410,45 +411,6 @@ class AdminCmsSiteController extends BackendModelStandartController
 
         ];
 
-        /*if (!$action->model->isNewRecord) {
-            $result['domains'] = [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/cms', "Domains"),
-                'fields' => [
-                    'domains' => [
-                        'class' => HtmlBlock::class,
-                        'content' => \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                            'label' => "",
-                            'hint' => "",
-                            'parentModel' => $action->model,
-                            'relation' => [
-                                'cms_site_id' => 'id'
-                            ],
-
-                            'controllerRoute' => '/cms/admin-cms-site-domain',
-                            'gridViewOptions' => [
-                                'columns' => [
-                                    //['class' => 'yii\grid\SerialColumn'],
-                                    'domain',
-                                    'is_main' => [
-                                        'class' => BooleanColumn::class,
-                                        'attribute' => 'is_main',
-                                        'trueValue' => 1,
-                                        'falseValue' => 0,
-                                    ],
-                                    'is_https' => [
-                                        'class' => BooleanColumn::class,
-                                        'attribute' => 'is_https',
-                                        'trueValue' => 1,
-                                        'falseValue' => 0,
-                                    ],
-                                ],
-                            ],
-                        ])
-                    ]
-                ],
-            ];
-        }*/
 
         return $result;
     }

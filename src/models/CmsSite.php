@@ -9,6 +9,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\assets\CmsAsset;
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\rbac\models\CmsAuthAssignment;
@@ -31,7 +32,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                $is_default
  * @property integer                $priority
  * @property string                 $name
- * @property string                 $server_name
+ * @property string                 $internal_name
  * @property string                 $description
  * @property integer                $image_id
  * @property integer                $favicon_storage_file_id
@@ -39,7 +40,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property string                 $url
  *
- * @property CmsAuthAssignment[]       $authAssignments
+ * @property string                 $internalName
+ * @property CmsAuthAssignment[]    $authAssignments
  * @property CmsTree                $rootCmsTree
  * @property CmsLang                $cmsLang
  * @property CmsSiteDomain[]        $cmsSiteDomains
@@ -61,7 +63,7 @@ use yii\helpers\ArrayHelper;
  * @property string                 $faviconUrl всегда вернет какую нибудь фавиконку, не важно задана она для сайта или нет
  * @property string                 $faviconType полный тип фивикон https://yandex.ru/support/webmaster/search-results/create-favicon.html
  */
-class CmsSite extends Core
+class CmsSite extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -184,6 +186,7 @@ class CmsSite extends Core
             'is_default'              => Yii::t('skeeks/cms', 'Default'),
             'priority'                => Yii::t('skeeks/cms', 'Priority'),
             'name'                    => Yii::t('skeeks/cms', 'Name'),
+            'internal_name'           => Yii::t('skeeks/cms', 'Внутреннее название'),
             'description'             => Yii::t('skeeks/cms', 'Description'),
             'image_id'                => Yii::t('skeeks/cms', 'Логотип'),
             'favicon_storage_file_id' => Yii::t('skeeks/cms', 'Favicon'),
@@ -198,6 +201,7 @@ class CmsSite extends Core
     {
         return array_merge(parent::attributeHints(), [
             'name'                    => Yii::t('skeeks/cms', 'Основное название сайта, отображается в разных местах шаблона, в заголовках писем и других местах.'),
+            'internal_name'           => Yii::t('skeeks/cms', 'Название сайта, чаще всего невидимое для клиента, но видимое администраторам и менеджерам.'),
             'favicon_storage_file_id' => Yii::t('skeeks/cms',
                 'Формат: ICO (рекомендуемый), Размер: 16 × 16, 32 × 32 или 120 × 120 пикселей. Иконка сайта отображаемая в браузере, а так же в различных поисковиках. <br />Подробная документация <a href="https://yandex.ru/support/webmaster/search-results/favicon.html" target="_blank" data-pjax="0">https://yandex.ru/support/webmaster/search-results/favicon.html</a>'),
         ]);
@@ -214,8 +218,10 @@ class CmsSite extends Core
             [['is_active'], 'integer'],
             [['is_default'], 'integer'],
             [['name', 'description'], 'string', 'max' => 255],
+            [['internal_name'], 'string', 'max' => 255],
             ['priority', 'default', 'value' => 500],
             ['is_active', 'default', 'value' => 1],
+            ['internal_name', 'default', 'value' => null],
             ['is_default', 'default', 'value' => null],
             /*[['is_default'], 'unique'],*/
             [['image_id'], 'safe'],
@@ -470,9 +476,8 @@ class CmsSite extends Core
         }
         return "image/".$last;
     }
-    
-    
-    
+
+
     /**
      * Gets query for [[AuthAssignments]].
      *
@@ -481,5 +486,30 @@ class CmsSite extends Core
     public function getCmsAuthAssignments()
     {
         return $this->hasMany(CmsAuthAssignment::className(), ['cms_site_id' => 'id']);
+    }
+
+    /**
+     * Внутреннее название сайта используемое в административной части
+     * @return string
+     */
+    public function getInternalName()
+    {
+        if ($this->internal_name) {
+            return $this->internal_name;
+        }
+
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        $name = $this->name;
+        $this->name = $this->internalName;
+        $result = parent::asText();
+        $this->name = $name;
+        return $result;
     }
 }
