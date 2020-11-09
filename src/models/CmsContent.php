@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property integer|null         $updated_by
  * @property integer|null         $created_at
  * @property integer|null         $updated_at
+ *
  * @property string               $name
  * @property string               $code
  * @property integer              $priority
@@ -49,6 +50,7 @@ use yii\helpers\ArrayHelper;
  * @property string               $parent_content_on_delete
  * @property integer              $is_parent_content_required
  * @property integer              $is_have_page
+ * @property integer              $is_show_on_all_sites
  *
  * ***
  *
@@ -107,6 +109,7 @@ class CmsContent extends Core
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
+            'is_show_on_all_sites'    => Yii::t('skeeks/cms', 'Если эта опция включена, то страница элемента этого контента, может отображаться на любом из сайтов.'),
             'is_have_page'    => Yii::t('skeeks/cms', 'Если эта опция включена, то показываются настройки SEO и URL'),
             'code'            => Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.'),
             'view_file'       => Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.'),
@@ -158,6 +161,7 @@ class CmsContent extends Core
             'is_have_page' => Yii::t('skeeks/cms', 'У элементов есть страница на сайте.'),
 
             'editable_fields' => Yii::t('skeeks/cms', 'Редактируемые поля'),
+            'is_show_on_all_sites' => Yii::t('skeeks/cms', 'Показывать элементы на всех сайтах?'),
         ]);
     }
 
@@ -174,6 +178,7 @@ class CmsContent extends Core
             [['is_visible'], 'integer'],
             [['is_parent_content_required'], 'integer'],
             [['is_have_page'], 'integer'],
+            [['is_show_on_all_sites'], 'integer'],
             [['name', 'content_type'], 'required'],
             [['description'], 'string'],
             [['meta_title_template'], 'string'],

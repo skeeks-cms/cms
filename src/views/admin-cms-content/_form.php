@@ -137,6 +137,7 @@ echo $form->field($model, 'editable_fields')->widget(
     \skeeks\cms\backend\widgets\forms\NumberInputWidget::class
 ); ?>
 <?= $form->field($model, 'is_count_views')->checkbox([], false); ?>
+<?= $form->field($model, 'is_show_on_all_sites')->checkbox([], false); ?>
 <?php /*= $form->fieldRadioListBoolean($model, 'index_for_search'); */ ?>
 
 <? $fieldSet::end(); ?>
