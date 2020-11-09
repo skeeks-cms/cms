@@ -88,6 +88,8 @@ return [
                     "cms/admin-cms-site-address-email",
 
                     "cms/admin-site-user",
+
+                    "cms/admin-cache",
                 ],
             ],
         ],
@@ -119,6 +121,8 @@ return [
                     "cms/admin-storage-files/download",
                     "cms/admin-storage-files/delete/own",
                     "cms/admin-storage-files/delete-tmp-dir",
+
+                    "cms/admin-cache",
                 ],
             ],
         ],
@@ -290,6 +294,11 @@ return [
         [
             'name'        => 'cms/admin-cms-content',
             'description' => ['skeeks/cms', 'Управление контентом'],
+        ],
+
+        [
+            'name'        => 'cms/admin-cache',
+            'description' => ['skeeks/cms', 'Управление кэшем'],
         ],
 
         /*[

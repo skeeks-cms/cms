@@ -23,13 +23,13 @@ use yii\behaviors\TimestampBehavior;
  * @method string getTableCacheTagCmsSite()
  *
  * @property integer      $id
- * 
+ *
  * @property integer      $created_by
  * @property integer      $updated_by
  * @property integer      $created_at
  * @property integer      $updated_at
  *
- * @property integer      $cacheTag
+ * @property string       $cacheTag
  *
  * @property CmsUser|User $createdBy
  * @property CmsUser|User $updatedBy
@@ -197,6 +197,6 @@ class ActiveRecord extends \yii\db\ActiveRecord
      */
     public function getCacheTag()
     {
-        return static::tableName() . $this->primaryKey;
+        return static::tableName().$this->primaryKey;
     }
 }

@@ -40,15 +40,13 @@ class AdminClearController extends AdminController
 
     public function actions()
     {
-        return
-            [
-                "index" =>
-                    [
-                        "class"    => BackendAction::className(),
-                        "name"     => \Yii::t('skeeks/cms', 'Clearing temporary data'),
-                        "callback" => [$this, 'actionIndex'],
-                    ],
-            ];
+        return [
+            "index" => [
+                "class"    => BackendAction::className(),
+                "name"     => \Yii::t('skeeks/cms', 'Clearing temporary data'),
+                "callback" => [$this, 'actionIndex'],
+            ],
+        ];
     }
 
     public function actionIndex()
