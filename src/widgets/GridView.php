@@ -23,6 +23,7 @@ use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
 use yii\db\ActiveQueryInterface;
+use yii\grid\Column;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
@@ -562,8 +563,11 @@ JS
 
         if ($modelClassName) {
 
+            $query = $modelClassName::find()
+                    ->select([$modelClassName::tableName() . ".*"])
+            ;
             return new ActiveDataProvider([
-                'query' => $modelClassName::find(),
+                'query' => $query,
             ]);
 
         } else {
@@ -725,31 +729,14 @@ JS
     protected function _applyColumns()
     {
         $result = [];
-        
-        /*if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
-            $this->visibleColumns = ArrayHelper::merge([
-                "sx-choose"
-            ], (array) $this->visibleColumns);
-        }*/
-        
+
         //Есть логика включенных выключенных колонок
         if ($this->visibleColumns && $this->columns) {
-
             foreach ($this->visibleColumns as $key) {
                 $result[$key] = ArrayHelper::getValue($this->columns, $key);
             }
-
-            /*foreach ($this->_resultColumns as $key => $config) {
-                $config['visible'] = false;
-                $this->_resultColumns[$key] = $config;
-            }*/
-
-            /*$result = ArrayHelper::merge($result, $this->_resultColumns);
-            $this->_resultColumns = $result;*/
             $this->columns = $result;
         }
-
-        
 
         return $this;
     }

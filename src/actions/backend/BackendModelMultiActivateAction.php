@@ -14,8 +14,8 @@ use skeeks\cms\components\Cms;
  */
 class BackendModelMultiActivateAction extends BackendModelMultiAction {
 
-    public $attribute = 'active';
-    public $value = Cms::BOOL_Y;
+    public $attribute = 'is_active';
+    public $value = true;
 
     public function init()
     {

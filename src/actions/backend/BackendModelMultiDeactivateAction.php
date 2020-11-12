@@ -5,26 +5,25 @@
  * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
  */
+
 namespace skeeks\cms\actions\backend;
 
 use skeeks\cms\backend\actions\BackendModelMultiAction;
-use skeeks\cms\components\Cms;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class BackendModelMultiDeactivateAction extends BackendModelMultiAction {
-    public $attribute = 'active';
-    public $value = Cms::BOOL_N;
+class BackendModelMultiDeactivateAction extends BackendModelMultiAction
+{
+    public $attribute = 'is_active';
+    public $value = false;
 
     public function init()
     {
-        if (!$this->icon)
-        {
+        if (!$this->icon) {
             $this->icon = "fas fa-eye-slash";
         }
 
-        if (!$this->name)
-        {
+        if (!$this->name) {
             $this->name = \Yii::t('skeeks/cms', "Deactivate");
         }
 
