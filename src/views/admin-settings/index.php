@@ -30,6 +30,7 @@ CSS
 
 ?>
 
+<div class="" style="padding: 15px;">
 <div class="row sx-components">
     <? foreach ($loadedComponents as $key => $loadedComponent) : ?>
         <?
@@ -42,7 +43,7 @@ CSS
 
         ?>
         <div class="col-lg-3 col-md-4 col-sm-6 <?= $component && $key == $component->className() ? "sx-active-component" : ""; ?>">
-            <div class="card g-pa-15 g-mb-30 g-bg-gray-light-v8" onclick='new sx.classes.backend.widgets.Action(<?= $actionData; ?>).go(); return false;'>
+            <div class="card g-pa-15 g-mb-30 sx-bg-secondary" onclick='new sx.classes.backend.widgets.Action(<?= $actionData; ?>).go(); return false;'>
                 <header class="g-mb-10 g-mt-10 text-center">
                     <a href="<?= $url; ?>" data-pjax="0">
                         <img class="img-fluid rounded-circle g-height-100 g-mb-14 g-mt-14"
@@ -58,5 +59,6 @@ CSS
             </div>
         </div>
     <? endforeach; ?>
+</div>
 </div>
 

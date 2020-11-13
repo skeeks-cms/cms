@@ -21,6 +21,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\Element;
 use skeeks\yii2\form\fields\BoolField;
@@ -623,12 +624,11 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 'name'   => \Yii::t('skeeks/cms', 'Показ на сайтах'),
                 'fields' => [
                     'cms_site_id' => [
-                        'class' => SelectField::class,
-                        'items' => ArrayHelper::map(
-                            CmsSite::find()->all(),
-                            'id',
-                            'asText'
-                        )
+                        'class' => WidgetField::class,
+                        'widgetClass' => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => CmsSite::class
+                        ]
                     ],
                 ]
             ];

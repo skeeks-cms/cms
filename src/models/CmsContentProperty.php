@@ -107,6 +107,10 @@ class CmsContentProperty extends RelatedPropertyModel
 
             [['cmsContents'], 'required'],
 
+            [['cms_site_id'], 'required', 'when' => function() {
+                return $this->cmsTrees;
+            }]
+
 
             //[['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
         ]);
