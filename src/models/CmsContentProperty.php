@@ -79,8 +79,10 @@ class CmsContentProperty extends RelatedPropertyModel
      */
     public function attributeHints()
     {
-        return ArrayHelper::merge(parent::attributeLabels(), [
+        return ArrayHelper::merge(parent::attributeHints(), [
             'cms_site_id'    => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
+            'cmsContents'    => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
+            'cmsTrees'    => Yii::t('skeeks/cms', 'Так же есть возможность ограничить отображение поля только для определенных разделов. Если будут выбраны разделы, то добавляя элемент в соответствующий раздел будет показываться это поле.'),
         ]);
     }
 

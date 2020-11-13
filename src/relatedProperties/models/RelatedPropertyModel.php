@@ -106,6 +106,14 @@ abstract class RelatedPropertyModel extends ActiveRecord
     /**
      * @inheritdoc
      */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'component'          => Yii::t('skeeks/cms', 'От этого зависит как будет показываться свойство в форме редактирования.'),
+        ]);
+    }
+
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
@@ -116,7 +124,7 @@ abstract class RelatedPropertyModel extends ActiveRecord
             'property_type'      => Yii::t('skeeks/cms', 'Property Type'),
             'is_multiple'        => Yii::t('skeeks/cms', 'Multiple'),
             'is_required'        => Yii::t('skeeks/cms', 'Is Required'),
-            'component'          => Yii::t('skeeks/cms', 'Component'),
+            'component'          => Yii::t('skeeks/cms', 'Элемент формы'),
             'component_settings' => Yii::t('skeeks/cms', 'Component Settings'),
             'hint'               => Yii::t('skeeks/cms', 'Hint'),
             'cms_measure_code'   => Yii::t('skeeks/cms', 'Единица измерения'),

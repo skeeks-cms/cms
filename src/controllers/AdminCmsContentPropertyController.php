@@ -13,6 +13,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\helpers\Image;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
@@ -70,7 +71,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 "filters" => [
                     'visibleFilters' => [
                         'q',
-                        'component',
+                        /*'component',*/
                         'content_ids',
                         'tree_ids',
                     ],
@@ -284,7 +285,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                                         function ($cmsTree) {
                                             $path = [];
 
-                                            if ($cmsTree->parents) {
+                                            /*if ($cmsTree->parents) {
                                                 foreach ($cmsTree->parents as $parent) {
                                                     if ($parent->isRoot()) {
                                                         $path[] = "[".$parent->site->name."] ".$parent->name;
@@ -293,13 +294,30 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                                                     }
                                                 }
                                             }
-                                            $path = implode(" / ", $path);
-                                            return "<small><a href='{$cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$cmsTree->name}</a></small>";
+                                            $path = implode(" / ", $path);*/
+                                            /**
+                                             * @var $cmsTree CmsTree
+                                             */
+                                            $imgCap = Image::getCapSrc();
+                                            $img = "<img src='{$imgCap}' style='max-width: 30px; max-heught: 30px;' />";
+                                            if ($cmsTree->image) {
+                                                $img = "<img src='{$cmsTree->image->src}' style='max-width: 30px; max-heught: 30px;' />";
+                                            }
+                                            return "<li style='display: inline-block; padding-right: 20px !important;'>
+                                                    <div class='d-flex flex-row'>
+                                                        <div class='my-auto' style='margin-right: 5px;'>
+                                                            {$img}
+                                                        </div>
+                                                        <div class='my-auto'>
+                                                            <a href='{$cmsTree->url}' target='_blank' data-pjax='0' title='{$cmsTree->fullName}'>{$cmsTree->name}</a>
+                                                        </div>
+                                                    </div>
+                                                    </li>";
 
                                         });
 
 
-                                    return '<div>'.\Yii::t('skeeks/cms', 'Заполняется только для')." <b>".$contents.'</b> которые привязаны к разделам: </div>'.implode('<br />', $sections);
+                                    return '<div>'.\Yii::t('skeeks/cms', 'Заполняется только для')." <b>".$contents.'</b> которые привязаны к разделам: </div><ul class="list-unstyled">'.implode('', $sections) . "</ul>";
                                 } else {
                                     return '<span>'.\Yii::t('skeeks/cms', 'Заполняется для: ')."<b>".$contents.'</b> любого раздела</span>';
                                 }
@@ -398,6 +416,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                                 $treesQ = CmsTree::find()->where(['in', 'id', $subquery]);
                                 if ($trees = $treesQ->all()) {
+
                                     return implode("<br />", ArrayHelper::map($trees, 'id', 'fullName'));
                                 }
 
