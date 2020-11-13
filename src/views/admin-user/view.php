@@ -152,8 +152,7 @@ JS
                                 <?php if ($cmsSite->cmsSiteMainDomain) : ?>
                                     <small style="color: gray;"><a style="color: gray;" href="<?php echo $cmsSite->cmsSiteMainDomain->url; ?>" target="_blank"><?php echo $cmsSite->cmsSiteMainDomain->url; ?></a></small>
                                 <?php endif; ?>
-
-
+                                
                             </td>
                             <td>
                                 <?php
