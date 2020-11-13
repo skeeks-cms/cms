@@ -74,10 +74,10 @@ $model = $action->model;
     <?php if (\skeeks\cms\models\CmsSite::find()->count() > 1) : ?>
 
 
-    <?php
+        <?php
         $addSiteUrl = \yii\helpers\Url::to(['add-site-permission', 'pk' => $model->id]);
         $saveSitePermissionsUrl = \yii\helpers\Url::to(['save-site-permissions', 'pk' => $model->id]);
-                                $this->registerJs(<<<JS
+        $this->registerJs(<<<JS
 var addSite = '{$addSiteUrl}';
 var saveSite = '{$saveSitePermissionsUrl}';
 $(".sx-select-site-trigger").on("click", function() {
@@ -131,7 +131,7 @@ $("select", $(".cms-site-permissions")).on("change", function() {
 
 
 JS
-                                ); ?>
+        ); ?>
 
         <div class="col-8 mx-auto">
             <h4>Права доступа</h4>
@@ -148,8 +148,12 @@ JS
                     foreach ($sites as $cmsSite) : ?>
                         <tr data-cms_site_id="<?php echo $cmsSite->id; ?>" class="cms-site-permissions">
                             <td style="width: 50%;">
-                                <?php echo $cmsSite->name; ?><br />
-                                <small style="color: gray;"><a style="color: gray;" href="<?php echo $cmsSite->cmsSiteMainDomain->url; ?>" target="_blank"><?php echo $cmsSite->cmsSiteMainDomain->url; ?></a></small>
+                                <?php echo $cmsSite->name; ?><br/>
+                                <?php if ($cmsSite->cmsSiteMainDomain) : ?>
+                                    <small style="color: gray;"><a style="color: gray;" href="<?php echo $cmsSite->cmsSiteMainDomain->url; ?>" target="_blank"><?php echo $cmsSite->cmsSiteMainDomain->url; ?></a></small>
+                                <?php endif; ?>
+
+
                             </td>
                             <td>
                                 <?php
@@ -157,16 +161,16 @@ JS
                                 $roleNames = \yii\helpers\ArrayHelper::map($manager->getAvailableRoles(), 'name', 'description');
                                 \yii\helpers\ArrayHelper::remove($roleNames, \skeeks\cms\rbac\CmsManager::ROLE_GUEST);
                                 echo \skeeks\cms\widgets\Select::widget([
-                                    'items' => $roleNames,
+                                    'items'    => $roleNames,
                                     'multiple' => true,
-                                    'name' => 'roles',
-                                    'value' => \yii\helpers\ArrayHelper::map($manager->getRolesByUser($model->id), 'name', 'name')
+                                    'name'     => 'roles',
+                                    'value'    => \yii\helpers\ArrayHelper::map($manager->getRolesByUser($model->id), 'name', 'name'),
                                 ]); ?>
-                                <?php /*if ($roles = (new \skeeks\cms\rbac\CmsManager(['cmsSite' => $cmsSite]))->getRolesByUser($model->id)) : */?><!--
-                                    <?/* foreach ($roles as $role) : */?>
-                                        <label class="u-label u-label-default g-rounded-20 g-mr-5"><?php /*echo $role->description; */?></label>
-                                    <?/* endforeach; */?>
-                                --><?php /*endif; */?>
+                                <?php /*if ($roles = (new \skeeks\cms\rbac\CmsManager(['cmsSite' => $cmsSite]))->getRolesByUser($model->id)) : */ ?><!--
+                                    <? /* foreach ($roles as $role) : */ ?>
+                                        <label class="u-label u-label-default g-rounded-20 g-mr-5"><?php /*echo $role->description; */ ?></label>
+                                    <? /* endforeach; */ ?>
+                                --><?php /*endif; */ ?>
                             </td>
                         </tr>
                     <? endforeach; ?>
