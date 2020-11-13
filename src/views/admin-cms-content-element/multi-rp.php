@@ -80,6 +80,15 @@ JS
                     'class' => 'sx-form',
                 ],
             ]); ?>
+            <?/*= \skeeks\cms\widgets\AjaxSelectModel::widget([
+                'multiple' => true,
+                'name'     => 'fields',
+                'options'  => [
+                    'class' => 'sx-select',
+                ],
+                'items'    => \yii\helpers\ArrayHelper::map($properties, "code", "name"),
+            ]); */?>
+
             <?= \skeeks\cms\widgets\Select::widget([
                 'multiple' => true,
                 'name'     => 'fields',
