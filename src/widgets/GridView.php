@@ -138,6 +138,8 @@ class GridView extends \yii\grid\GridView
                                          * @var $widgetField WidgetField
                                          */
                                         $widgetField = $e->sender;
+
+                                        //skeeks\cms\backend\controllers\AdminBackendShowingController
                                         $widgetField->widgetConfig['items'] = ArrayHelper::getValue(
                                             \Yii::$app->controller->getCallableData(),
                                             'availableColumns'
@@ -301,6 +303,10 @@ class GridView extends \yii\grid\GridView
 
 
     /**
+     * @var null|callable
+     */
+    public $columnConfigCallback = null;
+    /**
      *
      */
     public function init()
@@ -317,16 +323,28 @@ class GridView extends \yii\grid\GridView
         //Автомтическое конфигурирование колонок
         $this->_initAutoColumns();
 
-        //Сбор результирующего конфига колонок
-        $this->_preInitColumns();
 
+        //Кое что для массового управления свойствами
         $this->_initDialogCallbackData();
+
         //Получение настроек из хранилища
+
         parent::init();
 
-        //Применение сортировки колонок
+        //Сбор результирующего конфига колонок
+        $this->_initConfigColumns();
+
+        //Конфиг некоторых колонок включается только если они вообще включены
+        //Используется $columnConfigCallback
+        $this->_initDynamycColumns();
+
+        //И создание объектов колонок
+        $this->afterInitColumns();
+
+        //Правильно формирование колонок согласно настройкам
         $this->_applyColumns();
 
+        //Инициализация постраничной навигации и возможных сортировок
         $this->_initPagination();
         $this->_initSort();
 
@@ -338,11 +356,14 @@ class GridView extends \yii\grid\GridView
         }
     }
 
+    protected function initColumns() {
+        return $this;
+    }
 
     /**
      * Creates column objects and initializes them.
      */
-    protected function initColumns()
+    protected function afterInitColumns()
     {
         if (empty($this->columns)) {
             $this->guessColumns();
@@ -665,10 +686,31 @@ JS
 
         return $this;
     }
+
+
     /**
-     * @return array
+     * @return $this
      */
-    protected function _preInitColumns()
+    protected function _initDynamycColumns() {
+        if ($this->columnConfigCallback && is_callable($this->columnConfigCallback)) {
+            $callback = $this->columnConfigCallback;
+            if ($this->visibleColumns && is_array($this->visibleColumns)) {
+                foreach ($this->visibleColumns as $columnCode)
+                {
+                    if (!isset($this->columns[$columnCode])) {
+                        $this->columns[$columnCode] = call_user_func($callback, $columnCode, $this);
+                    }
+                }
+             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _initConfigColumns()
     {
         $result = [];
         $autoColumns = $this->_autoColumns;

@@ -39,10 +39,12 @@ use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\AjaxSelect;
 use skeeks\cms\widgets\AjaxSelectModel;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
+use skeeks\yii2\queryfilter\QueryFilterWidget;
 use yii\base\DynamicModel;
 use yii\base\Event;
 use yii\base\Exception;
@@ -328,19 +330,63 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             ],
                         ],
                     ],
+
+                    'on init' => function(Event $event) {
+                        $this->initFiltersModel($event->sender, $this->content);
+                    }
                 ],
                 'grid'    => [
+
                     'on init'        => function (Event $event) {
                         /**
                          * @var $query ActiveQuery
+                         * @var $grid GridView
                          */
+                        $grid = $event->sender;
+
                         $query = $event->sender->dataProvider->query;
                         $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
                         if ($this->content) {
                             $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
                         }
 
+                        $this->initGridColumns($grid, $this->content);
                     },
+
+                    'columnConfigCallback' => function($columnName, GridView $grid) {
+
+                        if (strpos($columnName, "property") != -1) {
+
+                            $propertyId = (int) str_replace("property", "", $columnName);
+                            /**
+                             * @var $property CmsContentProperty
+                             */
+                            $property = CmsContentProperty::findOne($propertyId);
+
+                            return [
+                                'headerOptions' => [
+                                    'style' => 'width: 150px;'
+                                ],
+                                'contentOptions' => [
+                                    'style' => 'width: 150px;'
+                                ],
+
+                                'label'  => $property ? $property->name : "Свойство удалено",
+                                'format' => 'raw',
+                                'value'  => function ($model, $key, $index) use ($property) {
+                                    if (!$property) {
+                                        return '';
+                                    }
+                                    /**
+                                     * @var $model \skeeks\cms\models\CmsContentElement
+                                     */
+                                    return $model->relatedPropertiesModel->getAttributeAsHtml($property->code);
+                                },
+                            ];
+                        }
+
+                    },
+
                     'defaultOrder'   => [
                         'active'   => SORT_DESC,
                         'priority' => SORT_ASC,
@@ -748,19 +794,9 @@ HTML;
     }
 
 
-    public function initGridData($action, $content)
+    public function initGridColumns($grid, $content)
     {
-        /**
-         * @var $content CmsContent
-         * @var $action BackendGridModelAction
-         * @var $property CmsContentProperty
-         */
-
         $model = null;
-        $autoFilters = [];
-        $autoRules = [];
-        $autoLabels = [];
-
         $autoColumns = [];
 
         if ($content) {
@@ -773,25 +809,14 @@ HTML;
             $relatedPropertiesModel = $model->relatedPropertiesModel;
 
             $properties = $content->getCmsContentProperties();
-            if (!\Yii::$app->skeeks->site->is_default) {
-                $properties->andWhere([
-                    'or',
-                    [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
-                    [CmsContentProperty::tableName().'.cms_site_id' => null],
-                ]);
-            } else {
-                $properties->andWhere([
-                    'or',
-                    [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
-                    [CmsContentProperty::tableName().'.cms_site_id' => null],
-                ]);
-            }
-            //print_r($properties->createCommand()->rawSql);die;
-
+            $properties->andWhere([
+                'or',
+                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                [CmsContentProperty::tableName().'.cms_site_id' => null],
+            ]);
             $properties = $properties->all();
 
             foreach ($properties as $property) {
-
                 $name = $property->code;
                 //$property = $relatedPropertiesModel->getRelatedProperty($name);
                 $filter = '';
@@ -812,13 +837,60 @@ HTML;
                          * @var $model \skeeks\cms\models\CmsContentElement
                          */
                         return $model->relatedPropertiesModel->getAttributeAsHtml($name);
-                        /*if (is_array($value)) {
-                            return implode(",", $value);
-                        } else {
-                            return $value;
-                        }*/
                     },
                 ];
+            }
+        }
+
+        if ($autoColumns) {
+            $grid->columns = ArrayHelper::merge($grid->columns, $autoColumns);
+        }
+
+        return $this;
+    }
+
+
+    public function initGridData($action, $content) {
+        return $this;
+    }
+
+    public function initFiltersModel($filtersWidget, $content)
+    {
+        /**
+         * @var $content CmsContent
+         * @var  $filtersWidget QueryFilterWidget
+         * @var $action BackendGridModelAction
+         * @var $property CmsContentProperty
+         */
+        $model = null;
+        $autoFilters = [];
+        $autoRules = [];
+        $autoLabels = [];
+
+        $autoColumns = [];
+
+        if ($content) {
+            $model = new CmsContentElement([
+                'content_id' => $content->id,
+            ]);
+        }
+
+        if ($model && $content && $content->getCmsContentProperties()->count()) {
+            $relatedPropertiesModel = $model->relatedPropertiesModel;
+
+            $properties = $content->getCmsContentProperties();
+            $properties->andWhere([
+                'or',
+                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                [CmsContentProperty::tableName().'.cms_site_id' => null],
+            ]);
+            $properties = $properties->all();
+
+            foreach ($properties as $property) {
+
+                $name = $property->code;
+                //$property = $relatedPropertiesModel->getRelatedProperty($name);
+                $filter = '';
 
                 $autoRules[] = ["property{$property->id}", "safe"];
                 $autoLabels["property{$property->id}"] = $property->name;
@@ -883,35 +955,6 @@ HTML;
 
                 } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
 
-                    /*$count = CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->count();
-
-                    if ($count > 100) {
-                        $autoFilters["property{$property->id}"] = [
-                            'class'        => WidgetField::class,
-                            'widgetClass'  => \skeeks\cms\backend\widgets\SelectModelDialogWidget::class,
-                            'widgetConfig' => [
-                                'modelClassName' => \skeeks\cms\models\CmsContentPropertyEnum::class,
-                                'dialogRoute'    => [
-                                    '/cms/admin-cms-content-property-enum',
-                                    'CmsContentPropertyEnum' => [
-                                        'property_id' => $property->id,
-                                    ],
-                                ],
-                            ],
-                        ];
-                    } else {
-                        $autoFilters["property{$property->id}"] = [
-                            'class'    => SelectField::class,
-                            'items'    => function() use ($property) {
-                                return ArrayHelper::map(CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->all(), 'id', 'value');
-                            },
-                            //'items'    => ArrayHelper::map(CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->all(), 'id', 'value')
-                            'multiple' => true,
-                        ];
-                    }*/
-
-
-
                     $find = CmsContentPropertyEnum::find()->where(['property_id' => $property->id]);
                     $autoFilters["property{$property->id}"] = [
                         'class'    => WidgetField::class,
@@ -919,42 +962,10 @@ HTML;
                         'widgetConfig' => [
                             'multiple' => true,
                             'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                            /*'dataCallback' => function($q = '') use ($find) {
-
-                                $query = $find;
-
-                                if ($q) {
-                                    $query->andWhere(['like', 'value', $q]);
-                                }
-
-                                $data = $query->limit(50)
-                                    ->all();
-
-                                $result = [];
-
-                                if ($data) {
-                                    foreach ($data as $model)
-                                    {
-                                        $result[] = [
-                                            'id' => $model->id,
-                                            'text' => $model->value
-                                        ];
-                                    }
-                                }
-
-                                return $result;
-                            },*/
-
                             'valueCallback' => function($value) {
                                 return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
                             },
-
                         ]
-
-                        /*'items'    => function () use ($propertyType) {
-                            return ArrayHelper::map(CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->all(), 'id', 'name');
-                        },*/
-
                     ];
 
 
@@ -991,64 +1002,12 @@ HTML;
                         'widgetConfig' => [
                             'multiple' => true,
                             'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                            /*'dataCallback' => function($q = '') use ($find) {
-
-                                $query = $find;
-
-                                if ($q) {
-                                    $query->andWhere(['like', 'name', $q]);
-                                }
-
-                                $data = $query->limit(50)
-                                    ->all();
-
-                                $result = [];
-
-                                if ($data) {
-                                    foreach ($data as $model)
-                                    {
-                                        $result[] = [
-                                            'id' => $model->id,
-                                            'text' => $model->name
-                                        ];
-                                    }
-                                }
-
-                                return $result;
-                            },*/
-
                             'valueCallback' => function($value) {
                                 return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
                             },
-
                         ]
 
-                        /*'items'    => function () use ($propertyType) {
-                            return ArrayHelper::map(CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->all(), 'id', 'name');
-                        },*/
-
                     ];
-
-
-                    /*$count = CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->count();
-
-                    if ($count > 100) {
-                        $autoFilters["property{$property->id}"] = [
-                            'class'        => WidgetField::class,
-                            'widgetClass'  => \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                            'widgetConfig' => [
-                                'content_id' => $propertyType->content_id,
-                            ],
-                        ];
-                    } else {
-                        $autoFilters["property{$property->id}"] = [
-                            'class'    => SelectField::class,
-                            'items'    => function () use ($propertyType) {
-                                return ArrayHelper::map(CmsContentElement::find()->where(['content_id' => $propertyType->content_id])->all(), 'id', 'name');
-                            },
-                            'multiple' => true,
-                        ];
-                    }*/
 
                     $autoFilters["property{$property->id}"]["label"] = $property->name;
                     $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
@@ -1099,30 +1058,22 @@ HTML;
                         },
                     ];
                 }
-
-
             }
         }
 
-        if ($autoColumns) {
-            //$result['index']['grid']['columns'] = ArrayHelper::merge($result['index']['grid']['columns'], $autoColumns);
-            $action->grid['columns'] = ArrayHelper::merge($action->grid['columns'], $autoColumns);
-        }
+        $filterModel = $filtersWidget->filtersModel;
 
         if ($autoRules) {
-            //$result['index']['filters']['filtersModel']['rules'] = ArrayHelper::merge((array)$result['index']['filters']['filtersModel']['rules'], $autoRules);
-            $action->filters['filtersModel']['rules'] = ArrayHelper::merge($action->filters['filtersModel']['rules'], $autoRules);
+            $filterModel['rules'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "rules", []), $autoRules);
         }
 
         if ($autoFilters) {
-            //$result['index']['filters']['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'fields']), $autoFilters);
-            //$result['index']['filters']['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeDefines']), array_keys($autoFilters));
-            //$result['index']['filters']['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($result, ['index', 'filters', 'filtersModel', 'attributeLabels']), $autoLabels);
-
-            $action->filters['filtersModel']['fields'] = ArrayHelper::merge($action->filters['filtersModel']['fields'], $autoFilters);
-            $action->filters['filtersModel']['attributeDefines'] = ArrayHelper::merge($action->filters['filtersModel']['attributeDefines'], array_keys($autoFilters));
-            $action->filters['filtersModel']['attributeLabels'] = ArrayHelper::merge(ArrayHelper::getValue($action->filters, ['filtersModel', 'attributeLabels']), $autoLabels);
+            $filterModel['fields'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "fields", []), $autoFilters);
+            $filterModel['attributeDefines'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "attributeDefines", []), array_keys($autoFilters));
+            $filterModel['attributeLabels'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "attributeLabels", []), $autoLabels);
         }
+
+        $filtersWidget->filtersModel = $filterModel;
 
         return $this;
     }
