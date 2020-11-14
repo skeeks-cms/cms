@@ -50,6 +50,8 @@ class UrlRuleContentElement
 
             $cmsTree = ArrayHelper::getValue($params, 'cmsTree');
             ArrayHelper::remove($params, 'cmsTree');
+            $cmsSite = ArrayHelper::getValue($params, 'cmsSite', null);
+            ArrayHelper::remove($params, 'cmsSite');
             //We need to build on what that particular section of the settings
             /*if (!$cmsTree) {
                 $cmsTree = $contentElement->cmsTree;
@@ -83,10 +85,12 @@ class UrlRuleContentElement
             }
 
             //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
-            if ($contentElement->cmsSite) {
-                //TODO:: добавить проверку текущего сайта. В случае совпадения возврат локального пути
-                if ($contentElement->cmsSite->cmsSiteMainDomain) {
-                    return $contentElement->cmsSite->url . '/' . $url;
+            if (!$cmsSite) {
+                $cmsSite = $contentElement->cmsSite;
+            }
+            if ($cmsSite) {
+                if ($cmsSite->cmsSiteMainDomain) {
+                    return $cmsSite->url . '/' . $url;
                 }
             }
 
