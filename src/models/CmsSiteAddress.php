@@ -111,13 +111,13 @@ class CmsSiteAddress extends ActiveRecord
                 },
             ],
 
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_image_id', 'priority'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'priority'], 'integer'],
             [['cms_site_id', 'value', 'latitude', 'longitude'], 'required'],
             [['latitude', 'longitude'], 'number'],
-            [['work_time'], 'string'],
+            [['work_time'], 'safe'],
+            [['cms_image_id'], 'safe'],
             [['name', 'value'], 'string', 'max' => 255],
             [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value']],
-            [['cms_image_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsStorageFile::className(), 'targetAttribute' => ['cms_image_id' => 'id']],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => \Yii::$app->skeeks->siteClass, 'targetAttribute' => ['cms_site_id' => 'id']],
 
             [
