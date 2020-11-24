@@ -43,7 +43,7 @@ class CmsContentElementActiveQuery extends CmsActiveQuery
      * @param bool         $isJoinSecondTrees Искать элементы по второстепенной привязке? Находит элементы, которые не привязаны к основному разделу
      * @return $this
      */
-    public function cmsTree($cmsTree = null, $isDescendants = false, $isJoinSecondTrees = false)
+    public function cmsTree($cmsTree = null, $isDescendants = true, $isJoinSecondTrees = true)
     {
         if ($cmsTree === null) {
             $cmsTree = \Yii::$app->cms->currentTree;
