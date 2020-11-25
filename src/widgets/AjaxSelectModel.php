@@ -90,6 +90,14 @@ class AjaxSelectModel extends AjaxSelect
 
                 $result = [];
 
+                /*if (!$this->isRequired()) {
+                    $result[] = [
+                        'id' => '',
+                        'text' => 'Не выбрано',
+                    ];
+                }*/
+
+
                 if ($data) {
                     foreach ($data as $model) {
                         $result[] = [

@@ -199,8 +199,8 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         } else {
                             $query->andWhere([
                                 'or',
-                                [CmsContentProperty::tableName() . '.cms_site_id' => \Yii::$app->skeeks->site->id],
-                                [CmsContentProperty::tableName() . '.cms_site_id' => null]
+                                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                                [CmsContentProperty::tableName().'.cms_site_id' => null],
                             ]);
                         }
 
@@ -317,7 +317,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                                         });
 
 
-                                    return '<div>'.\Yii::t('skeeks/cms', 'Заполняется только для')." <b>".$contents.'</b> которые привязаны к разделам: </div><ul class="list-unstyled">'.implode('', $sections) . "</ul>";
+                                    return '<div>'.\Yii::t('skeeks/cms', 'Заполняется только для')." <b>".$contents.'</b> которые привязаны к разделам: </div><ul class="list-unstyled">'.implode('', $sections)."</ul>";
                                 } else {
                                     return '<span>'.\Yii::t('skeeks/cms', 'Заполняется для: ')."<b>".$contents.'</b> любого раздела</span>';
                                 }
@@ -522,10 +522,14 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
     public function updateFields($action)
     {
         /**
-         * @var $model CmsTreeTypeProperty
+         * @var $model CmsContentProperty
          */
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
+
+        if ($model->isNewRecord) {
+            $model->cms_site_id = \Yii::$app->skeeks->site->id;
+        }
 
         $result = [
             'main' => [
@@ -618,12 +622,12 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
                 'fields' => [
 
-                    'is_active'        => [
+                    'is_active' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
 
-                    'is_required'      => [
+                    'is_required' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
@@ -636,24 +640,28 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 ],
             ],
         ];
-        
+
         if (\Yii::$app->skeeks->site->is_default && CmsSite::find()->count() > 1) {
             $result['site'] = [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Показ на сайтах'),
                 'fields' => [
                     'cms_site_id' => [
-                        'class' => WidgetField::class,
-                        'widgetClass' => AjaxSelectModel::class,
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxSelectModel::class,
                         'widgetConfig' => [
-                            'modelClass' => CmsSite::class
-                        ]
+                            'modelClass' => CmsSite::class,
+                            'allowDeselect' => true,
+                            'options' => [
+                                'required'   => false,
+                            ]
+                        ],
                     ],
-                ]
+                ],
             ];
-                
+
         }
-        
+
         return $result;
     }
 }

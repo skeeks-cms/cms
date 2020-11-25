@@ -111,4 +111,30 @@ class Select extends Select2
         $this->registerWidgetJs("window.{$this->_hashVar} = {$encOptions};\n", View::POS_READY);
     }
 
+    /**
+     * @return bool
+     */
+    protected function isRequired()
+    {
+        if (!empty($this->options['required'])) {
+            return true;
+        }
+        if (!$this->hasModel()) {
+            return false;
+        }
+        $validators = $this->model->getActiveValidators($this->attribute);
+        foreach ($validators as $validator) {
+            if ($validator instanceof RequiredValidator) {
+                if (is_callable($validator->when)) {
+                    if (call_user_func($validator->when, $this->model, $this->attribute)) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+
+            }
+        }
+        return false;
+    }
 }
