@@ -835,7 +835,7 @@ class Tree extends ActiveRecord
         if ($this->parents) {
             foreach ($this->parents as $parent) {
                 if ($parent->isRoot()) {
-                    $paths[] = "[".$parent->site->name."] ".$parent->name;
+                    $paths[] = "".$parent->site->internalName." ";
                 } else {
                     $paths[] = $parent->name;
                 }
