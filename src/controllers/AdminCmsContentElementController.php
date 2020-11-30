@@ -76,7 +76,6 @@ class AdminCmsContentElementController extends BackendModelStandartController
      */
     protected $_content = null;
 
-
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', 'Elements');
@@ -641,6 +640,17 @@ HTML;
                     return \Yii::$app->user->can($this->permissionName."/update");
                 },
 
+            ],
+            "delete-multi" => [
+                'on init' => function ($e) {
+                    $action = $e->sender;
+                    /**
+                     * @var BackendGridModelAction $action
+                     */
+                    if ($this->content) {
+                        $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                    }
+                },
             ],
             "deactivate-multi" => [
                 'class'   => BackendModelMultiDeactivateAction::class,
@@ -1383,6 +1393,7 @@ HTML
      */
     public function setContent($content)
     {
+        $this->permissionName = $this->uniqueId . "__" . $content->id;
         $this->_content = $content;
         return $this;
     }

@@ -32,6 +32,11 @@ trait TActiveFormHasPjax
     public $pjaxClass = Pjax::class;
 
     /**
+     * @var null 
+     */
+    public $pjaxWidget = null;
+
+    /**
      * @return $this
      */
     protected function _initPjax()
@@ -46,7 +51,7 @@ trait TActiveFormHasPjax
 
         $pjaxClass = $this->pjaxClass;
 
-        $pjax = $pjaxClass::begin(ArrayHelper::merge([
+        $this->pjaxWidget = $pjaxClass::begin(ArrayHelper::merge([
             'id'              => 'sx-pjax-form-'.$this->id,
             'enablePushState' => false,
             'isShowError'     => true,

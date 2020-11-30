@@ -77,7 +77,7 @@ $properties = $model->getRelatedProperties()->all();
     <?php foreach ($properties as $property) : ?>
         <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
 
-            <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+            <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */?>
             <div class="row">
                 <div class="col-md-12">
                     <?
@@ -107,7 +107,11 @@ $properties = $model->getRelatedProperties()->all();
 
                             $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
                                 'actions'         => ['create' => $actionCreate],
-                                'clientOptions'   => ['pjax-id' => $pjax->id],
+                                'clientOptions'   => ['updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
+function() {
+}
+JS
+                                    )],
                                 'isOpenNewWindow' => true,
                                 'tag'             => 'div',
                                 'minViewCount'  => 1,
@@ -128,21 +132,20 @@ $properties = $model->getRelatedProperties()->all();
 
                 </div>
             </div>
-            <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
+            <?php /*\skeeks\cms\modules\admin\widgets\Pjax::end(); */?>
         <?php elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT): ?>
 
-            <?php $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+            <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */?>
             <div class="row">
                 <div class="col-md-12">
                     <?
                     $create = '';
                     ?>
-                    <?php if (!in_array($property->handler->fieldElement, [
-                        \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG,
-                        \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE,
-                    ])) : ?>
+                    <?php if (1 == 2) : ?>
                         <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
                             <?
+                        
+                            $controllerProperty->content = \skeeks\cms\models\CmsContent::findOne($property->handler->content_id);
                             /**
                              * @var \skeeks\cms\backend\BackendAction $actionIndex
                              * @var \skeeks\cms\backend\BackendAction $actionCreate
@@ -164,7 +167,11 @@ $properties = $model->getRelatedProperties()->all();
 
                                 $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
                                     'actions'         => ['create' => $actionCreate],
-                                    'clientOptions'   => ['pjax-id' => $pjax->id],
+                                    'clientOptions'   => ['updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
+function() {
+}
+JS
+                                    )],
                                     'isOpenNewWindow' => true,
                                     'tag'             => 'div',
                                     'minViewCount'    => 1,
@@ -187,7 +194,7 @@ $properties = $model->getRelatedProperties()->all();
                     <?php endif; ?>
                 </div>
             </div>
-            <?php \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
+            <?php /*\skeeks\cms\modules\admin\widgets\Pjax::end(); */?>
 
         <?php else
             : ?>
