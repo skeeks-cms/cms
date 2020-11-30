@@ -56,6 +56,9 @@ use yii\helpers\Url;
  * @property string                      $seo_h1
  * @property integer|null                $cms_site_id
  * @property string|null                 $external_id
+ * @property integer|null                $main_cce_id
+ * @property integer|null                $main_cce_at
+ * @property integer|null                $main_cce_by
  *
  * @property bool                        $is_active
  *
@@ -97,6 +100,8 @@ use yii\helpers\Url;
  * @property CmsUser[]                   $usersToFavorites
  * @property string                      $seoName
  *
+ * @property CmsContentElement           $mainCmsContentElement
+ *
  */
 class CmsContentElement extends RelatedElementModel
 {
@@ -118,9 +123,35 @@ class CmsContentElement extends RelatedElementModel
         parent::init();
 
         $this->cms_site_id = \Yii::$app->skeeks->site->id;
-        
+
         $this->on(self::EVENT_BEFORE_DELETE, [$this, '_beforeDeleteE']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, '_afterDeleteE']);
+
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, "_beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeSaveEvent"]);
+    }
+
+    /**
+     * Перед сохранением модели, всегда следим за типом товара
+     * @param $event
+     */
+    public function _beforeSaveEvent($event)
+    {
+        if ($this->isAttributeChanged('main_cce_id')) {
+            if ($this->main_cce_id) {
+                $this->main_cce_at = time();
+
+                if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
+                    $this->main_cce_by = \Yii::$app->user->id;
+                } else {
+                    $this->main_cce_by = null;
+                }
+
+            } else {
+                $this->main_cce_id = null;
+                $this->main_cce_by = null;
+            }
+        }
     }
 
     public function _beforeDeleteE($e)
@@ -238,6 +269,7 @@ class CmsContentElement extends RelatedElementModel
             'show_counter'              => Yii::t('skeeks/cms', 'Number of views'),
             'seo_h1'                    => Yii::t('skeeks/cms', 'SEO заголовок h1'),
             'external_id'               => Yii::t('skeeks/cms', 'Уникальный код'),
+            'main_cce_id'               => Yii::t('skeeks/cms', 'Инфо карточка'),
         ]);
     }
     /**
@@ -271,6 +303,9 @@ class CmsContentElement extends RelatedElementModel
                     'show_counter',
                     'cms_site_id',
                     'show_counter_start',
+                    'main_cce_id',
+                    'main_cce_at',
+                    'main_cce_by',
                 ],
                 'integer',
             ],
@@ -303,6 +338,33 @@ class CmsContentElement extends RelatedElementModel
             ['description_full_type', 'string'],
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
+            ['main_cce_id', 'default', 'value' => null],
+
+            [
+                ['main_cce_at'],
+                'default',
+                'value' => function () {
+                    if ($this->main_cce_id) {
+                        return time();
+                    }
+
+                    return null;
+                },
+            ],
+
+            [
+                ['main_cce_by'],
+                'default',
+                'value' => function () {
+                    if ($this->main_cce_id) {
+                        if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
+                            return \Yii::$app->user->id;
+                        }
+                    }
+
+                    return null;
+                },
+            ],
             [
                 'tree_id',
                 'default',
@@ -475,7 +537,7 @@ class CmsContentElement extends RelatedElementModel
                 ['map2trees.cms_tree_id' => null]
             );
         }
-        
+
 
         if ($this->cms_site_id) {
             $q->andWhere([
@@ -795,6 +857,15 @@ class CmsContentElement extends RelatedElementModel
     public function getIs_active()
     {
         return (bool)($this->active == "Y");
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMainCmsContentElement()
+    {
+        return $this->hasOne(static::class, ['id' => 'main_cce_id'])->from(['mainCce' => self::tableName()]);
     }
 
 

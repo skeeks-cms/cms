@@ -12,7 +12,8 @@ class m150521_183315_alter_table__cms_tree extends Migration
 {
     public function safeUp()
     {
-        $this->dropForeignKey("pid_main_pid_cms_tree", "{{%cms_tree%}}");
+        $this->dropForeignKey("pid_" .
+            "main_pid_cms_tree", "{{%cms_tree%}}");
         //$this->execute("ALTER TABLE {{%cms_tree%}} DROP INDEX pid_main;");
         $this->execute("ALTER TABLE {{%cms_tree%}} DROP `pid_main`;");
     }
