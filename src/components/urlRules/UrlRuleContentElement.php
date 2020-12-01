@@ -13,6 +13,7 @@ use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\web\Application;
 
 /**
  * Class UrlRuleContentElement
@@ -29,6 +30,10 @@ class UrlRuleContentElement
         }
     }
 
+    /**
+     * //Это можно использовать только в коротких сценариях, иначе произойдет переполнение памяти
+     * @var array
+     */
     static public $models = [];
 
     /**
@@ -115,14 +120,18 @@ class UrlRuleContentElement
         }
 
         if ($contentElement && $contentElement instanceof CmsContentElement) {
-            self::$models[$contentElement->id] = $contentElement;
+            if (\Yii::$app instanceof Application) {
+                self::$models[$contentElement->id] = $contentElement;
+            }
         } else {
             /**
              * @var $contentElement CmsContentElement
              */
             if (!$contentElement = ArrayHelper::getValue(self::$models, $id)) {
                 $contentElement = CmsContentElement::findOne(['id' => $id]);
-                self::$models[$id] = $contentElement;
+                if (\Yii::$app instanceof Application) {
+                    self::$models[$id] = $contentElement;
+                }
             }
         }
 

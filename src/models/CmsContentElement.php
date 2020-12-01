@@ -27,6 +27,7 @@ use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\web\Application;
 
 /**
  * This is the model class for table "{{%cms_content_element}}".
@@ -616,7 +617,12 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getUrl($scheme = false, $params = [])
     {
-        UrlRuleContentElement::$models[$this->id] = $this;
+        //Это можно использовать только в коротких сценариях, иначе произойдет переполнение памяти
+        if (\Yii::$app instanceof Application) {
+            UrlRuleContentElement::$models[$this->id] = $this;
+        }
+
+
         if ($params) {
             $params = ArrayHelper::merge(['/cms/content-element/view', 'id' => $this->id], $params);
         } else {
