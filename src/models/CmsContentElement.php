@@ -868,6 +868,14 @@ class CmsContentElement extends RelatedElementModel
         return $this->hasOne(static::class, ['id' => 'main_cce_id'])->from(['mainCce' => self::tableName()]);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSecondaryCmsContentElements()
+    {
+        return $this->hasMany(static::class, ['main_cce_id' => 'id'])->from(['secondaryCCE' => static::tableName()]);
+    }
+
 
     /**
      * @return \skeeks\cms\query\CmsActiveQuery|CmsContentElementActiveQuery
