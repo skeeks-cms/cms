@@ -165,6 +165,17 @@ JS
     ]); ?>
 
     <?php foreach ($relatedModel->properties as $property) : ?>
+        <?
+
+            if (in_array($property->property_type, [
+                    \skeeks\cms\relatedProperties\PropertyType::CODE_LIST,
+                    \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT
+            ])) {
+
+                $property->handler->setAjaxSelectUrl(\yii\helpers\Url::to(['/cms/ajax/autocomplete-tree-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]));
+                $property->handler->setEnumClass(\skeeks\cms\models\CmsTreeTypePropertyEnum::class);
+            }
+        ?>
         <?= $property->renderActiveForm($form); ?>
     <?php endforeach; ?>
 

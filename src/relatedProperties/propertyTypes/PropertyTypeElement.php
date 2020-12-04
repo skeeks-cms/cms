@@ -47,9 +47,9 @@ class PropertyTypeElement extends PropertyType
             //self::FIELD_ELEMENT_CHECKBOX_LIST          => \Yii::t('skeeks/cms', 'Checkbox List'),
             //self::FIELD_ELEMENT_LISTBOX                => \Yii::t('skeeks/cms', 'ListBox'),
             //self::FIELD_ELEMENT_LISTBOX_MULTI          => \Yii::t('skeeks/cms', 'ListBox Multi'),
-            self::FIELD_ELEMENT_SELECT_DIALOG          => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
+            /*self::FIELD_ELEMENT_SELECT_DIALOG          => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
             self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE => \Yii::t('skeeks/cms',
-                'Selection widget in the dialog box (multiple choice)'),
+                'Selection widget in the dialog box (multiple choice)'),*/
         ];
     }
 
@@ -108,10 +108,86 @@ class PropertyTypeElement extends PropertyType
             ]);
     }
 
+    protected $_ajaxSelectUrl = null;
+
+    public function setAjaxSelectUrl($url) {
+        $this->_ajaxSelectUrl = $url;
+        return $this;
+    }
+
+    public function getAjaxSelectUrl()
+    {
+        if ($this->_ajaxSelectUrl === null) {
+            $this->_ajaxSelectUrl = Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]);
+        }
+
+        return $this->_ajaxSelectUrl;
+    }
+
     /**
      * @return \yii\widgets\ActiveField
      */
     public function renderForActiveForm()
+    {
+        $field = parent::renderForActiveForm();
+
+        $find = CmsContentElement::find()->active();
+
+        if ($this->content_id) {
+            $find->andWhere(['content_id' => $this->content_id]);
+        }
+
+
+        if (in_array($this->fieldElement, [
+                self::FIELD_ELEMENT_SELECT,
+                self::FIELD_ELEMENT_RADIO_LIST,
+
+        ])) {
+            $config = [];
+            if ($this->property->is_required) {
+                $config['allowDeselect'] = false;
+            } else {
+                $config['allowDeselect'] = true;
+            }
+
+            //echo $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+            $field->widget(
+                AjaxSelect::class, [
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
+                    'valueCallback' => function($value) {
+                        return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
+                    },
+                ]
+            );
+
+        } else {
+
+            $field->widget(
+                AjaxSelect::class, [
+                    'multiple' => true,
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
+                    'valueCallback' => function($value) {
+                        return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
+                    },
+                ]
+            );
+
+        }
+
+
+        if (!$field) {
+            return '';
+        }
+
+
+        return $field;
+    }
+
+    /**
+     * @deprecated
+     * @return \yii\widgets\ActiveField
+     */
+    public function _renderForActiveFormOLD()
     {
         $field = parent::renderForActiveForm();
 
@@ -133,77 +209,19 @@ class PropertyTypeElement extends PropertyType
             //echo $this->property->relatedPropertiesModel->getAttribute($this->property->code);
             $field->widget(
                 AjaxSelect::class, [
-                    'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                    /*'dataCallback' => function($q = '') use ($find) {
-
-                        $query = $find;
-
-                        if ($q) {
-                            $query->andWhere(['like', 'name', $q]);
-                        }
-
-                        $data = $query->limit(50)
-                            ->all();
-
-                        $result = [];
-
-                        if ($data) {
-                            foreach ($data as $model)
-                            {
-                                $result[] = [
-                                    'id' => $model->id,
-                                    'text' => $model->name
-                                ];
-                            }
-                        }
-
-                        return $result;
-                    },*/
-
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
                     'valueCallback' => function($value) {
                         return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
                     },
                 ]
             );
 
-            /*$field = $this->activeForm->fieldSelect(
-                $this->property->relatedPropertiesModel,
-                $this->property->code,
-                ArrayHelper::map($find->all(), 'id', 'name'),
-                $config
-            );*/
         } elseif ($this->fieldElement == self::FIELD_ELEMENT_SELECT_MULTI) {
 
             $field->widget(
                 AjaxSelect::class, [
                     'multiple' => true,
-                    'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                    /*'dataCallback' => function($q = '') use ($find) {
-
-                        $query = $find;
-
-                        if ($q) {
-                            $query->andWhere(['like', 'name', $q]);
-                        }
-
-                        $data = $query->limit(50)
-                            ->all();
-
-                        $result = [];
-
-                        if ($data) {
-                            foreach ($data as $model)
-                            {
-                                $result[] = [
-                                    'id' => $model->id,
-                                    'text' => $model->name
-                                ];
-                            }
-                        }
-
-                        return $result;
-                    },*/
-
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
                     'valueCallback' => function($value) {
                         return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
                     },
@@ -231,15 +249,15 @@ class PropertyTypeElement extends PropertyType
                     } else {
                         if ($this->fieldElement == self::FIELD_ELEMENT_SELECT_DIALOG) {
                             $field = parent::renderForActiveForm();
-                            
+
                             $data = [
                                 'content_id' => $this->content_id
                             ];
-                            
+
                             if ($this->dialogControllerUniqueId) {
                                 $data['dialogRoute'] = ["/" . $this->dialogControllerUniqueId];
                             }
-                        
+
                             $field->widget(
                                 SelectModelDialogContentElementWidget::class,
                                 $data
@@ -251,11 +269,11 @@ class PropertyTypeElement extends PropertyType
                                     'content_id' => $this->content_id,
                                     'multiple' => true,
                                 ];
-                                
+
                                 if ($this->dialogControllerUniqueId) {
                                     $data['dialogRoute'] = ["/" . $this->dialogControllerUniqueId];
                                 }
-                                
+
                                 $field = parent::renderForActiveForm();
                                 $field->widget(
                                     SelectModelDialogContentElementWidget::class,

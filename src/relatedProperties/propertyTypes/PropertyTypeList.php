@@ -49,9 +49,9 @@ class PropertyTypeList extends PropertyType
             //self::FIELD_ELEMENT_CHECKBOX_LIST          => \Yii::t('skeeks/cms', 'Checkbox List'),
             //self::FIELD_ELEMENT_LISTBOX                => \Yii::t('skeeks/cms', 'ListBox'),
             //self::FIELD_ELEMENT_LISTBOX_MULTI          => \Yii::t('skeeks/cms', 'ListBox Multi'),
-            self::FIELD_ELEMENT_SELECT_DIALOG          => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
+            /*self::FIELD_ELEMENT_SELECT_DIALOG          => \Yii::t('skeeks/cms', 'Selection widget in the dialog box'),
             self::FIELD_ELEMENT_SELECT_DIALOG_MULTIPLE => \Yii::t('skeeks/cms',
-                'Selection widget in the dialog box (multiple choice)'),
+                'Selection widget in the dialog box (multiple choice)'),*/
 
         ];
     }
@@ -146,10 +146,90 @@ class PropertyTypeList extends PropertyType
         return $result;
     }
 
+    protected $_ajaxSelectUrl = null;
+    protected $_enumClass = null;
+
+    public function setAjaxSelectUrl($url) {
+        $this->_ajaxSelectUrl = $url;
+        return $this;
+    }
+
+    public function getAjaxSelectUrl()
+    {
+        if ($this->_ajaxSelectUrl === null) {
+            $this->_ajaxSelectUrl = Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]);
+        }
+
+        return $this->_ajaxSelectUrl;
+    }
+
+    public function setEnumClass($class) {
+        $this->_enumClass = $class;
+        return $this;
+    }
+
+    public function getEnumClass()
+    {
+        if ($this->_enumClass === null) {
+            $this->_enumClass = CmsContentPropertyEnum::class;
+        }
+
+        return $this->_enumClass;
+    }
+
     /**
      * @return \yii\widgets\ActiveField
      */
     public function renderForActiveForm()
+    {
+        $field = parent::renderForActiveForm();
+
+        $find = CmsContentPropertyEnum::find()->andWhere(['property_id' => $this->property->id]);
+
+        if (in_array($this->fieldElement, [
+                self::FIELD_ELEMENT_SELECT,
+                self::FIELD_ELEMENT_RADIO_LIST,
+
+            ])) {
+
+            $config = [];
+            if ($this->property->is_required) {
+                $config['allowDeselect'] = false;
+            } else {
+                $config['allowDeselect'] = true;
+            }
+
+            //echo $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+            $field->widget(
+                AjaxSelect::class, [
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
+                    'valueCallback' => function($value) {
+                        $class = $this->getEnumClass();
+                        return \yii\helpers\ArrayHelper::map($class::find()->where(['id' => $value])->all(), 'id', 'value');
+                    },
+                ]
+            );
+        } else {
+            $field->widget(
+                AjaxSelect::class, [
+                    'multiple' => true,
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
+                    'valueCallback' => function($value) {
+                        $class = $this->getEnumClass();
+                        return \yii\helpers\ArrayHelper::map($class::find()->where(['id' => $value])->all(), 'id', 'value');
+                    },
+                ]
+            );
+        }
+
+        return $field;
+    }
+
+    /**
+     * @deprecated
+     * @return \yii\widgets\ActiveField
+     */
+    public function _renderForActiveFormOld()
     {
         $field = parent::renderForActiveForm();
 
@@ -167,33 +247,7 @@ class PropertyTypeList extends PropertyType
             //echo $this->property->relatedPropertiesModel->getAttribute($this->property->code);
             $field->widget(
                 AjaxSelect::class, [
-                    'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                    /*'dataCallback' => function($q = '') use ($find) {
-
-                        $query = $find;
-
-                        if ($q) {
-                            $query->andWhere(['like', 'value', $q]);
-                        }
-
-                        $data = $query->limit(50)
-                            ->all();
-
-                        $result = [];
-
-                        if ($data) {
-                            foreach ($data as $model)
-                            {
-                                $result[] = [
-                                    'id' => $model->id,
-                                    'text' => $model->value
-                                ];
-                            }
-                        }
-
-                        return $result;
-                    },*/
-
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
                     'valueCallback' => function($value) {
                         return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
                     },
@@ -206,45 +260,13 @@ class PropertyTypeList extends PropertyType
                 $field->widget(
                 AjaxSelect::class, [
                     'multiple' => true,
-                    'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                    /*'dataCallback' => function($q = '') use ($find) {
-
-                        $query = $find;
-
-                        if ($q) {
-                            $query->andWhere(['like', 'value', $q]);
-                        }
-
-                        $data = $query->limit(50)
-                            ->all();
-
-                        $result = [];
-
-                        if ($data) {
-                            foreach ($data as $model)
-                            {
-                                $result[] = [
-                                    'id' => $model->id,
-                                    'text' => $model->value
-                                ];
-                            }
-                        }
-
-                        return $result;
-                    },*/
-
+                    'ajaxUrl' => $this->getAjaxSelectUrl(),
                     'valueCallback' => function($value) {
                         return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
                     },
                 ]
             );
 
-                /*$field = $this->activeForm->fieldSelectMulti(
-                    $this->property->relatedPropertiesModel,
-                    $this->property->code,
-                    ArrayHelper::map($this->property->enums, 'id', 'value'),
-                    []
-                );*/
             } else {
                 if ($this->fieldElement == self::FIELD_ELEMENT_RADIO_LIST) {
                     $field = parent::renderForActiveForm();
