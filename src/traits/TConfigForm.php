@@ -31,12 +31,11 @@ trait TConfigForm
     {
         return [];
     }
-
-
+    
     /**
      * @var string 
      */
-    public $configFormView = "";
+    /*public $configFormView = "";*/
     /**
      *
      * @param ActiveForm $form
@@ -54,12 +53,12 @@ trait TConfigForm
                 'fields'     => $fields,
             ]))->render();
         } else {
-            if ($this->configFormView) {
+            /*if ($this->configFormView) {
                 $formContent = \Yii::$app->view->render($this->configFormView, [
                     'model' => $this,
                     'form' => $form,
                 ]);
-            }
+            }*/
         }
         
         return $formContent;
