@@ -72,6 +72,10 @@
             this.AjaxQueryHandler.on('success', function (e, data) {
                 //console.log('this.AjaxQueryHandler.success');
                 self.trigger('success', data);
+
+                sx.EventManager.trigger("ajaxFormSuccessSubmited", {
+                    'form': self
+                });
             });
 
             this.AjaxQueryHandler.on('error', function (e, data) {
