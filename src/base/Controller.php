@@ -55,5 +55,37 @@ class Controller extends YiiWebController
         return parent::render($viewApp, $params);
     }
 
+    /**
+     * @param string $view
+     * @param array  $params
+     * @return string
+     */
+    public function renderPartial($view, $params = [])
+    {
+        if ($this->module instanceof Application) {
+            return parent::renderPartial($view, $params);
+        }
+
+        if (strpos($view, '/') && !strpos($view, '@app/views')) {
+            return parent::renderPartial($view, $params);
+        }
+
+        $viewDir = "@app/views/modules/" . $this->module->id . '/' . $this->id;
+        $viewApp = $viewDir . '/' . $view;
+
+        if (isset(\Yii::$app->view->theme->pathMap['@app/views'])) {
+            $tmpPaths = [];
+            foreach (\Yii::$app->view->theme->pathMap['@app/views'] as $path) {
+                $tmpPaths[] = $path . "/modules/" . $this->module->id . '/' . $this->id;
+            }
+
+            $tmpPaths[] = $this->viewPath;
+            \Yii::$app->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->view->theme->pathMap, [
+                $viewDir => $tmpPaths
+            ]);
+        }
+
+        return parent::renderPartial($viewApp, $params);
+    }
 
 }
