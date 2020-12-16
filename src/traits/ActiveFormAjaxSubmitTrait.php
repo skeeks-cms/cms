@@ -9,6 +9,8 @@
 namespace skeeks\cms\traits;
 
 use skeeks\cms\assets\ActiveFormAjaxSubmitAsset;
+use yii\helpers\Html;
+use yii\helpers\Inflector;
 
 /**
  *
@@ -55,9 +57,10 @@ JS
         $clientCallback = $this->clientCallback;
 
         if ($clientCallback) {
+            $id = Inflector::id2camel($this->id);
             $this->view->registerJs(<<<JS
-            var callback = $clientCallback;
-            callback(sx.ActiveForm);
+            var callback{$id} = $clientCallback;
+            callback{$id}(sx.ActiveForm);
 JS
     );
         }

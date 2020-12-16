@@ -107,7 +107,7 @@ class ContentElementController extends Controller
         if ($this->model && \Yii::$app->cmsToolbar) {
             $controller = \Yii::$app->createController($this->editControllerRoute)[0];
             $adminControllerRoute = [
-                '/'.$this->editControllerRoute.'/update',
+                '/'.$this->editControllerRoute.'/' . $controller->modelDefaultAction,
                 $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute},
             ];
 
