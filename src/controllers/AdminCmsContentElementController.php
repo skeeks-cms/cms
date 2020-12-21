@@ -1609,4 +1609,22 @@ HTML
         }
         return $autoColumns;
     }
+
+
+    /**
+     * @return Model|ActiveRecord
+     */
+    public function getModel()
+    {
+        $model = parent::getModel();
+        if (!$model) {
+            return $model;
+        }
+
+        if ($model->cms_site_id != \Yii::$app->skeeks->site->id) {
+            return null;
+        }
+
+        return $model;
+    }
 }
