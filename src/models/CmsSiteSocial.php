@@ -35,6 +35,8 @@ class CmsSiteSocial extends ActiveRecord
     const SOCIAL_VK = 'vk';
     const SOCIAL_OK = 'odnoklassniki';
     const SOCIAL_YOUTUBE = 'youtube';
+    const SOCIAL_WHATSAPP = 'whatsapp';
+    const SOCIAL_TELEGRAM = 'telegram';
     const SOCIAL_OTHER = 'other';
 
     /**
@@ -56,6 +58,8 @@ class CmsSiteSocial extends ActiveRecord
             self::SOCIAL_YOUTUBE   => 'Youtube',
             self::SOCIAL_VK        => 'Вконтакте',
             self::SOCIAL_OK        => 'Одноклассники',
+            self::SOCIAL_TELEGRAM  => 'Telegram',
+            self::SOCIAL_WHATSAPP  => 'WatsApp',
             self::SOCIAL_OTHER     => 'Другое',
         ];
     }
