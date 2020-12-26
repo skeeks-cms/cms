@@ -336,7 +336,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                 ],
                 'grid'    => [
 
-                    'on init'        => function (Event $event) {
+                    'on beforeInit'        => function (Event $event) {
                         /**
                          * @var $query ActiveQuery
                          * @var $grid GridView

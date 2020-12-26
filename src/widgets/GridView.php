@@ -329,10 +329,13 @@ class GridView extends \yii\grid\GridView
 
         //Получение настроек из хранилища
 
+        $this->trigger("beforeInit");
+
         parent::init();
 
         //Сбор результирующего конфига колонок
         $this->_initConfigColumns();
+        /*print_r($this->visibleColumns);die;*/
 
         //Конфиг некоторых колонок включается только если они вообще включены
         //Используется $columnConfigCallback
