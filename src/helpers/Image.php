@@ -52,7 +52,7 @@ class Image
      * @param null $capSrc
      * @return string
      */
-    public static function thumbnailUrlOnRequest($originalSrc = '', Filter $filter, $nameForSave = '', $capSrc = null)
+    public static function thumbnailUrlOnRequest(string $originalSrc, Filter $filter, $nameForSave = '', $capSrc = null)
     {
         if ($originalSrc) {
             return \Yii::$app->imaging->thumbnailUrlOnRequest($originalSrc, $filter, $nameForSave = '');
