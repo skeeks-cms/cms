@@ -20,8 +20,10 @@ if (YII_ENV == 'dev') {
     error_reporting(E_ALL);
     ini_set('display_errors', 'On');
     //\skeeks\cms\composer\config\Builder::rebuild();
-    \Yiisoft\Composer\Config\Builder::rebuild();
-    \Yii::endProfile('Rebuild config');
+    if (isset($_GET['rebuild'])) {
+        \Yiisoft\Composer\Config\Builder::rebuild();
+        \Yii::endProfile('Rebuild config');
+    }
 }
 
 //$configFile = \skeeks\cms\composer\config\Builder::path('web-' . ENV);
