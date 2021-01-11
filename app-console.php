@@ -16,13 +16,13 @@ require_once(__DIR__ . '/bootstrap.php');
 
 if (YII_ENV == 'dev') {
     \Yii::beginProfile('Rebuild config');
-    \skeeks\cms\composer\config\Builder::rebuild();
+    \Yiisoft\Composer\Config\Builder::rebuild();
     \Yii::endProfile('Rebuild config');
 }
 
-$configFile = \skeeks\cms\composer\config\Builder::path('console-' . ENV);
+$configFile = \Yiisoft\Composer\Config\Builder::path('console-' . ENV);
 if (!file_exists($configFile)) {
-    $configFile = \skeeks\cms\composer\config\Builder::path('console');
+    $configFile = \Yiisoft\Composer\Config\Builder::path('console');
 }
 
 $config = (array)require $configFile;

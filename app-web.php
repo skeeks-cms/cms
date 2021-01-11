@@ -19,16 +19,16 @@ if (YII_ENV == 'dev') {
     \Yii::beginProfile('Rebuild config');
     error_reporting(E_ALL);
     ini_set('display_errors', 'On');
-    \skeeks\cms\composer\config\Builder::rebuild();
-    //\Yiisoft\Composer\Config\Builder::rebuild();
+    //\skeeks\cms\composer\config\Builder::rebuild();
+    \Yiisoft\Composer\Config\Builder::rebuild();
     \Yii::endProfile('Rebuild config');
 }
 
-$configFile = \skeeks\cms\composer\config\Builder::path('web-' . ENV);
-//$configFile = \Yiisoft\Composer\Config\Builder::path('web-' . ENV);
+//$configFile = \skeeks\cms\composer\config\Builder::path('web-' . ENV);
+$configFile = \Yiisoft\Composer\Config\Builder::path('web-' . ENV);
 if (!file_exists($configFile)) {
-    //$configFile = \Yiisoft\Composer\Config\Builder::path('web');
-    $configFile = \skeeks\cms\composer\config\Builder::path('web');
+    $configFile = \Yiisoft\Composer\Config\Builder::path('web');
+    //$configFile = \skeeks\cms\composer\config\Builder::path('web');
 }
 $config = (array)require $configFile;
 

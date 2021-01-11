@@ -25,13 +25,14 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.0.0",
+        "php": "^7.4|^8.0",
 
         "yiisoft/yii2": "^2.0.24 || dev-master@dev",
         "yiisoft/yii2-jui": "^2.0.7",
         "yiisoft/yii2-bootstrap": "^2.0.9 || dev-master@dev",
 
-        "skeeks/cms-composer": "^1.0.0 || dev-master@dev",
+        "skeeks/cms-composer": "^2.0 || dev-master@dev",
+        "skeeks/cms-composer-update-plugin": "^2.0 || dev-master",
 
         "skeeks/yii2-config": "^1.0.0 || dev-master@dev",
         "skeeks/yii2-form": "^1.0.0 || dev-master@dev",
