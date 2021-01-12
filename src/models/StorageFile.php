@@ -42,9 +42,15 @@ use yii\helpers\ArrayHelper;
  * @property integer                                $external_id
  *
  * @property string                                 $fileName
+ * 
+ * @property string                                 $baseNameSrc
+ * @property string                                 $absoluteBaseNameSrc
+ * 
  * @property string                                 $src
  * @property string                                 $absoluteSrc
+ * 
  * @property string                                 $downloadName
+ * 
  * @property CmsSite                                $cmsSite
  *
  * @property \skeeks\cms\components\storage\Cluster $cluster
@@ -147,8 +153,8 @@ class StorageFile extends Core
         try {
             $cluster = $this->cluster;
 
-            $cluster->deleteTmpDir($this->cluster_file);
-            $cluster->delete($this->cluster_file);
+            $cluster->deleteTmpDir($this);
+            $cluster->delete($this);
 
         } catch (\common\components\storage\Exception $e) {
             return false;
@@ -171,7 +177,7 @@ class StorageFile extends Core
      */
     public function deleteTmpDir()
     {
-        $this->cluster->deleteTmpDir($this->cluster_file);
+        $this->cluster->deleteTmpDir($this);
 
         return $this;
     }
@@ -234,7 +240,7 @@ class StorageFile extends Core
      */
     public function getAbsoluteSrc()
     {
-        return $this->cluster->getAbsoluteUrl($this->cluster_file);
+        return $this->cluster->getAbsoluteUrl($this);
     }
 
     /**
@@ -243,10 +249,26 @@ class StorageFile extends Core
      */
     public function getSrc()
     {
-        return $this->cluster->getPublicSrc($this->cluster_file);
+        return $this->cluster->getPublicUrl($this);
     }
 
 
+    /**
+     * @return string
+     */
+    public function getBaseNameSrc()
+    {
+        return $this->cluster->getPublicBaseNameUrl($this);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAbsoluteBaseNameSrc()
+    {
+        return $this->cluster->getAbsoluteBaseNameUrl($this);
+    }
+    
     /**
      * @return \skeeks\cms\components\storage\Cluster
      */
@@ -258,6 +280,8 @@ class StorageFile extends Core
     public function fields()
     {
         return ArrayHelper::merge(parent::fields(), [
+            'baseNameSrc',
+            'absoluteBaseNameSrc',
             'src',
             'absoluteSrc',
             'rootSrc',
@@ -290,7 +314,7 @@ class StorageFile extends Core
      */
     public function getRootSrc()
     {
-        return $this->cluster->getRootSrc($this->cluster_file);
+        return $this->cluster->getRootSrc($this);
     }
 
     /**

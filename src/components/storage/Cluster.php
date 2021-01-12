@@ -11,6 +11,8 @@
 
 namespace skeeks\cms\components\storage;
 
+use skeeks\cms\components\Imaging;
+use skeeks\cms\models\StorageFile;
 use Yii;
 use yii\base\Component;
 
@@ -59,7 +61,7 @@ abstract class Cluster extends Model
      * @param $clusterFileUniqSrc
      * @return mixed
      */
-    abstract public function delete($clusterFileUniqSrc);
+    abstract public function delete(StorageFile $clusterFile);
 
 
     /**
@@ -68,7 +70,7 @@ abstract class Cluster extends Model
      * @param $clusterFileUniqSrc
      * @return mixed
      */
-    abstract public function deleteTmpDir($clusterFileUniqSrc);
+    abstract public function deleteTmpDir(StorageFile $clusterFile);
 
     /**
      * Путь до папки с временными файлами превью например
@@ -76,9 +78,9 @@ abstract class Cluster extends Model
      * @param $clusterFileUniqSrc
      * @return string
      */
-    public function rootTmpDir($clusterFileUniqSrc)
+    public function rootTmpDir(StorageFile $clusterFile)
     {
-        $file = new File($this->getRootSrc($clusterFileUniqSrc));
+        $file = new File($this->getRootSrc($clusterFile));
         return $file->getDirName() . "/" . $file->getFileName();
     }
 
@@ -89,9 +91,9 @@ abstract class Cluster extends Model
      * @param $clusterFileSrc
      * @return string
      */
-    public function getRootSrc($clusterFileUniqSrc)
+    public function getRootSrc(StorageFile $clusterFile)
     {
-        return $this->rootBasePath . DIRECTORY_SEPARATOR . $clusterFileUniqSrc;
+        return $this->rootBasePath . DIRECTORY_SEPARATOR . $clusterFile->cluster_file;
     }
 
     /**
@@ -101,19 +103,43 @@ abstract class Cluster extends Model
      * @param $clusterFileSrc
      * @return string
      */
-    public function getPublicSrc($clusterFileUniqSrc)
+    public function getPublicUrl(StorageFile $clusterFile)
     {
-        return $this->publicBaseUrl . "/" . $clusterFileUniqSrc;
+        return $this->publicBaseUrl . "/" . $clusterFile->cluster_file;
     }
 
     /**
      * @param $clusterFileUniqSrc
      * @return string
      */
-    public function getAbsoluteUrl($clusterFileUniqSrc)
+    public function getAbsoluteUrl(StorageFile $clusterFile)
     {
-        return $this->getPublicSrc($clusterFileUniqSrc);
+        return $this->getPublicUrl($clusterFile);
     }
+    
+    /**
+     * Полный публичный путь до файла.
+     * Например /uploads/all/f4/df/sadfsd/sdfsdfsd/asdasd.jpg
+     *
+     * @param $clusterFileSrc
+     * @return string
+     */
+    public function getPublicBaseNameUrl(StorageFile $clusterFile)
+    {
+        $data = explode(".", $clusterFile->cluster_file);
+        
+        return $this->publicBaseUrl . "/" . $data[0] . "/" . Imaging::STORAGE_FILE_PREFIX . "/" . $clusterFile->downloadName;
+    }
+
+    /**
+     * @param $clusterFileUniqSrc
+     * @return string
+     */
+    public function getAbsoluteBaseNameUrl(StorageFile $clusterFile)
+    {
+        return $this->getPublicBaseNameUrl($clusterFile);
+    }
+
 
 
     /**

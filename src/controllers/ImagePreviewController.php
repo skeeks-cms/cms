@@ -23,7 +23,7 @@ use yii\web\NotFoundHttpException;
  * Class ImagingController
  * @package skeeks\cms\controllers
  */
-class ImagingController extends Controller
+class ImagePreviewController extends Controller
 {
     /**
      * Lists all StorageFile models.
@@ -52,21 +52,20 @@ class ImagingController extends Controller
         }
 
 
-        $newFile = File::object($newFileSrc);
         $strposFilter = strpos($newFileSrc, "/".Imaging::THUMBNAIL_PREFIX);
         if (!$strposFilter) {
             throw new NotFoundHttpException("This is not a filter thumbnail: ".$newFileSrc);
         }
 
+        $newFile = File::object($newFileSrc);
         $originalFileSrc = substr($newFileSrc, 0, $strposFilter).".".$newFile->getExtension();
 
         //TODO: hardcode delete it in the future
         $webRoot = \Yii::getAlias('@webroot');
 
-        $originalFileRoot = $webRoot.DIRECTORY_SEPARATOR.$originalFileSrc;
-        $newFileRoot = $webRoot.DIRECTORY_SEPARATOR.$newFileSrc;
-        $newFileRootDefault = $webRoot.DIRECTORY_SEPARATOR.str_replace($newFile->getBaseName(),
-                Imaging::DEFAULT_THUMBNAIL_FILENAME.".".$extension, $newFileSrc);
+        $originalFileRoot = $webRoot . DIRECTORY_SEPARATOR . $originalFileSrc;
+        $newFileRoot = $webRoot . DIRECTORY_SEPARATOR . $newFileSrc;
+        $newFileRootDefault = $webRoot . DIRECTORY_SEPARATOR.str_replace($newFile->getBaseName(), Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $extension, $newFileSrc);
 
         $originalFile = new File($originalFileRoot);
 
@@ -124,7 +123,7 @@ class ImagingController extends Controller
                 }
             } else {
                 if ($newFileRoot != $newFileRootDefault) {
-                    symlink($newFileRootDefault, $newFileRoot);
+                    symlink(Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $extension, $newFileRoot);
                 }
             }
 

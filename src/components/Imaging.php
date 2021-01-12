@@ -40,6 +40,9 @@ class Imaging extends Component
      * Константа для разбора URL - это некая метка, с этого момента идет указание фильтра
      */
     const THUMBNAIL_PREFIX = "sx-filter__";
+    
+    const STORAGE_FILE_PREFIX = "sx-o-file__";
+    
     const DEFAULT_THUMBNAIL_FILENAME = "sx-file";
 
 
@@ -139,27 +142,5 @@ class Imaging extends Component
     public function getImagingUrl($imageSrc, Filter $filter)
     {
         return $this->thumbnailUrlOnRequest($imageSrc, $filter);
-    }
-
-
-    /**
-     * @param $filterCode
-     * @return string
-     */
-    protected function _assembleParams(Filter $filter)
-    {
-        /*$params[] = $filter->getId();
-
-        if ($filter->getConfig())
-        {
-            $params[] = $filter->getConfig();
-        }
-
-        $result = String::compressBase64EncodeUrl($params);
-
-        $result = str_split($result, $this->splitLongNames);
-        $result = implode("/", $result);
-
-        return $result;*/
     }
 }

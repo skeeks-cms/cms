@@ -110,139 +110,6 @@ class StorageFilesController extends Controller
         return $response;
     }
 
-
-    /**
-     * ���������� � ������ ������ ����
-     * @see skeeks\cms\widgets\formInputs\StorageImage
-     * @return RequestResponse
-     */
-    public function actionLinkToModel()
-    {
-        $rr = new RequestResponse();
-
-        if ($rr->isRequestAjaxPost()) {
-            try {
-                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelAttribute')) {
-                    throw new \yii\base\Exception("�� ���������� ������� ������");
-                }
-
-                $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
-                if (!$file) {
-                    throw new \yii\base\Exception("�������� ���� ��� ������ ��� �� ����������");
-                }
-
-                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className())) {
-                    throw new \yii\base\Exception("���������� ��������� ���� � ���� ������");
-                }
-
-                $className = \Yii::$app->request->post('modelClassName');
-                /**
-                 * @var $model ActiveRecord
-                 */
-                $model = $className::findOne(\Yii::$app->request->post('modelId'));
-                if (!$model) {
-                    throw new \yii\base\Exception("������ � ������� ���������� ��������� ���� �� �������");
-                }
-
-                if (!$model->hasAttribute(\Yii::$app->request->post('modelAttribute'))) {
-                    throw new \yii\base\Exception("� ������ �� ������ ������� �������� �����: " . \Yii::$app->request->post('modelAttribute'));
-                }
-
-                //�������� ������� �����
-                if ($oldFileId = $model->{\Yii::$app->request->post('modelAttribute')}) {
-                    /**
-                     * @var $oldFile CmsStorageFile
-                     * @var $file CmsStorageFile
-                     */
-                    $oldFile = CmsStorageFile::findOne($oldFileId);
-                    $oldFile->delete();
-                }
-
-                $model->{\Yii::$app->request->post('modelAttribute')} = $file->id;
-                if (!$model->save(false)) {
-                    throw new \yii\base\Exception("�� ������� ��������� ������");
-                }
-
-                $file->name = $model->name;
-                $file->save(false);
-
-                $rr->success = true;
-                $rr->message = "";
-
-            } catch (\Exception $e) {
-                $rr->success = false;
-                $rr->message = $e->getMessage();
-            }
-
-        }
-
-        return $rr;
-    }
-
-    /**
-     * ���������� � ������ ������ ����
-     * @see skeeks\cms\widgets\formInputs\StorageImage
-     * @return RequestResponse
-     */
-    public function actionLinkToModels()
-    {
-        $rr = new RequestResponse();
-
-        if ($rr->isRequestAjaxPost()) {
-            try {
-                if (!\Yii::$app->request->post('file_id') || !\Yii::$app->request->post('modelId') || !\Yii::$app->request->post('modelClassName') || !\Yii::$app->request->post('modelRelation')) {
-                    throw new \yii\base\Exception("�� ���������� ������� ������");
-                }
-
-                $file = CmsStorageFile::findOne(\Yii::$app->request->post('file_id'));
-                if (!$file) {
-                    throw new \yii\base\Exception("�������� ���� ��� ������ ��� �� ����������");
-                }
-
-                if (!is_subclass_of(\Yii::$app->request->post('modelClassName'), ActiveRecord::className())) {
-                    throw new \yii\base\Exception("���������� ��������� ���� � ���� ������");
-                }
-
-                $className = \Yii::$app->request->post('modelClassName');
-                /**
-                 * @var $model ActiveRecord
-                 */
-                $model = $className::findOne(\Yii::$app->request->post('modelId'));
-                if (!$model) {
-                    throw new \yii\base\Exception("������ � ������� ���������� ��������� ���� �� �������");
-                }
-
-                if (!$model->hasProperty(\Yii::$app->request->post('modelRelation'))) {
-                    throw new \yii\base\Exception("� ������ �� ������ ������� �������� � ������ modelRelation: " . \Yii::$app->request->post('modelRelation'));
-                }
-
-                try {
-                    $model->link(\Yii::$app->request->post('modelRelation'), $file);
-
-                    if (!$file->name) {
-                        $file->name = $model->name;
-                        $file->save(false);
-                    }
-
-                    $rr->success = true;
-                    $rr->message = "";
-                } catch (\Exception $e) {
-                    $rr->success = false;
-                    $rr->message = $e->getMessage();
-                }
-
-
-            } catch (\Exception $e) {
-                $rr->success = false;
-                $rr->message = $e->getMessage();
-            }
-
-        }
-
-        return $rr;
-    }
-
-
     public function actionRemoteUpload()
     {
         $response =
@@ -279,4 +146,15 @@ class StorageFilesController extends Controller
     }
 
 
+    public function actionGetFile()
+    {
+        $newFileSrc = \Yii::$app->request->getPathInfo();
+        $extension = Imaging::getExtension($newFileSrc);
+
+        if (!$extension) {
+            throw new \yii\base\Exception("Extension not found: ".$newFileSrc);
+        }
+
+        print_r($newFileSrc);die;
+    }
 }

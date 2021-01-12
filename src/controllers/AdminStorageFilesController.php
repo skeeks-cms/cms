@@ -97,7 +97,7 @@ class AdminStorageFilesController extends BackendModelStandartController
                             if (window.opener) {
                                 if (window.opener.CKEDITOR) {
                                     sx.EventManager.on("submitElement", function(e, data) {
-                                        window.opener.CKEDITOR.tools.callFunction({$CKEditorFuncNum}, data.src);
+                                        window.opener.CKEDITOR.tools.callFunction({$CKEditorFuncNum}, data.basenamesrc);
                                         window.close();
                                     });
                                 }
@@ -412,7 +412,7 @@ HTML
 
         header('Content-type: '.$file->mime_type);
         header('Content-Disposition: attachment; filename="'.$file->downloadName.'"');
-        echo file_get_contents($file->cluster->getAbsoluteUrl($file->cluster_file));
+        echo file_get_contents($file->cluster->getAbsoluteUrl($file));
         die;
 
     }

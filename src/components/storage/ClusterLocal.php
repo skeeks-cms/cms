@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\components\storage;
 
+use skeeks\cms\models\StorageFile;
 use skeeks\sx\Dir;
 use skeeks\sx\File;
 
@@ -79,9 +80,9 @@ class ClusterLocal extends Cluster
      * @return bool
      * @throws Exception
      */
-    public function delete($clusterFileUniqSrc)
+    public function delete(StorageFile $clusterFile)
     {
-        $file = new File($this->getRootSrc($clusterFileUniqSrc));
+        $file = new File($this->getRootSrc($clusterFile));
         if ($file->isExist()) {
             $file->remove();
         }
@@ -96,9 +97,9 @@ class ClusterLocal extends Cluster
      * @param $clusterFileUniqSrc
      * @return bool|mixed
      */
-    public function deleteTmpDir($clusterFileUniqSrc)
+    public function deleteTmpDir(StorageFile $clusterFile)
     {
-        $dir = new Dir($this->rootTmpDir($clusterFileUniqSrc), false);
+        $dir = new Dir($this->rootTmpDir($clusterFile), false);
         if ($dir->isExist()) {
             $dir->remove();
         }
@@ -114,14 +115,28 @@ class ClusterLocal extends Cluster
      * @param $clusterFileUniqSrc
      * @return string
      */
-    public function getAbsoluteUrl($clusterFileUniqSrc)
+    public function getAbsoluteUrl(StorageFile $clusterFile)
     {
         if ($this->publicBaseUrlIsAbsolute) {
-            return $this->getPublicSrc($clusterFileUniqSrc);
+            return $this->getPublicUrl($clusterFile);
         } else {
-            return \Yii::$app->urlManager->hostInfo.$this->getPublicSrc($clusterFileUniqSrc);
+            return \Yii::$app->urlManager->hostInfo.$this->getPublicUrl($clusterFile);
         }
     }
+    
+    /**
+     * @param $clusterFileUniqSrc
+     * @return string
+     */
+    public function getAbsoluteBaseNameUrl(StorageFile $clusterFile)
+    {
+        if ($this->publicBaseUrlIsAbsolute) {
+            return $this->getPublicBaseNameUrl($clusterFile);
+        } else {
+            return \Yii::$app->urlManager->hostInfo.$this->getPublicBaseNameUrl($clusterFile);
+        }
+    }
+    
     /**
      * Свободное место на сервере
      * @return float

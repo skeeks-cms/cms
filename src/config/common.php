@@ -109,8 +109,9 @@ return [
 
                 'favicon.<extension:\w+>' => '/cms/favicon/on-request',
 
-                "cms-imaging" => ["class" => 'skeeks\cms\components\ImagingUrlRule'],
-                
+                "image-preview" => ["class" => 'skeeks\cms\components\urlRules\UrlRuleImagePreview'],
+                "storage-file" => ["class" => 'skeeks\cms\components\urlRules\UrlRuleStorageFile'],
+
                 //Resize image on request
             ],
         ],
