@@ -64,7 +64,6 @@ class Pjax extends \yii\widgets\Pjax
     public function registerClientScript()
     {
         parent::registerClientScript();
-
         $errorMessage = \Yii::t('skeeks/admin', 'An unexpected error occurred. Refer to the developers.');
 
         $errorNotify = '';
@@ -107,6 +106,8 @@ CSS
                     $(document).on('pjax:send', function(e)
                     {
                         if ('{$this->id}' == e.target.id) {
+                            //console.log('pjax:send');
+                            
                             blockerPanel = new sx.classes.Blocker($(e.target));
                             blockerPanel.block();
                         }
@@ -115,12 +116,32 @@ CSS
 
                     $(document).on('pjax:complete', function(e) {
                         if ('{$this->id}' == e.target.id) {
+                            //console.log('pjax:complete');
                             blockerPanel.unblock();
+                        }
+                    });
+                    
+                    $(document).on('pjax:end', function(e) {
+                        if ('{$this->id}' == e.target.id) {
+                            //console.log('pjax:end');
+                        }
+                    });
+                    
+                    $(document).on('pjax:timeout', function(e) {
+                        if ('{$this->id}' == e.target.id) {
+                            //console.log('pjax:timeout');
+                        }
+                    });
+                    
+                    $(document).on('pjax:success', function(e) {
+                        if ('{$this->id}' == e.target.id) {
+                            //console.log('pjax:success');
                         }
                     });
 
                     $(document).on('pjax:error', function(e, data) {
                         if ('{$this->id}' == e.target.id) {
+                            //console.log('pjax:error');
                             {$errorNotify}
                             {$error}
                             blockerPanel.unblock();
@@ -139,6 +160,8 @@ JS
                 {
                     var blockerPanel = new sx.classes.Blocker($("{$this->blockContainer}"));
 
+                    //console.log('blockContainer');
+                    
                     $(document).on('pjax:send', function(e)
                     {
                         if ('{$this->id}' == e.target.id) {
@@ -176,6 +199,7 @@ JS
             $clientCallbackSend = $this->clientCallbackSend;
             $this->getView()->registerJs(<<<JS
              
+                 //console.log('clientCallbackSend');
                 $(document).on('pjax:send', function(e, data)
                 {
                     var success = {$clientCallbackSend};

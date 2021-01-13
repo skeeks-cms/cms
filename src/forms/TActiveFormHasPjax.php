@@ -57,6 +57,7 @@ trait TActiveFormHasPjax
             'isShowError'     => true,
         ], $this->pjaxOptions));
 
+        //todo: подумать возможно с этим подходом мы как то упускаем exceptions
         $this->on(self::EVENT_AFTER_RUN, function (WidgetEvent $event) use ($pjaxClass) {
 
             ob_start();
