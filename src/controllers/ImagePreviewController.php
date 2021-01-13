@@ -138,6 +138,7 @@ class ImagePreviewController extends Controller
             return \Yii::$app->response->redirect($url, 302);
 
         } catch (\Exception $e) {
+            throw $e;
             return $e->getMessage();
         }
     }
