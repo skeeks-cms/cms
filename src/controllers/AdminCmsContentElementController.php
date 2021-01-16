@@ -1412,6 +1412,7 @@ HTML
 
         return $actions;
     }
+
     public function beforeAction($action)
     {
         if ($this->content) {
@@ -1624,6 +1625,7 @@ HTML
         if ($model->cms_site_id != \Yii::$app->skeeks->site->id) {
             return null;
         }
+
 
         return $model;
     }
