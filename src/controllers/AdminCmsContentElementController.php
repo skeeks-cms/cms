@@ -623,6 +623,8 @@ HTML;
 
             "activate-multi"   => [
                 'class'   => BackendModelMultiActivateAction::class,
+                'value' => 'Y',
+                'attribute' => 'active',
                 'on init' => function ($e) {
                     $action = $e->sender;
                     /**
@@ -654,6 +656,8 @@ HTML;
             ],
             "deactivate-multi" => [
                 'class'   => BackendModelMultiDeactivateAction::class,
+                'value' => 'N',
+                'attribute' => 'active',
                 'on init' => function ($e) {
                     $action = $e->sender;
                     /**
