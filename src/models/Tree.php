@@ -503,7 +503,8 @@ class Tree extends ActiveRecord
     public function getSite()
     {
         //return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
-        return CmsSite::getById($this->cms_site_id);
+        $siteClass = \Yii::$app->skeeks->siteClass;
+        return $siteClass::getById($this->cms_site_id);
     }
 
     /**
