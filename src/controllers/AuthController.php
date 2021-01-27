@@ -302,7 +302,7 @@ class AuthController extends Controller
             $user->setPassword($password);
             $user->generatePasswordResetToken();
 
-            if ($user->save()) {
+            if ($user->save(false)) {
 
                 \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap,
                     [
