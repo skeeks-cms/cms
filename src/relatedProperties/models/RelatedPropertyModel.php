@@ -67,6 +67,11 @@ abstract class RelatedPropertyModel extends ActiveRecord
      * @var RelatedPropertiesModel
      */
     public $relatedPropertiesModel = null;
+    
+    /**
+     * @var null 
+     */
+    public $relatedPropertyEnumClassName = null;
 
     protected $_handler = null;
 

@@ -10,6 +10,7 @@
 
 namespace skeeks\cms\models\behaviors;
 
+use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\Behavior;
@@ -34,6 +35,11 @@ class HasRelatedProperties extends Behavior
      * @var string модель свойства ( например CmsContentProperty::className() )
      */
     public $relatedPropertyClassName;
+    
+    /**
+     * @var string модель свойства ( например CmsContentPropertyEnum::class )
+     */
+    //public $relatedPropertyEnumClassName;
 
     /**
      * Значения связанных свойств.

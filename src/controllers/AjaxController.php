@@ -36,15 +36,26 @@ class AjaxController extends Controller
             return $result;
         }
 
+        $propertyClass = CmsContentProperty::class;
+        $propertyEnumClass = CmsContentPropertyEnum::class;
+        
+        if (\Yii::$app->request->get("property_class")) {
+            $propertyClass = (string) \Yii::$app->request->get("property_class");
+        }
+        
+        if (\Yii::$app->request->get("property_enum_class")) {
+            $propertyEnumClass = (string) \Yii::$app->request->get("property_enum_class");
+        }
+        
         /**
          * @var $property CmsContentProperty
          */
-        if (!$property = CmsContentProperty::find()->where(['code' => $code])->one()) {
+        if (!$property = $propertyClass::find()->where(['code' => $code])->one()) {
             return $result;
         }
 
         if ($property->property_type == PropertyType::CODE_LIST) {
-            $query = CmsContentPropertyEnum::find()->andWhere(['property_id' => $property->id]);
+            $query = $propertyEnumClass::find()->andWhere(['property_id' => $property->id]);
 
             if ($q = \Yii::$app->request->get('q')) {
                 $query->andWhere(['like', 'value', $q]);
