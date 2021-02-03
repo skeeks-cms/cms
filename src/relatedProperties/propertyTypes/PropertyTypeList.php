@@ -24,7 +24,6 @@ use yii\widgets\ActiveForm;
 class PropertyTypeList extends PropertyType
 {
     public $enumRoute = 'cms/admin-cms-content-property-enum';
-    public $enumClass = '\skeeks\cms\models\CmsContentPropertyEnum';
 
     public $code = self::CODE_LIST;
     public $name = "";
@@ -157,7 +156,15 @@ class PropertyTypeList extends PropertyType
     public function getAjaxSelectUrl()
     {
         if ($this->_ajaxSelectUrl === null) {
-            $this->_ajaxSelectUrl = Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]);
+            
+            $r = new \ReflectionClass($this->property);
+            $this->_ajaxSelectUrl = Url::to([
+                '/cms/ajax/autocomplete-eav-options', 
+                'code' => $this->property->code, 
+                'cms_site_id' => \Yii::$app->skeeks->site->id,
+                'property_class' => $r->getName(),
+                'property_enum_class' => $this->enumClass
+            ]);
         }
 
         return $this->_ajaxSelectUrl;
@@ -171,7 +178,12 @@ class PropertyTypeList extends PropertyType
     public function getEnumClass()
     {
         if ($this->_enumClass === null) {
-            $this->_enumClass = CmsContentPropertyEnum::class;
+            if ($enumClassName = $this->property->relatedPropertyEnumClassName) {
+                $this->_enumClass = $enumClassName;
+            } else {
+                $this->_enumClass = CmsContentPropertyEnum::class;
+            }
+            
         }
 
         return $this->_enumClass;
