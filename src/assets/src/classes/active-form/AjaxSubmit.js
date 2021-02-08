@@ -98,12 +98,19 @@
             this.on('start', function () {
                 //console.log('start');
                 self.beforeSubmitProcess = true;
-                self.Blocker.block();
+                if (self.Blocker) {
+                    self.Blocker.block();
+                }
+
             });
 
             this.on('stop', function () {
                 self.beforeSubmitProcess = false;
-                self.Blocker.unblock();
+
+                if (self.Blocker) {
+                    self.Blocker.unblock();
+                }
+
                 self.InProgress = false;
                 self.IsSubmitProcess = false;
             });
