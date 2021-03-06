@@ -127,18 +127,12 @@ JS
                             'q',
                             //'id',
                         ],
+                        'autoFilters' => [
+                            'id',
+                            ''
+                        ],
                         'filtersModel'   => [
-
-                            'rules' => [
-                                ['q', 'safe'],
-                            ],
-
-                            'attributeDefines' => [
-                                'q',
-                            ],
-
                             'fields' => [
-
                                 'q' => [
                                     'label'          => 'Поиск',
                                     'elementOptions' => [
@@ -163,7 +157,6 @@ JS
                                         }
                                     },
                                 ],
-
                             ],
                         ],
                     ],

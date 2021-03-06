@@ -54,7 +54,16 @@ class GridView extends \yii\grid\GridView
     /**
      * @var bool генерировать колонки по названию модели автоматически
      */
-    public $isEnabledAutoColumns = true;
+    //public $isEnabledAutoColumns = true;
+
+    /**
+     * @var array
+     */
+    public $autoColumns = [];
+    /**
+     * @var array
+     */
+    public $disableAutoColumns = [];
 
     /**
      * @var array результирующий массив конфига колонок
@@ -107,6 +116,21 @@ class GridView extends \yii\grid\GridView
      */
     public $sortAttributes = [];
 
+    /**
+     * @var array Additional information in the context of a call widget
+     */
+    public $contextData = [];
+
+    /**
+     * @param $value
+     * @return bool
+     * @deprecated
+     */
+    public function setIsEnabledAutoColumns($value)
+    {
+        $this->autoColumns = $value;
+        return false;
+    }
 
     public function behaviors()
     {
@@ -124,7 +148,7 @@ class GridView extends \yii\grid\GridView
                             'class'  => FieldSet::class,
                             'name'   => \Yii::t('skeeks/cms', 'Main'),
                             'fields' => [
-                                'caption',
+                                //'caption',
                                 'visibleColumns' => [
                                     'class'           => WidgetField::class,
                                     'widgetClass'     => DualSelect::class,
@@ -139,11 +163,14 @@ class GridView extends \yii\grid\GridView
                                          */
                                         $widgetField = $e->sender;
 
+                                        $fields = $this->getAvailableColumns(\Yii::$app->controller->getCallableData());
+                                        $widgetField->widgetConfig['items'] = $this->getFilteredAvailableColumns($fields, \Yii::$app->controller->getCallableData());
+
                                         //skeeks\cms\backend\controllers\AdminBackendShowingController
-                                        $widgetField->widgetConfig['items'] = ArrayHelper::getValue(
+                                        /*$widgetField->widgetConfig['items'] = ArrayHelper::getValue(
                                             \Yii::$app->controller->getCallableData(),
                                             'availableColumns'
-                                        );
+                                        );*/
                                     },
                                 ],
                             ],
@@ -187,8 +214,8 @@ class GridView extends \yii\grid\GridView
                                         'type' => 'number',
                                     ],
                                 ],
-                                'pageParam',
-                                'pageSizeParam',
+                                /*'pageParam',
+                                'pageSizeParam',*/
                             ],
                         ],
                     ],
@@ -231,6 +258,46 @@ class GridView extends \yii\grid\GridView
                 ],
             ], (array)$this->configBehaviorData),
         ]);
+    }
+
+
+
+    /**
+     * @param $callableData
+     * @return array
+     */
+    public function getAvailableColumns($callableData)
+    {
+        return (array)ArrayHelper::getValue(
+            $callableData,
+            'availableColumns'
+        );
+    }
+
+    /**
+     * @param $fields
+     * @return array
+     */
+    public function getFilteredAvailableColumns($fields, $callableData)
+    {
+        $result = [];
+
+        $autoFilters = (array) ArrayHelper::getValue($callableData, 'callAttributes.autoColumns');
+        $disableAutoFilters = (array) ArrayHelper::getValue($callableData, 'callAttributes.disableAutoColumns');
+
+        foreach ($fields as $key => $value) {
+            if (is_array($autoFilters) && $autoFilters && !in_array($key, $autoFilters)) {
+                continue;
+            }
+
+            if (in_array($key, $disableAutoFilters)) {
+                continue;
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 
     public function getColumnsKeyLabels()
@@ -286,20 +353,6 @@ class GridView extends \yii\grid\GridView
 
         return $result;
     }
-
-
-    /**
-     * @return PaginationConfig
-     */
-    /*public function getPaginationConfig()
-    {
-        if ($this->_paginationConfig === null) {
-            $this->_paginationConfig = new PaginationConfig();
-            $this->_paginationConfig->setAttributes($this->paginationConfigArray);
-        }
-
-        return $this->_paginationConfig;
-    }*/
 
 
     /**
@@ -609,7 +662,7 @@ JS
     {
 
         //Если автоопределение колонок не включено
-        if (!$this->isEnabledAutoColumns) {
+        if ($this->autoColumns === false) {
             return $this;
         }
 

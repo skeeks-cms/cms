@@ -39,6 +39,8 @@ use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\AjaxSelect;
 use skeeks\cms\widgets\AjaxSelectModel;
+use skeeks\cms\widgets\ContentElementBackendFiltersWidget;
+use skeeks\cms\widgets\ContentElementBackendGridView;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
@@ -135,9 +137,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
                 },
 
                 "filters" => [
-                    'disableAutoFilters' => [
-                        //'created_by',
-                        'updated_by',
+                    'class' => ContentElementBackendFiltersWidget::class,
+                    'contextData' => [
+                        'content_id' => $this->content->id
                     ],
                     'visibleFilters'     => [
                         'q',
@@ -146,18 +148,6 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         //'active',
                     ],
                     'filtersModel'       => [
-
-                        'rules' => [
-                            ['q', 'safe'],
-                            ['has_image', 'safe'],
-                            ['created_by', 'safe'],
-                        ],
-
-                        'attributeDefines' => [
-                            'q',
-                            'has_image',
-                            'created_by',
-                        ],
 
                         'fields' => [
 
@@ -213,17 +203,6 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                         },
                                     ],
                                 ],
-                                
-                                /*'class' => WidgetField::class,
-                                'widgetClass' => SelectModelDialogUserWidget::class,*/
-                                //'isAllowChangeMode' => false,
-                                /*'class' => NumberFilterField::class,
-                                'field' => [
-                                    'class'       => WidgetField::class,
-                                    'widgetClass' => SelectModelDialogUserWidget::class,
-                                    /*'items'       => new UnsetArrayValue(),
-                                    'multiple'    => new UnsetArrayValue(),
-                                ]*/
                             ],
 
 
@@ -330,11 +309,17 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         ],
                     ],
 
-                    'on init' => function(Event $event) {
+                    /*'on init' => function(Event $event) {
                         $this->initFiltersModel($event->sender, $this->content);
-                    }
+                    }*/
                 ],
                 'grid'    => [
+
+                    'class' => ContentElementBackendGridView::class,
+
+                    'contextData' => [
+                        'content_id' => $this->content->id
+                    ],
 
                     'on beforeInit'        => function (Event $event) {
                         /**
@@ -352,14 +337,13 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         $this->initGridColumns($grid, $this->content);
                     },
 
-                    'columnConfigCallback' => function($columnName, GridView $grid) {
+                    /*'columnConfigCallback' => function($columnName, GridView $grid) {
 
                         if (strpos($columnName, "property") != -1) {
 
                             $propertyId = (int) str_replace("property", "", $columnName);
                             /**
                              * @var $property CmsContentProperty
-                             */
                             $property = CmsContentProperty::findOne($propertyId);
 
                             return [
@@ -378,13 +362,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     }
                                     /**
                                      * @var $model \skeeks\cms\models\CmsContentElement
-                                     */
                                     return $model->relatedPropertiesModel->getAttributeAsHtml($property->code);
                                 },
                             ];
                         }
 
-                    },
+                    },*/
 
                     'defaultOrder'   => [
                         'active'   => SORT_DESC,
@@ -778,16 +761,13 @@ HTML;
                 },
             ],
 
-            "rp" => [
+            /*"rp" => [
                 'class'        => BackendModelMultiDialogEditAction::class,
                 "name"         => \Yii::t('skeeks/cms', 'Properties'),
                 "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/multi-rp",
                 "eachCallback" => [$this, 'eachRelatedProperties'],
                 'on init'      => function ($e) {
                     $action = $e->sender;
-                    /**
-                     * @var BackendGridModelAction $action
-                     */
                     if ($this->content) {
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     }
@@ -799,7 +779,7 @@ HTML;
                 "accessCallback"     => function () {
                     return \Yii::$app->user->can($this->permissionName."/update");
                 },
-            ],
+            ],*/
 
         ]);
 
@@ -810,6 +790,7 @@ HTML;
 
     public function initGridColumns($grid, $content)
     {
+        return [];
         $model = null;
         $autoColumns = [];
 
@@ -865,230 +846,6 @@ HTML;
 
 
     public function initGridData($action, $content) {
-        return $this;
-    }
-
-    public function initFiltersModel($filtersWidget, $content)
-    {
-        /**
-         * @var $content CmsContent
-         * @var  $filtersWidget QueryFilterWidget
-         * @var $action BackendGridModelAction
-         * @var $property CmsContentProperty
-         */
-        $model = null;
-        $autoFilters = [];
-        $autoRules = [];
-        $autoLabels = [];
-
-        $autoColumns = [];
-
-        if ($content) {
-            $model = new CmsContentElement([
-                'content_id' => $content->id,
-            ]);
-        }
-
-        if ($model && $content && $content->getCmsContentProperties()->count()) {
-            $relatedPropertiesModel = $model->relatedPropertiesModel;
-
-            $properties = $content->getCmsContentProperties();
-            $properties->andWhere([
-                'or',
-                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
-                [CmsContentProperty::tableName().'.cms_site_id' => null],
-            ]);
-            $properties = $properties->all();
-
-            foreach ($properties as $property) {
-
-                $name = $property->code;
-                //$property = $relatedPropertiesModel->getRelatedProperty($name);
-                $filter = '';
-
-                $autoRules[] = ["property{$property->id}", "safe"];
-                $autoLabels["property{$property->id}"] = $property->name;
-
-
-                if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
-                    $autoFilters["property{$property->id}"] = [
-                        'class'    => TextField::class,
-                        'label'    => $property->name,
-                        'on apply' => function (QueryFiltersEvent $e) use ($property) {
-                            /**
-                             * @var $query ActiveQuery
-                             */
-                            $query = $e->dataProvider->query;
-
-
-                            if ($e->field->value) {
-                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
-                                    ->where([
-                                        "property_id" => $property->id,
-                                    ])
-                                    ->andWhere([
-                                        'like',
-                                        'value',
-                                        $e->field->value,
-                                    ]);
-
-                                $query->andWhere([
-                                    CmsContentElement::tableName().".id" => $query1,
-                                ]);
-                            }
-                        },
-                    ];
-                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL) {
-
-                    $autoFilters["property{$property->id}"] = [
-                        'class'    => BoolField::class,
-                        'label'    => $property->name,
-                        'on apply' => function (QueryFiltersEvent $e) use ($property) {
-                            /**
-                             * @var $query ActiveQuery
-                             */
-                            $query = $e->dataProvider->query;
-
-
-                            if ($e->field->value) {
-                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
-                                    ->where([
-                                        "value_bool"  => $e->field->value,
-                                        "property_id" => $property->id,
-                                    ]);
-
-                                $query->andWhere([
-                                    CmsContentElement::tableName().".id" => $query1,
-                                ]);
-                            }
-                        },
-                    ];
-
-                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) {
-
-
-                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
-
-                    $find = CmsContentPropertyEnum::find()->where(['property_id' => $property->id]);
-                    $autoFilters["property{$property->id}"] = [
-                        'class'    => WidgetField::class,
-                        'widgetClass' => AjaxSelect::class,
-                        'widgetConfig' => [
-                            'multiple' => true,
-                            'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                            'valueCallback' => function($value) {
-                                return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
-                            },
-                        ]
-                    ];
-
-
-                    $autoFilters["property{$property->id}"]['label'] = $property->name;
-                    $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
-                        /**
-                         * @var $query ActiveQuery
-                         */
-                        $query = $e->dataProvider->query;
-
-
-                        if ($e->field->value) {
-                            $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
-                                ->where([
-                                    "value_enum"  => $e->field->value,
-                                    "property_id" => $property->id,
-                                ]);
-
-                            $query->andWhere([
-                                CmsContentElement::tableName().".id" => $query1,
-                            ]);
-                        }
-                    };
-
-
-                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
-
-                    $propertyType = $property->handler;
-
-                    $find = CmsContentElement::find()->where(['content_id' => $propertyType->content_id]);
-                    $autoFilters["property{$property->id}"] = [
-                        'class'    => WidgetField::class,
-                        'widgetClass' => AjaxSelect::class,
-                        'widgetConfig' => [
-                            'multiple' => true,
-                            'ajaxUrl' => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
-                            'valueCallback' => function($value) {
-                                return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
-                            },
-                        ]
-
-                    ];
-
-                    $autoFilters["property{$property->id}"]["label"] = $property->name;
-                    $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
-                        /**
-                         * @var $query ActiveQuery
-                         */
-                        $query = $e->dataProvider->query;
-
-
-                        if ($e->field->value) {
-                            $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
-                                ->where([
-                                    "value_enum"  => $e->field->value,
-                                    "property_id" => $property->id,
-                                ]);
-
-                            $query->andWhere([
-                                CmsContentElement::tableName().".id" => $query1,
-                            ]);
-                        }
-                    };
-
-
-                } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_TREE) {
-                    $propertyType = $property->handler;
-                    $autoFilters["property{$property->id}"] = [
-                        'class'       => WidgetField::class,
-                        'widgetClass' => \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class,
-                        'label'       => $property->name,
-                        'on apply'    => function (QueryFiltersEvent $e) use ($property) {
-                            /**
-                             * @var $query ActiveQuery
-                             */
-                            $query = $e->dataProvider->query;
-
-
-                            if ($e->field->value) {
-                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
-                                    ->where([
-                                        "value_enum"  => $e->field->value,
-                                        "property_id" => $property->id,
-                                    ]);
-
-                                $query->andWhere([
-                                    CmsContentElement::tableName().".id" => $query1,
-                                ]);
-                            }
-                        },
-                    ];
-                }
-            }
-        }
-
-        $filterModel = $filtersWidget->filtersModel;
-
-        if ($autoRules) {
-            $filterModel['rules'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "rules", []), $autoRules);
-        }
-
-        if ($autoFilters) {
-            $filterModel['fields'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "fields", []), $autoFilters);
-            $filterModel['attributeDefines'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "attributeDefines", []), array_keys($autoFilters));
-            $filterModel['attributeLabels'] = ArrayHelper::merge(ArrayHelper::getValue($filterModel, "attributeLabels", []), $autoLabels);
-        }
-
-        $filtersWidget->filtersModel = $filterModel;
-
         return $this;
     }
 
