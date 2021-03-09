@@ -52,7 +52,7 @@ class PasswordResetRequestFormEmailOrLogin extends Model
     public function attributeLabels()
     {
         return [
-            'identifier' => \Yii::t('skeeks/cms', 'Username or Email'),
+            'identifier' => \Yii::t('skeeks/cms', 'Email'),
         ];
     }
 

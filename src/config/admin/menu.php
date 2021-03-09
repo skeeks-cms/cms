@@ -411,6 +411,24 @@ return array_merge(dashboardsMenu(), [
                     //contentEditMenu()
                 ],
 
+                [
+                    "label" => \Yii::t('skeeks/cms', "SMS"),
+                    //"url"   => ["cms/admin-cms-content-type"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sms_icon-icons.com_67293.svg'],
+
+                    'items' => [
+                        [
+                            'url'   => ["/cms/admin-cms-sms-provider"],
+                            'label' => \Yii::t('skeeks/cms', "SMS провайдеры"),
+                        ],
+                        [
+                            'url'   => ["/cms/admin-cms-sms-message"],
+                            'label' => \Yii::t('skeeks/cms', "SMS сообщения"),
+                        ],
+                    ],
+                    //contentEditMenu()
+                ],
+
 
                 [
                     "label" => \Yii::t('skeeks/cms', "User settings"),

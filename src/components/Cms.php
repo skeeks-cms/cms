@@ -16,6 +16,7 @@ use skeeks\cms\helpers\FileHelper;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsSmsProvider;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
@@ -42,7 +43,6 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
-use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use Yii;
@@ -52,7 +52,6 @@ use yii\console\Application;
 use yii\helpers\ArrayHelper;
 use yii\web\UserEvent;
 use yii\web\View;
-use yii\widgets\ActiveForm;
 
 /**
  * @property Tree                             $currentTree
@@ -69,10 +68,13 @@ use yii\widgets\ActiveForm;
  * @property PropertyType[]                   $relatedHandlers
  * @property array                            $relatedHandlersDataForSelect
  *
+ * @property CmsSmsProvider                   $smsProvider
+ *
  * @package skeeks\cms\components
  */
 class Cms extends \skeeks\cms\base\Component
 {
+
     /**
      * Разршение на доступ к персональной части
      */
@@ -140,7 +142,6 @@ class Cms extends \skeeks\cms\base\Component
     public $userOnlineTime = 60; //1 минута
 
 
-
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
@@ -185,7 +186,7 @@ class Cms extends \skeeks\cms\base\Component
     }*/
     /**
      * @return CmsSite
-     * @deprecated 
+     * @deprecated
      */
     public function getSite()
     {
@@ -200,7 +201,7 @@ class Cms extends \skeeks\cms\base\Component
 
         return (array)$this->_languages;
     }
-    
+
     public function init()
     {
         parent::init();
@@ -286,11 +287,11 @@ class Cms extends \skeeks\cms\base\Component
                         ], 'cmsmagazine');
                     }
 
-                     $view->registerLinkTag([
-                         'rel' => 'icon',
-                         'type' => \Yii::$app->skeeks->site->faviconType,
-                         'href' => \Yii::$app->skeeks->site->faviconUrl,
-                     ]);
+                    $view->registerLinkTag([
+                        'rel'  => 'icon',
+                        'type' => \Yii::$app->skeeks->site->faviconType,
+                        'href' => \Yii::$app->skeeks->site->faviconUrl,
+                    ]);
                 }
             });
 
@@ -324,8 +325,8 @@ class Cms extends \skeeks\cms\base\Component
             'languageCode'                => 'Язык по умолчанию',
             'registerRoles'               => 'При регистрации добавлять в группу',
             'auth_only_email_is_approved' => 'Разрешить авторизацию на сайте только с подтвержденными email?',
-            'email_approved_key_length' => 'Длина проверочного кода',
-            'approved_key_is_letter' => 'Проверочный код содержит буквы?',
+            'email_approved_key_length'   => 'Длина проверочного кода',
+            'approved_key_is_letter'      => 'Проверочный код содержит буквы?',
         ]);
     }
     public function attributeHints()
@@ -384,7 +385,7 @@ class Cms extends \skeeks\cms\base\Component
                         'allowNull' => false,
                     ],
                     'email_approved_key_length',
-                    'approved_key_is_letter' => [
+                    'approved_key_is_letter'      => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
@@ -593,5 +594,50 @@ class Cms extends \skeeks\cms\base\Component
     public function getAppName()
     {
         return \Yii::$app->skeeks->site->name;
+    }
+
+
+    public $smsHandlers = [];
+
+    /**
+     * @return array
+     */
+    public function getSmsHandlersForSelect()
+    {
+        $result = [];
+
+        if ($this->smsHandlers) {
+            foreach ($this->smsHandlers as $handlerClass) {
+                $result[$handlerClass] = (new $handlerClass())->descriptor->name;
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @var null|CmsSmsProvider
+     */
+    protected $_smsProvider = null;
+
+    /**
+     * @return CmsSmsProvider|null
+     */
+    public function getSmsProvider()
+    {
+        if ($this->_smsProvider === null) {
+            $this->_smsProvider = CmsSmsProvider::find()->cmsSite()->andWhere(['is_main' => 1])->one();
+        }
+
+        return $this->_smsProvider;
+    }
+    /**
+     * @return CmsSmsProvider|null
+     */
+    public function setSmsProvider(CmsSmsProvider $smsProvider)
+    {
+        $this->_smsProvider = $smsProvider;
+        return $this;
     }
 }

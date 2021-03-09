@@ -37,6 +37,8 @@ use yii\web\Response;
  */
 class AuthController extends Controller
 {
+    public $defaultAction = 'login';
+
     public function behaviors()
     {
         return
