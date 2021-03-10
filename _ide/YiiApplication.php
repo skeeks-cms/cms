@@ -30,7 +30,7 @@ use skeeks\cms\Skeeks;
  * @property ConsoleComponent      $console
  * @property I18N                  $i18n
  *
- * @property \yii\web\User|UserIde $user
+ * @property \yii\web\User|UserIde|\skeeks\cms\components\User $user
  *
  * Class Application
  * @package yii\web
