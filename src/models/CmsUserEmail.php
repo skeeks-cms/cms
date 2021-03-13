@@ -141,7 +141,7 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
         $this->approved_key_at = time();
 
         if (!$this->save()) {
-            throw new Exception('Не сохранились данные ключа');
+            throw new Exception('Не сохранились данные ключа: ' . print_r($this->errors, true));
         }
 
         return $this;

@@ -398,9 +398,6 @@ class AuthController extends Controller
     }
 
 
-
-
-
     /**
      * Авторизация пользователя через телефон
      *
@@ -447,7 +444,7 @@ class AuthController extends Controller
                         $user = new $class();
                         $user->phone = $model->phone;
                         if (!$user->save()) {
-                            throw new Exception("Ошибка регистрации: " . print_r($user->errors, true));
+                            throw new Exception("Ошибка регистрации: ".print_r($user->errors, true));
                         }
 
                         //Генерация, отправка и сохранение sms кода
@@ -457,10 +454,10 @@ class AuthController extends Controller
 
                         //Авторазиция по временному коду
                         $rr->data = [
-                            'user'  => true,
-                            'phone' => $model->phone,
-                            'type'  => "tmp-phone-code",
-                            'left-repeat' => $this->getSessionAuthPhoneLeftRepeat()
+                            'user'        => true,
+                            'phone'       => $model->phone,
+                            'type'        => "tmp-phone-code",
+                            'left-repeat' => $this->getSessionAuthPhoneLeftRepeat(),
                         ];
 
 
@@ -519,7 +516,7 @@ class AuthController extends Controller
                     throw new Exception("Некорректные данные для входа");
                 }
 
-                \Yii::$app->user->login($user,  3600 * 24 * 30);
+                \Yii::$app->user->login($user, 3600 * 24 * 30);
 
                 $rr->success = true;
 
@@ -572,6 +569,36 @@ class AuthController extends Controller
     /**
      * @return RequestResponse
      */
+    public function actionAuthByEmailCode()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            if (\Yii::$app->request->post('email_code') == $this->getSessionAuthEmailCode() && $this->getSessionAuthEmail()) {
+                $user = CmsUser::find()->andWhere(['email' => $this->getSessionAuthEmail()])->one();
+                \Yii::$app->user->login($user, 3600 * 24 * 30);
+
+                $rr->success = true;
+                $rr->message = 'Авторизация прошла успешно';
+
+                if ($ref = UrlHelper::getCurrent()->getRef()) {
+                    $rr->redirect = $ref;
+                } else {
+                    $rr->redirect = \Yii::$app->getUser()->getReturnUrl();;
+                }
+            } else {
+                $rr->success = false;
+                $rr->message = 'Код некорректный или устарел';
+            }
+        }
+
+        return $rr;
+    }
+
+
+    /**
+     * @return RequestResponse
+     */
     public function actionGeneratePhoneCode()
     {
         $rr = new RequestResponse();
@@ -589,13 +616,13 @@ class AuthController extends Controller
 
                 $this->_generateAndSaveSmsCode($phone);
                 $rr->data = [
-                    'left-repeat' => $this->getSessionAuthPhoneLeftRepeat()
+                    'left-repeat' => $this->getSessionAuthPhoneLeftRepeat(),
                 ];
 
                 $rr->message = "Проверочный код отправлен в SMS";
                 $rr->success = true;
 
-            } catch (\Exception $e ) {
+            } catch (\Exception $e) {
                 $rr->success = false;
                 $rr->message = $e->getMessage();
             }
@@ -605,6 +632,41 @@ class AuthController extends Controller
         return $rr;
     }
 
+    /**
+     * @return RequestResponse
+     */
+    public function actionGenerateEmailCode()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            try {
+
+                if (!\Yii::$app->user->isGuest) {
+                    throw new Exception("Некорректный запрос");
+                }
+
+                if (!$email = \Yii::$app->request->post('email')) {
+                    throw new Exception("Некорректный запрос");
+                }
+
+                $this->_generateAndSaveEmailCode($email);
+                $rr->data = [
+                    'left-repeat' => $this->getSessionAuthEmailLeftRepeat(),
+                ];
+
+                $rr->message = "Проверочный код отправлен на email";
+                $rr->success = true;
+
+            } catch (\Exception $e) {
+                $rr->success = false;
+                $rr->message = $e->getMessage();
+            }
+
+        }
+
+        return $rr;
+    }
 
 
     /**
@@ -653,20 +715,20 @@ class AuthController extends Controller
                         $user = new $class();
                         $user->email = $model->email;
                         if (!$user->save()) {
-                            throw new Exception("Ошибка регистрации: " . print_r($user->errors, true));
+                            throw new Exception("Ошибка регистрации: ".print_r($user->errors, true));
                         }
 
                         //Генерация, отправка и сохранение sms кода
-                        //$this->_generateAndSaveSmsCode($model->phone);
+                        $this->_generateAndSaveEmailCode($model->email);
 
                         $t->commit();
 
                         //Авторазиция по временному коду
                         $rr->data = [
-                            'user'  => true,
-                            'email' => $model->email,
-                            'type'  => "tmp-email-code",
-                            'left-repeat' => $this->getSessionAuthEmailLeftRepeat()
+                            'user'        => true,
+                            'email'       => $model->email,
+                            'type'        => "tmp-email-code",
+                            'left-repeat' => $this->getSessionAuthEmailLeftRepeat(),
                         ];
 
 
@@ -724,7 +786,7 @@ class AuthController extends Controller
                     throw new Exception("Некорректные данные для входа");
                 }
 
-                \Yii::$app->user->login($user,  3600 * 24 * 30);
+                \Yii::$app->user->login($user, 3600 * 24 * 30);
 
                 $rr->success = true;
 
@@ -772,6 +834,42 @@ class AuthController extends Controller
         }
     }
 
+    protected function _generateAndSaveEmailCode($email)
+    {
+        //Если на этот номер уже отправили пароль
+        if ($this->getSessionAuthEmail() == $email && $this->getSessionAuthEmailIsActual()) {
+
+        } else {
+            $code = rand(1000, 9999);
+
+
+            \Yii::$app->mailer->view->theme->pathMap = ArrayHelper::merge(\Yii::$app->mailer->view->theme->pathMap, [
+                '@app/mail' => [
+                    '@skeeks/cms/mail-templates',
+                ],
+            ]);
+
+            $result = \Yii::$app->mailer->compose('@app/mail/auth-by-email-code', [
+                'code'     => $code,
+            ])
+                ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                ->setTo($email)
+                ->setSubject("Проверочный код для входа")
+                ->send();
+
+
+            if (!$result) {
+                throw new Exception("Отправка email не удалась");
+            }
+
+            \Yii::$app->session->set(self::SESSION_AUTH_EMAIL_DATA, [
+                'phone'      => $email,
+                'created_at' => time(),
+                'phone_code' => $code,
+            ]);
+        }
+    }
+
     const SESSION_AUTH_SMS_DATA = "auth_sms_data";
     const SESSION_AUTH_EMAIL_DATA = "auth_email_data";
 
@@ -812,7 +910,7 @@ class AuthController extends Controller
 
     public function getSessionAuthPhoneLeftRepeat()
     {
-        return 60*20 - $this->getSessionAuthPhoneDuration();
+        return 60 * 3 - $this->getSessionAuthPhoneDuration();
     }
 
     /**
@@ -822,8 +920,6 @@ class AuthController extends Controller
     {
         return (bool)($this->getSessionAuthPhoneLeftRepeat() > 0);
     }
-
-
 
 
     public function getSessionAuthEmail()
@@ -848,7 +944,7 @@ class AuthController extends Controller
 
     public function getSessionAuthEmailLeftRepeat()
     {
-        return 60*20 - $this->getSessionAuthEmailDuration();
+        return 60 * 3 - $this->getSessionAuthEmailDuration();
     }
 
     /**
