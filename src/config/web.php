@@ -59,7 +59,7 @@ $config = [
                     'personal' => [
                         'name' => ['skeeks/cms', 'Personal data'],
                         'url' => ['/cms/upa-personal/update'],
-                        'icon' => 'fa fa-user',
+                        'icon' => 'icon-user',
                         /*'items' => [
                             [
                                 'name' => ['skeeks/cms', 'Personal data'],
