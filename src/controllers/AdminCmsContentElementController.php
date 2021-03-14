@@ -439,38 +439,38 @@ HTML;
                                 $data[] = "<span style='max-width: 300px;'>".Html::a($model->asText, "#", [
                                         'class' => 'sx-trigger-action',
                                         'title' => $model->asText,
-                                        //'style' => 'white-space: nowrap; '
+                                        'style' => 'border-bottom: none;'
                                     ])."</span>";
 
                                 if ($model->tree_id) {
-                                    $data[] = '<i class="far fa-folder"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
+                                    $data[] = '<i class="far fa-folder" style="color: gray;"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
                                             'title'     => $model->cmsTree->fullName,
-                                            'style'     => 'color: #333; max-width: 200px;',
+                                            'style'     => 'color: #333; max-width: 200px; display: inline-block; color: gray; cursor: pointer; white-space: nowrap; border-bottom: none;',
                                         ]);
                                 }
 
                                 if ($model->cmsTrees) {
                                     foreach ($model->cmsTrees as $cmsTree) {
-                                        $data[] = Html::a($cmsTree->name, $cmsTree->url, [
+                                        $data[] = '<i class="far fa-folder" style="color: gray;"></i> ' . Html::a($cmsTree->name, $cmsTree->url, [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
                                             'title'     => $cmsTree->fullName,
-                                            'style'     => 'color: #333; max-width: 200px; ',
+                                            'style'     => 'color: #333; max-width: 200px; display: inline-block; color: gray; cursor: pointer; white-space: nowrap;  border-bottom: none;',
                                         ]);
                                     }
                                 }
 
                                 $info = implode("<br />", $data);
 
-                                return "<div class='row no-gutters'>
-                                                <div style='margin-left: 5px;'>
-                                                <div class='sx-trigger-action' style='width: 50px; margin-right: 10px; float: left;'>
+                                return "<div class='d-flex no-gutters'>
+                                                <div class='sx-trigger-action my-auto' style='width: 50px; margin-right: 10px; float: left;'>
                                                     <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                        <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                        <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 40px; max-height: 40px; border-radius: 5px;' />
                                                     </a>
-                                                </div>".$info."</div></div>";;
+                                                </div>
+                                                <div style='line-height: 1.1;'>".$info."</div></div>";;
                             },
                         ],
                         'image_id'     => [
