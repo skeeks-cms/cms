@@ -219,6 +219,18 @@ class TreeMenuCmsWidget extends WidgetRenderable
                     'treePid'            => [
                         'class'       => WidgetField::class,
                         'widgetClass' => SelectTreeInputWidget::class,
+                        'widgetConfig' => [
+                            'isAllowNodeSelectCallback' => function ($tree) {
+                                /*if (in_array($tree->id, $childrents)) {
+                                    return false;
+                                }*/
+
+                                return true;
+                            },
+                            'treeWidgetOptions'         => [
+                                'models' => CmsTree::findRoots()->cmsSite()->all(),
+                            ],
+                        ],
                     ],
                 ],
             ],

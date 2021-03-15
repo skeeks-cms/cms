@@ -61,7 +61,7 @@ class AjaxController extends Controller
                 $query->andWhere(['like', 'value', $q]);
             }
 
-            $data = $query->limit(25)
+            $data = $query->limit(50)
                         ->all();
 
             $result = [];
@@ -85,7 +85,7 @@ class AjaxController extends Controller
                 $query->andWhere(['like', 'name', $q]);
             }
 
-            $data = $query->limit(25)
+            $data = $query->limit(50)
                         ->all();
 
             $result = [];
@@ -132,7 +132,7 @@ class AjaxController extends Controller
                 $query->andWhere(['like', 'value', $q]);
             }
 
-            $data = $query->limit(25)
+            $data = $query->limit(50)
                         ->all();
 
             $result = [];
@@ -156,7 +156,7 @@ class AjaxController extends Controller
                 $query->andWhere(['like', 'name', $q]);
             }
 
-            $data = $query->limit(25)
+            $data = $query->limit(50)
                         ->all();
 
             $result = [];
