@@ -516,6 +516,7 @@ class AuthController extends Controller
                     throw new Exception("Некорректные данные для входа");
                 }
 
+
                 \Yii::$app->user->login($user, 3600 * 24 * 30);
 
                 $rr->success = true;
@@ -546,6 +547,13 @@ class AuthController extends Controller
         if ($rr->isRequestAjaxPost()) {
             if (\Yii::$app->request->post('phone_code') == $this->getSessionAuthPhoneCode() && $this->getSessionAuthPhone()) {
                 $user = CmsUser::find()->andWhere(['phone' => $this->getSessionAuthPhone()])->one();
+
+                if (!$user->phone_is_approved) {
+                    $user->phone_is_approved = 1;
+                    $user->save();
+                }
+
+
                 \Yii::$app->user->login($user, 3600 * 24 * 30);
 
                 $rr->success = true;
@@ -575,7 +583,16 @@ class AuthController extends Controller
 
         if ($rr->isRequestAjaxPost()) {
             if (\Yii::$app->request->post('email_code') == $this->getSessionAuthEmailCode() && $this->getSessionAuthEmail()) {
+                /**
+                 * @var $user CmsUser
+                 */
                 $user = CmsUser::find()->andWhere(['email' => $this->getSessionAuthEmail()])->one();
+
+                if (!$user->email_is_approved) {
+                    $user->email_is_approved = 1;
+                    $user->save();
+                }
+
                 \Yii::$app->user->login($user, 3600 * 24 * 30);
 
                 $rr->success = true;

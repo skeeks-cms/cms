@@ -111,9 +111,9 @@ class AdminUserController extends BackendModelStandartController
                                      */
                                     $query = $e->dataProvider->query;
                                     if ($e->field->value) {
-                                        $query->innerJoin('auth_assignment', 'auth_assignment.cms_user_id = cms_user.id');
+                                        $query->innerJoin(['auth_assignment_role' => 'auth_assignment'], 'auth_assignment_role.cms_user_id = cms_user.id');
                                         $query->andFilterWhere([
-                                            'auth_assignment.item_name' => $e->field->value,
+                                            'auth_assignment_role.item_name' => $e->field->value,
                                         ]);
                                     }
 

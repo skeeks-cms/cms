@@ -315,6 +315,8 @@ class CmsContentElement extends RelatedElementModel
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
             [['seo_h1'], 'string', 'max' => 255],
+
+            [['external_id'], 'trim'],
             [['external_id'], 'string', 'max' => 255],
             [['external_id'], 'default', 'value' => null],
             /*[
