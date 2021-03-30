@@ -29,6 +29,7 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeListMulti;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeNumber;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeRadioList;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeRange;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelect;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelectMulti;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile;
@@ -217,39 +218,42 @@ class Cms extends \skeeks\cms\base\Component
         }
 
         $this->relatedHandlers = ArrayHelper::merge([
-            PropertyTypeText::className()   => [
-                'class' => PropertyTypeText::className(),
+            PropertyTypeText::class   => [
+                'class' => PropertyTypeText::class,
             ],
-            PropertyTypeNumber::className() => [
-                'class' => PropertyTypeNumber::className(),
+            PropertyTypeNumber::class => [
+                'class' => PropertyTypeNumber::class,
             ],
-            PropertyTypeBool::className()   => [
-                'class' => PropertyTypeBool::className(),
+            /*PropertyTypeRange::class => [
+                'class' => PropertyTypeRange::class,
+            ],*/
+            PropertyTypeBool::class   => [
+                'class' => PropertyTypeBool::class,
             ],
-            PropertyTypeList::className()   => [
-                'class' => PropertyTypeList::className(),
+            PropertyTypeList::class   => [
+                'class' => PropertyTypeList::class,
             ],
 
-            PropertyTypeTree::className()           => [
-                'class' => PropertyTypeTree::className(),
+            PropertyTypeTree::class           => [
+                'class' => PropertyTypeTree::class,
             ],
-            PropertyTypeElement::className()        => [
-                'class' => PropertyTypeElement::className(),
+            PropertyTypeElement::class        => [
+                'class' => PropertyTypeElement::class,
             ],
-            PropertyTypeStorageFile::className()    => [
-                'class' => PropertyTypeStorageFile::className(),
+            PropertyTypeStorageFile::class    => [
+                'class' => PropertyTypeStorageFile::class,
             ],
-            UserPropertyTypeDate::className()       => [
-                'class' => UserPropertyTypeDate::className(),
+            UserPropertyTypeDate::class       => [
+                'class' => UserPropertyTypeDate::class,
             ],
-            UserPropertyTypeComboText::className()  => [
-                'class' => UserPropertyTypeComboText::className(),
+            UserPropertyTypeComboText::class  => [
+                'class' => UserPropertyTypeComboText::class,
             ],
-            UserPropertyTypeColor::className()      => [
-                'class' => UserPropertyTypeColor::className(),
+            UserPropertyTypeColor::class      => [
+                'class' => UserPropertyTypeColor::class,
             ],
-            UserPropertyTypeSelectFile::className() => [
-                'class' => UserPropertyTypeSelectFile::className(),
+            UserPropertyTypeSelectFile::class => [
+                'class' => UserPropertyTypeSelectFile::class,
             ],
 
         ], $this->relatedHandlers);
