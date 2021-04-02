@@ -474,6 +474,9 @@ class CmsSite extends ActiveRecord
         if (in_array($extension, ["png", "jpeg", "gif", "bmp"])) {
             $last = $extension;
         }
+        if (in_array($extension, ["svg"])) {
+            $last = "svg+xml";
+        }
         return "image/".$last;
     }
 

@@ -9,6 +9,7 @@
 namespace skeeks\cms\assets;
 
 use skeeks\cms\base\AssetBundle;
+use yii\web\YiiAsset;
 
 /**
  * Class AppAsset
@@ -25,4 +26,8 @@ class FancyboxAssets extends AssetBundle
     public $css = [
         'jquery.fancybox.min.css',
     ];
+    
+    /*public $depends = [
+        YiiAsset::class  
+    ];*/
 }
