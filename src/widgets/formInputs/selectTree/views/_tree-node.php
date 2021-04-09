@@ -14,7 +14,20 @@ $selectTreeInputWidget = \yii\helpers\ArrayHelper::getValue($widget->contextData
 ?>
 
 <?= $selectTreeInputWidget->renderNodeControll($model); ?>
+
 <div class="sx-label-node level-<?= $model->level; ?> status-<?= $model->active; ?>">
+    <? if ($model->level == 0) : ?>
+        <i class="fas fa-home"></i>
+    <? elseif ($model->redirectTree) : ?>
+        <i class="fas fa-directions" data-toggle="tooltip" title="<?= $model->redirect_code ?> редирект в раздел: <?= $model->redirectTree->fullName; ?>"></i>
+    <? elseif ($model->redirect) : ?>
+        <i class="fas fa-directions" data-toggle="tooltip" title="<?= $model->redirect_code ?> редирект по url: <?= $model->redirect; ?>"></i>
+    <? elseif ($widget->isOpenNode($model)) : ?>
+        <i class="far fa-folder-open"></i>
+    <? else : ?>
+        <i class="far fa-folder"></i>
+    <? endif; ?>
+    
     <a href="<?= $widget->getOpenCloseLink($model); ?>"><?= $selectTreeInputWidget->renderNodeName($model); ?></a>
 </div>
 

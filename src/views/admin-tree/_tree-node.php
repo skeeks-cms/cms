@@ -35,6 +35,18 @@ if ($additionalName) {
 
 <div class="sx-label-node level-<?= $model->level; ?> status-<?= $model->active; ?>">
 
+    <? if ($model->level == 0) : ?>
+        <i class="fas fa-home"></i>
+    <? elseif ($model->redirectTree) : ?>
+        <i class="fas fa-directions" data-toggle="tooltip" title="<?= $model->redirect_code ?> редирект в раздел: <?= $model->redirectTree->fullName; ?>"></i>
+    <? elseif ($model->redirect) : ?>
+        <i class="fas fa-directions" data-toggle="tooltip" title="<?= $model->redirect_code ?> редирект по url: <?= $model->redirect; ?>"></i>
+    <? elseif ($widget->isOpenNode($model)) : ?>
+        <i class="far fa-folder-open"></i>
+    <? else : ?>
+        <i class="far fa-folder"></i>
+    <? endif; ?>
+    
     <a href="<?= $widget->getOpenCloseLink($model); ?>">
         <?= $result; ?>
     </a>
@@ -43,17 +55,8 @@ if ($additionalName) {
         <small title="Сколько элементов привязано к этому разделу. Учитывается только главная привязка."><b>(<?php echo $count; ?>)</b></small>
     <? endif; ?>
 
-    <?php if ($model->redirectTree) : ?>
-        → <small title="<?= $model->redirect_code ?> редирект"><?= $model->fullName; ?></small>
-    <?php endif; ?>
-
-    <?php if ($model->redirect) : ?>
-        → <small title="<?= $model->redirect_code ?> редирект"><?= $model->redirect; ?></small>
-    <?php endif; ?>
-
-
     <?php if ($model->mainCmsTree) : ?>
-        <small title="Связан с разделом: <?= $model->mainCmsTree->fullName; ?>"><i class="fas fa-link"></i> <?= $model->mainCmsTree->name; ?></small>
+        <small data-toggle="tooltip" title="Связан с разделом: <?= $model->mainCmsTree->fullName; ?>"><i class="fas fa-link"></i> <?= $model->mainCmsTree->name; ?></small>
     <?php endif; ?>
 
 </div>

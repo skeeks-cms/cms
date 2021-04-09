@@ -19,6 +19,7 @@ use yii\helpers\Json;
 use yii\helpers\Url;
 
 /**
+ * @property string $searchValue
  * @property int[] $openedIds
  *
  * Class CmsTreeWidget
@@ -47,6 +48,16 @@ class CmsTreeWidget extends Widget
      * @var string
      */
     public $openedRequestName = "o";
+
+    /**
+     * @var string 
+     */
+    public $searchRequestName = "__sx-tree-search";
+    
+    /**
+     * @var bool 
+     */
+    public $isSearchEnabled = true;
 
     /**
      * @var string Widget view file
@@ -87,14 +98,31 @@ class CmsTreeWidget extends Widget
 
         //Automatic filling models
         if ($this->models !== false && is_array($this->models) && count($this->models) == 0) {
+
             $this->models = CmsTree::findRoots()
                 ->joinWith('cmsSiteRelation')
                 ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
+
         }
+
 
         $this->_beginPjax();
     }
 
+    /**
+     * @return array
+     */
+    public function getSearchValue()
+    {
+        if (\Yii::$app->request->getQueryParam($this->searchRequestName, false) === false) {
+            $fromRequest = \Yii::$app->getSession()->get($this->searchRequestName, "");
+        } else {
+            $fromRequest = \skeeks\cms\helpers\StringHelper::strtolower((string) \Yii::$app->request->getQueryParam($this->searchRequestName));
+            \Yii::$app->getSession()->set($this->searchRequestName, $fromRequest);
+        }
+        
+        return $fromRequest;
+    }
     /**
      * @return array
      */
@@ -239,6 +267,10 @@ class CmsTreeWidget extends Widget
      */
     public function isOpenNode($model)
     {
+        if ($this->searchValue) {
+            return true;
+        }
+        
         $isOpen = false;
 
         if ($openedIds = (array)$this->openedIds) {
