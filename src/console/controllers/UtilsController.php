@@ -243,7 +243,7 @@ class UtilsController extends Controller
      */
     public function actionRemoveContentElements($contentId = null)
     {
-        $query = CmsContentElement::find();
+        $query = CmsContentElement::find()->cmsSite();
         if ($contentId) {
             $query->andWhere(['content_id' => $contentId]);
         }
