@@ -96,6 +96,11 @@ class Cms extends \skeeks\cms\base\Component
     public $noImageUrl;
 
     /**
+     * @var string Это изображение показывается в тех случаях, когда не найдено основное.
+     */
+    public $image1px;
+
+    /**
      * @var array
      */
     public $registerRoles = [
@@ -266,6 +271,10 @@ class Cms extends \skeeks\cms\base\Component
             //web init
             if (!$this->noImageUrl) {
                 $this->noImageUrl = CmsAsset::getAssetUrl('img/image-not-found.jpg');
+            }
+            //web init
+            if (!$this->image1px) {
+                $this->image1px = CmsAsset::getAssetUrl('img/1px.jpg');
             }
 
             \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function (Event $e) {
