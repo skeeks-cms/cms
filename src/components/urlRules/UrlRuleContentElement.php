@@ -9,6 +9,7 @@
 namespace skeeks\cms\components\urlRules;
 
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
@@ -91,8 +92,11 @@ class UrlRuleContentElement
 
             //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
             if (!$cmsSite) {
-                $cmsSite = $contentElement->cmsSite;
+                $siteClass = \Yii::$app->skeeks->siteClass;
+                $cmsSite = $siteClass::getById($contentElement->cms_site_id);
+                //$cmsSite = $contentElement->cmsSite;
             }
+
             if ($cmsSite) {
                 if ($cmsSite->cmsSiteMainDomain) {
                     return $cmsSite->url . '/' . $url;

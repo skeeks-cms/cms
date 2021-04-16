@@ -197,7 +197,10 @@ class ContentElementController extends Controller
             if ($cmsContent->is_count_views) {
                 $model = $this->model;
                 $model->show_counter = $model->show_counter + 1;
-                $model->update(false, ['show_counter']);
+
+                //TODO:это сбрасывает кэш таблицы ActiveRecord.php
+                //$model->update(false, ['show_counter']);
+                CmsContentElement::updateAll(['show_counter' => $model->show_counter], ['id' => $model->id]);
             }
         }
 
