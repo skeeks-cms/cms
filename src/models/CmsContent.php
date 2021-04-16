@@ -320,11 +320,20 @@ class CmsContent extends Core
      */
     public function getCmsContentProperties()
     {
-        return $this->hasMany(CmsContentProperty::className(),
-            ['id' => 'cms_content_property_id'])
-            ->via('cmsContentProperty2contents')
-            //->viaTable('cms_content_property2content', ['cms_content_id' => 'id'])
-            ->orderBy('priority');
+        $q = CmsContentProperty::find();
+
+        $q->innerJoinWith("cmsContentProperty2contents as cmsContentProperty2contents");
+        $q->andWhere(["cmsContentProperty2contents.cms_content_id" => $this->id]);
+        $q->orderBy("priority");
+
+        $q->multiple = true;
+
+        return $q;
+
+        /*return $this
+            ->hasMany(CmsContentProperty::className(), ['id' => 'cms_content_property_id'])
+                ->via('cmsContentProperty2contents')
+            ->orderBy('priority');*/
     }
 
 
