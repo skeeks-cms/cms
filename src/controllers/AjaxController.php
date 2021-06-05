@@ -79,7 +79,7 @@ class AjaxController extends Controller
                 return $result;
             }
 
-            $query = CmsContentElement::find()->active()->andWhere(['content_id' => $property->handler->content_id]);
+            $query = CmsContentElement::find()->cmsSite()->active()->andWhere(['content_id' => $property->handler->content_id]);
 
             if ($q = \Yii::$app->request->get('q')) {
                 $query->andWhere(['like', 'name', $q]);
