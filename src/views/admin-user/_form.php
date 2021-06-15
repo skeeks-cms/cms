@@ -91,7 +91,9 @@ JS
 
 <? $fieldSet::end(); ?>
 
-<?php if (\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model]) && $model->id != \Yii::$app->user->id) : ?>
+<?php if ((\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model]) && $model->id == \Yii::$app->user->id)
+    || \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROOT_ACCESS)
+) : ?>
     <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Groups')) ?>
 
     <?php $this->registerCss(<<<CSS
