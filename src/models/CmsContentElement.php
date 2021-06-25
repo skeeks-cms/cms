@@ -404,7 +404,7 @@ class CmsContentElement extends RelatedElementModel
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles'    => 50,
+                'maxFiles'    => 100,
                 'maxSize'     => 1024 * 1024 * 10,
                 'minSize'     => 256,
             ],
