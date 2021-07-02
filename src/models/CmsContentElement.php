@@ -311,6 +311,7 @@ class CmsContentElement extends RelatedElementModel
                 'integer',
             ],
             [['name'], 'required'],
+            [['name'], 'trim'],
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
