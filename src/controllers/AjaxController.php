@@ -50,7 +50,7 @@ class AjaxController extends Controller
         /**
          * @var $property CmsContentProperty
          */
-        if (!$property = $propertyClass::find()->where(['code' => $code])->one()) {
+        if (!$property = $propertyClass::find()->cmsSite()->where(['code' => $code])->one()) {
             return $result;
         }
 
