@@ -252,6 +252,12 @@ return array_merge(dashboardsMenu(), [
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
                 ],
 
+                [
+                    "label" => \Yii::t('skeeks/cms', "Сохраненные фильтры"),
+                    "url"   => ["cms/admin-cms-saved-filter"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+                ],
+
 
             ], contentMenu()),
         ],

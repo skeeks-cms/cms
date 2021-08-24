@@ -856,6 +856,17 @@ class Tree extends ActiveRecord
         return $this->getChildren()->active();
     }
 
+    protected $_seoName = null;
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setSeoName($value)
+    {
+        $this->_seoName = $value;
+        return $this;
+    }
     /**
      * Полное название
      *
@@ -863,12 +874,16 @@ class Tree extends ActiveRecord
      */
     public function getSeoName()
     {
-        $result = "";
-        if ($this->seo_h1) {
-            return $this->seo_h1;
-        } else {
-            return $this->name;
+        if ($this->_seoName === null) {
+            $result = "";
+            if ($this->seo_h1) {
+                $this->_seoName = $this->seo_h1;
+            } else {
+                $this->_seoName = $this->name;
+            }
         }
+
+        return $this->_seoName;
     }
 
 
