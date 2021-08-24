@@ -28,7 +28,7 @@ use yii\web\Application;
  * @property integer                $created_at
  * @property integer                $updated_at
  * @property integer                $priority
- * @property string|null            $name
+ * @property string|null            $short_name
  * @property string                 $code
  * @property string                 $description_short
  * @property string                 $description_full
@@ -58,6 +58,8 @@ use yii\web\Application;
  * @property CmsContentProperty     $cmsContentProperty
  *
  * @property string                 $seoName
+ * @property string                 $name
+ * @property CmsStorageFile|null    $image
  *
  */
 class CmsSavedFilter extends ActiveRecord
@@ -106,7 +108,7 @@ class CmsSavedFilter extends ActiveRecord
             'created_at'             => Yii::t('skeeks/cms', 'Created At'),
             'updated_at'             => Yii::t('skeeks/cms', 'Updated At'),
             'priority'               => Yii::t('skeeks/cms', 'Priority'),
-            'name'                   => Yii::t('skeeks/cms', 'Name'),
+            'short_name'             => Yii::t('skeeks/cms', 'Name'),
             'code'                   => Yii::t('skeeks/cms', 'Code'),
             'description_short'      => Yii::t('skeeks/cms', 'Description Short'),
             'description_full'       => Yii::t('skeeks/cms', 'Description Full'),
@@ -152,11 +154,11 @@ class CmsSavedFilter extends ActiveRecord
                 'integer',
             ],
 
-            [['name'], 'trim'],
+            [['short_name'], 'trim'],
 
             [['description_short', 'description_full'], 'string'],
 
-            [['name', 'code'], 'string', 'max' => 255],
+            [['short_name', 'code'], 'string', 'max' => 255],
             [['seo_h1'], 'string', 'max' => 255],
 
             ['priority', 'default', 'value' => 500],
@@ -277,7 +279,66 @@ class CmsSavedFilter extends ActiveRecord
         return $this->hasOne(CmsContentPropertyEnum::className(), ['id' => 'value_content_property_enum_id']);
     }
 
+    /**
+     * @return CmsStorageFile|null
+     */
+    public function getImage()
+    {
+        if ($this->cmsImage) {
+            return $this->cmsImage;
+        }
+
+        if ($this->cmsTree && $this->cmsTree->image) {
+            return $this->cmsTree->image;
+        }
+
+        return null;
+    }
+
+    public function getName()
+    {
+        if ($this->_name === null) {
+            if ($this->short_name) {
+                $this->_name = $this->short_name;
+            } else {
+                $last = '';
+
+                if ($this->value_content_element_id) {
+                    if ($this->isNewRecord) {
+                        $element = CmsContentElement::findOne($this->value_content_element_id);
+                        if ($element) {
+                            $last = $element->name;
+                        }
+                    } else {
+                        if ($this->valueContentElement) {
+                            $last = $this->valueContentElement->name;
+                        }
+                    }
+
+                } elseif ($this->value_content_property_enum_id) {
+
+                    if ($this->isNewRecord) {
+                        $element = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
+                        if ($element) {
+                            $last = $element->value;
+                        }
+                    } else {
+                        if ($this->valueContentPropertyEnum) {
+                            $last = $this->valueContentPropertyEnum->value;
+                        }
+                    }
+                }
+
+                $this->_name = $last;
+            }
+        }
+
+        return $this->_name;
+    }
+
+    protected $_name = null;
     protected $_seoName = null;
+
     /**
      * Полное название
      *
@@ -290,7 +351,7 @@ class CmsSavedFilter extends ActiveRecord
         if ($this->_seoName === null) {
             if ($this->seo_h1) {
                 $this->_seoName = $this->seo_h1;
-            } elseif ($this->name) {
+            } elseif ($this->short_name) {
                 $this->_seoName = $this->name;
             } else {
                 $last = '';

@@ -45,7 +45,7 @@ class m210821_120601__create_table__cms_saved_filter extends Migration
 
             'cms_image_id' => $this->integer(),
 
-            'name' => $this->string(255),
+            'short_name' => $this->string(255),
 
             'code' => $this->string(255),
 

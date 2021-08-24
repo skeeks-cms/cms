@@ -33,7 +33,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Сохраненные фильтры");
-        $this->modelShowAttribute = "name";
+        $this->modelShowAttribute = "asText";
         $this->modelClassName = CmsSavedFilter::class;
 
         $this->generateAccessActions = false;
@@ -50,7 +50,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
             'index'  => [
                 "filters" => [
                     'visibleFilters' => [
-                        'name',
+                        'short_name',
                     ],
                 ],
                 'grid'    => [
@@ -127,7 +127,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
             'value_content_element_id',
             'value_content_property_enum_id',
 
-            'name',
+            'short_name',
 
             'cms_image_id' => [
                 'class'        => WidgetField::class,

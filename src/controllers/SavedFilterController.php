@@ -85,7 +85,7 @@ class SavedFilterController extends Controller
         $cmsTree = $this->model->cmsTree;
         \Yii::$app->cms->setCurrentTree($cmsTree);
         \Yii::$app->breadcrumbs->setPartsByTree($cmsTree)->append([
-            'name' => $this->model->name ? $this->model->name : $this->model->seoName,
+            'name' => $this->model->name,
             'url' => $this->model->url,
         ]);
 
@@ -126,16 +126,25 @@ class SavedFilterController extends Controller
      */
     protected function _initStandartMetaData()
     {
+        /**
+         * @var $model CmsSavedFilter
+         */
         $model = $this->model;
 
-        if ($title = $model->meta_title) {
-            $this->view->title = $title;
-        } else {
+        //Заголовок
+        if (!$title = $model->meta_title) {
             if (isset($model->seoName)) {
-                $this->view->title = $model->seoName;
+                $title = $model->seoName;
             }
         }
 
+        $this->view->title = $title;
+        $this->view->registerMetaTag([
+            'property' => 'og:title',
+            'content'  => $title,
+        ], 'og:title');
+
+        //Ключевые слова
         if ($meta_keywords = $model->meta_keywords) {
             $this->view->registerMetaTag([
                 "name" => 'keywords',
@@ -143,19 +152,57 @@ class SavedFilterController extends Controller
             ], 'keywords');
         }
 
+
+        //Описание
         if ($meta_descripption = $model->meta_description) {
-            $this->view->registerMetaTag([
-                "name" => 'description',
-                "content" => $meta_descripption
-            ], 'description');
+            $description = $meta_descripption;
+        } elseif ($model->description_short) {
+            $description = $model->description_short;
         } else {
-            if (isset($model->seoName)) {
-                $this->view->registerMetaTag([
-                    "name" => 'description',
-                    "content" => $model->seoName
-                ], 'description');
+            if (isset($model->name)) {
+                if ($model->name != $model->seoName) {
+                    $description = $model->seoName;
+                } else {
+                    $description = $model->name;
+                }
             }
         }
+
+        $description = trim(strip_tags($description));
+
+        $this->view->registerMetaTag([
+            "name" => 'description',
+            "content" => $description
+        ], 'description');
+
+        $this->view->registerMetaTag([
+            'property' => 'og:description',
+            'content'  => $description,
+        ], 'og:description');
+
+        //Картика
+        $imageAbsoluteSrc = null;
+        if ($model->image) {
+            $imageAbsoluteSrc = $model->image->absoluteSrc;
+        }
+
+        if ($imageAbsoluteSrc) {
+            $this->view->registerMetaTag([
+                'property' => 'og:image',
+                'content'  => $imageAbsoluteSrc,
+            ], 'og:image');
+        }
+
+
+        $this->view->registerMetaTag([
+            'property' => 'og:url',
+            'content'  => $model->getUrl(true),
+        ], 'og:url');
+
+        $this->view->registerMetaTag([
+            'property' => 'og:type',
+            'content'  => 'website',
+        ], 'og:type');
 
         return $this;
     }

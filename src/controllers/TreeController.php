@@ -1,9 +1,9 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (�����)
- * @date 14.04.2016
  */
 
 namespace skeeks\cms\controllers;
@@ -119,14 +119,20 @@ class TreeController extends Controller
     {
         $model = $this->model;
 
-        if ($title = $model->meta_title) {
-            $this->view->title = $title;
-        } else {
-            if (isset($model->name)) {
-                $this->view->title = $model->name;
+        //Заголовок
+        if (!$title = $model->meta_title) {
+            if (isset($model->seoName)) {
+                $title = $model->seoName;
             }
         }
 
+        $this->view->title = $title;
+        $this->view->registerMetaTag([
+            'property' => 'og:title',
+            'content'  => $title,
+        ], 'og:title');
+
+        //Ключевые слова
         if ($meta_keywords = $model->meta_keywords) {
             $this->view->registerMetaTag([
                 "name" => 'keywords',
@@ -134,19 +140,58 @@ class TreeController extends Controller
             ], 'keywords');
         }
 
+
+        //Описание
         if ($meta_descripption = $model->meta_description) {
-            $this->view->registerMetaTag([
-                "name" => 'description',
-                "content" => $meta_descripption
-            ], 'description');
+            $description = $meta_descripption;
+        } elseif ($model->description_short) {
+            $description = $model->description_short;
         } else {
             if (isset($model->name)) {
-                $this->view->registerMetaTag([
-                    "name" => 'description',
-                    "content" => $model->name
-                ], 'description');
+                if ($model->name != $model->seoName) {
+                    $description = $model->seoName;
+                } else {
+                    $description = $model->name;
+                }
             }
         }
+
+        $description = trim(strip_tags($description));
+
+        $this->view->registerMetaTag([
+            "name" => 'description',
+            "content" => $description
+        ], 'description');
+
+        $this->view->registerMetaTag([
+            'property' => 'og:description',
+            'content'  => $description,
+        ], 'og:description');
+
+        //Картика
+        $imageAbsoluteSrc = null;
+        if ($model->image_id) {
+            $imageAbsoluteSrc = $model->image->absoluteSrc;
+        } elseif ($model->image_full_id) {
+            $imageAbsoluteSrc = $model->fullImage->absoluteSrc;
+        }
+        if ($imageAbsoluteSrc) {
+            $this->view->registerMetaTag([
+                'property' => 'og:image',
+                'content'  => $imageAbsoluteSrc,
+            ], 'og:image');
+        }
+
+
+        $this->view->registerMetaTag([
+            'property' => 'og:url',
+            'content'  => $model->getUrl(true),
+        ], 'og:url');
+
+        $this->view->registerMetaTag([
+            'property' => 'og:type',
+            'content'  => 'website',
+        ], 'og:type');
 
         return $this;
     }
