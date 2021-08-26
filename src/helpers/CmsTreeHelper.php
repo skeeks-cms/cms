@@ -9,7 +9,7 @@
 namespace skeeks\cms\helpers;
 
 use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\models\Tree;
+use skeeks\cms\models\CmsTree;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
@@ -31,7 +31,7 @@ abstract class CmsTreeHelper extends Component
     public $model;
 
     /**
-     * @param Tree $model
+     * @param CmsTree $model
      * @param $data
      */
     public function __construct($model, $data = [])
@@ -45,7 +45,7 @@ abstract class CmsTreeHelper extends Component
     }
 
     /**
-     * @param Tree $model
+     * @param CmsTree $model
      * @param array $data
      * @return static
      */

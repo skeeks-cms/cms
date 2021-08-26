@@ -210,7 +210,7 @@ class CmsSavedFilter extends ActiveRecord
      */
     public function getCmsTree()
     {
-        return $this->hasOne(Tree::className(), ['id' => 'cms_tree_id']);
+        return $this->hasOne(CmsTree::className(), ['id' => 'cms_tree_id']);
     }
 
     /**

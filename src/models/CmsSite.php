@@ -156,7 +156,7 @@ class CmsSite extends ActiveRecord
 
     public function createTreeAfterInsert(Event $e)
     {
-        $tree = new Tree([
+        $tree = new CmsTree([
             'name' => 'Главная страница',
         ]);
 

@@ -496,7 +496,7 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getCmsTree()
     {
-        return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
+        return $this->hasOne(CmsTree::className(), ['id' => 'tree_id']);
     }
 
     /**

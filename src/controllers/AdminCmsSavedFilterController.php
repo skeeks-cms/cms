@@ -64,8 +64,8 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
 
                         'custom',
                         //'code',
-                        'is_active',
                         'priority',
+                        'view',
                     ],
                     'columns'        => [
                         'custom'       => [
@@ -76,18 +76,51 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                                 $data = [];
                                 $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
 
+
+                                if ($model->cmsTree) {
+                                    $data[] = '<i class="far fa-folder" style="color: gray;"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
+                                            'data-pjax' => '0',
+                                            'target'    => '_blank',
+                                            'title'     => $model->cmsTree->fullName,
+                                            'style'     => 'color: #333; max-width: 200px; display: inline-block; color: gray; cursor: pointer; white-space: nowrap; border-bottom: none;',
+                                        ]);
+                                }
                                 $info = implode("<br />", $data);
 
                                 return "<div class='row no-gutters'>
                                                 <div class='sx-trigger-action' style='width: 50px;'>
                                                 <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='". ($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                    <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a>
                                                 </div>
-                                                <div style='margin-left: 5px;'>" . $info  . "<br />(" . $model->code . ")</div></div>";
+                                                <div style='margin-left: 5px;'>" . $info  . /*. "<br />(" . $model->code . ")*/
+                                                    "</div></div>";
 
                                             ;
                             }
+                        ],
+
+                        'priority'     => [
+                            'headerOptions'  => [
+                                'style' => 'max-width: 100px; width: 100px;',
+                            ],
+                        ],
+
+                        'view' => [
+                            'value'          => function (CmsSavedFilter $model) {
+                                return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $model->absoluteUrl,
+                                    [
+                                        'target'    => '_blank',
+                                        'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                                        'data-pjax' => '0',
+                                        'class'     => 'btn btn-sm',
+                                    ]);
+                            },
+                            'format'         => 'raw',
+                            /*'label'  => "Смотреть",*/
+                            'headerOptions'  => [
+                                'style' => 'max-width: 40px; width: 40px;',
+                            ],
                         ],
                     ],
                 ],

@@ -11,7 +11,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsTree;
-use skeeks\cms\models\Tree;
 use Yii;
 use yii\web\NotFoundHttpException;
 

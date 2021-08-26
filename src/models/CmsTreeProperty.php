@@ -26,7 +26,7 @@ use skeeks\cms\relatedProperties\models\RelatedElementPropertyModel;
  * @property string $description
  *
  * @property CmsTreeTypeProperty $property
- * @property Tree $element
+ * @property CmsTree $element
  */
 class CmsTreeProperty extends RelatedElementPropertyModel
 {
@@ -51,6 +51,6 @@ class CmsTreeProperty extends RelatedElementPropertyModel
      */
     public function getElement()
     {
-        return $this->hasOne(Tree::className(), ['id' => 'element_id']);
+        return $this->hasOne(CmsTree::className(), ['id' => 'element_id']);
     }
 }

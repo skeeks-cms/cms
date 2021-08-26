@@ -11,7 +11,6 @@ namespace skeeks\cms\components\urlRules;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsSite;
-use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -47,23 +46,19 @@ class UrlRuleSavedFilter
     public function createUrl($manager, $route, $params)
     {
         if ($route == 'cms/saved-filter/view') {
+
             $savedFilter = $this->_getElement($params);
 
             if (!$savedFilter) {
                 return false;
             }
 
-            $url = '';
-
             $cmsTree = ArrayHelper::getValue($params, 'cmsTree');
             ArrayHelper::remove($params, 'cmsTree');
             $cmsSite = ArrayHelper::getValue($params, 'cmsSite', null);
             ArrayHelper::remove($params, 'cmsSite');
 
-            if ($cmsTree) {
-                $url = $cmsTree->dir . "/";
-            }
-            $url .= $savedFilter->code . '-f' . $savedFilter->id;
+            $url = $savedFilter->code . '-f' . $savedFilter->id;
 
 
             if (strpos($url, '//') !== false) {
@@ -126,10 +121,10 @@ class UrlRuleSavedFilter
             /**
              * @var $savedFilter CmsSavedFilter
              */
-            if (!$contentElement = ArrayHelper::getValue(self::$models, $id)) {
-                $contentElement = CmsSavedFilter::findOne(['id' => $id]);
+            if (!$savedFilter = ArrayHelper::getValue(self::$models, $id)) {
+                $savedFilter = CmsSavedFilter::findOne(['id' => $id]);
                 if (\Yii::$app instanceof Application) {
-                    self::$models[$id] = $contentElement;
+                    self::$models[$id] = $savedFilter;
                 }
             }
         }
@@ -138,7 +133,7 @@ class UrlRuleSavedFilter
         ArrayHelper::remove($params, 'code');
         ArrayHelper::remove($params, 'model');
 
-        return $contentElement;
+        return $savedFilter;
     }
 
     /**
