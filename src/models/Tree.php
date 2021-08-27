@@ -111,6 +111,7 @@ use yii\helpers\Url;
  * @property Tree                      $next
  * @property Tree[]                    $descendants
  * @property bool                      $isActive
+ * @property CmsSavedFilter[]          $cmsSavedFilters
  *
  * @depricated
  */
@@ -910,6 +911,17 @@ class Tree extends ActiveRecord
     public function getIsActive()
     {
         return $this->active == 'Y';
+    }
+
+
+    /**
+     * Gets query for [[CmsSavedFilters]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSavedFilters()
+    {
+        return $this->hasMany(CmsSavedFilter::className(), ['cms_tree_id' => 'id']);
     }
 }
 

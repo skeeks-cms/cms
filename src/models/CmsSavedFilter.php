@@ -58,6 +58,7 @@ use yii\web\Application;
  * @property CmsContentProperty     $cmsContentProperty
  *
  * @property string                 $seoName
+ * @property string                 $propertyValueName
  * @property string                 $name
  * @property CmsStorageFile|null    $image
  *
@@ -295,41 +296,48 @@ class CmsSavedFilter extends ActiveRecord
         return null;
     }
 
+    public function getPropertyValueName()
+    {
+        $last = '';
+
+        if ($this->value_content_element_id) {
+            if ($this->isNewRecord) {
+                $element = CmsContentElement::findOne($this->value_content_element_id);
+                if ($element) {
+                    $last = $element->name;
+                }
+            } else {
+                if ($this->valueContentElement) {
+                    $last = $this->valueContentElement->name;
+                }
+            }
+
+        } elseif ($this->value_content_property_enum_id) {
+
+            if ($this->isNewRecord) {
+                $element = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
+                if ($element) {
+                    $last = $element->value;
+                }
+            } else {
+                if ($this->valueContentPropertyEnum) {
+                    $last = $this->valueContentPropertyEnum->value;
+                }
+            }
+        }
+
+        return $last;
+    }
+    /**
+     * @return string|null
+     */
     public function getName()
     {
         if ($this->_name === null) {
             if ($this->short_name) {
                 $this->_name = $this->short_name;
             } else {
-                $last = '';
-
-                if ($this->value_content_element_id) {
-                    if ($this->isNewRecord) {
-                        $element = CmsContentElement::findOne($this->value_content_element_id);
-                        if ($element) {
-                            $last = $element->name;
-                        }
-                    } else {
-                        if ($this->valueContentElement) {
-                            $last = $this->valueContentElement->name;
-                        }
-                    }
-
-                } elseif ($this->value_content_property_enum_id) {
-
-                    if ($this->isNewRecord) {
-                        $element = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
-                        if ($element) {
-                            $last = $element->value;
-                        }
-                    } else {
-                        if ($this->valueContentPropertyEnum) {
-                            $last = $this->valueContentPropertyEnum->value;
-                        }
-                    }
-                }
-
-                $this->_name = $last;
+                $this->_name = $this->propertyValueName;
             }
         }
 
