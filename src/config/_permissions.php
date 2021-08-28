@@ -87,6 +87,8 @@ return [
                     "cms/admin-cms-site-address-phone",
                     "cms/admin-cms-site-address-email",
 
+                    "cms/admin-cms-saved-filter",
+
                     "cms/admin-site-user",
 
                     "cms/admin-cache",
@@ -121,6 +123,8 @@ return [
                     "cms/admin-storage-files/download",
                     "cms/admin-storage-files/delete/own",
                     "cms/admin-storage-files/delete-tmp-dir",
+
+                    "cms/admin-cms-saved-filter",
 
                     "cms/admin-cache",
                 ],
@@ -245,6 +249,10 @@ return [
         [
             'name'        => 'cms/admin-tree/new-children',
             'description' => ['skeeks/cms', 'Создать подраздел'],
+        ],
+        [
+            'name'        => 'cms/admin-cms-saved-filter',
+            'description' => ['skeeks/cms', 'Сохраненные фильтры'],
         ],
 
 
