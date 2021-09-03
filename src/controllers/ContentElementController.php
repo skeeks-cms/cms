@@ -231,6 +231,7 @@ class ContentElementController extends Controller
             if ($contentElement->getUrl(true) != $url) {
                 $url = $contentElement->getUrl(true);
                 \Yii::$app->response->redirect($url, 301);
+                \Yii::$app->end();
             }
         } else {
 
@@ -244,6 +245,7 @@ class ContentElementController extends Controller
                 if (ArrayHelper::getValue($urlData, 'path') != ArrayHelper::getValue($requestUrlData, 'path')) {
                     $url = $contentElement->getUrl(true);
                     \Yii::$app->response->redirect($url, 301);
+                    \Yii::$app->end();
                 }
             }
         }

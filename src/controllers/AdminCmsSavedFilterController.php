@@ -12,6 +12,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsLang;
@@ -68,6 +69,12 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                         'view',
                     ],
                     'columns'        => [
+                        'created_at'       =>  [
+                            'class' => DateTimeColumnData::class
+                        ],
+                        'updated_at'       =>  [
+                            'class' => DateTimeColumnData::class
+                        ],
                         'custom'       => [
                             'attribute' => 'id',
                             'format' => 'raw',
