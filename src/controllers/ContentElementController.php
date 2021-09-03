@@ -11,7 +11,10 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\filters\CmsAccessControl;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
@@ -120,6 +123,88 @@ class ContentElementController extends Controller
 
         return parent::beforeAction($action);
     }
+
+    protected function _getSavedFilter()
+    {
+        $contentElement = $this->model;
+        if (!$contentElement->cmsContent) {
+            return false;
+        }
+
+
+        if (!$contentElement->cmsContent->saved_filter_tree_type_id) {
+            return false;
+        }
+
+        $mainCmsTree = CmsTree::find()
+            ->andWhere(['tree_type_id' => $contentElement->cmsContent->saved_filter_tree_type_id])
+            ->orderBy(['level' => SORT_ASC, 'priority' => SORT_ASC])
+            ->limit(1)
+            ->one();
+
+        if (!$mainCmsTree) {
+            return false;
+        }
+
+        $savedFilter = CmsSavedFilter::find()->cmsSite()
+            ->andWhere([
+                'cms_tree_id' => $mainCmsTree->id,
+            ])
+            ->andWhere([
+                'value_content_element_id' => $contentElement->id,
+            ])
+            ->one();
+        ;
+
+        if ($savedFilter) {
+            return $savedFilter;
+        }
+
+        //Создать сохраненный фильтр
+        //Нужно определить свойство в этом разделе
+            $q = CmsContentProperty::find()->cmsSite();
+
+            $q->joinWith('cmsContentProperty2trees as map2trees')
+                ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
+
+            $q->andWhere([
+                'or',
+                ['map2trees.cms_tree_id' => $mainCmsTree->id],
+                ['map2trees.cms_tree_id' => null],
+            ]);
+            $q->orderBy(['priority' => SORT_ASC])
+            ;
+        /**
+         * @var $cmsContentProperty CmsContentProperty
+         */
+        $property = null;
+        foreach ($q->each(10) as $cmsContentProperty)
+        {
+            if ($cmsContentProperty->property_type == PropertyType::CODE_ELEMENT) {
+                if ($cmsContentProperty->handler->content_id == $contentElement->cmsContent->id) {
+                    $property = $cmsContentProperty;
+                    break;
+                }
+            }
+        }
+
+        if ($property) {
+            $savedFilter = new CmsSavedFilter();
+            $savedFilter->cms_tree_id = $mainCmsTree->id;
+            $savedFilter->value_content_element_id = $contentElement->id;
+
+            $savedFilter->cms_content_property_id = $property->id;
+            if (!$savedFilter->save()) {
+                $savedFilter = null;
+            }
+            
+            return $savedFilter;
+        }
+            
+
+
+        return false;
+    }
     /**
      * @return $this|string
      * @throws NotFoundHttpException
@@ -133,6 +218,7 @@ class ContentElementController extends Controller
         $contentElement = $this->model;
         $tree = $contentElement->cmsTree;
 
+        $this->_getSavedFilter();
 
         //TODO: Может быть не сбрасывать GET параметры
         if (Url::isRelative($contentElement->url)) {

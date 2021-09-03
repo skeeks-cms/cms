@@ -9,8 +9,11 @@
 namespace skeeks\cms\components\urlRules;
 
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentElementProperty;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;

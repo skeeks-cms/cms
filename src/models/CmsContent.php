@@ -40,6 +40,8 @@ use yii\helpers\ArrayHelper;
  * @property string               $view_file
  * @property integer              $is_access_check_element
  * @property array                $editable_fields
+ * @property integer              $cms_tree_type_id
+ * @property integer              $saved_filter_tree_type_id
  *
  * @property string               $meta_title_template
  * @property string               $meta_description_template
@@ -64,6 +66,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsContent           $parentContent
  * @property CmsContent[]         $childrenContents
+ * @property CmsTreeType          $savedFilterTreeType
+ * @property CmsTreeType          $cmsTreeType
  */
 class CmsContent extends Core
 {
@@ -96,8 +100,8 @@ class CmsContent extends Core
     {
         return array_merge(parent::behaviors(), [
 
-            HasJsonFieldsBehavior::className() => [
-                'class'  => HasJsonFieldsBehavior::className(),
+            HasJsonFieldsBehavior::class => [
+                'class'  => HasJsonFieldsBehavior::class,
                 'fields' => ['editable_fields'],
             ],
         ]);
@@ -109,12 +113,14 @@ class CmsContent extends Core
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'is_show_on_all_sites'    => Yii::t('skeeks/cms', 'Если эта опция включена, то страница элемента этого контента, может отображаться на любом из сайтов.'),
-            'is_have_page'    => Yii::t('skeeks/cms', 'Если эта опция включена, то показываются настройки SEO и URL'),
-            'code'            => Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.'),
-            'view_file'       => Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.'),
-            'root_tree_id'    => Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.'),
-            'editable_fields' => Yii::t('skeeks/cms', 'Поля которые отображаются при редактировании. Если ничего не выбрано, то показываются все!'),
+            'is_show_on_all_sites'      => Yii::t('skeeks/cms', 'Если эта опция включена, то страница элемента этого контента, может отображаться на любом из сайтов.'),
+            'is_have_page'              => Yii::t('skeeks/cms', 'Если эта опция включена, то показываются настройки SEO и URL'),
+            'code'                      => Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.'),
+            'view_file'                 => Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.'),
+            'root_tree_id'              => Yii::t('skeeks/cms', 'If it is set to the root partition, the elements can be tied to him and his sub.'),
+            'editable_fields'           => Yii::t('skeeks/cms', 'Поля которые отображаются при редактировании. Если ничего не выбрано, то показываются все!'),
+            'cms_tree_type_id'          => Yii::t('skeeks/cms', 'Этот параметр ограничевает возможность привязки элементов этого контента к разделам только этого типа'),
+            'saved_filter_tree_type_id' => Yii::t('skeeks/cms', 'Элементы этого контента не имеют самостоятельной страницы а создают посадочную на корневой раздел этого типа'),
         ]);
     }
 
@@ -124,22 +130,24 @@ class CmsContent extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'               => Yii::t('skeeks/cms', 'ID'),
-            'created_by'       => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by'       => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at'       => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at'       => Yii::t('skeeks/cms', 'Updated At'),
-            'name'             => Yii::t('skeeks/cms', 'Name'),
-            'code'             => Yii::t('skeeks/cms', 'Code'),
-            'is_active'        => Yii::t('skeeks/cms', 'Active'),
-            'priority'         => Yii::t('skeeks/cms', 'Priority'),
-            'description'      => Yii::t('skeeks/cms', 'Description'),
-            'content_type'     => Yii::t('skeeks/cms', 'Content Type'),
-            'index_for_search' => Yii::t('skeeks/cms', 'To index for search module'),
-            'tree_chooser'     => Yii::t('skeeks/cms', 'The Interface Binding Element to Sections'),
-            'list_mode'        => Yii::t('skeeks/cms', 'View Mode Sections And Elements'),
-            'name_meny'        => Yii::t('skeeks/cms', 'The Name Of The Elements (Plural)'),
-            'name_one'         => Yii::t('skeeks/cms', 'The Name One Element'),
+            'cms_tree_type_id'          => Yii::t('skeeks/cms', 'Основной тип разделов'),
+            'saved_filter_tree_type_id' => Yii::t('skeeks/cms', 'Тип раздела для посадочной страницы'),
+            'id'                        => Yii::t('skeeks/cms', 'ID'),
+            'created_by'                => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'                => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'                => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'                => Yii::t('skeeks/cms', 'Updated At'),
+            'name'                      => Yii::t('skeeks/cms', 'Name'),
+            'code'                      => Yii::t('skeeks/cms', 'Code'),
+            'is_active'                 => Yii::t('skeeks/cms', 'Active'),
+            'priority'                  => Yii::t('skeeks/cms', 'Priority'),
+            'description'               => Yii::t('skeeks/cms', 'Description'),
+            'content_type'              => Yii::t('skeeks/cms', 'Content Type'),
+            'index_for_search'          => Yii::t('skeeks/cms', 'To index for search module'),
+            'tree_chooser'              => Yii::t('skeeks/cms', 'The Interface Binding Element to Sections'),
+            'list_mode'                 => Yii::t('skeeks/cms', 'View Mode Sections And Elements'),
+            'name_meny'                 => Yii::t('skeeks/cms', 'The Name Of The Elements (Plural)'),
+            'name_one'                  => Yii::t('skeeks/cms', 'The Name One Element'),
 
             'default_tree_id'      => Yii::t('skeeks/cms', 'Default Section'),
             'is_allow_change_tree' => Yii::t('skeeks/cms', 'Is Allow Change Default Section'),
@@ -160,7 +168,7 @@ class CmsContent extends Core
 
             'is_have_page' => Yii::t('skeeks/cms', 'У элементов есть страница на сайте.'),
 
-            'editable_fields' => Yii::t('skeeks/cms', 'Редактируемые поля'),
+            'editable_fields'      => Yii::t('skeeks/cms', 'Редактируемые поля'),
             'is_show_on_all_sites' => Yii::t('skeeks/cms', 'Показывать элементы на всех сайтах?'),
         ]);
     }
@@ -176,6 +184,8 @@ class CmsContent extends Core
                 'integer',
             ],
             [['is_visible'], 'integer'],
+            [['cms_tree_type_id'], 'integer'],
+            [['saved_filter_tree_type_id'], 'integer'],
             [['is_parent_content_required'], 'integer'],
             [['is_have_page'], 'integer'],
             [['is_show_on_all_sites'], 'integer'],
@@ -270,7 +280,7 @@ class CmsContent extends Core
      */
     public function getRootTree()
     {
-        return $this->hasOne(CmsTree::className(), ['id' => 'root_tree_id']);
+        return $this->hasOne(CmsTree::class, ['id' => 'root_tree_id']);
     }
 
     /**
@@ -278,7 +288,7 @@ class CmsContent extends Core
      */
     public function getDefaultTree()
     {
-        return $this->hasOne(CmsTree::className(), ['id' => 'default_tree_id']);
+        return $this->hasOne(CmsTree::class, ['id' => 'default_tree_id']);
     }
 
     /**
@@ -286,7 +296,22 @@ class CmsContent extends Core
      */
     public function getContentType()
     {
-        return $this->hasOne(CmsContentType::className(), ['code' => 'content_type']);
+        return $this->hasOne(CmsContentType::class, ['code' => 'content_type']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSavedFilterTreeType()
+    {
+        return $this->hasOne(CmsTreeType::class, ['id' => 'saved_filter_tree_type_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeType()
+    {
+        return $this->hasOne(CmsTreeType::class, ['id' => 'cms_tree_type_id']);
     }
 
 
@@ -295,7 +320,7 @@ class CmsContent extends Core
      */
     public function getCmsContentElements()
     {
-        return $this->hasMany(CmsContentElement::className(), ['content_id' => 'id']);
+        return $this->hasMany(CmsContentElement::class, ['content_id' => 'id']);
     }
 
     /**
@@ -303,7 +328,7 @@ class CmsContent extends Core
      */
     /*public function getCmsContentProperties()
     {
-        return $this->hasMany(CmsContentProperty::className(), ['content_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+        return $this->hasMany(CmsContentProperty::class, ['content_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }*/
 
 
@@ -312,7 +337,7 @@ class CmsContent extends Core
      */
     public function getCmsContentProperty2contents()
     {
-        return $this->hasMany(CmsContentProperty2content::className(), ['cms_content_id' => 'id']);
+        return $this->hasMany(CmsContentProperty2content::class, ['cms_content_id' => 'id']);
     }
 
     /**
@@ -331,7 +356,7 @@ class CmsContent extends Core
         return $q;
 
         /*return $this
-            ->hasMany(CmsContentProperty::className(), ['id' => 'cms_content_property_id'])
+            ->hasMany(CmsContentProperty::class, ['id' => 'cms_content_property_id'])
                 ->via('cmsContentProperty2contents')
             ->orderBy('priority');*/
     }
@@ -351,7 +376,7 @@ class CmsContent extends Core
      */
     public function getParentContent()
     {
-        return $this->hasOne(CmsContent::className(), ['id' => 'parent_content_id']);
+        return $this->hasOne(CmsContent::class, ['id' => 'parent_content_id']);
     }
 
     /**
@@ -359,7 +384,7 @@ class CmsContent extends Core
      */
     public function getChildrenContents()
     {
-        return $this->hasMany(CmsContent::className(), ['parent_content_id' => 'id']);
+        return $this->hasMany(CmsContent::class, ['parent_content_id' => 'id']);
     }
 
     /**
@@ -368,7 +393,7 @@ class CmsContent extends Core
     public function createElement()
     {
         return new CmsContentElement([
-            'content_id' => $this->id,
+            'content_id'  => $this->id,
             'cms_site_id' => \Yii::$app->skeeks->site->id,
         ]);
     }
@@ -386,6 +411,7 @@ class CmsContent extends Core
             return true;
         }
 
-        return (bool) in_array((string) $code, (array) $this->editable_fields);
+        return (bool)in_array((string)$code, (array)$this->editable_fields);
     }
+    
 }
