@@ -137,6 +137,7 @@ class ContentElementController extends Controller
         }
 
         $mainCmsTree = CmsTree::find()
+            ->cmsSite()
             ->andWhere(['tree_type_id' => $contentElement->cmsContent->saved_filter_tree_type_id])
             ->orderBy(['level' => SORT_ASC, 'priority' => SORT_ASC])
             ->limit(1)

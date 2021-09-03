@@ -691,6 +691,7 @@ class CmsContentElement extends RelatedElementModel
             if ($cmsContent) {
                 if ($cmsContent->saved_filter_tree_type_id) {
                     $mainCmsTree = CmsTree::find()
+                        ->cmsSite()
                         ->andWhere(['tree_type_id' => $cmsContent->saved_filter_tree_type_id])
                         ->orderBy(['level' => SORT_ASC, 'priority' => SORT_ASC])
                         ->limit(1)
