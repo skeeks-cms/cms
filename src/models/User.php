@@ -164,8 +164,9 @@ class User
             foreach ((array)$this->_roleNames as $roleName) {
                 if ($role = \Yii::$app->authManager->getRole($roleName)) {
                     try {
-                        //todo: добавить проверку
-                        \Yii::$app->authManager->assign($role, $this->id);
+                        if (!\Yii::$app->authManager->getAssignment($role, $this->id)) {
+                            \Yii::$app->authManager->assign($role, $this->id);
+                        }
                     } catch (\Exception $e) {
                         \Yii::error("Ошибка назначения роли: ".$e->getMessage(), self::class);
                         //throw $e;
