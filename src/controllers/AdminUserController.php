@@ -387,6 +387,8 @@ class AdminUserController extends BackendModelStandartController
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
+                    
+                    return true;
                 },
 
             ],
@@ -441,6 +443,7 @@ class AdminUserController extends BackendModelStandartController
         if (!$model->roles) {
             return true;
         }
+
         if (in_array(CmsManager::ROLE_ROOT, array_keys($model->roles))) {
             if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROOT_ACCESS)) {
                 return false;

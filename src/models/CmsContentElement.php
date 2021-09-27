@@ -311,6 +311,7 @@ class CmsContentElement extends RelatedElementModel
                 'integer',
             ],
             [['name'], 'required'],
+            [['name'], 'trim'],
             [['description_short', 'description_full'], 'string'],
             [['active'], 'string', 'max' => 1],
             [['name', 'code'], 'string', 'max' => 255],
@@ -404,7 +405,7 @@ class CmsContentElement extends RelatedElementModel
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
-                'maxFiles'    => 50,
+                'maxFiles'    => 100,
                 'maxSize'     => 1024 * 1024 * 10,
                 'minSize'     => 256,
             ],
@@ -456,6 +457,18 @@ class CmsContentElement extends RelatedElementModel
                     }
                 },
             ],
+            [
+                ['tree_id'],
+                function ($attribute) {
+                    if ($this->cmsTree && $this->cmsContent->cms_tree_type_id) {
+                        if ($this->cmsTree->tree_type_id != $this->cmsContent->cms_tree_type_id) {
+                            $typeName = $this->cmsContent->cmsTreeType->asText;
+                            $this->addError($attribute, "Нельзя привязать к этому разделу. Разрешено привязывать к разделам у которых тип '{$typeName}'");
+                            return false;
+                        }
+                    }
+                },
+            ],
         ]);
     }
     /**
@@ -495,7 +508,7 @@ class CmsContentElement extends RelatedElementModel
      */
     public function getCmsTree()
     {
-        return $this->hasOne(Tree::className(), ['id' => 'tree_id']);
+        return $this->hasOne(CmsTree::className(), ['id' => 'tree_id']);
     }
 
     /**
@@ -624,14 +637,72 @@ class CmsContentElement extends RelatedElementModel
             UrlRuleContentElement::$models[$this->id] = $this;
         }
 
+        $isSavedFilter = false;
+        if ($savedFilterCmsTree = static::getContentMainTreeForSavedFilter($this->content_id)) {
 
-        if ($params) {
-            $params = ArrayHelper::merge(['/cms/content-element/view', 'id' => $this->id], $params);
-        } else {
-            $params = ['/cms/content-element/view', 'id' => $this->id];
+            $savedFilter = CmsSavedFilter::find()->cmsSite()
+                ->andWhere([
+                    'cms_tree_id' => $savedFilterCmsTree->id,
+                ])
+                ->andWhere([
+                    'value_content_element_id' => $this->id,
+                ])
+                ->one();
+
+            if ($savedFilter) {
+                $isSavedFilter = true;
+                if ($params) {
+                    $params = ArrayHelper::merge([
+                        '/cms/saved-filter/view',
+                        'model' => $savedFilter,
+                    ], $params);
+                } else {
+                    $params = [
+                        '/cms/saved-filter/view',
+                        'model' => $savedFilter,
+                    ];
+                }
+            }
+        }
+
+        if ($isSavedFilter === false) {
+            if ($params) {
+                $params = ArrayHelper::merge(['/cms/content-element/view', 'id' => $this->id], $params);
+            } else {
+                $params = ['/cms/content-element/view', 'id' => $this->id];
+            }
         }
 
         return Url::to($params, $scheme);
+    }
+
+    static protected $_contentSavedFilter = [];
+
+    /**
+     * Главный раздел для посадочной страницы
+     * @param $content_id
+     * @return null|CmsTree
+     */
+    static public function getContentMainTreeForSavedFilter($content_id)
+    {
+        if (!isset(static::$_contentSavedFilter[$content_id])) {
+            static::$_contentSavedFilter[$content_id] = null;
+            $cmsContent = CmsContent::findOne($content_id);
+            if ($cmsContent) {
+                if ($cmsContent->saved_filter_tree_type_id) {
+                    $mainCmsTree = CmsTree::find()
+                        ->cmsSite()
+                        ->andWhere(['tree_type_id' => $cmsContent->saved_filter_tree_type_id])
+                        ->orderBy(['level' => SORT_ASC, 'priority' => SORT_ASC])
+                        ->limit(1)
+                        ->one();
+
+                    static::$_contentSavedFilter[$content_id] = $mainCmsTree;
+                }
+            }
+        }
+
+        return static::$_contentSavedFilter[$content_id];
     }
     /**
      * @return \yii\db\ActiveQuery

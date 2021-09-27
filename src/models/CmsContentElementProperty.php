@@ -29,7 +29,7 @@ use skeeks\cms\relatedProperties\models\RelatedElementPropertyModel;
  * @property CmsContentElement      $element
  * @property CmsContentPropertyEnum $valueEnum
  *
- * @property CmsContentElement      $valueCmsContentElements
+ * @property CmsContentElement      $valueCmsContentElement
  */
 class CmsContentElementProperty extends RelatedElementPropertyModel
 {

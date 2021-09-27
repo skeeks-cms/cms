@@ -77,11 +77,11 @@ class SelectTreeInputWidget extends InputWidget
     {
         $this->treeWidgetOptions = ArrayHelper::merge([
             "models" => [],
+            //"isSearchEnabled" => false,
             "sessionName" => 'select-' . (int)$this->multiple,
             "viewNodeContentFile" => '@skeeks/cms/widgets/formInputs/selectTree/views/_tree-node',
 
-            'pjaxOptions' =>
-                [
+            'pjaxOptions' => [
                     'enablePushState' => false,
                 ],
 

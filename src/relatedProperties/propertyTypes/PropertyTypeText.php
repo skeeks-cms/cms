@@ -94,9 +94,12 @@ class PropertyTypeText extends PropertyType
 
         if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
-            $field->$fieldElement([
-                'rows' => $this->rows
-            ]);
+
+            if ($fieldElement == 'textarea') {
+                $field->$fieldElement([
+                    'rows' => $this->rows
+                ]);
+            }
 
             if ($this->fieldElement == 'hiddenInput') {
                 $field->label(false);

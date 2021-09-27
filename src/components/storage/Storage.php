@@ -225,7 +225,9 @@ class Storage extends Component
 
         $data = array_merge((array) $newData, (array) $data);
         $file = new StorageFile($data);
-        $file->save();
+        if (!$file->save()) {
+            throw new Exception("Файл не сохранен: " . print_r($file->errors, true));
+        }
 
         return $file;
     }

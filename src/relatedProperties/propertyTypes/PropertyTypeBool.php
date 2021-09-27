@@ -82,6 +82,9 @@ class PropertyTypeBool extends PropertyType
 
         if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
+            if ($this->property->relatedPropertiesModel->relatedElementModel->isNewRecord && $this->defaultValue) {
+                $this->property->relatedPropertiesModel->setAttribute($this->property->code, $this->defaultValue);
+            }
 
             if ($fieldElement == 'radioList' || $fieldElement == 'listBox') {
                 $field->{$fieldElement}(\Yii::$app->formatter->booleanFormat);

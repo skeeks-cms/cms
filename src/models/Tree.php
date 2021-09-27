@@ -111,6 +111,7 @@ use yii\helpers\Url;
  * @property Tree                      $next
  * @property Tree[]                    $descendants
  * @property bool                      $isActive
+ * @property CmsSavedFilter[]          $cmsSavedFilters
  *
  * @depricated
  */
@@ -856,6 +857,17 @@ class Tree extends ActiveRecord
         return $this->getChildren()->active();
     }
 
+    protected $_seoName = null;
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setSeoName($value)
+    {
+        $this->_seoName = $value;
+        return $this;
+    }
     /**
      * Полное название
      *
@@ -863,12 +875,16 @@ class Tree extends ActiveRecord
      */
     public function getSeoName()
     {
-        $result = "";
-        if ($this->seo_h1) {
-            return $this->seo_h1;
-        } else {
-            return $this->name;
+        if ($this->_seoName === null) {
+            $result = "";
+            if ($this->seo_h1) {
+                $this->_seoName = $this->seo_h1;
+            } else {
+                $this->_seoName = $this->name;
+            }
         }
+
+        return $this->_seoName;
     }
 
 
@@ -895,6 +911,17 @@ class Tree extends ActiveRecord
     public function getIsActive()
     {
         return $this->active == 'Y';
+    }
+
+
+    /**
+     * Gets query for [[CmsSavedFilters]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSavedFilters()
+    {
+        return $this->hasMany(CmsSavedFilter::className(), ['cms_tree_id' => 'id']);
     }
 }
 

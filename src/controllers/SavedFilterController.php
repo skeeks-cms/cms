@@ -1,38 +1,40 @@
 <?php
 /**
- * @link https://cms.skeeks.com/
- * @copyright Copyright (c) 2010 SkeekS
- * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (�����)
+ * @date 14.04.2016
  */
 
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\models\Tree;
 use Yii;
 use yii\web\NotFoundHttpException;
 
 /**
- * @property CmsTree $model
  *
- * Class TreeController
- * @package skeeks\cms\controllers
+ * @property CmsSavedFilter $model
+ *
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class TreeController extends Controller
+class SavedFilterController extends Controller
 {
     /**
-     * @var CmsTree
+     * @var CmsSavedFilter
      */
     public $_model = false;
 
     public function init()
     {
         if ($this->model && \Yii::$app->cmsToolbar) {
-            $controller = \Yii::$app->createController('cms/admin-tree')[0];
+            $controller = \Yii::$app->createController('cms/admin-cms-saved-filter')[0];
             $adminControllerRoute = [
-                '/cms/admin-tree/update',
+                '/cms/admin-cms-saved-filter/update',
                 $controller->requestPkParamName => $this->model->{$controller->modelPkAttribute}
             ];
 
@@ -47,7 +49,7 @@ class TreeController extends Controller
     }
 
     /**
-     * @return array|bool|null|CmsTree|\yii\db\ActiveRecord
+     * @return array|bool|null|CmsSavedFilter
      */
     public function getModel()
     {
@@ -60,9 +62,8 @@ class TreeController extends Controller
             return false;
         }
 
-        $this->_model = \Yii::$app->cms->currentTree;
         if (!$this->_model) {
-            $this->_model = CmsTree::find()->where([
+            $this->_model = CmsSavedFilter::find()->where([
                 'id' => $id
             ])->one();
         }
@@ -81,33 +82,42 @@ class TreeController extends Controller
             throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Page not found'));
         }
 
-        \Yii::$app->cms->setCurrentTree($this->model);
-        \Yii::$app->breadcrumbs->setPartsByTree($this->model);
-
-        if ($this->model->redirect || $this->model->redirect_tree_id) {
-            return \Yii::$app->response->redirect($this->model->url, $this->model->redirect_code);
-        }
+        $cmsTree = $this->model->cmsTree;
+        \Yii::$app->cms->setCurrentTree($cmsTree);
+        \Yii::$app->breadcrumbs->setPartsByTree($cmsTree)->append([
+            'name' => $this->model->name,
+            'url' => $this->model->url,
+        ]);
 
         $viewFile = $this->action->id;
-        if ($this->model) {
-            if ($this->model->view_file) {
-                $viewFile = $this->model->view_file;
 
+        if ($cmsTree) {
+            if ($cmsTree->view_file) {
+                $viewFile = $cmsTree->view_file;
             } else {
-                if ($this->model->treeType) {
-                    if ($this->model->treeType->view_file) {
-                        $viewFile = $this->model->treeType->view_file;
+                if ($cmsTree->treeType) {
+                    if ($cmsTree->treeType->view_file) {
+                        $viewFile = $cmsTree->treeType->view_file;
                     } else {
-                        $viewFile = $this->model->treeType->code;
+                        $viewFile = $cmsTree->treeType->code;
                     }
                 }
             }
         }
 
+        $viewFile = "@app/views/modules/cms/tree/" . $viewFile;
+
         $this->_initStandartMetaData();
 
+        $cmsTree->description_short = $this->model->description_short;
+        $cmsTree->description_full = $this->model->description_full;
+
+        $cmsTree->name = $this->model->seoName;
+        $cmsTree->seoName = $this->model->seoName;
+
         return $this->render($viewFile, [
-            'model' => $this->model
+            'model' => $cmsTree,
+            'savedFilter' => $this->model
         ]);
     }
 
@@ -116,6 +126,9 @@ class TreeController extends Controller
      */
     protected function _initStandartMetaData()
     {
+        /**
+         * @var $model CmsSavedFilter
+         */
         $model = $this->model;
 
         //Заголовок
@@ -169,11 +182,10 @@ class TreeController extends Controller
 
         //Картика
         $imageAbsoluteSrc = null;
-        if ($model->image_id) {
+        if ($model->image) {
             $imageAbsoluteSrc = $model->image->absoluteSrc;
-        } elseif ($model->image_full_id) {
-            $imageAbsoluteSrc = $model->fullImage->absoluteSrc;
         }
+
         if ($imageAbsoluteSrc) {
             $this->view->registerMetaTag([
                 'property' => 'og:image',

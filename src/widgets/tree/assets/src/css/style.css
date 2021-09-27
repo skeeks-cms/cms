@@ -1,24 +1,3 @@
-.sx-tree ul li.sx-tree-node .row .sx-label-node.level-0
-{
-    background: url("../images/icon.domik.png") no-repeat 2px 2px !important;
-}
-
-.sx-tree ul li.sx-tree-node .row .sx-label-node
-{
-    background: url("../images/ico-folder-blue.png") no-repeat 2px 3px;
-    padding-top: 0px;
-}
-
-.sx-tree ul li.sx-tree-node.open > .row > .sx-label-node
-{
-    background: url("../images/ico-folder-open-blue.png") no-repeat 2px 3px;
-}
-
-.sx-tree ul li.sx-tree-node .row
-{
-    height: 24px;
-    /*cursor: move;*/
-}
 
 
 .sx-tree ul li.sx-tree-node .row:hover
@@ -56,9 +35,9 @@
 
 
 
-.sx-tree
+.cms-tree-wrapper
 {
-    margin-left: 15px;
+    margin-left: 23px;
 }
 .sx-tree ul
 {
@@ -147,8 +126,8 @@
 
     .sx-tree ul li.sx-tree-node .sx-label-node
     {
-        float: left;
-        padding-left: 23px;
+        /*float: left;
+        padding-left: 23px;*/
     }
 
         .sx-tree ul li.sx-tree-node .sx-label-node > a
@@ -158,7 +137,8 @@
             color: #000000;
         }
 
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > a
+        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > a,
+        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > i
         {
             color: silver;
         }
@@ -166,4 +146,26 @@
 .sx-tree-move
 {
     cursor: move;
+}
+
+
+.sx-tree-search input {
+    background: #f3f3f3;
+}
+
+.sx-tree-search input,
+.sx-tree-search button {
+    font-size: 12px;
+    height: 26px;
+}
+
+.sx-tree-search {
+    position: relative;
+}
+
+.sx-tree-search .btn-search {
+    position: absolute;
+    top:0;
+    right: 0;
+    padding: 3px;
 }

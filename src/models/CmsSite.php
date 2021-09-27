@@ -156,7 +156,7 @@ class CmsSite extends ActiveRecord
 
     public function createTreeAfterInsert(Event $e)
     {
-        $tree = new Tree([
+        $tree = new CmsTree([
             'name' => 'Главная страница',
         ]);
 
@@ -232,7 +232,10 @@ class CmsSite extends ActiveRecord
                 ['image_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'svg'],
+                'mimeTypes' => [
+                    'image/*'
+                ],
+                //'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'svg'],
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 2,
                 'minSize'     => 1024,
@@ -242,7 +245,10 @@ class CmsSite extends ActiveRecord
                 ['favicon_storage_file_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'ico', 'svg'],
+                //'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'ico', 'svg'],
+                'mimeTypes' => [
+                    'image/*'
+                ],
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 2,
                 //'minSize'     => 1024,
@@ -473,6 +479,9 @@ class CmsSite extends ActiveRecord
         $last = 'x-icon';
         if (in_array($extension, ["png", "jpeg", "gif", "bmp"])) {
             $last = $extension;
+        }
+        if (in_array($extension, ["svg"])) {
+            $last = "svg+xml";
         }
         return "image/".$last;
     }

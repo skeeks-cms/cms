@@ -9,8 +9,11 @@
 namespace skeeks\cms\components\urlRules;
 
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentElementProperty;
+use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsSite;
-use skeeks\cms\models\Tree;
+use skeeks\cms\models\CmsTree;
 use \yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -20,7 +23,7 @@ use yii\web\Application;
  * Class UrlRuleContentElement
  * @package skeeks\cms\components\urlRules
  */
-class UrlRuleContentElement
+class UrlRuleSavedFilter
     extends \yii\web\UrlRule
 {
 
@@ -45,30 +48,20 @@ class UrlRuleContentElement
      */
     public function createUrl($manager, $route, $params)
     {
-        if ($route == 'cms/content-element/view') {
-            $contentElement = $this->_getElement($params);
+        if ($route == 'cms/saved-filter/view') {
 
-            if (!$contentElement) {
+            $savedFilter = $this->_getElement($params);
+
+            if (!$savedFilter) {
                 return false;
             }
-
-            $url = '';
 
             $cmsTree = ArrayHelper::getValue($params, 'cmsTree');
             ArrayHelper::remove($params, 'cmsTree');
             $cmsSite = ArrayHelper::getValue($params, 'cmsSite', null);
             ArrayHelper::remove($params, 'cmsSite');
-            //We need to build on what that particular section of the settings
-            /*if (!$cmsTree) {
-                $cmsTree = $contentElement->cmsTree;
-            }*/
 
-            if ($cmsTree) {
-                $url = $cmsTree->dir . "/";
-            }
-
-            //$url .= $contentElement->id . "-" . $contentElement->code;
-            $url .= $contentElement->code . '-' . $contentElement->id;
+            $url = $savedFilter->code . '-f' . $savedFilter->id;
 
 
             if (strpos($url, '//') !== false) {
@@ -93,7 +86,7 @@ class UrlRuleContentElement
             //Раздел привязан к сайту, сайт может отличаться от того на котором мы сейчас находимся
             if (!$cmsSite) {
                 $siteClass = \Yii::$app->skeeks->siteClass;
-                $cmsSite = $siteClass::getById($contentElement->cms_site_id);
+                $cmsSite = $siteClass::getById($savedFilter->cms_site_id);
                 //$cmsSite = $contentElement->cmsSite;
             }
 
@@ -117,24 +110,24 @@ class UrlRuleContentElement
     protected function _getElement(&$params)
     {
         $id = (int)ArrayHelper::getValue($params, 'id');
-        $contentElement = ArrayHelper::getValue($params, 'model');
+        $savedFilter = ArrayHelper::getValue($params, 'model');
 
-        if (!$id && !$contentElement) {
+        if (!$id && !$savedFilter) {
             return false;
         }
 
-        if ($contentElement && $contentElement instanceof CmsContentElement) {
+        if ($savedFilter && $savedFilter instanceof CmsSavedFilter) {
             if (\Yii::$app instanceof Application) {
-                self::$models[$contentElement->id] = $contentElement;
+                self::$models[$savedFilter->id] = $savedFilter;
             }
         } else {
             /**
-             * @var $contentElement CmsContentElement
+             * @var $savedFilter CmsSavedFilter
              */
-            if (!$contentElement = ArrayHelper::getValue(self::$models, $id)) {
-                $contentElement = CmsContentElement::findOne(['id' => $id]);
+            if (!$savedFilter = ArrayHelper::getValue(self::$models, $id)) {
+                $savedFilter = CmsSavedFilter::findOne(['id' => $id]);
                 if (\Yii::$app instanceof Application) {
-                    self::$models[$id] = $contentElement;
+                    self::$models[$id] = $savedFilter;
                 }
             }
         }
@@ -143,7 +136,7 @@ class UrlRuleContentElement
         ArrayHelper::remove($params, 'code');
         ArrayHelper::remove($params, 'model');
 
-        return $contentElement;
+        return $savedFilter;
     }
 
     /**
@@ -179,21 +172,9 @@ class UrlRuleContentElement
             $pathInfo = substr($pathInfo, 0, strlen($pathInfo) - strlen($suffix));
         }
 
-        if (preg_match('/\/(?<code>\S+)\-(?<id>\d+)$/i', "/" . $pathInfo, $matches)) {
+        if (preg_match('/\/(?<code>\S+)\-f(?<id>\d+)$/i', "/" . $pathInfo, $matches)) {
             return [
-                'cms/content-element/view', [
-                    'id' => $matches['id'],
-                    'code' => $matches['code']
-                ]
-            ];
-        }
-
-        /**
-         * @deprecated 
-         */
-        if (preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
-            return [
-                'cms/content-element/view', [
+                'cms/saved-filter/view', [
                     'id' => $matches['id'],
                     'code' => $matches['code']
                 ]
@@ -201,12 +182,6 @@ class UrlRuleContentElement
         }
 
         return false;
-        /*if (!preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
-            return false;
-        }*/
-
-
-        
     }
 
 

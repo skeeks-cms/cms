@@ -15,6 +15,21 @@ $action = $controller->action;
 $model->load(\Yii::$app->request->get());
 ?>
 <?php $form = $action->beginActiveForm(); ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Важное')); ?>
+<?= $form->field($model, 'is_active')->checkbox([], false); ?>
+<?= $form->field($model, 'is_have_page')->checkbox([], false); ?>
+
+<?= $form->field($model, 'saved_filter_tree_type_id')->widget(
+    \skeeks\cms\widgets\Select::class, [
+        'options' => [
+            'multiple' => false,
+        ],
+        'data'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'asText'),
+    ]
+); ?>
+
+<? $fieldSet::end(); ?>
+
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
 <?php if ($model->content_type) : ?>
@@ -27,7 +42,6 @@ $model->load(\Yii::$app->request->get());
     ?>
 <?php endif; ?>
 
-<?= $form->field($model, 'is_active')->checkbox([], false); ?>
 <?= $form->field($model, 'name'); ?>
 <?= $form->field($model, 'code'); ?>
 
@@ -36,7 +50,6 @@ $model->load(\Yii::$app->request->get());
 
 
 <?= $form->field($model, 'is_visible')->checkbox([], false); ?>
-<?= $form->field($model, 'is_have_page')->checkbox([], false); ?>
 <?
 $element = new \skeeks\cms\models\CmsContentElement();
 $items = [
@@ -70,6 +83,16 @@ echo $form->field($model, 'editable_fields')->widget(
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/cms', 'Link to section'),
 ]); ?>
+
+
+<?= $form->field($model, 'cms_tree_type_id')->widget(
+    \skeeks\cms\widgets\Select::class, [
+        'options' => [
+            'multiple' => false,
+        ],
+        'data'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'asText'),
+    ]
+); ?>
 
 <?= $form->field($model, 'default_tree_id')->widget(
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class

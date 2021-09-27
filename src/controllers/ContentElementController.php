@@ -11,7 +11,10 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\filters\CmsAccessControl;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
@@ -120,6 +123,89 @@ class ContentElementController extends Controller
 
         return parent::beforeAction($action);
     }
+
+    protected function _getSavedFilter()
+    {
+        $contentElement = $this->model;
+        if (!$contentElement->cmsContent) {
+            return false;
+        }
+
+
+        if (!$contentElement->cmsContent->saved_filter_tree_type_id) {
+            return false;
+        }
+
+        $mainCmsTree = CmsTree::find()
+            ->cmsSite()
+            ->andWhere(['tree_type_id' => $contentElement->cmsContent->saved_filter_tree_type_id])
+            ->orderBy(['level' => SORT_ASC, 'priority' => SORT_ASC])
+            ->limit(1)
+            ->one();
+
+        if (!$mainCmsTree) {
+            return false;
+        }
+
+        $savedFilter = CmsSavedFilter::find()->cmsSite()
+            ->andWhere([
+                'cms_tree_id' => $mainCmsTree->id,
+            ])
+            ->andWhere([
+                'value_content_element_id' => $contentElement->id,
+            ])
+            ->one();
+        ;
+
+        if ($savedFilter) {
+            return $savedFilter;
+        }
+
+        //Создать сохраненный фильтр
+        //Нужно определить свойство в этом разделе
+            $q = CmsContentProperty::find()->cmsSite();
+
+            $q->joinWith('cmsContentProperty2trees as map2trees')
+                ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
+
+            $q->andWhere([
+                'or',
+                ['map2trees.cms_tree_id' => $mainCmsTree->id],
+                ['map2trees.cms_tree_id' => null],
+            ]);
+            $q->orderBy(['priority' => SORT_ASC])
+            ;
+        /**
+         * @var $cmsContentProperty CmsContentProperty
+         */
+        $property = null;
+        foreach ($q->each(10) as $cmsContentProperty)
+        {
+            if ($cmsContentProperty->property_type == PropertyType::CODE_ELEMENT) {
+                if ($cmsContentProperty->handler->content_id == $contentElement->cmsContent->id) {
+                    $property = $cmsContentProperty;
+                    break;
+                }
+            }
+        }
+
+        if ($property) {
+            $savedFilter = new CmsSavedFilter();
+            $savedFilter->cms_tree_id = $mainCmsTree->id;
+            $savedFilter->value_content_element_id = $contentElement->id;
+
+            $savedFilter->cms_content_property_id = $property->id;
+            if (!$savedFilter->save()) {
+                $savedFilter = null;
+            }
+            
+            return $savedFilter;
+        }
+            
+
+
+        return false;
+    }
     /**
      * @return $this|string
      * @throws NotFoundHttpException
@@ -133,6 +219,7 @@ class ContentElementController extends Controller
         $contentElement = $this->model;
         $tree = $contentElement->cmsTree;
 
+        $this->_getSavedFilter();
 
         //TODO: Может быть не сбрасывать GET параметры
         if (Url::isRelative($contentElement->url)) {
@@ -145,6 +232,7 @@ class ContentElementController extends Controller
             if ($contentElement->getUrl(true) != $url) {
                 $url = $contentElement->getUrl(true);
                 \Yii::$app->response->redirect($url, 301);
+                \Yii::$app->end();
             }
         } else {
 
@@ -158,6 +246,7 @@ class ContentElementController extends Controller
                 if (ArrayHelper::getValue($urlData, 'path') != ArrayHelper::getValue($requestUrlData, 'path')) {
                     $url = $contentElement->getUrl(true);
                     \Yii::$app->response->redirect($url, 301);
+                    \Yii::$app->end();
                 }
             }
         }
@@ -197,7 +286,10 @@ class ContentElementController extends Controller
             if ($cmsContent->is_count_views) {
                 $model = $this->model;
                 $model->show_counter = $model->show_counter + 1;
-                $model->update(false, ['show_counter']);
+
+                //TODO:это сбрасывает кэш таблицы ActiveRecord.php
+                //$model->update(false, ['show_counter']);
+                CmsContentElement::updateAll(['show_counter' => $model->show_counter], ['id' => $model->id]);
             }
         }
 
@@ -219,34 +311,79 @@ class ContentElementController extends Controller
     {
         $model = $this->model;
 
-        if ($title = $model->meta_title) {
-            $this->view->title = $title;
-        } else {
+        //Заголовок
+        if (!$title = $model->meta_title) {
             if (isset($model->seoName)) {
-                $this->view->title = $model->seoName;
+                $title = $model->seoName;
             }
         }
 
+        $this->view->title = $title;
+        $this->view->registerMetaTag([
+            'property' => 'og:title',
+            'content'  => $title,
+        ], 'og:title');
+
+        //Ключевые слова
         if ($meta_keywords = $model->meta_keywords) {
             $this->view->registerMetaTag([
-                "name"    => 'keywords',
-                "content" => $meta_keywords,
+                "name" => 'keywords',
+                "content" => $meta_keywords
             ], 'keywords');
         }
 
+
+        //Описание
         if ($meta_descripption = $model->meta_description) {
-            $this->view->registerMetaTag([
-                "name"    => 'description',
-                "content" => $meta_descripption,
-            ], 'description');
+            $description = $meta_descripption;
+        } elseif ($model->description_short) {
+            $description = $model->description_short;
         } else {
             if (isset($model->name)) {
-                $this->view->registerMetaTag([
-                    "name"    => 'description',
-                    "content" => $model->name,
-                ], 'description');
+                if ($model->name != $model->seoName) {
+                    $description = $model->seoName;
+                } else {
+                    $description = $model->name;
+                }
             }
         }
+
+        $description = trim(strip_tags($description));
+
+        $this->view->registerMetaTag([
+            "name" => 'description',
+            "content" => $description
+        ], 'description');
+
+        $this->view->registerMetaTag([
+            'property' => 'og:description',
+            'content'  => $description,
+        ], 'og:description');
+
+        //Картика
+        $imageAbsoluteSrc = null;
+        if ($model->image_id) {
+            $imageAbsoluteSrc = $model->image->absoluteSrc;
+        } elseif ($model->image_full_id) {
+            $imageAbsoluteSrc = $model->fullImage->absoluteSrc;
+        }
+        if ($imageAbsoluteSrc) {
+            $this->view->registerMetaTag([
+                'property' => 'og:image',
+                'content'  => $imageAbsoluteSrc,
+            ], 'og:image');
+        }
+
+
+        $this->view->registerMetaTag([
+            'property' => 'og:url',
+            'content'  => $model->getUrl(true),
+        ], 'og:url');
+
+        $this->view->registerMetaTag([
+            'property' => 'og:type',
+            'content'  => 'article',
+        ], 'og:type');
 
         return $this;
     }

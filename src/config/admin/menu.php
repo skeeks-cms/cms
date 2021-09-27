@@ -252,6 +252,12 @@ return array_merge(dashboardsMenu(), [
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
                 ],
 
+                [
+                    "label" => \Yii::t('skeeks/cms', "Сохраненные фильтры"),
+                    "url"   => ["cms/admin-cms-saved-filter"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+                ],
+
 
             ], contentMenu()),
         ],
@@ -332,12 +338,12 @@ return array_merge(dashboardsMenu(), [
 
         'items' =>
             [
-                /*[
+                [
                     "label" => \Yii::t('skeeks/cms', 'Sites'),
                     "url"   => ["/cms/admin-cms-site"],
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
 
-                ],*/
+                ],
 
 
                 [
@@ -454,12 +460,12 @@ return array_merge(dashboardsMenu(), [
             ],
     ],
 
-    'sites' => [
+    /*'sites' => [
         'priority' => 310,
         'label'    => \Yii::t('skeeks/cms', 'Sites'),
         "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
         "url"      => ["/cms/admin-cms-site"],
-    ],
+    ],*/
 
 
     'other' =>

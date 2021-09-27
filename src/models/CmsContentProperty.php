@@ -95,15 +95,18 @@ class CmsContentProperty extends RelatedPropertyModel
         $rules = ArrayHelper::merge(parent::rules(), [
             [['cmsContents'], 'safe'],
             [['cmsTrees'], 'safe'],
-            [['code'], 'unique'],
+            [['code', 'cms_site_id'], 'unique', 'targetAttribute' => ['code', 'cms_site_id']],
             [['cms_site_id'], 'integer'],
             [['cms_site_id'], 'default', 'value' => function() {
 
-                if (\Yii::$app->skeeks->site->is_default) {
+                if (\Yii::$app->skeeks->site) {
+                    return \Yii::$app->skeeks->site->id;
+                }
+                /*if (\Yii::$app->skeeks->site->is_default) {
                     return null;
                 } else {
                     return \Yii::$app->skeeks->site->id;
-                }
+                }*/
             }],
 
 

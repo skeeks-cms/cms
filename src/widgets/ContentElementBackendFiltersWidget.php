@@ -140,16 +140,32 @@ class ContentElementBackendFiltersWidget extends FiltersWidget
                                 return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
                             },
                         ],
+                        'on apply' => function (QueryFiltersEvent $e) use ($property) {
+                            /**
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->dataProvider->query;
+
+                            if ($e->field->value) {
+                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                    ->where([
+                                        "value_enum"  => $e->field->value,
+                                        "property_id" => $property->id,
+                                    ]);
+
+                                $query->andWhere([
+                                    CmsContentElement::tableName().".id" => $query1,
+                                ]);
+                            }
+                        }
                     ];
 
 
-                    $autoFilters["property{$property->id}"]['label'] = $property->name;
+                    /*$autoFilters["property{$property->id}"]['label'] = $property->name;
                     $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
                         /**
                          * @var $query ActiveQuery
-                         */
                         $query = $e->dataProvider->query;
-
 
                         if ($e->field->value) {
                             $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
@@ -162,7 +178,7 @@ class ContentElementBackendFiltersWidget extends FiltersWidget
                                 CmsContentElement::tableName().".id" => $query1,
                             ]);
                         }
-                    };
+                    };*/
 
 
                 } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
@@ -182,13 +198,32 @@ class ContentElementBackendFiltersWidget extends FiltersWidget
                             },
                         ],
 
+                        'on apply' => function (QueryFiltersEvent $e) use ($property) {
+                            /**
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->dataProvider->query;
+
+
+                            if ($e->field->value) {
+                                $query1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                    ->where([
+                                        "value_enum"  => $e->field->value,
+                                        "property_id" => $property->id,
+                                    ]);
+
+                                $query->andWhere([
+                                    CmsContentElement::tableName().".id" => $query1,
+                                ]);
+                            }
+                        }
+
                     ];
 
-                    $autoFilters["property{$property->id}"]["label"] = $property->name;
+                    /*$autoFilters["property{$property->id}"]["label"] = $property->name;
                     $autoFilters["property{$property->id}"]["on apply"] = function (QueryFiltersEvent $e) use ($property) {
                         /**
                          * @var $query ActiveQuery
-                         */
                         $query = $e->dataProvider->query;
 
 
@@ -203,7 +238,7 @@ class ContentElementBackendFiltersWidget extends FiltersWidget
                                 CmsContentElement::tableName().".id" => $query1,
                             ]);
                         }
-                    };
+                    };*/
 
 
                 } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_TREE) {
