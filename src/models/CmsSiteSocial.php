@@ -27,6 +27,7 @@ use yii\helpers\ArrayHelper;
  * @property int         $priority
  *
  * @property CmsSite     $cmsSite
+ * @property string      $iconCode
  */
 class CmsSiteSocial extends ActiveRecord
 {
@@ -38,6 +39,7 @@ class CmsSiteSocial extends ActiveRecord
     const SOCIAL_WHATSAPP = 'whatsapp';
     const SOCIAL_TELEGRAM = 'telegram';
     const SOCIAL_OTHER = 'other';
+    const SOCIAL_PINTEREST = 'pinterest';
 
     /**
      * @inheritdoc
@@ -60,6 +62,7 @@ class CmsSiteSocial extends ActiveRecord
             self::SOCIAL_OK        => 'Одноклассники',
             self::SOCIAL_TELEGRAM  => 'Telegram',
             self::SOCIAL_WHATSAPP  => 'WatsApp',
+            self::SOCIAL_PINTEREST => 'Pinterest',
             self::SOCIAL_OTHER     => 'Другое',
         ];
     }
@@ -126,5 +129,11 @@ class CmsSiteSocial extends ActiveRecord
     public function getCmsSite()
     {
         return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
+    }
+
+
+    public function getIconCode()
+    {
+        return $this->social_type == self::SOCIAL_OTHER ? 'fas fa-external-link-alt' : "fab fa-".$this->social_type;
     }
 }
