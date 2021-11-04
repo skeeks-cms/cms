@@ -489,6 +489,9 @@ class ContentElementsCmsWidget extends WidgetRenderable
             'tags' => [
                 $this->className().(string)$this->namespace,
                 (new CmsContentElement())->getTableCacheTagCmsSite(),
+                $this->namespace,
+                $this->cmsUser ? $this->cmsUser->cacheTag : '',
+                $this->cmsSite ? $this->cmsSite->cacheTag : '',
             ],
         ]);
 

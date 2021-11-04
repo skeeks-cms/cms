@@ -751,7 +751,7 @@ class AdminUserController extends BackendModelStandartController
             $cmsSite = CmsSite::find()->where(['id' => $site_id])->one();
 
             $manager = new CmsManager(['cmsSite' => $cmsSite]);
-            foreach (\Yii::$app->cms->registerRoles as $roleCode) {
+            foreach ((array) \Yii::$app->cms->registerRoles as $roleCode) {
                 if (!$manager->getAssignment($roleCode, $model->id)) {
                     $manager->assign($manager->getRole($roleCode), $model->id);
                 }
