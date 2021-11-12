@@ -19,7 +19,6 @@ class GridViewAsset extends AssetBundle
 
     public $css = [
         'grid.css',
-        'table.css',
     ];
 
     public $js = [];
