@@ -14,21 +14,24 @@ $widget = $this->context;
 
 <div class="row">
     <div class="col-md-12">
-        <ul class="sx-selected">
-            <?php if ($widget->sections) : ?>
-                <?php foreach ($widget->sections as $tree) : ?>
-                    <li data-id="<?= $tree->id; ?>">
-                        <a href="<?= $tree->url; ?>" target="_blank" data-pjax="0">
-                            <?= $widget->getNodeName($tree); ?>
-                        </a>
-                        <a href="#" class="sx-close-btn pull-right"><i class="fa fa-times"></i></a>
-                    </li>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </ul>
+        <div class="sx-selected-tree-input">
+            <ul class="sx-selected">
+                <?php if ($widget->sections) : ?>
+                    <?php foreach ($widget->sections as $tree) : ?>
+                        <li data-id="<?= $tree->id; ?>">
+                            <div class="sx-selected-value" data-href="<?= $tree->url; ?>" title="<?= $widget->getNodeName($tree); ?>">
+                                <?= $tree->name; ?>
+                            </div>
+                            <div class="sx-close-btn pull-right">×</div>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        </div>
     </div>
 
-    <div class="col-md-12">
+    <?php /*echo $widget->sections ? "style='display: none;'" : ""; */?>
+    <div class="col-md-12 sx-select-tree" style='display: none;'>
         <div class="col-md-12 sx-select-tree-widget">
             <?php $treeWidgetClass = $widget->treeWidgetClass; ?>
             <?php $widgetTree = $treeWidgetClass::begin($widget->treeWidgetOptions); ?>

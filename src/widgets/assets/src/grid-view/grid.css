@@ -163,9 +163,14 @@
     }
 
     table.sx-table > tbody > tr.sx-active td {
-        background-color: #4caf5021;
+        background-color: #f2f8ff;
     }
 
     table.sx-table > tbody > tr.sx-active:hover td {
-        background-color: #4caf502e;
+        background-color: #d8ebff;
+    }
+
+    table.sx-table td {
+        border-top: 0.8px solid rgb(34 36 38 / 7%);
+        vertical-align: middle;
     }

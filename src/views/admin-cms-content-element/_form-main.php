@@ -57,9 +57,7 @@
     <?php endif; ?>
 <?php endif; ?>
 
-<? if ($contentModel->isAllowEdit("external_id")) : ?>
-    <?= $form->field($model, 'external_id'); ?>
-<? endif; ?>
+
 
 
 <?

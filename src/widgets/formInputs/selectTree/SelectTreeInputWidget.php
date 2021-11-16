@@ -103,6 +103,12 @@ class SelectTreeInputWidget extends InputWidget
      */
     public function run()
     {
+        Html::addCssClass($this->wrapperOptions, "sx-select-tree-input-widget");
+        if ($this->multiple) {
+            Html::addCssClass($this->wrapperOptions, "sx-multi-mode");
+        } else {
+            Html::addCssClass($this->wrapperOptions, "sx-single-mode");
+        }
         $value = $this->model->{$this->attribute};
         $items = $value;
         if ($value && is_string($value) || is_int($value)) {

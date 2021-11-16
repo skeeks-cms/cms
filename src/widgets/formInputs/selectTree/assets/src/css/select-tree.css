@@ -5,29 +5,63 @@
 
 .sx-selected
 {
-    margin-bottom: 10px;
+    margin-bottom: 0px;
+    list-style: none;
+    padding-left: 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background: white;
+    min-height: 33px;
+    line-height: 21px;
 }
 
 .sx-selected .sx-close-btn
 {
-    display: none;
-    color: red;
+    color: black;
+    font-size: 16px;
+    opacity: 0.5;
+    margin-left: 20px;
 }
 
+.sx-selected .sx-close-btn:hover
+{
+    opacity: 0.7;
+}
+
+.sx-selected li a {
+    overflow: hidden;
+    white-space: nowrap;
+}
 .sx-selected li
 {
-    padding: 5px;
+    padding: 5px 10px;
     font-size: 14px;
-    font-weight: bold;
+    /*font-weight: bold;*/
+    /*background: white;*/
+    display: flex;
 
 }
 
-.sx-selected li:hover
-{
-    background: rgba(192, 192, 192, 0.14);
+.sx-single-mode .sx-selected-value {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.sx-selected li:hover .sx-close-btn
-{
-    display: block;
+.sx-select-tree {
+    padding-top: 10px;
+}
+
+.sx-multi-mode .sx-selected li {
+    display: inline-flex;
+    padding: 0.05rem 0.25rem 0.05rem 0.25rem;
+    color: #555;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    margin: 2px;
+}
+.sx-multi-mode .sx-selected .sx-close-btn {
+    margin-left: 6px;
 }
