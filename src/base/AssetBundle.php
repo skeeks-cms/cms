@@ -34,6 +34,11 @@ class AssetBundle extends \yii\web\AssetBundle
         $this->js = (array)$this->js;
         $this->css = (array)$this->css;
 
+        //Если есть css нормально не работает
+        if ($this->css) {
+            return $this;
+        }
+
         if (count($this->js) <= 1 && count($this->css) <= 1) {
             return $this;
         }
