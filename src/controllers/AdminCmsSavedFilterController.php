@@ -23,6 +23,7 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -55,6 +56,17 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
+                    
+                    'on init'       => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $dataProvider = $e->sender->dataProvider;
+                        $query->cmsSite();
+                    },
+                    
                     'defaultOrder' => [
                         'priority' => SORT_ASC,
                         'id' => SORT_DESC,
