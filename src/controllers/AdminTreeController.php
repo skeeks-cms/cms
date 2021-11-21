@@ -44,13 +44,13 @@ class AdminTreeController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelHeader = function () {
             $model = $this->model;
-            return Html::tag('h1', $model->asText.Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
+            return Html::tag("div", $model->fullName, [
+                    'style' => 'font-size: 14px; margin-bottom: 0px; color: gray;',
+                ]).Html::tag('h1', $model->asText.Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
                         'target' => "_blank",
                         'class'  => "g-ml-20",
                         'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                    ]), ['style' => "margin-bottom: 0px;",]).Html::tag("div", $model->fullName, [
-                    'style' => 'font-size: 20px; margin-bottom: 10px; color: gray;',
-                ]);
+                    ]));
         };
         $this->modelClassName = Tree::className();
 

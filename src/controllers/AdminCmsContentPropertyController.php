@@ -530,6 +530,24 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
         if ($model->isNewRecord) {
             $model->cms_site_id = \Yii::$app->skeeks->site->id;
         }
+        
+        $isChange = true;
+        $changeOptions = [];
+        $message = 'От этого зависит как будет показываться свойство в форме редактирования.';
+
+        if (!$model->isNewRecord) {
+            if ($model->property_type == PropertyType::CODE_LIST) {
+                if ($model->getEnums()->one()) {
+                    $isChange = false;
+                    $message = 'Нельзя менять тип характеристики, потому что у нее уже созданы опции.';
+                }
+            }
+        }
+        if (!$isChange) {
+            $changeOptions = [
+                'disabled' => "disabled",
+            ];
+        }
 
         $result = [
             'main' => [
@@ -560,18 +578,17 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                     'component'        => [
                         'class'          => SelectField::class,
-                        'elementOptions' => [
+                        'elementOptions' => ArrayHelper::merge([
                             'data' => [
                                 'form-reload' => 'true',
                             ],
-                        ],
-                        /*'options' => [
-                            'class' => 'teat'
-                        ],*/
+                        ], $changeOptions),
                         'items'          => function () {
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
                         },
+                        'hint' => $message
                     ],
+                    
                     'cms_measure_code' => [
                         'class' => SelectField::class,
                         /*'elementOptions' => [
