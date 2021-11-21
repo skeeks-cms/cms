@@ -414,12 +414,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     $time = \Yii::$app->formatter->asRelativeTime($model->published_at);
                                     $dateTime = \Yii::$app->formatter->asDatetime($model->published_at);
                                     return <<<HTML
-<span class="fa fa-check text-success" title=""></span> <small title="{$dateTime}">{$time}</small>
+<span class="text-success" title="">✓</span> <small title="{$dateTime}">{$time}</small>
 HTML;
 
                                 } else {
                                     return <<<HTML
-<span class="fa fa-times text-danger" title=""></span>
+<span class="text-danger" title="">x</span>
 HTML;
                                 }
                             },

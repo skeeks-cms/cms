@@ -314,7 +314,7 @@ class Tree extends ActiveRecord
             'description_full'       => Yii::t('skeeks/cms', 'Description Full'),
             'description_short_type' => Yii::t('skeeks/cms', 'Description Short Type'),
             'description_full_type'  => Yii::t('skeeks/cms', 'Description Full Type'),
-            'image_id'               => Yii::t('skeeks/cms', 'Main Image (announcement)'),
+            'image_id'               => Yii::t('skeeks/cms', 'Image'),
             'image_full_id'          => Yii::t('skeeks/cms', 'Main Image'),
             'images'                 => Yii::t('skeeks/cms', 'Images'),
             'imageIds'               => Yii::t('skeeks/cms', 'Images'),

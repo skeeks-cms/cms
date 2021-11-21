@@ -469,7 +469,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             'enums' => [
                 'class'           => BackendGridModelRelatedAction::class,
                 'accessCallback'  => true,
-                'name'            => "Элементы списка",
+                'name'            => "Опции",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-content-property-enum",
                 'relation'        => ['property_id' => 'id'],
@@ -620,6 +620,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             'captions' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
+                'elementOptions' => ['isOpen' => false],
                 'fields' => [
 
                     'is_active' => [

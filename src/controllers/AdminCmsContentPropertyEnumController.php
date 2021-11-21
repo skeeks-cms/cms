@@ -13,6 +13,7 @@ use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsTreeTypeProperty;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
@@ -33,7 +34,7 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $this->name = \Yii::t('skeeks/cms', 'Managing property values');
         $this->modelShowAttribute = "value";
         $this->modelClassName = CmsContentPropertyEnum::class;
-        
+
         $this->generateAccessActions = false;
 
         //$this->generateAccessActions = false;
@@ -50,7 +51,7 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
     static public function initGridQuery($query)
     {
         $subQuery = CmsContentElementProperty::find()->select([new Expression("count(1)")])->where([
-            'value_enum_id' => new Expression(CmsContentPropertyEnum::tableName().".id")
+            'value_enum_id' => new Expression(CmsContentPropertyEnum::tableName().".id"),
         ]);
 
         if (!\Yii::$app->skeeks->site->is_default) {
@@ -59,7 +60,7 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
             $query->andWhere([
                 'or',
                 ['property.cms_site_id' => \Yii::$app->skeeks->site->id],
-                ['property.cms_site_id' => null]
+                ['property.cms_site_id' => null],
             ]);
         }
 
@@ -70,15 +71,51 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
             'countElementProperties' => $subQuery,
         ]);
     }
-    
+
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
-            'index' => [
+            'index'  => [
                 'filters' => [
                     'visibleFilters' => [
-                        'value',
-                        'property_id',
+                        'q',
+                        //'property_id',
+                    ],
+
+                    'filtersModel' => [
+                        'rules' => [
+                            ['q', 'safe'],
+                        ],
+
+                        'attributeDefines' => [
+                            'q',
+                        ],
+
+                        'fields' => [
+                            'q' => [
+                                'label'          => 'Поиск',
+                                'elementOptions' => [
+                                    'placeholder' => 'Поиск',
+                                ],
+                                'on apply'       => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        $query->andWhere([
+                                            'or',
+                                            ['like', CmsContentPropertyEnum::tableName().'.value', $e->field->value],
+                                            ['like', CmsContentPropertyEnum::tableName().'.code', $e->field->value],
+                                            ['like', CmsContentPropertyEnum::tableName().'.id', $e->field->value],
+                                        ]);
+
+                                        $query->groupBy([CmsContentPropertyEnum::tableName().'.id']);
+                                    }
+                                },
+                            ],
+                        ],
                     ],
                 ],
                 'grid'    => [
@@ -93,7 +130,7 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                         //$query->joinWith('elementProperties as elementProperties');
                         self::initGridQuery($query);
                     },
-                    
+
                     'sortAttributes' => [
                         'countElementProperties' => [
                             'asc'     => ['countElementProperties' => SORT_ASC],
@@ -102,23 +139,24 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                             'default' => SORT_ASC,
                         ],
                     ],
-                    
-                    'defaultOrder'   => [
+
+                    'defaultOrder' => [
                         //'def' => SORT_DESC,
                         'priority' => SORT_ASC,
                     ],
-                    
+
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
-                        'id',
+                        //'id',
                         'value',
                         'property_id',
-                        'code',
-                        'priority',
+                        //'code',
                         'countElementProperties',
+                        'priority',
+
                     ],
-                    'columns' => [
+                    'columns'        => [
                         'value' => [
                             'attribute' => "value",
                             'format'    => "raw",
@@ -128,16 +166,25 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                                 ]);
                             },
                         ],
-                        
+
+                        'priority' => [
+                            'headerOptions' => [
+                                'style' => 'width: 95px;',
+                            ],
+                        ],
+
                         'countElementProperties' => [
-                            'attribute' => 'countElementProperties',
-                            'format'    => 'raw',
-                            'label'     => \Yii::t('skeeks/cms', 'Где заполнена опция'),
-                            'value'     => function (CmsContentPropertyEnum $model) {
+                            'headerOptions' => [
+                                'style' => 'width: 95px;',
+                            ],
+                            'attribute'     => 'countElementProperties',
+                            'format'        => 'raw',
+                            'label'         => \Yii::t('skeeks/cms', 'Где заполнена опция'),
+                            'value'         => function (CmsContentPropertyEnum $model) {
                                 return isset($model->raw_row['countElementProperties']) ? $model->raw_row['countElementProperties'] : "";
                             },
                         ],
-                    ]
+                    ],
                 ],
             ],
             'create' => [
@@ -169,21 +216,21 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         } else {
             $qProperty->andWhere([
                 'or',
-                [CmsContentProperty::tableName() . '.cms_site_id' => \Yii::$app->skeeks->site->id],
-                [CmsContentProperty::tableName() . '.cms_site_id' => null]
+                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                [CmsContentProperty::tableName().'.cms_site_id' => null],
             ]);
         }
 
         if ($model->property_id && $model->isNewRecord) {
             $result = [
                 [
-                    'class' => HtmlBlock::class,
-                    'content' => "<div style='display: none;'>"
+                    'class'   => HtmlBlock::class,
+                    'content' => "<div style='display: none;'>",
                 ],
                 'property_id',
                 [
-                    'class' => HtmlBlock::class,
-                    'content' => "</div>"
+                    'class'   => HtmlBlock::class,
+                    'content' => "</div>",
                 ],
                 'value',
                 'code',
@@ -201,11 +248,11 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                         $qProperty->all(),
                         "id",
                         "name"
-                    )
+                    ),
                 ],
                 'value',
                 'code',
-                'priority' => [
+                'priority'    => [
                     'class' => NumberField::class,
                 ],
             ];
