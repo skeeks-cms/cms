@@ -9,6 +9,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelAction;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
@@ -218,6 +219,20 @@ class AdminTreeController extends BackendModelStandartController
                 "priority" => 100,
             ],
 
+            "properties" => [
+                "priority"       => 150,
+                'name'      => "Характеристики",
+                'icon'      => "fa fa-list",
+                'class'          => BackendModelAction::class,
+
+                'accessCallback' => function($action) {
+                    if (!$action->model) {
+                        return false;
+                    }
+                    return \skeeks\cms\models\CmsContent::find()->andWhere(['cms_tree_type_id' => $action->model->tree_type_id])->exists();
+                }
+            ],
+
             "move" => [
                 "priority"       => 200,
                 'class'          => BackendModelUpdateAction::class,
@@ -328,8 +343,9 @@ class AdminTreeController extends BackendModelStandartController
                 },
             ],
 
-
         ]);
+
+
 
         unset($actions['create']);
 

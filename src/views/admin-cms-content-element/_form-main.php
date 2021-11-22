@@ -70,7 +70,7 @@ $properties = $model->getRelatedProperties()->all();
 ?>
 <?php if ($properties) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/cms', 'Additional properties'),
+        'content' => \Yii::t('skeeks/cms', 'Характеристики'),
     ]); ?>
     <?
     $this->registerCss(<<<CSS
@@ -90,7 +90,7 @@ $properties = $model->getRelatedProperties()->all();
     position: absolute;
     top: 50%;
     transform: translateX(-50%) translateY(-50%);
-    left: 5px;
+    left: 15px;
     z-index: 999;
 }
 CSS
@@ -120,7 +120,7 @@ CSS
                                 'property_id' => $property->id,
                             ]);
 
-                            $actionCreate->name = \Yii::t("skeeks/cms", "Create");
+                            $actionCreate->name = \Yii::t("skeeks/cms", "Добавить опцию");
 
                             /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
                                 'actions' => ['create' => $actionCreate],
@@ -192,7 +192,7 @@ JS
                                     'content_id' => $property->handler->content_id,
                                 ]);
 
-                                $actionCreate->name = \Yii::t("skeeks/cms", "Create");
+                                $actionCreate->name = \Yii::t("skeeks/cms", "Добавить опцию");
 
                                 /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
                                     'actions' => ['create' => $actionCreate],
@@ -283,10 +283,7 @@ JS
         ?>
     <?php endforeach; ?>
 
-<?php else
-    : ?>
+<?php else : ?>
     <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
-<?php
-endif;
-?>
+<?php endif; ?>
 <? $fieldSet::end(); ?>
