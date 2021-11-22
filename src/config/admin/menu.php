@@ -408,6 +408,12 @@ return array_merge(dashboardsMenu(), [
                             'url'   => ["cms/admin-cms-content-property-enum"],
                             'label' => \Yii::t('skeeks/cms', "Options"),
                         ],
+
+                        [
+                            'url'   => ["cms/admin-cms-content"],
+                            'label' => \Yii::t('skeeks/cms', "Типы контента"),
+                        ],
+
                         [
                             'url'   => ["cms/admin-cms-content-type"],
                             'label' => \Yii::t('skeeks/cms', "Группы контента"),

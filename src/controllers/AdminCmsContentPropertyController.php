@@ -14,6 +14,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
@@ -681,5 +682,58 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
         }
 
         return $result;
+    }
+
+    /**
+     * @return RequestResponse
+     */
+    public function actionJoinProperty()
+    {
+        $rr = new RequestResponse();
+
+        $treeId = \Yii::$app->request->post("tree_id");
+        $contentId = \Yii::$app->request->post("content_id");
+        $pk = \Yii::$app->request->get("pk");
+
+        if ($contentId && $treeId && $pk) {
+
+            /**
+             * @var $property CmsContentProperty
+             */
+            $property = CmsContentProperty::find()->cmsSite()->andWhere(['id' => $pk])->one();
+
+            if ($property) {
+
+                $newContentIds = [];
+                foreach ($property->cmsContents as $content)
+                {
+                    $newContentIds[] = $content->id;
+                }
+                $newContentIds[] = $contentId;
+                $property->cmsContents = $newContentIds;
+
+                $newTreeIds = [];
+                foreach ($property->cmsTrees as $tree)
+                {
+                    $newTreeIds[] = $tree->id;
+                }
+                $newTreeIds[] = $treeId;
+                $property->cmsTrees = $newTreeIds;
+
+                if (!$property->save()) {
+                    print_r($property->errors);die;
+                    $rr->success = false;
+                    $rr->message = print_r($property->errors, true);
+                    return $rr;
+                }
+
+                $rr->success = true;
+                $rr->message = "Характеристика добавлена";
+
+            }
+
+        }
+
+        return $rr;
     }
 }

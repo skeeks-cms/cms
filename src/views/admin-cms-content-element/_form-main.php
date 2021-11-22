@@ -72,6 +72,114 @@ $properties = $model->getRelatedProperties()->all();
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('skeeks/cms', 'Характеристики'),
     ]); ?>
+
+    <?php
+    $createProperty = null;
+    if ($model->tree_id) {
+
+        if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property')[0]) {
+
+            /**
+             * @var \skeeks\cms\backend\BackendAction $actionIndex
+             * @var \skeeks\cms\backend\BackendAction $actionCreate
+             */
+            $createAction = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+            if ($createAction) {
+
+                $r = new \ReflectionClass(\skeeks\cms\models\CmsContentProperty::class);
+
+                $createAction->url = \yii\helpers\ArrayHelper::merge($createAction->urlData, [
+                    $r->getShortName() => [
+                        'cmsContents' => [$model->content_id],
+                        'cmsTrees'    => [$model->tree_id],
+                    ],
+                ]);
+
+
+                $createAction->name = \Yii::t("skeeks/cms", "Создать характеристику");
+
+                /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                    'actions' => ['create' => $actionCreate],
+                    'isOpenNewWindow' => true
+                ]);*/
+
+                $createProperty = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                    'actions'         => ['create' => $createAction],
+                    'clientOptions'   => [
+                        'updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
+    function() {
+    $("[data-form-reload]:first").trigger("change");
+    }
+JS
+                        ),
+                    ],
+                    'isOpenNewWindow' => true,
+                    'tag'             => 'span',
+                    'minViewCount'    => 1,
+                    'itemWrapperTag'  => 'span',
+                    'itemTag'         => 'button',
+                    'itemOptions'     => ['class' => 'btn btn-default'],
+                    'options'         => ['class' => 'sx-controll-actions'],
+                ]);
+
+            }
+        }
+    }
+
+    ?>
+
+
+    <? if ($createProperty) : ?>
+        <div class="sx-controlls" style="margin-bottom: 10px;">
+            <?php echo $createProperty; ?>
+            <a href="#" class="btn btn-default sx-btn-search-property"><i class="fa fa-search"></i> Добавить существующую</a>
+
+            <div style="display: none;" class="sx-search-property-element-wrapper">
+                <?
+
+                $url = \yii\helpers\Url::to(['/cms/admin-cms-content-property/join-property']);
+
+                $this->registerJs(<<<JS
+    var propertyUrl = "{$url}";
+    $("#search-exist-property").on("change", function() {
+    var ajaxQuery = sx.ajax.preparePostQuery(propertyUrl + "&pk=" + $(this).val());
+    ajaxQuery.setData({
+        'tree_id': {$model->tree_id},
+        'content_id': {$model->content_id}
+    });
+    
+    console.log(ajaxQuery.toArray());
+    
+    var AjaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
+    AjaxHandler.on("success", function() {
+        $("[data-form-reload]:first").trigger("change");
+    });
+    
+    ajaxQuery.execute();
+    
+    return false;
+    });
+    $(".sx-btn-search-property").on("click", function() {
+    $(".sx-search-property-element-wrapper .sx-btn-create").click();
+    return false;
+    });
+JS
+                );
+                echo \skeeks\cms\backend\widgets\SelectModelDialogWidget::widget([
+                    'id'             => 'search-exist-property',
+                    'modelClassName' => \skeeks\cms\models\CmsContentProperty::class,
+                    'name'           => 'search-property',
+                    'dialogRoute'    => [
+                        '/cms/admin-cms-content-property',
+                    ],
+                ]);
+                ?>
+            </div>
+
+        </div>
+    <? endif; ?>
+
+
     <?
     $this->registerCss(<<<CSS
 .form-group .sx-fast-edit {
@@ -204,6 +312,7 @@ JS
                                     'clientOptions'   => [
                                         'updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
 function() {
+    
 }
 JS
                                         ),
@@ -286,4 +395,14 @@ JS
 <?php else : ?>
     <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
 <?php endif; ?>
+
+        <? if (count($properties) > 10) : ?>
+            <? if ($createProperty) : ?>
+                <div class="sx-controlls" style="margin-bottom: 10px; margin-top: 10px;">
+                    <?php echo $createProperty; ?>
+                    <a href="#" class="btn btn-default sx-btn-search-property"><i class="fa fa-search"></i> Добавить существующую</a>
+                </div>
+            <? endif; ?>
+        <? endif; ?>
+
 <? $fieldSet::end(); ?>

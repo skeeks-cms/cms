@@ -30,17 +30,16 @@ $model->load(\Yii::$app->request->get());
 
 <? $fieldSet::end(); ?>
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
-
-<?php if ($model->content_type) : ?>
-    <div style="display: none;">
-        <?= $form->field($model, 'content_type')->hiddenInput()->label(false); ?>
-    </div>
-<?php else : ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Меню')); ?>
     <?= $form->fieldSelect($model, 'content_type',
         \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsContentType::find()->all(), 'code', 'name'));
     ?>
-<?php endif; ?>
+<?= $form->field($model, 'is_visible')->checkbox([], false); ?>
+
+<? $fieldSet::end(); ?>
+
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
+
 
 <?= $form->field($model, 'name'); ?>
 <?= $form->field($model, 'code'); ?>
@@ -49,7 +48,6 @@ $model->load(\Yii::$app->request->get());
 
 
 
-<?= $form->field($model, 'is_visible')->checkbox([], false); ?>
 <?
 $element = new \skeeks\cms\models\CmsContentElement();
 $items = [
