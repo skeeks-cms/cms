@@ -97,23 +97,33 @@
             var self = this;
             var jWrapper = this.getJWrapper();
 
-            $(document).mouseup(function (e){ // событие клика по веб-документу
-                var div = $(".sx-select-tree-input-widget"); // тут указываем ID элемента
-                if (!div.is(e.target) // если клик был не по нашему блоку
-                    && div.has(e.target).length === 0) { // и не по его дочерним элементам
-                    var jElement = $(".sx-select-tree", jWrapper);
-                    jElement.slideUp();
-                }
-            });
 
-            $(".sx-selected", jWrapper).on("click", function() {
-                var jElement = $(".sx-select-tree", jWrapper);
-                if (jElement.is(":visible")) {
-                    jElement.slideUp();
-                } else {
-                    jElement.slideDown();
-                }
-            });
+
+            if (!$(".sx-selected", jWrapper).hasClass("sx-ready")) {
+
+                $(".sx-selected", jWrapper).addClass("sx-ready");
+
+                $(document).mouseup(function (e){ // событие клика по веб-документу
+                    var div = $(".sx-select-tree-input-widget"); // тут указываем ID элемента
+                    if (!div.is(e.target) // если клик был не по нашему блоку
+                        && div.has(e.target).length === 0) { // и не по его дочерним элементам
+                        var jElement = $(".sx-select-tree", jWrapper);
+                        jElement.slideUp();
+                    }
+                });
+
+                $(".sx-selected", jWrapper).on("click", function() {
+                    console.log('11111');
+                    
+                    var jElement = $(".sx-select-tree", jWrapper);
+                    if (jElement.is(":visible")) {
+                        jElement.slideUp();
+                    } else {
+                        jElement.slideDown();
+                    }
+                });
+            }
+            
         },
 
         getJWrapper: function()
