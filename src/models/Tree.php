@@ -487,7 +487,7 @@ class Tree extends ActiveRecord
             $params = ['/cms/tree/view', 'id' => $this->id];
         }
 
-        return Url::to(['/cms/tree/view', 'id' => $this->id], $scheme);
+        return Url::to($params, $scheme);
     }
 
     /**
