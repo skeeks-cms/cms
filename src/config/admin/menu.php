@@ -273,7 +273,7 @@ return array_merge(dashboardsMenu(), [
             'label'    => \Yii::t('skeeks/cms', 'Users'),
             'priority' => 200,
             'enabled'  => true,
-            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
+            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],
 
             'items' => [
                 [
