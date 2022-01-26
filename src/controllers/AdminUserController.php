@@ -52,12 +52,12 @@ class AdminUserController extends BackendModelStandartController
         $this->modelClassName = CmsUser::class;
 
         $this->generateAccessActions = false;
-        $this->accessCallback = function () {
+        /*$this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
             return true;
-        };
+        };*/
         /*$this->permissionName = 'cms/admin-cms-site';*/
 
         parent::init();
@@ -185,9 +185,10 @@ class AdminUserController extends BackendModelStandartController
 
                     'on init' => function (Event $event) {
 
+                        $query = $event->sender->dataProvider->query;
+
                         if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROOT_ACCESS)) {
-                            //TODO: доработать запрос
-                            $query = $event->sender->dataProvider->query;
+
                             $query->innerJoin('auth_assignment', 'auth_assignment.cms_user_id = cms_user.id');
                             $query->andFilterWhere([
                                 "!=",
@@ -197,6 +198,7 @@ class AdminUserController extends BackendModelStandartController
                             $query->groupBy([CmsUser::tableName().".id"]);
                         }
 
+                        $query->cmsSite();
                     },
 
                     'defaultOrder'       => [

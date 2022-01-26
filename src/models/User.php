@@ -57,6 +57,7 @@ use yii\web\IdentityInterface;
  * @property string                      $phone
  * @property integer                     $email_is_approved
  * @property integer                     $phone_is_approved
+ * @property integer                     $cms_site_id
  *
  * ***
  *
@@ -232,8 +233,19 @@ class User
             ['gender', 'default', 'value' => 'men'],
             ['gender', 'in', 'range' => ['men', 'women']],
 
-            [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved'], 'integer'],
+            [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved', 'cms_site_id'], 'integer'],
 
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                },
+            ],
+
+            [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::class, 'targetAttribute' => ['cms_site_id' => 'id']],
 
             [['image_id'], 'safe'],
             [
@@ -256,16 +268,16 @@ class User
 
             [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::class],
-            [['phone'], 'unique'],
+            [['phone'], 'unique', 'targetAttribute' => ['cms_site_id', 'phone']],
             [['phone', 'email'], 'default', 'value' => null],
 
 
-            [['email'], 'unique'],
+            [['email'], 'unique', 'targetAttribute' => ['cms_site_id', 'email']],
             [['email'], 'email'],
 
             //[['username'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 25],
-            [['username'], 'unique'],
+            [['username'], 'unique', 'targetAttribute' => ['cms_site_id', 'username']],
             [['username'], \skeeks\cms\validators\LoginValidator::class],
 
             [['logged_at'], 'integer'],

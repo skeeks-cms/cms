@@ -262,12 +262,6 @@ return array_merge(dashboardsMenu(), [
             ], contentMenu()),
         ],
 
-    'site-users' => [
-        "label"    => \Yii::t('skeeks/cms', "Пользователи сайта"),
-        "url"      => ["cms/admin-site-user"],
-        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
-        'priority' => 200,
-    ],
     'users'      =>
         [
             'label'    => \Yii::t('skeeks/cms', 'Users'),

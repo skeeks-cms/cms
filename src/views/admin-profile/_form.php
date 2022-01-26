@@ -8,7 +8,9 @@
 /* @var $this yii\web\View */
 
 ?>
-<?php if (!$model->email || !$model->first_name || !$model->last_name || !$model->image) : ?>
+<?php if (!$model->email || !$model->first_name || !$model->last_name 
+    //|| !$model->image
+) : ?>
     <?php $alert = \yii\bootstrap\Alert::begin([
         'options' => [
             'class' => 'alert-danger',
