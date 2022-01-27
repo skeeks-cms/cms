@@ -71,7 +71,7 @@ class AdminUserController extends BackendModelStandartController
                 "filters"        => [
                     "visibleFilters" => [
                         'q',
-                        'active',
+                        'is_active',
                         'role',
                         'isOnline',
                     ],
@@ -90,11 +90,9 @@ class AdminUserController extends BackendModelStandartController
 
                         'fields' => [
 
-                            'active' => [
+                            'is_active' => [
                                 'field'             => [
                                     'class'      => BoolField::class,
-                                    'trueValue'  => "Y",
-                                    'falseValue' => "N",
                                 ],
                                 "isAllowChangeMode" => false,
                                 "defaultMode"       => FilterModeEq::ID,
@@ -202,8 +200,8 @@ class AdminUserController extends BackendModelStandartController
                     },
 
                     'defaultOrder'       => [
-                        'logged_at'  => SORT_DESC,
-                        'created_at' => SORT_DESC,
+                        'id'  => SORT_DESC,
+                        //'created_at' => SORT_DESC,
                     ],
                     'dialogCallbackData' => function ($model) {
                         return \yii\helpers\ArrayHelper::merge($model->toArray(), [
@@ -214,30 +212,35 @@ class AdminUserController extends BackendModelStandartController
                     'visibleColumns'     => [
                         'checkbox',
                         'actions',
-                        'id',
+                        //'id',
+                        'custom',
+                        'phone',
+                        'email',
                         //'image_id',
                         //'displayName',
-                        'created_at',
-                        'logged_at',
+                        //'created_at',
+                        //'logged_at',
                         //'role',
-                        'active',
+                        'is_active',
                     ],
                     'columns'            => [
-                        'id'               => [
+                        'custom'               => [
                             //'label'  => 'Данные пользователя',
                             'format' => 'raw',
+                            'attribute' => 'id',
+                            'label' => 'Аккаунт',
                             'value'  => function (CmsUser $cmsUser) {
                                 //$data[] = $cmsUser->asText;
                                 $data[] = Html::a($cmsUser->shortDisplayName, "#", [
-                                    'style' => 'margin-bottom: 5px;
+                                    'style' => 'font-size: 15px;
                                                 display: block;'
                                 ]);
-                                if ($cmsUser->phone) {
+                                /*if ($cmsUser->phone) {
                                     $data[] = "<div style='color: gray;'>" . $cmsUser->phone . "</div>";
                                 }
                                 if ($cmsUser->email) {
                                     $data[] = "<div style='color: gray;'>" . $cmsUser->email . "</div>";
-                                }
+                                }*/
 
                                 $rolesData = [];
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
@@ -245,7 +248,12 @@ class AdminUserController extends BackendModelStandartController
                                         $rolesData[] = Html::tag('label', $role->description, [
                                             'title' => $role->name,
                                             'class' => "u-label u-label-default g-rounded-20 g-mr-5 ".($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "font-size: 9px; margin-top: 5px;",
+                                            'style' => "    font-size: 9px;
+    margin-top: 5px;
+    margin-bottom: 0;
+    padding: 2px ​5px 4px 5px;
+    background: #ededed;
+    color: gray;",
                                         ]);
                                     }
                                 }
@@ -263,7 +271,7 @@ class AdminUserController extends BackendModelStandartController
     border-bottom: 0;
     width: 54px;
     border-radius: 50%;
-    border: 2px solid silver;
+    border: 2px solid #ededed;
     height: 54px;
     display: flex;
     overflow: hidden;'>
@@ -291,7 +299,7 @@ class AdminUserController extends BackendModelStandartController
                         'image_id'         => [
                             'class' => ImageColumn2::class,
                         ],
-                        'active'           => [
+                        'is_active'           => [
                             'class' => BooleanColumn::class,
                         ],
                         'role'             => [
@@ -308,6 +316,22 @@ class AdminUserController extends BackendModelStandartController
                             },
                             'format' => 'html',
                             'label'  => \Yii::t('skeeks/cms', 'Roles'),
+                        ],
+                        'phone'             => [
+                            'headerOptions' => [
+                                'style' => 'width: 120px;'
+                            ],
+                            'value'  => function ($cmsUser) {
+                                return $cmsUser->phone ? $cmsUser->phone : "";
+                            },
+                        ],
+                        'email'             => [
+                            'headerOptions' => [
+                                'style' => 'width: 100px;'
+                            ],
+                            'value'  => function ($cmsUser) {
+                                return $cmsUser->email ? $cmsUser->email : "";
+                            },
                         ],
                     ],
                 ],

@@ -47,7 +47,8 @@ use yii\web\IdentityInterface;
  * @property string                      $patronymic
  *
  * @property string                      $gender
- * @property string                      $active
+ * @property string                      $alias
+ * @property integer                     $is_active
  * @property integer                     $updated_by
  * @property integer                     $created_by
  * @property integer                     $logged_at
@@ -134,7 +135,7 @@ class User
             return true;
         }
 
-        if ($this->active == "N" && $this->id == \Yii::$app->user->identity->id) {
+        if (!$this->is_active && $this->id == \Yii::$app->user->identity->id) {
             throw new Exception(\Yii::t('skeeks/cms', 'Нельзя деактивировать себя'));
         }
 
@@ -229,11 +230,13 @@ class User
     public function rules()
     {
         return [
-            ['active', 'default', 'value' => Cms::BOOL_Y],
+            ['alias', 'default', 'value' => null],
+            ['is_active', 'default', 'value' => 1],
             ['gender', 'default', 'value' => 'men'],
             ['gender', 'in', 'range' => ['men', 'women']],
 
-            [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved', 'cms_site_id'], 'integer'],
+            [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved', 'cms_site_id', 'is_active'], 'integer'],
+            [['alias'], 'string'],
 
             [
                 'cms_site_id',
@@ -339,7 +342,8 @@ class User
             'password_reset_token'   => Yii::t('skeeks/cms', 'Password Reset Token'),
             'email'                  => Yii::t('skeeks/cms', 'Email'),
             'phone'                  => Yii::t('skeeks/cms', 'Phone'),
-            'active'                 => Yii::t('skeeks/cms', 'Active'),
+            'is_active'              => Yii::t('skeeks/cms', 'Active'),
+            'alias'                  => "Псевдоним",
             'created_at'             => Yii::t('skeeks/cms', 'Created At'),
             'updated_at'             => Yii::t('skeeks/cms', 'Updated At'),
             'name'                   => \Yii::t('skeeks/cms/user', 'Name'), //Yii::t('skeeks/cms', 'Name???'),
@@ -541,7 +545,7 @@ class User
      */
     public static function findIdentity($id)
     {
-        return static::findOne(['id' => $id, 'active' => Cms::BOOL_Y]);
+        return static::findOne(['id' => $id, 'is_active' => 1]);
     }
 
     /**
@@ -560,7 +564,7 @@ class User
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'active' => Cms::BOOL_Y]);
+        return static::findOne(['username' => $username, 'is_active' => 1]);
     }
 
     /**
@@ -571,7 +575,7 @@ class User
      */
     public static function findByEmail($email)
     {
-        return static::findOne(['email' => $email, 'active' => Cms::BOOL_Y]);
+        return static::findOne(['email' => $email, 'is_active' => 1]);
     }
 
     /**
@@ -580,7 +584,7 @@ class User
      */
     public static function findByPhone($phone)
     {
-        return static::findOne(['phone' => $phone, 'active' => Cms::BOOL_Y]);
+        return static::findOne(['phone' => $phone, 'is_active' => 1]);
 
         return null;
     }
@@ -628,7 +632,7 @@ class User
 
         return static::findOne([
             'password_reset_token' => $token,
-            'active'               => Cms::BOOL_Y,
+            'is_active'            => 1,
         ]);
     }
 
