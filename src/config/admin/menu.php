@@ -108,15 +108,15 @@ function dashboardsMenu()
 
         return [
             'dashboard' => [
-                    'priority' => 90,
-                    'label'    => $dashboard->name,
-                    "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/dashboard.png'],
-                    'url'            => ["admin/admin-index/dashboard", "pk" => $dashboard->id],
-                    "activeCallback" => function ($adminMenuItem) {
-                        return (bool)(\Yii::$app->controller->action->uniqueId == 'admin/admin-index/dashboard' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
-                                'pk') == \Yii::$app->request->get('pk'));
-                    },
-                ],
+                'priority'       => 90,
+                'label'          => $dashboard->name,
+                "img"            => ['\skeeks\cms\assets\CmsAsset', 'images/icons/dashboard.png'],
+                'url'            => ["admin/admin-index/dashboard", "pk" => $dashboard->id],
+                "activeCallback" => function ($adminMenuItem) {
+                    return (bool)(\Yii::$app->controller->action->uniqueId == 'admin/admin-index/dashboard' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
+                            'pk') == \Yii::$app->request->get('pk'));
+                },
+            ],
         ];
 
     } else {
@@ -262,34 +262,21 @@ return array_merge(dashboardsMenu(), [
             ], contentMenu()),
         ],
 
-    'users'      =>
+    'users' =>
         [
             'label'    => \Yii::t('skeeks/cms', 'Users'),
             'priority' => 200,
-            'enabled'  => true,
             "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],
+            "url"      => ["cms/admin-user"],
 
-            'items' => [
+            /*'items' => [
                 [
                     "label"    => \Yii::t('skeeks/cms', "Users"),
                     "url"      => ["cms/admin-user"],
                     "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
                     'priority' => 0,
                 ],
-
-
-                /*[
-                    "label" => \Yii::t('skeeks/cms', 'The base of {email} addresses', ['email' => 'email']),
-                    "url"   => ["cms/admin-user-email"],
-                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/email-2.png'],
-                ],
-
-                [
-                    "label" => \Yii::t('skeeks/cms', "Base phones"),
-                    "url"   => ["cms/admin-user-phone"],
-                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/phone.png'],
-                ],*/
-            ],
+            ],*/
         ],
 
 
@@ -352,13 +339,6 @@ return array_merge(dashboardsMenu(), [
                     "url"   => ["cms/admin-settings"],
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
                     /*'items' => componentsMenu(),*/
-                ],
-
-
-                [
-                    "label" => \Yii::t('skeeks/cms', "Файловое хранилище"),
-                    "url"   => ["cms/admin-storage/index"],
-                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/servers.png'],
                 ],
 
 
@@ -443,6 +423,22 @@ return array_merge(dashboardsMenu(), [
                     "items" =>
                         [
                             [
+                                "label"    => \Yii::t('skeeks/rbac', 'Roles'),
+                                "url"      => ["rbac/admin-role"],
+                                "img"      => ['skeeks\cms\rbac\assets\RbacAsset', 'icons/users-role.png'],
+                                'enabled'  => true,
+                                'priority' => 500,
+                            ],
+
+                            [
+                                "label"    => \Yii::t('skeeks/rbac', 'Privileges'),
+                                "url"      => ["rbac/admin-permission"],
+                                "img"      => ['skeeks\cms\rbac\assets\RbacAsset', 'icons/access.png'],
+                                'enabled'  => true,
+                                'priority' => 500,
+                            ],
+
+                            [
                                 "label" => \Yii::t('skeeks/cms', "User properties"),
                                 "url"   => ["cms/admin-cms-user-universal-property"],
                                 "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
@@ -453,6 +449,7 @@ return array_merge(dashboardsMenu(), [
                                 "url"   => ["cms/admin-cms-user-universal-property-enum"],
                                 "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/settings-big.png'],
                             ],
+
                         ],
                 ],
 

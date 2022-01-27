@@ -228,12 +228,15 @@ class AdminUserController extends BackendModelStandartController
                             'format' => 'raw',
                             'value'  => function (CmsUser $cmsUser) {
                                 //$data[] = $cmsUser->asText;
-                                $data[] = Html::a($cmsUser->asText, "#");
+                                $data[] = Html::a($cmsUser->shortDisplayName, "#", [
+                                    'style' => 'margin-bottom: 5px;
+                                                display: block;'
+                                ]);
                                 if ($cmsUser->phone) {
-                                    $data[] = $cmsUser->phone;
+                                    $data[] = "<div style='color: gray;'>" . $cmsUser->phone . "</div>";
                                 }
                                 if ($cmsUser->email) {
-                                    $data[] = $cmsUser->email;
+                                    $data[] = "<div style='color: gray;'>" . $cmsUser->email . "</div>";
                                 }
 
                                 $rolesData = [];
@@ -242,7 +245,7 @@ class AdminUserController extends BackendModelStandartController
                                         $rolesData[] = Html::tag('label', $role->description, [
                                             'title' => $role->name,
                                             'class' => "u-label u-label-default g-rounded-20 g-mr-5 ".($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "font-size: 9px;",
+                                            'style' => "font-size: 9px; margin-top: 5px;",
                                         ]);
                                     }
                                 }
@@ -252,15 +255,25 @@ class AdminUserController extends BackendModelStandartController
                                 }
 
 
-                                $info = implode("<br />", $data);
+                                $info = implode("", $data);
 
                                 return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                <div class='sx-trigger-action my-auto' style='width: 50px;'>
+                                                <a href='#' style='text-decoration: none;
+    border-bottom: 0;
+    width: 54px;
+    border-radius: 50%;
+    border: 2px solid silver;
+    height: 54px;
+    display: flex;
+    overflow: hidden;'>
+                                                    <img src='".($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc())."' style='    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%;
+    margin: auto;' />
                                                 </a>
                                                 </div>
-                                                <div style='margin-left: 5px;'>".$info."</div></div>";;
+                                                <div style='margin-left: 10px; line-height: 1.1;' class='my-auto'>".$info."</div></div>";;
                             },
                         ],
                         'created_at'       => [
