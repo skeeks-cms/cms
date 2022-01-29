@@ -61,6 +61,16 @@ class AdminUserController extends BackendModelStandartController
         };*/
         /*$this->permissionName = 'cms/admin-cms-site';*/
 
+        $this->modelHeader = function () {
+            /**
+             * @var $model CmsContentElement
+             */
+            $model = $this->model;
+            return $this->renderPartial("@skeeks/cms/views/admin-user/_model_header", [
+                'model' => $model
+            ]);
+        };
+
         parent::init();
     }
 

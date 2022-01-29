@@ -72,7 +72,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
     public $editForm = '_form';
 
     public $modelClassName = CmsContentElement::class;
-    public $modelShowAttribute = "asText";
+    public $modelShowAttribute = "name";
     /**
      * @var CmsContent
      */
@@ -93,18 +93,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
              * @var $model CmsContentElement
              */
             $model = $this->model;
-            $result = $model->asText;
-
-            if ($model->cmsContent->is_have_page) {
-                $result .= Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
-                    'target' => "_blank",
-                    'class'  => "g-ml-20",
-                    'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                ]);
-            }
-
-            $result = Html::tag('h1', $result);
-            return $result;
+            return $this->renderPartial("@skeeks/cms/views/admin-cms-content-element/_model_header", [
+                'model' => $model
+            ]);
         };
 
         parent::init();
@@ -427,6 +418,9 @@ HTML;
                         'custom'       => [
                             'attribute' => 'id',
                             'format'    => 'raw',
+                            'headerOptions' => [
+                                'style' => 'min-width: 300px;'
+                            ],
                             'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
 
                                 $data = [];
@@ -436,9 +430,10 @@ HTML;
                                         ])
                                         , "#", ['class' => 'sx-trigger-action', 'style' => 'width: 50px;'])."</div>";*/
 
-                                $data[] = "<span style='max-width: 300px;'>".Html::a($model->asText, "#", [
+                                $data[] = "<span style='max-width: 300px;'>".Html::a($model->name, "#", [
                                         'class' => 'sx-trigger-action',
-                                        'title' => $model->asText,
+                                        'title' => "id: {$model->id}",
+                                        'data-toggle' => "tooltip",
                                         'style' => 'border-bottom: none;'
                                     ])."</span>";
 
@@ -453,7 +448,7 @@ HTML;
 
                                 if ($model->cmsTrees) {
                                     foreach ($model->cmsTrees as $cmsTree) {
-                                        $data[] = '<i class="far fa-folder" style="color: gray;"></i> ' . Html::a($cmsTree->name, $cmsTree->url, [
+                                        $data[] = '<i class="far fa-folder" style="color: silver;"></i> ' . Html::a($cmsTree->name, $cmsTree->url, [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
                                             'title'     => $cmsTree->fullName,
@@ -470,7 +465,7 @@ HTML;
                                                         <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 40px; max-height: 40px; border-radius: 5px;' />
                                                     </a>
                                                 </div>
-                                                <div style='line-height: 1.1;'>".$info."</div></div>";;
+                                                <div style='line-height: 1.1;' class='my-auto'>".$info."</div></div>";;
                             },
                         ],
                         'image_id'     => [
