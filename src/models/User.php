@@ -14,12 +14,13 @@ namespace skeeks\cms\models;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\authclient\models\UserAuthClient;
 use skeeks\cms\base\ActiveRecord;
-use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\queries\CmsUserQuery;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\rbac\models\CmsAuthAssignment;
 use skeeks\cms\validators\PhoneValidator;
@@ -56,8 +57,6 @@ use yii\web\IdentityInterface;
  * @property integer                     $last_admin_activity_at
  * @property string                      $email
  * @property string                      $phone
- * @property integer                     $email_is_approved
- * @property integer                     $phone_is_approved
  * @property integer                     $cms_site_id
  *
  * ***
@@ -84,6 +83,9 @@ use yii\web\IdentityInterface;
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
  * @property CmsContentElement[]         $favoriteCmsContentElements
  * @property CmsAuthAssignment[]         $cmsAuthAssignments
+ *
+ * @property CmsUserEmail                $mainCmsUserEmail
+ * @property CmsUserPhone                $mainCmsUserPhone
  *
  */
 class User
@@ -150,6 +152,8 @@ class User
                 }
             }
         }
+
+
     }
 
     public function _cmsAfterSave(AfterSaveEvent $e)
@@ -179,7 +183,46 @@ class User
             }
         }
 
-
+        //Если пытаюсь поменять главный email
+        if ($this->_mainEmail) {
+            $value = trim(StringHelper::strtolower($this->_mainEmail));
+            if ($this->mainCmsUserEmail) {
+                $cmsUserEmail = $this->mainCmsUserEmail;
+                if ($cmsUserEmail->value != $value) {
+                    $cmsUserEmail->value = $value;
+                    if (!$cmsUserEmail->save()) {
+                        throw new Exception("Email не обновлен! " . print_r($cmsUserEmail->errors, true));
+                    }
+                }
+            } else {
+                $cmsUserEmail = new CmsUserEmail();
+                $cmsUserEmail->value = $value;
+                $cmsUserEmail->cms_user_id = $this->id;
+                if (!$cmsUserEmail->save()) {
+                    throw new Exception("Email не обновлен! " . print_r($cmsUserEmail->errors, true));
+                }
+            }
+        }
+        //Если пытаюсь поменять главный телефон
+        if ($this->_mainPhone) {
+            $value = trim(StringHelper::strtolower($this->_mainPhone));
+            if ($this->mainCmsUserPhone) {
+                $cmsUserPhone = $this->mainCmsUserPhone;
+                if ($cmsUserPhone->value != $value) {
+                    $cmsUserPhone->value = $value;
+                    if (!$cmsUserPhone->save()) {
+                        throw new Exception("Телефон не обновлен! " . print_r($cmsUserPhone->errors, true));
+                    }
+                }
+            } else {
+                $cmsUserPhone = new CmsUserPhone();
+                $cmsUserPhone->value = $value;
+                $cmsUserPhone->cms_user_id = $this->id;
+                if (!$cmsUserPhone->save()) {
+                    throw new Exception("Телефон не обновлен! " . print_r($cmsUserPhone->errors, true));
+                }
+            }
+        }
     }
 
     /**
@@ -235,8 +278,18 @@ class User
             ['gender', 'default', 'value' => 'men'],
             ['gender', 'in', 'range' => ['men', 'women']],
 
-            [['created_at', 'updated_at', 'email_is_approved', 'phone_is_approved', 'cms_site_id', 'is_active'], 'integer'],
+            [['created_at', 'updated_at', 'cms_site_id', 'is_active'], 'integer'],
             [['alias'], 'string'],
+
+            [
+                ['username'],
+                'default',
+                'value' => null,
+                /*'value' => function (self $model) {
+                    $userLast = static::find()->orderBy("id DESC")->limit(1)->one();
+                    return "id".($userLast->id + 1);
+                },*/
+            ],
 
             [
                 'cms_site_id',
@@ -263,7 +316,7 @@ class User
 
             [['gender'], 'string'],
             [
-                ['username', 'password_hash', 'password_reset_token', 'email', 'first_name', 'last_name', 'patronymic'],
+                ['username', 'password_hash', 'password_reset_token', 'first_name', 'last_name', 'patronymic'],
                 'string',
                 'max' => 255,
             ],
@@ -271,14 +324,65 @@ class User
 
             [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::class],
-            [['phone'], 'unique', 'targetAttribute' => ['cms_site_id', 'phone']],
-            [['phone', 'email'], 'default', 'value' => null],
+            [['phone'], "filter", 'filter' => 'trim'],
+            [['phone'], "filter", 'filter' => function($value) {
+                return StringHelper::strtolower($value);
+            }],
+            [['phone'], function($attribute) {
+                $value = StringHelper::strtolower(trim($this->{$attribute}));
+
+                if ($this->isNewRecord) {
+                    if (CmsUserPhone::find()->cmsSite()->andWhere(['value' => $value])->one()) {
+                        $this->addError($attribute, "Этот телефон уже занят");
+                    }
+                } else {
+                    if (CmsUserPhone::find()
+                        ->cmsSite()
+                        ->andWhere(['value' => $value])
+                        ->andWhere(['!=', 'cms_user_id', $this->id])
+                        ->one()) {
+                        $this->addError($attribute, "Этот телефон уже занят");
+                    }
+                    if ($this->mainCmsUserPhone && $this->mainCmsUserPhone->is_approved && $this->mainCmsUserPhone->value != $value) {
+                        $this->addError($attribute, "Этот телефон подтвержден, и его менять нельзя. Добавьте другой телефон, а после удалите этот!");
+                        return false;
+                    }
+                }
+            }],
 
 
-            [['email'], 'unique', 'targetAttribute' => ['cms_site_id', 'email']],
+            [['email'], 'string', 'max' => 64],
             [['email'], 'email'],
+            [['email'], "filter", 'filter' => 'trim'],
+            [['email'], "filter", 'filter' => function($value) {
+                return StringHelper::strtolower($value);
+            }],
+            [['email'], function($attribute) {
 
-            //[['username'], 'required'],
+                $value = StringHelper::strtolower(trim($this->{$attribute}));
+
+                if ($this->isNewRecord) {
+                    if (CmsUserEmail::find()->cmsSite()->andWhere(['value' => $value])->one()) {
+                        $this->addError($attribute, "Этот email уже занят");
+                        return false;
+                    }
+                } else {
+                    if (CmsUserEmail::find()
+                        ->cmsSite()
+                        ->andWhere(['value' => $value])
+                        ->andWhere(['!=', 'cms_user_id', $this->id])
+                        ->one()) {
+
+                        $this->addError($attribute, "Этот email уже занят");
+                        return false;
+                    }
+                    if ($this->mainCmsUserEmail && $this->mainCmsUserEmail->is_approved && $this->mainCmsUserEmail->value != $value) {
+                        $this->addError($attribute, "Этот email подтвержден, и его менять нельзя. Добавьте другой email, а после удалите этот!");
+                        return false;
+                    }
+                }
+            }],
+
             ['username', 'string', 'min' => 3, 'max' => 25],
             [['username'], 'unique', 'targetAttribute' => ['cms_site_id', 'username']],
             [['username'], \skeeks\cms\validators\LoginValidator::class],
@@ -287,16 +391,6 @@ class User
             [['last_activity_at'], 'integer'],
             [['last_admin_activity_at'], 'integer'],
 
-            [
-                ['username'],
-                'default',
-                'value' => function (self $model) {
-                    $userLast = static::find()->orderBy("id DESC")->limit(1)->one();
-                    return "id".($userLast->id + 1);
-                },
-            ],
-
-            [['email_is_approved', 'phone_is_approved'], 'default', 'value' => 0],
 
             [
                 ['auth_key'],
@@ -356,8 +450,6 @@ class User
             'last_admin_activity_at' => Yii::t('skeeks/cms', 'Last Activity In The Admin At'),
             'image_id'               => Yii::t('skeeks/cms', 'Image'),
             'roleNames'              => Yii::t('skeeks/cms', 'Группы'),
-            'email_is_approved'      => Yii::t('skeeks/cms', 'Email is approved'),
-            'phone_is_approved'      => Yii::t('skeeks/cms', 'Phone is approved'),
         ];
     }
 
@@ -473,7 +565,15 @@ class User
             return $this->email;
         }
 
-        return $this->username;
+        if ($this->phone) {
+            return $this->phone;
+        }
+
+        if ($this->username) {
+            $this->username;
+        }
+
+        return $this->id;
     }
 
 
@@ -536,16 +636,24 @@ class User
             return parent::asText();
         }
 
-        return parent::asText()."{$this->username}";
+        $lastName = $this->username;
+        return parent::asText()."{$lastName}";
     }
 
+    /**
+     * @return CmsUserQuery|\skeeks\cms\query\CmsActiveQuery
+     */
+    public static function find()
+    {
+        return (new CmsUserQuery(get_called_class()));
+    }
 
     /**
      * @inheritdoc
      */
     public static function findIdentity($id)
     {
-        return static::findOne(['id' => $id, 'is_active' => 1]);
+        return static::find()->cmsSite()->active()->andWhere(['id' => $id])->one();
     }
 
     /**
@@ -557,14 +665,16 @@ class User
     }
 
     /**
-     * Finds user by username
-     *
      * @param string $username
      * @return static
+     * @deprecated
+     *
+     * Finds user by username
+     *
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'is_active' => 1]);
+        return static::find()->cmsSite()->active()->username($username)->one();
     }
 
     /**
@@ -575,25 +685,27 @@ class User
      */
     public static function findByEmail($email)
     {
-        return static::findOne(['email' => $email, 'is_active' => 1]);
+        return static::find()->cmsSite()->active()->email($email)->one();
     }
 
     /**
      * @param $phone
      * @return null|CmsUser
+     * @deprecated
+     *
      */
     public static function findByPhone($phone)
     {
-        return static::findOne(['phone' => $phone, 'is_active' => 1]);
-
-        return null;
+        return static::find()->cmsSite()->active()->phone($phone)->one();
     }
 
 
     /**
-     * Поиск пользователя по email или логину
      * @param $value
      * @return User
+     * @deprecated
+     *
+     * Поиск пользователя по email или логину
      */
     public static function findByUsernameOrEmail($value)
     {
@@ -614,7 +726,9 @@ class User
      */
     public static function findByAuthAssignments($assignments)
     {
-        return static::find()->joinWith('cmsAuthAssignments as cmsAuthAssignments')
+        return static::find()
+            ->cmsSite()
+            ->joinWith('cmsAuthAssignments as cmsAuthAssignments')
             ->where(['cmsAuthAssignments.item_name' => $assignments]);
     }
 
@@ -630,10 +744,7 @@ class User
             return null;
         }
 
-        return static::findOne([
-            'password_reset_token' => $token,
-            'is_active'            => 1,
-        ]);
+        return static::find()->cmsSite()->active()->andWhere(['password_reset_token' => $token])->one();
     }
 
     /**
@@ -662,7 +773,7 @@ class User
     {
         $password = \Yii::$app->security->generateRandomString(6);
 
-        $this->generateUsername();
+        //$this->generateUsername();
         $this->setPassword($password);
         $this->generateAuthKey();
 
@@ -720,11 +831,6 @@ class User
      */
     public function generateUsername()
     {
-        /*if ($this->email)
-        {
-            $userName = \skeeks\cms\helpers\StringHelper::substr($this->email, 0, strpos() );
-        }*/
-
         $userLast = static::find()->orderBy("id DESC")->limit(1)->one();
         $this->username = "id".($userLast->id + 1);
 
@@ -791,9 +897,94 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getMainCmsUserEmail()
+    {
+        $query = $this->getCmsUserEmails()->limit(1);
+        $query->multiple = false;
+
+        return $query;
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMainCmsUserPhone()
+    {
+        $query = $this->getCmsUserPhones()->limit(1);
+        $query->multiple = false;
+
+        return $query;
+    }
+
+    /**
+     * @var null
+     */
+    protected $_mainEmail = null;
+    /**
+     * @var null
+     */
+    protected $_mainPhone = null;
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        if ($this->_mainEmail !== null) {
+            return $this->_mainEmail;
+        }
+
+        if ($this->mainCmsUserEmail) {
+            return $this->mainCmsUserEmail->value;
+        }
+
+        return '';
+    }
+
+    /**
+     * @return string
+     */
+    public function setEmail(string $email)
+    {
+        $this->_mainEmail = $email;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhone()
+    {
+        if ($this->_mainPhone !== null) {
+            return $this->_mainPhone;
+        }
+
+        if ($this->mainCmsUserPhone) {
+            return $this->mainCmsUserPhone->value;
+        }
+
+        return '';
+    }
+
+    /**
+     * @return string
+     */
+    public function setPhone(string $phone)
+    {
+        $this->_mainPhone = $phone;
+        return $this;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getCmsUserEmails()
     {
-        return $this->hasMany(CmsUserEmail::class, ['user_id' => 'id']);
+        return $this->hasMany(CmsUserEmail::class, ['cms_user_id' => 'id'])
+            ->orderBy([
+                'sort' => SORT_ASC,
+            ])
+            //->via('cmsUserEmails')
+        ;
     }
 
     /**
@@ -801,8 +992,14 @@ class User
      */
     public function getCmsUserPhones()
     {
-        return $this->hasMany(CmsUserPhone::class, ['user_id' => 'id']);
+        return $this->hasMany(CmsUserPhone::class, ['cms_user_id' => 'id'])->orderBy([
+            'sort' => SORT_ASC,
+        ])
+            //->via('cmsUserPhones')
+        //
+        ;
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */

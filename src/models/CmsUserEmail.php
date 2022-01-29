@@ -8,24 +8,31 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\helpers\StringHelper;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /**
- * @property integer $id
- * @property integer $cms_user_id
- * @property string  $value
- * @property boolean $is_approved
- * @property boolean $is_main
- * @property string|null  $approved_key
- * @property integer|null  $approved_key_at
+ * This is the model class for table "cms_user_email".
  *
- * @property CmsUser $cmsUser
- * @property string $approveUrl
+ * @property int         $id
+ * @property int|null    $created_by
+ * @property int|null    $updated_by
+ * @property int|null    $created_at
+ * @property int|null    $updated_at
+ * @property int         $cms_site_id
+ * @property int         $cms_user_id
+ * @property string      $value Email
+ * @property string|null $name Примечание к Email
+ * @property int         $sort
+ * @property int         $is_approved Email подтвержден?
+ * @property string|null $approved_key Ключ для подтверждения Email
+ * @property int|null    $approved_key_at Время генерация ключа
  *
- * @author Semenov Alexander <semenov@skeeks.com>
+ * @property CmsSite     $cmsSite
+ * @property CmsUser     $cmsUser
  */
 class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
 {
@@ -37,43 +44,13 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
         return '{{%cms_user_email}}';
     }
 
-
     /**
-     * @inheritdoc
+     * @return \skeeks\cms\query\CmsActiveQuery
      */
-    public function init()
+    /*public static function find()
     {
-        parent::init();
-
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeSaveEvent"]);
-    }
-
-    /**
-     * @param $event
-     */
-    public function beforeSaveEvent($event)
-    {
-        if (!$this->is_main) {
-            if ($this->cms_user_id) {
-                if (!static::find()->where(['is_main' => 1])->andWhere([
-                    '!=',
-                    'id',
-                    $this->id,
-                ])->andWhere(['cms_user_id' => $this->cms_user_id])->count()) {
-                    $this->is_main = 1;
-                }
-            }
-        } else if ($this->is_main) {
-            if ($this->cms_user_id) {
-                static::updateAll(['is_main' => 0], [
-                    'and',
-                    ['cms_user_id' => $this->cms_user_id],
-                    ['!=', 'id', $this->id],
-                ]);
-            }
-        }
-    }
-
+        return static::find()->cmsSite();
+    }*/
 
     /**
      * @inheritdoc
@@ -81,17 +58,35 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['cms_user_id', 'created_at', 'updated_at'], 'integer'],
-            [['cms_user_id'], 'required'],
-            [['value'], 'required'],
-            [['value'], 'email'],
-            [['value', 'approved_key'], 'string', 'max' => 255],
-            [['is_main', 'is_approved'], 'boolean'],
-            [['value'], 'unique'],
-            [['is_main'], 'default', 'value' => 0],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_user_id', 'sort', 'is_approved', 'approved_key_at'], 'integer'],
+            [['cms_user_id', 'value'], 'required'],
+            [['value', 'name', 'approved_key'], 'string', 'max' => 255],
+            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['cms_user_id' => 'id']],
+            [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
+            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
+            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
+
+            [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value']],
+            [['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value']],
+
             [['is_approved'], 'default', 'value' => 0],
-            [['approved_key_at'], 'integer'],
-            [['approved_key_at', 'approved_key'], 'default', 'value' => null],
+            [['name', 'approved_key_at', 'approved_key'], 'default', 'value' => null],
+
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                },
+            ],
+
+            [['value'], "filter", 'filter' => 'trim'],
+            [['value'], "filter", 'filter' => function($value) {
+                return StringHelper::strtolower($value);
+            }],
+            [['value'], "email"],
         ]);
     }
 
@@ -103,7 +98,7 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_user_id' => Yii::t('skeeks/cms', 'User'),
-            'value'   => "Email",
+            'value'       => "Email",
         ]);
     }
 
@@ -116,32 +111,25 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
         return $this->hasOne($userClass, ['id' => 'cms_user_id']);
     }
 
-
     /**
-     * @deprecated
-     * @return \yii\db\ActiveQuery
+     * @return $this
+     * @throws Exception
      */
-    public function getUser()
-    {
-        return $this->getCmsUser();
-    }
-
-
     public function genereteApprovedKey()
     {
         if (\Yii::$app->cms->approved_key_is_letter) {
-            $this->approved_key = \Yii::$app->security->generateRandomString((int) \Yii::$app->cms->email_approved_key_length);
+            $this->approved_key = \Yii::$app->security->generateRandomString((int)\Yii::$app->cms->email_approved_key_length);
         } else {
             $permitted_chars = '0123456789012345678901234567890123456789';
             // Output: 54esmdr0qf
             $random = substr(str_shuffle($permitted_chars), 0, (int)\Yii::$app->cms->email_approved_key_length);
             $this->approved_key = $random;
         }
-        
+
         $this->approved_key_at = time();
 
         if (!$this->save()) {
-            throw new Exception('Не сохранились данные ключа: ' . print_r($this->errors, true));
+            throw new Exception('Не сохранились данные ключа: '.print_r($this->errors, true));
         }
 
         return $this;
@@ -160,9 +148,9 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
         ]);
 
         return \Yii::$app->mailer->compose('@app/mail/approve-email', [
-            'approveUrl'     => $this->approveUrl,
-            'approveCode'     => $this->approved_key,
-            'email' => $this->value,
+            'approveUrl'  => $this->approveUrl,
+            'approveCode' => $this->approved_key,
+            'email'       => $this->value,
         ])
             ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
             ->setTo(trim($this->value))

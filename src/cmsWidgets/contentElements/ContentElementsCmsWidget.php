@@ -383,7 +383,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                     'createdBy'         => [
                         'class' => SelectField::class,
                         'items' => \yii\helpers\ArrayHelper::map(
-                            \skeeks\cms\models\User::find()->active()->all(),
+                            \skeeks\cms\models\User::find()->cmsSite()->active()->all(),
                             'id',
                             'displayName'
                         ),

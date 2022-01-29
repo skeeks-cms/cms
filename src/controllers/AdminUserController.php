@@ -32,6 +32,7 @@ use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\widgets\ActiveForm;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use Yii;
 use yii\base\Event;
 use yii\db\ActiveQuery;
@@ -318,6 +319,7 @@ class AdminUserController extends BackendModelStandartController
                             'label'  => \Yii::t('skeeks/cms', 'Roles'),
                         ],
                         'phone'             => [
+                            'label' => "Телефон",
                             'headerOptions' => [
                                 'style' => 'width: 120px;'
                             ],
@@ -326,6 +328,7 @@ class AdminUserController extends BackendModelStandartController
                             },
                         ],
                         'email'             => [
+                            'label' => "Email",
                             'headerOptions' => [
                                 'style' => 'width: 100px;'
                             ],
@@ -338,8 +341,9 @@ class AdminUserController extends BackendModelStandartController
             ],
 
             'create' => [
-                "callback"       => [$this, 'create'],
+                //"callback"       => [$this, 'create'],
                 'generateAccess' => true,
+                'fields'  => [$this, 'createFields'],
             ],
 
 
@@ -497,68 +501,53 @@ class AdminUserController extends BackendModelStandartController
         return $this->render($this->action->id);
     }
 
-    public function create($adminAction)
+    
+    
+    public function createFields()
     {
-        $modelClassName = $this->modelClassName;
-        $model = new $modelClassName();
-        $model->loadDefaultValues();
-
-        $relatedModel = $model->relatedPropertiesModel;
-        $relatedModel->loadDefaultValues();
-
-        $passwordChange = new PasswordChangeForm([
-            'user' => $model,
-        ]);
-
-        $rr = new RequestResponse();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $passwordChange->load(\Yii::$app->request->post());
-
-            return \yii\widgets\ActiveForm::validateMultiple([
-                $model,
-                $relatedModel,
-                $passwordChange,
-            ]);
-        }
-
-
-        if ($rr->isRequestPjaxPost()) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-
-            if ($model->save() && $relatedModel->save()) {
-                if ($passwordChange->new_password) {
-                    if (!$passwordChange->changePassword()) {
-                        \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
-                    }
-                }
-
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply') {
-                    return $this->redirect(
-                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                            ->toString()
+        return [
+            'image_id' => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                'widgetConfig' => [
+                    'accept'   => 'image/*',
+                    'multiple' => false,
+                ],
+            ],
+            /*'username',*/
+            'gender' => [
+                'class' => SelectField::class,
+                'allowNull' => false,
+                'items' => [
+                    'men' => \Yii::t('skeeks/cms', 'Male'),
+                    'women' => \Yii::t('skeeks/cms', 'Female'),
+                ]
+            ],
+            'last_name',
+            'first_name',
+            'patronymic',
+            
+            'email',
+            'phone'    => [
+                'elementOptions'  => [
+                    'placeholder' => '+7 903 722-28-73',
+                ],
+                'on beforeRender' => function (Event $e) {
+                    /**
+                     * @var $field Field
+                     */
+                    $field = $e->sender;
+                    \skeeks\cms\admin\assets\JqueryMaskInputAsset::register(\Yii::$app->view);
+                    $id = \yii\helpers\Html::getInputId($field->model, $field->attribute);
+                    \Yii::$app->view->registerJs(<<<JS
+                        $("#{$id}").mask("+7 999 999-99-99");
+JS
                     );
-                } else {
-                    return $this->redirect(
-                        $this->url
-                    );
-                }
-            }
-        }
-
-        return $this->render('_form', [
-            'model'          => $model,
-            'relatedModel'   => $relatedModel,
-            'passwordChange' => $passwordChange,
-        ]);
+                },
+            ],
+        ];
     }
-
+    
 
     public function update($adminAction)
     {

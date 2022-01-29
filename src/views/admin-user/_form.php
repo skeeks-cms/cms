@@ -26,7 +26,7 @@ $action = $controller->action;
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'General information')) ?>
 
 <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
-<?= $form->field($model, 'active')->listBox(\Yii::$app->cms->booleanFormat(), ['size' => 1]); ?>
+<?= $form->field($model, 'is_active')->checkbox(\Yii::$app->formatter->booleanFormat, false); ?>
 <?php endif; ?>
 <?= $form->field($model, 'gender')->radioList([
     'men' => \Yii::t('skeeks/cms', 'Male'),
@@ -49,9 +49,9 @@ $action = $controller->action;
 <?= $form->field($model, 'patronymic')->textInput(); ?>
 
 <?= $form->field($model, 'email')->textInput(); ?>
-        <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
-            <?= $form->field($model, 'email_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
-        <?php endif; ?>
+        <?php /*if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : */?><!--
+            <?/*= $form->field($model, 'email_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); */?>
+        --><?php /*endif; */?>
 
 
 <?
@@ -66,9 +66,9 @@ JS
         <?= $form->field($model, 'phone')->textInput([
             'placeholder' => '+7 903 722-28-73'
         ]); ?>
-        <?php if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : ?>
-            <?= $form->field($model, 'phone_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); ?>
-        <?php endif; ?>
+        <?php /*if (\Yii::$app->user->can('cms/admin-user/update-advanced')) : */?><!--
+            <?/*= $form->field($model, 'phone_is_approved')->checkbox(\Yii::$app->formatter->booleanFormat); */?>
+        --><?php /*endif; */?>
 
 
 

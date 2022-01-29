@@ -19,6 +19,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\CmsUserEmail;
+use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\models\forms\LoginFormUsernameOrEmail;
 use skeeks\cms\models\forms\PasswordResetRequestFormEmailOrLogin;
 use skeeks\cms\models\forms\SignupForm;
@@ -353,7 +354,7 @@ class AuthController extends Controller
             /**
              * @var $cmsUserEmail CmsUserEmail
              */
-            $cmsUserEmail = CmsUserEmail::find()->where(['approved_key' => $token])->one();
+            $cmsUserEmail = CmsUserEmail::find()->cmsSite()->where(['approved_key' => $token])->one();
 
             if ($cmsUserEmail) {
                 $cmsUserEmail->is_approved = 1;
@@ -363,14 +364,14 @@ class AuthController extends Controller
 
                 if ($cmsUserEmail->save()) {
 
-                    if ($cmsUserEmail->cmsUser->email == $cmsUserEmail->value) {
+                    /*if ($cmsUserEmail->cmsUser->email == $cmsUserEmail->value) {
                         $user = $cmsUserEmail->cmsUser;
                         $user->email_is_approved = 1;
                         if (!$user->save()) {
                             print_r($user->errors);
                             die;
                         }
-                    }
+                    }*/
 
                     \Yii::$app->user->login($cmsUserEmail->cmsUser);
                     return $this->redirect(Yii::$app->getUser()->getReturnUrl());
@@ -424,7 +425,7 @@ class AuthController extends Controller
                 $rr->success = true;
                 $rr->message = '';
 
-                if ($user = CmsUser::find()->andWhere(['phone' => $model->phone])->one()) {
+                if ($user = CmsUser::find()->cmsSite()->phone($model->phone)->one()) {
                     //Если пользователь существует
                     //Нужно предложить ему авторизоваться с его паролем
 
@@ -508,7 +509,7 @@ class AuthController extends Controller
                 /**
                  * @var $user CmsUser
                  */
-                if (!$user = CmsUser::find()->andWhere(['phone' => $model->phone])->one()) {
+                if (!$user = CmsUser::find()->cmsSite()->andWhere(['phone' => $model->phone])->one()) {
                     throw new Exception("Некорректные данные для входа");
                 }
 
@@ -546,15 +547,15 @@ class AuthController extends Controller
 
         if ($rr->isRequestAjaxPost()) {
             if (\Yii::$app->request->post('phone_code') == $this->getSessionAuthPhoneCode() && $this->getSessionAuthPhone()) {
-                $user = CmsUser::find()->andWhere(['phone' => $this->getSessionAuthPhone()])->one();
+                $userPhone = CmsUserPhone::find()->cmsSite()->andWhere(['value' => $this->getSessionAuthPhone()])->one();
 
-                if (!$user->phone_is_approved) {
-                    $user->phone_is_approved = 1;
-                    $user->save();
+                if (!$userPhone->is_approved) {
+                    $userPhone->is_approved = 1;
+                    $userPhone->update(false, ['is_approved']);
                 }
 
 
-                \Yii::$app->user->login($user, 3600 * 24 * 30);
+                \Yii::$app->user->login($userPhone->cmsUser, 3600 * 24 * 30);
 
                 $rr->success = true;
                 $rr->message = 'Авторизация прошла успешно';
@@ -584,16 +585,22 @@ class AuthController extends Controller
         if ($rr->isRequestAjaxPost()) {
             if (\Yii::$app->request->post('email_code') == $this->getSessionAuthEmailCode() && $this->getSessionAuthEmail()) {
                 /**
-                 * @var $user CmsUser
+                 * @var $userEmail CmsUserEmail
                  */
-                $user = CmsUser::find()->andWhere(['email' => $this->getSessionAuthEmail()])->one();
+                $userEmail = CmsUserEmail::find()->cmsSite()->andWhere(['value' => $this->getSessionAuthEmail()])->one();
 
-                if (!$user->email_is_approved) {
-                    $user->email_is_approved = 1;
-                    $user->save();
+                if (!$userEmail) {
+                    $rr->success = false;
+                    $rr->message = 'Email не найден в базе';
+                    return $rr;
                 }
 
-                \Yii::$app->user->login($user, 3600 * 24 * 30);
+                if (!$userEmail->is_approved) {
+                    $userEmail->is_approved = 1;
+                    $userEmail->update(false, ['is_approved']);
+                }
+
+                \Yii::$app->user->login($userEmail->cmsUser, 3600 * 24 * 30);
 
                 $rr->success = true;
                 $rr->message = 'Авторизация прошла успешно';
@@ -712,7 +719,7 @@ class AuthController extends Controller
                 $rr->success = true;
                 $rr->message = '';
 
-                if ($user = CmsUser::find()->andWhere(['email' => $model->email])->one()) {
+                if ($user = CmsUser::find()->cmsSite()->email($model->email)->one()) {
                     //Если пользователь существует
                     //Нужно предложить ему авторизоваться с его паролем
 
@@ -728,9 +735,15 @@ class AuthController extends Controller
                     $t = \Yii::$app->db->beginTransaction();
                     try {
 
+                        /**
+                         * @var $user CmsUser
+                         */
                         $class = \Yii::$app->user->identityClass;
                         $user = new $class();
                         $user->email = $model->email;
+                        /*$user->email = "info@sitika.ru";
+                        var_dump($user->validate());
+                        die;*/
                         if (!$user->save()) {
                             throw new Exception("Ошибка регистрации: ".print_r($user->errors, true));
                         }
@@ -795,7 +808,7 @@ class AuthController extends Controller
                 /**
                  * @var $user CmsUser
                  */
-                if (!$user = CmsUser::find()->andWhere(['email' => $model->email])->one()) {
+                if (!$user = CmsUser::find()->cmsSite()->email($model->email)->one()) {
                     throw new Exception("Некорректные данные для входа");
                 }
 

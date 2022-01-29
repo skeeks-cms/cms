@@ -180,12 +180,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                             $query = null;
                                             if ($userIds) {
                                                 $userIds = array_keys($userIds);
-                                                $query = CmsUser::find()->where(['id' => $userIds]);
+                                                $query = CmsUser::find()->cmsSite()->where(['id' => $userIds]);
                                                 /*return ArrayHelper::map($q->all(), 'id', function(CmsUser $model) {
                                                     return $model->shortDisplayName . ($model->email ? " ($model->email)" : "");
                                                 });*/
                                             } else {
-                                                $query = CmsUser::find()->where(['id' => null]);
+                                                $query = CmsUser::find()->cmsSite()->where(['id' => null]);
                                             }
 
 

@@ -24,9 +24,9 @@ $model = $action->model;
                 <div class="col-6 g-py-10 g-py-25--md">
                     <a href="tel:<?php echo $model->phone; ?>" class="g-font-weight-300">
                         <i class="fas fa-phone"></i> <?php echo $model->phone; ?>
-                        <?php if ($model->phone_is_approved) : ?>
+                        <?php /*if ($model->phone_is_approved) : */?><!--
                             <i class="fas fa-check" style="color: green; font-size: 10px;" data-toggle="tooltip" title="Телефон подтвержден"></i>
-                        <?php endif; ?>
+                        --><?php /*endif; */?>
 
                     </a>
                 </div>
@@ -34,9 +34,9 @@ $model = $action->model;
                 <div class="col-6 g-brd-left--md g-brd-gray-light-v4 g-py-10 g-py-25--md">
                     <a href="mailto:<?php echo $model->email; ?>" class="g-font-weight-300">
                         <i class="far fa-envelope"></i> <?php echo $model->email; ?>
-                        <?php if ($model->phone_is_approved) : ?>
+                        <?php /*if ($model->phone_is_approved) : */?><!--
                             <i class="fas fa-check" style="color: green; font-size: 10px;" data-toggle="tooltip" title="Email подтвержден"></i>
-                        <?php endif; ?>
+                        --><?php /*endif; */?>
                     </a>
                 </div>
             </section>

@@ -47,7 +47,7 @@ class CmsActiveQuery extends ActiveQuery
     }
     /**
      * @param int $order
-     * @return CmsActiveQuery
+     * @return $this
      */
     public function sort($order = SORT_ASC)
     {
@@ -55,20 +55,9 @@ class CmsActiveQuery extends ActiveQuery
     }
 
     /**
-     * @depricated
-     *
-     * @param bool $state
-     * @return CmsActiveQuery
-     */
-    public function def($state = true)
-    {
-        return $this->andWhere(['def' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
-    }
-
-    /**
      * Фильтрация по сайту
      *
-     * @return CmsActiveQuery
+     * @return $this
      */
     public function cmsSite($cmsSite = null)
     {
@@ -77,20 +66,23 @@ class CmsActiveQuery extends ActiveQuery
         }
 
         $alias = $this->getPrimaryTableName();
+
         if ($this->from) {
+                            var_dump($this->from);die;
+
             foreach ($this->from as $code => $table) {
                 if ($table == $alias) {
                     $alias = $code;
                 }
             }
         }
-        
+
         return $this->andWhere([$alias.'.cms_site_id' => $cmsSite->id]);
     }
 
     /**
      * @param string $word
-     * @return CmsActiveQuery
+     * @return $this
      */
     public function search($word = '')
     {
@@ -107,5 +99,17 @@ class CmsActiveQuery extends ActiveQuery
         }
 
         return $this;
+    }
+
+
+    /**
+     * @depricated
+     *
+     * @param bool $state
+     * @return $this
+     */
+    public function def($state = true)
+    {
+        return $this->andWhere(['def' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
     }
 }

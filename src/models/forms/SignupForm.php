@@ -159,7 +159,7 @@ class SignupForm extends Model
                 return $user;
 
             } elseif ($this->scenario == self::SCENARION_SHORTINFO) {
-                $user->generateUsername();
+                //$user->generateUsername();
                 $user->email = $this->email;
                 $user->last_name = $this->last_name;
                 $user->first_name = $this->first_name;
@@ -176,7 +176,7 @@ class SignupForm extends Model
 
                     $password = \Yii::$app->security->generateRandomString(6);
 
-                    $user->generateUsername();
+                    //$user->generateUsername();
                     $user->setPassword($password);
                     $user->email = $this->email;
                     $user->generateAuthKey();
