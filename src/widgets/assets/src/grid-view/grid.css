@@ -175,3 +175,8 @@
         border-top: 0.8px solid rgb(34 36 38 / 7%);
         vertical-align: middle;
     }
+
+/*
+table.sx-table a {
+    color: black;
+}*/

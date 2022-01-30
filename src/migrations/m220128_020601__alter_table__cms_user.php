@@ -8,7 +8,7 @@
 
 use yii\db\Migration;
 
-class m230127_020601__alter_table__cms_user extends Migration
+class m220128_020601__alter_table__cms_user extends Migration
 {
     public function safeUp()
     {
