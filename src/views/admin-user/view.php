@@ -201,7 +201,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
             <div class="sx-properties-wrapper sx-columns-1" style="">
                 <ul class="sx-properties">
 
-                    <li>
+                    <!--<li>
                         <span class="sx-properties--name">
                             Активность
                         </span>
@@ -210,11 +210,11 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                                   data-form="#is_active-form"
                                   data-title="Активность"
                             >
-                                <?php echo $model->is_active ? '<span data-toggle="tooltip" title="Пользователь активен"  style="color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red;">x</span>' ?>
+                                <?php /*echo $model->is_active ? '<span data-toggle="tooltip" title="Пользователь активен"  style="color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red;">x</span>' */?>
                             </span>
 
                             <div class="sx-fast-edit-form-wrapper">
-                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                <?php /*$form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                                     'id'             => "is_active-form",
                                     'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id]),
                                     'options'        => [
@@ -229,16 +229,16 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                                         }
 JS
                                     ),
-                                ]); ?>
-                                <?php echo $form->field($model, 'is_active')->radioList(\Yii::$app->formatter->booleanFormat)->label(false); ?>
+                                ]); */?>
+                                <?php /*echo $form->field($model, 'is_active')->radioList(\Yii::$app->formatter->booleanFormat)->label(false); */?>
                                     <div class="input-group-append">
                                         <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
                                     </div>
-                                <?php $form::end(); ?>
+                                <?php /*$form::end(); */?>
                             </div>
 
                         </span>
-                    </li>
+                    </li>-->
 
                     <li>
                         <span class="sx-properties--name">
