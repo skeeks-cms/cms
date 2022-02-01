@@ -18,7 +18,7 @@
         </div>
     <? endif; ?>
     <div class="col my-auto">
-        <h1 style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->displayName; ?> <?php echo $model->is_active ? '<span data-toggle="tooltip" title="Пользователь активен"  style="font-size: 20px; color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red; font-size: 20px;">x</span>' ?></h1>
+        <h1 style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->displayName; ?> <?php echo $model->is_active ? '<span data-html="true" data-toggle="tooltip" title="Пользователь активен<br />Значит он может авторизоваться на сайте."  style="font-size: 20px; color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red; font-size: 20px;">x</span>' ?></h1>
         <div class="sx-small-info" style="font-size: 10px; color: silver;">
             <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
             <? if ($model->created_at) : ?>

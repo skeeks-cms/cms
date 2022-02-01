@@ -42,7 +42,7 @@ class m220127_220601__create_table__cms_user_phone extends Migration
 
             'name' => $this->string(255)->comment("Примечание к телефону"),
 
-            'priority' => $this->integer()->notNull()->defaultValue(500),
+            'sort' => $this->integer()->notNull()->defaultValue(500),
 
             'is_approved'     => $this->integer()->notNull()->defaultValue(0)->comment("Телефон подтвержден?"),
             'approved_key'    => $this->string(255)->comment("Ключ для подтверждения телефона"),
@@ -63,7 +63,7 @@ class m220127_220601__create_table__cms_user_phone extends Migration
         $this->createIndex($tableName.'__uniq2site', $tableName, ['cms_site_id', 'value'], true);
         $this->createIndex($tableName.'__uniq2user', $tableName, ['cms_user_id', 'value'], true);
 
-        $this->createIndex($tableName.'__priority', $tableName, ['priority']);
+        $this->createIndex($tableName.'__sort', $tableName, ['sort']);
 
         $this->addCommentOnTable($tableName, 'Телефоны пользователей');
 
