@@ -58,20 +58,6 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_user_id', 'sort', 'is_approved', 'approved_key_at'], 'integer'],
-            [['cms_user_id', 'value'], 'required'],
-            [['value', 'name', 'approved_key'], 'string', 'max' => 255],
-            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['cms_user_id' => 'id']],
-            [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
-
-            [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value']],
-            [['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value']],
-
-            [['is_approved'], 'default', 'value' => 0],
-            [['name', 'approved_key_at', 'approved_key'], 'default', 'value' => null],
-
             [
                 'cms_site_id',
                 'default',
@@ -82,10 +68,30 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
                 },
             ],
 
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_user_id', 'sort', 'is_approved', 'approved_key_at'], 'integer'],
+            [['cms_user_id', 'value'], 'required'],
+            [['value', 'name', 'approved_key'], 'string', 'max' => 255],
+            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['cms_user_id' => 'id']],
+            [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
+            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
+            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
+
+            [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value'], 'message' => 'Этот email уже занят'],
+            [['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value'], 'message' => 'Этот email уже занят'],
+
+            [['is_approved'], 'default', 'value' => 0],
+            [['name', 'approved_key_at', 'approved_key'], 'default', 'value' => null],
+
+
+
             [['value'], "filter", 'filter' => 'trim'],
-            [['value'], "filter", 'filter' => function($value) {
-                return StringHelper::strtolower($value);
-            }],
+            [
+                ['value'],
+                "filter",
+                'filter' => function ($value) {
+                    return StringHelper::strtolower($value);
+                },
+            ],
             [['value'], "email"],
         ]);
     }
@@ -98,6 +104,7 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_user_id' => Yii::t('skeeks/cms', 'User'),
+            'name'        => "Описание",
             'value'       => "Email",
         ]);
     }

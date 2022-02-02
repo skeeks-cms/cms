@@ -6,15 +6,11 @@
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
 <? if ($contentModel->isAllowEdit("active")) : ?>
-    <div class="row">
-        <div class="col" style="<?= !$model->is_active ? "color: red;" : ""; ?>">
-            <?= $form->field($model, 'active')->checkbox([
-                'uncheck'                                                         => \skeeks\cms\components\Cms::BOOL_N,
-                'value'                                                           => \skeeks\cms\components\Cms::BOOL_Y,
-                \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
-            ]); ?>
-        </div>
-    </div>
+    <?= $form->field($model, 'active')->checkbox([
+        'uncheck'                                                         => \skeeks\cms\components\Cms::BOOL_N,
+        'value'                                                           => \skeeks\cms\components\Cms::BOOL_Y,
+        \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
+    ]); ?>
 <? endif; ?>
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
@@ -38,23 +34,19 @@
 
 <?php if ($contentModel->is_allow_change_tree) : ?>
     <?php if ($rootTreeModels) : ?>
-        <div class="row">
-            <div class="col-md-12">
-                <?= $form->field($model, 'tree_id')->widget(
-                    \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+        <?= $form->field($model, 'tree_id')->widget(
+            \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+            [
+                'options'           => [
+                    'data-form-reload' => 'true',
+                ],
+                'multiple'          => false,
+                'treeWidgetOptions' =>
                     [
-                        'options'           => [
-                            'data-form-reload' => 'true',
-                        ],
-                        'multiple'          => false,
-                        'treeWidgetOptions' =>
-                            [
-                                'models' => $rootTreeModels,
-                            ],
-                    ]
-                ); ?>
-            </div>
-        </div>
+                        'models' => $rootTreeModels,
+                    ],
+            ]
+        ); ?>
     <?php endif; ?>
 <?php endif; ?>
 
@@ -130,7 +122,7 @@ JS
 
 
     <? if ($createProperty) : ?>
-        <div class="sx-controlls" style="margin-bottom: 10px;">
+        <div class="sx-controlls" style="margin-bottom: 10px; margin-left: 15px;">
             <?php echo $createProperty; ?>
             <a href="#" class="btn btn-default sx-btn-search-property"><i class="fa fa-search"></i> Добавить существующую</a>
 
@@ -195,11 +187,12 @@ JS
 .form-group .sx-fast-edit {
     transition: 1s;
     color: gray;
-    position: absolute;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
     left: 15px;
     z-index: 999;
+}
+.sx-edit-prop-wrapper {
+    max-width: 100px;
+    text-align: right;
 }
 CSS
     );
@@ -208,8 +201,6 @@ CSS
         <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
 
             <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */ ?>
-            <div class="row">
-                <div class="col-md-12">
                     <?
                     $create = '';
                     ?>
@@ -263,23 +254,20 @@ JS
                         'controllerId' => "/cms/admin-cms-content-property/",
                         'modelId'      => $property->id,
                         'tag'          => 'span',
-                        'content'      => '<i class="fas fa-pencil-alt"></i>',
+                        'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
                         'options'      => [
                             'class' => 'sx-fast-edit',
                         ],
                     ]);
 
-                    $field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
+                    $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
+                    //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
                     echo $field;
                     ?>
-                </div>
-            </div>
             <?php /*\skeeks\cms\modules\admin\widgets\Pjax::end(); */ ?>
         <?php elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT): ?>
 
             <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */ ?>
-            <div class="row">
-                <div class="col-md-12">
                     <?
                     $create = '';
                     ?>
@@ -335,14 +323,15 @@ JS
                             'controllerId' => "/cms/admin-cms-content-property/",
                             'modelId'      => $property->id,
                             'tag'          => 'span',
-                            'content'      => '<i class="fas fa-pencil-alt"></i>',
+                            'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
                             'options'      => [
                                 'class' => 'sx-fast-edit',
                             ],
                         ]);
                         ?>
                         <? $field = $property->renderActiveForm($form, $model);
-                        $field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
+                        //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
+                        $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
                         echo $field;
                         ?>
 
@@ -353,7 +342,7 @@ JS
                             'controllerId' => "/cms/admin-cms-content-property/",
                             'modelId'      => $property->id,
                             'tag'          => 'span',
-                            'content'      => '<i class="fas fa-pencil-alt"></i>',
+                            'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
                             'options'      => [
                                 'class' => 'sx-fast-edit',
                             ],
@@ -361,12 +350,11 @@ JS
                         ?>
 
                         <? $field = $property->renderActiveForm($form, $model);
-                        $field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}111</div><div class="col-md-8">{input}{hint}{error}</div></div>';
+                        $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
+                        //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-8">{input}{hint}{error}</div></div>';
                         echo $field;
                         ?>
                     <?php endif; ?>
-                </div>
-            </div>
             <?php /*\skeeks\cms\modules\admin\widgets\Pjax::end(); */ ?>
 
         <?php else
@@ -377,7 +365,7 @@ JS
                 'controllerId' => "/cms/admin-cms-content-property/",
                 'modelId'      => $property->id,
                 'tag'          => 'span',
-                'content'      => '<i class="fas fa-pencil-alt"></i>',
+                'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
                 'options'      => [
                     'class' => 'sx-fast-edit',
                 ],
@@ -385,7 +373,8 @@ JS
             ?>
 
             <? $field = $property->renderActiveForm($form, $model);
-            $field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-8">{input}{hint}{error}</div></div>';
+            //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-8">{input}{hint}{error}</div></div>';
+            $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
             echo $field;
             ?>
         <?php endif;
@@ -396,13 +385,13 @@ JS
     <?php /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
 <?php endif; ?>
 
-        <? if (count($properties) > 10) : ?>
-            <? if ($createProperty) : ?>
-                <div class="sx-controlls" style="margin-bottom: 10px; margin-top: 10px;">
-                    <?php echo $createProperty; ?>
-                    <a href="#" class="btn btn-default sx-btn-search-property"><i class="fa fa-search"></i> Добавить существующую</a>
-                </div>
-            <? endif; ?>
-        <? endif; ?>
+<? if (count($properties) > 10) : ?>
+    <? if ($createProperty) : ?>
+        <div class="sx-controlls" style="margin-bottom: 10px; margin-top: 10px; margin-left: 15px;">
+            <?php echo $createProperty; ?>
+            <a href="#" class="btn btn-default sx-btn-search-property"><i class="fa fa-search"></i> Добавить существующую</a>
+        </div>
+    <? endif; ?>
+<? endif; ?>
 
 <? $fieldSet::end(); ?>

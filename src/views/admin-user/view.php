@@ -201,6 +201,27 @@ ul.sx-properties .sx-properties--name:after {
     padding: 10px;
     background: #f9f9f9;
 }
+
+.sx-label {
+    font-size: 11px;
+    color: #a1a1a1;
+}
+
+.sx-value-row {
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+.sx-edit-btn {
+    color: silver;
+    cursor: pointer;
+    opacity: 0;
+    margin-right: 5px;
+    transition: 0.4s;
+}
+.sx-value-row:hover .sx-edit-btn {
+    opacity: 1;
+}
+
 CSS
 );
 $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
@@ -211,140 +232,158 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
 <div class="row no-gutters">
     <div class="col-lg-4 col-sm-6 col-12">
         <div class="sx-block">
-            <div class="sx-block-title">Контактные данные <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Основные контактные данные, телефон-ы, email-ы, адреса.<br />При помощи этих данных пользователь может авторизоваться на сайте." class="far fa-question-circle"></i></div>
+            <div class="sx-block-title">Телефон <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                   title="У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."
+                                                   class="far fa-question-circle"></i>
+            </div>
             <div class="sx-block-content">
-                <div class="sx-properties-wrapper sx-columns-1" style="">
-                    <ul class="sx-properties">
+                <div class="sx-phones-block">
+                    <? foreach ($model->cmsUserPhones as $cmsUserPhone) : ?>
+                        <div class="sx-value-row d-flex">
+                            <div style="width: 100%;">
+                                <div class="sx-label">
+                                    <? if ($cmsUserPhone->name) : ?>
+                                        <? echo $cmsUserPhone->name; ?>
+                                    <? else : ?>
+                                        Телефон
+                                    <? endif; ?>
+                                </div>
+                                <div class="sx-value">
+                                    <a href="#"><?php echo $cmsUserPhone->value; ?></a>
+                                    <?php if ($cmsUserPhone->is_approved) : ?>
+                                        <span data-html="true" data-toggle="tooltip" style="color: green;"
+                                              title="Телефон подтвержден пользователем<br />Пользователь реально получил код на этот телефон и подтвердил его.">✓</span>
+                                    <?php else : ?>
+                                        <span data-html="true" data-toggle="tooltip" style="color: silver; font-size: 12px;" title="Пользователь не подтверждал телефон."><i class="far fa-question-circle"></i></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
 
-                        <!--<li>
-                            <span class="sx-properties--name">
-                                Активность
-                            </span>
-                            <span class="sx-properties--value">
-                                <span class="sx-fast-edit sx-fast-edit-popover"
-                                      data-form="#is_active-form"
-                                      data-title="Активность"
-                                >
-                                    <?php /*echo $model->is_active ? '<span data-toggle="tooltip" title="Пользователь активен"  style="color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red;">x</span>' */ ?>
-                                </span>
+                            <div class="my-auto">
+                                <?
+                                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => "/cms/admin-user-phone",
+                                    'modelId'      => $cmsUserPhone->id,
+                                    'tag'          => 'div',
+                                    'options'      => [
+                                        'title' => 'Редактировать телефон',
+                                        'class' => 'sx-edit-btn btn btn-default',
+                                    ],
+                                ]);
+                                ?>
+                                    <!--<i class="hs-admin-angle-down"></i>-->
+                                    <i class="fas fa-ellipsis-v"></i>
+                                <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
 
-                                <div class="sx-fast-edit-form-wrapper">
-                                    <?php /*$form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                        'id'             => "is_active-form",
-                                        'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id]),
-                                        'options'        => [
-                                            'class' => 'sx-fast-edit-form',
-                                        ],
-                                        'clientCallback' => new \yii\web\JsExpression(<<<JS
-                                            function (ActiveFormAjaxSubmit) {
-                                                ActiveFormAjaxSubmit.on('success', function(e, response) {
-                                                    $.pjax.reload("#{$pjax->id}");
-                                                    $(".sx-fast-edit").popover("hide");
-                                                });
-                                            }
-    JS
-                                        ),
-                                    ]); */ ?>
-                                    <?php /*echo $form->field($model, 'is_active')->radioList(\Yii::$app->formatter->booleanFormat)->label(false); */ ?>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
-                                        </div>
-                                    <?php /*$form::end(); */ ?>
+                            </div>
+                            <div class="my-auto d-flex">
+                                <div class="btn btn-default" data-html="true" title="Написать sms" style="margin-right: 5px;">
+                                    <i class="fas fa-sms"></i>
                                 </div>
 
-                            </span>
-                        </li>-->
-
-                        <li>
-                            <span class="sx-properties--name">
-                                Email
-                            </span>
-                            <span class="sx-properties--value">
-                                <span class="sx-fast-edit sx-fast-edit-popover"
-                                      data-form="#emails-form"
-                                      data-title="Email"
-                                >
-                                    <?php echo $model->email ? $model->email : $noValue; ?>
-                                </span>
-
-                                <div class="sx-fast-edit-form-wrapper">
-                                    <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                        'id'             => "emails-form",
-                                        'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id]),
-                                        'options'        => [
-                                            'class' => 'sx-fast-edit-form',
-                                        ],
-                                        'clientCallback' => new \yii\web\JsExpression(<<<JS
-                                            function (ActiveFormAjaxSubmit) {
-                                                ActiveFormAjaxSubmit.on('success', function(e, response) {
-                                                    $.pjax.reload("#{$pjax->id}");
-                                                    $(".sx-fast-edit").popover("hide");
-                                                });
-                                            }
-JS
-                                        ),
-                                    ]); ?>
-                                    <?php echo $form->field($model, 'email')->textInput()->label(false); ?>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
-                                        </div>
-                                    <?php $form::end(); ?>
+                                <div class="btn btn-default" data-html="true" title="Начать звонок">
+                                    <i class="fas fa-phone"></i>
                                 </div>
-
-                            </span>
-                        </li>
-
-                        <li>
-                            <span class="sx-properties--name">
-                                Телефон
-                            </span>
-                            <span class="sx-properties--value">
-                                <span class="sx-fast-edit sx-fast-edit-popover"
-                                      data-form="#phones-form"
-                                      data-title="Телефон"
-                                >
-                                    <?php echo $model->phone ? $model->phone : $noValue; ?>
-                                </span>
-
-                                <div class="sx-fast-edit-form-wrapper">
-                                    <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                        'id'             => "phones-form",
-                                        'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id]),
-                                        'options'        => [
-                                            'class' => 'sx-fast-edit-form',
-                                        ],
-                                        'clientCallback' => new \yii\web\JsExpression(<<<JS
-                                            function (ActiveFormAjaxSubmit) {
-                                                ActiveFormAjaxSubmit.on('success', function(e, response) {
-                                                    $.pjax.reload("#{$pjax->id}");
-                                                    $(".sx-fast-edit").popover("hide");
-                                                });
-                                            }
-JS
-                                        ),
-                                    ]); ?>
-                                    <?php echo $form->field($model, 'phone')->textInput()->label(false); ?>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
-                                        </div>
-                                    <?php $form::end(); ?>
-                                </div>
-
-                            </span>
-                        </li>
-
-                    </ul>
+                            </div>
+                        </div>
+                    <? endforeach; ?>
                 </div>
+                <?
+
+                    $actionData = \yii\helpers\Json::encode([
+    "isOpenNewWindow" => true,
+    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(["/cms/admin-user-phone/create", 'CmsUserPhone' => [
+            'cms_user_id' => $model->id 
+    ]])->enableEmptyLayout()->enableNoActions()->url,
+]);
+                    ?>
+                <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+                ); ?>'>Добавить</button>
             </div>
         </div>
+
+
         <div class="sx-block">
-            <div class="sx-block-title">Контрагенты <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle"></i></div>
+            <div class="sx-block-title">Email <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                   title="У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию."
+                                                   class="far fa-question-circle"></i>
+            </div>
+            <div class="sx-block-content">
+                <div class="sx-phones-block">
+                    <? foreach ($model->cmsUserEmails as $cmsUserEmail) : ?>
+                        <div class="sx-value-row d-flex">
+                            <div style="width: 100%;">
+                                <div class="sx-label">
+                                    <? if ($cmsUserEmail->name) : ?>
+                                        <? echo $cmsUserEmail->name; ?>
+                                    <? else : ?>
+                                        Email
+                                    <? endif; ?>
+                                </div>
+                                <div class="sx-value">
+                                    <a href="#"><?php echo $cmsUserEmail->value; ?></a>
+                                    <?php if ($cmsUserEmail->is_approved) : ?>
+                                        <span data-html="true" data-toggle="tooltip" style="color: green;"
+                                              title="Email подтвержден пользователем<br />Пользователь реально получил код на этот email и подтвердил его.">✓</span>
+                                    <?php else : ?>
+                                        <span data-html="true" data-toggle="tooltip" style="color: silver; font-size: 12px;" title="Пользователь не подтверждал email."><i class="far fa-question-circle"></i></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div class="my-auto">
+                                <?
+                                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => "/cms/admin-user-email",
+                                    'modelId'      => $cmsUserEmail->id,
+                                    'tag'          => 'div',
+                                    'options'      => [
+                                        'title' => 'Редактировать email',
+                                        'class' => 'sx-edit-btn btn btn-default',
+                                    ],
+                                ]);
+                                ?>
+                                    <!--<i class="hs-admin-angle-down"></i>-->
+                                    <i class="fas fa-ellipsis-v"></i>
+                                <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+
+                            </div>
+                            <div class="my-auto">
+                                <div class="btn btn-default" data-html="true" title="Написать письмо">
+                                    <i class="far fa-envelope"></i>
+                                </div>
+                            </div>
+                        </div>
+                    <? endforeach; ?>
+                </div>
+                <?
+
+                    $actionData = \yii\helpers\Json::encode([
+    "isOpenNewWindow" => true,
+    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(["/cms/admin-user-email/create", 'CmsUserEmail' => [
+            'cms_user_id' => $model->id
+    ]])->enableEmptyLayout()->enableNoActions()->url,
+]);
+                    ?>
+                <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+                ); ?>'>Добавить</button>
+            </div>
+        </div>
+
+        <div class="sx-block">
+            <div class="sx-block-title">Контрагенты <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                       title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle"></i></div>
             <div class="sx-block-content">
                 <button class="btn btn-default">Добавить</button>
             </div>
         </div>
         <div class="sx-block">
-            <div class="sx-block-title">Менеджеры и сотрудники <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этим клиентом." class="far fa-question-circle"></i></div>
+            <div class="sx-block-title">Менеджеры и сотрудники <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этим клиентом."
+                                                                  class="far fa-question-circle"></i></div>
             <div class="sx-block-content">
                 <button class="btn btn-default">Добавить</button>
             </div>
@@ -353,7 +392,9 @@ JS
 
     <div class="col-lg-8 col-sm-6 col-12" style="padding-left: 10px;">
         <div class="sx-block">
-            <div class="sx-block-title">Лента <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Лента активности по этому пользователю, заметки, письма, звонки, задачи. Распологаются на временной линии. Сверху самые новые события." class="far fa-question-circle"></i></b></div>
+            <div class="sx-block-title">Лента <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                 title="Лента активности по этому пользователю, заметки, письма, звонки, задачи. Распологаются на временной линии. Сверху самые новые события."
+                                                 class="far fa-question-circle"></i></b></div>
             <div class="sx-block-content">
                 Добавить комментарий
             </div>

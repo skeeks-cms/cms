@@ -47,8 +47,6 @@ JS
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
-
-
 <?= $form->field($model, 'active')->checkbox([
     'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
     'value'   => \skeeks\cms\components\Cms::BOOL_Y,
@@ -109,21 +107,15 @@ JS
     ]
 ); ?>
 
-    <div class="row">
-        <div class="col-md-3">
-        </div>
-        <div class="col-md-3">
-
-            <?= Html::checkbox("isLink", (bool)($model->redirect || $model->redirect_tree_id), [
-                'value' => '1',
-                'label' => \Yii::t('skeeks/cms', 'This section is a link'),
-                'class' => 'smartCheck',
-                'id'    => 'isLink',
-            ]); ?>
-        </div>
+    <div class="form-group">
+        <?= Html::checkbox("isLink", (bool)($model->redirect || $model->redirect_tree_id), [
+            'value' => '1',
+            'label' => \Yii::t('skeeks/cms', 'This section is a link'),
+            'class' => 'smartCheck',
+            'id'    => 'isLink',
+        ]); ?>
     </div>
 
-    
 
     <div data-listen="isLink" data-show="1" class="sx-hide">
 
@@ -186,9 +178,8 @@ JS
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement'), ['isOpen' => false]); ?>
 
 
-
     <div data-listen="isLink" data-show="0" class="sx-hide">
-        <?= $form->field($model, 'description_short')->widget(
+        <?= $form->field($model, 'description_short')->label(false)->widget(
             \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
             [
                 'modelAttributeSaveType' => 'description_short_type',
@@ -255,7 +246,7 @@ JS
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Дополнительно'), ['isOpen' => false]); ?>
 
-<div data-listen="isLink" data-show="0" class="sx-hide">
+    <div data-listen="isLink" data-show="0" class="sx-hide">
 
 
         <?= $form->field($model, 'view_file')->textInput()

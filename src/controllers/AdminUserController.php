@@ -174,14 +174,18 @@ class AdminUserController extends BackendModelStandartController
                                      */
                                     $query = $e->dataProvider->query;
 
+                                    $query->joinWith("cmsUserEmails as cmsUserEmails");
+                                    $query->joinWith("cmsUserPhones as cmsUserPhones");
+
                                     if ($e->field->value) {
                                         $query->andWhere([
                                             'or',
                                             ['like', CmsUser::tableName().'.first_name', $e->field->value],
                                             ['like', CmsUser::tableName().'.last_name', $e->field->value],
                                             ['like', CmsUser::tableName().'.patronymic', $e->field->value],
-                                            ['like', CmsUser::tableName().'.email', $e->field->value],
-                                            ['like', CmsUser::tableName().'.phone', $e->field->value],
+
+                                            ['like', 'cmsUserEmails.value', $e->field->value],
+                                            ['like', 'cmsUserPhones.value', $e->field->value],
                                         ]);
                                     }
                                 },
@@ -375,7 +379,7 @@ class AdminUserController extends BackendModelStandartController
             'stat' => [
                 'class'          => BackendModelAction::class,
                 'name'           => 'Статистика',
-                'icon'           => 'fas fa-info-circle',
+                'icon'           => 'far fa-chart-bar',
                 'priority'       => 500,
 
                 'permissionName' => 'cms/admin-user/update-advanced',
@@ -424,6 +428,7 @@ class AdminUserController extends BackendModelStandartController
 
             'update' => [
                 "callback"       => [$this, 'update'],
+                'isVisible' => false,
                 'generateAccess' => true,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {

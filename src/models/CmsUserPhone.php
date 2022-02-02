@@ -60,20 +60,6 @@ class CmsUserPhone extends ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_user_id', 'sort', 'is_approved', 'approved_key_at'], 'integer'],
-            [['cms_user_id', 'value'], 'required'],
-            [['value', 'name', 'approved_key'], 'string', 'max' => 255],
-            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['cms_user_id' => 'id']],
-            [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
-
-            [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value']],
-            [['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value']],
-
-            [['is_approved'], 'default', 'value' => 0],
-            [['name', 'approved_key_at', 'approved_key'], 'default', 'value' => null],
-
             [
                 'cms_site_id',
                 'default',
@@ -83,6 +69,20 @@ class CmsUserPhone extends ActiveRecord
                     }
                 },
             ],
+
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_user_id', 'sort', 'is_approved', 'approved_key_at'], 'integer'],
+            [['cms_user_id', 'value'], 'required'],
+            [['value', 'name', 'approved_key'], 'string', 'max' => 255],
+            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['cms_user_id' => 'id']],
+            [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
+            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
+            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
+
+            [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value'], 'message' => 'Этот телефон уже занят'],
+            [['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value'], 'message' => 'Этот телефон уже занят'],
+
+            [['is_approved'], 'default', 'value' => 0],
+            [['name', 'approved_key_at', 'approved_key'], 'default', 'value' => null],
 
             [['value'], "filter", 'filter' => 'trim'],
             [['value'], "filter", 'filter' => function($value) {
@@ -99,15 +99,11 @@ class CmsUserPhone extends ActiveRecord
      */
     public function attributeLabels()
     {
-        return [
-            'id'         => Yii::t('skeeks/cms', 'ID'),
-            'user_id'    => Yii::t('skeeks/cms', 'User'),
-            'value'      => \Yii::t('skeeks/cms', "Phone Number"),
-            'approved'   => \Yii::t('skeeks/cms', "Approved"),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'def'        => 'Def',
-        ];
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'cms_user_id' => Yii::t('skeeks/cms', 'User'),
+            'name'        => "Описание",
+            'value'       => "Телефон",
+        ]);
     }
 
     /**

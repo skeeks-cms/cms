@@ -14,7 +14,6 @@ use common\models\User;
 /* @var $model \skeeks\cms\models\CmsLang */
 $controller = $this->context;
 $action = $controller->action;
-
 ?>
 
 
@@ -41,7 +40,10 @@ $action = $controller->action;
     ]
 ); ?>
 
-<?= $form->field($model, 'username')->textInput(['maxlength' => 25])->hint(\Yii::t('skeeks/cms',
+<?= $form->field($model, 'username')->textInput([
+    'maxlength' => 25,
+    'autocomplite' => 'off'
+])->hint(\Yii::t('skeeks/cms',
     'The unique username. Used for authorization and to form links to personal cabinet.')); ?>
 
 <?= $form->field($model, 'first_name')->textInput(); ?>

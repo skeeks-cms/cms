@@ -30,6 +30,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\IdentityInterface;
 
 /**
@@ -191,7 +192,7 @@ class User
                 if ($cmsUserEmail->value != $value) {
                     $cmsUserEmail->value = $value;
                     if (!$cmsUserEmail->save()) {
-                        throw new Exception("Email не обновлен! " . print_r($cmsUserEmail->errors, true));
+                        throw new Exception("Email не обновлен! ".print_r($cmsUserEmail->errors, true));
                     }
                 }
             } else {
@@ -199,7 +200,7 @@ class User
                 $cmsUserEmail->value = $value;
                 $cmsUserEmail->cms_user_id = $this->id;
                 if (!$cmsUserEmail->save()) {
-                    throw new Exception("Email не обновлен! " . print_r($cmsUserEmail->errors, true));
+                    throw new Exception("Email не обновлен! ".print_r($cmsUserEmail->errors, true));
                 }
             }
         }
@@ -211,7 +212,7 @@ class User
                 if ($cmsUserPhone->value != $value) {
                     $cmsUserPhone->value = $value;
                     if (!$cmsUserPhone->save()) {
-                        throw new Exception("Телефон не обновлен! " . print_r($cmsUserPhone->errors, true));
+                        throw new Exception("Телефон не обновлен! ".print_r($cmsUserPhone->errors, true));
                     }
                 }
             } else {
@@ -219,7 +220,7 @@ class User
                 $cmsUserPhone->value = $value;
                 $cmsUserPhone->cms_user_id = $this->id;
                 if (!$cmsUserPhone->save()) {
-                    throw new Exception("Телефон не обновлен! " . print_r($cmsUserPhone->errors, true));
+                    throw new Exception("Телефон не обновлен! ".print_r($cmsUserPhone->errors, true));
                 }
             }
         }
@@ -325,63 +326,77 @@ class User
             [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::class],
             [['phone'], "filter", 'filter' => 'trim'],
-            [['phone'], "filter", 'filter' => function($value) {
-                return StringHelper::strtolower($value);
-            }],
-            [['phone'], function($attribute) {
-                $value = StringHelper::strtolower(trim($this->{$attribute}));
+            [
+                ['phone'],
+                "filter",
+                'filter' => function ($value) {
+                    return StringHelper::strtolower($value);
+                },
+            ],
+            [
+                ['phone'],
+                function ($attribute) {
+                    $value = StringHelper::strtolower(trim($this->{$attribute}));
 
-                if ($this->isNewRecord) {
-                    if (CmsUserPhone::find()->cmsSite()->andWhere(['value' => $value])->one()) {
-                        $this->addError($attribute, "Этот телефон уже занят");
+                    if ($this->isNewRecord) {
+                        if (CmsUserPhone::find()->cmsSite()->andWhere(['value' => $value])->one()) {
+                            $this->addError($attribute, "Этот телефон уже занят");
+                        }
+                    } else {
+                        if (CmsUserPhone::find()
+                            ->cmsSite()
+                            ->andWhere(['value' => $value])
+                            ->andWhere(['!=', 'cms_user_id', $this->id])
+                            ->one()) {
+                            $this->addError($attribute, "Этот телефон уже занят");
+                        }
+                        if ($this->mainCmsUserPhone && $this->mainCmsUserPhone->is_approved && $this->mainCmsUserPhone->value != $value) {
+                            $this->addError($attribute, "Этот телефон подтвержден, и его менять нельзя. Добавьте другой телефон, а после удалите этот!");
+                            return false;
+                        }
                     }
-                } else {
-                    if (CmsUserPhone::find()
-                        ->cmsSite()
-                        ->andWhere(['value' => $value])
-                        ->andWhere(['!=', 'cms_user_id', $this->id])
-                        ->one()) {
-                        $this->addError($attribute, "Этот телефон уже занят");
-                    }
-                    if ($this->mainCmsUserPhone && $this->mainCmsUserPhone->is_approved && $this->mainCmsUserPhone->value != $value) {
-                        $this->addError($attribute, "Этот телефон подтвержден, и его менять нельзя. Добавьте другой телефон, а после удалите этот!");
-                        return false;
-                    }
-                }
-            }],
+                },
+            ],
 
 
             [['email'], 'string', 'max' => 64],
             [['email'], 'email'],
             [['email'], "filter", 'filter' => 'trim'],
-            [['email'], "filter", 'filter' => function($value) {
-                return StringHelper::strtolower($value);
-            }],
-            [['email'], function($attribute) {
+            [
+                ['email'],
+                "filter",
+                'filter' => function ($value) {
+                    return StringHelper::strtolower($value);
+                },
+            ],
+            [
+                ['email'],
+                function ($attribute) {
 
-                $value = StringHelper::strtolower(trim($this->{$attribute}));
+                    $value = StringHelper::strtolower(trim($this->{$attribute}));
 
-                if ($this->isNewRecord) {
-                    if (CmsUserEmail::find()->cmsSite()->andWhere(['value' => $value])->one()) {
-                        $this->addError($attribute, "Этот email уже занят");
-                        return false;
-                    }
-                } else {
-                    if (CmsUserEmail::find()
-                        ->cmsSite()
-                        ->andWhere(['value' => $value])
-                        ->andWhere(['!=', 'cms_user_id', $this->id])
-                        ->one()) {
+                    if ($this->isNewRecord) {
+                        if (CmsUserEmail::find()->cmsSite()->andWhere(['value' => $value])->one()) {
+                            $this->addError($attribute, "Этот email уже занят");
+                            return false;
+                        }
+                    } else {
+                        if (CmsUserEmail::find()
+                            ->cmsSite()
+                            ->andWhere(['value' => $value])
+                            ->andWhere(['!=', 'cms_user_id', $this->id])
+                            ->one()) {
 
-                        $this->addError($attribute, "Этот email уже занят");
-                        return false;
+                            $this->addError($attribute, "Этот email уже занят");
+                            return false;
+                        }
+                        if ($this->mainCmsUserEmail && $this->mainCmsUserEmail->is_approved && $this->mainCmsUserEmail->value != $value) {
+                            $this->addError($attribute, "Этот email подтвержден, и его менять нельзя. Добавьте другой email, а после удалите этот!");
+                            return false;
+                        }
                     }
-                    if ($this->mainCmsUserEmail && $this->mainCmsUserEmail->is_approved && $this->mainCmsUserEmail->value != $value) {
-                        $this->addError($attribute, "Этот email подтвержден, и его менять нельзя. Добавьте другой email, а после удалите этот!");
-                        return false;
-                    }
-                }
-            }],
+                },
+            ],
 
             ['username', 'string', 'min' => 3, 'max' => 25],
             [['username'], 'unique', 'targetAttribute' => ['cms_site_id', 'username']],
@@ -412,7 +427,6 @@ class User
             [['roleNames'], 'default', 'value' => \Yii::$app->cms->registerRoles],
 
             [['first_name', 'last_name'], 'trim'],
-
         ];
     }
 
@@ -979,12 +993,7 @@ class User
      */
     public function getCmsUserEmails()
     {
-        return $this->hasMany(CmsUserEmail::class, ['cms_user_id' => 'id'])
-            ->orderBy([
-                'sort' => SORT_ASC,
-            ])
-            //->via('cmsUserEmails')
-        ;
+        return $this->hasMany(CmsUserEmail::class, ['cms_user_id' => 'id']);
     }
 
     /**
@@ -992,12 +1001,10 @@ class User
      */
     public function getCmsUserPhones()
     {
-        return $this->hasMany(CmsUserPhone::class, ['cms_user_id' => 'id'])->orderBy([
-            'sort' => SORT_ASC,
-        ])
+        return $this->hasMany(CmsUserPhone::class, ['cms_user_id' => 'id']);
             //->via('cmsUserPhones')
-        //
-        ;
+            //
+            ;
     }
 
     /**
@@ -1087,4 +1094,5 @@ class User
             return $this->displayName;
         }
     }
+
 }
