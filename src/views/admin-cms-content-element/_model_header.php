@@ -35,7 +35,7 @@
     </div>
     <? if ($model->cmsContent->is_have_page) : ?>
         <div class="col my-auto" style="max-width: 70px; text-align: right;">
-            <a href="" data-toggle="tooltip" class="btn btn-default" target="_blank" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i class="fas fa-external-link-alt"></i></a>
+            <a href="<?php echo $model->url; ?>" data-toggle="tooltip" class="btn btn-default" target="_blank" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i class="fas fa-external-link-alt"></i></a>
         </div>
     <? endif; ?>
 </div>

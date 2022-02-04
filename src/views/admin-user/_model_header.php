@@ -28,7 +28,7 @@
                 "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                     "/cms/admin-user/update",
                     'pk' => $model->id,
-                ])->enableEmptyLayout()->enableNoActions()->url,
+                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
             ]);
             ?>
 
@@ -36,6 +36,24 @@
                new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
             ); ?>' title="Редактировать основную информацию: фото, активность, имя, фамилия и т.д." data-toggle="tooltip" style="font-size: 17px; color: silver; cursor: pointer;"></i>
+
+
+            <?
+
+            $actionData = \yii\helpers\Json::encode([
+                "isOpenNewWindow" => true,
+                "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                    "/cms/admin-user/change-password",
+                    'pk' => $model->id,
+                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
+            ]);
+            ?>
+
+            <i class="fas fa-key" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+            ); ?>' title="Изменить пароль" data-toggle="tooltip" style="font-size: 17px; color: silver; cursor: pointer;"></i>
+
 
         </h1>
 

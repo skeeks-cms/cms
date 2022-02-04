@@ -68,8 +68,6 @@ class CmsActiveQuery extends ActiveQuery
         $alias = $this->getPrimaryTableName();
 
         if ($this->from) {
-                            var_dump($this->from);die;
-
             foreach ($this->from as $code => $table) {
                 if ($table == $alias) {
                     $alias = $code;

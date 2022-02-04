@@ -7,7 +7,6 @@
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
-
 $dm = new \skeeks\cms\base\DynamicModel([
     'from',
     'to',
@@ -27,7 +26,6 @@ $q = \skeeks\cms\models\CmsContentElement::find()->from([
         "content_id"   => 'c.content_id',
         "content_name" => 'cmsContent.name',
     ]);
-
 
 $qTree = \skeeks\cms\models\CmsTree::find()->from([
         't' => \skeeks\cms\models\CmsTree::tableName(),
