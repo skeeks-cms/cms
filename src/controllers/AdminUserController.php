@@ -21,7 +21,9 @@ use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
@@ -58,7 +60,7 @@ class AdminUserController extends BackendModelStandartController
             }
             return true;
         };*/
-        /*$this->permissionName = 'cms/admin-cms-site';*/
+        /*$this->permissionName = 'cms/admin-user';*/
 
         $this->modelHeader = function () {
             /**
@@ -387,6 +389,16 @@ class AdminUserController extends BackendModelStandartController
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
+
+                    if ($this->model) {
+                        $elementExists = CmsContentElement::find()->andWhere(['created_by' => $this->model->id])->exists();
+                        $treeExists = CmsTree::find()->andWhere(['created_by' => $this->model->id])->exists();
+
+                        if (!$treeExists && !$elementExists) {
+                            return false;
+                        }
+                    }
+
 
                     return true;
                 },

@@ -27,6 +27,9 @@ class AdminUserPhoneController extends BackendModelStandartController
         $this->name = "Управление телефонами";
         $this->modelShowAttribute = "value";
         $this->modelClassName = CmsUserPhone::className();
+        
+        $this->permissionName = 'cms/admin-user';
+        $this->generateAccessActions = false;
 
         parent::init();
 
@@ -41,11 +44,36 @@ class AdminUserPhoneController extends BackendModelStandartController
         $actions = ArrayHelper::merge(parent::actions(), [
             "create" => [
                 'fields' => [$this, 'updateFields'],
-                'buttons' => ['save']
+                'buttons' => ['save'],
+                "accessCallback" => function ($model) {
+            
+                    $cmsUserEmail = new CmsUserPhone();
+                    $cmsUserEmail->load(\Yii::$app->request->get());
+                    
+                    if ($model) {
+                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $cmsUserEmail->cmsUser]);
+                    }
+                    
+                    return false;
+                },
             ],
             "update" => [
                 'fields' => [$this, 'updateFields'],
-                'buttons' => ['save']
+                'buttons' => ['save'],
+                "accessCallback" => function ($model) {
+                    if ($this->model) {
+                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                    }
+                    return false;
+                },
+            ],
+            "delete" => [
+                "accessCallback" => function ($model) {
+                    if ($this->model) {
+                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                    }
+                    return false;
+                },
             ],
         ]);
 

@@ -9,6 +9,16 @@
  * @var $this yii\web\View
  * @var $model \skeeks\cms\models\CmsContentElement
  */
+$this->registerCss(<<<CSS
+.sx-user-header-h1 .sx-controlls {
+    opacity: 0;
+    transition: 0.5s;
+}
+.sx-user-header-h1:hover .sx-controlls {
+    opacity: 1;
+}
+CSS
+);
 ?>
 <div class="row" style="margin-bottom: 5px;">
     <? if ($model->image) : ?>
@@ -18,9 +28,10 @@
         </div>
     <? endif; ?>
     <div class="col my-auto">
-        <h1 style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->displayName; ?>
+        <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->displayName; ?>
             <?php echo $model->is_active ? '<span data-html="true" data-toggle="tooltip" title="Пользователь активен<br />Значит он может авторизоваться на сайте."  style="font-size: 20px; color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red; font-size: 20px;">x</span>' ?>
 
+            <span class="sx-controlls">
             <?
 
             $actionData = \yii\helpers\Json::encode([
@@ -54,6 +65,8 @@ JS
 JS
             ); ?>' title="Изменить пароль" data-toggle="tooltip" style="font-size: 17px; color: silver; cursor: pointer;"></i>
 
+            </span>
+
 
         </h1>
 
@@ -76,5 +89,23 @@ JS
 
 
         </div>
+    </div>
+
+    <div class="col my-auto text-right">
+        <?php if ($model->phone) : ?>
+            <span>
+                <a href="#" class="btn btn-default" title="Позвонить"><i class="fas fa-phone"></i></a>
+            </span>
+            <span>
+                <a href="#" class="btn btn-default" title="Написать sms"><i class="fas fa-sms"></i></a>
+            </span>
+        <?php endif; ?>
+        <?php if ($model->email) : ?>
+            <span>
+                <a href="#" class="btn btn-default" title="Написать письмо"><i class="far fa-envelope"></i></a>
+            </span>
+        <?php endif; ?>
+
+
     </div>
 </div>
