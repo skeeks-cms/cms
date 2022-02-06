@@ -36,6 +36,7 @@ CSS
 
             $actionData = \yii\helpers\Json::encode([
                 "isOpenNewWindow" => true,
+                "size"            => 'small',
                 "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                     "/cms/admin-user/update",
                     'pk' => $model->id,
@@ -53,6 +54,7 @@ JS
 
             $actionData = \yii\helpers\Json::encode([
                 "isOpenNewWindow" => true,
+                "size"            => 'small',
                 "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                     "/cms/admin-user/change-password",
                     'pk' => $model->id,

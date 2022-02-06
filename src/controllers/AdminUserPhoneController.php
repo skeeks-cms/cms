@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
@@ -44,6 +45,7 @@ class AdminUserPhoneController extends BackendModelStandartController
         $actions = ArrayHelper::merge(parent::actions(), [
             "create" => [
                 'fields' => [$this, 'updateFields'],
+                'size'           => BackendAction::SIZE_SMALL,
                 'buttons' => ['save'],
                 "accessCallback" => function ($model) {
             
@@ -60,6 +62,7 @@ class AdminUserPhoneController extends BackendModelStandartController
             "update" => [
                 'fields' => [$this, 'updateFields'],
                 'buttons' => ['save'],
+                'size'           => BackendAction::SIZE_SMALL,
                 "accessCallback" => function ($model) {
                     if ($this->model) {
                         return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
@@ -88,12 +91,13 @@ class AdminUserPhoneController extends BackendModelStandartController
         $result = [
             [
                 'class' => HtmlBlock::class,
-                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 300px;">'
+                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 500px;">'
             ],
             'value' => [
                 'class' => TextField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Телефон'
+                    'placeholder' => 'Телефон',
+                    'autocomplete' => 'off'
                 ],
                 'on beforeRender' => function (Event $e) {
                     /**
@@ -110,7 +114,7 @@ JS
             ],
             [
                 'class' => HtmlBlock::class,
-                'content' => '</div><div class="col-12" style="max-width: 300px;">'
+                'content' => '</div><div class="col-12" style="max-width: 500px;">'
             ],
             'name' => [
                 'class' => TextField::class,

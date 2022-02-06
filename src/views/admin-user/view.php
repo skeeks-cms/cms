@@ -292,6 +292,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
 
                     $actionData = \yii\helpers\Json::encode([
     "isOpenNewWindow" => true,
+    "size"            => 'small',
     "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(["/cms/admin-user-phone/create", 'CmsUserPhone' => [
             'cms_user_id' => $model->id 
     ]])->enableEmptyLayout()->enableNoActions()->url,
@@ -362,6 +363,7 @@ JS
 
                     $actionData = \yii\helpers\Json::encode([
     "isOpenNewWindow" => true,
+    "size"            => 'small',
     "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(["/cms/admin-user-email/create", 'CmsUserEmail' => [
             'cms_user_id' => $model->id
     ]])->enableEmptyLayout()->enableNoActions()->url,

@@ -545,9 +545,11 @@ class GridView extends \yii\grid\GridView
 
         submit: function(data)
         {
-            this.trigger("submit", data);
+            /*this.trigger("submit", data);
             sx.EventManager.trigger('submitElement', data);
-            
+            console.log('submit');*/
+            sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
+            /*
             if (window.opener)
             {
                 if (window.opener.sx)
@@ -562,7 +564,7 @@ class GridView extends \yii\grid\GridView
                     window.parent.sx.EventManager.trigger('{$callbackEventName}', data);
                     return this;
                 }
-            }
+            }*/
 
             return this;
         }

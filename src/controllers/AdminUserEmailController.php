@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
@@ -41,6 +42,7 @@ class AdminUserEmailController extends BackendModelStandartController
         $actions = ArrayHelper::merge(parent::actions(), [
             "create" => [
                 'fields' => [$this, 'updateFields'],
+                'size'           => BackendAction::SIZE_SMALL,
                 'buttons' => ['save'],
                 "accessCallback" => function ($model) {
             
@@ -56,6 +58,7 @@ class AdminUserEmailController extends BackendModelStandartController
             ],
             "update" => [
                 'fields' => [$this, 'updateFields'],
+                'size'           => BackendAction::SIZE_SMALL,
                 'buttons' => ['save'],
                 "accessCallback" => function ($model) {
                     if ($this->model) {
@@ -85,17 +88,18 @@ class AdminUserEmailController extends BackendModelStandartController
         $result = [
             [
                 'class' => HtmlBlock::class,
-                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 300px;">'
+                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 500px;">'
             ],
             'value' => [
                 'class' => TextField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Email'
+                    'placeholder' => 'Email',
+                    'autocomplete' => 'off'
                 ]
             ],
             [
                 'class' => HtmlBlock::class,
-                'content' => '</div><div class="col-12" style="max-width: 300px;">'
+                'content' => '</div><div class="col-12" style="max-width: 500px;">'
             ],
             'name' => [
                 'class' => TextField::class,

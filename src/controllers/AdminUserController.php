@@ -15,6 +15,7 @@ use common\models\User;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
@@ -357,6 +358,8 @@ class AdminUserController extends BackendModelStandartController
 
             'create' => [
                 //"callback"       => [$this, 'create'],
+                'buttons'        => ['save'],
+                'size'           => BackendAction::SIZE_SMALL,
                 'generateAccess' => true,
                 'fields'         => [$this, 'createFields'],
             ],
@@ -440,6 +443,7 @@ class AdminUserController extends BackendModelStandartController
             'update' => [
                 'fields'         => [$this, 'updateFields'],
                 //"callback"       => [$this, 'update'],
+                'buttons'        => ['save'],
                 'isVisible'      => false,
                 'generateAccess' => true,
                 "accessCallback" => function () {
@@ -612,10 +616,10 @@ JS
             $roles = \Yii::$app->authManager->getAvailableRoles();
             \yii\helpers\ArrayHelper::remove($roles, \skeeks\cms\rbac\CmsManager::ROLE_GUEST);
 
-            $result['roleNames']    = [
+            $result['roleNames'] = [
                 'class'     => SelectField::class,
                 'allowNull' => false,
-                'multiple' => true,
+                'multiple'  => true,
                 'items'     => \yii\helpers\ArrayHelper::map($roles, 'name', 'description'),
             ];
 
@@ -648,9 +652,12 @@ JS
 
         if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword()) {
             \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
+            die('1');
         } else {
             if (\Yii::$app->request->isPost) {
+                //throw new Exception("111");
                 \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
+                //die('2');
             }
         }
 
