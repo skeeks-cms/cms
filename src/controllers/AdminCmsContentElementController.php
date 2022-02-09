@@ -656,6 +656,7 @@ HTML;
 
 
             "copy" => [
+                'isVisible' => false,
                 'priority'       => 200,
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Copy'),

@@ -17,6 +17,7 @@ use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\base\DynamicModel;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
@@ -26,7 +27,6 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
-use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -37,6 +37,7 @@ use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use Yii;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -637,32 +638,64 @@ JS
      */
     public function actionChangePassword()
     {
+        /**
+         * @var $model CmsUser
+         */
         $model = $this->model;
 
-        $modelForm = new PasswordChangeForm([
-            'user' => $model,
-        ]);
+        $dm = new DynamicModel(['password']);
+        $dm->addRule(['password'], 'string', ['min' => 8]);
+        $dm->addRule(['password'], 'required');
+        $dm->addRule(['password'], function ($attribute) use ($dm) {
 
-        $rr = new RequestResponse();
+            $password = $dm->{$attribute};
+            $number = preg_match('@[0-9]@', $password);
+            $uppercase = preg_match('@[A-Z]@', $password);
+            $lowercase = preg_match('@[a-z]@', $password);
+            //$specialChars = preg_match('@[^\w]@', $password);
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            return $rr->ajaxValidateForm($modelForm);
-        }
-
-
-        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword()) {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            die('1');
-        } else {
-            if (\Yii::$app->request->isPost) {
-                //throw new Exception("111");
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
-                //die('2');
+            if (!$number) {
+                $dm->addError($attribute, "Пароль должен содержать как минимум одну цифру");
+                return false;
             }
+            if (!$uppercase) {
+                $dm->addError($attribute, "Пароль должен хоть одну заглавную английскую букву");
+                return false;
+            }
+            if (!$lowercase) {
+                $dm->addError($attribute, "Пароль должен хоть одну строчную английскую букву");
+                return false;
+            }
+            /*if (!$specialChars) {
+                $dm->addError($attribute, "Пароль должен содержать хоть один специальный символ");
+                return false;
+            }*/
+        });
+        $dm->setAttrubuteLebel('password', 'Новый пароль');
+
+        $is_saved = false;
+        try {
+            if (\Yii::$app->request->post()) {
+                if ($dm->load(\Yii::$app->request->post()) && $dm->validate()) {
+                    $model->setPassword($dm->password);
+                    if (!$model->save(false)) {
+                        throw new Exception("Пароль не изменен");
+                    }
+
+                    $is_saved = true;
+
+                } else {
+                    throw new Exception("Пароль не изменен");
+                }
+            }
+        } catch (\Exception $exception) {
+            $dm->addError('', $exception->getMessage());
         }
+
 
         return $this->render($this->action->id, [
-            'model' => $modelForm,
+            'dm'       => $dm,
+            'is_saved' => $is_saved,
         ]);
     }
 
