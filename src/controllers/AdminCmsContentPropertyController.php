@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
@@ -435,6 +436,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
             'create' => [
                 'fields' => [$this, 'updateFields'],
+                'size' => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -451,6 +453,8 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             ],
             'update' => [
                 'fields' => [$this, 'updateFields'],
+
+                'size' => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -660,7 +664,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             ],
         ];
 
-        if (\Yii::$app->skeeks->site->is_default && CmsSite::find()->count() > 1) {
+        /*if (\Yii::$app->skeeks->site->is_default && CmsSite::find()->count() > 1) {
             $result['site'] = [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Показ на сайтах'),
@@ -679,7 +683,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 ],
             ];
 
-        }
+        }*/
 
         return $result;
     }

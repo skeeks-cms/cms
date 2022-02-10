@@ -8,15 +8,16 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
-use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -188,10 +189,14 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                 ],
             ],
             'create' => [
-                'fields' => [$this, 'updateFields'],
+                'size'    => BackendAction::SIZE_SMALL,
+                'fields'  => [$this, 'updateFields'],
+                'buttons' => ['save'],
             ],
             'update' => [
-                'fields' => [$this, 'updateFields'],
+                'size'    => BackendAction::SIZE_SMALL,
+                'fields'  => [$this, 'updateFields'],
+                'buttons' => ['save'],
             ],
         ]);
     }
@@ -221,42 +226,41 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
             ]);
         }
 
-        if ($model->property_id && $model->isNewRecord) {
-            $result = [
-                [
-                    'class'   => HtmlBlock::class,
-                    'content' => "<div style='display: none;'>",
-                ],
-                'property_id',
-                [
-                    'class'   => HtmlBlock::class,
-                    'content' => "</div>",
-                ],
-                'value',
-                'code',
-                'priority' => [
-                    'class' => NumberField::class,
-                ],
-            ];
-        } else {
+        $result = [
 
-            $result = [
+            'main'        => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Основное'),
+                'fields' => [
+                    'value',
+                ],
+            ],
+            'additionals' => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/cms', 'Additionally'),
+                'elementOptions' => ['isOpen' => false],
+                'fields'         => [
 
-                'property_id' => [
-                    'class' => SelectField::class,
-                    'items' => \yii\helpers\ArrayHelper::map(
-                        $qProperty->all(),
-                        "id",
-                        "name"
-                    ),
+                    'code',
+
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => "<div style='display: none;'>",
+                    ],
+                    'property_id',
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => "</div>",
+                    ],
+
+                    'priority' => [
+                        'class' => NumberField::class,
+                    ],
+
+
                 ],
-                'value',
-                'code',
-                'priority'    => [
-                    'class' => NumberField::class,
-                ],
-            ];
-        }
+            ],
+        ];
 
         return $result;
     }

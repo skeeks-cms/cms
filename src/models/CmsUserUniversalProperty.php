@@ -10,9 +10,10 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "{{%cms_content_property}}".
+ * @property CmsSite $cmsSite
  *
  * @property CmsUserUniversalPropertyEnum[] $enums
  * @property CmsUserProperty[] $elementProperties
@@ -25,6 +26,26 @@ class CmsUserUniversalProperty extends RelatedPropertyModel
     public static function tableName()
     {
         return '{{%cms_user_universal_property}}';
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        $rules = ArrayHelper::merge(parent::rules(), [
+            [['cms_site_id'], 'integer'],
+            [['cms_site_id'], 'default', 'value' => function() {
+                if (\Yii::$app->skeeks->site) {
+                    return \Yii::$app->skeeks->site->id;
+                }
+            }],
+
+            [['code', 'cms_site_id'], 'unique', 'targetAttribute' => ['code', 'cms_site_id']],
+        ]);
+
+        return $rules;
     }
 
     /**
@@ -50,14 +71,13 @@ class CmsUserUniversalProperty extends RelatedPropertyModel
         ]);
     }
 
-
     /**
-     * @inheritdoc
+     * @return \yii\db\ActiveQuery
      */
-    public function rules()
+    public function getCmsSite()
     {
-        return array_merge(parent::rules(), [
-            [['code'], 'unique'],
-        ]);
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'cms_site_id']);
     }
+
 }

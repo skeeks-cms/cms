@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
@@ -20,6 +21,7 @@ use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
@@ -41,9 +43,6 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
         $this->generateAccessActions = false;
         
         $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
             return \Yii::$app->user->can($this->uniqueId);
         };
 
@@ -94,6 +93,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
 
             'create' => [
                 'fields' => [$this, 'updateFields'],
+                'size' => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -110,6 +110,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
             ],
             'update' => [
                 'fields' => [$this, 'updateFields'],
+                'size' => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -180,43 +181,52 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
+        $isChange = true;
+        $changeOptions = [];
+        $message = 'От этого зависит как будет показываться свойство в форме редактирования.';
+
+        if (!$model->isNewRecord) {
+            if ($model->property_type == PropertyType::CODE_LIST) {
+                if ($model->getEnums()->one()) {
+                    $isChange = false;
+                    $message = 'Нельзя менять тип характеристики, потому что у нее уже созданы опции.';
+                }
+            }
+        }
+        if (!$isChange) {
+            $changeOptions = [
+                'disabled' => "disabled",
+            ];
+        }
+
         return [
             'main' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Basic settings'),
                 'fields' => [
-                    'is_required' => [
-                        'class'      => BoolField::class,
-                        'allowNull'  => false,
-                    ],
-                    'is_active'      => [
-                        'class'      => BoolField::class,
-                        'allowNull'  => false,
-                    ],
                     'name',
-                    'code',
-                    'component'   => [
+
+                    'component'        => [
                         'class'          => SelectField::class,
-                        'elementOptions' => [
+                        'elementOptions' => ArrayHelper::merge([
                             'data' => [
                                 'form-reload' => 'true',
                             ],
-                        ],
-                        /*'options' => [
-                            'class' => 'teat'
-                        ],*/
+                        ], $changeOptions),
                         'items'          => function () {
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
                         },
+                        'hint' => $message
                     ],
-                    'cms_measure_code'   => [
-                        'class'          => SelectField::class,
+
+                    'cms_measure_code' => [
+                        'class' => SelectField::class,
                         /*'elementOptions' => [
                             'data' => [
                                 'form-reload' => 'true',
                             ],
                         ],*/
-                        'items'          => function () {
+                        'items' => function () {
                             return ArrayHelper::map(
                                 CmsMeasure::find()->all(),
                                 'code',
@@ -224,6 +234,8 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                             );
                         },
                     ],
+
+
                     [
                         'class'           => HtmlBlock::class,
                         'on beforeRender' => function (Event $e) use ($model) {
@@ -257,9 +269,24 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
             'captions' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
+                'elementOptions' => ['isOpen' => false],
                 'fields' => [
+
+                    'is_active' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+
+                    'is_required' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'code',
                     'hint',
-                    'priority',
+                    'priority'    => [
+                        'class' => NumberField::class,
+                    ],
+
                 ],
             ],
         ];

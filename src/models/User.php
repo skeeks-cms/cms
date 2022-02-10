@@ -469,6 +469,15 @@ class User
 
 
     /**
+     * Все возможные свойства связанные с моделью
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRelatedProperties()
+    {
+        return CmsUserUniversalProperty::find()->cmsSite()->sort();
+    }
+    
+    /**
      * Установка последней активности пользователя. Больше чем в настройках.
      * @return $this
      */

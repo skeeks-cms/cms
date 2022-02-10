@@ -152,23 +152,8 @@ if ($additionalName) {
 
         submit: function(data)
         {
+            sx.notify.info("Выбрано");
             sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
-            /*
-            if (window.opener)
-            {
-                if (window.opener.sx)
-                {
-                    window.opener.sx.EventManager.trigger('{$callbackEventName}', data);
-                    return this;
-                }
-            } else if (window.parent)
-            {
-                if (window.parent.sx)
-                {
-                    window.parent.sx.EventManager.trigger('{$callbackEventName}', data);
-                    return this;
-                }
-            }*/
 
             return this;
         }

@@ -377,6 +377,32 @@ JS
         </div>
 
         <div class="sx-block">
+            <div class="sx-block-title">Информация <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                       title="Общая информация по пользователю, есть возможность создать любое количество полей с данными." class="far fa-question-circle"></i></div>
+            <div class="sx-block-content">
+
+
+
+
+                <?
+
+                    $actionData = \yii\helpers\Json::encode([
+                        "isOpenNewWindow" => true,
+                        "size"            => 'small',
+                        "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                            "/cms/admin-user/update-eav",
+                            'pk' => $model->id,
+                        ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
+                    ]);
+                    ?>
+                <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+            ); ?>'>Редактировать</button>
+            </div>
+        </div>
+
+        <div class="sx-block">
             <div class="sx-block-title">Контрагенты <i style="color: silver;" data-toggle="tooltip" data-html="true"
                                                        title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle"></i></div>
             <div class="sx-block-content">

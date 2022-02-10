@@ -15,6 +15,7 @@ use common\models\User;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\base\DynamicModel;
@@ -456,6 +457,12 @@ class AdminUserController extends BackendModelStandartController
                 },
             ],
 
+            'update-eav' => [
+                'class' => BackendModelUpdateAction::class,
+                "callback"       => [$this, 'updateEav'],
+                'isVisible'      => false,
+            ],
+
             'delete' => [
                 'generateAccess' => true,
                 "accessCallback" => function () {
@@ -696,6 +703,65 @@ JS
         return $this->render($this->action->id, [
             'dm'       => $dm,
             'is_saved' => $is_saved,
+        ]);
+    }
+
+    /**
+     * Updates an existing Game model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function updateEav()
+    {
+        /**
+         * @var $model CmsUser
+         */
+        $model = $this->model;
+
+        $model = $this->model;
+        $relatedModel = $model->relatedPropertiesModel;
+
+        $is_saved = false;
+        $redirect = null;
+
+        $rr = new RequestResponse();
+
+        if ($post = \Yii::$app->request->post()) {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+        }
+
+
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+
+                $model->save();
+
+                if ($relatedModel->save()) {
+
+                    $is_saved = true;
+
+                    if (\Yii::$app->request->post('submit-btn') == 'save') {
+                    } else {
+                        $redirect = $this->url;
+                    }
+
+                    //$model->refresh();
+                    $relatedModel = $model->relatedPropertiesModel;
+                }
+            }
+
+        }
+
+
+        return $this->render("update-eav", [
+            'model'        => $model,
+            'relatedModel' => $relatedModel,
+            'is_saved'     => $is_saved,
+            'submitBtn'    => \Yii::$app->request->post('submit-btn'),
+            'redirect'     => $redirect,
         ]);
     }
 
