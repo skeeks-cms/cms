@@ -8,9 +8,12 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserUniversalPropertyEnum;
-use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\NumberField;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -25,7 +28,7 @@ class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartCo
         $this->modelClassName = CmsUserUniversalPropertyEnum::class;
 
         $this->generateAccessActions = false;
-        
+
         $this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
@@ -43,10 +46,10 @@ class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartCo
                 'filters' => [
                     'visibleFilters' => [
                         'value',
-                        'property_id'
-                    ]
+                        'property_id',
+                    ],
                 ],
-                'grid' => [
+                'grid'    => [
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
@@ -55,15 +58,19 @@ class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartCo
                         'value',
                         'code',
                         'priority',
-                    ]
-                ]
+                    ],
+                ],
             ],
 
             'create' => [
-                'fields' => [$this, 'updateFields'],
+                'size'    => BackendAction::SIZE_SMALL,
+                'fields'  => [$this, 'updateFields'],
+                'buttons' => ['save'],
             ],
             'update' => [
-                'fields' => [$this, 'updateFields'],
+                'size'    => BackendAction::SIZE_SMALL,
+                'fields'  => [$this, 'updateFields'],
+                'buttons' => ['save'],
             ],
         ]);
 
@@ -80,21 +87,44 @@ class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartCo
         if ($property_id = \Yii::$app->request->get("property_id")) {
             $model->property_id = $property_id;
         }
-        return [
-            'property_id' => [
-                'class' => SelectField::class,
-                'items' => function() {
-                    return \yii\helpers\ArrayHelper::map(
-                        \skeeks\cms\models\CmsUserUniversalProperty::find()->all(),
-                        "id",
-                        "name"
-                    );
-                }
+
+        $result = [
+
+            'main'        => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'Основное'),
+                'fields' => [
+                    'value',
+                ],
             ],
-            'value',
-            'code',
-            'priority',
+            'additionals' => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/cms', 'Additionally'),
+                'elementOptions' => ['isOpen' => false],
+                'fields'         => [
+
+                    'code',
+
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => "<div style='display: none;'>",
+                    ],
+                    'property_id',
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => "</div>",
+                    ],
+
+                    'priority' => [
+                        'class' => NumberField::class,
+                    ],
+
+
+                ],
+            ],
         ];
+
+        return $result;
     }
 
 }

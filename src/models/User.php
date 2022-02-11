@@ -474,7 +474,9 @@ class User
      */
     public function getRelatedProperties()
     {
-        return CmsUserUniversalProperty::find()->cmsSite()->sort();
+        $q = CmsUserUniversalProperty::find()->cmsSite()->sort();
+        $q->multiple = true;
+        return $q;
     }
     
     /**

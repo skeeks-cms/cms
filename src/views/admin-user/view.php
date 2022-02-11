@@ -208,7 +208,7 @@ ul.sx-properties .sx-properties--name:after {
 }
 
 .sx-value-row {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     line-height: 1.3;
 }
 .sx-edit-btn {
@@ -271,8 +271,8 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                                     ],
                                 ]);
                                 ?>
-                                    <!--<i class="hs-admin-angle-down"></i>-->
-                                    <i class="fas fa-ellipsis-v"></i>
+                                <!--<i class="hs-admin-angle-down"></i>-->
+                                <i class="fas fa-ellipsis-v"></i>
                                 <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
 
                             </div>
@@ -290,26 +290,30 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                 </div>
                 <?
 
-                    $actionData = \yii\helpers\Json::encode([
-    "isOpenNewWindow" => true,
-    "size"            => 'small',
-    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(["/cms/admin-user-phone/create", 'CmsUserPhone' => [
-            'cms_user_id' => $model->id 
-    ]])->enableEmptyLayout()->enableNoActions()->url,
-]);
-                    ?>
+                $actionData = \yii\helpers\Json::encode([
+                    "isOpenNewWindow" => true,
+                    "size"            => 'small',
+                    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        "/cms/admin-user-phone/create",
+                        'CmsUserPhone' => [
+                            'cms_user_id' => $model->id,
+                        ],
+                    ])->enableEmptyLayout()->enableNoActions()->url,
+                ]);
+                ?>
                 <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
                new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
-                ); ?>'>Добавить</button>
+                ); ?>'>Добавить
+                </button>
             </div>
         </div>
 
 
         <div class="sx-block">
             <div class="sx-block-title">Email <i style="color: silver;" data-toggle="tooltip" data-html="true"
-                                                   title="У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию."
-                                                   class="far fa-question-circle"></i>
+                                                 title="У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию."
+                                                 class="far fa-question-circle"></i>
             </div>
             <div class="sx-block-content">
                 <div class="sx-phones-block">
@@ -346,8 +350,8 @@ JS
                                     ],
                                 ]);
                                 ?>
-                                    <!--<i class="hs-admin-angle-down"></i>-->
-                                    <i class="fas fa-ellipsis-v"></i>
+                                <!--<i class="hs-admin-angle-down"></i>-->
+                                <i class="fas fa-ellipsis-v"></i>
                                 <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
 
                             </div>
@@ -361,44 +365,68 @@ JS
                 </div>
                 <?
 
-                    $actionData = \yii\helpers\Json::encode([
-    "isOpenNewWindow" => true,
-    "size"            => 'small',
-    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(["/cms/admin-user-email/create", 'CmsUserEmail' => [
-            'cms_user_id' => $model->id
-    ]])->enableEmptyLayout()->enableNoActions()->url,
-]);
-                    ?>
+                $actionData = \yii\helpers\Json::encode([
+                    "isOpenNewWindow" => true,
+                    "size"            => 'small',
+                    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        "/cms/admin-user-email/create",
+                        'CmsUserEmail' => [
+                            'cms_user_id' => $model->id,
+                        ],
+                    ])->enableEmptyLayout()->enableNoActions()->url,
+                ]);
+                ?>
                 <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
                new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
-                ); ?>'>Добавить</button>
+                ); ?>'>Добавить
+                </button>
             </div>
         </div>
 
         <div class="sx-block">
             <div class="sx-block-title">Информация <i style="color: silver;" data-toggle="tooltip" data-html="true"
-                                                       title="Общая информация по пользователю, есть возможность создать любое количество полей с данными." class="far fa-question-circle"></i></div>
+                                                      title="Общая информация по пользователю, есть возможность создать любое количество полей с данными." class="far fa-question-circle"></i></div>
             <div class="sx-block-content">
+                <?
+                $eav = $model->relatedPropertiesModel;
+                //$eav->initAllProperties();
+                //print_r($eav->toArray());die;
+                //print_r($model->relatedProperties);die;
+                ?>
+                <? if ($eav->toArray()) : ?>
+                    <? foreach ($eav->toArray() as $key => $value) : ?>
+                        <? if ($value) : ?>
+                            <div class="sx-value-row d-flex">
+                                <div style="width: 100%;">
+                                    <div class="sx-label">
+                                        <? echo $eav->getAttributeLabel($key); ?>
+                                    </div>
+                                    <div class="sx-value">
+                                        <?php echo $eav->getSmartAttribute($key); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <? endif; ?>
 
-
-
-
+                    <? endforeach; ?>
+                <? endif; ?>
                 <?
 
-                    $actionData = \yii\helpers\Json::encode([
-                        "isOpenNewWindow" => true,
-                        "size"            => 'small',
-                        "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                            "/cms/admin-user/update-eav",
-                            'pk' => $model->id,
-                        ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
-                    ]);
-                    ?>
+                $actionData = \yii\helpers\Json::encode([
+                    "isOpenNewWindow" => true,
+                    "size"            => 'small',
+                    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        "/cms/admin-user/update-eav",
+                        'pk' => $model->id,
+                    ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
+                ]);
+                ?>
                 <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
                new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
-            ); ?>'>Редактировать</button>
+                ); ?>'>Редактировать
+                </button>
             </div>
         </div>
 
