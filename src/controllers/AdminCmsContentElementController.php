@@ -69,7 +69,7 @@ use yii\web\Application;
 class AdminCmsContentElementController extends BackendModelStandartController
 {
 
-    public $editForm = '_form';
+    public $editForm = '@skeeks/cms/views/admin-cms-content-element/_form';
 
     public $modelClassName = CmsContentElement::class;
     public $modelShowAttribute = "name";
