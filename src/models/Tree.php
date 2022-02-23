@@ -112,6 +112,8 @@ use yii\helpers\Url;
  * @property Tree[]                    $descendants
  * @property bool                      $isActive
  * @property CmsSavedFilter[]          $cmsSavedFilters
+ * @property static[]                  $cmsTreeChildsByPid
+ * @property static                    $cmsTreeByPid
  *
  * @depricated
  */
@@ -538,6 +540,20 @@ class Tree extends ActiveRecord
     public function getCmsTreeProperties()
     {
         return $this->hasMany(CmsTreeProperty::className(), ['element_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeByPid()
+    {
+        return $this->hasOne(static::class, ['id' => 'pid']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeChildsByPid()
+    {
+        return $this->hasMany(static::class, ['pid' => 'id']);
     }
 
     /**
