@@ -12,10 +12,11 @@
 namespace skeeks\cms\models\forms;
 
 use skeeks\cms\models\CmsUserEmail;
+use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\models\User;
 use skeeks\cms\validators\PhoneValidator;
-use yii\base\Model;
 use Yii;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -45,11 +46,11 @@ class SignupForm extends Model
     public function attributeLabels()
     {
         return [
-            'username' => \Yii::t('skeeks/cms', 'Login'),
-            'email' => \Yii::t('skeeks/cms', 'Email'),
-            'password' => \Yii::t('skeeks/cms', 'Password'),
+            'username'   => \Yii::t('skeeks/cms', 'Login'),
+            'email'      => \Yii::t('skeeks/cms', 'Email'),
+            'password'   => \Yii::t('skeeks/cms', 'Password'),
             'first_name' => \Yii::t('skeeks/cms', 'First name'),
-            'last_name' => \Yii::t('skeeks/cms', 'Last name'),
+            'last_name'  => \Yii::t('skeeks/cms', 'Last name'),
             'patronymic' => \Yii::t('skeeks/cms', 'Patronymic'),
 
             'email' => Yii::t('skeeks/cms', 'Email'),
@@ -81,7 +82,7 @@ class SignupForm extends Model
         ];
 
         $scenarions[self::SCENARION_ONLYEMAIL] = [
-            'email'
+            'email',
         ];
 
         return $scenarions;
@@ -99,7 +100,7 @@ class SignupForm extends Model
                 'username',
                 'unique',
                 'targetClass' => \Yii::$app->user->identityClass,
-                'message' => \Yii::t('skeeks/cms', 'This login is already in use by another user.')
+                'message'     => \Yii::t('skeeks/cms', 'This login is already in use by another user.'),
             ],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
@@ -109,8 +110,9 @@ class SignupForm extends Model
             [
                 'email',
                 'unique',
-                'targetClass' => \Yii::$app->user->identityClass,
-                'message' => \Yii::t('skeeks/cms', 'This Email is already in use by another user')
+                'targetAttribute' => 'value',
+                'targetClass'     => CmsUserEmail::class,
+                'message'         => \Yii::t('skeeks/cms', 'This Email is already in use by another user'),
             ],
 
             //[['email'], 'unique', 'targetClass' => CmsUserEmail::className(), 'targetAttribute' => 'value'],
@@ -121,12 +123,17 @@ class SignupForm extends Model
             [
                 ['first_name', 'last_name', 'patronymic'],
                 'string',
-                'max' => 255
+                'max' => 255,
             ],
 
             [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::class],
-            [['phone'], 'unique', 'targetClass' => \Yii::$app->user->identityClass],
+            [
+                ['phone'],
+                'unique',
+                'targetClass'     => CmsUserPhone::class,
+                'targetAttribute' => 'value',
+            ],
             [['phone'], 'default', 'value' => null],
         ];
     }
@@ -186,22 +193,22 @@ class SignupForm extends Model
                             [
                                 '@app/mail' =>
                                     [
-                                        '@skeeks/cms/mail-templates'
-                                    ]
+                                        '@skeeks/cms/mail-templates',
+                                    ],
                             ]);
 
                         \Yii::$app->mailer->compose('@app/mail/register-by-email', [
-                            'user' => $user,
-                            'password' => $password
+                            'user'     => $user,
+                            'password' => $password,
                         ])
-                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                             ->setTo($user->email)
-                            ->setSubject(\Yii::t('skeeks/cms', 'Sign up at site') . \Yii::$app->cms->appName)
+                            ->setSubject(\Yii::t('skeeks/cms', 'Sign up at site').\Yii::$app->cms->appName)
                             ->send();
 
                         return $user;
                     } else {
-                        \Yii::error("User rgister by email error: {$user->username} " . Json::encode($user->getFirstErrors()),
+                        \Yii::error("User rgister by email error: {$user->username} ".Json::encode($user->getFirstErrors()),
                             'RegisterError');
                         return null;
                     }
@@ -234,14 +241,14 @@ class SignupForm extends Model
                     [
                         '@app/mail' =>
                             [
-                                '@skeeks/cms/mail'
-                            ]
+                                '@skeeks/cms/mail',
+                            ],
                     ]);
 
                 return \Yii::$app->mailer->compose('@app/mail/password-reset-token', ['user' => $user])
-                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ' robot'])
+                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.' robot'])
                     ->setTo($this->email)
-                    ->setSubject(\Yii::t('skeeks/cms', 'Password reset for ') . \Yii::$app->cms->appName)
+                    ->setSubject(\Yii::t('skeeks/cms', 'Password reset for ').\Yii::$app->cms->appName)
                     ->send();
             }
         }
