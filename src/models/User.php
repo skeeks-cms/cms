@@ -200,7 +200,7 @@ class User
                 $cmsUserEmail->value = $value;
                 $cmsUserEmail->cms_user_id = $this->id;
                 if (!$cmsUserEmail->save()) {
-                    throw new Exception("Email не обновлен! ".print_r($cmsUserEmail->errors, true));
+                    throw new Exception("Email не добавлен! ".print_r($cmsUserEmail->errors, true));
                 }
             }
         }
