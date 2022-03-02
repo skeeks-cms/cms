@@ -76,8 +76,10 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
 
-            [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value'], 'message' => 'Этот email уже занят'],
-            [['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value'], 'message' => 'Этот email уже занят'],
+            [['cms_site_id', 'value'], 'unique', 'targetAttribute' => ['cms_site_id', 'value'],
+                                                 //'message' => 'Этот email уже занят'
+            ],
+            //[['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value'], 'message' => 'Этот email уже занят'],
 
             [['is_approved'], 'default', 'value' => 0],
             [['name', 'approved_key_at', 'approved_key'], 'default', 'value' => null],
