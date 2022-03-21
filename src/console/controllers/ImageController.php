@@ -18,6 +18,16 @@ use yii\helpers\Console;
  */
 class ImageController extends \yii\console\Controller
 {
+
+    protected function _wait($time = 10) {
+
+        for ($i = 0; $i <= $time; $i ++) {
+            $else = $time - $i;
+            $this->stdout("\tСтарт через {$else} сек...\n");
+            sleep(1);
+        }
+    }
+
     /**
      * Изменение размера у оригинальных картинок в хранилище
      *
@@ -31,6 +41,8 @@ class ImageController extends \yii\console\Controller
         $query = CmsStorageFile::find()
             ->andWhere(['>', 'image_height', $maxHeight])
             ->andWhere(['>', 'image_width', $maxWidth])
+            //->orderBy(['image_width' => SORT_DESC])
+            ->orderBy(['size' => SORT_DESC])
         ;
 
         if ($total = $query->count()) {
@@ -39,6 +51,9 @@ class ImageController extends \yii\console\Controller
             $this->stdout("Неоптимизированных картинок нет\n");
             return;
         }
+
+
+        $this->_wait(5);
 
         /**
          * @var CmsStorageFile $storageFile
@@ -60,7 +75,6 @@ class ImageController extends \yii\console\Controller
             $this->stdout("\t\tnew: {$newWidth}x{$newHeight}\n");
 
             Image::thumbnail($fileRoot, $newWidth, $newHeight)->save($fileRoot);
-
 
             $newSize = Image::getImagine()->open($fileRoot)->getSize();
             $storageFile->image_height = $newSize->getHeight();
