@@ -27,6 +27,7 @@ use yii\grid\Column;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
+use yii\helpers\Json;
 
 /**
  * @property string                $modelClassName; название класса модели с которой идет работа
@@ -519,6 +520,10 @@ class GridView extends \yii\grid\GridView
     protected function _initDialogCallbackData()
     {
         if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
+
+            $isCkeditor = (int) \Yii::$app->request->get("CKEditorFuncNum");
+            $jsData = Json::encode(['is_ckeditor' => $isCkeditor]);
+
             $this->view->registerJs(<<<JS
 (function(sx, $, _)
 {
@@ -545,10 +550,16 @@ class GridView extends \yii\grid\GridView
 
         submit: function(data)
         {
+            if (this.get("is_ckeditor")) {
+                sx.EventManager.trigger('submitElement', data);
+            } else {
+                sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
+            }
+            
             /*this.trigger("submit", data);
             sx.EventManager.trigger('submitElement', data);
             console.log('submit');*/
-            sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
+            
             /*
             if (window.opener)
             {
@@ -570,7 +581,8 @@ class GridView extends \yii\grid\GridView
         }
     });
 
-    sx.SelectCmsElement = new sx.classes.SelectCmsElement();
+    
+    sx.SelectCmsElement = new sx.classes.SelectCmsElement({$jsData});
 
 })(sx, sx.$, sx._);
 JS
