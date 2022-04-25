@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\console\controllers;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
@@ -16,14 +15,11 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentProperty2content;
 use skeeks\cms\models\CmsSearchPhrase;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\shop\models\ShopCmsContentElement;
-use skeeks\sx\Dir;
-use Yii;
-use yii\base\Event;
 use yii\console\Controller;
 use yii\console\controllers\HelpController;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\helpers\FileHelper;
 
@@ -52,7 +48,7 @@ class UtilsController extends Controller
 
             if ($actions) {
                 foreach ($actions as $actionId) {
-                    $commands[] = $controller . "/" . $actionId;
+                    $commands[] = $controller."/".$actionId;
                 }
             }
         };
@@ -118,7 +114,7 @@ class UtilsController extends Controller
                 }
             }
         } else {
-            $newPids = $tree->parent->pids . "/" . $tree->id;
+            $newPids = $tree->parent->pids."/".$tree->id;
             if ($newPids != $tree->pids) {
                 if (\Yii::$app->db->createCommand()->update(CmsTree::tableName(), [
                     'pids' => $newPids,
@@ -167,8 +163,8 @@ class UtilsController extends Controller
                 ->exists()
             ) {
                 if ((new CmsContentProperty2content([
-                    'cms_content_id' => $cmsContentProperty->content_id,
-                    'cms_content_property_id' => $cmsContentProperty->id
+                    'cms_content_id'          => $cmsContentProperty->content_id,
+                    'cms_content_property_id' => $cmsContentProperty->id,
                 ]))->save()) {
                     $this->stdout("\t Created: {$cmsContentProperty->name}\n", Console::FG_GREEN);
                 } else {
@@ -195,8 +191,7 @@ class UtilsController extends Controller
             $contentElementClass = ShopCmsContentElement::class;
         }
 
-        $query = $contentElementClass::find()
-                    //->andWhere(['>', 'id', 202300])
+        $query = $contentElementClass::find()//->andWhere(['>', 'id', 202300])
         ;
         if ($contentId) {
             $query->andWhere(['content_id' => $contentId]);
@@ -211,28 +206,29 @@ class UtilsController extends Controller
 
         foreach ($query->orderBy([
             'content_id' => SORT_ASC,
-            'id' => SORT_ASC
+            'id'         => SORT_ASC,
         ])->each(10) as $cmsContentElement) {
             $this->stdout("\t{$cmsContentElement->id}: {$cmsContentElement->name}\n");
 
             try {
                 $cmsContentElement->code = '';
                 if (!$cmsContentElement->save()) {
-                    $this->stdout("\tError:" . print_r($cmsContentElement->errors, true) . "\n", Console::FG_RED);
+                    $this->stdout("\tError:".print_r($cmsContentElement->errors, true)."\n", Console::FG_RED);
                     sleep(5);
                 }
 
             } catch (\Exception $e) {
-                $this->stdout("\tError:" . $e->getMessage() . "\n", Console::FG_RED);
+                $this->stdout("\tError:".$e->getMessage()."\n", Console::FG_RED);
                 sleep(5);
             }
-            
+
             //$this->stdout($this->memoryUsage(memory_get_usage(), $base_memory_usage) . "\n");
 
         }
     }
 
-    public function memoryUsage($usage, $base_memory_usage) {
+    public function memoryUsage($usage, $base_memory_usage)
+    {
         return \Yii::$app->formatter->asSize($usage - $base_memory_usage);
     }
 
@@ -257,7 +253,7 @@ class UtilsController extends Controller
 
         foreach ($query->orderBy([
             'content_id' => SORT_ASC,
-            'id' => SORT_ASC
+            'id'         => SORT_ASC,
         ])->each(10) as $cmsContentElement) {
             $this->stdout("\t{$cmsContentElement->id}: {$cmsContentElement->name}");
 
@@ -266,6 +262,114 @@ class UtilsController extends Controller
             } else {
                 $this->stdout(" - NOT deleted\n", Console::FG_RED);
             }
+        }
+    }
+
+    /**
+     * Приведение телефонов пользователей к единому формату
+     *
+     * @return void
+     */
+    public function actionNormalizeUserPhones()
+    {
+        $q = CmsUserPhone::find();
+        $this->stdout("Found: {$q->count()}!\n", Console::BOLD);
+        $this->stdout("Wait: 5 sec....\n", Console::BOLD);
+        sleep(5);
+
+        /**
+         * @var
+         */
+        foreach ($q->each() as $userPhone) {
+            $this->stdout("\t{$userPhone->value}\n");
+
+            $phone = $userPhone->value;
+            $first = substr($phone, 0, 1);
+            if ($first == 8) {
+                $newPhone = substr($phone, 1, strlen($phone));
+                $newPhone = trim("+7".$newPhone);
+
+                $userPhone->value = $newPhone;
+                $this->stdout("\t\t new -> {$newPhone}\n");
+            } elseif ($first == 9) {
+                $newPhone = trim("+7".$phone);
+                $userPhone->value = $newPhone;
+                $this->stdout("\t\t new -> {$newPhone}\n");
+            }
+
+            if (!$userPhone->save()) {
+                $this->stdout("\t\tошибка!\n");
+            }
+
+        }
+    }
+    /**
+     * Удаляет файлы которые остались в хранилище но нет в базе хранилища
+     *
+     * @return void
+     */
+    public function actionRemoveFilesNotStorage()
+    {
+        $clusters = \Yii::$app->storage->getClusters();
+        foreach ($clusters as $cluster) {
+            $this->stdout("cluster: {$cluster->rootBasePath}\n");
+            //sleep(3);
+
+            $firstLevel = FileHelper::findDirectories($cluster->rootBasePath, ['recursive' => false]);
+            foreach ($firstLevel as $firstLevelDir)
+            {
+                $this->stdout("\t{$firstLevelDir}\n");
+                $secondLevel = FileHelper::findDirectories($firstLevelDir, ['recursive' => false]);
+
+                if ($secondLevel) {
+                    foreach ($secondLevel as $secondLevelDir)
+                    {
+                        $this->stdout("\t\t{$secondLevelDir}\n");
+                        
+                        $thirdLevel = FileHelper::findDirectories($secondLevelDir, ['recursive' => false]);
+
+                        if ($thirdLevel) {
+                            foreach ($thirdLevel as $thirdLevelDir)
+                            {
+                                $this->stdout("\t\t\t{$thirdLevelDir}\n");
+                                $files = FileHelper::findFiles($thirdLevelDir, ['recursive' => false]);
+                                if ($files) {
+                                    foreach ($files as $file)
+                                    {
+                                        
+                                        $cluster_file_name = str_replace($cluster->rootBasePath . "/", "", $file);
+                                        
+                                        $cmsStorageFile = StorageFile::find()->clusterFile($cluster->id, $cluster_file_name)->one();
+                                        if (!$cmsStorageFile) {
+                                            $this->stdout("\t\t\t\t{$file}\n");
+                                            
+                                            $this->stdout("\t\t\t\tУдалить!\n");
+                                            $this->stdout("\t\t\t\t{$cluster->id}\n");
+                                            $this->stdout("\t\t\t\t{$cluster_file_name}\n");
+
+                                            unlink($file);
+
+                                        } else {
+                                            //$this->stdout("\t\t\t\tНЕ Удалять!\n");
+                                        }
+                                    }
+                                } else {
+                                    $this->stdout("\t\t\tNo Files!!!\n");
+                                    FileHelper::removeDirectory($thirdLevelDir);
+                                }
+                            }
+
+                        }
+                        /*if ($files) {
+                            foreach ($files as $file)
+                            {
+                                $this->stdout("\t\t\t{$file}\n");
+                            }
+                        }*/
+                    }
+                }
+            }
+
         }
     }
 }

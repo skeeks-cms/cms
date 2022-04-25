@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\validators;
 
+use skeeks\cms\base\DynamicModel;
 use yii\validators\Validator;
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\PhoneNumberFormat;
@@ -77,5 +78,33 @@ class PhoneValidator extends Validator
             $this->addError($model, $attribute,
                 \Yii::t('skeeks/cms', 'Unexpected Phone Number Format or Country Code'));
         }
+    }
+
+    static public function format($value)
+    {
+        $phone = trim($value);
+        $newPhone = $phone;
+
+        $first = substr($phone, 0, 1);
+
+        if ($first == 8) {
+            $newPhone = substr($phone, 1, strlen($phone));
+            $newPhone = trim("+7" . $newPhone);
+        } elseif ($first == 7) {
+            $newPhone = substr($phone, 1, strlen($phone));
+            $newPhone = trim("+7" . $newPhone);
+        } elseif ($first == 9) {
+            $newPhone = trim("+7" . $phone);
+        }
+
+        $newPhone = str_replace("(", "", $newPhone);
+        $newPhone = str_replace(")", "", $newPhone);
+
+        $dm = new DynamicModel(['phone']);
+        $dm->addRule("phone", self::class);
+        $dm->phone = $newPhone;
+        $dm->validate();
+
+        return $dm->phone;
     }
 }

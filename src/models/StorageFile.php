@@ -14,6 +14,7 @@ use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
+use skeeks\cms\query\CmsStorageFileActiveQuery;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -42,15 +43,15 @@ use yii\helpers\ArrayHelper;
  * @property integer                                $external_id
  *
  * @property string                                 $fileName
- * 
+ *
  * @property string                                 $baseNameSrc
  * @property string                                 $absoluteBaseNameSrc
- * 
+ *
  * @property string                                 $src
  * @property string                                 $absoluteSrc
- * 
+ *
  * @property string                                 $downloadName
- * 
+ *
  * @property CmsSite                                $cmsSite
  *
  * @property \skeeks\cms\components\storage\Cluster $cluster
@@ -63,6 +64,14 @@ class StorageFile extends Core
     public static function tableName()
     {
         return '{{%cms_storage_file}}';
+    }
+
+    /**
+     * @return CmsUserQuery|\skeeks\cms\query\CmsActiveQuery
+     */
+    public static function find()
+    {
+        return (new CmsStorageFileActiveQuery(get_called_class()));
     }
 
     /**
@@ -95,9 +104,9 @@ class StorageFile extends Core
                     }
                 },
             ],
-            
+
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::class, 'targetAttribute' => ['cms_site_id' => 'id']],
-            
+
             [['external_id'], 'string', 'max' => 255],
             [['external_id'], 'default', 'value' => null],
             [
@@ -268,7 +277,7 @@ class StorageFile extends Core
     {
         return $this->cluster->getAbsoluteBaseNameUrl($this);
     }
-    
+
     /**
      * @return \skeeks\cms\components\storage\Cluster
      */
