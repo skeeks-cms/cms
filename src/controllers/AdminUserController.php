@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use common\models\User;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
@@ -32,7 +33,9 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\widgets\ActiveForm;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
@@ -40,6 +43,7 @@ use Yii;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\rbac\Item;
@@ -354,6 +358,39 @@ class AdminUserController extends BackendModelStandartController
                                 return $cmsUser->email ? $cmsUser->email : "";
                             },
                         ],
+
+                        'countOrders' => [
+                            'attribute'     => "countOrders",
+                            'label'         => "Количество заказов",
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery = ShopOrder::find()->select([new Expression("count(1)")])->where([
+                                    'cms_user_id' => new Expression(CmsUser::tableName().".id"),
+                                ]);
+
+                                $query->addSelect([
+                                    'countOrders' => $subQuery,
+                                ]);
+
+
+                                $grid->sortAttributes["countOrders"] = [
+                                    'asc'  => ['countOrders' => SORT_ASC],
+                                    'desc' => ['countOrders' => SORT_DESC],
+                                ];
+                            },
+
+                            'value' => function ($model) {
+                                return $model->raw_row['countOrders'];
+                            },
+                        ],
                     ],
                 ],
             ],
@@ -409,6 +446,37 @@ class AdminUserController extends BackendModelStandartController
                 },
             ],
 
+
+            "orders" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Заказы",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-order",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    /*ArrayHelper::removeValue($visibleColumns, 'cms_site_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;*/
+
+                },
+
+                "accessCallback" => function () {
+                    if ($this->model) {
+                        return ShopOrder::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
+                    }
+
+                    return false;
+                },
+            ],
+
             'add-site-permission' => [
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
@@ -458,9 +526,9 @@ class AdminUserController extends BackendModelStandartController
             ],
 
             'update-eav' => [
-                'class' => BackendModelUpdateAction::class,
-                "callback"       => [$this, 'updateEav'],
-                'isVisible'      => false,
+                'class'     => BackendModelUpdateAction::class,
+                "callback"  => [$this, 'updateEav'],
+                'isVisible' => false,
             ],
 
             'delete' => [

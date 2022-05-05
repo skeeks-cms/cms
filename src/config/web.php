@@ -49,6 +49,15 @@ $config = [
             ],
         ],
 
+        'view' => [
+            'class' => '\skeeks\cms\web\View',
+            /*'themes' => [
+                "id" => [
+                    'class' => \skeeks\cms\base\Theme::class
+                ],
+            ]*/
+        ],
+
         'breadcrumbs' => [
             'class' => '\skeeks\cms\components\Breadcrumbs',
         ],

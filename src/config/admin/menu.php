@@ -280,38 +280,7 @@ return array_merge(dashboardsMenu(), [
         ],
 
 
-    'siteinfo' => [
-        'priority' => 290,
-        'label'    => \Yii::t('skeeks/cms', 'Информация о сайте'),
-        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/information.png'],
 
-        'items' => [
-            [
-                'label' => 'Общая информация',
-                'url'   => ['cms/admin-cms-site-info'],
-            ],
-            [
-                'label' => 'Телефоны',
-                'url'   => ['cms/admin-cms-site-phone'],
-            ],
-            [
-                'label' => 'Email-ы',
-                'url'   => ['cms/admin-cms-site-email'],
-            ],
-            [
-                'label' => 'Адреса',
-                'url'   => ['cms/admin-cms-site-address'],
-            ],
-            [
-                'label' => 'Социальные сети',
-                'url'   => ['cms/admin-cms-site-social'],
-            ],
-            [
-                'label' => 'Домены',
-                'url'   => ['cms/admin-cms-site-domain'],
-            ],
-        ],
-    ],
     'settings' => [
         'priority' => 300,
         'label'    => \Yii::t('skeeks/cms', 'Settings'),
@@ -319,13 +288,45 @@ return array_merge(dashboardsMenu(), [
 
         'items' =>
             [
-                [
-                    "label" => \Yii::t('skeeks/cms', 'Sites'),
-                    "url"   => ["/cms/admin-cms-site"],
-                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
+                'siteinfo' => [
+                    //'priority' => 290,
+                    'label'    => \Yii::t('skeeks/cms', 'Информация'),
+                    "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/information.png'],
 
+                    'items' => [
+                        [
+                            'label' => 'Общая',
+                            'url'   => ['cms/admin-cms-site-info'],
+                        ],
+                        [
+                            'label' => 'Телефоны',
+                            'url'   => ['cms/admin-cms-site-phone'],
+                        ],
+                        [
+                            'label' => 'Email-ы',
+                            'url'   => ['cms/admin-cms-site-email'],
+                        ],
+                        [
+                            'label' => 'Адреса',
+                            'url'   => ['cms/admin-cms-site-address'],
+                        ],
+                        [
+                            'label' => 'Социальные сети',
+                            'url'   => ['cms/admin-cms-site-social'],
+                        ],
+                        [
+                            'label' => 'Домены',
+                            'url'   => ['cms/admin-cms-site-domain'],
+                        ],
+                    ],
                 ],
 
+                [
+                    "label" => \Yii::t('skeeks/cms', 'Дизайн'),
+                    "url"   => ["/cms/admin-cms-theme"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/themes.png'],
+
+                ],
 
                 [
                     "label" => \Yii::t('skeeks/cms', "Languages"),
@@ -504,4 +505,13 @@ return array_merge(dashboardsMenu(), [
                     ],
                 ],
         ],
+
+
+    'sites' => [
+        'priority' => 9000,
+        "label" => \Yii::t('skeeks/cms', 'Sites'),
+        "url"   => ["/cms/admin-cms-site"],
+        "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
+
+    ],
 ]);

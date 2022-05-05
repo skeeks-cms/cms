@@ -552,6 +552,14 @@ class GridView extends \yii\grid\GridView
         {
             if (this.get("is_ckeditor")) {
                 sx.EventManager.trigger('submitElement', data);
+                
+                if (window.opener) {
+                    if (window.opener.CKEDITOR) {
+                        window.opener.CKEDITOR.tools.callFunction(self.get("is_ckeditor"), data.basenamesrc);
+                        window.close();
+                    }
+                }
+    
             } else {
                 sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
             }
