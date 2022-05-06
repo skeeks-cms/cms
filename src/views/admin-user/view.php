@@ -195,7 +195,8 @@ ul.sx-properties .sx-properties--name:after {
     color: #3a3a3a;
 }
 .sx-block {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
 }
 .sx-block .sx-block-content {
     padding: 10px;

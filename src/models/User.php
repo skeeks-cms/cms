@@ -198,6 +198,7 @@ class User
             } else {
                 $cmsUserEmail = new CmsUserEmail();
                 $cmsUserEmail->value = $value;
+                $cmsUserEmail->cms_site_id = $this->cms_site_id;
                 $cmsUserEmail->cms_user_id = $this->id;
                 if (!$cmsUserEmail->save()) {
                     throw new Exception("Email не добавлен! ".print_r($cmsUserEmail->errors, true));
@@ -217,6 +218,7 @@ class User
                 }
             } else {
                 $cmsUserPhone = new CmsUserPhone();
+                $cmsUserPhone->cms_site_id = $this->cms_site_id;
                 $cmsUserPhone->value = $value;
                 $cmsUserPhone->cms_user_id = $this->id;
                 if (!$cmsUserPhone->save()) {
@@ -339,12 +341,12 @@ class User
                     $value = StringHelper::strtolower(trim($this->{$attribute}));
 
                     if ($this->isNewRecord) {
-                        if (CmsUserPhone::find()->cmsSite()->andWhere(['value' => $value])->one()) {
+                        if (CmsUserPhone::find()->cmsSite($this->cms_site_id)->andWhere(['value' => $value])->one()) {
                             $this->addError($attribute, "Этот телефон уже занят");
                         }
                     } else {
                         if (CmsUserPhone::find()
-                            ->cmsSite()
+                            ->cmsSite($this->cms_site_id)
                             ->andWhere(['value' => $value])
                             ->andWhere(['!=', 'cms_user_id', $this->id])
                             ->one()) {
@@ -376,13 +378,13 @@ class User
                     $value = StringHelper::strtolower(trim($this->{$attribute}));
 
                     if ($this->isNewRecord) {
-                        if (CmsUserEmail::find()->cmsSite()->andWhere(['value' => $value])->one()) {
+                        if (CmsUserEmail::find()->cmsSite($this->cms_site_id)->andWhere(['value' => $value])->one()) {
                             $this->addError($attribute, "Этот email уже занят");
                             return false;
                         }
                     } else {
                         if (CmsUserEmail::find()
-                            ->cmsSite()
+                            ->cmsSite($this->cms_site_id)
                             ->andWhere(['value' => $value])
                             ->andWhere(['!=', 'cms_user_id', $this->id])
                             ->one()) {
