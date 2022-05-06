@@ -204,6 +204,7 @@ class AdminCmsThemeController extends BackendController
                 if (!CmsTheme::find()->cmsSite($cmsSite)->andWhere(['code' => $id])->one()) {
                     $cmsTheme = new CmsTheme();
                     $cmsTheme->code = $id;
+                    $cmsTheme->cms_site_id = $cmsSite->id;
                     if (!$cmsTheme->save()) {
                         throw new Exception(print_r($cmsTheme->errors, true));
                     }
