@@ -67,7 +67,10 @@ class AdminCmsSmsMessageController extends BackendModelStandartController
                         ],
 
                         'body' => <<<HTML
-<p></p>
+<p>
+В этом разделе показаны все sms отправленные с сайта.
+
+</p>
 HTML
                         ,
                     ]);
