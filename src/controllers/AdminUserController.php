@@ -469,7 +469,7 @@ class AdminUserController extends BackendModelStandartController
                 },
 
                 "accessCallback" => function () {
-                    if ($this->model) {
+                    if ($this->model && class_exists(ShopOrder::class)) {
                         return ShopOrder::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
                     }
 
