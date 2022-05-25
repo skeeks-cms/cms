@@ -7,7 +7,7 @@
  */
 ?>
 <h2><?= \Yii::t('skeeks/cms', 'Servers to store the files.') ?></h2>
-<?php foreach (\Yii::$app->storage->getClusters() as $count => $cluster) : ?>
+<?php $count = 0; foreach (\Yii::$app->storage->getClusters() as $cluster) : ?>
     <div class="sx-box g-pa-10 sx-bg-primary">
         <div class="row">
             <div class="col-md-12">
