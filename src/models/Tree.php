@@ -112,6 +112,8 @@ use yii\helpers\Url;
  * @property Tree[]                    $descendants
  * @property bool                      $isActive
  * @property CmsSavedFilter[]          $cmsSavedFilters
+ * @property static[]                  $cmsTreeChildsByPid
+ * @property static                    $cmsTreeByPid
  *
  * @depricated
  */
@@ -314,7 +316,7 @@ class Tree extends ActiveRecord
             'description_full'       => Yii::t('skeeks/cms', 'Description Full'),
             'description_short_type' => Yii::t('skeeks/cms', 'Description Short Type'),
             'description_full_type'  => Yii::t('skeeks/cms', 'Description Full Type'),
-            'image_id'               => Yii::t('skeeks/cms', 'Main Image (announcement)'),
+            'image_id'               => Yii::t('skeeks/cms', 'Image'),
             'image_full_id'          => Yii::t('skeeks/cms', 'Main Image'),
             'images'                 => Yii::t('skeeks/cms', 'Images'),
             'imageIds'               => Yii::t('skeeks/cms', 'Images'),
@@ -487,7 +489,7 @@ class Tree extends ActiveRecord
             $params = ['/cms/tree/view', 'id' => $this->id];
         }
 
-        return Url::to(['/cms/tree/view', 'id' => $this->id], $scheme);
+        return Url::to($params, $scheme);
     }
 
     /**
@@ -538,6 +540,20 @@ class Tree extends ActiveRecord
     public function getCmsTreeProperties()
     {
         return $this->hasMany(CmsTreeProperty::className(), ['element_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeByPid()
+    {
+        return $this->hasOne(static::class, ['id' => 'pid']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTreeChildsByPid()
+    {
+        return $this->hasMany(static::class, ['pid' => 'id']);
     }
 
     /**

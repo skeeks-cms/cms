@@ -16,6 +16,8 @@ use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsTreeProperty;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
+use skeeks\cms\models\CmsUserUniversalProperty;
+use skeeks\cms\models\CmsUserUniversalPropertyEnum;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\web\Controller;
 
@@ -47,6 +49,87 @@ class AjaxController extends Controller
             $propertyEnumClass = (string) \Yii::$app->request->get("property_enum_class");
         }
         
+        /**
+         * @var $property CmsContentProperty
+         */
+        if (!$property = $propertyClass::find()->cmsSite()->where(['code' => $code])->one()) {
+            return $result;
+        }
+
+        if ($property->property_type == PropertyType::CODE_LIST) {
+            $query = $propertyEnumClass::find()->andWhere(['property_id' => $property->id]);
+
+            if ($q = \Yii::$app->request->get('q')) {
+                $query->andWhere(['like', 'value', $q]);
+            }
+
+            $data = $query->limit(50)
+                        ->all();
+
+            $result = [];
+
+            if ($data) {
+                foreach ($data as $model) {
+                    $result[] = [
+                        'id'   => $model->id,
+                        'text' => $model->value,
+                    ];
+                }
+            }
+        } elseif ($property->property_type == PropertyType::CODE_ELEMENT) {
+            if (!isset($property->handler->content_id) || ! $property->handler->content_id) {
+                return $result;
+            }
+
+            $query = CmsContentElement::find()->cmsSite()->active()->andWhere(['content_id' => $property->handler->content_id]);
+
+            if ($q = \Yii::$app->request->get('q')) {
+                $query->andWhere(['like', 'name', $q]);
+            }
+
+            $data = $query->limit(50)
+                        ->all();
+
+            $result = [];
+
+            if ($data) {
+                foreach ($data as $model) {
+                    $result[] = [
+                        'id'   => $model->id,
+                        'text' => $model->name,
+                    ];
+                }
+            }
+        }
+
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return ['results' => $result];
+    }
+    /**
+     * @return array
+     */
+    public function actionAutocompleteUserEavOptions()
+    {
+        $result = [];
+
+        $code = (string) \Yii::$app->request->get("code");
+        if (!$code) {
+            return $result;
+        }
+
+        $propertyClass = CmsUserUniversalProperty::class;
+        $propertyEnumClass = CmsUserUniversalPropertyEnum::class;
+
+        if (\Yii::$app->request->get("property_class")) {
+            $propertyClass = (string) \Yii::$app->request->get("property_class");
+        }
+
+        if (\Yii::$app->request->get("property_enum_class")) {
+            $propertyEnumClass = (string) \Yii::$app->request->get("property_enum_class");
+        }
+
         /**
          * @var $property CmsContentProperty
          */

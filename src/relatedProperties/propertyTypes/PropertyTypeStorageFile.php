@@ -40,7 +40,7 @@ class PropertyTypeStorageFile extends PropertyType
         parent::init();
 
         if (!$this->name) {
-            $this->name = "Файлы из хранилища";
+            $this->name = "Файл";
         }
     }
 

@@ -22,13 +22,14 @@ use skeeks\cms\i18n\I18N;
 use skeeks\cms\Skeeks;
 
 /**
- * @property Storage               $storage
- * @property Cms                   $cms
- * @property Imaging               $imaging
- * @property Breadcrumbs           $breadcrumbs
- * @property Skeeks                $skeeks
- * @property ConsoleComponent      $console
- * @property I18N                  $i18n
+ * @property Storage                                           $storage
+ * @property Cms                                               $cms
+ * @property Imaging                                           $imaging
+ * @property Breadcrumbs                                       $breadcrumbs
+ * @property Skeeks                                            $skeeks
+ * @property ConsoleComponent                                  $console
+ * @property I18N                                              $i18n
+ * @property \skeeks\cms\web\View                              $view
  *
  * @property \yii\web\User|UserIde|\skeeks\cms\components\User $user
  *

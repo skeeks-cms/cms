@@ -188,7 +188,7 @@ class AdminCmsSiteController extends BackendModelStandartController
                             'value' => function (CmsSite $model) {
 
                                 $data = [];
-                                $data[] = ($model->is_default ? '<span class="fa fa-check text-success" title="Сайт по умолчанию"></span> ' : '') . Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = ($model->is_default ? '<span class="text-success" title="Сайт по умолчанию">✓</span> ' : '') . Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
 
                                 if ($model->cmsSiteMainDomain) {
                                     /*foreach ($model->cmsSiteDomains as $cmsSiteDomain)

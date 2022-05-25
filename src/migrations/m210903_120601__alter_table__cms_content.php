@@ -10,6 +10,7 @@ use yii\db\Migration;
 
 class m210903_120601__alter_table__cms_content extends Migration
 {
+
     public function safeUp()
     {
         $tableName = 'cms_content';

@@ -17,6 +17,8 @@ class DynamicModel extends \yii\base\DynamicModel {
      * @var string
      */
     public $formName = null;
+
+    protected $_attributeLabels = [];
     
     /**
      * @return null|string
@@ -28,5 +30,34 @@ class DynamicModel extends \yii\base\DynamicModel {
         }
 
         return $this->formName;
+    }
+
+    /**
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        return $this->_attributeLabels;
+    }
+
+    /**
+     * @param array $attributeLabels
+     * @return $this
+     */
+    public function setAttributeLebels($attributeLabels = [])
+    {
+        $this->_attributeLabels = [];
+        return $this;
+    }
+
+    /**
+     * @param string $attribute
+     * @param string $value
+     * @return $this
+     */
+    public function setAttrubuteLebel(string $attribute, string $value)
+    {
+        $this->_attributeLabels[$attribute] = $value;
+        return $this;
     }
 }

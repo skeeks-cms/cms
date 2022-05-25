@@ -383,7 +383,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                     'createdBy'         => [
                         'class' => SelectField::class,
                         'items' => \yii\helpers\ArrayHelper::map(
-                            \skeeks\cms\models\User::find()->active()->all(),
+                            \skeeks\cms\models\User::find()->cmsSite()->active()->all(),
                             'id',
                             'displayName'
                         ),
@@ -489,6 +489,9 @@ class ContentElementsCmsWidget extends WidgetRenderable
             'tags' => [
                 $this->className().(string)$this->namespace,
                 (new CmsContentElement())->getTableCacheTagCmsSite(),
+                $this->namespace,
+                $this->cmsUser ? $this->cmsUser->cacheTag : '',
+                $this->cmsSite ? $this->cmsSite->cacheTag : '',
             ],
         ]);
 

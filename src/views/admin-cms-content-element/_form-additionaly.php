@@ -4,9 +4,13 @@
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 ?>
 
-<? if ($contentModel->isAllowEdit("published_at") || $contentModel->isAllowEdit("code") || $contentModel->isAllowEdit("priority") || $contentModel->isAllowEdit("fileIds") || $contentModel->parent_content_id) : ?>
+<? if ($contentModel->isAllowEdit("published_at") || $contentModel->isAllowEdit("external_id") || $contentModel->isAllowEdit("code") || $contentModel->isAllowEdit("priority") || $contentModel->isAllowEdit("fileIds") || $contentModel->parent_content_id) : ?>
 
     <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Additionally'), ['isOpen' => false]); ?>
+
+    <? if ($contentModel->isAllowEdit("external_id")) : ?>
+        <?= $form->field($model, 'external_id'); ?>
+    <? endif; ?>
 
     <? if ($contentModel->isAllowEdit("published_at")) : ?>
         <? /* if ($model->is_active) : */ ?>

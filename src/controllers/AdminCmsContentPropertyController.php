@@ -10,10 +10,12 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
@@ -434,6 +436,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
             'create' => [
                 'fields' => [$this, 'updateFields'],
+                'size' => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -450,6 +453,8 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             ],
             'update' => [
                 'fields' => [$this, 'updateFields'],
+
+                'size' => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -469,7 +474,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             'enums' => [
                 'class'           => BackendGridModelRelatedAction::class,
                 'accessCallback'  => true,
-                'name'            => "Элементы списка",
+                'name'            => "Опции",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-content-property-enum",
                 'relation'        => ['property_id' => 'id'],
@@ -530,6 +535,24 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
         if ($model->isNewRecord) {
             $model->cms_site_id = \Yii::$app->skeeks->site->id;
         }
+        
+        $isChange = true;
+        $changeOptions = [];
+        $message = 'От этого зависит как будет показываться свойство в форме редактирования.';
+
+        if (!$model->isNewRecord) {
+            if ($model->property_type == PropertyType::CODE_LIST) {
+                if ($model->getEnums()->one()) {
+                    $isChange = false;
+                    $message = 'Нельзя менять тип характеристики, потому что у нее уже созданы опции.';
+                }
+            }
+        }
+        if (!$isChange) {
+            $changeOptions = [
+                'disabled' => "disabled",
+            ];
+        }
 
         $result = [
             'main' => [
@@ -560,18 +583,17 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
                     'component'        => [
                         'class'          => SelectField::class,
-                        'elementOptions' => [
+                        'elementOptions' => ArrayHelper::merge([
                             'data' => [
                                 'form-reload' => 'true',
                             ],
-                        ],
-                        /*'options' => [
-                            'class' => 'teat'
-                        ],*/
+                        ], $changeOptions),
                         'items'          => function () {
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
                         },
+                        'hint' => $message
                     ],
+                    
                     'cms_measure_code' => [
                         'class' => SelectField::class,
                         /*'elementOptions' => [
@@ -620,6 +642,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             'captions' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
+                'elementOptions' => ['isOpen' => false],
                 'fields' => [
 
                     'is_active' => [
@@ -641,7 +664,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
             ],
         ];
 
-        if (\Yii::$app->skeeks->site->is_default && CmsSite::find()->count() > 1) {
+        /*if (\Yii::$app->skeeks->site->is_default && CmsSite::find()->count() > 1) {
             $result['site'] = [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Показ на сайтах'),
@@ -660,8 +683,61 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 ],
             ];
 
-        }
+        }*/
 
         return $result;
+    }
+
+    /**
+     * @return RequestResponse
+     */
+    public function actionJoinProperty()
+    {
+        $rr = new RequestResponse();
+
+        $treeId = \Yii::$app->request->post("tree_id");
+        $contentId = \Yii::$app->request->post("content_id");
+        $pk = \Yii::$app->request->get("pk");
+
+        if ($contentId && $treeId && $pk) {
+
+            /**
+             * @var $property CmsContentProperty
+             */
+            $property = CmsContentProperty::find()->cmsSite()->andWhere(['id' => $pk])->one();
+
+            if ($property) {
+
+                $newContentIds = [];
+                foreach ($property->cmsContents as $content)
+                {
+                    $newContentIds[] = $content->id;
+                }
+                $newContentIds[] = $contentId;
+                $property->cmsContents = $newContentIds;
+
+                $newTreeIds = [];
+                foreach ($property->cmsTrees as $tree)
+                {
+                    $newTreeIds[] = $tree->id;
+                }
+                $newTreeIds[] = $treeId;
+                $property->cmsTrees = $newTreeIds;
+
+                if (!$property->save()) {
+                    print_r($property->errors);die;
+                    $rr->success = false;
+                    $rr->message = print_r($property->errors, true);
+                    return $rr;
+                }
+
+                $rr->success = true;
+                $rr->message = "Характеристика добавлена";
+
+            }
+
+        }
+
+        return $rr;
     }
 }

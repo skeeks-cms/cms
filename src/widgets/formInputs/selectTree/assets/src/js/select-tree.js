@@ -28,13 +28,15 @@
          * @param name
          * @returns {sx.classes.treeinput.SelectedUl}
          */
-        add: function(id, name, url)
+        add: function(id, name, url, jNode)
         {
             var jWrapper = this._TreeInput.getJSelectedContainer();
 
+            var shortName = jNode.children().children('.sx-label-node').find('a').text();
+
             var jLi = $('<li>', {'data-id': id})
-                .append($("<a>", {'target': '_blank', 'href': url}).text(name))
-                .append($("<a>", {'href': '#', 'class': 'sx-close-btn pull-right'}).append('<i class="fa fa-times"></i>'))
+                .append($("<div>", {'data-href': url, 'class': 'sx-selected-value', 'title': 'name'}).text(shortName))
+                .append($("<div>", {'class': 'sx-close-btn pull-right'}).append('×'))
             ;
 
             jWrapper.append(jLi);
@@ -91,6 +93,39 @@
         {
         },
 
+        _initBase: function() {
+            var self = this;
+            var jWrapper = this.getJWrapper();
+
+
+
+            if (!$(".sx-selected", jWrapper).hasClass("sx-ready")) {
+
+                $(".sx-selected", jWrapper).addClass("sx-ready");
+
+                $(document).mouseup(function (e){ // событие клика по веб-документу
+                    var div = $(".sx-select-tree-input-widget"); // тут указываем ID элемента
+                    if (!div.is(e.target) // если клик был не по нашему блоку
+                        && div.has(e.target).length === 0) { // и не по его дочерним элементам
+                        var jElement = $(".sx-select-tree", jWrapper);
+                        jElement.slideUp();
+                    }
+                });
+
+                $(".sx-selected", jWrapper).on("click", function() {
+                    console.log('11111');
+                    
+                    var jElement = $(".sx-select-tree", jWrapper);
+                    if (jElement.is(":visible")) {
+                        jElement.slideUp();
+                    } else {
+                        jElement.slideDown();
+                    }
+                });
+            }
+            
+        },
+
         getJWrapper: function()
         {
             return $('#' + this.get('wrapperid'))
@@ -128,7 +163,7 @@
 
             var jNode = jQueryElement.closest('.sx-tree-node');
             var name = self.getNodeName(jNode);
-            this.SelectedUl.add(value, name, jNode.data('url'));
+            this.SelectedUl.add(value, name, jNode.data('url'), jNode);
 
             self.getJElement().change();
 
@@ -197,6 +232,8 @@
             var self = this;
             var jWrapper = this.getJWrapper();
 
+            self._initBase();
+
             this.getJCheckbox().on('change', function()
             {
                 if ($(this).is(":checked"))
@@ -262,6 +299,8 @@
             var self = this;
             var jWrapper = this.getJWrapper();
 
+            self._initBase();
+
             this.getJRadio().on('change', function()
             {
                 self.unSelectValue(self.getJElement().val(), false);
@@ -277,10 +316,16 @@
                 self.trigger("change", {
                     'value': self.get('value'),
                 });
+
+                //Если значение выбрано, то скрыть выбор
+                if (self.get('value')) {
+                    $(".sx-select-tree", jWrapper).slideUp();
+                } else {
+                    $(".sx-select-tree", jWrapper).slideDown();
+                }
             });
 
-            if (this.getValue())
-            {
+            if (this.getValue()) {
                 var Jelement = $(".sx-radio[value='" + this.getValue() + "']", jWrapper);
                 if (!Jelement.is(":checked"))
                 {

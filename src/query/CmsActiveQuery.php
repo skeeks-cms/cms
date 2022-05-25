@@ -47,7 +47,7 @@ class CmsActiveQuery extends ActiveQuery
     }
     /**
      * @param int $order
-     * @return CmsActiveQuery
+     * @return $this
      */
     public function sort($order = SORT_ASC)
     {
@@ -55,28 +55,25 @@ class CmsActiveQuery extends ActiveQuery
     }
 
     /**
-     * @depricated
-     *
-     * @param bool $state
-     * @return CmsActiveQuery
-     */
-    public function def($state = true)
-    {
-        return $this->andWhere(['def' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
-    }
-
-    /**
      * Фильтрация по сайту
+     * @param int|CmsSite $cmsSite
      *
      * @return CmsActiveQuery
      */
     public function cmsSite($cmsSite = null)
     {
-        if (!$cmsSite instanceof CmsSite) {
-            $cmsSite = \Yii::$app->skeeks->site;
+        $cms_site_id = null;
+
+        if (is_int($cmsSite)) {
+            $cms_site_id = $cmsSite;
+        } elseif ($cmsSite instanceof CmsSite) {
+            $cms_site_id = $cmsSite->id;
+        } else {
+            $cms_site_id = \Yii::$app->skeeks->site->id;
         }
 
         $alias = $this->getPrimaryTableName();
+
         if ($this->from) {
             foreach ($this->from as $code => $table) {
                 if ($table == $alias) {
@@ -84,13 +81,13 @@ class CmsActiveQuery extends ActiveQuery
                 }
             }
         }
-        
-        return $this->andWhere([$alias.'.cms_site_id' => $cmsSite->id]);
+
+        return $this->andWhere([$alias.'.cms_site_id' => $cms_site_id]);
     }
 
     /**
      * @param string $word
-     * @return CmsActiveQuery
+     * @return $this
      */
     public function search($word = '')
     {
@@ -107,5 +104,17 @@ class CmsActiveQuery extends ActiveQuery
         }
 
         return $this;
+    }
+
+
+    /**
+     * @depricated
+     *
+     * @param bool $state
+     * @return $this
+     */
+    public function def($state = true)
+    {
+        return $this->andWhere(['def' => ($state == true ? Cms::BOOL_Y : Cms::BOOL_N)]);
     }
 }

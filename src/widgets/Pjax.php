@@ -142,6 +142,7 @@ CSS
                     $(document).on('pjax:error', function(e, data) {
                         if ('{$this->id}' == e.target.id) {
                             //console.log('pjax:error');
+                            //console.log(data);
                             {$errorNotify}
                             {$error}
                             blockerPanel.unblock();

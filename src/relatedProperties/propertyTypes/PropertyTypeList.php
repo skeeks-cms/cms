@@ -181,7 +181,10 @@ class PropertyTypeList extends PropertyType
             if ($enumClassName = $this->property->relatedPropertyEnumClassName) {
                 $this->_enumClass = $enumClassName;
             } else {
-                $this->_enumClass = CmsContentPropertyEnum::class;
+
+                $r = new \ReflectionClass($this->property);
+                $enumClassName = $r->getName() . "Enum";
+                $this->_enumClass = $enumClassName;
             }
             
         }

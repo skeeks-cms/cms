@@ -14,27 +14,36 @@ namespace skeeks\cms\controllers;
 use common\models\User;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\base\DynamicModel;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
-use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\widgets\ActiveForm;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use Yii;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\rbac\Item;
@@ -52,13 +61,23 @@ class AdminUserController extends BackendModelStandartController
         $this->modelClassName = CmsUser::class;
 
         $this->generateAccessActions = false;
-        $this->accessCallback = function () {
+        /*$this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
             return true;
+        };*/
+        /*$this->permissionName = 'cms/admin-user';*/
+
+        $this->modelHeader = function () {
+            /**
+             * @var $model CmsContentElement
+             */
+            $model = $this->model;
+            return $this->renderPartial("@skeeks/cms/views/admin-user/_model_header", [
+                'model' => $model,
+            ]);
         };
-        /*$this->permissionName = 'cms/admin-cms-site';*/
 
         parent::init();
     }
@@ -68,10 +87,10 @@ class AdminUserController extends BackendModelStandartController
         $actions = ArrayHelper::merge(parent::actions(), [
 
             "index" => [
-                "filters"        => [
+                "filters" => [
                     "visibleFilters" => [
                         'q',
-                        'active',
+                        'is_active',
                         'role',
                         'isOnline',
                     ],
@@ -90,11 +109,9 @@ class AdminUserController extends BackendModelStandartController
 
                         'fields' => [
 
-                            'active' => [
+                            'is_active' => [
                                 'field'             => [
-                                    'class'      => BoolField::class,
-                                    'trueValue'  => "Y",
-                                    'falseValue' => "N",
+                                    'class' => BoolField::class,
                                 ],
                                 "isAllowChangeMode" => false,
                                 "defaultMode"       => FilterModeEq::ID,
@@ -165,14 +182,18 @@ class AdminUserController extends BackendModelStandartController
                                      */
                                     $query = $e->dataProvider->query;
 
+                                    $query->joinWith("cmsUserEmails as cmsUserEmails");
+                                    $query->joinWith("cmsUserPhones as cmsUserPhones");
+
                                     if ($e->field->value) {
                                         $query->andWhere([
                                             'or',
                                             ['like', CmsUser::tableName().'.first_name', $e->field->value],
                                             ['like', CmsUser::tableName().'.last_name', $e->field->value],
                                             ['like', CmsUser::tableName().'.patronymic', $e->field->value],
-                                            ['like', CmsUser::tableName().'.email', $e->field->value],
-                                            ['like', CmsUser::tableName().'.phone', $e->field->value],
+
+                                            ['like', 'cmsUserEmails.value', $e->field->value],
+                                            ['like', 'cmsUserPhones.value', $e->field->value],
                                         ]);
                                     }
                                 },
@@ -185,9 +206,10 @@ class AdminUserController extends BackendModelStandartController
 
                     'on init' => function (Event $event) {
 
+                        $query = $event->sender->dataProvider->query;
+
                         if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROOT_ACCESS)) {
-                            //TODO: доработать запрос
-                            $query = $event->sender->dataProvider->query;
+
                             $query->innerJoin('auth_assignment', 'auth_assignment.cms_user_id = cms_user.id');
                             $query->andFilterWhere([
                                 "!=",
@@ -197,11 +219,12 @@ class AdminUserController extends BackendModelStandartController
                             $query->groupBy([CmsUser::tableName().".id"]);
                         }
 
+                        $query->cmsSite();
                     },
 
                     'defaultOrder'       => [
-                        'logged_at'  => SORT_DESC,
-                        'created_at' => SORT_DESC,
+                        'id' => SORT_DESC,
+                        //'created_at' => SORT_DESC,
                     ],
                     'dialogCallbackData' => function ($model) {
                         return \yii\helpers\ArrayHelper::merge($model->toArray(), [
@@ -212,27 +235,35 @@ class AdminUserController extends BackendModelStandartController
                     'visibleColumns'     => [
                         'checkbox',
                         'actions',
-                        'id',
+                        //'id',
+                        'custom',
+                        'phone',
+                        'email',
                         //'image_id',
                         //'displayName',
-                        'created_at',
-                        'logged_at',
+                        //'created_at',
+                        //'logged_at',
                         //'role',
-                        'active',
+                        'is_active',
                     ],
                     'columns'            => [
-                        'id'               => [
+                        'custom'                 => [
                             //'label'  => 'Данные пользователя',
-                            'format' => 'raw',
-                            'value'  => function (CmsUser $cmsUser) {
+                            'format'    => 'raw',
+                            'attribute' => 'id',
+                            'label'     => 'Аккаунт',
+                            'value'     => function (CmsUser $cmsUser) {
                                 //$data[] = $cmsUser->asText;
-                                $data[] = Html::a($cmsUser->asText, "#");
-                                if ($cmsUser->phone) {
-                                    $data[] = $cmsUser->phone;
+                                $data[] = Html::a($cmsUser->shortDisplayName, "#", [
+                                    'style' => 'font-size: 15px;
+                                                display: block;',
+                                ]);
+                                /*if ($cmsUser->phone) {
+                                    $data[] = "<div style='color: gray;'>" . $cmsUser->phone . "</div>";
                                 }
                                 if ($cmsUser->email) {
-                                    $data[] = $cmsUser->email;
-                                }
+                                    $data[] = "<div style='color: gray;'>" . $cmsUser->email . "</div>";
+                                }*/
 
                                 $rolesData = [];
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
@@ -240,7 +271,12 @@ class AdminUserController extends BackendModelStandartController
                                         $rolesData[] = Html::tag('label', $role->description, [
                                             'title' => $role->name,
                                             'class' => "u-label u-label-default g-rounded-20 g-mr-5 ".($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "font-size: 9px;",
+                                            'style' => "    font-size: 9px;
+    margin-top: 5px;
+    margin-bottom: 0;
+    padding: 2px ​5px 4px 5px;
+    background: #ededed;
+    color: gray;",
                                         ]);
                                     }
                                 }
@@ -250,36 +286,46 @@ class AdminUserController extends BackendModelStandartController
                                 }
 
 
-                                $info = implode("<br />", $data);
+                                $info = implode("", $data);
 
                                 return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                <div class='sx-trigger-action my-auto' style='width: 50px;'>
+                                                <a href='#' style='text-decoration: none;
+    border-bottom: 0;
+    width: 54px;
+    border-radius: 50%;
+    border: 2px solid #ededed;
+    height: 54px;
+    display: flex;
+    overflow: hidden;'>
+                                                    <img src='".($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc())."' style='    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%;
+    margin: auto;' />
                                                 </a>
                                                 </div>
-                                                <div style='margin-left: 5px;'>".$info."</div></div>";;
+                                                <div style='margin-left: 10px; line-height: 1.1;' class='my-auto'>".$info."</div></div>";;
                             },
                         ],
-                        'created_at'       => [
+                        'created_at'             => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'logged_at'        => [
+                        'logged_at'              => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'last_activity_at' => [
+                        'last_activity_at'       => [
                             'class' => DateTimeColumnData::class,
                         ],
                         'last_admin_activity_at' => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'image_id'         => [
+                        'image_id'               => [
                             'class' => ImageColumn2::class,
                         ],
-                        'active'           => [
+                        'is_active'              => [
                             'class' => BooleanColumn::class,
                         ],
-                        'role'             => [
+                        'role'                   => [
                             'value'  => function ($cmsUser) {
                                 $result = [];
 
@@ -294,13 +340,67 @@ class AdminUserController extends BackendModelStandartController
                             'format' => 'html',
                             'label'  => \Yii::t('skeeks/cms', 'Roles'),
                         ],
+                        'phone'                  => [
+                            'label'         => "Телефон",
+                            'headerOptions' => [
+                                'style' => 'width: 120px;',
+                            ],
+                            'value'         => function ($cmsUser) {
+                                return $cmsUser->phone ? $cmsUser->phone : "";
+                            },
+                        ],
+                        'email'                  => [
+                            'label'         => "Email",
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'value'         => function ($cmsUser) {
+                                return $cmsUser->email ? $cmsUser->email : "";
+                            },
+                        ],
+
+                        'countOrders' => [
+                            'attribute'     => "countOrders",
+                            'label'         => "Количество заказов",
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery = ShopOrder::find()->select([new Expression("count(1)")])->where([
+                                    'cms_user_id' => new Expression(CmsUser::tableName().".id"),
+                                ]);
+
+                                $query->addSelect([
+                                    'countOrders' => $subQuery,
+                                ]);
+
+
+                                $grid->sortAttributes["countOrders"] = [
+                                    'asc'  => ['countOrders' => SORT_ASC],
+                                    'desc' => ['countOrders' => SORT_DESC],
+                                ];
+                            },
+
+                            'value' => function ($model) {
+                                return $model->raw_row['countOrders'];
+                            },
+                        ],
                     ],
                 ],
             ],
 
             'create' => [
-                "callback"       => [$this, 'create'],
+                //"callback"       => [$this, 'create'],
+                'buttons'        => ['save'],
+                'size'           => BackendAction::SIZE_SMALL,
                 'generateAccess' => true,
+                'fields'         => [$this, 'createFields'],
             ],
 
 
@@ -320,10 +420,10 @@ class AdminUserController extends BackendModelStandartController
             ],
 
             'stat' => [
-                'class'          => BackendModelAction::class,
-                'name'           => 'Статистика',
-                'icon'           => 'fas fa-info-circle',
-                'priority'       => 500,
+                'class'    => BackendModelAction::class,
+                'name'     => 'Статистика',
+                'icon'     => 'far fa-chart-bar',
+                'priority' => 500,
 
                 'permissionName' => 'cms/admin-user/update-advanced',
 
@@ -332,15 +432,56 @@ class AdminUserController extends BackendModelStandartController
                         return false;
                     }
 
+                    if ($this->model) {
+                        $elementExists = CmsContentElement::find()->andWhere(['created_by' => $this->model->id])->exists();
+                        $treeExists = CmsTree::find()->andWhere(['created_by' => $this->model->id])->exists();
+
+                        if (!$treeExists && !$elementExists) {
+                            return false;
+                        }
+                    }
+
+
                     return true;
                 },
             ],
 
+
+            "orders" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Заказы",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-order",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    /*ArrayHelper::removeValue($visibleColumns, 'cms_site_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;*/
+
+                },
+
+                "accessCallback" => function () {
+                    if ($this->model) {
+                        return ShopOrder::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
+                    }
+
+                    return false;
+                },
+            ],
+
             'add-site-permission' => [
-                'class'          => BackendModelAction::class,
-                'isVisible'      => false,
-                'name'           => 'Профиль',
-                "callback"       => [$this, 'addSite'],
+                'class'     => BackendModelAction::class,
+                'isVisible' => false,
+                'name'      => 'Профиль',
+                "callback"  => [$this, 'addSite'],
 
                 'permissionName' => 'cms/admin-user/update-advanced',
 
@@ -370,7 +511,10 @@ class AdminUserController extends BackendModelStandartController
             ],
 
             'update' => [
-                "callback"       => [$this, 'update'],
+                'fields'         => [$this, 'updateFields'],
+                //"callback"       => [$this, 'update'],
+                'buttons'        => ['save'],
+                'isVisible'      => false,
                 'generateAccess' => true,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
@@ -381,13 +525,19 @@ class AdminUserController extends BackendModelStandartController
                 },
             ],
 
+            'update-eav' => [
+                'class'     => BackendModelUpdateAction::class,
+                "callback"  => [$this, 'updateEav'],
+                'isVisible' => false,
+            ],
+
             'delete' => [
                 'generateAccess' => true,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
-                    
+
                     return true;
                 },
 
@@ -458,126 +608,101 @@ class AdminUserController extends BackendModelStandartController
         return $this->render($this->action->id);
     }
 
-    public function create($adminAction)
+
+    public function createFields()
     {
-        $modelClassName = $this->modelClassName;
-        $model = new $modelClassName();
-        $model->loadDefaultValues();
+        return [
+            'image_id' => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                'widgetConfig' => [
+                    'accept'   => 'image/*',
+                    'multiple' => false,
+                ],
+            ],
+            /*'username',*/
+            'gender'   => [
+                'class'     => SelectField::class,
+                'allowNull' => false,
+                'items'     => [
+                    'men'   => \Yii::t('skeeks/cms', 'Male'),
+                    'women' => \Yii::t('skeeks/cms', 'Female'),
+                ],
+            ],
+            'last_name',
+            'first_name',
+            'patronymic',
 
-        $relatedModel = $model->relatedPropertiesModel;
-        $relatedModel->loadDefaultValues();
-
-        $passwordChange = new PasswordChangeForm([
-            'user' => $model,
-        ]);
-
-        $rr = new RequestResponse();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $passwordChange->load(\Yii::$app->request->post());
-
-            return \yii\widgets\ActiveForm::validateMultiple([
-                $model,
-                $relatedModel,
-                $passwordChange,
-            ]);
-        }
-
-
-        if ($rr->isRequestPjaxPost()) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-
-            if ($model->save() && $relatedModel->save()) {
-                if ($passwordChange->new_password) {
-                    if (!$passwordChange->changePassword()) {
-                        \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
-                    }
-                }
-
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply') {
-                    return $this->redirect(
-                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                            ->toString()
+            'email',
+            'phone'    => [
+                'elementOptions'  => [
+                    'placeholder' => '+7 903 722-28-73',
+                ],
+                'on beforeRender' => function (Event $e) {
+                    /**
+                     * @var $field Field
+                     */
+                    $field = $e->sender;
+                    \skeeks\cms\admin\assets\JqueryMaskInputAsset::register(\Yii::$app->view);
+                    $id = \yii\helpers\Html::getInputId($field->model, $field->attribute);
+                    \Yii::$app->view->registerJs(<<<JS
+                        $("#{$id}").mask("+7 999 999-99-99");
+JS
                     );
-                } else {
-                    return $this->redirect(
-                        $this->url
-                    );
-                }
-            }
-        }
-
-        return $this->render('_form', [
-            'model'          => $model,
-            'relatedModel'   => $relatedModel,
-            'passwordChange' => $passwordChange,
-        ]);
+                },
+            ],
+        ];
     }
 
 
-    public function update($adminAction)
+    public function updateFields()
     {
-        /**
-         * @var $model CmsUser
-         */
-        $model = $this->model;
-        $relatedModel = $model->relatedPropertiesModel;
-        $passwordChange = new PasswordChangeForm([
-            'user' => $model,
-        ]);
 
-        $rr = new RequestResponse();
+        $result = [
+            'is_active' => [
+                'class'     => BoolField::class,
+                'allowNull' => false,
+            ],
+            'image_id'  => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                'widgetConfig' => [
+                    'accept'   => 'image/*',
+                    'multiple' => false,
+                ],
+            ],
+            /*'username',*/
+            'gender'    => [
+                'class'     => SelectField::class,
+                'allowNull' => false,
+                'items'     => [
+                    'men'   => \Yii::t('skeeks/cms', 'Male'),
+                    'women' => \Yii::t('skeeks/cms', 'Female'),
+                ],
+            ],
+            'last_name',
+            'first_name',
+            'patronymic',
+        ];
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $passwordChange->load(\Yii::$app->request->post());
 
-            return \yii\widgets\ActiveForm::validateMultiple([
-                $model,
-                $relatedModel,
-                $passwordChange,
-            ]);
+        if ((\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $this->model]))
+            || \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROOT_ACCESS)) {
+
+            $roles = \Yii::$app->authManager->getAvailableRoles();
+            \yii\helpers\ArrayHelper::remove($roles, \skeeks\cms\rbac\CmsManager::ROLE_GUEST);
+
+            $result['roleNames'] = [
+                'class'     => SelectField::class,
+                'allowNull' => false,
+                'multiple'  => true,
+                'items'     => \yii\helpers\ArrayHelper::map($roles, 'name', 'description'),
+            ];
+
         }
 
-        if ($rr->isRequestPjaxPost()) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $passwordChange->load(\Yii::$app->request->post());
+        return $result;
 
-            if ($model->save() && $relatedModel->save()) {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
-
-                if ($passwordChange->new_password) {
-                    if (!$passwordChange->changePassword()) {
-                        \Yii::$app->getSession()->setFlash('error', "Пароль не изменен");
-                    }
-                }
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply') {
-
-                } else {
-                    return $this->redirect(
-                        $this->url
-                    );
-                }
-
-                $model->refresh();
-
-            }
-        }
-
-        return $this->render('_form', [
-            'model'          => $model,
-            'relatedModel'   => $relatedModel,
-            'passwordChange' => $passwordChange,
-        ]);
     }
 
 
@@ -588,29 +713,123 @@ class AdminUserController extends BackendModelStandartController
      */
     public function actionChangePassword()
     {
+        /**
+         * @var $model CmsUser
+         */
         $model = $this->model;
 
-        $modelForm = new PasswordChangeForm([
-            'user' => $model,
+        $dm = new DynamicModel(['password']);
+        $dm->addRule(['password'], 'string', ['min' => 8]);
+        $dm->addRule(['password'], 'required');
+        $dm->addRule(['password'], function ($attribute) use ($dm) {
+
+            $password = $dm->{$attribute};
+            $number = preg_match('@[0-9]@', $password);
+            $uppercase = preg_match('@[A-Z]@', $password);
+            $lowercase = preg_match('@[a-z]@', $password);
+            //$specialChars = preg_match('@[^\w]@', $password);
+
+            if (!$number) {
+                $dm->addError($attribute, "Пароль должен содержать как минимум одну цифру");
+                return false;
+            }
+            if (!$uppercase) {
+                $dm->addError($attribute, "Пароль должен хоть одну заглавную английскую букву");
+                return false;
+            }
+            if (!$lowercase) {
+                $dm->addError($attribute, "Пароль должен хоть одну строчную английскую букву");
+                return false;
+            }
+            /*if (!$specialChars) {
+                $dm->addError($attribute, "Пароль должен содержать хоть один специальный символ");
+                return false;
+            }*/
+        });
+        $dm->setAttrubuteLebel('password', 'Новый пароль');
+
+        $is_saved = false;
+        try {
+            if (\Yii::$app->request->post()) {
+                if ($dm->load(\Yii::$app->request->post()) && $dm->validate()) {
+                    $model->setPassword($dm->password);
+                    if (!$model->save(false)) {
+                        throw new Exception("Пароль не изменен");
+                    }
+
+                    $is_saved = true;
+
+                } else {
+                    throw new Exception("Пароль не изменен");
+                }
+            }
+        } catch (\Exception $exception) {
+            $dm->addError('', $exception->getMessage());
+        }
+
+
+        return $this->render($this->action->id, [
+            'dm'       => $dm,
+            'is_saved' => $is_saved,
         ]);
+    }
+
+    /**
+     * Updates an existing Game model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function updateEav()
+    {
+        /**
+         * @var $model CmsUser
+         */
+        $model = $this->model;
+
+        $model = $this->model;
+        $relatedModel = $model->relatedPropertiesModel;
+
+        $is_saved = false;
+        $redirect = null;
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            return $rr->ajaxValidateForm($modelForm);
+        if ($post = \Yii::$app->request->post()) {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
         }
 
 
-        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword()) {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-        } else {
-            if (\Yii::$app->request->isPost) {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+
+                $model->save();
+
+                if ($relatedModel->save()) {
+
+                    $is_saved = true;
+
+                    if (\Yii::$app->request->post('submit-btn') == 'save') {
+                    } else {
+                        $redirect = $this->url;
+                    }
+
+                    //$model->refresh();
+                    $relatedModel = $model->relatedPropertiesModel;
+                }
             }
+
         }
 
-        return $this->render($this->action->id, [
-            'model' => $modelForm,
+
+        return $this->render("update-eav", [
+            'model'        => $model,
+            'relatedModel' => $relatedModel,
+            'is_saved'     => $is_saved,
+            'submitBtn'    => \Yii::$app->request->post('submit-btn'),
+            'redirect'     => $redirect,
         ]);
     }
 
@@ -751,7 +970,7 @@ class AdminUserController extends BackendModelStandartController
             $cmsSite = CmsSite::find()->where(['id' => $site_id])->one();
 
             $manager = new CmsManager(['cmsSite' => $cmsSite]);
-            foreach (\Yii::$app->cms->registerRoles as $roleCode) {
+            foreach ((array)\Yii::$app->cms->registerRoles as $roleCode) {
                 if (!$manager->getAssignment($roleCode, $model->id)) {
                     $manager->assign($manager->getRole($roleCode), $model->id);
                 }

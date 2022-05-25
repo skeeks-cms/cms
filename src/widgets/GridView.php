@@ -27,6 +27,7 @@ use yii\grid\Column;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
+use yii\helpers\Json;
 
 /**
  * @property string                $modelClassName; название класса модели с которой идет работа
@@ -519,6 +520,10 @@ class GridView extends \yii\grid\GridView
     protected function _initDialogCallbackData()
     {
         if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
+
+            $isCkeditor = (int) \Yii::$app->request->get("CKEditorFuncNum");
+            $jsData = Json::encode(['is_ckeditor' => $isCkeditor]);
+
             $this->view->registerJs(<<<JS
 (function(sx, $, _)
 {
@@ -545,9 +550,25 @@ class GridView extends \yii\grid\GridView
 
         submit: function(data)
         {
-            this.trigger("submit", data);
-            sx.EventManager.trigger('submitElement', data);
+            if (this.get("is_ckeditor")) {
+                sx.EventManager.trigger('submitElement', data);
+                
+                if (window.opener) {
+                    if (window.opener.CKEDITOR) {
+                        window.opener.CKEDITOR.tools.callFunction(self.get("is_ckeditor"), data.basenamesrc);
+                        window.close();
+                    }
+                }
+    
+            } else {
+                sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
+            }
             
+            /*this.trigger("submit", data);
+            sx.EventManager.trigger('submitElement', data);
+            console.log('submit');*/
+            
+            /*
             if (window.opener)
             {
                 if (window.opener.sx)
@@ -562,13 +583,14 @@ class GridView extends \yii\grid\GridView
                     window.parent.sx.EventManager.trigger('{$callbackEventName}', data);
                     return this;
                 }
-            }
+            }*/
 
             return this;
         }
     });
 
-    sx.SelectCmsElement = new sx.classes.SelectCmsElement();
+    
+    sx.SelectCmsElement = new sx.classes.SelectCmsElement({$jsData});
 
 })(sx, sx.$, sx._);
 JS

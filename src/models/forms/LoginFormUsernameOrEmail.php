@@ -51,7 +51,7 @@ class LoginFormUsernameOrEmail extends Model
     public function attributeLabels()
     {
         return [
-            'identifier' => \Yii::t('skeeks/cms', 'Email'),
+            'identifier' => \Yii::t('skeeks/cms', 'Username or Email'),
             'password' => \Yii::t('skeeks/cms', 'Password'),
             'rememberMe' => \Yii::t('skeeks/cms', 'Remember me'),
         ];
@@ -69,7 +69,7 @@ class LoginFormUsernameOrEmail extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (\Yii::$app->cms->auth_only_email_is_approved && !$user->email_is_approved) {
-                $this->addError($attribute, \Yii::t('skeeks/cms', 'Вам необходимо подтвердить ваш email.'));
+                $this->addError($attribute, \Yii::t('skeeks/cms', 'Вам необходимо подтвердить ваш email. Для этого перейдите по ссылке из письма.'));
             }
         }
     }
@@ -112,7 +112,8 @@ class LoginFormUsernameOrEmail extends Model
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findByUsernameOrEmail($this->identifier);
+            $identityClass = \Yii::$app->user->identityClass;
+            $this->_user = $identityClass::findByUsernameOrEmail($this->identifier);
         }
 
         return $this->_user;

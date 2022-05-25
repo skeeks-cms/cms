@@ -207,7 +207,13 @@ abstract class Component extends Model implements IHasConfigForm
 
         if (!\Yii::$app instanceof Application) {
 
-            if (isset(\Yii::$app->user) && $this->cmsUser === null && \Yii::$app->user && !\Yii::$app->user->isGuest) {
+            /*if (isset(\Yii::$app->user) && $this->cmsUser === null && \Yii::$app->user && !\Yii::$app->user->isGuest) {
+                $this->cmsUser = \Yii::$app->user->identity;
+            }*/
+            if (isset(\Yii::$app->user) 
+                && \Yii::$app->user
+                && $this->cmsUser === null 
+                && !\Yii::$app->user->getIsGuest()) {
                 $this->cmsUser = \Yii::$app->user->identity;
             }
         }

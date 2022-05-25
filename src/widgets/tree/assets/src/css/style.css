@@ -1,23 +1,19 @@
 
-
-.sx-tree ul li.sx-tree-node .row:hover
-{
+.sx-tree ul li.sx-tree-node .row:hover {
     background: rgba(192, 192, 192, 0.17);
 }
 
-.sx-tree ul li.sx-tree-node .row .sx-controll-node
-{
+.sx-tree ul li.sx-tree-node .row .sx-controll-node {
     display: none;
     float: left;
 }
 
-.sx-tree ul li.sx-tree-node .row .sx-controll-node .sx-btn-caret-action
-{
+.sx-tree ul li.sx-tree-node .row .sx-controll-node .sx-btn-caret-action {
     width: 21px;
     height: 22px;
 }
-.sx-tree ul li.sx-tree-node .row .sx-controll-node .btn
-{
+
+.sx-tree ul li.sx-tree-node .row .sx-controll-node .btn {
     height: 22px;
     border-color: #afafaf;
 }
@@ -26,125 +22,105 @@
     padding: 10px;
 }
 
-.sx-tree ul li.sx-tree-node .row:hover .sx-controll-node
-{
+.sx-tree ul li.sx-tree-node .row:hover .sx-controll-node {
     display: block;
 }
 
 
-
-
-
-.cms-tree-wrapper
-{
+.cms-tree-wrapper {
     margin-left: 23px;
 }
-.sx-tree ul
-{
+
+.sx-tree ul {
     padding-left: 0px;
 }
 
 
-    .sx-tree ul li.sx-tree-node
-    {
-        list-style-type: none;
-        padding-left: 15px;
-        margin: 2px 0px;
-        /*overflow: hidden;*/
-    }
+.sx-tree ul li.sx-tree-node {
+    list-style-type: none;
+    padding-left: 15px;
+    margin: 2px 0px;
+    /*overflow: hidden;*/
+}
 
-        .sx-tree ul li .sx-tree-type
-        {
-            display: none;
-            padding-top: 5px;
-            padding-left: 20px;
-            font-size: 11px;
-        }
+.sx-tree ul li .sx-tree-type {
+    display: none;
+    padding-top: 5px;
+    padding-left: 20px;
+    font-size: 11px;
+}
 
-            .sx-tree ul li:hover>.row .sx-tree-type
-            {
-                display: block;
-            }
+.sx-tree ul li:hover > .row .sx-tree-type {
+    display: block;
+}
 
-        .sx-tree ul li.sx-tree-node .sx-controll-act
-        {
-            margin-left: 5px;
-        }
+.sx-tree ul li.sx-tree-node .sx-controll-act {
+    margin-left: 5px;
+}
 
-    .sx-tree ul li.sx-tree-node.open
-    {}
+.sx-tree ul li.sx-tree-node.open {
+}
 
-    .sx-tree ul li.sx-tree-node.active
-    {}
+.sx-tree ul li.sx-tree-node.active {
+}
 
-        .sx-tree ul li.sx-tree-node .row
-        {
-            /*margin: 0 !important;*/
-        }
+.sx-tree ul li.sx-tree-node .row {
+    /*margin: 0 !important;*/
+}
 
 
+.sx-tree ul li.sx-tree-node .sx-node-open-close {
+    float: left;
+    width: 23px;
+    margin-left: -23px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
 
-    .sx-tree ul li.sx-tree-node .sx-node-open-close
-    {
-        float: left;
-        width: 23px;
-        margin-left: -23px;
-        margin-top: -1px;
-    }
+.sx-tree ul li.sx-tree-node .sx-node-open-close > a {
+    font-size: 6px;
+    color: #000000;
+    background: white;
+    padding: 2px 4px;
+    border: 1px solid #e6ecec;
+}
 
-        .sx-tree ul li.sx-tree-node .sx-node-open-close > a
-        {
-            font-size: 6px;
-            color: #000000;
-            background: white;
-            padding: 2px 4px;
-            border: 1px solid #e6ecec;
-        }
-
-.btn-tree-node-controll
-{
+.btn-tree-node-controll {
     font-size: 8px;
 }
 
-    .sx-tree ul li.sx-tree-node .sx-controll-node
-    {
-        width: auto;
-        float: left;
-        margin-left: 10px;
-        padding-top: 0px;
-    }
+.sx-tree ul li.sx-tree-node .sx-controll-node {
+    width: auto;
+    float: left;
+    margin-left: 10px;
+    padding-top: 0px;
+}
 
-        .sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button
-        {
-            font-size: 6px;
-            color: #000000;
-            background: white;
-            padding: 2px 4px;
-        }
+.sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button {
+    font-size: 6px;
+    color: #000000;
+    background: white;
+    padding: 2px 4px;
+}
 
 
+.sx-tree ul li.sx-tree-node .sx-label-node {
+    /*float: left;
+    padding-left: 23px;*/
+}
 
-    .sx-tree ul li.sx-tree-node .sx-label-node
-    {
-        /*float: left;
-        padding-left: 23px;*/
-    }
+.sx-tree ul li.sx-tree-node .sx-label-node > a {
+    font-size: 15px;
+    font-weight: bold;
+    color: #000000;
+}
 
-        .sx-tree ul li.sx-tree-node .sx-label-node > a
-        {
-            font-size: 15px;
-            font-weight: bold;
-            color: #000000;
-        }
+.sx-tree ul li.sx-tree-node .sx-label-node.status-N > a,
+.sx-tree ul li.sx-tree-node .sx-label-node.status-N > i {
+    color: silver;
+}
 
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > a,
-        .sx-tree ul li.sx-tree-node .sx-label-node.status-N  > i
-        {
-            color: silver;
-        }
-
-.sx-tree-move
-{
+.sx-tree-move {
     cursor: move;
 }
 
@@ -165,7 +141,7 @@
 
 .sx-tree-search .btn-search {
     position: absolute;
-    top:0;
+    top: 0;
     right: 0;
     padding: 3px;
 }

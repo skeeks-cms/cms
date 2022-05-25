@@ -142,7 +142,7 @@ class CmsContent extends Core
             'is_active'                 => Yii::t('skeeks/cms', 'Active'),
             'priority'                  => Yii::t('skeeks/cms', 'Priority'),
             'description'               => Yii::t('skeeks/cms', 'Description'),
-            'content_type'              => Yii::t('skeeks/cms', 'Content Type'),
+            'content_type'              => Yii::t('skeeks/cms', 'Меню'),
             'index_for_search'          => Yii::t('skeeks/cms', 'To index for search module'),
             'tree_chooser'              => Yii::t('skeeks/cms', 'The Interface Binding Element to Sections'),
             'list_mode'                 => Yii::t('skeeks/cms', 'View Mode Sections And Elements'),

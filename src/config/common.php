@@ -112,7 +112,7 @@ return [
                 "image-preview" => ["class" => 'skeeks\cms\components\urlRules\UrlRuleImagePreview'],
                 "storage-file" => ["class" => 'skeeks\cms\components\urlRules\UrlRuleStorageFile'],
 
-                'search' => 'cmsSearch/result',
+                //'search' => 'cmsSearch/result',
 
                 [
                     'class' => \skeeks\cms\components\urlRules\UrlRuleSavedFilter::class

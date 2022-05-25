@@ -69,10 +69,10 @@ use yii\web\Application;
 class AdminCmsContentElementController extends BackendModelStandartController
 {
 
-    public $editForm = '_form';
+    public $editForm = '@skeeks/cms/views/admin-cms-content-element/_form';
 
     public $modelClassName = CmsContentElement::class;
-    public $modelShowAttribute = "asText";
+    public $modelShowAttribute = "name";
     /**
      * @var CmsContent
      */
@@ -93,18 +93,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
              * @var $model CmsContentElement
              */
             $model = $this->model;
-            $result = $model->asText;
-
-            if ($model->cmsContent->is_have_page) {
-                $result .= Html::a('<i class="fas fa-external-link-alt"></i>', $model->url, [
-                    'target' => "_blank",
-                    'class'  => "g-ml-20",
-                    'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                ]);
-            }
-
-            $result = Html::tag('h1', $result);
-            return $result;
+            return $this->renderPartial("@skeeks/cms/views/admin-cms-content-element/_model_header", [
+                'model' => $model
+            ]);
         };
 
         parent::init();
@@ -180,12 +171,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                             $query = null;
                                             if ($userIds) {
                                                 $userIds = array_keys($userIds);
-                                                $query = CmsUser::find()->where(['id' => $userIds]);
+                                                $query = CmsUser::find()->cmsSite()->where(['id' => $userIds]);
                                                 /*return ArrayHelper::map($q->all(), 'id', function(CmsUser $model) {
                                                     return $model->shortDisplayName . ($model->email ? " ($model->email)" : "");
                                                 });*/
                                             } else {
-                                                $query = CmsUser::find()->where(['id' => null]);
+                                                $query = CmsUser::find()->cmsSite()->where(['id' => null]);
                                             }
 
 
@@ -414,12 +405,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     $time = \Yii::$app->formatter->asRelativeTime($model->published_at);
                                     $dateTime = \Yii::$app->formatter->asDatetime($model->published_at);
                                     return <<<HTML
-<span class="fa fa-check text-success" title=""></span> <small title="{$dateTime}">{$time}</small>
+<span class="text-success" title="">✓</span> <small title="{$dateTime}">{$time}</small>
 HTML;
 
                                 } else {
                                     return <<<HTML
-<span class="fa fa-times text-danger" title=""></span>
+<span class="text-danger" title="">x</span>
 HTML;
                                 }
                             },
@@ -427,6 +418,9 @@ HTML;
                         'custom'       => [
                             'attribute' => 'id',
                             'format'    => 'raw',
+                            'headerOptions' => [
+                                'style' => 'min-width: 300px;'
+                            ],
                             'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
 
                                 $data = [];
@@ -436,9 +430,10 @@ HTML;
                                         ])
                                         , "#", ['class' => 'sx-trigger-action', 'style' => 'width: 50px;'])."</div>";*/
 
-                                $data[] = "<span style='max-width: 300px;'>".Html::a($model->asText, "#", [
+                                $data[] = "<span style='max-width: 300px;'>".Html::a($model->name, "#", [
                                         'class' => 'sx-trigger-action',
-                                        'title' => $model->asText,
+                                        'title' => "id: {$model->id}",
+                                        'data-toggle' => "tooltip",
                                         'style' => 'border-bottom: none;'
                                     ])."</span>";
 
@@ -453,7 +448,7 @@ HTML;
 
                                 if ($model->cmsTrees) {
                                     foreach ($model->cmsTrees as $cmsTree) {
-                                        $data[] = '<i class="far fa-folder" style="color: gray;"></i> ' . Html::a($cmsTree->name, $cmsTree->url, [
+                                        $data[] = '<i class="far fa-folder" style="color: silver;"></i> ' . Html::a($cmsTree->name, $cmsTree->url, [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
                                             'title'     => $cmsTree->fullName,
@@ -470,7 +465,7 @@ HTML;
                                                         <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 40px; max-height: 40px; border-radius: 5px;' />
                                                     </a>
                                                 </div>
-                                                <div style='line-height: 1.1;'>".$info."</div></div>";;
+                                                <div style='line-height: 1.1;' class='my-auto'>".$info."</div></div>";;
                             },
                         ],
                         'image_id'     => [
@@ -661,6 +656,7 @@ HTML;
 
 
             "copy" => [
+                'isVisible' => false,
                 'priority'       => 200,
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Copy'),

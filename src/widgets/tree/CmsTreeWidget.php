@@ -42,7 +42,7 @@ class CmsTreeWidget extends Widget
     /**
      * @var string Widget session param name
      */
-    public $sessionName = "cms-tree-opened";
+    public $sessionName = "cms-tree-opened-v2";
 
     /**
      * @var string
@@ -130,7 +130,11 @@ class CmsTreeWidget extends Widget
     {
         $opened = [];
 
-        if ($fromRequest = (array)\Yii::$app->request->getQueryParam($this->openedRequestName)) {
+        if ($fromRequest = \Yii::$app->request->getQueryParam($this->openedRequestName)) {
+
+            if (is_string($fromRequest)) {
+                $fromRequest = explode("_", $fromRequest);
+            }
             $opened = array_unique($fromRequest);
             if ($this->sessionName) {
                 \Yii::$app->getSession()->set($this->sessionName, $opened);
@@ -243,13 +247,15 @@ class CmsTreeWidget extends Widget
                 $urlOptionsOpen = array_unique($newOptionsOpen);
                 $params = \Yii::$app->request->getQueryParams();
                 $pathInfo = \Yii::$app->request->pathInfo;
-                $params[$this->openedRequestName] = $urlOptionsOpen;
+                //$params[$this->openedRequestName] = $urlOptionsOpen;
+                $params[$this->openedRequestName] = implode("_", $urlOptionsOpen);
 
                 $currentLink = "/{$pathInfo}?" . http_build_query($params);
             } else {
                 $urlOptionsOpen = array_unique(array_merge($openedIds, [$model->id]));
                 $params = \Yii::$app->request->getQueryParams();
-                $params[$this->openedRequestName] = $urlOptionsOpen;
+                //$params[$this->openedRequestName] = $urlOptionsOpen;
+                $params[$this->openedRequestName] = implode("_", $urlOptionsOpen);
                 $pathInfo = \Yii::$app->request->pathInfo;
 
                 $currentLink = "/{$pathInfo}?" . http_build_query($params);

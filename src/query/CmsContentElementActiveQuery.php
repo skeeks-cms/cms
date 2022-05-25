@@ -75,6 +75,20 @@ class CmsContentElementActiveQuery extends CmsActiveQuery
         }
 
         return $this;
+    }
 
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function hasImage($value = true)
+    {
+        if ($value) {
+             $this->andWhere(['is not', $this->getPrimaryTableName() . '.image_id', null]);
+        } else {
+            $this->andWhere([$this->getPrimaryTableName() . '.image_id' => null]);
+        }
+
+        return $this;
     }
 }

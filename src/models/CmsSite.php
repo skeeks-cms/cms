@@ -373,7 +373,9 @@ class CmsSite extends ActiveRecord
      */
     public function getCmsSiteMainDomain()
     {
-        $query = $this->getCmsSiteDomains()->andWhere(['is_main' => 1]);
+        $query = $this->getCmsSiteDomains()
+            ->andWhere(['is_main' => 1])
+        ;
         $query->multiple = false;
         return $query;
     }
