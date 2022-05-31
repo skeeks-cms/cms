@@ -58,6 +58,8 @@ use yii\helpers\ArrayHelper;
  * @property CmsSiteAddress[]       $cmsSiteAddresses
  * @property CmsSitePhone[]         $cmsSitePhones
  * @property CmsSiteSocial[]        $cmsSiteSocials
+ * @property CmsSmsProvider[]       $cmsSmsProviders
+ * @property CmsSmsProvider|null    $cmsSmsProvider
  *
  * @property string                 $faviconRootSrc
  * @property string                 $faviconUrl всегда вернет какую нибудь фавиконку, не важно задана она для сайта или нет
@@ -232,8 +234,8 @@ class CmsSite extends ActiveRecord
                 ['image_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'mimeTypes' => [
-                    'image/*'
+                'mimeTypes'   => [
+                    'image/*',
                 ],
                 //'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'svg'],
                 'maxFiles'    => 1,
@@ -246,8 +248,8 @@ class CmsSite extends ActiveRecord
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 //'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'ico', 'svg'],
-                'mimeTypes' => [
-                    'image/*'
+                'mimeTypes'   => [
+                    'image/*',
                 ],
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 2,
@@ -292,6 +294,25 @@ class CmsSite extends ActiveRecord
     public function getCmsSiteDomains()
     {
         return $this->hasMany(CmsSiteDomain::class, ['cms_site_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[CmsSiteEmails]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSmsProviders()
+    {
+        return $this->hasMany(CmsSmsProvider::className(), ['cms_site_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
+    /**
+     * Gets query for [[CmsSiteEmails]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSmsProvider()
+    {
+        return $this->getCmsSmsProviders()->default()->one();
     }
 
     /**
@@ -374,8 +395,7 @@ class CmsSite extends ActiveRecord
     public function getCmsSiteMainDomain()
     {
         $query = $this->getCmsSiteDomains()
-            ->andWhere(['is_main' => 1])
-        ;
+            ->andWhere(['is_main' => 1]);
         $query->multiple = false;
         return $query;
     }
