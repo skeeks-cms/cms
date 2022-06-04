@@ -30,7 +30,6 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 use yii\web\IdentityInterface;
 
 /**
@@ -47,6 +46,8 @@ use yii\web\IdentityInterface;
  * @property string                      $first_name
  * @property string                      $last_name
  * @property string                      $patronymic
+ * @property integer                     $is_company
+ * @property string                      $company_name
  *
  * @property string                      $gender
  * @property string                      $alias
@@ -70,6 +71,7 @@ use yii\web\IdentityInterface;
  * @property string                      $avatarSrc
  * @property string                      $profileUrl
  *
+ * @property CmsUserAddress[]            $cmsUserAddresses
  * @property CmsUserEmail[]              $cmsUserEmails
  * @property CmsUserPhone[]              $cmsUserPhones
  * @property UserAuthClient[]            $cmsUserAuthClients
@@ -79,6 +81,7 @@ use yii\web\IdentityInterface;
  *
  * @property string                      $displayName
  * @property string                      $shortDisplayName
+ * @property string                      $shortDisplayNameWithAlias
  * @property string                      $isOnline Пользователь онлайн?
  *
  * @property CmsContentElement2cmsUser[] $cmsContentElement2cmsUsers
@@ -87,6 +90,8 @@ use yii\web\IdentityInterface;
  *
  * @property CmsUserEmail                $mainCmsUserEmail
  * @property CmsUserPhone                $mainCmsUserPhone
+ * @property CmsContractor[]             $cmsContractors
+ * @property CmsContractorMap[]          $cmsContractorMaps
  *
  */
 class User
@@ -281,6 +286,18 @@ class User
             ['gender', 'default', 'value' => 'men'],
             ['gender', 'in', 'range' => ['men', 'women']],
 
+            [['company_name'], 'string'],
+            [
+                ['company_name'],
+                'required',
+                'when' => function () {
+                    return $this->is_company;
+                },
+            ],
+
+            [['is_company'], 'integer'],
+            ['is_company', 'default', 'value' => 0],
+
             [['created_at', 'updated_at', 'cms_site_id', 'is_active'], 'integer'],
             [['alias'], 'string'],
 
@@ -442,6 +459,13 @@ class User
     /**
      * @inheritdoc
      */
+    public function attributeHints()
+    {
+        return [
+            'alias' => "Короткое альтернативное название, необязательно к заполнениею.",
+        ];
+    }
+
     public function attributeLabels()
     {
         return [
@@ -466,6 +490,8 @@ class User
             'last_admin_activity_at' => Yii::t('skeeks/cms', 'Last Activity In The Admin At'),
             'image_id'               => Yii::t('skeeks/cms', 'Image'),
             'roleNames'              => Yii::t('skeeks/cms', 'Группы'),
+            'is_company'             => "Тип аккаунта",
+            'company_name'           => "Название компании",
         ];
     }
 
@@ -480,7 +506,7 @@ class User
         $q->multiple = true;
         return $q;
     }
-    
+
     /**
      * Установка последней активности пользователя. Больше чем в настройках.
      * @return $this
@@ -584,6 +610,7 @@ class User
      */
     public function getDisplayName()
     {
+
         if ($this->name) {
             return $this->name;
         }
@@ -641,17 +668,22 @@ class User
     {
         $data = [];
 
-        if ($this->last_name) {
-            $data[] = $this->last_name;
+        if ($this->is_company) {
+            $data[] = $this->company_name;
+        } else {
+            if ($this->last_name) {
+                $data[] = $this->last_name;
+            }
+
+            if ($this->first_name) {
+                $data[] = $this->first_name;
+            }
+
+            if ($this->patronymic) {
+                $data[] = $this->patronymic;
+            }
         }
 
-        if ($this->first_name) {
-            $data[] = $this->first_name;
-        }
-
-        if ($this->patronymic) {
-            $data[] = $this->patronymic;
-        }
 
         return $data ? implode(" ", $data) : null;
     }
@@ -1004,6 +1036,13 @@ class User
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getCmsUserAddresses()
+    {
+        return $this->hasMany(CmsUserAddress::class, ['cms_user_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getCmsUserEmails()
     {
         return $this->hasMany(CmsUserEmail::class, ['cms_user_id' => 'id']);
@@ -1015,9 +1054,9 @@ class User
     public function getCmsUserPhones()
     {
         return $this->hasMany(CmsUserPhone::class, ['cms_user_id' => 'id']);
-            //->via('cmsUserPhones')
-            //
-            ;
+        //->via('cmsUserPhones')
+        //
+        ;
     }
 
     /**
@@ -1101,11 +1140,44 @@ class User
      */
     public function getShortDisplayName()
     {
-        if ($this->last_name || $this->first_name) {
-            return implode(" ", [$this->last_name, $this->first_name]);
+        if ($this->is_company) {
+            return $this->company_name;
         } else {
-            return $this->displayName;
+            if ($this->last_name || $this->first_name) {
+                return implode(" ", [$this->last_name, $this->first_name]);
+            }
         }
+
+        return $this->displayName;
+    }
+    /**
+     * @return string
+     */
+    public function getShortDisplayNameWithAlias()
+    {
+        if ($this->alias) {
+            return $this->shortDisplayName." ({$this->alias})";
+        }
+
+        return $this->shortDisplayName;
     }
 
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContractorMaps()
+    {
+        return $this->hasMany(CmsContractorMap::class, ['cms_user_id' => 'id'])
+            ->from(['cmsContractorMaps' => CmsContractorMap::tableName()]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsContractors()
+    {
+        return $this->hasMany(CmsContractor::class, ['id' => 'cms_contractor_id'])
+            ->via('cmsContractorMaps');;
+    }
 }

@@ -916,7 +916,7 @@ HTML
                 $relatedModel->load(\Yii::$app->request->post());
 
                 if ($model->save() && $relatedModel->save()) {
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
+                    \Yii::$app->getSession()->setFlash('success', $this->action->successMessage);
 
                     $is_saved = true;
 
@@ -947,6 +947,7 @@ HTML
             'model'        => $model,
             'relatedModel' => $relatedModel,
 
+            'is_create'  => true,
             'is_saved'  => $is_saved,
             'submitBtn' => \Yii::$app->request->post('submit-btn'),
             'redirect'  => $redirect,
@@ -985,7 +986,7 @@ HTML
                 $relatedModel->load(\Yii::$app->request->post());
 
                 if ($model->save() && $relatedModel->save()) {
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
+                    \Yii::$app->getSession()->setFlash('success', $this->action->successMessage);
 
                     $is_saved = true;
 

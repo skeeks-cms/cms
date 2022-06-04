@@ -191,7 +191,15 @@ JS
     <?php endforeach; ?>
 <?php endif; ?>
 
+<?php $successMessage = ''; ?>
+<?php if(@$is_create) : ?>
+<?php else : ?>
+<? if ($successMessageFlash = \Yii::$app->getSession()->getFlash('success')) : ?>
+    <?php $successMessage = $successMessageFlash; ?>
+<? endif; ?>
+<? endif; ?>
 
-<?= $form->buttonsStandart($model); ?>
+<?= $form->buttonsStandart($model, $action->buttons, $successMessage); ?>
+
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <?php $form::end(); ?>

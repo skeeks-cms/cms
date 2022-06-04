@@ -28,46 +28,10 @@ CSS
         </div>
     <? endif; ?>
     <div class="col my-auto">
-        <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->displayName; ?>
-            <?php echo $model->is_active ? '<span data-html="true" data-toggle="tooltip" title="Пользователь активен<br />Значит он может авторизоваться на сайте."  style="font-size: 20px; color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red; font-size: 20px;">x</span>' ?>
+        <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
+            <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
 
-            <span class="sx-controlls">
-            <?
-
-            $actionData = \yii\helpers\Json::encode([
-                "isOpenNewWindow" => true,
-                "size"            => 'small',
-                "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                    "/cms/admin-user/update",
-                    'pk' => $model->id,
-                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
-            ]);
-            ?>
-
-            <i class="fas fa-pencil-alt" onclick='<?= new \yii\web\JsExpression(<<<JS
-               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
-JS
-            ); ?>' title="Редактировать основную информацию: фото, активность, имя, фамилия и т.д." data-toggle="tooltip" style="font-size: 17px; color: silver; cursor: pointer;"></i>
-
-
-            <?
-
-            $actionData = \yii\helpers\Json::encode([
-                "isOpenNewWindow" => true,
-                "size"            => 'small',
-                "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                    "/cms/admin-user/change-password",
-                    'pk' => $model->id,
-                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
-            ]);
-            ?>
-
-            <i class="fas fa-key" onclick='<?= new \yii\web\JsExpression(<<<JS
-               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
-JS
-            ); ?>' title="Изменить пароль" data-toggle="tooltip" style="font-size: 17px; color: silver; cursor: pointer;"></i>
-
-            </span>
+            
 
 
         </h1>
@@ -94,17 +58,61 @@ JS
     </div>
 
     <div class="col my-auto text-right">
+        
+        <span>
+            <?
+
+            $actionData = \yii\helpers\Json::encode([
+                "isOpenNewWindow" => true,
+                "size"            => 'small',
+                "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                    "/cms/admin-user/update",
+                    'pk' => $model->id,
+                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
+            ]);
+            ?>
+
+            <a href="#" class="btn btn-default" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+            ); ?>' title="Редактировать основную информацию: фото, активность, имя, фамилия и т.д." data-toggle="tooltip">
+                <i class="fas fa-pencil-alt"></i>
+            </a>
+</span>
+        
+        <span>
+            <?
+
+            $actionData = \yii\helpers\Json::encode([
+                "isOpenNewWindow" => true,
+                "size"            => 'small',
+                "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                    "/cms/admin-user/change-password",
+                    'pk' => $model->id,
+                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
+            ]);
+            ?>
+
+            <a href="#" class="btn btn-default" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+            ); ?>' title="Изменить пароль" data-toggle="tooltip">
+                <i class="fas fa-key"></i>
+            </a>
+
+        </span>
+        
         <?php if ($model->phone) : ?>
             <span>
-                <a href="#" class="btn btn-default" title="Позвонить"><i class="fas fa-phone"></i></a>
+                <a href="#" class="btn btn-default" title="Позвонить" data-toggle="tooltip"><i class="fas fa-phone"></i></a>
             </span>
             <span>
-                <a href="#" class="btn btn-default" title="Написать sms"><i class="fas fa-sms"></i></a>
+                <a href="#" class="btn btn-default" title="Написать sms" data-toggle="tooltip"><i class="fas fa-sms"></i></a>
             </span>
         <?php endif; ?>
         <?php if ($model->email) : ?>
             <span>
-                <a href="#" class="btn btn-default" title="Написать письмо"><i class="far fa-envelope"></i></a>
+                <a href="#" class="btn btn-default" title="Написать письмо" data-toggle="tooltip"><i class="far fa-envelope"></i></a>
             </span>
         <?php endif; ?>
 

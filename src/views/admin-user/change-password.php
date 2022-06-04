@@ -96,7 +96,7 @@ JS
 
 
 <?php echo $form->errorSummary([$dm]); ?>
-<?= $form->buttonsStandart($dm, ['save']); ?>
+<?= $form->buttonsStandart($dm, $action->buttons); ?>
 
 
 <? if ($is_saved) : ?>

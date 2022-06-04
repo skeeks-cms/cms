@@ -43,7 +43,6 @@ class AdminUserEmailController extends BackendModelStandartController
             "create" => [
                 'fields' => [$this, 'updateFields'],
                 'size'           => BackendAction::SIZE_SMALL,
-                'buttons' => ['save'],
                 "accessCallback" => function ($model) {
             
                     $cmsUserEmail = new CmsUserEmail();
@@ -59,7 +58,6 @@ class AdminUserEmailController extends BackendModelStandartController
             "update" => [
                 'fields' => [$this, 'updateFields'],
                 'size'           => BackendAction::SIZE_SMALL,
-                'buttons' => ['save'],
                 "accessCallback" => function ($model) {
                     if ($this->model) {
                         return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);

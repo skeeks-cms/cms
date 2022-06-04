@@ -385,6 +385,70 @@ JS
             </div>
         </div>
 
+
+        <div class="sx-block">
+            <div class="sx-block-title">Адреса <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                 title="У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию."
+                                                 class="far fa-question-circle"></i>
+            </div>
+            <div class="sx-block-content">
+                <div class="sx-phones-block">
+                    <? foreach ($model->cmsUserAddresses as $cmsUserAddress) : ?>
+                        <div class="sx-value-row d-flex">
+                            <div style="width: 100%;">
+                                <div class="sx-label">
+                                    <? if ($cmsUserAddress->name) : ?>
+                                        <? echo $cmsUserAddress->name; ?>
+                                    <? else : ?>
+                                        Адрес
+                                    <? endif; ?>
+                                </div>
+                                <div class="sx-value">
+                                    <a href="#"><?php echo $cmsUserAddress->value; ?></a>
+                                </div>
+                            </div>
+
+                            <div class="my-auto">
+                                <?
+                                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => "/cms/admin-user-address",
+                                    'modelId'      => $cmsUserAddress->id,
+                                    'tag'          => 'div',
+                                    'options'      => [
+                                        'title' => 'Редактировать адрес',
+                                        'class' => 'sx-edit-btn btn btn-default',
+                                    ],
+                                ]);
+                                ?>
+                                <!--<i class="hs-admin-angle-down"></i>-->
+                                <i class="fas fa-ellipsis-v"></i>
+                                <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+
+                            </div>
+                        </div>
+                    <? endforeach; ?>
+                </div>
+                <?
+
+                $actionData = \yii\helpers\Json::encode([
+                    "isOpenNewWindow" => true,
+                    //"size"            => 'small',
+                    "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        "/cms/admin-user-address/create",
+                        'CmsUserAddress' => [
+                            'cms_user_id' => $model->id,
+                        ],
+                    ])->enableEmptyLayout()->enableNoActions()->url,
+                ]);
+                ?>
+                <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+                ); ?>'>Добавить
+                </button>
+            </div>
+        </div>
+
         <div class="sx-block">
             <div class="sx-block-title">Информация <i style="color: silver;" data-toggle="tooltip" data-html="true"
                                                       title="Общая информация по пользователю, есть возможность создать любое количество полей с данными." class="far fa-question-circle"></i></div>
@@ -432,17 +496,120 @@ JS
         </div>
 
         <div class="sx-block">
-            <div class="sx-block-title">Контрагенты <i style="color: silver;" data-toggle="tooltip" data-html="true"
+            <div class="sx-block-title">Юр. лица <i style="color: silver;" data-toggle="tooltip" data-html="true"
                                                        title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle"></i></div>
+
+
+
+
+
+            <? foreach ($model->cmsContractors as $cmsContractor) : ?>
+                <div class="sx-value-row d-flex">
+                    <div style="width: 100%;">
+                        <div class="sx-label">
+                            <? if ($cmsContractor->contractor_type) : ?>
+                                <? echo $cmsContractor->getTypeAsText(); ?>
+                            <? else : ?>
+
+                            <? endif; ?>
+                        </div>
+                        <div class="sx-value">
+                            <a href="#"><?php echo $cmsContractor->asText; ?></a>
+                        </div>
+                    </div>
+
+                    <div class="my-auto">
+                        <?
+                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            'controllerId' => "/cms/admin-cms-contractor",
+                            'modelId'      => $cmsContractor->id,
+                            'tag'          => 'div',
+                            'options'      => [
+                                'title' => 'Редактировать юр. лицо',
+                                'class' => 'sx-edit-btn btn btn-default',
+                            ],
+                        ]);
+                        ?>
+                        <!--<i class="hs-admin-angle-down"></i>-->
+                        <i class="fas fa-ellipsis-v"></i>
+                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+
+                    </div>
+                    <!--<div class="my-auto">
+                        <div class="btn btn-default" data-html="true" title="Написать письмо">
+                            <i class="far fa-envelope"></i>
+                        </div>
+                    </div>-->
+                </div>
+            <? endforeach; ?>
+
+
+
             <div class="sx-block-content">
-                <button class="btn btn-default">Добавить</button>
+            <?php $widget = \yii\bootstrap\Modal::begin([
+                        'header'       => "Добавление юр. лица",
+                        'size'         => \yii\bootstrap\Modal::SIZE_DEFAULT,
+                        'toggleButton' => [
+                            'label' => 'Добавить',
+                            'class' => 'btn btn-default btn-sm',
+                        ],
+                    ]); ?>
+
+                    <?php
+                    $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                        'action'         => \yii\helpers\Url::to(['add-contractor', 'pk' => $model->id]),
+                        'enableAjaxValidation' => false,
+                        'clientCallback' => new \yii\web\JsExpression(<<<JS
+        function (ActiveFormAjaxSubmit) {
+            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                $(".modal").modal("hide");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 500);
+                
+            });
+        }
+JS
+                        ),
+                    ]); ?>
+
+                    <div class="d-flex flex-row" style="padding-bottom: 20px;">
+                        <input type="text" name="inn" class="form-control" placeholder="Инн организации или ИП">
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                    <?php $form::end(); ?>
+
+                    <?php $widget::end(); ?>
+            
             </div>
+
+            <?/*
+
+            $actionData = \yii\helpers\Json::encode([
+                "isOpenNewWindow" => true,
+                //"size"            => 'small',
+                "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                    "/cms/admin-cms-contractor/create",
+                    'cms_user_id' => $model->id,
+                ])->enableEmptyLayout()->enableNoActions()->url,
+            ]);
+            */?><!--
+            
+
+
+            <div class="sx-block-content">
+                <button class="btn btn-default btn-sm" onclick='<?/*= new \yii\web\JsExpression(<<<JS
+           new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
+JS
+            ); */?>'>Добавить
+            </button>
+            </div>-->
         </div>
         <div class="sx-block">
-            <div class="sx-block-title">Менеджеры и сотрудники <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этим клиентом."
+            <div class="sx-block-title">Менеджер <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этим клиентом."
                                                                   class="far fa-question-circle"></i></div>
             <div class="sx-block-content">
-                <button class="btn btn-default">Добавить</button>
+                <button class="btn btn-default btn-sm">Добавить</button>
             </div>
         </div>
     </div>

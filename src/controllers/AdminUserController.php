@@ -26,6 +26,8 @@ use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContractor;
+use skeeks\cms\models\CmsContractorMap;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
@@ -36,7 +38,9 @@ use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\widgets\ActiveForm;
 use skeeks\cms\widgets\GridView;
+use skeeks\yii2\dadataClient\models\PartyModel;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use Yii;
@@ -57,7 +61,7 @@ class AdminUserController extends BackendModelStandartController
     public function init()
     {
         $this->name = "Управление пользователями";
-        $this->modelShowAttribute = "displayName";
+        $this->modelShowAttribute = "shortDisplayNameWithAlias";
         $this->modelClassName = CmsUser::class;
 
         $this->generateAccessActions = false;
@@ -254,7 +258,7 @@ class AdminUserController extends BackendModelStandartController
                             'label'     => 'Аккаунт',
                             'value'     => function (CmsUser $cmsUser) {
                                 //$data[] = $cmsUser->asText;
-                                $data[] = Html::a($cmsUser->shortDisplayName, "#", [
+                                $data[] = Html::a($cmsUser->shortDisplayNameWithAlias, "#", [
                                     'style' => 'font-size: 15px;
                                                 display: block;',
                                 ]);
@@ -395,12 +399,18 @@ class AdminUserController extends BackendModelStandartController
                 ],
             ],
 
+            'add-contractor' => [
+                'class'     => BackendModelAction::class,
+                'isVisible' => false,
+                'callback'  => [$this, 'addContractor'],
+            ],
+            
             'create' => [
                 //"callback"       => [$this, 'create'],
-                'buttons'        => ['save'],
                 'size'           => BackendAction::SIZE_SMALL,
                 'generateAccess' => true,
                 'fields'         => [$this, 'createFields'],
+                'buttons'         => ["save"],
             ],
 
 
@@ -512,8 +522,7 @@ class AdminUserController extends BackendModelStandartController
 
             'update' => [
                 'fields'         => [$this, 'updateFields'],
-                //"callback"       => [$this, 'update'],
-                'buttons'        => ['save'],
+                'buttons'         => ["save"],
                 'isVisible'      => false,
                 'generateAccess' => true,
                 "accessCallback" => function () {
@@ -611,7 +620,40 @@ class AdminUserController extends BackendModelStandartController
 
     public function createFields()
     {
+
+
+        \Yii::$app->view->registerJs(<<<JS
+function updateFields() {
+    $(".sx-0-block").hide();
+    $(".sx-1-block").hide();
+    
+    var contType = $("#cmsuser-is_company").val();
+    if (contType == '1') {
+        $(".sx-1-block").show();
+    }
+    if (contType == '0') {
+        $(".sx-0-block").show();
+    }
+}
+
+$("#cmsuser-is_company").on("change", function() {
+    updateFields();
+});
+
+updateFields();
+JS
+        );
+
         return [
+            'is_company' => [
+                'class'     => SelectField::class,
+                'allowNull' => false,
+                'items'     => [
+                    '0'   => "Человек",
+                    '1' => "Компания",
+                ],
+            ],
+
             'image_id' => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
@@ -620,7 +662,20 @@ class AdminUserController extends BackendModelStandartController
                     'multiple' => false,
                 ],
             ],
-            /*'username',*/
+
+            [
+                'class'   => HtmlBlock::class,
+                'content' => '<div class="sx-1-block">',
+            ],
+
+            'company_name',
+            'alias',
+
+            [
+                'class'   => HtmlBlock::class,
+                'content' => '</div><div class="sx-0-block">',
+            ],
+
             'gender'   => [
                 'class'     => SelectField::class,
                 'allowNull' => false,
@@ -632,6 +687,17 @@ class AdminUserController extends BackendModelStandartController
             'last_name',
             'first_name',
             'patronymic',
+            'alias',
+
+            [
+                'class'   => HtmlBlock::class,
+                'content' => '</div>',
+            ],
+
+
+
+
+
 
             'email',
             'phone'    => [
@@ -658,32 +724,55 @@ JS
     public function updateFields()
     {
 
-        $result = [
-            'is_active' => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
-            ],
-            'image_id'  => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
-                'widgetConfig' => [
-                    'accept'   => 'image/*',
-                    'multiple' => false,
+        if ($this->model->is_company) {
+            $result = [
+                'is_active' => [
+                    'class'     => BoolField::class,
+                    'allowNull' => false,
                 ],
-            ],
-            /*'username',*/
-            'gender'    => [
-                'class'     => SelectField::class,
-                'allowNull' => false,
-                'items'     => [
-                    'men'   => \Yii::t('skeeks/cms', 'Male'),
-                    'women' => \Yii::t('skeeks/cms', 'Female'),
+                'image_id'  => [
+                    'class'        => WidgetField::class,
+                    'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                    'widgetConfig' => [
+                        'accept'   => 'image/*',
+                        'multiple' => false,
+                    ],
                 ],
-            ],
-            'last_name',
-            'first_name',
-            'patronymic',
-        ];
+
+                'company_name',
+                'alias',
+            ];
+        } else {
+            $result = [
+                'is_active' => [
+                    'class'     => BoolField::class,
+                    'allowNull' => false,
+                ],
+                'image_id'  => [
+                    'class'        => WidgetField::class,
+                    'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                    'widgetConfig' => [
+                        'accept'   => 'image/*',
+                        'multiple' => false,
+                    ],
+                ],
+                /*'username',*/
+                'gender'    => [
+                    'class'     => SelectField::class,
+                    'allowNull' => false,
+                    'items'     => [
+                        'men'   => \Yii::t('skeeks/cms', 'Male'),
+                        'women' => \Yii::t('skeeks/cms', 'Female'),
+                    ],
+                ],
+                'last_name',
+                'first_name',
+                'patronymic',
+
+                'alias',
+            ];
+        }
+
 
 
         if ((\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $this->model]))
@@ -1026,6 +1115,71 @@ JS
             $rr->success = true;
 
         }
+
+        return $rr;
+    }
+    
+    
+    
+    public function addContractor()
+    {
+        $rr = new RequestResponse();
+
+        try {
+            /**
+             * @var $user CmsUser
+             */
+            $user = $this->model;
+            if ($rr->isRequestAjaxPost()) {
+                if (!$inn = trim(\Yii::$app->request->post("inn"))) {
+                    throw new Exception("Инн не указан");
+                }
+
+                $q = CmsContractor::find()->typeIndividualAndLegal()->inn($inn);
+                //print_r($q->createCommand()->rawSql);die;
+                $contractor = $q->one();
+                if ($contractor) {
+                    
+                    if ($user->getCmsContractorMaps()->andWhere(['cms_contractor_id' => $contractor->id])->exists()) {
+                        throw new Exception("Эта компания уже добавлена");
+                    }
+
+                    $map = new CmsContractorMap();
+                    $map->cms_user_id = $user->id;
+                    $map->cms_contractor_id = $contractor->id;
+                    if (!$map->save()) {
+                        throw new Exception("Не удалось добавить компанию: ".print_r($map->errors, true));
+                    }
+                } else {
+                    $dadata = \Yii::$app->dadataClient->suggest->findByIdParty($inn);
+                    if (isset($dadata[0]) && $dadata[0]) {
+                        //Создать компанию
+                        $party = new PartyModel($dadata[0]);
+                        $contractor = new CmsContractor();
+                        $contractor->setAttributesFromDadata($party);
+                        if (!$contractor->save()) {
+                            throw new Exception("Не удалось создать компанию: ".print_r($contractor->errors, true));
+                        }
+
+                        $map = new CmsContractorMap();
+                        $map->cms_user_id = $user->id;
+                        $map->cms_contractor_id = $contractor->id;
+                        if (!$map->save()) {
+                            throw new Exception("Не удалось добавить компанию: ".print_r($map->errors, true));
+                        }
+                    } else {
+                        throw new Exception("Компания с таким ИНН не найдена");
+                    }
+                }
+
+                $rr->success = true;
+            }
+
+        } catch (\Exception $e) {
+            $rr->success = false;
+            $rr->message = $e->getMessage();
+        }
+
 
         return $rr;
     }

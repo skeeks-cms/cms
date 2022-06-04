@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsSiteAddress;
+use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
 use skeeks\cms\ya\map\widgets\YaMapInput;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
@@ -183,35 +184,7 @@ HTML
 
         $result = ArrayHelper::merge($result, [
 
-            'coordinates' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => YaMapInput::class,
-                'widgetConfig' => [
-                    'YaMapWidgetOptions' => [
-                        'options' => [
-                            'style' => 'height: 400px;',
-                        ],
-                    ],
-
-                    'clientOptions' => [
-                        'select' => new \yii\web\JsExpression(<<<JS
-        function(e, data)
-        {
-            var lat = data.coords[0];
-            var long = data.coords[1];
-            var address = data.address;
-            var phone = data.phone;
-            var email = data.email;
-
-            $('#cmssiteaddress-value').val(address);
-            $('#cmssiteaddress-latitude').val(lat);
-            $('#cmssiteaddress-longitude').val(long);
-        }
-JS
-                        ),
-                    ],
-                ],
-            ],
+            
 
             'name',
 
@@ -219,7 +192,25 @@ JS
                 'class'   => HtmlBlock::class,
                 'content' => '<div style="display: block;">',
             ],
-            'value',
+            
+            'value' => [
+                'class' => WidgetField::class,
+                'widgetClass' => YaMapDecodeInput::class,
+                'widgetConfig' => [
+                    'modelLatitudeAttr' => 'latitude',
+                    'modelLongitudeAttr' => 'longitude',
+                ]
+            ],
+            
+            
+            [
+                'class'   => HtmlBlock::class,
+                'content' => '</div>',
+            ],
+            [
+                'class'   => HtmlBlock::class,
+                'content' => '<div style="display: none;">',
+            ],
             'latitude',
             'longitude',
 

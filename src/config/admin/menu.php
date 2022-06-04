@@ -322,6 +322,12 @@ return array_merge(dashboardsMenu(), [
                 ],
 
                 [
+                    "label" => \Yii::t('skeeks/cms', 'Юр. Лица'),
+                    "url"   => ["/cms/admin-cms-contractor"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/company.png'],
+
+                ],
+                [
                     "label" => \Yii::t('skeeks/cms', 'Дизайн'),
                     "url"   => ["/cms/admin-cms-theme"],
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/themes.png'],
