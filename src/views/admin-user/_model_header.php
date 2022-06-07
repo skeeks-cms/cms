@@ -31,8 +31,6 @@ CSS
         <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
             <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
 
-            
-
 
         </h1>
 
@@ -79,7 +77,7 @@ JS
                 <i class="fas fa-pencil-alt"></i>
             </a>
 </span>
-        
+
         <span>
             <?
 
@@ -101,13 +99,13 @@ JS
             </a>
 
         </span>
-        
+
         <?php if ($model->phone) : ?>
             <span>
                 <a href="#" class="btn btn-default" title="Позвонить" data-toggle="tooltip"><i class="fas fa-phone"></i></a>
             </span>
             <span>
-                <a href="#" class="btn btn-default" title="Написать sms" data-toggle="tooltip"><i class="fas fa-sms"></i></a>
+                <a href="#" class="btn btn-default sx-send-sms-trigger" data-phone="<?php echo $model->phone; ?>" title="Написать sms" data-toggle="tooltip"><i class="fas fa-sms"></i></a>
             </span>
         <?php endif; ?>
         <?php if ($model->email) : ?>
@@ -115,7 +113,5 @@ JS
                 <a href="#" class="btn btn-default" title="Написать письмо" data-toggle="tooltip"><i class="far fa-envelope"></i></a>
             </span>
         <?php endif; ?>
-
-
     </div>
 </div>
