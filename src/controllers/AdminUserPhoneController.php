@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserPhone;
@@ -68,6 +69,44 @@ class AdminUserPhoneController extends BackendModelStandartController
                     return false;
                 },
             ],
+
+            "sms-messages" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "SMS сообщения",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/cms/admin-cms-sms-message",
+                'relation'        => ['phone' => 'value'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    //$visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    /*ArrayHelper::removeValue($visibleColumns, 'cms_site_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;*/
+
+                },
+
+                "accessCallback" => function ($model) {
+                    if ($this->model) {
+                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                    }
+                    return false;
+                },
+
+                /*"accessCallback" => function () {
+                    if ($this->model) {
+                        return ShopOrder::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
+                    }
+
+                    return false;
+                },*/
+            ],
+
             "delete" => [
                 "accessCallback" => function ($model) {
                     if ($this->model) {

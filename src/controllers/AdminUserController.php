@@ -404,6 +404,11 @@ class AdminUserController extends BackendModelStandartController
                 'isVisible' => false,
                 'callback'  => [$this, 'addContractor'],
             ],
+            'send-sms' => [
+                'class'     => BackendModelAction::class,
+                'isVisible' => false,
+                'callback'  => [$this, 'sendSms'],
+            ],
             
             'create' => [
                 //"callback"       => [$this, 'create'],
@@ -483,7 +488,7 @@ class AdminUserController extends BackendModelStandartController
                         return ShopOrder::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
                     }
 
-                    return false;
+                    return true;
                 },
             ],
 
@@ -1173,6 +1178,46 @@ JS
                 }
 
                 $rr->success = true;
+            }
+
+        } catch (\Exception $e) {
+            $rr->success = false;
+            $rr->message = $e->getMessage();
+        }
+
+
+        return $rr;
+    }
+
+    public function sendSms()
+    {
+        $rr = new RequestResponse();
+
+        try {
+            /**
+             * @var $user CmsUser
+             */
+            $user = $this->model;
+            if ($rr->isRequestAjaxPost()) {
+                if (!$phone = trim(\Yii::$app->request->post("phone"))) {
+                    throw new Exception("Не указан телефон");
+                }
+                if (!$message = trim(\Yii::$app->request->post("message"))) {
+                    throw new Exception("Не указано сообщение");
+                }
+
+                if (!\Yii::$app->cms->smsProvider) {
+                    throw new Exception("Не настроена SMS отправка на сайте");
+                }
+
+                $cmsSmsMessage = \Yii::$app->cms->smsProvider->send($phone, $message);
+                if ($cmsSmsMessage->isError) {
+                    throw new Exception($cmsSmsMessage->error_message);
+                } else {
+                    $rr->message = "Сообщение отправлено!";
+                    $rr->success = true;
+                }
+
             }
 
         } catch (\Exception $e) {
