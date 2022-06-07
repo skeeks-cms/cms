@@ -9,7 +9,6 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
-use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -29,9 +28,9 @@ use yii\helpers\ArrayHelper;
  * @property string      $value Полный адрес
  * @property float       $latitude
  * @property float       $longitude
- * @property string         $entrance    Подъезд
- * @property string         $floor Этаж
- * @property string         $apartment_number Номер квартиры
+ * @property string      $entrance    Подъезд
+ * @property string      $floor Этаж
+ * @property string      $apartment_number Номер квартиры
  * @property string      $comment
  * @property int|null    $cms_image_id
  * @property int         $priority
@@ -55,7 +54,7 @@ class CmsUserAddress extends ActiveRecord
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
-            HasStorageFile::class              => [
+            HasStorageFile::class => [
                 'class'  => HasStorageFile::class,
                 'fields' => ['cms_image_id'],
             ],
@@ -98,7 +97,7 @@ class CmsUserAddress extends ActiveRecord
                     'updated_at',
                     'cms_site_id',
                     'cms_user_id',
-                    
+
                     'priority',
                 ],
                 'integer',
@@ -126,7 +125,6 @@ class CmsUserAddress extends ActiveRecord
             //[['cms_user_id', 'value'], 'unique', 'targetAttribute' => ['cms_user_id', 'value'], 'message' => 'Этот телефон уже занят'],
 
 
-
             [
                 [
                     'value',
@@ -137,7 +135,6 @@ class CmsUserAddress extends ActiveRecord
                 "filter",
                 'filter' => 'trim',
             ],
-
 
 
         ]);
