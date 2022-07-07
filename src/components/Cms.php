@@ -620,8 +620,13 @@ class Cms extends \skeeks\cms\base\Component
         $result = [];
 
         if ($this->smsHandlers) {
-            foreach ($this->smsHandlers as $handlerClass) {
-                $result[$handlerClass] = (new $handlerClass())->descriptor->name;
+            foreach ($this->smsHandlers as $id => $handlerClass) {
+                if (is_array($handlerClass)) {
+                    $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
+                }
+
+                $result[$id] = (new $handlerClass())->descriptor->name;
+
             }
         }
 
@@ -653,4 +658,6 @@ class Cms extends \skeeks\cms\base\Component
         $this->_smsProvider = $smsProvider;
         return $this;
     }
+
+
 }
