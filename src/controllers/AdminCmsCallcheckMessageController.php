@@ -12,6 +12,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsCallcheckMessage;
 use skeeks\cms\models\CmsSiteEmail;
 use skeeks\cms\models\CmsSitePhone;
 use skeeks\cms\models\CmsSiteSocial;
@@ -34,13 +35,13 @@ use yii\helpers\UnsetArrayValue;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminCmsSmsMessageController extends BackendModelStandartController
+class AdminCmsCallcheckMessageController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = \Yii::t('skeeks/cms', "SMS сообщения");
+        $this->name = \Yii::t('skeeks/cms', "Дозвоны");
         $this->modelShowAttribute = 'asText';
-        $this->modelClassName = CmsSmsMessage::class;
+        $this->modelClassName = CmsCallcheckMessage::class;
 
         $this->generateAccessActions = false;
         $this->permissionName = 'cms/admin-settings';
@@ -68,7 +69,7 @@ class AdminCmsSmsMessageController extends BackendModelStandartController
 
                         'body' => <<<HTML
 <p>
-В этом разделе показаны все sms отправленные с сайта.
+В этом разделе показаны все дозвоны для авторизации на сайте.
 
 </p>
 HTML
@@ -99,7 +100,7 @@ HTML
                         'actions',
 
                         'phone',
-                        'message',
+                        'code',
                         'created_at',
                         'status',
                     ],
@@ -122,7 +123,7 @@ HTML
                                     'width' => '150px;'
                                 ]
                             ],
-                            'value' => function(CmsSmsMessage $message) {
+                            'value' => function(CmsCallcheckMessage $message) {
                                 $data[] = "<div>{$message->statusAsText}</div>";
                                 if ($message->cmsSmsProvider) {
                                     $data[] = "<div style='font-size: 10px; color: gray;'>{$message->cmsSmsProvider->name}</div>";
