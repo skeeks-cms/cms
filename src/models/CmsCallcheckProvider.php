@@ -8,28 +8,29 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\callcheck\CallcheckHandler;
 use skeeks\cms\models\behaviors\Serialize;
-use skeeks\cms\sms\SmsHandler;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "cms_callcheck_provider".
  *
- * @property int $id
- * @property int|null $created_by
- * @property int|null $updated_by
- * @property int|null $created_at
- * @property int|null $updated_at
- * @property int $cms_site_id
- * @property string $name
- * @property int $priority
- * @property int|null $is_main
- * @property string $component
- * @property string|null $component_config
+ * @property int                   $id
+ * @property int|null              $created_by
+ * @property int|null              $updated_by
+ * @property int|null              $created_at
+ * @property int|null              $updated_at
+ * @property int                   $cms_site_id
+ * @property string                $name
+ * @property int                   $priority
+ * @property int|null              $is_main
+ * @property string                $component
+ * @property string|null           $component_config
  *
+ * @property CallcheckHandler      $handler
  * @property CmsCallcheckMessage[] $cmsCallcheckMessages
- * @property CmsSite $cmsSite
+ * @property CmsSite               $cmsSite
  */
 class CmsCallcheckProvider extends \skeeks\cms\base\ActiveRecord
 {
@@ -54,7 +55,7 @@ class CmsCallcheckProvider extends \skeeks\cms\base\ActiveRecord
     protected $_handler = null;
 
     /**
-     * @return SmsHandler
+     * @return CallcheckHandler
      */
     public function getHandler()
     {
@@ -63,6 +64,7 @@ class CmsCallcheckProvider extends \skeeks\cms\base\ActiveRecord
         }
 
         if ($this->component) {
+
             try {
 
                 $componentConfig = ArrayHelper::getValue(\Yii::$app->cms->callcheckHandlers, $this->component);
@@ -74,6 +76,7 @@ class CmsCallcheckProvider extends \skeeks\cms\base\ActiveRecord
                 return $this->_handler;
             } catch (\Exception $e) {
                 \Yii::error("Related property handler not found '{$this->component}'", self::class);
+                //throw $e;
                 return null;
             }
 
@@ -95,7 +98,7 @@ class CmsCallcheckProvider extends \skeeks\cms\base\ActiveRecord
 
             [
                 'is_main',
-                function() {
+                function () {
                     if ($this->is_main != 1) {
                         $this->is_main = null;
                     }
@@ -153,34 +156,33 @@ class CmsCallcheckProvider extends \skeeks\cms\base\ActiveRecord
      * @return CmsSmsMessage
      * @throws \Exception
      */
-    public function send($phone, $text)
+    public function callcheck($phone)
     {
         $provider_message_id = '';
 
-        $cmsSmsMessage = new CmsSmsMessage();
+        $message = new CmsCallcheckMessage();
 
-        $cmsSmsMessage->phone = $phone;
-        $cmsSmsMessage->message = $text;
-        $cmsSmsMessage->cms_sms_provider_id = $this->id;
+        $message->phone = $phone;
+        $message->cms_callcheck_provider_id = $this->id;
 
         try {
 
-            $this->handler->sendMessage($cmsSmsMessage);
+            $this->handler->callcheckMessage($message);
 
-            if (!$cmsSmsMessage->save()) {
-                throw new Exception(print_r($cmsSmsMessage->errors, true));
+            if (!$message->save()) {
+                throw new Exception(print_r($message->errors, true));
             }
 
         } catch (\Exception $exception) {
-            $cmsSmsMessage->status = CmsSmsMessage::STATUS_ERROR;
-            $cmsSmsMessage->error_message = $exception->getMessage();
-            if (!$cmsSmsMessage->save()) {
-                throw new Exception(print_r($cmsSmsMessage->errors, true));
+            $message->status = CmsCallcheckMessage::STATUS_ERROR;
+            $message->error_message = $exception->getMessage();
+            if (!$message->save()) {
+                throw new Exception(print_r($message->errors, true));
             }
             //throw $exception;
         }
 
-        return $cmsSmsMessage;
+        return $message;
     }
 
 }

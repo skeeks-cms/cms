@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\models\behaviors\Serialize;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -35,8 +36,7 @@ use yii\helpers\ArrayHelper;
 class CmsCallcheckMessage extends \skeeks\cms\base\ActiveRecord
 {
     const STATUS_ERROR = "error";
-    const STATUS_NEW = "new";
-    const STATUS_DELIVERED = "delivered";
+    const STATUS_OK = "ok";
 
     /**
      * {@inheritdoc}
@@ -46,11 +46,20 @@ class CmsCallcheckMessage extends \skeeks\cms\base\ActiveRecord
         return 'cms_callcheck_message';
     }
 
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            Serialize::class => [
+                'class'  => Serialize::class,
+                'fields' => ['provider_response_data'],
+            ],
+        ]);
+    }
+
     public function statuses()
     {
         return [
-            self::STATUS_NEW       => "Новое",
-            self::STATUS_DELIVERED => "Доставлено",
+            self::STATUS_OK       => "Успешно",
             self::STATUS_ERROR     => "Ошибка",
         ];
     }
@@ -58,9 +67,9 @@ class CmsCallcheckMessage extends \skeeks\cms\base\ActiveRecord
     /**
      * @return bool
      */
-    public function getIsDelivered()
+    public function getIsOk()
     {
-        return $this->status == self::STATUS_DELIVERED;
+        return $this->status == self::STATUS_OK;
     }
 
     /**
@@ -86,14 +95,12 @@ class CmsCallcheckMessage extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_callcheck_provider_id'], 'integer'],
-            [['cms_site_id', 'phone', 'status'], 'required'],
-            [['provider_response_data'], 'string'],
+            [['phone'], 'required'],
+            [['provider_response_data'], 'safe'],
             [['user_ip'], 'string', 'max' => 20],
             [['phone', 'status', 'code', 'error_message', 'provider_status', 'provider_call_id'], 'string', 'max' => 255],
             [['cms_callcheck_provider_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsCallcheckProvider::className(), 'targetAttribute' => ['cms_callcheck_provider_id' => 'id']],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
 
             [
                 ['error_message', 'provider_status', 'provider_call_id'],
@@ -103,7 +110,7 @@ class CmsCallcheckMessage extends \skeeks\cms\base\ActiveRecord
             [
                 'status',
                 'default',
-                'value' => self::STATUS_NEW,
+                'value' => self::STATUS_OK,
             ],
             [
                 'cms_site_id',

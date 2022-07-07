@@ -664,17 +664,17 @@ class Cms extends \skeeks\cms\base\Component
     /**
      * @var array
      */
-    public $callchekHandlers = [];
+    public $callcheckHandlers = [];
 
     /**
      * @return array
      */
-    public function getCallchekHandlersForSelect()
+    public function getCallcheckHandlersForSelect()
     {
         $result = [];
 
-        if ($this->callchekHandlers) {
-            foreach ($this->callchekHandlers as $id => $handlerClass) {
+        if ($this->callcheckHandlers) {
+            foreach ($this->callcheckHandlers as $id => $handlerClass) {
                 if (is_array($handlerClass)) {
                     $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
                 }
@@ -702,7 +702,7 @@ class Cms extends \skeeks\cms\base\Component
             $this->_callcheckProvider = CmsCallcheckProvider::find()->cmsSite()->andWhere(['is_main' => 1])->one();
         }
 
-        return $this->_smsProvider;
+        return $this->_callcheckProvider;
     }
     /**
      * @return CmsSmsProvider|null

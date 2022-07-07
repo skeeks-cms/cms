@@ -207,7 +207,7 @@ CSS
 
                     'component' => [
                         'class'   => SelectField::class,
-                        'items'   => \Yii::$app->cms->getCallchekHandlersForSelect(),
+                        'items'   => \Yii::$app->cms->getCallcheckHandlersForSelect(),
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
                         ],
