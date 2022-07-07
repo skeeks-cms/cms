@@ -479,6 +479,85 @@ class AuthController extends Controller
 
 
     /**
+     * Авторизация пользователя через телефон
+     *
+     * @return array
+     */
+    public function actionAuthByCallcheckPhone()
+    {
+        $rr = new RequestResponse();
+
+        //Запрос ajax post
+        if ($rr->isRequestAjaxPost() && \Yii::$app->user->isGuest) {
+
+            try {
+
+                $model = new DynamicModel();
+                $model->defineAttribute("phone", \Yii::$app->request->post('phone'));
+                $model->addRule("phone", "required");
+                $model->addRule("phone", PhoneValidator::class);
+
+                if (!$model->validate()) {
+                    throw new Exception("Некорректный номер телефона");
+                }
+
+                $rr->success = true;
+                $rr->message = '';
+
+                if ($user = CmsUser::find()->cmsSite()->phone($model->phone)->one()) {
+                    //Если пользователь существует
+                    //Нужно предложить ему авторизоваться с его паролем
+
+                    $rr->data = [
+                        'user'  => true,
+                        'phone' => $model->phone,
+                        'type'  => "password",
+                    ];
+
+
+                } else {
+                    //Если пользователь не существует нужно создать
+                    $t = \Yii::$app->db->beginTransaction();
+                    try {
+
+                        $class = \Yii::$app->user->identityClass;
+                        $user = new $class();
+                        $user->phone = $model->phone;
+                        if (!$user->save()) {
+                            throw new Exception("Ошибка регистрации: ".print_r($user->errors, true));
+                        }
+
+                        //Генерация, отправка и сохранение sms кода
+                        $this->_generateAndSaveCallcheckCode($model->phone);
+
+                        $t->commit();
+
+                        //Авторазиция по временному коду
+                        $rr->data = [
+                            'user'        => true,
+                            'phone'       => $model->phone,
+                            'type'        => "tmp-phone-code",
+                            'left-repeat' => $this->getSessionCallcheckAuthPhoneLeftRepeat(),
+                        ];
+
+
+                    } catch (\Exception $exception) {
+                        $t->rollBack();
+                        throw $exception;
+                    }
+
+                }
+            } catch (\Exception $e) {
+                $rr->message = $e->getMessage();
+                $rr->success = false;
+            }
+        }
+
+        return (array)$rr;
+    }
+
+
+    /**
      * Авторизация пользователя через телефон и пароль
      *
      * @return array
@@ -509,7 +588,61 @@ class AuthController extends Controller
                 /**
                  * @var $user CmsUser
                  */
-                if (!$user = CmsUser::find()->cmsSite()->andWhere(['phone' => $model->phone])->one()) {
+                if (!$user = CmsUser::find()->cmsSite()->phone($model->phone)->one()) {
+                    throw new Exception("Некорректные данные для входа");
+                }
+
+                if (!$user->validatePassword($model->password)) {
+                    throw new Exception("Некорректные данные для входа");
+                }
+
+
+                \Yii::$app->user->login($user, 3600 * 24 * 30);
+
+                $rr->success = true;
+
+                if ($ref = UrlHelper::getCurrent()->getRef()) {
+                    $rr->redirect = $ref;
+                } else {
+                    $rr->redirect = \Yii::$app->user->getReturnUrl();;
+                }
+
+            } catch (\Exception $e) {
+                $rr->message = $e->getMessage();
+                $rr->success = false;
+            }
+        }
+
+        return (array)$rr;
+    }
+
+    public function actionAuthByCallcheckPhonePassword()
+    {
+        $rr = new RequestResponse();
+
+        //Запрос ajax post
+        if ($rr->isRequestAjaxPost() && \Yii::$app->user->isGuest) {
+
+            try {
+
+                $model = new DynamicModel();
+                $model->defineAttribute("phone", \Yii::$app->request->post('phone'));
+                $model->defineAttribute("password", \Yii::$app->request->post('password'));
+                $model->addRule("phone", PhoneValidator::class);
+                $model->addRule("phone", "required");
+                $model->addRule("password", "required");
+
+                if (!$model->validate()) {
+                    throw new Exception("Некорректные данные для авторизации");
+                }
+
+                $rr->success = true;
+                $rr->message = '';
+
+                /**
+                 * @var $user CmsUser
+                 */
+                if (!$user = CmsUser::find()->cmsSite()->phone($model->phone)->one()) {
                     throw new Exception("Некорректные данные для входа");
                 }
 
@@ -548,6 +681,38 @@ class AuthController extends Controller
         if ($rr->isRequestAjaxPost()) {
             if (\Yii::$app->request->post('phone_code') == $this->getSessionAuthPhoneCode() && $this->getSessionAuthPhone()) {
                 $userPhone = CmsUserPhone::find()->cmsSite()->andWhere(['value' => $this->getSessionAuthPhone()])->one();
+
+                if (!$userPhone->is_approved) {
+                    $userPhone->is_approved = 1;
+                    $userPhone->update(false, ['is_approved']);
+                }
+
+
+                \Yii::$app->user->login($userPhone->cmsUser, 3600 * 24 * 30);
+
+                $rr->success = true;
+                $rr->message = 'Авторизация прошла успешно';
+
+                if ($ref = UrlHelper::getCurrent()->getRef()) {
+                    $rr->redirect = $ref;
+                } else {
+                    $rr->redirect = \Yii::$app->getUser()->getReturnUrl();;
+                }
+            } else {
+                $rr->success = false;
+                $rr->message = 'Код некорректный или устарел';
+            }
+        }
+
+        return $rr;
+    }
+    public function actionAuthByCallcheckPhoneCode()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            if (\Yii::$app->request->post('phone_code') == $this->getSessionCallcheckAuthPhoneCode() && $this->getSessionCallcheckAuthPhone()) {
+                $userPhone = CmsUserPhone::find()->cmsSite()->andWhere(['value' => $this->getSessionCallcheckAuthPhone()])->one();
 
                 if (!$userPhone->is_approved) {
                     $userPhone->is_approved = 1;
@@ -644,6 +809,41 @@ class AuthController extends Controller
                 ];
 
                 $rr->message = "Проверочный код отправлен в SMS";
+                $rr->success = true;
+
+            } catch (\Exception $e) {
+                $rr->success = false;
+                $rr->message = $e->getMessage();
+            }
+
+        }
+
+        return $rr;
+    }
+    /**
+     * @return RequestResponse
+     */
+    public function actionGenerateCallcheckPhoneCode()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            try {
+
+                if (!\Yii::$app->user->isGuest) {
+                    throw new Exception("Некорректный запрос");
+                }
+
+                if (!$phone = \Yii::$app->request->post('phone')) {
+                    throw new Exception("Некорректный запрос");
+                }
+
+                $this->_generateAndSaveCallcheckCode($phone);
+                $rr->data = [
+                    'left-repeat' => $this->getSessionCallcheckAuthPhoneLeftRepeat(),
+                ];
+
+                $rr->message = "Мы уже звоним вам!";
                 $rr->success = true;
 
             } catch (\Exception $e) {
@@ -841,6 +1041,34 @@ class AuthController extends Controller
      * @param $phone
      * @throws Exception
      */
+    protected function _generateAndSaveCallcheckCode($phone)
+    {
+        //Если на этот номер уже отправили пароль
+        if ($this->getSessionCallcheckAuthPhone() == $phone && $this->getSessionCallcheckAuthPhoneIsActual()) {
+
+        } else {
+
+            $message = \Yii::$app->cms->callcheckProvider->callcheck($phone);
+            $code = $message->code;
+
+            if ($message->isError) {
+                throw new Exception("Звонок не удалось совершить: {$message->error_message}");
+            }
+
+            \Yii::$app->session->set(self::SESSION_AUTH_CALLCHECK_DATA, [
+                'phone'      => $phone,
+                'created_at' => time(),
+                'phone_code' => $code,
+            ]);
+        }
+    }
+
+    /**
+     * Генерация, сохранение в сессию и отправка sms кода
+     *
+     * @param $phone
+     * @throws Exception
+     */
     protected function _generateAndSaveSmsCode($phone)
     {
         //Если на этот номер уже отправили пароль
@@ -900,9 +1128,17 @@ class AuthController extends Controller
         }
     }
 
+    const SESSION_AUTH_CALLCHECK_DATA = "auth_callcheck_data";
     const SESSION_AUTH_SMS_DATA = "auth_sms_data";
     const SESSION_AUTH_EMAIL_DATA = "auth_email_data";
 
+    /**
+     * @return array
+     */
+    public function getSessionCallcheckData()
+    {
+        return (array)\Yii::$app->session->get(self::SESSION_AUTH_CALLCHECK_DATA);
+    }
     /**
      * @return array
      */
@@ -933,6 +1169,26 @@ class AuthController extends Controller
         return (int)ArrayHelper::getValue($this->getSessionSmsData(), "created_at");
     }
 
+    public function getSessionCallcheckAuthPhone()
+    {
+        return (string)ArrayHelper::getValue($this->getSessionCallcheckData(), "phone");
+    }
+
+    public function getSessionCallcheckAuthPhoneCode()
+    {
+        return (string)ArrayHelper::getValue($this->getSessionCallcheckData(), "phone_code");
+    }
+
+    public function getSessionCallcheckAuthPhoneCreatedAt()
+    {
+        return (int)ArrayHelper::getValue($this->getSessionCallcheckData(), "created_at");
+    }
+
+    public function getSessionCallcheckAuthPhoneDuration()
+    {
+        return (int)(time() - $this->getSessionCallcheckAuthPhoneCreatedAt());
+    }
+
     public function getSessionAuthPhoneDuration()
     {
         return (int)(time() - $this->getSessionAuthPhoneCreatedAt());
@@ -943,12 +1199,25 @@ class AuthController extends Controller
         return 60 * 3 - $this->getSessionAuthPhoneDuration();
     }
 
+    public function getSessionCallcheckAuthPhoneLeftRepeat()
+    {
+        return 60 * 3 - $this->getSessionCallcheckAuthPhoneDuration();
+    }
+
     /**
      * @return bool
      */
     public function getSessionAuthPhoneIsActual()
     {
         return (bool)($this->getSessionAuthPhoneLeftRepeat() > 0);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSessionCallcheckAuthPhoneIsActual()
+    {
+        return (bool)($this->getSessionCallcheckAuthPhoneLeftRepeat() > 0);
     }
 
 
