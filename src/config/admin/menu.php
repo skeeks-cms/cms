@@ -422,6 +422,24 @@ return array_merge(dashboardsMenu(), [
                     //contentEditMenu()
                 ],
 
+                [
+                    "label" => \Yii::t('skeeks/cms', "Авторизация по звонку"),
+                    //"url"   => ["cms/admin-cms-content-type"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/telephone-call.png'],
+
+                    'items' => [
+                        [
+                            'url'   => ["/cms/admin-cms-callcheck-provider"],
+                            'label' => \Yii::t('skeeks/cms', "Провайдеры"),
+                        ],
+                        [
+                            'url'   => ["/cms/admin-cms-callcheck-message"],
+                            'label' => \Yii::t('skeeks/cms', "Дозвоны"),
+                        ],
+                    ],
+                    //contentEditMenu()
+                ],
+
 
                 [
                     "label" => \Yii::t('skeeks/cms', "User settings"),

@@ -13,6 +13,7 @@ use skeeks\cms\backend\widgets\SelectModelDialogStorageFileSrcWidget;
 use skeeks\cms\base\Module;
 use skeeks\cms\helpers\ComposerHelper;
 use skeeks\cms\helpers\FileHelper;
+use skeeks\cms\models\CmsCallcheckProvider;
 use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
@@ -29,7 +30,6 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeListMulti;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeNumber;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeRadioList;
-use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeRange;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelect;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeSelectMulti;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile;
@@ -70,6 +70,7 @@ use yii\web\View;
  * @property array                            $relatedHandlersDataForSelect
  *
  * @property CmsSmsProvider                   $smsProvider
+ * @property CmsCallcheckProvider             $callcheckProvider
  *
  * @package skeeks\cms\components
  */
@@ -656,6 +657,59 @@ class Cms extends \skeeks\cms\base\Component
     public function setSmsProvider(CmsSmsProvider $smsProvider)
     {
         $this->_smsProvider = $smsProvider;
+        return $this;
+    }
+
+
+    /**
+     * @var array
+     */
+    public $callchekHandlers = [];
+
+    /**
+     * @return array
+     */
+    public function getCallchekHandlersForSelect()
+    {
+        $result = [];
+
+        if ($this->callchekHandlers) {
+            foreach ($this->callchekHandlers as $id => $handlerClass) {
+                if (is_array($handlerClass)) {
+                    $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
+                }
+
+                $result[$id] = (new $handlerClass())->descriptor->name;
+
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @var null|CmsCallcheckProvider
+     */
+    protected $_callcheckProvider = null;
+
+    /**
+     * @return CmsSmsProvider|null
+     */
+    public function getCallcheckProvider()
+    {
+        if ($this->_callcheckProvider === null) {
+            $this->_callcheckProvider = CmsCallcheckProvider::find()->cmsSite()->andWhere(['is_main' => 1])->one();
+        }
+
+        return $this->_smsProvider;
+    }
+    /**
+     * @return CmsSmsProvider|null
+     */
+    public function setCallcheckProvider(CmsCallcheckProvider $provider)
+    {
+        $this->_callcheckProvider = $provider;
         return $this;
     }
 

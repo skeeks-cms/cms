@@ -42,7 +42,7 @@ class AdminCmsSmsProviderController extends BackendModelStandartController
         $this->modelClassName = CmsSmsProvider::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-cms-sms-provider';
+        $this->permissionName = 'cms/admin-settings';
 
         parent::init();
     }
