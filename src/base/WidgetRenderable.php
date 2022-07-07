@@ -176,9 +176,14 @@ class WidgetRenderable extends Widget
         if ($result === false || $this->is_cache === false) {
 
             if ($this->viewFile) {
-                $result = $this->render($this->viewFile, ArrayHelper::merge($this->params, [
-                    'widget' => $this,
-                ]));
+                try {
+                    $result = $this->render($this->viewFile, ArrayHelper::merge($this->params, [
+                        'widget' => $this,
+                    ]));
+                } catch (\Exception $e) {
+                    $result = $e->getMessage();
+                }
+                
             } else {
                 $result = \Yii::t('skeeks/cms', "Template not found");
             }

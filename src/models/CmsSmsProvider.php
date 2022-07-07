@@ -65,7 +65,9 @@ class CmsSmsProvider extends \skeeks\cms\base\ActiveRecord
         if ($this->component) {
             try {
 
-                $component = \Yii::createObject($this->component);
+                $componentConfig = ArrayHelper::getValue(\Yii::$app->cms->smsHandlers, $this->component);
+
+                $component = \Yii::createObject($componentConfig);
                 $component->load($this->component_config, "");
 
                 $this->_handler = $component;
