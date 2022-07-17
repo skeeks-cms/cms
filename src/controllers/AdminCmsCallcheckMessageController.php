@@ -125,8 +125,8 @@ HTML
                             ],
                             'value' => function(CmsCallcheckMessage $message) {
                                 $data[] = "<div>{$message->statusAsText}</div>";
-                                if ($message->cmsSmsProvider) {
-                                    $data[] = "<div style='font-size: 10px; color: gray;'>{$message->cmsSmsProvider->name}</div>";
+                                if ($message->cmsCallcheckProvider) {
+                                    $data[] = "<div style='font-size: 10px; color: gray;'>{$message->cmsCallcheckProvider->name}</div>";
                                 }
 
                                 if ($message->isError) {
