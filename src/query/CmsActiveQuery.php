@@ -8,8 +8,10 @@
 
 namespace skeeks\cms\query;
 
+use http\Exception\InvalidArgumentException;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\User;
 use yii\db\ActiveQuery;
 
 /**
@@ -45,6 +47,26 @@ class CmsActiveQuery extends ActiveQuery
             return $this->andWhere(['!=', $this->getPrimaryTableName().'.is_default', 1]);
         }
     }
+    
+    /**
+     * @param int|strin|User $user
+     * @return CmsActiveQuery
+     */
+    public function createdBy($user)
+    {
+        $user_id = null;
+        if (is_int($user)) {
+            $user_id = $user;
+        } elseif (is_string($user)) {
+            $user_id = (int) $user;
+        } elseif ($user instanceof User) {
+            $user_id = (int) $user->id;
+        } else {
+            throw new InvalidArgumentException("Parametr user invalid");
+        }
+        return $this->andWhere([$this->getPrimaryTableName().'.created_by' => $user_id]);
+    }
+    
     /**
      * @param int $order
      * @return $this

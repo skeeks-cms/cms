@@ -453,6 +453,7 @@ class User
     {
         return [
             'displayName',
+            'shortDisplayName',
         ];
     }
 
