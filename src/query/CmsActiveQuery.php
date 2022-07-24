@@ -50,7 +50,7 @@ class CmsActiveQuery extends ActiveQuery
     
     /**
      * @param int|strin|User $user
-     * @return CmsActiveQuery
+     * @return static
      */
     public function createdBy($user)
     {
