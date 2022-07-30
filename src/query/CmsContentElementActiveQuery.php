@@ -55,6 +55,8 @@ class CmsContentElementActiveQuery extends CmsActiveQuery
 
         $treeIds = [$cmsTree->id];
         if ($isDescendants) {
+            //$treeIds = $cmsTree->getDescendants(null, true)->select(['id']);
+            //print_r($treeIds->createCommand()->rawSql);die;
             $treeDescendantIds = $cmsTree->getDescendants()->select(['id'])->indexBy('id')->asArray()->all();
             if ($treeDescendantIds) {
                 $treeDescendantIds = array_keys($treeDescendantIds);
