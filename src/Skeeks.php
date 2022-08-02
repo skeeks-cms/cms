@@ -123,4 +123,13 @@ class Skeeks extends Component
         $this->_site = $cmsSite;
         return $this;
     }
+
+    /**
+     * @return void
+     */
+    static public function unlimited()
+    {
+        set_time_limit(0);
+        ini_set("memory_limit", "2G");
+    }
 }
