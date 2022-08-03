@@ -186,7 +186,7 @@ class CmsSavedFilter extends ActiveRecord
                 ['cms_image_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 10,
                 'minSize'     => 256,

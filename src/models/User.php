@@ -328,7 +328,7 @@ class User
                 ['image_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
-                'extensions'  => ['jpg', 'jpeg', 'gif', 'png'],
+                'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 5,
                 'minSize'     => 1024,

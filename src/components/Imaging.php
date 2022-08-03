@@ -28,6 +28,7 @@ class Imaging extends Component
             "jpg",
             "png",
             "jpeg",
+            "webp",
             "gif"
         ];
 
