@@ -398,14 +398,14 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 'style' => 'max-width: 100px; width: 100px;',
                             ],
                             'contentOptions' => [
-                                'style' => 'max-width: 100px; width: 100px;',
+                                'style' => 'max-width: 100px; width: 100px; text-align:center;',
                             ],
                             'value'          => function (\skeeks\cms\models\CmsContentElement $model) {
                                 if ($model->active == "Y") {
                                     $time = \Yii::$app->formatter->asRelativeTime($model->published_at);
                                     $dateTime = \Yii::$app->formatter->asDatetime($model->published_at);
                                     return <<<HTML
-<span class="text-success" title="">✓</span> <small title="{$dateTime}">{$time}</small>
+<span class="text-success" title="{$dateTime} ({$time})">✓</span>
 HTML;
 
                                 } else {
@@ -835,7 +835,9 @@ HTML;
 
         if ($autoColumns) {
             $grid->columns = ArrayHelper::merge($grid->columns, $autoColumns);
+
         }
+
 
         return $this;
     }
