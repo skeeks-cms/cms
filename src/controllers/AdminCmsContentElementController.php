@@ -656,8 +656,8 @@ HTML;
 
 
             "copy" => [
-                'isVisible' => false,
-                'priority'       => 200,
+                //'isVisible' => false,
+                'priority'       => 900,
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Copy'),
                 "icon"           => "fas fa-copy",

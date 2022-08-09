@@ -869,7 +869,9 @@ class CmsContentElement extends RelatedElementModel
             ArrayHelper::remove($data, 'code');
 
             $newModel = new static($data);
-            $newModel->name = $newModel->name;
+            $newModel->name = $newModel->name . " (копия)";
+            $newModel->external_id = null;
+            $newModel->active = "N";
             if ($newModel->save()) {
 
                 /**
@@ -897,8 +899,11 @@ class CmsContentElement extends RelatedElementModel
 
             if ($rp = $this->relatedPropertiesModel) {
                 $this->relatedPropertiesModel->initAllProperties();
-                $rp->relatedElementModel = $newModel;
-                $rp->save();
+                $newRp = $newModel->relatedPropertiesModel;
+                $newRp->initAllProperties();
+                $newRp->setAttributes($rp->toArray());
+                //$rp->relatedElementModel = $newModel;
+                $newRp->save();
             }
 
             $transaction->commit();
