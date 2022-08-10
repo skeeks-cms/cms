@@ -64,6 +64,9 @@ class Imaging extends Component
         if (!$extension) {
             return $originalSrc;
         }
+        
+        $outExtension = $extension;
+        //$outExtension = "webp";
 
         if (!$this->isAllowExtension($extension)) {
             return $originalSrc;
@@ -83,7 +86,7 @@ class Imaging extends Component
             . ($params ? DIRECTORY_SEPARATOR . $this->getParamsCheckString($params) : "")
             . DIRECTORY_SEPARATOR . $nameForSave;
 
-        $imageSrcResult = str_replace('.' . $extension, $replacePart . '.' . $extension, $originalSrc);
+        $imageSrcResult = str_replace('.' . $extension, $replacePart . '.' . $outExtension, $originalSrc);
 
         if ($params) {
             $imageSrcResult = $imageSrcResult . '?' . http_build_query($params);
