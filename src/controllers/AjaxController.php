@@ -49,10 +49,12 @@ class AjaxController extends Controller
             $propertyEnumClass = (string) \Yii::$app->request->get("property_enum_class");
         }
         
+        $q = $propertyClass::find()->cmsSite()->andWhere(['code' => $code]);
+
         /**
          * @var $property CmsContentProperty
          */
-        if (!$property = $propertyClass::find()->cmsSite()->where(['code' => $code])->one()) {
+        if (!$property = $q->one()) {
             return $result;
         }
 
@@ -133,7 +135,7 @@ class AjaxController extends Controller
         /**
          * @var $property CmsContentProperty
          */
-        if (!$property = $propertyClass::find()->cmsSite()->where(['code' => $code])->one()) {
+        if (!$property = $propertyClass::find()->cmsSite()->andWhere(['code' => $code])->one()) {
             return $result;
         }
 
