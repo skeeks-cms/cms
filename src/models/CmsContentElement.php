@@ -870,7 +870,12 @@ class CmsContentElement extends RelatedElementModel
 
             $newModel = new static($data);
             $newModel->name = $newModel->name . " (копия)";
+
             $newModel->external_id = null;
+            $newModel->main_cce_at = null;
+            $newModel->main_cce_by = null;
+            $newModel->main_cce_id = null;
+
             $newModel->active = "N";
             if ($newModel->save()) {
 

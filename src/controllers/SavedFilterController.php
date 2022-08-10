@@ -115,10 +115,13 @@ class SavedFilterController extends Controller
         $cmsTree->name = $this->model->seoName;
         $cmsTree->seoName = $this->model->seoName;
 
-        return $this->render($viewFile, [
+        $result = $this->render($viewFile, [
             'model' => $cmsTree,
             'savedFilter' => $this->model
         ]);
+
+
+        return $result;
     }
 
     /**

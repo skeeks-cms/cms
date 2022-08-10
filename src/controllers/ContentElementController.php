@@ -213,7 +213,10 @@ class ContentElementController extends Controller
     public function actionView()
     {
         if (!$this->model) {
-            throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Page not found: '.\Yii::$app->request->absoluteUrl));
+            throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Страница не найдена: ') .\Yii::$app->request->absoluteUrl);
+        }
+        if (!$this->model->is_active) {
+            throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Страница отключена: ') .\Yii::$app->request->absoluteUrl);
         }
 
         $contentElement = $this->model;

@@ -348,6 +348,15 @@ class CmsSavedFilter extends ActiveRecord
     protected $_seoName = null;
 
     /**
+     * @param $value
+     * @return $this
+     */
+    public function setSeoName($value)
+    {
+        $this->_seoName = $value;
+        return $this;
+    }
+    /**
      * Полное название
      *
      * @return string
@@ -390,7 +399,7 @@ class CmsSavedFilter extends ActiveRecord
                     }
                 }
 
-                $this->_seoName = $this->cmsTree->name." ".$last;
+                $this->_seoName = $this->cmsTree->seoName." ".$last;
             }
         }
 
