@@ -143,6 +143,10 @@ class Cms extends \skeeks\cms\base\Component
     public $element_max_code_length = 48;
 
     /**
+     * @var bool Делать картинки webp при ресайзе?
+     */
+    public $is_webp = true;
+    /**
      * Время последней активности когда считается что пользователь онлайн
      * @var int
      */
