@@ -13,29 +13,34 @@ use Yii;
 /**
  * This is the model class for table "{{%cms_tree_type}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $name
- * @property string $code
- * @property integer $is_active
- * @property integer $priority
- * @property string $description
- * @property string $name_meny
- * @property string $name_one
- * @property string $viewFile
- * @property integer $default_children_tree_type
+ * @property integer                    $id
+ * @property integer                    $created_by
+ * @property integer                    $updated_by
+ * @property integer                    $created_at
+ * @property integer                    $updated_at
+ * @property string                     $name
+ * @property string                     $code
+ * @property integer                    $is_active
+ * @property integer                    $priority
+ * @property string                     $description
+ *
+ * @property string|null                $meta_title_template
+ * @property string|null                $meta_description_template
+ * @property string|null                $meta_keywords_template
+ *
+ * @property string                     $name_meny
+ * @property string                     $name_one
+ * @property string                     $viewFile
+ * @property integer                    $default_children_tree_type
  *
  * ***
  *
- * @property CmsTree[] $cmsTrees
- * @property CmsTreeType $defaultChildrenTreeType
+ * @property CmsTree[]                  $cmsTrees
+ * @property CmsTreeType                $defaultChildrenTreeType
  *
- * @property CmsTreeType[] $cmsTreeTypes
+ * @property CmsTreeType[]              $cmsTreeTypes
  * @property CmsTreeTypeProperty2type[] $cmsTreeTypeProperty2types
- * @property CmsTreeTypeProperty[] $cmsTreeTypeProperties
+ * @property CmsTreeTypeProperty[]      $cmsTreeTypeProperties
  */
 class CmsTreeType extends Core
 {
@@ -53,20 +58,23 @@ class CmsTreeType extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/cms', 'ID'),
-            'created_by' => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by' => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at' => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at' => Yii::t('skeeks/cms', 'Updated At'),
-            'name' => Yii::t('skeeks/cms', 'Name'),
-            'code' => Yii::t('skeeks/cms', 'Code'),
-            'is_active' => Yii::t('skeeks/cms', 'Active'),
-            'priority' => Yii::t('skeeks/cms', 'Priority'),
-            'description' => Yii::t('skeeks/cms', 'Description'),
-            'name_meny' => Yii::t('skeeks/cms', 'Name of many sections'),
-            'name_one' => Yii::t('skeeks/cms', 'Name of one section'),
-            'view_file' => Yii::t('skeeks/cms', 'Template'),
+            'id'                         => Yii::t('skeeks/cms', 'ID'),
+            'created_by'                 => Yii::t('skeeks/cms', 'Created By'),
+            'updated_by'                 => Yii::t('skeeks/cms', 'Updated By'),
+            'created_at'                 => Yii::t('skeeks/cms', 'Created At'),
+            'updated_at'                 => Yii::t('skeeks/cms', 'Updated At'),
+            'name'                       => Yii::t('skeeks/cms', 'Name'),
+            'code'                       => Yii::t('skeeks/cms', 'Code'),
+            'is_active'                  => Yii::t('skeeks/cms', 'Active'),
+            'priority'                   => Yii::t('skeeks/cms', 'Priority'),
+            'description'                => Yii::t('skeeks/cms', 'Description'),
+            'name_meny'                  => Yii::t('skeeks/cms', 'Name of many sections'),
+            'name_one'                   => Yii::t('skeeks/cms', 'Name of one section'),
+            'view_file'                  => Yii::t('skeeks/cms', 'Template'),
             'default_children_tree_type' => Yii::t('skeeks/cms', 'Type of child partitions by default'),
+            'meta_title_template' => Yii::t('skeeks/cms', 'Шаблон meta title'),
+            'meta_description_template' => Yii::t('skeeks/cms', 'Шаблон meta description'),
+            'meta_keywords_template' => Yii::t('skeeks/cms', 'Шаблон meta keywords'),
         ]);
     }
     /**
@@ -75,8 +83,8 @@ class CmsTreeType extends Core
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'code' => \Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.'),
-            'view_file' => \Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.'),
+            'code'                       => \Yii::t('skeeks/cms', 'The name of the template to draw the elements of this type will be the same as the name of the code.'),
+            'view_file'                  => \Yii::t('skeeks/cms', 'The path to the template. If not specified, the pattern will be the same code.'),
             'default_children_tree_type' => \Yii::t('skeeks/cms', 'If this parameter is not specified, the child partition is created of the same type as the current one.'),
         ]);
     }
@@ -89,9 +97,19 @@ class CmsTreeType extends Core
         return array_merge(parent::rules(), [
             [
                 ['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'default_children_tree_type', 'is_active'],
-                'integer'
+                'integer',
             ],
             [['name', 'code'], 'required'],
+
+            [['meta_title_template'], 'string'],
+            [['meta_description_template'], 'string'],
+            [['meta_keywords_template'], 'string'],
+
+            [[
+                'meta_title_template',
+                'meta_description_template',
+                'meta_keywords_template',
+            ], 'default', 'value' => null],
             [['description'], 'string'],
             [['name', 'view_file'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
@@ -163,6 +181,6 @@ class CmsTreeType extends Core
     public function asText()
     {
         $result = parent::asText();
-        return $result . " ($this->code)";
+        return $result." ($this->code)";
     }
 }
