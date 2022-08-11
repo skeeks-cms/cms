@@ -10,6 +10,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\components\urlRules\UrlRuleContentElement;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasStorageFile;
@@ -387,19 +388,21 @@ class CmsSavedFilter extends ActiveRecord
 
                 } elseif ($this->value_content_property_enum_id) {
 
+                    //преобразуем вторую часть в нижний регистр
+                    
                     if ($this->isNewRecord) {
                         $element = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
                         if ($element) {
-                            $last = $element->value;
+                            $last = StringHelper::lcfirst($element->value);
                         }
                     } else {
                         if ($this->valueContentPropertyEnum) {
-                            $last = $this->valueContentPropertyEnum->value;
+                            $last = StringHelper::lcfirst($this->valueContentPropertyEnum->value);
                         }
                     }
                 }
 
-                $this->_seoName = $this->cmsTree->seoName." ".$last;
+                $this->_seoName = $this->cmsTree->seoName." ". $last;
             }
         }
 

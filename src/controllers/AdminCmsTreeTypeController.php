@@ -16,7 +16,9 @@ use skeeks\cms\models\CmsTreeType;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Event;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -173,6 +175,7 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
 
     public function fields()
     {
+        $siteName = \Yii::$app->skeeks->site->name;
         return [
             'main' => [
                 'class'  => FieldSet::class,
@@ -194,6 +197,55 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                 ],
             ],
 
+            'seo' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/cms', 'SEO'),
+                'fields' => [
+                    [
+                        'class' => HtmlBlock::class,
+                        'content' => <<<HTML
+<div class="col-12">
+<div class="alert alert-default" style="margin-top: 10px;">
+    <p>
+    Пример meta title:<br />
+    <b>{=section.seoName} купить в интернет-магазине, цены от {=minMoney} - {=siteName}</b>
+    </p>
+    <p>
+    Результат meta title:<br />
+    <b>Льняные шторы купить в интернет-магазине, цены от 2 000 руб. - {$siteName}</b>
+    </p>
+    <hr />
+    <p>
+    Пример meta description:<br />
+    <b>❤ {=section.seoName}. Цены от {=minMoney} ✔ 100% качественные продукты и материалы. ✔ доставка по Москве и всей России.</b>
+    </p>
+    <p>
+    Результат meta description:<br />
+    <b>❤ Льняные шторы. Цены от 2 000 руб. ✔ 100% качественные продукты и материалы. ✔ доставка по Москве и всей России.</b>
+    </p>
+    <hr />
+    <p>
+    Доступные переменные:<br />
+    <b>{=section.seoName}</b> — сео название раздела<br />
+    <b>{=minMoney}</b> — минимальная цена за товар в этом разделе<br />
+    <b>{=siteName}</b> — Название сайта<br />
+</p>
+</div>
+</div>
+HTML
+
+                    ],
+                    'meta_title_template' => [
+                        'class' => TextareaField::class
+                    ],
+                    'meta_description_template' => [
+                        'class' => TextareaField::class
+                    ],
+                    'meta_keywords_template' => [
+                        'class' => TextareaField::class
+                    ],
+                ],
+            ],
             'captions' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Captions'),
