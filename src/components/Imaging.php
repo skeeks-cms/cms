@@ -54,9 +54,10 @@ class Imaging extends Component
      * @param $originalSrc          Путь к оригинальному изображению
      * @param Filter $filter Объект фильтр, который будет заниматься преобразованием
      * @param string $nameForSave Название для сохраненеия файла (нужно для сео)
+     * @param null|boolean $isWebP Если передано null - настройки будут взяты из настроек сайта; true - не важно какие настройки картика будет webp; false - картинка не изменит расширение
      * @return string
      */
-    public function thumbnailUrlOnRequest($originalSrc, Filter $filter, $nameForSave = '')
+    public function thumbnailUrlOnRequest($originalSrc, Filter $filter, $nameForSave = '', $isWebP = null)
     {
         $originalSrc = (string)$originalSrc;
         $extension = static::getExtension($originalSrc);
@@ -64,9 +65,21 @@ class Imaging extends Component
         if (!$extension) {
             return $originalSrc;
         }
-        
-        $outExtension = $extension;
-        //$outExtension = "webp";
+
+        if ($isWebP === null) {
+            //Если параметр не передан принудительно, то нужно взять из настроек сайта
+            $isWebP = (bool) \Yii::$app->cms->is_webp;
+        }
+
+        $outExtension = null;
+        if ($isWebP === true) {
+            $outExtension = "webp";
+        }
+
+        if ($outExtension === null) {
+            $outExtension = $extension;
+        }
+
 
         if (!$this->isAllowExtension($extension)) {
             return $originalSrc;
@@ -79,6 +92,10 @@ class Imaging extends Component
         $params = [];
         if ($filter->getConfig()) {
             $params = $filter->getConfig();
+        }
+
+        if ($outExtension != $extension) {
+            $params['ext'] = $extension;
         }
 
 

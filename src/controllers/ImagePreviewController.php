@@ -15,6 +15,7 @@ use skeeks\cms\components\Imaging;
 use skeeks\cms\components\imaging\Filter;
 use skeeks\cms\Exception;
 use skeeks\sx\File;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -40,7 +41,17 @@ class ImagePreviewController extends Controller
         }
 
         $newFileSrc = \Yii::$app->request->getPathInfo();
-        $extension = Imaging::getExtension($newFileSrc);
+        //Если расширение файла не совпадает с оригинальным
+        $ext = trim(\Yii::$app->request->get("ext"));
+
+        if (!$ext) {
+            $extension = Imaging::getExtension($newFileSrc);
+            $newExtension = $extension;
+        } else {
+            $extension = $ext;
+            $newExtension = Imaging::getExtension($newFileSrc);
+        }
+
 
         if (!$extension) {
             throw new \yii\base\Exception("Extension not found: ".$newFileSrc);
@@ -58,14 +69,16 @@ class ImagePreviewController extends Controller
         }
 
         $newFile = File::object($newFileSrc);
-        $originalFileSrc = substr($newFileSrc, 0, $strposFilter).".".$newFile->getExtension();
+        $originalFileSrc = substr($newFileSrc, 0, $strposFilter).".".$extension;
 
         //TODO: hardcode delete it in the future
         $webRoot = \Yii::getAlias('@webroot');
 
         $originalFileRoot = $webRoot . DIRECTORY_SEPARATOR . $originalFileSrc;
         $newFileRoot = $webRoot . DIRECTORY_SEPARATOR . $newFileSrc;
-        $newFileRootDefault = $webRoot . DIRECTORY_SEPARATOR.str_replace($newFile->getBaseName(), Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $extension, $newFileSrc);
+        $newFileRootDefault = $webRoot . DIRECTORY_SEPARATOR.str_replace($newFile->getBaseName(), Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $newExtension, $newFileSrc);
+
+
 
         $originalFile = new File($originalFileRoot);
 
@@ -94,6 +107,8 @@ class ImagePreviewController extends Controller
             }
         }
 
+
+
         $filterClass = str_replace("-", "\\", $filterCode);
 
 
@@ -101,6 +116,7 @@ class ImagePreviewController extends Controller
             throw new \ErrorException("Filter class is not created: ".$newFileSrc);
         }
 
+        ArrayHelper::remove($params, "ext");
         /**
          * @var Filter $filter
          */
@@ -108,6 +124,13 @@ class ImagePreviewController extends Controller
         if (!is_subclass_of($filter, Filter::className())) {
             throw new NotFoundHttpException("No child filter class: ".$newFileSrc);
         }
+
+        /*if(YII_ENV_DEV) {
+            var_dump($newFileRoot);
+            var_dump($newFileRootDefault);
+            die;
+        }*/
+
 
         try {
             //Проверяем а создан ли уже файл, и если да то просто делаем на него ссылку.
@@ -123,7 +146,11 @@ class ImagePreviewController extends Controller
                 }
             } else {
                 if ($newFileRoot != $newFileRootDefault) {
-                    symlink(Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $extension, $newFileRoot);
+                    /*if(YII_ENV_DEV) {
+                        var_dump($newExtension);
+                        die;
+                    }*/
+                    symlink(Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $newExtension, $newFileRoot);
                 }
             }
 
