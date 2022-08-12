@@ -242,9 +242,9 @@ class CmsSavedFilter extends ActiveRecord
         }
 
         if ($params) {
-            $params = ArrayHelper::merge(['/cms/saved-filter/view', 'id' => $this->id], $params);
+            $params = ArrayHelper::merge(['/cms/saved-filter/view', 'model' => $this], $params);
         } else {
-            $params = ['/cms/saved-filter/view', 'id' => $this->id];
+            $params = ['/cms/saved-filter/view', 'model' => $this];
         }
 
         return Url::to($params, $scheme);
