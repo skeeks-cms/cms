@@ -401,7 +401,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                             'class' => UserColumnData::class,
                         ],
                         'is_adult' => [
-                            'class' => BooleanColumn::class
+                            'contentOptions' => [
+                                'style' => 'text-align:center;',
+                            ],
+                            'class' => BooleanColumn::class,
+                            'trueIcon' => '<span style="font-weight: bold; color: #ff0000bd;">18+</span>',
+                            'falseIcon' => ''
                         ],
                         'active'       => [
                             //'class' => BooleanColumn::class,

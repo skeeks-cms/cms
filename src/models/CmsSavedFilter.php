@@ -393,11 +393,12 @@ class CmsSavedFilter extends ActiveRecord
                     if ($this->isNewRecord) {
                         $element = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
                         if ($element) {
-                            $last = StringHelper::lcfirst($element->value);
+                            $last = StringHelper::lcfirst($element->value_for_saved_filter ? $element->value_for_saved_filter : $element->value);
                         }
                     } else {
                         if ($this->valueContentPropertyEnum) {
-                            $last = StringHelper::lcfirst($this->valueContentPropertyEnum->value);
+                            $enum = $this->valueContentPropertyEnum;
+                            $last = StringHelper::lcfirst($enum->value_for_saved_filter ? $enum->value_for_saved_filter : $enum->value);
                         }
                     }
                 }

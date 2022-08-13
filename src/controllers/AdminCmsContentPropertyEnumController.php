@@ -15,9 +15,11 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -233,6 +235,19 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                 'name'   => \Yii::t('skeeks/cms', 'Основное'),
                 'fields' => [
                     'value',
+                    'value_for_saved_filter',
+                    'cms_image_id' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                        'widgetConfig' => [
+                            'accept'   => 'image/*',
+                            'multiple' => false,
+                        ],
+                    ],
+                    'description' => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => ComboTextInputWidget::class
+                    ],
                 ],
             ],
             'additionals' => [

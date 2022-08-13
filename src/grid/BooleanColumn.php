@@ -59,13 +59,13 @@ class BooleanColumn extends DataColumn
      * If GridView `bootstrap` property is set to true - it will default to [[GridView::ICON_ACTIVE]]
      * `<span class="glyphicon glyphicon-ok text-success"></span>`
      */
-    public $trueIcon;
+    public $trueIcon = false;
     /**
      * @var string icon/indicator for the false value. If this is null, it will use the value from `falseLabel`.
      * If GridView `bootstrap` property is set to true - it will default to [[GridView::ICON_INACTIVE]]
      * `<span class="fa fa-times text-danger"></span>`
      */
-    public $falseIcon;
+    public $falseIcon = false;
     /**
      * @var bool whether to show null value as a false icon.
      */
@@ -95,10 +95,10 @@ class BooleanColumn extends DataColumn
         if (!$this->filter) {
             $this->filter = [$this->trueValue => $this->trueLabel, $this->falseValue => $this->falseLabel];
         }
-        if (empty($this->trueIcon)) {
+        if ($this->trueIcon === false) {
             $this->trueIcon = '<span class="text-success" title="' . $this->trueLabel . '">✓</span>';
         }
-        if (empty($this->falseIcon)) {
+        if ($this->falseIcon === false) {
             $this->falseIcon = '<span class="text-danger" title="' . $this->falseLabel . '">x</span>';
         }
         parent::init();

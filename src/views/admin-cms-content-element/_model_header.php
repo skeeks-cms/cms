@@ -18,7 +18,14 @@
         </div>
     <? endif; ?>
     <div class="col my-auto">
-        <h1 style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->name; ?></h1>
+        <h1 style="margin-bottom: 0px; line-height: 1.1;">
+            <?php echo $model->name; ?>
+            <? if ($model->is_adult) : ?>
+                <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
+                    <span data-toggle="tooltip" title="Этот раздел содержит информацию для взрослых. Имеет возрастные ограничения 18+">[18+]</span>
+                </span>
+            <? endif; ?>
+        </h1>
         <div class="sx-small-info" style="font-size: 10px; color: silver;">
             <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
             <? if ($model->created_at) : ?>
