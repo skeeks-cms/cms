@@ -119,9 +119,16 @@
 .sx-tree ul li.sx-tree-node .sx-label-node.status-N > i {
     color: silver;
 }
+.sx-tree ul li.sx-tree-node .sx-label-node.is-index-0 > a {
+    text-decoration: line-through;
+    text-decoration-color: red;
+}
 
 .sx-tree-move {
     cursor: move;
+}
+.sx-is-adult {
+    color: #ff0000bd;
 }
 
 

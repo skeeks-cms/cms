@@ -19,6 +19,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
+use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\grid\UserColumnData;
@@ -150,6 +151,14 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                 ],
                                 'defaultMode'       => FilterModeEq::ID,
                                 'isAllowChangeMode' => false,
+                            ],
+
+                            'is_adult' => [
+                                'field'             => [
+                                    'class'      => BoolField::class,
+                                ],
+                                /*'defaultMode'       => FilterModeEq::ID,
+                                'isAllowChangeMode' => false,*/
                             ],
 
                             'created_by' => [
@@ -390,6 +399,9 @@ class AdminCmsContentElementController extends BackendModelStandartController
                         ],
                         'updated_by'   => [
                             'class' => UserColumnData::class,
+                        ],
+                        'is_adult' => [
+                            'class' => BooleanColumn::class
                         ],
                         'active'       => [
                             //'class' => BooleanColumn::class,
@@ -714,7 +726,7 @@ HTML;
 
             "change-tree-multi" => [
                 'class'              => BackendModelMultiDialogEditAction::class,
-                "name"               => \Yii::t('skeeks/cms', 'The main section'),
+                "name"               => \Yii::t('skeeks/cms', 'Раздел'),
                 "viewDialog"         => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
                 "eachCallback"       => [$this, 'eachMultiChangeTree'],
                 'on init'            => function ($e) {

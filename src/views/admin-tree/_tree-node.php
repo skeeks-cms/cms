@@ -31,6 +31,23 @@ if ($additionalName) {
     $result .= " [{$additionalName}]";
 }
 
+
+if ($model->is_adult) {
+    $result .= " <span class='sx-is-adult' title='Содержит контент для взрослых. Ограничения 18+' data-toggle='tooltip' class='sx-is-adult'>[18+]</span>";
+}
+
+
+if ($model->is_index == 0) {
+    $result .= " <span title='Эта страница не индексируется поисковыми системами!' data-toggle='tooltip' class='sx-is-adult'>[no index]</span>";
+}
+
+if ($model->is_index == 0 || $model->isRedirect || $model->isCanonical) {
+    $result .= " <span title='Эта страница не попадает в карту сайта!' data-toggle='tooltip' class='sx-is-adult'>[no sitemap]</span>";
+}
+
+if ($model->isCanonical) {
+    $result .= " <span title='У этой страницы задана атрибут rel=canonical на сатраницу: {$model->canonicalUrl}' data-toggle='tooltip' class='sx-is-adult'>[canonical]</span>";
+}
 ?>
 
 <div class="sx-label-node level-<?= $model->level; ?> status-<?= $model->active; ?>">

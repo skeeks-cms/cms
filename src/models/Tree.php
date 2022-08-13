@@ -53,7 +53,6 @@ use yii\helpers\Url;
  * @property integer                   $priority
  * @property string                    $tree_type_id
  * @property integer                   $published_at
- * @property string                    $redirect
  * @property string                    $active
  * @property string                    $meta_title
  * @property string                    $meta_description
@@ -63,20 +62,36 @@ use yii\helpers\Url;
  * @property string                    $description_full_type
  * @property integer                   $image_full_id
  * @property integer                   $image_id
- * @property integer                   $redirect_tree_id
- * @property integer                   $redirect_code
  * @property string                    $name_hidden
  * @property string                    $view_file
  * @property string                    $seo_h1
  * @property string|null               $external_id
  * @property integer|null              $main_cms_tree_id
  *
+ * @property integer                   $is_adult Содержит контент для взрослых?
+ * @property integer                   $is_index Страница индексируется?
+ *
+ * @property string|null               $canonical_link Canonical на другую страницу
+ * @property integer|null              $canonical_tree_id Canonical раздел сайта
+ * @property integer|null              $canonical_content_element_id Canonical на раздел сайта
+ * @property integer|null              $canonical_saved_filter_id Canonical на сохраненный фильтр сайта
+ *
+ * @property integer|null              $redirect_content_element_id Перенаправление на элемент
+ * @property integer|null              $redirect_saved_filter_id Перенаправление на сохраненный фильтр
+ * @property integer|null              $redirect_tree_id Перенаправление на другой раздела
+ * @property integer|null              $redirect_code Код перенаправления
+ * @property string|null               $redirect Перенаправление на свободную ссылку
+ *
  * ***
  *
  * @property string                    $fullName
  *
+ * @property bool                      $isRedirect Страница является редирректом?
+ * @property bool                      $isCanonical Страница явялется канонической?
+ *
  * @property string                    $absoluteUrl
  * @property string                    $url
+ * @property string                    $canonicalUrl Ссылка на каноническую страницу
  *
  * @property CmsStorageFile|null       $mainImage
  * @property CmsStorageFile|null       $image
@@ -85,6 +100,7 @@ use yii\helpers\Url;
  * @property CmsTreeFile[]             $cmsTreeFiles
  * @property CmsTreeImage[]            $cmsTreeImages
  * @property CmsTree                   $redirectTree
+ * @property CmsTree                   $canonicalTree
  * @property CmsTree                   $mainCmsTree
  *
  * @property CmsStorageFile[]          $files
@@ -285,6 +301,9 @@ class Tree extends ActiveRecord
         return array_merge(parent::attributeHints(), [
             'seo_h1'      => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.',
             'external_id' => 'Это поле чаще всего задействуют программисты, для интеграций со сторонними системами',
+            'active'      => 'Если стоит галочка, то раздел показывается везде на сайте. Если галочка не стоит — раздел скрыт! Но при этому он индексируется и доступен по прямой ссылке!',
+            'is_adult'    => 'Если эта страница содержит контент для взрослых, то есть имеет возрастные ограничения 18+ нужно поставить эту галочку!',
+            'is_index'    => 'Необходимо поставить эту галочку, чтобы страница была доступна поисковым системам и попадала в карту сайта!',
         ]);
     }
 
@@ -294,21 +313,15 @@ class Tree extends ActiveRecord
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'                     => Yii::t('skeeks/cms', 'ID'),
-            'created_by'             => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by'             => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at'             => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at'             => Yii::t('skeeks/cms', 'Updated At'),
             'published_at'           => Yii::t('skeeks/cms', 'Published At'),
             'published_to'           => Yii::t('skeeks/cms', 'Published To'),
             'priority'               => Yii::t('skeeks/cms', 'Priority'),
-            'active'                 => Yii::t('skeeks/cms', 'Active'),
+            'active'                 => Yii::t('skeeks/cms', 'Показывается на сайте?'),
             'name'                   => Yii::t('skeeks/cms', 'Name'),
             'tree_type_id'           => Yii::t('skeeks/cms', 'Type'),
             'redirect'               => Yii::t('skeeks/cms', 'Redirect'),
             'priority'               => Yii::t('skeeks/cms', 'Priority'),
             'code'                   => Yii::t('skeeks/cms', 'Code'),
-            'active'                 => Yii::t('skeeks/cms', 'Active'),
             'meta_title'             => Yii::t('skeeks/cms', 'Meta Title'),
             'meta_keywords'          => Yii::t('skeeks/cms', 'Meta Keywords'),
             'meta_description'       => Yii::t('skeeks/cms', 'Meta Description'),
@@ -328,6 +341,10 @@ class Tree extends ActiveRecord
             'view_file'              => Yii::t('skeeks/cms', 'Template'),
             'seo_h1'                 => Yii::t('skeeks/cms', 'SEO заголовок h1'),
             'external_id'            => Yii::t('skeeks/cms', 'ID из внешней системы'),
+
+            'is_adult' => Yii::t('skeeks/cms', 'Контент для взрослых?'),
+            'is_index' => Yii::t('skeeks/cms', 'Страница индексируется?'),
+
         ]);
     }
 
@@ -339,12 +356,56 @@ class Tree extends ActiveRecord
     {
         return array_merge(parent::rules(), [
             [['description_short', 'description_full'], 'string'],
+
             ['active', 'default', 'value' => Cms::BOOL_Y],
+
             [['redirect_code'], 'default', 'value' => 301],
             [['redirect_code'], 'in', 'range' => [301, 302]],
             [['redirect'], 'string'],
+            [['redirect_content_element_id'], 'integer'],
+            [['redirect_saved_filter_id'], 'integer'],
+            [['redirect_tree_id'], 'integer'],
+            [['redirect_code'], 'integer'],
+
+            [
+                [
+                    'redirect',
+                    'redirect_content_element_id',
+                    'redirect_tree_id',
+                    'canonical_saved_filter_id',
+                ],
+                'default',
+                'value' => null,
+            ],
+
+
+            [['canonical_link'], 'string'],
+            [['canonical_tree_id'], 'integer'],
+            [['canonical_content_element_id'], 'integer'],
+            [['canonical_saved_filter_id'], 'integer'],
+
+            [
+                [
+                    'canonical_saved_filter_id',
+                    'canonical_tree_id',
+                    'canonical_content_element_id',
+                    'canonical_saved_filter_id',
+                ],
+                'default',
+                'value' => null,
+            ],
+
+            [['is_adult'], 'integer'],
+            [['is_adult'], 'default', 'value' => 0],
+            [['is_adult'], 'in', 'range' => [1, 0]],
+
+            [['is_index'], 'integer'],
+            [['is_index'], 'default', 'value' => 1],
+            [['is_index'], 'in', 'range' => [1, 0]],
+
+
             [['name_hidden'], 'string'],
-            [['priority', 'tree_type_id', 'redirect_tree_id', 'redirect_code'], 'integer'],
+            [['priority', 'tree_type_id'], 'integer'],
             [['code'], 'string', 'max' => 64],
             [['name'], 'string', 'max' => 255],
             [['seo_h1'], 'string', 'max' => 255],
@@ -446,6 +507,14 @@ class Tree extends ActiveRecord
     {
         return $this->hasOne(CmsTree::className(), ['id' => 'redirect_tree_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCanonicalTree()
+    {
+        return $this->hasOne(static::class, ['id' => 'canonical_tree_id']);
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -490,6 +559,22 @@ class Tree extends ActiveRecord
         }
 
         return Url::to($params, $scheme);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCanonicalUrl()
+    {
+        if ($this->canonical_link) {
+            return (string) $this->canonical_link;
+        }
+
+        if ($this->canonical_tree_id) {
+            return (string) $this->canonicalTree->url;
+        }
+
+        return "";
     }
 
     /**
@@ -938,6 +1023,31 @@ class Tree extends ActiveRecord
     public function getCmsSavedFilters()
     {
         return $this->hasMany(CmsSavedFilter::className(), ['cms_tree_id' => 'id']);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getIsCanonical()
+    {
+        if ($this->canonical_tree_id || $this->canonical_saved_filter_id || $this->canonical_link || $this->canonical_content_element_id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsRedirect()
+    {
+        if ($this->redirect || $this->redirect_saved_filter_id || $this->redirect_tree_id || $this->redirect_content_element_id) {
+            return true;
+        }
+
+        return false;
     }
 }
 

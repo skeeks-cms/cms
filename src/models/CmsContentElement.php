@@ -62,6 +62,7 @@ use yii\web\Application;
  * @property integer|null                $main_cce_by
  *
  * @property bool                        $is_active
+ * @property bool                        $is_adult
  *
  * @property integer                     $parent_content_element_id version > 2.4.8
  *
@@ -236,15 +237,10 @@ class CmsContentElement extends RelatedElementModel
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'                     => Yii::t('skeeks/cms', 'ID'),
-            'created_by'             => Yii::t('skeeks/cms', 'Created By'),
-            'updated_by'             => Yii::t('skeeks/cms', 'Updated By'),
-            'created_at'             => Yii::t('skeeks/cms', 'Created At'),
-            'updated_at'             => Yii::t('skeeks/cms', 'Updated At'),
             'published_at'           => Yii::t('skeeks/cms', 'Published At'),
             'published_to'           => Yii::t('skeeks/cms', 'Published To'),
             'priority'               => Yii::t('skeeks/cms', 'Priority'),
-            'active'                 => Yii::t('skeeks/cms', 'Active'),
+            'active'                 => Yii::t('skeeks/cms', 'Показывается на сайте?'),
             'name'                   => Yii::t('skeeks/cms', 'Name'),
             'code'                   => Yii::t('skeeks/cms', 'Code'),
             'description_short'      => Yii::t('skeeks/cms', 'Description Short'),
@@ -271,6 +267,8 @@ class CmsContentElement extends RelatedElementModel
             'seo_h1'                    => Yii::t('skeeks/cms', 'SEO заголовок h1'),
             'external_id'               => Yii::t('skeeks/cms', 'Уникальный код'),
             'main_cce_id'               => Yii::t('skeeks/cms', 'Инфо карточка'),
+
+            'is_adult'               => Yii::t('skeeks/cms', 'Контент для взрослых?'),
         ]);
     }
     /**
@@ -282,6 +280,8 @@ class CmsContentElement extends RelatedElementModel
             'treeIds'     => Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.'),
             'seo_h1'      => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.',
             'external_id' => Yii::t('skeeks/cms', 'Обычно заполняется если этот элемент выгружается из какой-либо внешней системы'),
+            'is_adult' => Yii::t('skeeks/cms', 'Если эта страница содержит контент для взрослых, то есть имеет возрастные ограничения 18+ нужно поставить эту галочку!'),
+            'active' => Yii::t('skeeks/cms', 'Если эта галочка не стоит, то контент не показывается и не индексируется поисковыми системами'),
         ]);
     }
     /**
@@ -307,6 +307,7 @@ class CmsContentElement extends RelatedElementModel
                     'main_cce_id',
                     'main_cce_at',
                     'main_cce_by',
+                    'is_adult',
                 ],
                 'integer',
             ],

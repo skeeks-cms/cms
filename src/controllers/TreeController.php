@@ -88,6 +88,20 @@ class TreeController extends Controller
             return \Yii::$app->response->redirect($this->model->url, $this->model->redirect_code);
         }
 
+        if ($this->model->isCanonical) {
+            \Yii::$app->view->registerLinkTag([
+                'rel' => 'canonical',
+                'href' => $this->model->canonicalUrl
+            ], "canonical");
+        }
+        if (!$this->model->is_index) {
+
+            \Yii::$app->view->registerMetaTag([
+                'name' => 'robots',
+                'content' => 'noindex, nofollow'
+            ], "robots");
+        }
+
         $viewFile = $this->action->id;
         if ($this->model) {
             if ($this->model->view_file) {

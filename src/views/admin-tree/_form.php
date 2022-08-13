@@ -42,75 +42,131 @@ JS
     ); ?>
 <? endif; ?>
 
+<?php   $this->registerCss(<<<CSS
+.sx-hide {
+    display: none;
+}
+CSS
+);
+?>
+
 <?php echo $form->errorSummary([$model, $model->relatedPropertiesModel]); ?>
 
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
-<?= $form->field($model, 'active')->checkbox([
-    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
-]); ?>
-<?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
+    <div class="d-flex">
+        <div>
+            <?= $form->field($model, 'active')->checkbox([
+                'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+                'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+            ]); ?>
+            <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
 
-<?= $form->field($model, 'tree_type_id')->widget(
-    \skeeks\cms\widgets\AjaxSelect::class,
-    [
-        'dataCallback' => function ($q = '') {
+            <?php if ($model->level > 0) : ?>
+                <div data-listen="isLink" data-show="0" class="sx-hide">
+                    <?php
+                    $this->registerCss(<<<CSS
+.sx-link-url .form-group {
+    padding: 0px !important;
+}
+.sx-link-url .form-control {
+    border: 0 !important;
+    padding: 0 !important;
+}
+CSS
+                    );
+                    ?>
+                    <div class="form-group sx-link-url">
+                        <label class="control-label" for="tree-code">Адрес страницы</label>
+                        <div class="d-flex no-fluid">
+                            <div class="my-auto">
+                                <?php if ($model->parent->level == 0) : ?>
+                                    <?php echo $model->parent->url; ?>
+                                <?php else: ?>
+                                    <?php echo $model->parent->url; ?>/
+                                <?php endif; ?>
 
-            $query = \skeeks\cms\models\CmsTreeType::find()
-                ->active();
 
-            if ($q) {
-                $query->andWhere(['like', 'name', $q]);
-            }
+                            </div>
+                            <div style="width: 100%;">
+                                <?= $form->field($model, 'code')
+                                    ->textInput(['maxlength' => 255])
+                                    ->label(false); ?>
+                            </div>
+                            <!--\Yii::t('skeeks/cms', 'This affects the address of the page, be careful when editing.')-->
+                        </div>
+                    </div>
 
-            $data = $query->limit(100)
-                ->all();
 
-            $result = [];
+                </div>
+            <?php endif; ?>
 
-            if ($data) {
-                foreach ($data as $model) {
-                    $result[] = [
-                        'id'   => $model->id,
-                        'text' => $model->name,
-                    ];
-                }
-            }
 
-            return $result;
-        },
 
-        'valueCallback' => function ($value) {
-            return \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->where(['id' => $value])->all(), 'id', 'name');
-        },
-        /*'items'   => \yii\helpers\ArrayHelper::map(
-           \skeeks\cms\models\CmsTreeType::find()->active()->all(),
-            "id",
-            "name"
-        ),*/
-        'allowDeselect' => false,
-        'options'       => [
-            'data-form-reload' => 'true',
-        ],
-    ])->label('Тип раздела')->hint(\Yii::t('skeeks/cms',
-    'On selected type of partition can depend how it will be displayed.'));
-?>
+            <?= $form->field($model, 'tree_type_id')->widget(
+                \skeeks\cms\widgets\AjaxSelect::class,
+                [
+                    'dataCallback' => function ($q = '') {
 
-<?= $form->field($model, 'image_id')->widget(
-    \skeeks\cms\widgets\AjaxFileUploadWidget::class,
-    [
-        'accept'   => 'image/*',
-        'multiple' => false,
-    ]
-); ?>
+                        $query = \skeeks\cms\models\CmsTreeType::find()
+                            ->active();
+
+                        if ($q) {
+                            $query->andWhere(['like', 'name', $q]);
+                        }
+
+                        $data = $query->limit(100)
+                            ->all();
+
+                        $result = [];
+
+                        if ($data) {
+                            foreach ($data as $model) {
+                                $result[] = [
+                                    'id'   => $model->id,
+                                    'text' => $model->name,
+                                ];
+                            }
+                        }
+
+                        return $result;
+                    },
+
+                    'valueCallback' => function ($value) {
+                        return \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->where(['id' => $value])->all(), 'id', 'name');
+                    },
+                    /*'items'   => \yii\helpers\ArrayHelper::map(
+                       \skeeks\cms\models\CmsTreeType::find()->active()->all(),
+                        "id",
+                        "name"
+                    ),*/
+                    'allowDeselect' => false,
+                    'options'       => [
+                        'data-form-reload' => 'true',
+                    ],
+                ])->label('Тип раздела')->hint(\Yii::t('skeeks/cms',
+                'On selected type of partition can depend how it will be displayed.'));
+            ?>
+
+        </div>
+        <div>
+            <?= $form->field($model, 'image_id')->widget(
+                \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                [
+                    'accept'   => 'image/*',
+                    'multiple' => false,
+                ]
+            ); ?>
+        </div>
+    </div>
+
 
     <div class="form-group">
         <?= Html::checkbox("isLink", (bool)($model->redirect || $model->redirect_tree_id), [
             'value' => '1',
-            'label' => \Yii::t('skeeks/cms', 'This section is a link'),
+            'label' => \Yii::t('skeeks/cms', 'Этот раздел является ссылкой (редирректом)'),
             'class' => 'smartCheck',
             'id'    => 'isLink',
         ]); ?>
@@ -120,7 +176,7 @@ JS
     <div data-listen="isLink" data-show="1" class="sx-hide">
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('skeeks/cms', 'Redirect'),
+            'content' => \Yii::t('skeeks/cms', 'Настройки перенаправления (редирректа)'),
         ]); ?>
 
 
@@ -130,15 +186,34 @@ JS
         ])
             ->label(\Yii::t('skeeks/cms', 'Redirect Code')) ?>
 
-        <?= $form->field($model, 'redirect', [])->textInput(['maxlength' => 500])->label(\Yii::t('skeeks/cms',
-            'Redirect'))
-            ->hint(\Yii::t('skeeks/cms',
-                'Specify an absolute or relative URL for redirection, in the free form.')) ?>
+        <div class="d-flex">
+            <div style="min-width: 300px;" class="my-auto">
+                <? /*= $form->field($model, 'redirect_tree_id')->widget(
+                    \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+                ) */ ?>
+                <?= $form->field($model, 'redirect_tree_id')->widget(
+                    \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+                    [
+                        'multiple' => false,
+                    ]
+                )->label("Выбрать раздел")->hint("Выбрать существующий раздел"); ?>
+
+            </div>
+            <div class="my-auto">
+                или
+            </div>
+
+            <div style="width: 100%;">
+                <?= $form->field($model, 'redirect', [])->textInput(['maxlength' => 500])->label(\Yii::t('skeeks/cms',
+                    'Redirect'))
+                    ->label("Ссылка в свободной форме")
+                    ->hint(\Yii::t('skeeks/cms',
+                        'Specify an absolute or relative URL for redirection, in the free form.')) ?>
+
+            </div>
 
 
-        <?= $form->field($model, 'redirect_tree_id')->widget(
-            \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
-        ) ?>
+        </div>
 
 
     </div>
@@ -178,15 +253,15 @@ JS
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement'), ['isOpen' => false]); ?>
 
 
-    <div data-listen="isLink" data-show="0" class="sx-hide">
-        <?= $form->field($model, 'description_short')->label(false)->widget(
-            \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
-            [
-                'modelAttributeSaveType' => 'description_short_type',
-            ]);
-        ?>
 
-        <?php /*= $form->field($model, 'description_short')->widget(
+<?= $form->field($model, 'description_short')->label(false)->widget(
+    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+    [
+        'modelAttributeSaveType' => 'description_short_type',
+    ]);
+?>
+
+<?php /*= $form->field($model, 'description_short')->widget(
         \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
         [
             'modelAttributeSaveType' => 'description_short_type',
@@ -211,20 +286,21 @@ JS
         ])
         */ ?>
 
-    </div>
 <? $fieldSet::end(); ?>
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'In detal'), ['isOpen' => false]); ?>
-
-<?= $form->field($model, 'image_full_id')->widget(
-    \skeeks\cms\widgets\AjaxFileUploadWidget::class,
-    [
-        'accept'   => 'image/*',
-        'multiple' => false,
-    ]
-); ?>
-
     <div data-listen="isLink" data-show="0" class="sx-hide">
+
+        <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'In detal'), ['isOpen' => false]); ?>
+
+        <?= $form->field($model, 'image_full_id')->widget(
+            \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+            [
+                'accept'   => 'image/*',
+                'multiple' => false,
+            ]
+        ); ?>
+
+
 
         <?= $form->field($model, 'description_full')->widget(
             \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
@@ -233,16 +309,69 @@ JS
             ]);
         ?>
 
+        <? $fieldSet::end(); ?>
     </div>
-<? $fieldSet::end(); ?>
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'SEO'), ['isOpen' => false]); ?>
-<?= $form->field($model, 'seo_h1'); ?>
-<?= $form->field($model, 'meta_title')->textarea(); ?>
-<?= $form->field($model, 'meta_description')->textarea(); ?>
-<?= $form->field($model, 'meta_keywords')->textarea(); ?>
-<? $fieldSet::end(); ?>
+    <div data-listen="isLink" data-show="0" class="sx-hide">
 
+        <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'SEO'), ['isOpen' => false]); ?>
+        <?= $form->field($model, 'is_index')->checkbox(); ?>
+        <?= $form->field($model, 'seo_h1'); ?>
+        <?= $form->field($model, 'meta_title')->textarea(); ?>
+        <?= $form->field($model, 'meta_description')->textarea(); ?>
+        <?= $form->field($model, 'meta_keywords')->textarea(); ?>
+
+        <div class="form-group">
+            <?= Html::checkbox("isCanonical", (bool)($model->isCanonical), [
+                'value' => '1',
+                'label' => \Yii::t('skeeks/cms', 'Указать атрибут canonical'),
+                'class' => 'smartCheck',
+                'id'    => 'isCanonical',
+            ]); ?>
+            <div class="hint-block">Атрибут rel=canonical сообщает поисковой системе, что некоторые страницы сайта являются одинаковыми <a href='https://skeeks.com/atribut-rel-canonical-chto-ehto-i-dlya-chego-isp-501' data-pjax='0' target='_blank'>подробнее</a></div>
+        </div>
+
+        <div data-listen="isCanonical" data-show="1" class="sx-hide">
+
+            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                'content' => \Yii::t('skeeks/cms', 'Настройки canonical'),
+            ]); ?>
+
+
+            <div class="d-flex">
+                <div style="min-width: 300px;">
+                    <? /*= $form->field($model, 'redirect_tree_id')->widget(
+                    \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+                ) */ ?>
+                    <?= $form->field($model, 'canonical_tree_id')->widget(
+                        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+                        [
+                            'multiple' => false,
+                        ]
+                    )->label("Выбрать раздел"); ?>
+
+                </div>
+                <div class="my-auto">
+                    или
+                </div>
+
+                <div style="width: 100%;">
+                    <?= $form->field($model, 'canonical_link', [])->textInput(['maxlength' => 500])->label(\Yii::t('skeeks/cms',
+                        'Redirect'))
+                        ->label("Ссылка в свободной форме")
+                        ->hint(\Yii::t('skeeks/cms',
+                            'Укажите абсолютный или относительный адрес ссылки.')) ?>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+        <? $fieldSet::end(); ?>
+    </div>
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Дополнительно'), ['isOpen' => false]); ?>
 
@@ -256,12 +385,10 @@ JS
 
 <?= $form->field($model, 'name_hidden')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms', 'Not displayed on the site')) ?>
 
+<?= $form->field($model, 'is_adult')->checkbox(); ?>
 
-<?= $form->field($model, 'code')->textInput(['maxlength' => 255])
-    ->hint(\Yii::t('skeeks/cms',
-        \Yii::t('skeeks/cms', 'This affects the address of the page, be careful when editing.'))); ?>
+
 <? $fieldSet::end(); ?>
-
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Images/Files'), ['isOpen' => false]); ?>
 
@@ -299,14 +426,18 @@ JS
             {
                 var self = this;
 
-                this.JsmartCheck = $('.smartCheck');
-
-                self.updateInstance($(this.JsmartCheck));
-
-                this.JsmartCheck.on("change", function()
-                {
-                    self.updateInstance($(this));
+                $('.smartCheck').each(function() {
+                    var jSmartCheck = $(this);
+                    self.updateInstance(jSmartCheck);
+    
+                    jSmartCheck.on("change", function()
+                    {
+                        self.updateInstance($(this));
+                    });
+                    
                 });
+
+                
             },
 
             updateInstance: function(JsmartCheck)
@@ -318,7 +449,7 @@ JS
 
                 var id  = JsmartCheck.attr('id');
                 var val = Number(JsmartCheck.is(":checked"));
-
+                console.log(id);
                 if (!id)
                 {
                     return false;
@@ -326,8 +457,14 @@ JS
 
                 if (val == 0)
                 {
-                    $('#tree-redirect').val('');
-                    $('#tree-redirect_tree_id').val('');
+                    if (id == 'isCanonical') {
+                        $('#tree-canonical_link').val('');
+                        $('#tree-canonical_tree_id').val('');
+                    } else {
+                        $('#tree-redirect').val('');
+                        $('#tree-redirect_tree_id').val('');
+                    }
+                    
                 }
 
                 $('[data-listen="' + id + '"]').hide();

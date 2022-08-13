@@ -53,6 +53,17 @@ class AdminTreeController extends BackendModelStandartController
                         'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
                     ]));
         };
+
+        $this->modelHeader = function () {
+            /**
+             * @var $model CmsContentElement
+             */
+            $model = $this->model;
+            return $this->renderPartial("@skeeks/cms/views/admin-tree/_model_header", [
+                'model' => $model
+            ]);
+        };
+
         $this->modelClassName = Tree::className();
 
         parent::init();
@@ -69,6 +80,7 @@ class AdminTreeController extends BackendModelStandartController
             ],
 
             'list' => [
+                'isVisible' => false,
                 'class'    => BackendGridModelAction::className(),
                 'name'     => \Yii::t('skeeks/cms', 'List'),
                 "icon"     => "fa fa-list",

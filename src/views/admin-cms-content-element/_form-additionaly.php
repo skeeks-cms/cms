@@ -13,16 +13,21 @@
     <? endif; ?>
 
     <? if ($contentModel->isAllowEdit("published_at")) : ?>
-        <? /* if ($model->is_active) : */ ?>
-        <?= $form->field($model, 'published_at')->widget(\skeeks\cms\backend\widgets\forms\DateControlInputWidget::class, [
-            //'displayFormat' => 'php:d-M-Y H:i:s',
-            'type' => \skeeks\cms\backend\widgets\forms\DateControlInputWidget::FORMAT_DATETIME,
-        ]); ?>
-
-        <?= $form->field($model, 'published_to')->widget(\skeeks\cms\backend\widgets\forms\DateControlInputWidget::class, [
-            //'displayFormat' => 'php:d-M-Y H:i:s',
-            'type' => \skeeks\cms\backend\widgets\forms\DateControlInputWidget::FORMAT_DATETIME,
-        ]); ?>
+        <div class="d-flex">
+            <div>
+                <? /* if ($model->is_active) : */ ?>
+                <?= $form->field($model, 'published_at')->widget(\skeeks\cms\backend\widgets\forms\DateControlInputWidget::class, [
+                    //'displayFormat' => 'php:d-M-Y H:i:s',
+                    'type' => \skeeks\cms\backend\widgets\forms\DateControlInputWidget::FORMAT_DATETIME,
+                ]); ?>
+            </div>
+            <div>
+                <?= $form->field($model, 'published_to')->widget(\skeeks\cms\backend\widgets\forms\DateControlInputWidget::class, [
+                    //'displayFormat' => 'php:d-M-Y H:i:s',
+                    'type' => \skeeks\cms\backend\widgets\forms\DateControlInputWidget::FORMAT_DATETIME,
+                ]); ?>
+            </div>
+        </div>
 
     <? endif; ?>
 
@@ -37,6 +42,9 @@
     <? if ($contentModel->isAllowEdit("priority")) : ?>
         <?= $form->field($model, 'priority')->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class); ?>
     <? endif; ?>
+
+
+    <?= $form->field($model, 'is_adult')->checkbox(); ?>
 
     <? if ($contentModel->isAllowEdit("fileIds")) : ?>
         <?= $form->field($model, 'fileIds')->widget(
