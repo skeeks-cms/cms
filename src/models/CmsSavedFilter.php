@@ -58,8 +58,11 @@ use yii\web\Application;
  * @property CmsContentPropertyEnum $valueContentPropertyEnum
  * @property CmsContentProperty     $cmsContentProperty
  *
- * @property string                 $seoName
- * @property string                 $propertyValueName
+ * @property string                 $seoName Полное seo название фильтра. Seo название раздела + склоненное название опции. Например (Строительные краски зеленого цвета).
+ * @property string                 $shortSeoName Короткое название фильтра. Название раздела + склоненное название опции. Например (Краски зеленого цвета).
+ * @property string                 $propertyValueName Название выбранной опции фильтра. Например цвет (Зеленый)
+ * @property string                 $propertyValueNameInflected Склоненное название выбранной опции фильтра. Например цвет (Зеленого цвета)
+ *
  * @property string                 $name
  * @property CmsStorageFile|null    $image
  *
@@ -297,38 +300,6 @@ class CmsSavedFilter extends ActiveRecord
         return null;
     }
 
-    public function getPropertyValueName()
-    {
-        $last = '';
-
-        if ($this->value_content_element_id) {
-            if ($this->isNewRecord) {
-                $element = CmsContentElement::findOne($this->value_content_element_id);
-                if ($element) {
-                    $last = $element->name;
-                }
-            } else {
-                if ($this->valueContentElement) {
-                    $last = $this->valueContentElement->name;
-                }
-            }
-
-        } elseif ($this->value_content_property_enum_id) {
-
-            if ($this->isNewRecord) {
-                $element = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
-                if ($element) {
-                    $last = $element->value;
-                }
-            } else {
-                if ($this->valueContentPropertyEnum) {
-                    $last = $this->valueContentPropertyEnum->value;
-                }
-            }
-        }
-
-        return $last;
-    }
     /**
      * @return string|null
      */
@@ -347,6 +318,7 @@ class CmsSavedFilter extends ActiveRecord
 
     protected $_name = null;
     protected $_seoName = null;
+    protected $_shortSeoName = null;
 
     /**
      * @param $value
@@ -357,6 +329,97 @@ class CmsSavedFilter extends ActiveRecord
         $this->_seoName = $value;
         return $this;
     }
+
+    /**
+     * @var null|CmsContentPropertyEnum
+     */
+    protected $_enum = null;
+
+    /**
+     * @var null|CmsContentElement
+     */
+    protected $_element = null;
+
+    /**
+     * @var null подгтовлены все названия?
+     */
+    protected $_initNames = null;
+
+    protected function _initNames() {
+        $last = '';
+
+        if ($this->_initNames === null) {
+            if ($this->value_content_element_id) {
+                if ($this->isNewRecord) {
+                    $this->_element = CmsContentElement::findOne($this->value_content_element_id);
+                    if ($this->_element) {
+                        $last = $this->_element->name;
+                    }
+                } else {
+                    $this->_element = $this->valueContentElement;
+                    if ($this->_element) {
+                        $last = $this->_element->name;
+                    }
+                }
+
+            } elseif ($this->value_content_property_enum_id) {
+
+                //преобразуем вторую часть в нижний регистр
+
+                if ($this->isNewRecord) {
+                    $this->_enum = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
+                    if ($this->_enum) {
+                        $last = StringHelper::lcfirst($this->_enum->value_for_saved_filter ? $this->_enum->value_for_saved_filter : $this->_enum->value);
+                    }
+                } else {
+                    $this->_enum = $this->valueContentPropertyEnum;
+                    if ($this->_enum) {
+                        $last = StringHelper::lcfirst($this->_enum->value_for_saved_filter ? $this->_enum->value_for_saved_filter : $this->_enum->value);
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Название выбранной опции фильтра
+     *
+     * @return string
+     */
+    public function getPropertyValueName()
+    {
+        $this->_initNames();
+
+        if ($this->_enum) {
+            return StringHelper::ucfirst($this->_enum->value);
+        } elseif($this->_element) {
+            return StringHelper::ucfirst($this->_element->name);
+        }
+
+        return '';
+    }
+
+    /**
+     * Название выбранной опции фильтра
+     *
+     * @return string
+     */
+    public function getPropertyValueNameInflected()
+    {
+        $this->_initNames();
+
+        if ($this->_enum) {
+            return StringHelper::ucfirst($this->_enum->value_for_saved_filter ? $this->_enum->value_for_saved_filter : $this->_enum->value);
+        } elseif($this->_element) {
+            //todo: доработать склонение тут
+            return StringHelper::ucfirst($this->_element->name);
+        }
+
+        return '';
+    }
+
     /**
      * Полное название
      *
@@ -372,44 +435,30 @@ class CmsSavedFilter extends ActiveRecord
             } elseif ($this->short_name) {
                 $this->_seoName = $this->name;
             } else {
-                $last = '';
-
-                if ($this->value_content_element_id) {
-                    if ($this->isNewRecord) {
-                        $element = CmsContentElement::findOne($this->value_content_element_id);
-                        if ($element) {
-                            $last = $element->name;
-                        }
-                    } else {
-                        if ($this->valueContentElement) {
-                            $last = $this->valueContentElement->name;
-                        }
-                    }
-
-                } elseif ($this->value_content_property_enum_id) {
-
-                    //преобразуем вторую часть в нижний регистр
-                    
-                    if ($this->isNewRecord) {
-                        $element = CmsContentPropertyEnum::findOne($this->value_content_property_enum_id);
-                        if ($element) {
-                            $last = StringHelper::lcfirst($element->value_for_saved_filter ? $element->value_for_saved_filter : $element->value);
-                        }
-                    } else {
-                        if ($this->valueContentPropertyEnum) {
-                            $enum = $this->valueContentPropertyEnum;
-                            $last = StringHelper::lcfirst($enum->value_for_saved_filter ? $enum->value_for_saved_filter : $enum->value);
-                        }
-                    }
-                }
-
-                $this->_seoName = $this->cmsTree->seoName." ". $last;
+                $this->_initNames();
+                $this->_seoName = $this->cmsTree->seoName." ". StringHelper::lcfirst($this->propertyValueNameInflected);
             }
         }
 
 
         return $this->_seoName;
     }
+    /**
+     * Полное название
+     *
+     * @return string
+     */
+    public function getShortSeoName()
+    {
+        $result = "";
+
+        $this->_initNames();
+        $this->_shortSeoName = $this->cmsTree->name." ". StringHelper::lcfirst($this->propertyValueNameInflected);
+
+
+        return $this->_shortSeoName;
+    }
+
 
     public function asText()
     {

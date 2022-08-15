@@ -82,7 +82,8 @@ class SavedFilterController extends Controller
             throw new NotFoundHttpException(\Yii::t('skeeks/cms', 'Page not found'));
         }
 
-        $cmsTree = $this->model->cmsTree;
+        $cmsTree = clone $this->model->cmsTree;
+
         \Yii::$app->cms->setCurrentTree($cmsTree);
         \Yii::$app->breadcrumbs->setPartsByTree($cmsTree)->append([
             'name' => $this->model->name,
