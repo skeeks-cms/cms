@@ -26,6 +26,7 @@ use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\UnsetArrayValue;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -144,9 +145,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                     ],
                 ],
             ],
-            "create" => [
-                'fields' => [$this, 'updateFields'],
-            ],
+            "create" => new UnsetArrayValue(),
             "update" => [
                 'fields' => [$this, 'updateFields'],
             ],
