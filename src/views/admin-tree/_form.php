@@ -42,7 +42,7 @@ JS
     ); ?>
 <? endif; ?>
 
-<?php   $this->registerCss(<<<CSS
+<?php $this->registerCss(<<<CSS
 .sx-hide {
     display: none;
 }
@@ -328,7 +328,8 @@ CSS
                 'class' => 'smartCheck',
                 'id'    => 'isCanonical',
             ]); ?>
-            <div class="hint-block">Атрибут rel=canonical сообщает поисковой системе, что некоторые страницы сайта являются одинаковыми <a href='https://skeeks.com/atribut-rel-canonical-chto-ehto-i-dlya-chego-isp-501' data-pjax='0' target='_blank'>подробнее</a></div>
+            <div class="hint-block">Атрибут rel=canonical сообщает поисковой системе, что некоторые страницы сайта являются одинаковыми <a href='https://skeeks.com/atribut-rel-canonical-chto-ehto-i-dlya-chego-isp-501'
+                                                                                                                                           data-pjax='0' target='_blank'>подробнее</a></div>
         </div>
 
         <div data-listen="isCanonical" data-show="1" class="sx-hide">
@@ -373,17 +374,212 @@ CSS
         <? $fieldSet::end(); ?>
     </div>
 
-<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Дополнительно'), ['isOpen' => false]); ?>
 
     <div data-listen="isLink" data-show="0" class="sx-hide">
+        <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Оформление/Дизайн'), ['isOpen' => false]); ?>
+
+        <?
+        $currentTheme = \skeeks\cms\models\CmsTheme::find()->cmsSite()->active()->one();
+        $this->registerCss(<<<CSS
+.btn-check .sx-title {
+    font-size: 16px;
+    font-weight: bold;
+    
+}
+.btn-check .sx-other {
+    display: none;
+}
+.btn-check .sx-checked-icon {
+    font-size: 16px;
+    display: none;
+    margin-right: 5px;
+}
+.btn-check {
+    text-align: left;
+    padding: 20px;
+    background: #ececec;
+    border: 1px solid gray;
+}
+.sx-checked {
+    background: #6c757d;
+    color: white;
+}
+.sx-checked:hover {
+    background: #6c757d;
+    color: white;
+}
+.sx-checked .sx-title {
+    font-weight: bold;
+}
+.sx-checked .sx-checked-icon {
+    display: block;
+}
+.sx-checked .sx-other {
+    display: block;
+}
+
+.sx-other .form-group {
+    margin: 0 !important;;
+    padding: 0 !important;
+}
+.sx-other .form-group:hover {
+    background: transparent !important;
+}
+CSS
+        );
+
+        $this->registerJs(<<<JS
+$(".sx-available-trees .btn-check").on("click", function() {
+    $(".sx-available-trees .btn-check").removeClass("sx-checked");
+    $(this).addClass("sx-checked");
+    
+    var code = $(this).data("code");
+    $("#tree-view_file").val(code);
+    if (code == 'sx-other') {
+        $("#tree-view_file").val("");
+    }
+    
+    return false;
+});
+
+if ($(".sx-available-trees .btn-check.sx-checked").length == 0) {
+    $(".sx-other-btn").addClass("sx-checked");
+}
+JS
+        );
+        ?>
+        <div class="col-12" style="margin-top: 15px;">
+            <div class="alert alert-default">
+                <p>От этих настроек зависит как будет выглядеть раздел на сайте.</p>
+                По умолчанию страница оформляется согласно выбранному:
+                <ol>
+                    <li>Общему шаблону сайта (задается в настройках сайта для всех страниц)</li>
+                    <li>Типу раздела (выше у вас уже выбран тип, опрределяющий оформление этой страницы)</li>
+                </ol>
+
+                Если вы хотите чтобы этот раздел был оформлен иначе, нажмите опцию ниже <b>(Использовать персональный шаблон для страницы)</b>
+            </div>
+
+            <?
+            /**
+             * @var $currentTheme \skeeks\cms\models\CmsTheme
+             */
+            $treeViews = [];
+            ?>
+            <?php if ($currentTheme) : ?>
+                <?php
+                $treeViews = $currentTheme->objectTheme->treeViews;
+                ?>
+                <div class="alert alert-default">
+                    <div style="margin-bottom: 5px;">
+                        <b>Общий шаблон подключенный к сайту:</b>
+                    </div>
+                    <div class="d-flex">
+                        <?php if ($currentTheme->themeImageSrc) : ?>
+                            <div class="my-auto" style="width: 60px;">
+                                <img style="width: 50px; border-radius: 8px; border: 1px solid silver;" src="<?php echo $currentTheme->themeImageSrc; ?>"/>
+                            </div>
+                        <?php endif; ?>
+                        <div class="my-auto">
+                            <b><?php echo $currentTheme->themeName; ?></b>
+                        </div>
+                        <div class="my-auto" style="margin-left: 10px;">
+                            <a href="<?php echo \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-cms-theme'])->disableEmptyLayout()->url; ?>" target="_blank" data-pjax="0"
+                               class="btn btn-default btn-xs">Изменить</a>
+                        </div>
+                    </div>
+                    <div style="color: gray; font-size: 10px;">От выбранного шаблона, будут зависеть доступные шаблоны страниц. <br/>
+                        Разные шаблоны имеют разные наборы для оформления страниц.
+                    </div>
+                </div>
+            <?php endif; ?>
 
 
-        <?= $form->field($model, 'view_file')->textInput()
-            ->hint('@app/views/template-name || template-name'); ?>
+        </div>
 
+        <div class="form-group">
+            <?= Html::checkbox("isSelfTemplate", (bool)($model->view_file), [
+                'value' => '1',
+                'label' => \Yii::t('skeeks/cms', 'Использовать персональный шаблон для страницы'),
+                'class' => 'smartCheck',
+                'id'    => 'isSelfTemplate',
+            ]); ?>
+        </div>
+
+        <div data-listen="isSelfTemplate" data-show="0" class="sx-show">
+            <div class="col-md-6 col-12" style="margin-top: 15px; margin-bottom: 15px;">
+                <div class="btn btn-block btn-check sx-checked">
+                    <div class="d-flex">
+                        <span class="sx-checked-icon" data-icon="✓">
+                            ✓
+                        </span>
+                        <span class="sx-title">
+                            <?php echo \yii\helpers\ArrayHelper::getValue($treeViews, [$model->cmsTreeType->code, 'name'], $model->cmsTreeType->code); ?>
+                        </span>
+                    </div>
+                    <div class="sx-description">
+                        <?php echo \yii\helpers\ArrayHelper::getValue($treeViews, [$model->cmsTreeType->code, 'description']); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div data-listen="isSelfTemplate" data-show="1" class="sx-hide">
+            <div class="sx-available-trees">
+                <?php if ($treeViews) : ?>
+                    <?php foreach ($treeViews as $code => $treeView) : ?>
+                        <div class="col-md-6 col-12" style="margin-top: 15px; margin-bottom: 15px;">
+                            <div class="btn btn-block btn-check <?php echo $code == $model->view_file ? "sx-checked" : ""; ?>" data-code="<?php echo $code; ?>">
+                                <div class="d-flex">
+                                <span class="sx-checked-icon" data-icon="✓">
+                                    ✓
+                                </span>
+                                    <span class="sx-title">
+                                    <?php echo \yii\helpers\ArrayHelper::getValue($treeView, ['name'], $model->cmsTreeType->code); ?>
+                                </span>
+                                </div>
+                                <div class="sx-description">
+                                    <?php echo \yii\helpers\ArrayHelper::getValue($treeView, ['description']); ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+
+                    <div class="col-md-6 col-12" style="margin-top: 15px; margin-bottom: 15px;">
+                        <div class="btn btn-block btn-check sx-other-btn" data-code="sx-other">
+                            <div class="d-flex">
+                            <span class="sx-checked-icon" data-icon="✓">
+                                ✓
+                            </span>
+                                <span class="sx-title">
+                                Другое
+                            </span>
+                            </div>
+                            <div class="sx-description">
+                                Можно указать в свободной форме (обычно это используют разработчики)
+                            </div>
+
+                            <div class="sx-other">
+                                <?= $form->field($model, 'view_file')->label("Укажите код шаблона")->textInput()
+                                    ->hint('@app/views/template-name || template-name');
+                                ?>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                <?php endif; ?>
+            </div>
+        </div>
+
+
+        <? $fieldSet::end(); ?>
     </div>
 
-<?= $form->field($model, 'name_hidden')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms', 'Not displayed on the site')) ?>
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Дополнительно'), ['isOpen' => false]); ?>
+
+<?= $form->field($model, 'name_hidden')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms', 'Не отображается на сайте! Показывается только как пометка возле названия раздела в админ части сайта.')) ?>
 
 <?= $form->field($model, 'is_adult')->checkbox(); ?>
 
@@ -460,6 +656,8 @@ CSS
                     if (id == 'isCanonical') {
                         $('#tree-canonical_link').val('');
                         $('#tree-canonical_tree_id').val('');
+                    } else if(id == 'isSelfTemplate') {
+                        $('#tree-view_file').val('');
                     } else {
                         $('#tree-redirect').val('');
                         $('#tree-redirect_tree_id').val('');
