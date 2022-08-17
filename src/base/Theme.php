@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
 
 /**
  * @property DynamicConfigModel $configFormModel
+ * @property array $treeViews
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -31,6 +32,36 @@ abstract class Theme extends \yii\base\Theme
      * @var array
      */
     public $site_ids = [];
+
+    public $tree_views = [];
+    /**
+     * @return array
+     */
+    public function _getDefaultTreeViews()
+    {
+        return [
+            'home' => [
+                'name' => 'Главная страница',
+                'description' => ''
+            ],
+            'text' => [
+                'name' => 'Текстовый раздел',
+                'description' => 'Стандартное оформление раздела с текстом'
+            ],
+            'contacts' => [
+                'name' => 'Страница контактов',
+                'description' => 'Страница с картой, временем работы и контактами'
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getTreeViews()
+    {
+        return ArrayHelper::merge($this->_getDefaultTreeViews(), $this->tree_views);
+    }
 
     /**
      * @var null
