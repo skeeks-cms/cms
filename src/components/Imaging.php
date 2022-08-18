@@ -68,7 +68,7 @@ class Imaging extends Component
 
         if ($isWebP === null) {
             //Если параметр не передан принудительно, то нужно взять из настроек сайта
-            $isWebP = (bool) \Yii::$app->cms->is_webp;
+            $isWebP = (bool) \Yii::$app->seo->is_webp;
         }
 
         $outExtension = null;
