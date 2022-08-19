@@ -12,6 +12,7 @@
 namespace yii\web;
 
 use skeeks\cms\_ide\UserIde;
+use skeeks\cms\components\Adult;
 use skeeks\cms\components\Breadcrumbs;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsToolbar;
@@ -30,6 +31,7 @@ use skeeks\cms\Skeeks;
  * @property ConsoleComponent                                  $console
  * @property I18N                                              $i18n
  * @property \skeeks\cms\web\View                              $view
+ * @property Adult                                             $adult
  *
  * @property \yii\web\User|UserIde|\skeeks\cms\components\User $user
  *

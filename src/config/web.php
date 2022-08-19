@@ -14,6 +14,10 @@ $config = [
 
     'components' => [
 
+        'adult' => [
+            'class' => \skeeks\cms\components\Adult::class,
+        ],
+
         'errorHandler' => [
             'errorAction' => 'cms/error/error',
         ],

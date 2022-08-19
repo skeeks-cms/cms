@@ -1,0 +1,49 @@
+.sx-adult .sx-adult-block-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    white-space: nowrap;
+    border-radius: 10px;
+    /*border: 2px solid red;*/
+    background: #ffd2d2;
+}
+
+.sx-adult .sx-adult-block {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    cursor: pointer;
+    overflow: hidden;
+}
+.sx-adult .sx-adult-blur {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    background: #fc838326;
+    filter: blur(30px);
+}
+.sx-adult img {
+    filter: blur(20px);
+}
+.sx-btn-no {
+    margin-left: 10px;
+}
+
+.sx-mini-text {
+    display: none;
+}
+.sx-mini .sx-full-text {
+    display: none;
+}
+.sx-mini .sx-mini-text {
+    display: block;
+}
+@media (max-width: 768px) {
+    .sx-adult .sx-adult-block-text {
+        font-size: 12px;
+    }
+}

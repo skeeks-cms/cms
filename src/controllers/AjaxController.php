@@ -10,6 +10,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
@@ -262,4 +263,19 @@ class AjaxController extends Controller
         return ['results' => $result];
     }
 
+
+    /**
+     * @return void
+     */
+    public function actionAdult()
+    {
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->request->post("is_allow")) {
+            \Yii::$app->adult->isAllowAdult = true;
+            $rr->success = true;
+        }
+
+        return $rr;
+    }
 }

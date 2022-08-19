@@ -89,17 +89,11 @@ class TreeController extends Controller
         }
 
         if ($this->model->isCanonical) {
-            \Yii::$app->view->registerLinkTag([
-                'rel' => 'canonical',
-                'href' => $this->model->canonicalUrl
-            ], "canonical");
+            \Yii::$app->seo->setCanonical($this->model->canonicalUrl);
         }
         if (!$this->model->is_index) {
 
-            \Yii::$app->view->registerMetaTag([
-                'name' => 'robots',
-                'content' => 'noindex, nofollow'
-            ], "robots");
+            \Yii::$app->seo->setNoIndexNoFollow();
         }
 
         $viewFile = $this->action->id;
