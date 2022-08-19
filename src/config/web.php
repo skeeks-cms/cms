@@ -23,10 +23,21 @@ $config = [
         ],
 
         'user' => [
-            'class' => '\yii\web\User',
-            'identityClass' => 'skeeks\cms\models\CmsUser',
+            'class'           => '\yii\web\User',
+            'identityClass'   => 'skeeks\cms\models\CmsUser',
             'enableAutoLogin' => true,
-            'loginUrl' => ['cms/auth/login'],
+            'loginUrl'        => ['cms/auth/login'],
+        ],
+
+        'session' => [
+
+            //Чтобы не разрушался сеанс сессии, после закрытия браузера нужно уставить cookie
+            'timeout'      => 3600 * 24 * 365,
+            'useCookies'   => true,
+            'cookieParams' => [
+                'httponly' => true,
+                'lifetime' => 3600 * 24 * 365,
+            ],
         ],
 
         'assetManager' => [
@@ -36,20 +47,20 @@ $config = [
                 'yii\web\JqueryAsset' => [
                     'js' => [
                         'jquery.min.js',
-                    ]
+                    ],
                 ],
 
                 'yii\bootstrap\BootstrapPluginAsset' => [
                     'js' => [
                         'js/bootstrap.min.js',
-                    ]
+                    ],
                 ],
 
                 'yii\bootstrap\BootstrapAsset' => [
                     'css' => [
                         'css/bootstrap.min.css',
-                    ]
-                ]
+                    ],
+                ],
             ],
         ],
 
@@ -71,7 +82,7 @@ $config = [
                 'data' => [
                     'personal' => [
                         'name' => ['skeeks/cms', 'Мой профиль'],
-                        'url' => ['/cms/upa-personal/update'],
+                        'url'  => ['/cms/upa-personal/update'],
                         'icon' => 'icon-user',
                         /*'items' => [
                             [
