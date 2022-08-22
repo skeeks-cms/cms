@@ -68,7 +68,12 @@ class Imaging extends Component
 
         if ($isWebP === null) {
             //Если параметр не передан принудительно, то нужно взять из настроек сайта
-            $isWebP = (bool) \Yii::$app->seo->is_webp;
+            if (\Yii::$app->mobileDetect->isDesktop) {
+                $isWebP = (bool) \Yii::$app->seo->is_webp;
+            } else {
+                $isWebP = (bool) \Yii::$app->seo->is_mobile_webp;
+            }
+            
         }
 
         $outExtension = null;

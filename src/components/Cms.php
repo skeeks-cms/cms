@@ -275,7 +275,8 @@ class Cms extends \skeeks\cms\base\Component
             }
             //web init
             if (!$this->image1px) {
-                $this->image1px = CmsAsset::getAssetUrl('img/1px.jpg');
+                //$this->image1px = CmsAsset::getAssetUrl('img/1px.jpg');
+                $this->image1px = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC";
             }
 
             \Yii::$app->view->on(View::EVENT_BEGIN_PAGE, function (Event $e) {

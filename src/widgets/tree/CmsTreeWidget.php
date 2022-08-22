@@ -100,6 +100,7 @@ class CmsTreeWidget extends Widget
         if ($this->models !== false && is_array($this->models) && count($this->models) == 0) {
 
             $this->models = CmsTree::findRoots()
+                ->cmsSite()
                 ->joinWith('cmsSiteRelation')
                 ->orderBy([CmsSite::tableName() . ".priority" => SORT_ASC])->all();
 
