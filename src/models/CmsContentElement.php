@@ -25,6 +25,7 @@ use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
 use yii\base\Exception;
+use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -689,7 +690,18 @@ class CmsContentElement extends RelatedElementModel
         $mainCmsTree = ArrayHelper::getValue(static::$_contentSavedFilter, $content_id, false);
         if ($mainCmsTree === false) {
             static::$_contentSavedFilter[$content_id] = null;
-            $cmsContent = CmsContent::findOne($content_id);
+            
+            $dependencyContent = new TagDependency([
+            'tags' => [
+                    (new CmsContent())->getTableCacheTag(),
+                ],
+            ]);
+
+
+            $cmsContent = CmsContent::getDb()->cache(function ($db) use ($content_id) {
+                return CmsContent::findOne($content_id);
+            }, null, $dependencyContent);
+                
             if ($cmsContent) {
                 if ($cmsContent->saved_filter_tree_type_id) {
                     $mainCmsTree = CmsTree::find()
