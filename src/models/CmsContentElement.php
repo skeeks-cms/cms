@@ -686,7 +686,8 @@ class CmsContentElement extends RelatedElementModel
      */
     static public function getContentMainTreeForSavedFilter($content_id)
     {
-        if (!isset(static::$_contentSavedFilter[$content_id])) {
+        $mainCmsTree = ArrayHelper::getValue(static::$_contentSavedFilter, $content_id, false);
+        if ($mainCmsTree === false) {
             static::$_contentSavedFilter[$content_id] = null;
             $cmsContent = CmsContent::findOne($content_id);
             if ($cmsContent) {
