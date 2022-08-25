@@ -34,7 +34,8 @@ class UserOnlineTriggerWidget extends Widget
     public function run()
     {
         $this->clientOptions['id'] = $this->id;
-        $this->clientOptions['url'] = Url::to('/cms/online/trigger');
+        $this->clientOptions['url'] = Url::to('/cms/online/trigger-v2');
+        $this->clientOptions['url_json_p'] = Url::to('/cms/online/trigger-json-p');
 
         $delay = $this->delay * 1000;
 
@@ -54,11 +55,11 @@ class UserOnlineTriggerWidget extends Widget
         },
 
 
-        request: function()
+        requestJsonP: function()
         {
             // Using YQL and JSONP
             $.ajax({
-                url: this.get('url'),
+                url: this.get('url_json_p'),
 
                 // The name of the callback parameter, as specified by the YQL service
                 jsonp: "callback",
@@ -76,6 +77,31 @@ class UserOnlineTriggerWidget extends Widget
                 success: function( response ) {
                     console.log( response ); // server response
                 }
+            });
+        },
+        
+        request: function()
+        {
+            // Using YQL and JSONP
+            $.ajax({
+                url: this.get('url'),
+
+                // The name of the callback parameter, as specified by the YQL service
+                //jsonp: "callback",
+
+                // Tell jQuery we're expecting JSONP
+                //dataType: "jsonp",
+
+                // Tell YQL what we want and that we want JSON
+                /*data: {
+                    q: "select title,abstract,url from search.news where query=\"cat\"",
+                    format: "json"
+                },*/
+
+                // Work with the response
+                /*success: function( response ) {
+                    console.log( response ); // server response
+                }*/
             });
         }
     });

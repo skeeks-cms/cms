@@ -21,7 +21,7 @@ class OnlineController extends Controller
     /**
      * @return RequestResponse
      */
-    public function actionTrigger()
+    public function actionTriggerJsonP()
     {
         $callback = \Yii::$app->request->get('callback');
 
@@ -31,6 +31,17 @@ class OnlineController extends Controller
 
         $data = Json::encode($rr->toArray());
         return "{$callback}({$data})";
+    }
+
+    /**
+     * @return RequestResponse
+     */
+    public function actionTriggerV2()
+    {
+        $rr = new RequestResponse();
+        $rr->success = true;
+
+        return $rr;
     }
 
 }

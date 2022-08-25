@@ -198,7 +198,7 @@ abstract class Component extends Model implements IHasConfigForm
     {
         $this->_callAttributes = $this->attributes;
 
-        //\Yii::beginProfile("Init: ".static::class);
+        \Yii::beginProfile("Init: ".static::class);
 
         if ($this->cmsSite === null && isset(\Yii::$app->skeeks) && \Yii::$app->skeeks->site) {
             $this->cmsSite = \Yii::$app->skeeks->site;
@@ -222,7 +222,7 @@ abstract class Component extends Model implements IHasConfigForm
 
         $this->trigger(self::EVENT_INIT);
 
-        //\Yii::endProfile("Init: ".static::class);
+        \Yii::endProfile("Init: ".static::class);
     }
 
     /**
