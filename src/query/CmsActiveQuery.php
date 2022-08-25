@@ -52,9 +52,14 @@ class CmsActiveQuery extends ActiveQuery
      * @param int|strin|User $user
      * @return static
      */
-    public function createdBy($user)
+    public function createdBy($user = null)
     {
         $user_id = null;
+        
+        if (!$user) {
+            $user = \Yii::$app->user->identity;
+        }
+        
         if (is_int($user)) {
             $user_id = $user;
         } elseif (is_string($user)) {

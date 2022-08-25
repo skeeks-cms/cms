@@ -56,7 +56,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
 
     //Условия для запроса
     public $limit = 0;
-    public $active = "";
+    public $active = "Y";
     public $createdBy = [];
     public $content_ids = [];
 
