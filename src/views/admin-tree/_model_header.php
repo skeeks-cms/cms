@@ -9,6 +9,7 @@
  * @var $this yii\web\View
  * @var $model \skeeks\cms\models\CmsTree
  */
+$controller = $this->context;
 ?>
 <div class="row" style="margin-bottom: 5px;">
 
@@ -21,6 +22,9 @@
         </div>
     <? endif; ?>
     <div class="col my-auto">
+        <div class="d-flex">
+            <div>
+
         <h1 style="margin-bottom: 0px; line-height: 1.1;">
             <?php echo $model->name; ?>
 
@@ -74,8 +78,45 @@
             --><?/* endif; */?>
 
         </div>
-    </div>
-    <div class="col my-auto" style="max-width: 70px; text-align: right;">
+        </div>
+
+            <div class="col my-auto" style="max-width: 70px; text-align: right;">
         <a href="<?php echo $model->url; ?>" data-toggle="tooltip" class="btn btn-default" target="_blank" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i class="fas fa-external-link-alt"></i></a>
     </div>
+
+        </div>
+    </div>
+
+    <?php
+
+    $modelActions = $controller->modelActions;
+    $deleteAction = \yii\helpers\ArrayHelper::getValue($modelActions, "delete");
+
+    if ($deleteAction) : ?>
+        <?php
+
+        $actionData = [
+            "url"             => $deleteAction->url,
+
+            //TODO:// is deprecated
+            "isOpenNewWindow" => true,
+            "confirm"         => isset($deleteAction->confirm) ? $deleteAction->confirm : "",
+            "method"          => isset($deleteAction->method) ? $deleteAction->method : "",
+            "request"         => isset($deleteAction->request) ? $deleteAction->request : "",
+            "size"            => isset($deleteAction->size) ? $deleteAction->size : "",
+        ];
+        $actionData = \yii\helpers\Json::encode($actionData);
+
+        $href = \yii\helpers\Html::a('<i class="fa fa-trash sx-action-icon"></i>', "#", [
+            'onclick'     => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;",
+            'class'       => "btn btn-default",
+            'data-toggle' => "tooltip",
+            'title'       => "Удалить",
+        ]);
+        ?>
+        <div class="col my-auto" style="text-align: right; max-width: 65px;">
+            <?php echo $href; ?>
+        </div>
+    <?php endif; ?>
+
 </div>

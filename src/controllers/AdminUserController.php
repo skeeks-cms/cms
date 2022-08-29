@@ -274,13 +274,23 @@ class AdminUserController extends BackendModelStandartController
                                     foreach ($roles as $role) {
                                         $rolesData[] = Html::tag('label', $role->description, [
                                             'title' => $role->name,
-                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5 ".($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "    font-size: 9px;
+                                            'class' => "".($role->name == 'root' ? 'u-label-danger' : ''),
+                                            'style' => "font-size: 10px;
+    padding: 2px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    background: silver;
+    color: white;
+        margin-bottom: 0;
+        margin-right: 5px;
+        border-radius: 20px;
+            line-height: 1;
+    text-align: center;
+    white-space: nowrap;
     margin-top: 5px;
     margin-bottom: 0;
-    padding: 2px ​5px 4px 5px;
-    background: #ededed;
-    color: gray;",
+    color: #fff;",
                                         ]);
                                     }
                                 }
@@ -300,6 +310,7 @@ class AdminUserController extends BackendModelStandartController
     border-radius: 50%;
     border: 2px solid #ededed;
     height: 54px;
+    
     display: flex;
     overflow: hidden;'>
                                                     <img src='".($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc())."' style='    max-width: 50px;

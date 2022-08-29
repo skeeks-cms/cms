@@ -322,13 +322,13 @@ class ContentElementsCmsWidget extends WidgetRenderable
     public function getConfigFormFields()
     {
         return [
-            'template' => [
+            /*'template' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Template'),
                 'fields' => [
                     'viewFile',
                 ],
-            ],
+            ],*/
 
             'pagination' => [
                 'class'  => FieldSet::class,

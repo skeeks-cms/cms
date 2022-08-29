@@ -19,6 +19,7 @@ $this->registerCss(<<<CSS
 }
 CSS
 );
+$controller = $this->context;
 ?>
 <div class="row" style="margin-bottom: 5px;">
     <? if ($model->image) : ?>
@@ -28,35 +29,39 @@ CSS
         </div>
     <? endif; ?>
     <div class="col my-auto">
-        <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
-            <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
+
+        <div class="d-flex">
+            <div>
+
+                <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
+                    <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
 
 
-        </h1>
+                </h1>
 
-        <div class="sx-small-info" style="font-size: 10px; color: silver;">
-            <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
-            <? if ($model->created_at) : ?>
-                <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
-                            class="far fa-clock"></i> <?php echo \Yii::$app->formatter->asDate($model->created_at); ?></span>
-            <? endif; ?>
-            <? if ($model->created_by) : ?>
-                <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
-                            class="far fa-user"></i> <?php echo $model->createdBy->shortDisplayName; ?></span>
-            <? endif; ?>
-            <? if ($model->email) : ?>
-                <span style="margin-left: 5px;"><i class="far fa-envelope"></i> <?php echo $model->email; ?></span>
-            <? endif; ?>
-            <? if ($model->phone) : ?>
-                <span style="margin-left: 5px;"><i class="fas fa-phone"></i> <?php echo $model->phone; ?></span>
-            <? endif; ?>
+                <div class="sx-small-info" style="font-size: 10px; color: silver;">
+                    <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
+                    <? if ($model->created_at) : ?>
+                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
+                                    class="far fa-clock"></i> <?php echo \Yii::$app->formatter->asDate($model->created_at); ?></span>
+                    <? endif; ?>
+                    <? if ($model->created_by) : ?>
+                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
+                                    class="far fa-user"></i> <?php echo $model->createdBy->shortDisplayName; ?></span>
+                    <? endif; ?>
+                    <? if ($model->email) : ?>
+                        <span style="margin-left: 5px;"><i class="far fa-envelope"></i> <?php echo $model->email; ?></span>
+                    <? endif; ?>
+                    <? if ($model->phone) : ?>
+                        <span style="margin-left: 5px;"><i class="fas fa-phone"></i> <?php echo $model->phone; ?></span>
+                    <? endif; ?>
 
 
-        </div>
-    </div>
+                </div>
+            </div>
 
-    <div class="col my-auto text-right">
-        
+            <div class="col my-auto">
+
         <span>
             <?
 
@@ -78,7 +83,7 @@ JS
             </a>
 </span>
 
-        <span>
+                <span>
             <?
 
             $actionData = \yii\helpers\Json::encode([
@@ -100,18 +105,55 @@ JS
 
         </span>
 
-        <?php if ($model->phone) : ?>
-            <span>
+                <?php if ($model->phone) : ?>
+                    <span>
                 <a href="#" class="btn btn-default" title="Позвонить" data-toggle="tooltip"><i class="fas fa-phone"></i></a>
             </span>
-            <span>
+                    <span>
                 <a href="#" class="btn btn-default sx-send-sms-trigger" data-phone="<?php echo $model->phone; ?>" title="Написать sms" data-toggle="tooltip"><i class="fas fa-sms"></i></a>
             </span>
-        <?php endif; ?>
-        <?php if ($model->email) : ?>
-            <span>
+                <?php endif; ?>
+                <?php if ($model->email) : ?>
+                    <span>
                 <a href="#" class="btn btn-default" title="Написать письмо" data-toggle="tooltip"><i class="far fa-envelope"></i></a>
             </span>
-        <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
+        </div>
     </div>
+
+    <?php
+
+    $modelActions = $controller->modelActions;
+    $deleteAction = \yii\helpers\ArrayHelper::getValue($modelActions, "delete");
+
+    if ($deleteAction) : ?>
+        <?php
+
+        $actionData = [
+            "url"             => $deleteAction->url,
+
+            //TODO:// is deprecated
+            "isOpenNewWindow" => true,
+            "confirm"         => isset($deleteAction->confirm) ? $deleteAction->confirm : "",
+            "method"          => isset($deleteAction->method) ? $deleteAction->method : "",
+            "request"         => isset($deleteAction->request) ? $deleteAction->request : "",
+            "size"            => isset($deleteAction->size) ? $deleteAction->size : "",
+        ];
+        $actionData = \yii\helpers\Json::encode($actionData);
+
+        $href = \yii\helpers\Html::a('<i class="fa fa-trash sx-action-icon"></i>', "#", [
+            'onclick'     => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;",
+            'class'       => "btn btn-default",
+            'data-toggle' => "tooltip",
+            'title'       => "Удалить",
+        ]);
+        ?>
+        <div class="col my-auto" style="text-align: right; max-width: 65px;">
+            <?php echo $href; ?>
+        </div>
+    <?php endif; ?>
+
+
 </div>

@@ -262,7 +262,7 @@ JS
 
                                     $result[] = Html::tag('label', $model->extension, [
                                             'title' => $model->extension,
-                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
+                                            'class' => "",
                                             'style' => "    font-size: 10px;
     padding: 2px;
     padding-bottom: 4px;
@@ -270,17 +270,31 @@ JS
     padding-right: 4px;
     background: silver;
         margin-bottom: 0;
+        margin-right: 5px;
+        border-radius: 20px;
+        color: white;
+            line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    color: #fff;
         ",
                                         ]).Html::tag('label', $model->mime_type, [
                                             'title' => $model->mime_type,
-                                            'class' => "u-label u-label-default g-rounded-20 g-mr-5 ",
+                                            'class' => "",
                                             'style' => "    font-size: 10px;
     padding: 2px;
     padding-bottom: 4px;
     padding-left: 4px;
     padding-right: 4px;
     background: silver;
+    color: white;
         margin-bottom: 0;
+        margin-right: 5px;
+        border-radius: 20px;
+            line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    color: #fff;
         ",
                                         ]);
 

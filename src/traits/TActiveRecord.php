@@ -29,12 +29,14 @@ trait TActiveRecord
     public function asText()
     {
         $result = [];
-        $result[] = "#".$this->id;
+        //$result[] = "#".$this->id;
 
         if (isset($this->name) && is_string($this->name)) {
             $result[] = $this->name;
         } else if (isset($this->label) && is_string($this->label)) {
             $result[] = $this->label;
+        } else if (isset($this->id)) {
+            $result[] = $this->id;
         }
 
         return implode("#", $result);

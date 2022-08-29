@@ -120,6 +120,7 @@
         color: #0e0e0e;
         text-shadow: 0 1px rgba(255,255,255,0.7);
         border-bottom: 1px solid #00000024;
+        font-size: 12px;
     }
     table.sx-table thead tr th a:hover
     {
