@@ -5,7 +5,7 @@
 ?>
 <? if ($contentModel->isAllowEdit("description_full") || $contentModel->isAllowEdit("image_full_id")) : ?>
 
-    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'In detal'), ['isOpen' => false]); ?>
+    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Полное описание'), ['isOpen' => false]); ?>
 
     <?/* if ($contentModel->isAllowEdit("image_full_id")) : */?><!--
         <?/*= $form->field($model, 'image_full_id')->widget(

@@ -5,7 +5,7 @@
 ?>
 <? if ($contentModel->isAllowEdit("description_short")) : ?>
 
-    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement'), ['isOpen' => false]); ?>
+    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Короткое описание'), ['isOpen' => false]); ?>
     <? /*= $form->field($model, 'image_id')->widget(
     \skeeks\cms\widgets\AjaxFileUploadWidget::class,
     [
