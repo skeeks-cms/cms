@@ -376,6 +376,8 @@ class PropertyTypeList extends PropertyType
     }
 
 
+    
+    
     /**
      * @return string
      */
@@ -395,18 +397,6 @@ class PropertyTypeList extends PropertyType
 
             return implode(", ", $result);
 
-            //TODO: Вариант плох тем, что если опций очень много, то кончится память.
-            /*if ($this->property->enums) {
-                $result = [];
-
-                foreach ($this->property->enums as $enum) {
-                    if (in_array($enum->id, $value)) {
-                        $result[$enum->code] = $enum->value;
-                    }
-                }
-
-                return implode(", ", $result);
-            }*/
         } else {
             if (isset(self::$propertyEnumValues[$this->property->id][$value])) {
                 return self::$propertyEnumValues[$this->property->id][$value];
