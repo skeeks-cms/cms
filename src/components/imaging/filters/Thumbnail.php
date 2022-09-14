@@ -44,17 +44,17 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
         if (!$this->w) {
             $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
             $width = ($size->getWidth() * $this->h) / $size->getHeight();
-            Image::thumbnail($this->_originalRootFilePath, (int)round($width), $this->h,
+            Image::thumbnailV2($this->_originalRootFilePath, (int)round($width), $this->h,
                 $this->m)->save($this->_newRootFilePath);
 
         } else {
             if (!$this->h) {
                 $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
                 $height = ($size->getHeight() * $this->w) / $size->getWidth();
-                Image::thumbnail($this->_originalRootFilePath, $this->w, (int)round($height),
+                Image::thumbnailV2($this->_originalRootFilePath, $this->w, (int)round($height),
                     $this->m)->save($this->_newRootFilePath);
             } else {
-                Image::thumbnail($this->_originalRootFilePath, $this->w, $this->h,
+                Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h,
                     $this->m)->save($this->_newRootFilePath);
             }
         }
