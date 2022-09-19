@@ -24,7 +24,7 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
 {
     public $w = 50;
     public $h = 50;
-    public $m = ManipulatorInterface::THUMBNAIL_OUTBOUND;
+    public $m = ManipulatorInterface::THUMBNAIL_INSET;
 
     public function init()
     {
@@ -38,9 +38,9 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
 
     protected function _save()
     {
-        if (!$this->m) {
+        /*if (!$this->m) {
             $this->m = ManipulatorInterface::THUMBNAIL_INSET;
-        }
+        }*/
         if (!$this->w) {
             $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
             $width = ($size->getWidth() * $this->h) / $size->getHeight();

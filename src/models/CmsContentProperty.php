@@ -10,6 +10,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use skeeks\cms\shop\models\ShopCmsContentProperty;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -26,6 +27,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsContentProperty2tree[]    $cmsContentProperty2trees
  * @property CmsTree[]                    $cmsTrees
  * @property CmsSite                      $cmsSite
+ * @property ShopCmsContentProperty       $shopProperty
  */
 class CmsContentProperty extends RelatedPropertyModel
 {
@@ -71,7 +73,7 @@ class CmsContentProperty extends RelatedPropertyModel
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cmsContents' => Yii::t('skeeks/cms', 'Linked to content'),
             'cmsTrees'    => Yii::t('skeeks/cms', 'Linked to sections'),
-            'cms_site_id'    => Yii::t('skeeks/cms', 'Сайт'),
+            'cms_site_id' => Yii::t('skeeks/cms', 'Сайт'),
         ]);
     }
     /**
@@ -80,9 +82,10 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'cms_site_id'    => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
-            'cmsContents'    => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
-            'cmsTrees'    => Yii::t('skeeks/cms', 'Так же есть возможность ограничить отображение поля только для определенных разделов. Если будут выбраны разделы, то добавляя элемент в соответствующий раздел будет показываться это поле.'),
+            'cms_site_id' => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
+            'cmsContents' => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
+            'cmsTrees'    => Yii::t('skeeks/cms',
+                'Так же есть возможность ограничить отображение поля только для определенных разделов. Если будут выбраны разделы, то добавляя элемент в соответствующий раздел будет показываться это поле.'),
         ]);
     }
 
@@ -97,24 +100,32 @@ class CmsContentProperty extends RelatedPropertyModel
             [['cmsTrees'], 'safe'],
             [['code', 'cms_site_id'], 'unique', 'targetAttribute' => ['code', 'cms_site_id']],
             [['cms_site_id'], 'integer'],
-            [['cms_site_id'], 'default', 'value' => function() {
+            [
+                ['cms_site_id'],
+                'default',
+                'value' => function () {
 
-                if (\Yii::$app->skeeks->site) {
-                    return \Yii::$app->skeeks->site->id;
-                }
-                /*if (\Yii::$app->skeeks->site->is_default) {
-                    return null;
-                } else {
-                    return \Yii::$app->skeeks->site->id;
-                }*/
-            }],
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                    /*if (\Yii::$app->skeeks->site->is_default) {
+                        return null;
+                    } else {
+                        return \Yii::$app->skeeks->site->id;
+                    }*/
+                },
+            ],
 
 
             [['cmsContents'], 'required'],
 
-            [['cms_site_id'], 'required', 'when' => function() {
-                return $this->cmsTrees;
-            }]
+            [
+                ['cms_site_id'],
+                'required',
+                'when' => function () {
+                    return $this->cmsTrees;
+                },
+            ]
 
 
             //[['code', 'content_id'], 'unique', 'targetAttribute' => ['content_id', 'code'], 'message' => \Yii::t('skeeks/cms','For the content of this code is already in use.')],
@@ -170,5 +181,13 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         return parent::asText();
         return $result." ($this->code)";
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProperty()
+    {
+        return $this->hasOne(ShopCmsContentProperty::class, ['cms_content_property_id' => 'id']);
     }
 }
