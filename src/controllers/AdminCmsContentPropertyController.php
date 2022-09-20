@@ -639,6 +639,33 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 ],
             ],
 
+            'shop' => [
+                'class'  => FieldSet::class,
+                'name'   => "Связь с магазином",
+                'elementOptions' => ['isOpen' => false],
+                'fields' => [
+
+                    'is_vendor' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+
+                    'is_vendor_code' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'is_country' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'is_offer_property' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+
+                ],
+            ],
+
             'captions' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'Additionally'),
