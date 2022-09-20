@@ -10,13 +10,17 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\cms\shop\models\ShopCmsContentProperty;
 use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cms_content_property}}".
  * @property integer|null                 $cms_site_id
+ *
+ * @property integer                      $is_offer_property
+ * @property integer                      $is_vendor
+ * @property integer                      $is_vendor_code
+ * @property integer                      $is_country
  *
  * @property CmsContent[]                 $cmsContents
  * @property CmsContentProperty2content[] $cmsContentProperty2contents
@@ -74,6 +78,11 @@ class CmsContentProperty extends RelatedPropertyModel
             'cmsContents' => Yii::t('skeeks/cms', 'Linked to content'),
             'cmsTrees'    => Yii::t('skeeks/cms', 'Linked to sections'),
             'cms_site_id' => Yii::t('skeeks/cms', 'Сайт'),
+
+            'is_offer_property' => \Yii::t('skeeks/shop/app', 'Свойство предложения?'),
+            'is_vendor'         => \Yii::t('skeeks/shop/app', 'Производитель?'),
+            'is_vendor_code'    => \Yii::t('skeeks/shop/app', 'Код производителя?'),
+            'is_country'        => \Yii::t('skeeks/shop/app', 'Страна'),
         ]);
     }
     /**
@@ -82,6 +91,7 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'is_offer_property'          => \Yii::t('skeeks/shop/app', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
             'cms_site_id' => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
             'cmsContents' => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
             'cmsTrees'    => Yii::t('skeeks/cms',
@@ -96,6 +106,17 @@ class CmsContentProperty extends RelatedPropertyModel
     public function rules()
     {
         $rules = ArrayHelper::merge(parent::rules(), [
+            [
+                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property'],
+                'integer',
+            ],
+
+            [
+                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property'],
+                'default',
+                'value' => null,
+            ],
+
             [['cmsContents'], 'safe'],
             [['cmsTrees'], 'safe'],
             [['code', 'cms_site_id'], 'unique', 'targetAttribute' => ['code', 'cms_site_id']],
@@ -181,13 +202,5 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         return parent::asText();
         return $result." ($this->code)";
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopProperty()
-    {
-        return $this->hasOne(ShopCmsContentProperty::class, ['cms_content_property_id' => 'id']);
     }
 }
