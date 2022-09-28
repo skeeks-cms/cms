@@ -13,6 +13,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\RequestResponse;
@@ -379,6 +380,15 @@ HTML
                     ],
                 ],
 
+
+
+                'stat' => [
+                    'generateAccess' => true,
+                    'class'          => ViewBackendAction::class,
+                    'name'           => 'Статистика',
+                    'icon'           => 'fas fa-info-circle',
+                    'priority'       => 500,
+                ],
 
                 'delete-tmp-dir' =>
                     [
