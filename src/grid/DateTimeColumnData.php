@@ -30,16 +30,30 @@ class DateTimeColumnData extends DataColumn
         'style' => 'width: 130px;'
     ];
 
+    const VIEW_RELITIVE_TYME = "VIEW_RELITIVE_TYME";
+    const VIEW_DATE = "VIEW_DATE";
+
+    public $view_type = self::VIEW_RELITIVE_TYME;
+
     /**
      * @inheritdoc
      */
     protected function renderDataCellContent($model, $key, $index)
     {
-        $timestamp = $model->{$this->attribute};
-        return Html::tag("span", \Yii::$app->formatter->asRelativeTime($timestamp), [
-            'title' => \Yii::$app->formatter->asDatetime($timestamp),
-            'data-toggle' => "tooltip"
-        ]);
+        if ($this->view_type == self::VIEW_RELITIVE_TYME) {
+            $timestamp = $model->{$this->attribute};
+            return Html::tag("span", \Yii::$app->formatter->asRelativeTime($timestamp), [
+                'title' => \Yii::$app->formatter->asDatetime($timestamp),
+                'data-toggle' => "tooltip"
+            ]);
+        } elseif ($this->view_type == self::VIEW_DATE) {
+            $timestamp = $model->{$this->attribute};
+            return Html::tag("span", \Yii::$app->formatter->asDate($timestamp), [
+                'title' => \Yii::$app->formatter->asDatetime($timestamp),
+                'data-toggle' => "tooltip"
+            ]);
+        }
+
         //return \Yii::$app->formatter->asDatetime($timestamp) . "<br /><small>" . \Yii::$app->formatter->asRelativeTime($timestamp) . "</small>";
     }
 }
