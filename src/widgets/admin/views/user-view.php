@@ -23,6 +23,7 @@ $class = 'g-brd-gray-light-v4';
             'controllerId' => '/cms/admin-user',
             'modelId'      => $cmsUser->id,
             'content'      => $cmsUser->shortDisplayNameWithAlias,
+            'isRunFirstActionOnClick'      => true,
             'options'      => [
                 'data-toggle' => 'tooltip',
                 'data-html'   => 'true',
@@ -58,6 +59,7 @@ $class = 'g-brd-gray-light-v4';
         echo \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
             'controllerId' => '/cms/admin-user',
             'modelId'      => $cmsUser->id,
+            'isRunFirstActionOnClick'      => true,
             'content'      => $cmsUser->shortDisplayNameWithAlias,
             'tag'          => $widget->tagName,
             'options'      => $options,

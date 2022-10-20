@@ -10,7 +10,8 @@
 ?>
 <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
     'controllerId' => 'cms/admin-user',
-    'modelId' => $user->id
+    'modelId' => $user->id,
+    'isRunFirstActionOnClick' => true
 ]); ?>
 <div class="d-flex flex-row">
     <div class="my-auto" style="margin-right: 5px;">

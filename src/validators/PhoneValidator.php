@@ -9,6 +9,7 @@
 namespace skeeks\cms\validators;
 
 use skeeks\cms\base\DynamicModel;
+use skeeks\cms\helpers\StringHelper;
 use yii\validators\Validator;
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\PhoneNumberFormat;
@@ -61,7 +62,7 @@ class PhoneValidator extends Validator
         }
         $phoneUtil = PhoneNumberUtil::getInstance();
         try {
-            $numberProto = $phoneUtil->parse($model->$attribute, $country);
+            $numberProto = $phoneUtil->parse($model->$attribute, StringHelper::strtoupper($country));
             if ($phoneUtil->isValidNumber($numberProto)) {
                 if ($this->format == true) {
                     $model->$attribute = $phoneUtil->format($numberProto, PhoneNumberFormat::INTERNATIONAL);
@@ -76,7 +77,7 @@ class PhoneValidator extends Validator
             $this->addError($model, $attribute, \Yii::t('skeeks/cms', 'Unexpected Phone Number Format'));
         } catch (Exception $e) {
             $this->addError($model, $attribute,
-                \Yii::t('skeeks/cms', 'Unexpected Phone Number Format or Country Code'));
+                \Yii::t('skeeks/cms', 'Unexpected Phone Number Format or Country Code ' . $model->$attribute . $e->getMessage()));
         }
     }
 
