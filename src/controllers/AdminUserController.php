@@ -35,6 +35,7 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\models\ShopBonusTransaction;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\widgets\ActiveForm;
 use skeeks\cms\widgets\GridView;
@@ -501,6 +502,118 @@ class AdminUserController extends BackendModelStandartController
 
                     return true;
                 },
+            ],
+
+            
+            
+            'payments' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'name'     => 'Платежи',
+                'priority' => 600,
+                //'callback' => [$this, 'payments'],
+                'icon'     => 'fas fa-credit-card',
+
+
+                'controllerRoute' => "/shop/admin-payment",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => 400,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'cms_user_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+
+
+            ],
+            
+            "checks" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Чеки",
+                'icon'            => 'fa fa-list',
+                
+                'controllerRoute' => "/shop/admin-shop-check",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'cms_user_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+            
+            'bills'    => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'name'     => 'Счета',
+                'priority' => 600,
+                //'callback' => [$this, 'bills'],
+                'icon'     => 'fas fa-credit-card',
+
+                'controllerRoute' => "/shop/admin-bill",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'cms_user_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+
+            ],
+            
+            
+            "bonus" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Бонусы",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-bonus-transaction",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => 700,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->filters = false;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'cms_user_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+
+                /*"accessCallback" => function () {
+                    if ($this->model) {
+                        return ShopBonusTransaction::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
+                    }
+
+                    return true;
+                },*/
             ],
 
             'add-site-permission' => [

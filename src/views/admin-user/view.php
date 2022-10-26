@@ -242,7 +242,43 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
     <div class="row no-gutters">
+
+
         <div class="col-lg-4 col-sm-6 col-12">
+
+            <div class="sx-block">
+                <div class="sx-block-title">Общие данные <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                            title="У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."
+                                                            class="far fa-question-circle"></i>
+                </div>
+                <div class="sx-block-content">
+                    <div class="sx-value-row d-flex">
+
+                        <div style="width: 100%;">
+                            Количество бонусов
+                        </div>
+
+                        <div class="my-auto">
+                            <?php if($model->bonusBalance > 0) : ?>
+                                <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0" style="color: green;">
+                                    +&nbsp;<?php echo $model->bonusBalance ? \Yii::$app->formatter->asDecimal($model->bonusBalance) : "нет бонусов"; ?>
+                                </a>
+                            <?php elseif ($model->bonusBalance < 0) : ?>
+                                <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0" style="color: red;">
+                                    -&nbsp;<?php echo $model->bonusBalance ? \Yii::$app->formatter->asDecimal($model->bonusBalance) : "нет бонусов"; ?>
+                                </a>
+                            <?php else : ?>
+                                <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0">
+                                    нет&nbsp;бонусов
+                                </a>
+                            <?php endif; ?>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="sx-block">
                 <div class="sx-block-title">Телефон <i style="color: silver;" data-toggle="tooltip" data-html="true"
                                                        title="У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."

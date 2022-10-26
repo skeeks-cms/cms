@@ -23,12 +23,14 @@ use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\queries\CmsUserQuery;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\rbac\models\CmsAuthAssignment;
+use skeeks\cms\shop\models\ShopBonusTransaction;
 use skeeks\cms\validators\PhoneValidator;
 use Yii;
 use yii\base\Exception;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\AfterSaveEvent;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 
@@ -92,6 +94,8 @@ use yii\web\IdentityInterface;
  * @property CmsUserPhone                $mainCmsUserPhone
  * @property CmsContractor[]             $cmsContractors
  * @property CmsContractorMap[]          $cmsContractorMaps
+ * @property ShopBonusTransaction[]      $bonusTransactions
+ * @property float                       $bonusBalance
  *
  */
 class User
@@ -692,6 +696,7 @@ class User
 
     public function asText()
     {
+        return $this->shortDisplayName;
         if ($this->name) {
             return parent::asText();
         }
@@ -1110,6 +1115,25 @@ class User
     public function getCmsContentElement2cmsUsers()
     {
         return $this->hasMany(CmsContentElement2cmsUser::class, ['cms_user_id' => 'id']);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBonusTransactions()
+    {
+        return $this->hasMany(ShopBonusTransaction::class, ['cms_user_id' => 'id']);
+    }
+
+    public function getBonusBalance()
+    {
+        $result = $this->getBonusTransactions()->addSelect([
+            "result" => new Expression("SUM(IF(is_debit, value * -1, value))"),
+        ])->asArray()->one();
+
+        return (float)ArrayHelper::getValue($result, "result");
+
     }
 
     /**
