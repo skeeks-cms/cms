@@ -33,7 +33,6 @@ class AjaxController extends Controller
     public function actionAutocompleteEavOptions()
     {
         $result = [];
-
         $code = (string) \Yii::$app->request->get("code");
         if (!$code) {
             return $result;
@@ -58,6 +57,7 @@ class AjaxController extends Controller
         if (!$property = $q->one()) {
             return $result;
         }
+        
 
         if ($property->property_type == PropertyType::CODE_LIST) {
             $query = $propertyEnumClass::find()->andWhere(['property_id' => $property->id]);

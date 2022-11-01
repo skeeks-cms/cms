@@ -118,7 +118,14 @@ class PropertyTypeElement extends PropertyType
     public function getAjaxSelectUrl()
     {
         if ($this->_ajaxSelectUrl === null) {
-            $this->_ajaxSelectUrl = Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $this->property->code, '__cms_site_id' => \Yii::$app->skeeks->site->id]);
+            $r = new \ReflectionClass($this->property);
+            
+            $this->_ajaxSelectUrl = Url::to([
+                '/cms/ajax/autocomplete-eav-options', 
+                'code' => $this->property->code, 
+                'cms_site_id' => \Yii::$app->skeeks->site->id,
+                'property_class' => $r->getName(),
+            ]);
         }
 
         return $this->_ajaxSelectUrl;
