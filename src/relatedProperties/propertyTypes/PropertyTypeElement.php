@@ -122,7 +122,7 @@ class PropertyTypeElement extends PropertyType
             
             $this->_ajaxSelectUrl = Url::to([
                 '/cms/ajax/autocomplete-eav-options', 
-                'code' => $this->property->code, 
+                'property_id' => $this->property->id, 
                 'cms_site_id' => \Yii::$app->skeeks->site->id,
                 'property_class' => $r->getName(),
             ]);
