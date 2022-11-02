@@ -234,7 +234,7 @@ CSS
             \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
         ])) {
 
-            $property->handler->setAjaxSelectUrl(\yii\helpers\Url::to(['/cms/ajax/autocomplete-tree-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]));
+            $property->handler->setAjaxSelectUrl(\yii\helpers\Url::to(['/cms/ajax/autocomplete-tree-eav-options', 'property_id' => $property->id, 'cms_site_id' => \Yii::$app->skeeks->site->id]));
             $property->handler->setEnumClass(\skeeks\cms\models\CmsTreeTypePropertyEnum::class);
         }
         ?>
