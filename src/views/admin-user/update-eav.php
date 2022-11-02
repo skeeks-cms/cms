@@ -143,7 +143,7 @@ CSS
 
             <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */ ?>
             <?
-            $property->handler->setAjaxSelectUrl(\yii\helpers\Url::to(['/cms/ajax/autocomplete-user-eav-options', 'code' => $property->code]));
+            $property->handler->setAjaxSelectUrl(\yii\helpers\Url::to(['/cms/ajax/autocomplete-user-eav-options', 'property_id' => $property->id]));
             $create = '';
             ?>
             <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-user-universal-property-enum')[0]) : ?>
@@ -211,7 +211,7 @@ JS
 
             <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */ ?>
             <?
-            $property->handler->setAjaxSelectUrl(\yii\helpers\Url::to(['/cms/ajax/autocomplete-user-eav-options', 'code' => $property->code]));
+            $property->handler->setAjaxSelectUrl(\yii\helpers\Url::to(['/cms/ajax/autocomplete-user-eav-options', 'property_id' => $property->id]));
             $create = '';
             ?>
             <?php if (1 == 1) : ?>

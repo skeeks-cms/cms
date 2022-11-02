@@ -117,10 +117,11 @@ class AjaxController extends Controller
     {
         $result = [];
 
-        $code = (string) \Yii::$app->request->get("code");
-        if (!$code) {
+        $property_id = (int) \Yii::$app->request->get("property_id");
+        if (!$property_id) {
             return $result;
         }
+
 
         $propertyClass = CmsUserUniversalProperty::class;
         $propertyEnumClass = CmsUserUniversalPropertyEnum::class;
@@ -136,7 +137,7 @@ class AjaxController extends Controller
         /**
          * @var $property CmsContentProperty
          */
-        if (!$property = $propertyClass::find()->cmsSite()->andWhere(['code' => $code])->one()) {
+        if (!$property = $propertyClass::find()->cmsSite()->andWhere(['id' => $property_id])->one()) {
             return $result;
         }
 
@@ -199,15 +200,16 @@ class AjaxController extends Controller
     {
         $result = [];
 
-        $code = (string) \Yii::$app->request->get("code");
-        if (!$code) {
+        $property_id = (int) \Yii::$app->request->get("property_id");
+        if (!$property_id) {
             return $result;
         }
+
 
         /**
          * @var $property CmsContentProperty
          */
-        if (!$property = CmsTreeTypeProperty::find()->where(['code' => $code])->one()) {
+        if (!$property = CmsTreeTypeProperty::find()->where(['property_id' => $property_id])->one()) {
             return $result;
         }
 
