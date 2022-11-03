@@ -135,7 +135,7 @@ class ContentElementBackendFiltersWidget extends FiltersWidget
                         'widgetClass'  => AjaxSelect::class,
                         'widgetConfig' => [
                             'multiple'      => true,
-                            'ajaxUrl'       => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
+                            'ajaxUrl'       => Url::to(['/cms/ajax/autocomplete-eav-options', 'property_id' => $property->id, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
                             'valueCallback' => function ($value) {
                                 return \yii\helpers\ArrayHelper::map(CmsContentPropertyEnum::find()->where(['id' => $value])->all(), 'id', 'value');
                             },
@@ -192,7 +192,7 @@ class ContentElementBackendFiltersWidget extends FiltersWidget
                         'widgetClass'  => AjaxSelect::class,
                         'widgetConfig' => [
                             'multiple'      => true,
-                            'ajaxUrl'       => Url::to(['/cms/ajax/autocomplete-eav-options', 'code' => $property->code, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
+                            'ajaxUrl'       => Url::to(['/cms/ajax/autocomplete-eav-options', 'property_id' => $property->id, 'cms_site_id' => \Yii::$app->skeeks->site->id]),
                             'valueCallback' => function ($value) {
                                 return \yii\helpers\ArrayHelper::map(CmsContentElement::find()->where(['id' => $value])->all(), 'id', 'name');
                             },
