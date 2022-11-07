@@ -21,6 +21,11 @@ return [
         ],
 
         [
+            'name'        => \skeeks\cms\rbac\CmsManager::ROLE_WORKER,
+            'description' => ['skeeks/cms', 'Сотрудник'],
+        ],
+
+        [
             'name'        => \skeeks\cms\rbac\CmsManager::ROLE_GUEST,
             'description' => ['skeeks/cms', 'Unauthorized user'],
         ],
