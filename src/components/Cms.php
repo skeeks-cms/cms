@@ -203,7 +203,7 @@ class Cms extends \skeeks\cms\base\Component
     public function getLanguages()
     {
         if ($this->_languages === null) {
-            $this->_languages = CmsLang::find()->active()->indexBy('code')->all();
+            $this->_languages = CmsLang::find()->active()->orderBy(['priority' => SORT_ASC])->indexBy('code')->all();
         }
 
         return (array)$this->_languages;

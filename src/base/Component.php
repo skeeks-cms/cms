@@ -466,6 +466,7 @@ abstract class Component extends Model implements IHasConfigForm
             static::class,
             $this->namespace,
             \Yii::$app->language,
+            \Yii::$app->id,
             implode('.', $this->overridePath),
             $this->cmsSite ? $this->cmsSite->cacheTag : "",
         ];
