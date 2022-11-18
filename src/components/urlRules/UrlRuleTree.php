@@ -137,7 +137,6 @@ class UrlRuleTree
         ArrayHelper::remove($params, 'dir');
         ArrayHelper::remove($params, 'site_id');
 
-
         if ($treeModel && $treeModel instanceof CmsTree) {
             $tree = $treeModel;
             self::$models[$treeModel->id] = $treeModel;
@@ -159,6 +158,7 @@ class UrlRuleTree
 
 
         if ($dir) {
+
             if (!$site_id && \Yii::$app->cms && \Yii::$app->skeeks->site) {
                 $site_id = \Yii::$app->skeeks->site->id;
             }
@@ -258,6 +258,74 @@ class UrlRuleTree
                     "cms_site_id" => \Yii::$app->skeeks->site->id,
                 ])->one();
             }, null, $dependency);
+
+            if (!$treeNode) {
+                //TODO: новое обновление пробуем разобрать и проанализировать dir
+                $dirData = explode("/", $originalDir);
+                $newDir = [];
+                if (count($dirData) > 1) {
+                    $last = $dirData[count($dirData) - 1];
+
+                    $cmsTreeQuery = CmsTree::find()->where([
+                        "code"        => $last,
+                        "cms_site_id" => \Yii::$app->skeeks->site->id,
+                    ]);
+
+                    if ($cmsTreeQuery->count() == 1) {
+                        $treeNode = $cmsTreeQuery->one();
+                    } else {
+                        $counter = 0;
+                        $totalCountDir = count($dirData);
+                        foreach ($dirData as $key => $dirPart) {
+                            $counter++;
+                            unset($dirData[$totalCountDir - $counter]);
+                            $checkDir = implode("/", $dirData);
+
+                            $betterNode = CmsTree::find()->where([
+                                "dir"         => $checkDir,
+                                "cms_site_id" => \Yii::$app->skeeks->site->id,
+                            ])->one();
+
+                            /*print_r($checkDir);
+                            echo "<br />";*/
+
+                            if (!$treeNode && $betterNode) {
+                                $treeNode = $betterNode;
+
+                                /*echo "<br />Tree node<br />";
+                                print_r($treeNode->dir);
+                                echo "<br />";*/
+
+                            }
+                            /**
+                             * @var $betterNode CmsTree
+                             */
+
+                            if ($betterNode) {
+
+                                $tmpQ = $betterNode->getDescendants()->andWhere(['code' => $last]);
+                                /*echo "<br />Check better node<br />";
+                                print_r($tmpQ->count());
+                                echo "<br />";*/
+
+                                if ($tmpQ->count() == 1) {
+                                    $treeNode = $tmpQ->one();
+
+                                    /*echo "<br />Tree node<br />";
+                                    print_r($treeNode->dir);
+                                    echo "<br />";*/
+
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+
+                    //die;
+                }
+            }
+
         }
 
 
