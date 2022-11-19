@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\models\behaviors;
 
+use skeeks\cms\models\CmsTheme;
 use yii\base\Behavior;
 use yii\caching\Cache;
 use yii\caching\TagDependency;
@@ -48,6 +49,11 @@ class HasTableCache extends Behavior
 
         $owner = $this->owner;
 
+        /*if ($owner instanceof CmsTheme) {
+            print_r($this->getTableCacheTagCmsSite($owner->cms_site_id));
+            die(111);
+        }*/
+
         if (isset($owner->cms_site_id) && $owner->cms_site_id) {
             //\Yii::info("Invalidate: " . $this->getTableCacheTagCmsSite($owner->cms_site_id));
             TagDependency::invalidate($this->cache, [
@@ -58,7 +64,7 @@ class HasTableCache extends Behavior
         if (isset($owner->site_id) && $owner->site_id) {
             //die('111');
             TagDependency::invalidate($this->cache, [
-                $this->getTableCacheTagCmsSite($owner->cms_site_id),
+                $this->getTableCacheTagCmsSite($owner->site_id),
             ]);
         }
 

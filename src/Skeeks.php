@@ -86,7 +86,7 @@ class Skeeks extends Component
                         null,
                         new TagDependency([
                             'tags' => [
-                                (new $cmsSiteClass())->getTableCacheTag(),
+                                (new CmsSiteDomain())->getTableCacheTagCmsSite($cmsDomain->cms_site_id),
                             ],
                         ])
                     );

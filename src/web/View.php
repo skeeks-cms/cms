@@ -12,6 +12,7 @@ use skeeks\cms\base\Theme;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteTheme;
 use skeeks\cms\models\CmsTheme;
+use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -97,7 +98,19 @@ class View extends \yii\web\View
         }
 
         //Поиск настроек сохраненных в базу данных
-        $cmsTheme = CmsTheme::find()->cmsSite()->active()->one();
+        $cmsTheme = CmsTheme::getDb()->cache(function ($db) {
+            return CmsTheme::find()->cmsSite()->active()->one();
+        },
+            null,
+            new TagDependency([
+                'tags' => [
+                    (new CmsTheme())->getTableCacheTagCmsSite(),
+                    \Yii::$app->skeeks->site->cacheTag
+                ],
+            ])
+        );
+
+
         $themeData = [];
         if ($cmsTheme) {
             //Бурется настройки из конфига
