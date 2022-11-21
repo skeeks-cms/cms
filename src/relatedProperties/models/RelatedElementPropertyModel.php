@@ -62,7 +62,7 @@ abstract class RelatedElementPropertyModel extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'element_id'], 'integer'],
+            [['property_id', 'element_id'], 'integer'],
             [['description'], 'string', 'max' => 255],
             //[['value_string'], 'string', 'max' => 255],
             [['value', 'value_string'], 'string'],
