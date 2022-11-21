@@ -246,9 +246,12 @@ class User
             throw new Exception(\Yii::t('skeeks/cms', 'This user can not be removed'));
         }
 
-        if ($this->id == \Yii::$app->user->identity->id) {
-            throw new Exception(\Yii::t('skeeks/cms', 'You can not delete yourself'));
+        if (isset(\Yii::$app->user)) {
+            if ($this->id == \Yii::$app->user->identity->id) {
+                throw new Exception(\Yii::t('skeeks/cms', 'You can not delete yourself'));
+            }
         }
+
     }
 
 
