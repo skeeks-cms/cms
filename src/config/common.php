@@ -31,7 +31,7 @@ return [
             //'dsn' => 'mysql:host=mysql.skeeks.com;dbname=s2_vz1005_demo-cms',
             //'username' => 's2_vz1016',
             //'password' => 'dryagtepEjsiocakVenAvyeyb',
-            'charset' => 'utf8',
+            'charset'             => 'utf8mb4', //чтобы работали символы 🌿
             'enableSchemaCache' => true,
             'schemaCacheDuration' => 3600,
         ],
