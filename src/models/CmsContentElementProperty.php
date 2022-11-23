@@ -14,8 +14,6 @@ use skeeks\cms\relatedProperties\models\RelatedElementPropertyModel;
  * This is the model class for table "{{%cms_content_element_property}}".
  *
  * @property integer                $id
- * @property integer                $created_by
- * @property integer                $updated_by
  * @property integer                $created_at
  * @property integer                $updated_at
  * @property integer                $property_id
