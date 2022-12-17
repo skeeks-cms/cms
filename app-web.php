@@ -27,12 +27,26 @@ if (YII_ENV == 'dev') {
     }
 }
 
-//$configFile = \skeeks\cms\composer\config\Builder::path('web-' . ENV);
 $configFile = \Yiisoft\Composer\Config\Builder::path('web-' . ENV);
 if (!file_exists($configFile)) {
     $configFile = \Yiisoft\Composer\Config\Builder::path('web');
-    //$configFile = \skeeks\cms\composer\config\Builder::path('web');
 }
+
+
+//Если по каким то причинам файла конфиг нет, надо попробовать пересобрать!
+if (!file_exists($configFile)) {
+    \Yii::warning("file not found - {$configFile}", "skeeks/cms");
+
+    \Yii::beginProfile('Rebuild config 2');
+    \Yiisoft\Composer\Config\Builder::rebuild();
+    \Yii::endProfile('Rebuild config 2');
+
+    $configFile = \Yiisoft\Composer\Config\Builder::path('web-' . ENV);
+    if (!file_exists($configFile)) {
+        $configFile = \Yiisoft\Composer\Config\Builder::path('web');
+    }
+}
+
 $config = (array)require $configFile;
 //print_r($config);die;
 \Yii::endProfile('Load config app');
