@@ -40,7 +40,7 @@ class PjaxLazyLoad extends Pjax
     setTimeout(function() {
         $.pjax.reload("#{$this->id}", {
             'timeout': $this->timeout,
-            //'push': false,
+            async: false
         });
     }, $this->delay);
 JS
