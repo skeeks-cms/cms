@@ -109,7 +109,9 @@ class Skeeks extends Component
         }
 
         if (\Yii::$app instanceof Application) {
-            \Yii::$app->urlManager->hostInfo = $this->_site->cmsSiteMainDomain->url;
+            if ($this->_site->cmsSiteMainDomain) {
+                \Yii::$app->urlManager->hostInfo = $this->_site->cmsSiteMainDomain->url;
+            }
         }
 
         return $this->_site;
