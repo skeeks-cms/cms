@@ -85,7 +85,8 @@
                 }
 
                 self.trigger('error', {
-                    'message': data.message
+                    'message': data.message,
+                    'data': data.data
                 });
             });
 
@@ -165,9 +166,13 @@
             });
 
 
-            this.jForm.on('submit', function (event, attribute, message) {
+            this.jForm.on('submit', function (event, data) {
                 //console.log('submit');
                 
+                /*if (data['pjax'] == 'reload') {
+                    return false;
+                }
+                */
                 self.AjaxQuery.setUrl(self.jForm.attr('action'))
 
                 if (self.IsSubmitProcess === false) {
@@ -175,8 +180,6 @@
 
                     self.trigger('start');
                     self.trigger('submit', {
-                        'message': message,
-                        'attribute': attribute,
                         'event': event,
                     });
                 }

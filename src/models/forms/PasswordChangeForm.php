@@ -59,6 +59,7 @@ class PasswordChangeForm extends Model
                 return $model->scenario != self::SCENARION_NOT_REQUIRED;
             }],*/
             /*],*/
+            [['new_password_confirm', 'new_password'], 'required'],
             [['new_password_confirm', 'new_password'], 'string', 'min' => 6],
             [['new_password_confirm'], 'validateNewPassword'],
         ];

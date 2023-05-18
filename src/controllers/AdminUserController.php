@@ -496,6 +496,10 @@ class AdminUserController extends BackendModelStandartController
                 },
 
                 "accessCallback" => function () {
+                    if (!isset(\Yii::$app->shop)) {
+                        return false;
+                    }
+
                     if ($this->model) {
                         return ShopOrder::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
                     }
@@ -937,7 +941,7 @@ JS
         $model = $this->model;
 
         $dm = new DynamicModel(['password']);
-        $dm->addRule(['password'], 'string', ['min' => 8]);
+        //$dm->addRule(['password'], 'string', ['min' => 8]);
         $dm->addRule(['password'], 'required');
         $dm->addRule(['password'], function ($attribute) use ($dm) {
 
@@ -947,7 +951,7 @@ JS
             $lowercase = preg_match('@[a-z]@', $password);
             //$specialChars = preg_match('@[^\w]@', $password);
 
-            if (!$number) {
+            /*if (!$number) {
                 $dm->addError($attribute, "Пароль должен содержать как минимум одну цифру");
                 return false;
             }
@@ -958,7 +962,7 @@ JS
             if (!$lowercase) {
                 $dm->addError($attribute, "Пароль должен хоть одну строчную английскую букву");
                 return false;
-            }
+            }*/
             /*if (!$specialChars) {
                 $dm->addError($attribute, "Пароль должен содержать хоть один специальный символ");
                 return false;

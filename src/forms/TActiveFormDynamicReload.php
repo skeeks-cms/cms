@@ -56,8 +56,23 @@ trait TActiveFormDynamicReload
             _.delay(function()
             {
                 var jForm = $("#" + self.get('id'));
+                var jPjax = jForm.closest("[data-pjax-container]");
+                
+                console.log(jPjax);
+                
                 jForm.append($('<input>', {'type': 'hidden', 'name' : self.get('nosubmit'), 'value': 'true'}));
-                jForm.submit();
+                
+                var data = {
+                    'container': "#" + jPjax.attr("id"),
+                    'method': jForm.attr("method"),
+                    'data': jForm.serializeArray()
+                };
+                console.log(data);
+                $.pjax.reload(data);
+                
+                /*jForm.trigger("submit", {
+                    'pjax' : 'reload'
+                });*/
             }, 200);
         }
     });

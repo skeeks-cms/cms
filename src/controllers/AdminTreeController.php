@@ -28,9 +28,11 @@ use skeeks\yii2\form\fields\WidgetField;
 use Yii;
 use yii\base\DynamicModel;
 use yii\base\Event;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\ActiveForm;
 
 /**
  * @property Tree $model
@@ -414,7 +416,40 @@ class AdminTreeController extends BackendModelStandartController
 
                 }
             }
+        } elseif ($rr->isRequestAjaxPost()) {
 
+            try {
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+
+                if (!$model->errors && !$relatedModel->errors)
+                {
+                    if (!$model->save()) {
+                        throw new Exception("Ошибка сохранения данных");
+                    }
+
+                    if (!$relatedModel->save()) {
+                        throw new Exception("Ошибка сохранения дополнительных данных");
+                    }
+
+                    $rr->message = '✓ Сохранено';
+                    $rr->success = true;
+                } else {
+                    $rr->success = false;
+                    $rr->data = [
+                        'validation' => ArrayHelper::merge(
+                            ActiveForm::validate($model),
+                            ActiveForm::validate($relatedModel),
+                        )
+                    ];
+                }
+            } catch (\Exception $exception) {
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+
+
+            return $rr;
         }
 
         return $this->render('_form', [

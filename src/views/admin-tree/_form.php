@@ -14,6 +14,8 @@ $controller = $this->context;
 $action = $controller->action;
 \skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
 ?>
+
+<?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
 <?php $form = $action->beginActiveForm(); ?>
 
 <? if ($is_saved && @$is_create) : ?>
@@ -678,3 +680,4 @@ JS
 ?>
 <?php echo $form->errorSummary([$model, $model->relatedPropertiesModel]); ?>
 <?php $form::end(); ?>
+<?php $pjax::end(); ?>

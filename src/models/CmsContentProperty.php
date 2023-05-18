@@ -79,10 +79,10 @@ class CmsContentProperty extends RelatedPropertyModel
             'cmsTrees'    => Yii::t('skeeks/cms', 'Linked to sections'),
             'cms_site_id' => Yii::t('skeeks/cms', 'Сайт'),
 
-            'is_offer_property' => \Yii::t('skeeks/shop/app', 'Свойство предложения?'),
-            'is_vendor'         => \Yii::t('skeeks/shop/app', 'Производитель?'),
-            'is_vendor_code'    => \Yii::t('skeeks/shop/app', 'Код производителя?'),
-            'is_country'        => \Yii::t('skeeks/shop/app', 'Страна'),
+            'is_offer_property' => \Yii::t('skeeks/cms', 'Свойство предложения?'),
+            'is_vendor'         => \Yii::t('skeeks/cms', 'Производитель?'),
+            'is_vendor_code'    => \Yii::t('skeeks/cms', 'Код производителя?'),
+            'is_country'        => \Yii::t('skeeks/cms', 'Страна'),
         ]);
     }
     /**
@@ -91,7 +91,7 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_offer_property'          => \Yii::t('skeeks/shop/app', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
+            'is_offer_property'          => \Yii::t('skeeks/cms', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
             'cms_site_id' => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
             'cmsContents' => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
             'cmsTrees'    => Yii::t('skeeks/cms',

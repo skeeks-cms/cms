@@ -14,15 +14,17 @@ class m221019_142301__update_table__cms_content_property extends Migration
     {
         $tableName = "cms_content_property";
 
-        $subQuery = $this->db->createCommand("
-            UPDATE 
-                `cms_content_property` as c
-                INNER JOIN shop_cms_content_property as sc ON sc.cms_content_property_id = c.id 
-            SET 
-                c.is_vendor = sc.is_vendor
-        ")->execute();
+        $tableExist = $this->db->getTableSchema("shop_cms_content_property", true);
+        if ($tableExist) {
+            $subQuery = $this->db->createCommand("
+                UPDATE 
+                    `cms_content_property` as c
+                    INNER JOIN shop_cms_content_property as sc ON sc.cms_content_property_id = c.id 
+                SET 
+                    c.is_vendor = sc.is_vendor
+            ")->execute();
 
-        $subQuery = $this->db->createCommand("
+            $subQuery = $this->db->createCommand("
             UPDATE 
                 `cms_content_property` as c
                 INNER JOIN shop_cms_content_property as sc ON sc.cms_content_property_id = c.id 
@@ -30,13 +32,16 @@ class m221019_142301__update_table__cms_content_property extends Migration
                 c.is_vendor_code = sc.is_vendor_code
         ")->execute();
 
-        $subQuery = $this->db->createCommand("
+            $subQuery = $this->db->createCommand("
             UPDATE 
                 `cms_content_property` as c
                 INNER JOIN shop_cms_content_property as sc ON sc.cms_content_property_id = c.id 
             SET 
                 c.is_offer_property = sc.is_offer_property
         ")->execute();
+        }
+
+
     }
 
     public function safeDown()

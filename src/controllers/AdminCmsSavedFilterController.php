@@ -17,6 +17,7 @@ use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSavedFilter;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
 use skeeks\yii2\form\fields\BoolField;
@@ -24,6 +25,7 @@ use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\UnsetArrayValue;
@@ -51,9 +53,53 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
     {
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
-                "filters" => [
+                /*"filters" => [
                     'visibleFilters' => [
                         'short_name',
+                    ],
+                ],*/
+                "filters" => [
+                    'visibleFilters' => [
+                        'q',
+                    ],
+                    'filtersModel'   => [
+                        'rules'            => [
+                            ['q', 'safe'],
+                        ],
+                        'attributeDefines' => [
+                            'q',
+                        ],
+
+                        'fields' => [
+
+                            'q' => [
+                                'label'          => 'Поиск',
+                                'elementOptions' => [
+                                    'placeholder' => 'Поиск',
+                                ],
+                                'on apply'       => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+
+                                        $query->joinWith("valueContentElement as valueContentElement");
+                                        $query->joinWith("valueContentPropertyEnum as valueContentPropertyEnum");
+
+                                        $query->andWhere([
+                                            'or',
+                                            ['like', CmsSavedFilter::tableName() .'.short_name', $e->field->value],
+                                            ['like', 'valueContentElement.name', $e->field->value],
+                                            ['like', 'valueContentPropertyEnum.value', $e->field->value],
+                                        ]);
+
+                                        $query->groupBy([CmsSavedFilter::tableName().'.id']);
+                                    }
+                                },
+                            ],
+                        ],
                     ],
                 ],
                 'grid'    => [

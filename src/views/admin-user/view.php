@@ -251,32 +251,38 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                                                             title="У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."
                                                             class="far fa-question-circle"></i>
                 </div>
-                <div class="sx-block-content">
-                    <div class="sx-value-row d-flex">
 
-                        <div style="width: 100%;">
-                            Количество бонусов
-                        </div>
+                <?php if(isset(\Yii::$app->shop)) : ?>
+                    <div class="sx-block-content">
+                        <div class="sx-value-row d-flex">
 
-                        <div class="my-auto">
-                            <?php if($model->bonusBalance > 0) : ?>
-                                <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0" style="color: green;">
-                                    +&nbsp;<?php echo $model->bonusBalance ? \Yii::$app->formatter->asDecimal($model->bonusBalance) : "нет бонусов"; ?>
-                                </a>
-                            <?php elseif ($model->bonusBalance < 0) : ?>
-                                <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0" style="color: red;">
-                                    -&nbsp;<?php echo $model->bonusBalance ? \Yii::$app->formatter->asDecimal($model->bonusBalance) : "нет бонусов"; ?>
-                                </a>
-                            <?php else : ?>
-                                <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0">
-                                    нет&nbsp;бонусов
-                                </a>
-                            <?php endif; ?>
-                            
-                            
+                            <div style="width: 100%;">
+                                Количество бонусов
+                            </div>
+
+                            <div class="my-auto">
+                                <?php if($model->bonusBalance > 0) : ?>
+                                    <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0" style="color: green;">
+                                        +&nbsp;<?php echo $model->bonusBalance ? \Yii::$app->formatter->asDecimal($model->bonusBalance) : "нет бонусов"; ?>
+                                    </a>
+                                <?php elseif ($model->bonusBalance < 0) : ?>
+                                    <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0" style="color: red;">
+                                        -&nbsp;<?php echo $model->bonusBalance ? \Yii::$app->formatter->asDecimal($model->bonusBalance) : "нет бонусов"; ?>
+                                    </a>
+                                <?php else : ?>
+                                    <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0">
+                                        нет&nbsp;бонусов
+                                    </a>
+                                <?php endif; ?>
+
+
+                            </div>
                         </div>
                     </div>
-                </div>
+                <?php endif; ?>
+
+
+
             </div>
 
             <div class="sx-block">

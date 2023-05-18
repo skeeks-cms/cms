@@ -60,6 +60,7 @@ use yii\helpers\Html;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 use yii\web\Application;
+use yii\widgets\ActiveForm;
 
 /**
  * @property CmsContent|static $content
@@ -914,16 +915,6 @@ HTML
 
         $rr = new RequestResponse();
 
-        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-
-            return \yii\widgets\ActiveForm::validateMultiple([
-                $model,
-                $relatedModel,
-            ]);
-        }*/
-
         if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
@@ -960,6 +951,42 @@ HTML
                 }
             }
 
+        } elseif ($rr->isRequestAjaxPost()) {
+            try {
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+
+                if (!$model->errors && !$relatedModel->errors)
+                {
+                    if (!$model->save()) {
+                        throw new Exception("Ошибка сохранения данных");
+                    }
+
+                    if (!$relatedModel->save()) {
+                        throw new Exception("Ошибка сохранения дополнительных данных");
+                    }
+
+                    $rr->message = '✓ Сохранено';
+                    $rr->success = true;
+                    $rr->data = [
+                        'type' => 'create'
+                    ];
+                } else {
+                    $rr->success = false;
+                    $rr->data = [
+                        'validation' => ArrayHelper::merge(
+                            ActiveForm::validate($model),
+                            ActiveForm::validate($relatedModel),
+                        )
+                    ];
+                }
+            } catch (\Exception $exception) {
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+
+
+            return $rr;
         }
 
         return $this->render($this->editForm, [
@@ -1019,6 +1046,39 @@ HTML
                 }
             }
 
+        } elseif ($rr->isRequestAjaxPost()) {
+
+            try {
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+
+                if (!$model->errors && !$relatedModel->errors)
+                {
+                    if (!$model->save()) {
+                        throw new Exception("Ошибка сохранения данных");
+                    }
+
+                    if (!$relatedModel->save()) {
+                        throw new Exception("Ошибка сохранения дополнительных данных");
+                    }
+
+                    $rr->message = '✓ Сохранено';
+                    $rr->success = true;
+                } else {
+                    $rr->success = false;
+                    $rr->data = [
+                        'validation' => ArrayHelper::merge(
+                            ActiveForm::validate($model),
+                            ActiveForm::validate($relatedModel),
+                        )
+                    ];
+                }
+            } catch (\Exception $exception) {
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+
+            return $rr;
         }
 
         return $this->render($this->editForm, [
