@@ -1064,6 +1064,9 @@ HTML
 
                     $rr->message = '✓ Сохранено';
                     $rr->success = true;
+                    $rr->data = [
+                        'type' => 'update'
+                    ];
                 } else {
                     $rr->success = false;
                     $rr->data = [
