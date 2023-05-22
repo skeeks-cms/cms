@@ -12,7 +12,14 @@ use yii\helpers\Html;
 /* @var $model \skeeks\cms\models\CmsLang */
 $controller = $this->context;
 $action = $controller->action;
+?>
 
+
+
+<?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
+<?php $form = $action->beginActiveForm(); ?>
+
+<?php
 if ($model->isNewRecord) {
     if ($tree_id = \Yii::$app->request->get("tree_id")) {
         $model->tree_id = $tree_id;
@@ -23,40 +30,6 @@ if ($model->isNewRecord) {
     }
 }
 ?>
-
-
-
-<?php $form = $action->beginActiveForm(); ?>
-
-
-<? if ($is_saved && @$is_create) : ?>
-    <?php $this->registerJs(<<<JS
-    sx.Window.openerWidgetTriggerEvent('model-create', {
-        'submitBtn' : '{$submitBtn}'
-    });
-JS
-    ); ?>
-
-<? elseif ($is_saved) : ?>
-    <?php $this->registerJs(<<<JS
-sx.Window.openerWidgetTriggerEvent('model-update', {
-        'submitBtn' : '{$submitBtn}'
-    });
-JS
-    ); ?>
-<? endif; ?>
-
-<? if (@$redirect) : ?>
-    <?php $this->registerJs(<<<JS
-window.location.href = '{$redirect}';
-console.log('window.location.href');
-console.log('{$redirect}');
-JS
-    ); ?>
-<? endif; ?>
-
-
-
 
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <div style="display: none;">
@@ -191,15 +164,9 @@ JS
     <?php endforeach; ?>
 <?php endif; ?>
 
-<?php $successMessage = ''; ?>
-<?php if(@$is_create) : ?>
-<?php else : ?>
-<? if ($successMessageFlash = \Yii::$app->getSession()->getFlash('success')) : ?>
-    <?php $successMessage = $successMessageFlash; ?>
-<? endif; ?>
-<? endif; ?>
 
-<?= $form->buttonsStandart($model, $action->buttons, $successMessage); ?>
+<?= $form->buttonsStandart($model, $action->buttons); ?>
 
 <?php echo $form->errorSummary([$model, $relatedModel]); ?>
 <?php $form::end(); ?>
+<?php $pjax::end(); ?>
