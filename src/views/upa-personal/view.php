@@ -37,7 +37,7 @@ CSS
                             'w' => 300,
                             'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
                         ])); ?>" alt=""
-                         class="img-fluid" data-toggle="tooltip" data-html="true" style="border-radius: 8px;" data-original-title="" title="">
+                         class="img-fluid" data-toggle="tooltip" data-html="true" style="    border-radius: var(--base-radius);" data-original-title="" title="">
                 </div>
             </div>
         </div>

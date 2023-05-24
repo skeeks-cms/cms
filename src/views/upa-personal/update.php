@@ -24,6 +24,12 @@ JS
 );
 ?>
 
+    <?php echo $form->field($model, "image_id")->widget(\skeeks\cms\widgets\AjaxFileUploadWidget::class, [
+        //'view_file'   => '@skeeks/yii2/ajaxfileupload/widgets/views/default',
+        'accept'    => 'image/*',
+        'multiple'  => false,
+    ]); ?>
+
     <?= $form->field($model, 'first_name') ?>
     <?= $form->field($model, 'last_name') ?>
     <?= $form->field($model, 'patronymic') ?>
