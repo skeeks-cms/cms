@@ -8,31 +8,27 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\backend\controllers\BackendModelController;
+use skeeks\cms\backend\BackendAction;
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\components\Cms;
-use skeeks\cms\models\CmsUser;
+use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\sx\helpers\ResponseHelper;
 use skeeks\yii2\form\Field;
-use skeeks\yii2\form\fields\PasswordField;
 use skeeks\yii2\form\fields\WidgetField;
-use yii\base\DynamicModel;
 use yii\base\Event;
-use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class UpaPersonalController
  * @package skeeks\cms\controllers
  */
-class UpaPersonalController extends BackendModelController
+class UpaPersonalController extends BackendController
 {
-    public $defaultAction = 'update';
+    public $defaultAction = 'view';
 
     public function init()
     {
         $this->name = ['skeeks/cms', 'Personal data'];
-        $this->modelClassName = \Yii::$app->user->identityClass;
-        $this->modelShowAttribute = 'displayName';
 
         $this->permissionNames = [
             Cms::UPA_PERMISSION => 'Доступ к персональной части',
@@ -52,12 +48,35 @@ class UpaPersonalController extends BackendModelController
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
-                "update"          => [
-                    'buttons' => ['apply'],
-                    'class'   => BackendModelUpdateAction::class,
-                    'name'    => ['skeeks/cms', 'Personal data'],
-                    'fields'  => [$this, 'updateFields'],
+                'view' =>
+                    [
+                        'class'           => BackendAction::class,
+                        'name'            => 'Профиль',
+                        "icon"            => "fa fa-user",
+                        "permissionNames" => [],
+                        "callback"        => [$this, 'actionView'],
+                        "priority"        => 10,
+                        "isVisible"       => false,
+                    ],
+
+                'password' =>
+                    [
+                        'class'           => BackendAction::class,
+                        'name'            => 'Смена пароля',
+                        "icon"            => "glyphicon glyphicon-warning-sign",
+                        "permissionNames" => [],
+                        "callback"        => [$this, 'actionPassword'],
+                        "priority"        => 10,
+                        "isVisible"       => false,
+                    ],
+
+                "update" => [
+                    'class'     => BackendAction::class,
+                    'name'      => ['skeeks/cms', 'Personal data'],
+                    "callback"  => [$this, 'actionUpdate'],
+                    "isVisible" => false,
                 ],
+                /*
                 "change-password" => [
                     'buttons'           => ['apply'],
                     'class'             => BackendModelUpdateAction::class,
@@ -82,7 +101,6 @@ class UpaPersonalController extends BackendModelController
                         /**
                          * @var $action BackendModelUpdateAction;
                          * @var $model CmsUser;
-                         */
                         $action = $e->sender;
                         $model = $action->model;
                         $action->isSaveFormModels = false;
@@ -108,7 +126,7 @@ class UpaPersonalController extends BackendModelController
                             'label' => ['skeeks/cms', 'New password (again)'],
                         ],
                     ],
-                ],
+                ],*/
             ]
         );
 
@@ -119,8 +137,95 @@ class UpaPersonalController extends BackendModelController
 
         return $actions;
     }
+    
+    
+    public function actionView() {
+        $user = \Yii::$app->user->identity;
+        return $this->render($this->action->id, [
+            'model' => $user,
+        ]);
+    }
+    public function actionUpdate()
+    {
+        $rr = new ResponseHelper();
+        $user = \Yii::$app->user->identity;
+
+        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            return $rr->ajaxValidateForm($user);
+        }*/
+
+        if ($rr->isRequestAjaxPost) {
+            if ($user->load(\Yii::$app->request->post()) && $user->save())
+            {
+                $rr->message = '✓ Сохранено';
+                $rr->success = true;
+            } else {
+                $rr->success = false;
+                $rr->data = [
+                    'validation' => ArrayHelper::merge(
+                        ActiveForm::validate($user),
+                    )
+                ];
+            }
+
+            return $rr;
+        }
+
+        return $this->render($this->action->id, [
+            'model' => $user,
+        ]);
+    }
 
     
+    public function actionPassword()
+    {
+        $rr = new ResponseHelper();
+        $model = \Yii::$app->user->identity;
+        $formModel = new PasswordChangeForm();
+        $formModel->user = $model;
+        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            return $rr->ajaxValidateForm($formModel);
+        }*/
+
+        if ($rr->isRequestPjaxPost)
+        {
+            if ($formModel->load(\Yii::$app->request->post()) && $formModel->changePassword())
+            {
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+
+                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                {}
+            }
+        } elseif ($rr->isRequestAjaxPost) {
+            try {
+                if ($formModel->load(\Yii::$app->request->post()) && $formModel->changePassword())
+                {
+                    $rr->message = '✓ Пароль изменен';
+                    $rr->success = true;
+                } else {
+                    $rr->success = false;
+                    $rr->data = [
+                        'validation' => ArrayHelper::merge(
+                            ActiveForm::validate($formModel), []
+                        )
+                    ];
+                }
+            } catch (\Exception $exception) {
+                $rr->message = 'Пароль не изменен!';
+                $rr->success = false;
+            }
+
+
+            return $rr;
+        }
+
+        return $this->render($this->action->id, ['model' => $formModel]);
+    }
+
+
+
     public function updateFields()
     {
         return [
