@@ -9,7 +9,6 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\backend\BackendComponent;
-use yii\base\Theme;
 
 /**
  * Class UpaBackendComponent
