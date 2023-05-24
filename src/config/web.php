@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 $config = [
-    'bootstrap' => ['cms'],
+    'bootstrap' => ['cms', 'upaBackend'],
 
     'components' => [
 
@@ -78,6 +78,8 @@ $config = [
         ],
 
         'upaBackend' => [
+            'id'    => 'upaBackend',
+            'class' => \skeeks\cms\components\UpaBackendComponent::class,
             'menu' => [
                 'data' => [
                     'personal' => [

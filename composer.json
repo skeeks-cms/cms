@@ -41,7 +41,6 @@
         "skeeks/cms-backend-admin": "^1.2 || dev-master@dev",
         "skeeks/cms-admin": "^2.2 || dev-master@dev",
 
-        "skeeks/cms-user-personal-area": "^1.0 || dev-master@dev",
         "skeeks/cms-query-filters": "^1.0 || dev-master@dev",
 
         "skeeks/yii2-jquery-contextmenu": "^1.0 || dev-master@dev",
